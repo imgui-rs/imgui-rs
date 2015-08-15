@@ -1,0 +1,24 @@
+[package]
+name = "imgui-rs"
+version = "0.0.1"
+authors = ["Joonas Javanainen <joonas.javanainen@gmail.com>"]
+build = "build.rs"
+
+[lib]
+name = "imgui"
+
+[dependencies]
+bitflags = "0.3"
+libc = "0.1"
+
+[dependencies.glium]
+version = "0.8"
+default-features = false
+optional = true
+
+[dependencies.sdl2]
+version = "0.7"
+optional = true
+
+[build-dependencies]
+gcc = "0.3"
