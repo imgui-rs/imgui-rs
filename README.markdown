@@ -1,4 +1,4 @@
-# imgui-rs: Rust bindings for (ImGui)
+# imgui-rs: Rust bindings for ImGui
 
 **Ultra hyper turbo cyber mega extra über experimental!!!**
 
