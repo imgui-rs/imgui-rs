@@ -1,4 +1,5 @@
 *~
 *.swp
-/target
-/Cargo.lock
+target
+Cargo.lock
+imgui.ini

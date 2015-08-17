@@ -1,0 +1,12 @@
+[package]
+name = "test_window"
+version = "0.0.0"
+authors = ["Joonas Javanainen <joonas.javanainen@gmail.com>"]
+
+[dependencies]
+glium = "0.8"
+time = "0.1"
+
+[dependencies.imgui-rs]
+path = "../../"
+features = ["glium"]
