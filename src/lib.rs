@@ -71,6 +71,15 @@ impl ImGui {
          mouse_state.x2()
       ];
    }
+   pub fn set_mouse_pos(&mut self, x: f32, y: f32) {
+      let io: &mut ffi::ImGuiIO = unsafe { mem::transmute(ffi::igGetIO()) };
+      io.mouse_pos.x = x;
+      io.mouse_pos.y = y;
+   }
+   pub fn set_mouse_down(&mut self, states: &[bool; 5]) {
+      let io: &mut ffi::ImGuiIO = unsafe { mem::transmute(ffi::igGetIO()) };
+      io.mouse_down = *states;
+   }
    pub fn frame<'a>(&'a mut self, width: u32, height: u32, delta_time: f32) -> Frame<'a> {
       unsafe {
          let io: &mut ffi::ImGuiIO = mem::transmute(ffi::igGetIO());
