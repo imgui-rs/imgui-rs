@@ -9,6 +9,7 @@ use glium::texture::{ClientFormat, RawImage2d};
 use glium::vertex::{Attribute, AttributeType, Vertex, VertexFormat};
 use libc::c_float;
 use std::borrow::Cow;
+use std::fmt;
 use std::mem;
 use std::rc::Rc;
 
@@ -16,12 +17,26 @@ use super::{DrawList, Frame, ImDrawIdx, ImDrawVert, ImGui, ImVec2, ImVec4};
 
 pub type RendererResult<T> = Result<T, RendererError>;
 
+#[derive(Clone, Debug)]
 pub enum RendererError {
     Vertex(vertex::BufferCreationError),
     Index(index::BufferCreationError),
     Program(program::ProgramCreationError),
     Texture(texture::TextureCreationError),
     Draw(DrawError)
+}
+
+impl fmt::Display for RendererError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        use self::RendererError::*;
+        match *self {
+            Vertex(_) => write!(f, "Vertex buffer creation failed"),
+            Index(_) => write!(f, "Index buffer creation failed"),
+            Program(ref e) => write!(f, "Program creation failed: {}", e),
+            Texture(_) => write!(f, "Texture creation failed"),
+            Draw(ref e) => write!(f, "Drawing failed: {}", e)
+        }
+    }
 }
 
 impl From<vertex::BufferCreationError> for RendererError {
