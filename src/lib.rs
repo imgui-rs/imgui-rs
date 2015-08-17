@@ -57,20 +57,6 @@ impl ImGui {
       let io: &mut ffi::ImGuiIO = unsafe { mem::transmute(ffi::igGetIO()) };
       io.mouse_draw_cursor = value;
    }
-   #[cfg(feature = "sdl2")]
-   pub fn update_mouse(&mut self, mouse: &::sdl2::mouse::MouseUtil) {
-      let (mouse_state, mouse_x, mouse_y) = mouse.get_mouse_state();
-      let io: &mut ffi::ImGuiIO = unsafe { mem::transmute(ffi::igGetIO()) };
-      io.mouse_pos.x = mouse_x as f32;
-      io.mouse_pos.y = mouse_y as f32;
-      io.mouse_down = [
-         mouse_state.left(),
-         mouse_state.right(),
-         mouse_state.middle(),
-         mouse_state.x1(),
-         mouse_state.x2()
-      ];
-   }
    pub fn set_mouse_pos(&mut self, x: f32, y: f32) {
       let io: &mut ffi::ImGuiIO = unsafe { mem::transmute(ffi::igGetIO()) };
       io.mouse_pos.x = x;
@@ -100,6 +86,23 @@ impl Drop for ImGui {
       unsafe {
          ffi::igShutdown();
       }
+   }
+}
+
+#[cfg(feature = "sdl2")]
+impl ImGui {
+   pub fn update_mouse(&mut self, mouse: &::sdl2::mouse::MouseUtil) {
+      let (mouse_state, mouse_x, mouse_y) = mouse.get_mouse_state();
+      let io: &mut ffi::ImGuiIO = unsafe { mem::transmute(ffi::igGetIO()) };
+      io.mouse_pos.x = mouse_x as f32;
+      io.mouse_pos.y = mouse_y as f32;
+      io.mouse_down = [
+         mouse_state.left(),
+         mouse_state.right(),
+         mouse_state.middle(),
+         mouse_state.x1(),
+         mouse_state.x2()
+      ];
    }
 }
 
