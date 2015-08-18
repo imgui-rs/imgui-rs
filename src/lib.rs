@@ -162,7 +162,7 @@ impl<'a> Frame<'a> {
       }
       Ok(())
    }
-   pub fn show_test_window(&mut self) -> bool {
+   pub fn show_test_window(&self) -> bool {
       let mut opened = true;
       unsafe {
          ffi::igShowTestWindow(&mut opened);
@@ -173,38 +173,38 @@ impl<'a> Frame<'a> {
 
 // Widgets
 impl<'a> Frame<'a> {
-   pub fn text<'b>(&mut self, text: ImStr<'b>) {
+   pub fn text<'b>(&self, text: ImStr<'b>) {
       // TODO: use igTextUnformatted
       unsafe {
          ffi::igText(fmt_ptr(), text.as_ptr());
       }
    }
-   pub fn text_colored<'b, A>(&mut self, col: A, text: ImStr<'b>) where A: Into<ImVec4> {
+   pub fn text_colored<'b, A>(&self, col: A, text: ImStr<'b>) where A: Into<ImVec4> {
       unsafe {
          ffi::igTextColored(col.into(), fmt_ptr(), text.as_ptr());
       }
    }
-   pub fn text_disabled<'b>(&mut self, text: ImStr<'b>) {
+   pub fn text_disabled<'b>(&self, text: ImStr<'b>) {
       unsafe {
          ffi::igTextDisabled(fmt_ptr(), text.as_ptr());
       }
    }
-   pub fn text_wrapped<'b>(&mut self, text: ImStr<'b>) {
+   pub fn text_wrapped<'b>(&self, text: ImStr<'b>) {
       unsafe {
          ffi::igTextWrapped(fmt_ptr(), text.as_ptr());
       }
    }
-   pub fn label_text<'b>(&mut self, label: ImStr<'b>, text: ImStr<'b>) {
+   pub fn label_text<'b>(&self, label: ImStr<'b>, text: ImStr<'b>) {
       unsafe {
          ffi::igLabelText(label.as_ptr(), fmt_ptr(), text.as_ptr());
       }
    }
-   pub fn bullet(&mut self) {
+   pub fn bullet(&self) {
       unsafe {
          ffi::igBullet();
       }
    }
-   pub fn bullet_text<'b>(&mut self, text: ImStr<'b>) {
+   pub fn bullet_text<'b>(&self, text: ImStr<'b>) {
       unsafe {
          ffi::igBulletText(fmt_ptr(), text.as_ptr());
       }
