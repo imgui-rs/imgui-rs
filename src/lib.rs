@@ -10,7 +10,7 @@ extern crate libc;
 #[cfg(feature = "sdl2")]
 extern crate sdl2;
 
-use libc::{c_float, c_int, c_uchar};
+use libc::{c_char, c_float, c_int, c_uchar};
 use std::marker::PhantomData;
 use std::mem;
 use std::ptr;
@@ -24,6 +24,27 @@ pub mod ffi;
 pub mod glium_renderer;
 
 pub struct ImGui;
+
+#[macro_export]
+macro_rules! im_str {
+   ($e:expr) => ({
+      let value = concat!($e, "\0");
+      unsafe { ImStr::from_bytes(value.as_bytes()) }
+   });
+}
+
+pub struct ImStr<'a> {
+   bytes: &'a [u8]
+}
+
+impl<'a> ImStr<'a> {
+   pub unsafe fn from_bytes(bytes: &'a [u8]) -> ImStr<'a> {
+      ImStr {
+         bytes: bytes
+      }
+   }
+   fn as_ptr(&self) -> *const c_char { self.bytes.as_ptr() as *const c_char }
+}
 
 pub struct TextureHandle<'a> {
    pub width: u32,
@@ -116,14 +137,11 @@ pub struct Frame<'a> {
    _phantom: PhantomData<&'a ImGui>
 }
 
+static FMT: &'static [u8] = b"%s\0";
+
+fn fmt_ptr() -> *const c_char { FMT.as_ptr() as *const c_char }
+
 impl<'a> Frame<'a> {
-   pub fn show_test_window(&mut self) -> bool {
-      let mut opened = true;
-      unsafe {
-         ffi::igShowTestWindow(&mut opened);
-      }
-      opened
-   }
    pub fn render<F, E>(self, mut f: F) -> Result<(), E>
          where F: FnMut(DrawList<'a>) -> Result<(), E> {
       unsafe {
@@ -143,6 +161,53 @@ impl<'a> Frame<'a> {
          }
       }
       Ok(())
+   }
+   pub fn show_test_window(&mut self) -> bool {
+      let mut opened = true;
+      unsafe {
+         ffi::igShowTestWindow(&mut opened);
+      }
+      opened
+   }
+}
+
+// Widgets
+impl<'a> Frame<'a> {
+   pub fn text<'b>(&mut self, text: ImStr<'b>) {
+      // TODO: use igTextUnformatted
+      unsafe {
+         ffi::igText(fmt_ptr(), text.as_ptr());
+      }
+   }
+   pub fn text_colored<'b, A>(&mut self, col: A, text: ImStr<'b>) where A: Into<ImVec4> {
+      unsafe {
+         ffi::igTextColored(col.into(), fmt_ptr(), text.as_ptr());
+      }
+   }
+   pub fn text_disabled<'b>(&mut self, text: ImStr<'b>) {
+      unsafe {
+         ffi::igTextDisabled(fmt_ptr(), text.as_ptr());
+      }
+   }
+   pub fn text_wrapped<'b>(&mut self, text: ImStr<'b>) {
+      unsafe {
+         ffi::igTextWrapped(fmt_ptr(), text.as_ptr());
+      }
+   }
+   pub fn label_text<'b>(&mut self, label: ImStr<'b>, text: ImStr<'b>) {
+      unsafe {
+         ffi::igLabelText(label.as_ptr(), fmt_ptr(), text.as_ptr());
+      }
+   }
+   pub fn bullet(&mut self) {
+      unsafe {
+         ffi::igBullet();
+      }
+   }
+   pub fn bullet_text<'b>(&mut self, text: ImStr<'b>) {
+      unsafe {
+         ffi::igBulletText(fmt_ptr(), text.as_ptr());
+      }
    }
 }
 
