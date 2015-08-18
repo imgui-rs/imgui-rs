@@ -211,6 +211,15 @@ pub struct ImVec2 {
     pub y: c_float
 }
 
+impl ImVec2 {
+   pub fn new(x: f32, y: f32) -> ImVec2 {
+      ImVec2 {
+         x: x as c_float,
+         y: y as c_float
+      }
+   }
+}
+
 #[repr(C)]
 #[derive(Copy, Clone, Debug, Default)]
 pub struct ImVec4 {
@@ -218,6 +227,17 @@ pub struct ImVec4 {
     pub y: c_float,
     pub z: c_float,
     pub w: c_float
+}
+
+impl ImVec4 {
+   pub fn new(x: f32, y: f32, z: f32, w: f32) -> ImVec4 {
+      ImVec4 {
+         x: x as c_float,
+         y: y as c_float,
+         z: z as c_float,
+         w: w as c_float
+      }
+   }
 }
 
 #[repr(C)]
