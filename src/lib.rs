@@ -87,7 +87,7 @@ impl ImGui {
       let io: &mut ffi::ImGuiIO = unsafe { mem::transmute(ffi::igGetIO()) };
       io.mouse_down = *states;
    }
-   pub fn frame<'a>(&'a mut self, width: u32, height: u32, delta_time: f32) -> Frame<'a> {
+   pub fn frame<'a>(&mut self, width: u32, height: u32, delta_time: f32) -> Frame<'a> {
       unsafe {
          let io: &mut ffi::ImGuiIO = mem::transmute(ffi::igGetIO());
          io.display_size.x = width as c_float;
