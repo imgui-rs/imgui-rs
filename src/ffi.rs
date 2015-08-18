@@ -520,7 +520,7 @@ extern "C" {
     pub fn igBegin2(name: *const c_char, opened: *mut bool, size_on_first_use: ImVec2,
                     bg_alpha: c_float, flags: ImGuiWindowFlags) -> bool;
     pub fn igEnd();
-    pub fn igBeginChild(str_id: *const char, size: ImVec2, border: bool,
+    pub fn igBeginChild(str_id: *const c_char, size: ImVec2, border: bool,
                         extra_flags: ImGuiWindowFlags) -> bool;
     pub fn igBeginChildEx(id: ImGuiID, size: ImVec2, border: bool,
                           extra_flags: ImGuiWindowFlags) -> bool;
@@ -634,8 +634,8 @@ extern "C" {
 extern "C" {
     pub fn igText(fmt: *const c_char, ...);
     // pub fn igTextV(fmt: *const c_char, args: va_list);
-    pub fn igTextColored(col: ImVec4, fmt: *const char, ...);
-    // pub fn igTextColoredV(col: ImVec4, fmt: *const char, args: va_list);
+    pub fn igTextColored(col: ImVec4, fmt: *const c_char, ...);
+    // pub fn igTextColoredV(col: ImVec4, fmt: *const c_char, args: va_list);
     pub fn igTextDisabled(fmt: *const c_char, ...);
     // pub fn igTextDisabledV(fmt: *const c_char, args: va_list);
     pub fn igTextWrapped(fmt: *const c_char, ...);
