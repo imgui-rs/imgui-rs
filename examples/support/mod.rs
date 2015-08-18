@@ -1,18 +1,11 @@
-#[macro_use]
-extern crate glium;
-extern crate imgui;
-extern crate time;
-
-use glium::DisplayBuild;
-use glium::Surface;
+use glium::{DisplayBuild, Surface};
 use glium::glutin;
 use glium::glutin::{ElementState, Event, MouseButton, VirtualKeyCode};
-use imgui::ImGui;
+use imgui::{ImGui, Frame};
 use imgui::glium_renderer::Renderer;
 use time::SteadyTime;
 
-fn main() {
-
+pub fn main_with_frame<'a, F: Fn(&Frame<'a>)>(f: F) {
     let display = glutin::WindowBuilder::new()
         .build_glium()
         .unwrap();
@@ -37,8 +30,8 @@ fn main() {
         target.clear_color(1.0, 1.0, 1.0, 1.0);
 
         let (width, height) = target.get_dimensions();
-        let mut frame = imgui.frame(width, height, delta_f);
-        frame.show_test_window();
+        let frame = imgui.frame(width, height, delta_f);
+        f(&frame);
         renderer.render(&mut target, frame).unwrap();
 
         target.finish().unwrap();

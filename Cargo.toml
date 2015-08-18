@@ -7,6 +7,9 @@ build = "build.rs"
 [lib]
 name = "imgui"
 
+[features]
+default = ["glium"]
+
 [dependencies]
 bitflags = "0.3"
 libc = "0.1"
@@ -22,3 +25,11 @@ optional = true
 
 [build-dependencies]
 gcc = "0.3"
+
+[dev-dependencies]
+time = "0.1"
+
+[dev-dependencies.glium]
+version = "0.8"
+features = ["glutin"]
+default-features = false
