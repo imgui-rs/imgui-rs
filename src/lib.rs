@@ -16,9 +16,11 @@ use std::mem;
 use std::ptr;
 use std::slice;
 
-pub use ffi::{ImDrawIdx, ImDrawVert, ImVec2, ImVec4};
+pub use ffi::{ImDrawIdx, ImDrawVert, ImGuiWindowFlags, ImVec2, ImVec4};
+pub use menus::{Menu, MenuItem};
 
 pub mod ffi;
+mod menus;
 
 #[cfg(feature = "glium")]
 pub mod glium_renderer;
@@ -29,7 +31,7 @@ pub struct ImGui;
 macro_rules! im_str {
    ($e:expr) => ({
       let value = concat!($e, "\0");
-      unsafe { ImStr::from_bytes(value.as_bytes()) }
+      unsafe { ::imgui::ImStr::from_bytes(value.as_bytes()) }
    });
 }
 
@@ -133,17 +135,17 @@ pub struct DrawList<'a> {
    pub vtx_buffer: &'a [ffi::ImDrawVert]
 }
 
-pub struct Frame<'a> {
-   _phantom: PhantomData<&'a ImGui>
+pub struct Frame<'fr> {
+   _phantom: PhantomData<&'fr ImGui>
 }
 
 static FMT: &'static [u8] = b"%s\0";
 
 fn fmt_ptr() -> *const c_char { FMT.as_ptr() as *const c_char }
 
-impl<'a> Frame<'a> {
+impl<'fr> Frame<'fr> {
    pub fn render<F, E>(self, mut f: F) -> Result<(), E>
-         where F: FnMut(DrawList<'a>) -> Result<(), E> {
+         where F: FnMut(DrawList<'fr>) -> Result<(), E> {
       unsafe {
          let mut im_draw_data = mem::zeroed();
          RENDER_DRAW_LISTS_STATE.0 = &mut im_draw_data;
@@ -172,7 +174,7 @@ impl<'a> Frame<'a> {
 }
 
 // Widgets
-impl<'a> Frame<'a> {
+impl<'fr> Frame<'fr> {
    pub fn text<'b>(&self, text: ImStr<'b>) {
       // TODO: use igTextUnformatted
       unsafe {
@@ -208,6 +210,32 @@ impl<'a> Frame<'a> {
       unsafe {
          ffi::igBulletText(fmt_ptr(), text.as_ptr());
       }
+   }
+}
+
+// Widgets: Menus
+impl<'fr> Frame<'fr> {
+   pub fn main_menu_bar<F>(&self, f: F) where F: FnOnce() {
+      let render = unsafe { ffi::igBeginMainMenuBar() };
+      if render {
+         f();
+         unsafe { ffi::igEndMainMenuBar() };
+      }
+   }
+   pub fn menu_bar<F>(&self, f: F) where F: FnOnce() {
+      let render = unsafe { ffi::igBeginMenuBar() };
+      if render {
+         f();
+         unsafe { ffi::igEndMenuBar() };
+      }
+   }
+   pub fn menu<'p>(&self, label: ImStr<'p>) -> Menu<'fr, 'p> { Menu::new(label) }
+   pub fn menu_item<'p>(&self, label: ImStr<'p>) -> MenuItem<'fr, 'p> { MenuItem::new(label) }
+}
+
+impl<'fr> Frame<'fr> {
+   pub fn separator(&self) {
+      unsafe { ffi:: igSeparator() };
    }
 }
 
