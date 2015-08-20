@@ -1,11 +1,13 @@
 [package]
-name = "imgui-rs"
+name = "imgui"
 version = "0.0.1"
 authors = ["Joonas Javanainen <joonas.javanainen@gmail.com>"]
+description = "Experimental bindings to ocornut/imgui"
+readme = "README.markdown"
+homepage = "https://github.com/gekkio/imgui-rs"
+repository = "https://github.com/gekkio/imgui-rs"
+license = "MIT"
 build = "build.rs"
-
-[lib]
-name = "imgui"
 
 [features]
 default = ["glium"]
