@@ -2,6 +2,8 @@
 
 **Ultra hyper turbo cyber mega extra über experimental!!!**
 
+ffi module (low-level API) is complete, the safe API is not!
+
 ![Hello world](hello_world.png)
 
 ```rust
