@@ -18,6 +18,7 @@ impl<'fr, 'p> Menu<'fr, 'p> {
          _phantom: PhantomData
       }
    }
+   #[inline]
    pub fn enabled(self, enabled: bool) -> Self {
       Menu {
          enabled: enabled,
@@ -51,18 +52,21 @@ impl<'fr, 'p> MenuItem<'fr, 'p> {
          _phantom: PhantomData
       }
    }
+   #[inline]
    pub fn shortcut(self, shortcut: ImStr<'p>) -> Self {
       MenuItem {
          shortcut: Some(shortcut),
          .. self
       }
    }
+   #[inline]
    pub fn selected(self, selected: bool) -> Self {
       MenuItem {
          selected: selected,
          .. self
       }
    }
+   #[inline]
    pub fn enabled(self, enabled: bool) -> Self {
       MenuItem {
          enabled: enabled,

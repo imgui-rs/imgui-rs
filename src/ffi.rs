@@ -161,6 +161,13 @@ bitflags!(
    }
 );
 
+impl ImGuiWindowFlags {
+   #[inline]
+   pub fn with(self, mask: ImGuiWindowFlags, value: bool) -> ImGuiWindowFlags {
+      if value { self | mask } else { self - mask }
+   }
+}
+
 bitflags!(
    #[repr(C)]
    flags ImGuiSetCond: c_int {

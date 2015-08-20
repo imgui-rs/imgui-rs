@@ -11,16 +11,31 @@ extern crate libc;
 extern crate sdl2;
 
 use libc::{c_char, c_float, c_int, c_uchar};
-use std::marker::PhantomData;
+use std::borrow::Cow;
+use std::ffi::CStr;
 use std::mem;
 use std::ptr;
 use std::slice;
+use std::str;
 
-pub use ffi::{ImDrawIdx, ImDrawVert, ImGuiWindowFlags, ImVec2, ImVec4};
+pub use ffi::{
+   ImDrawIdx, ImDrawVert,
+   ImGuiSetCond,
+   ImGuiSetCond_Always, ImGuiSetCond_Once,
+   ImGuiSetCond_FirstUseEver, ImGuiSetCond_Appearing,
+   ImGuiWindowFlags,
+   ImGuiWindowFlags_NoTitleBar, ImGuiWindowFlags_NoResize, ImGuiWindowFlags_NoMove,
+   ImGuiWindowFlags_NoScrollbar, ImGuiWindowFlags_NoScrollWithMouse, ImGuiWindowFlags_NoCollapse,
+   ImGuiWindowFlags_AlwaysAutoResize, ImGuiWindowFlags_ShowBorders,
+   ImGuiWindowFlags_NoSavedSettings, ImGuiWindowFlags_NoInputs, ImGuiWindowFlags_MenuBar,
+   ImVec2, ImVec4
+};
 pub use menus::{Menu, MenuItem};
+pub use window::{Window};
 
 pub mod ffi;
 mod menus;
+mod window;
 
 #[cfg(feature = "glium")]
 pub mod glium_renderer;
@@ -29,20 +44,30 @@ pub struct ImGui;
 
 #[macro_export]
 macro_rules! im_str {
-   ($e:expr) => ({
+   ($e:tt) => ({
       let value = concat!($e, "\0");
       unsafe { ::imgui::ImStr::from_bytes(value.as_bytes()) }
    });
+   ($e:tt, $($arg:tt)*) => ({
+      ::imgui::ImStr::from_str(&format!($e, $($arg)*))
+   })
 }
 
 pub struct ImStr<'a> {
-   bytes: &'a [u8]
+   bytes: Cow<'a, [u8]>
 }
 
 impl<'a> ImStr<'a> {
    pub unsafe fn from_bytes(bytes: &'a [u8]) -> ImStr<'a> {
       ImStr {
-         bytes: bytes
+         bytes: Cow::Borrowed(bytes)
+      }
+   }
+   pub fn from_str(value: &str) -> ImStr<'a> {
+      let mut bytes: Vec<u8> = value.bytes().collect();
+      bytes.push(0);
+      ImStr {
+         bytes: Cow::Owned(bytes)
       }
    }
    fn as_ptr(&self) -> *const c_char { self.bytes.as_ptr() as *const c_char }
@@ -52,6 +77,13 @@ pub struct TextureHandle<'a> {
    pub width: u32,
    pub height: u32,
    pub pixels: &'a [c_uchar]
+}
+
+pub fn get_version() -> &'static str {
+   unsafe {
+      let bytes = CStr::from_ptr(ffi::igGetVersion()).to_bytes();
+      str::from_utf8_unchecked(bytes)
+   }
 }
 
 impl ImGui {
@@ -80,6 +112,10 @@ impl ImGui {
       let io: &mut ffi::ImGuiIO = unsafe { mem::transmute(ffi::igGetIO()) };
       io.mouse_draw_cursor = value;
    }
+   pub fn mouse_pos(&self) -> (f32, f32) {
+      let io: &mut ffi::ImGuiIO = unsafe { mem::transmute(ffi::igGetIO()) };
+      (io.mouse_pos.x as f32, io.mouse_pos.y as f32)
+   }
    pub fn set_mouse_pos(&mut self, x: f32, y: f32) {
       let io: &mut ffi::ImGuiIO = unsafe { mem::transmute(ffi::igGetIO()) };
       io.mouse_pos.x = x;
@@ -89,7 +125,7 @@ impl ImGui {
       let io: &mut ffi::ImGuiIO = unsafe { mem::transmute(ffi::igGetIO()) };
       io.mouse_down = *states;
    }
-   pub fn frame<'a>(&mut self, width: u32, height: u32, delta_time: f32) -> Frame<'a> {
+   pub fn frame<'fr, 'a: 'fr>(&'a mut self, width: u32, height: u32, delta_time: f32) -> Frame<'fr> {
       unsafe {
          let io: &mut ffi::ImGuiIO = mem::transmute(ffi::igGetIO());
          io.display_size.x = width as c_float;
@@ -99,7 +135,7 @@ impl ImGui {
          ffi::igNewFrame();
       }
       Frame {
-         _phantom: PhantomData
+         imgui: self
       }
    }
 }
@@ -136,7 +172,7 @@ pub struct DrawList<'a> {
 }
 
 pub struct Frame<'fr> {
-   _phantom: PhantomData<&'fr ImGui>
+   imgui: &'fr ImGui
 }
 
 static FMT: &'static [u8] = b"%s\0";
@@ -144,6 +180,7 @@ static FMT: &'static [u8] = b"%s\0";
 fn fmt_ptr() -> *const c_char { FMT.as_ptr() as *const c_char }
 
 impl<'fr> Frame<'fr> {
+   pub fn imgui(&self) -> &ImGui { self.imgui }
    pub fn render<F, E>(self, mut f: F) -> Result<(), E>
          where F: FnMut(DrawList<'fr>) -> Result<(), E> {
       unsafe {
@@ -171,6 +208,11 @@ impl<'fr> Frame<'fr> {
       }
       opened
    }
+}
+
+// Window
+impl<'fr> Frame<'fr> {
+   pub fn window<'p>(&self) -> Window<'fr, 'p> { Window::new() }
 }
 
 // Widgets
