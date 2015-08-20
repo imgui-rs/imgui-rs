@@ -171,7 +171,7 @@ impl<'fr, 'p> Window<'fr, 'p> {
          }
          ffi::igBegin2(self.name.as_ptr(),
             if self.closable { &mut opened } else { ptr::null_mut() },
-            ImVec2::new(0.0, 0.0), self.bg_alpha as c_float, self.flags
+            ImVec2::new(0.0, 0.0), self.bg_alpha, self.flags
          )
       };
       if render {

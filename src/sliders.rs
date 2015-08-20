@@ -34,16 +34,15 @@ impl<'fr, 'p> SliderInt<'fr, 'p> {
       }
    }
    pub fn build(self) -> Option<i32> {
-      let mut value = self.value as c_int;
+      let mut value = self.value;
       let changed = unsafe {
          ffi::igSliderInt(self.label.as_ptr(),
             &mut value,
-            self.min as c_int,
-            self.max as c_int,
+            self.min, self.max,
             self.display_format.as_ptr()
          )
       };
-      if changed { Some(value as i32) } else { None }
+      if changed { Some(value) } else { None }
    }
 }
 
@@ -84,17 +83,16 @@ impl<'fr, 'p> SliderFloat<'fr, 'p> {
       }
    }
    pub fn build(self) -> Option<f32> {
-      let mut value = self.value as c_float;
+      let mut value = self.value;
       let changed = unsafe {
          ffi::igSliderFloat(self.label.as_ptr(),
             &mut value,
-            self.min as c_float,
-            self.max as c_float,
+            self.min, self.max,
             self.display_format.as_ptr(),
-            self.power as c_float
+            self.power
          )
       };
-      if changed { Some(value as f32) } else { None }
+      if changed { Some(value) } else { None }
    }
 }
 
