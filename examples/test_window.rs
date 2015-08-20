@@ -30,6 +30,7 @@ struct State {
     no_collapse: bool,
     no_menu: bool,
     bg_alpha: f32,
+    auto_resize_state: AutoResizeState,
     file_menu: FileMenuState
 }
 
@@ -55,6 +56,7 @@ impl Default for State {
             no_collapse: false,
             no_menu: false,
             bg_alpha: 0.65,
+            auto_resize_state: Default::default(),
             file_menu: Default::default()
         }
     }
@@ -68,6 +70,18 @@ impl Default for FileMenuState {
     fn default() -> Self {
         FileMenuState {
             enabled: true
+        }
+    }
+}
+
+struct AutoResizeState {
+    lines: usize
+}
+
+impl Default for AutoResizeState {
+    fn default() -> Self {
+        AutoResizeState {
+            lines: 10
         }
     }
 }
@@ -110,6 +124,9 @@ fn show_test_window<'a>(frame: &Frame<'a>, state: &mut State) -> bool {
         state.show_app_metrics = frame.show_metrics_window();
     }
     if state.show_app_main_menu_bar { show_example_app_main_menu_bar(frame, state) }
+    if state.show_app_auto_resize {
+        state.show_app_auto_resize = show_example_app_auto_resize(frame, &mut state.auto_resize_state);
+    }
     if state.show_app_fixed_overlay {
         state.show_app_fixed_overlay = show_example_app_fixed_overlay(frame);
     }
@@ -241,6 +258,25 @@ fn show_example_menu_file<'a>(frame: &Frame<'a>, state: &mut FileMenuState) {
     });
     if frame.menu_item(im_str!("Checked")).selected(true).build() { }
     if frame.menu_item(im_str!("Quit")).shortcut(im_str!("Alt+F4")).build() { }
+}
+
+fn show_example_app_auto_resize<'a>(frame: &Frame<'a>, state: &mut AutoResizeState) -> bool {
+    frame.window()
+        .name(im_str!("Example: Auto-resizing window"))
+        .closable(true)
+        .always_auto_resize(true)
+        .build(|| {
+            frame.text(im_str!("Window will resize every-frame to the size of its content.
+Note that you probably don't want to query the window size to
+output your content because that would create a feedback loop."));
+            if let Some(lines) = frame.slider_i32(im_str!("Number of lines"),
+                                                  state.lines as i32, 1, 20).build() {
+              state.lines = lines as usize;
+            }
+            for i in 0 .. state.lines {
+                frame.text(im_str!("{:2$}This is line {}", "", i, i * 4));
+            }
+        })
 }
 
 fn show_example_app_fixed_overlay<'a>(frame: &Frame<'a>) -> bool {

@@ -31,11 +31,13 @@ pub use ffi::{
    ImVec2, ImVec4
 };
 pub use menus::{Menu, MenuItem};
+pub use sliders::{SliderInt};
 pub use widgets::{CollapsingHeader};
 pub use window::{Window};
 
 pub mod ffi;
 mod menus;
+mod sliders;
 mod widgets;
 mod window;
 
@@ -273,6 +275,14 @@ impl<'fr> Frame<'fr> {
    }
    pub fn collapsing_header<'p>(&self, label: ImStr<'p>) -> CollapsingHeader<'fr, 'p> {
       CollapsingHeader::new(label)
+   }
+}
+
+// Widgets: Sliders
+impl<'fr> Frame<'fr> {
+   pub fn slider_i32<'p>(&self, label: ImStr<'p>,
+                         value: i32, min: i32, max: i32) -> SliderInt<'fr, 'p> {
+      SliderInt::new(label, value, min, max)
    }
 }
 
