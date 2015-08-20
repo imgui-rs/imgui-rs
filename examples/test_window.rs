@@ -205,6 +205,38 @@ fn show_test_window<'a>(frame: &Frame<'a>, state: &mut State) -> bool {
                 frame.text_wrapped(im_str!("This window is being created by the show_test_window() function. Please refer to the code for programming reference.\n\nUser Guide:"));
                 show_user_guide(frame);
             }
+
+            if frame.collapsing_header(im_str!("Window options")).build() {
+                if let Some(no_titlebar) = frame.checkbox(im_str!("no titlebar"), state.no_titlebar) {
+                    state.no_titlebar = no_titlebar;
+                }
+                frame.same_line(150.0);
+                if let Some(no_border) = frame.checkbox(im_str!("no border"), state.no_border) {
+                    state.no_border = no_border;
+                }
+                frame.same_line(300.0);
+                if let Some(no_resize) = frame.checkbox(im_str!("no resize"), state.no_resize) {
+                    state.no_resize = no_resize;
+                }
+                if let Some(no_move) = frame.checkbox(im_str!("no move"), state.no_move) {
+                    state.no_move = no_move;
+                }
+                frame.same_line(150.0);
+                if let Some(no_scrollbar) = frame.checkbox(im_str!("no scrollbar"), state.no_scrollbar) {
+                    state.no_scrollbar = no_scrollbar;
+                }
+                frame.same_line(300.0);
+                if let Some(no_collapse) = frame.checkbox(im_str!("no collapse"), state.no_collapse) {
+                    state.no_collapse = no_collapse;
+                }
+                if let Some(no_menu) = frame.checkbox(im_str!("no menu"), state.no_menu) {
+                    state.no_menu = no_menu;
+                }
+                if let Some(bg_alpha) = frame.slider_f32(im_str!("bg alpha"),
+                                                         state.bg_alpha, 0.0, 1.0).build() {
+                    state.bg_alpha = bg_alpha;
+                }
+            }
         })
 }
 

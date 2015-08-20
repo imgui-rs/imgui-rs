@@ -31,7 +31,7 @@ pub use ffi::{
    ImVec2, ImVec4
 };
 pub use menus::{Menu, MenuItem};
-pub use sliders::{SliderInt};
+pub use sliders::{SliderFloat, SliderInt};
 pub use widgets::{CollapsingHeader};
 pub use window::{Window};
 
@@ -231,7 +231,17 @@ impl<'fr> Frame<'fr> {
 
 // Layout
 impl<'fr> Frame<'fr> {
-   pub fn separator(&self) { unsafe { ffi:: igSeparator() }; }
+   pub fn separator(&self) { unsafe { ffi::igSeparator() }; }
+   pub fn same_line(&self, pos_x: f32) {
+      unsafe {
+         ffi::igSameLine(pos_x as c_float, -1.0f32 as c_float)
+      }
+   }
+   pub fn same_line_spacing(&self, pos_x: f32, spacing_w: f32) {
+      unsafe {
+         ffi::igSameLine(pos_x as c_float, spacing_w as c_float)
+      }
+   }
    pub fn spacing(&self) { unsafe { ffi::igSpacing() }; }
 }
 
@@ -276,10 +286,21 @@ impl<'fr> Frame<'fr> {
    pub fn collapsing_header<'p>(&self, label: ImStr<'p>) -> CollapsingHeader<'fr, 'p> {
       CollapsingHeader::new(label)
    }
+   pub fn checkbox<'p>(&self, label: ImStr<'p>, value: bool) -> Option<bool> {
+      let mut result = value;
+      let changed = unsafe {
+         ffi::igCheckbox(label.as_ptr(), &mut result)
+      };
+      if changed { Some(result) } else { None }
+   }
 }
 
 // Widgets: Sliders
 impl<'fr> Frame<'fr> {
+   pub fn slider_f32<'p>(&self, label: ImStr<'p>,
+                         value: f32, min: f32, max: f32) -> SliderFloat<'fr, 'p> {
+      SliderFloat::new(label, value, min, max)
+   }
    pub fn slider_i32<'p>(&self, label: ImStr<'p>,
                          value: i32, min: i32, max: i32) -> SliderInt<'fr, 'p> {
       SliderInt::new(label, value, min, max)
