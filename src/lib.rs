@@ -127,6 +127,8 @@ impl ImGui {
       let io: &mut ffi::ImGuiIO = unsafe { mem::transmute(ffi::igGetIO()) };
       io.mouse_down = *states;
    }
+   pub fn get_time(&self) -> f32 { unsafe { ffi::igGetTime() as f32 } }
+   pub fn get_frame_count(&self) -> i32 { unsafe { ffi::igGetFrameCount() as i32 } }
    pub fn frame<'fr, 'a: 'fr>(&'a mut self, width: u32, height: u32, delta_time: f32) -> Frame<'fr> {
       unsafe {
          let io: &mut ffi::ImGuiIO = mem::transmute(ffi::igGetIO());

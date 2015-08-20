@@ -106,9 +106,15 @@ fn show_user_guide<'a>(frame: &Frame<'a>) {
 }
 
 fn show_test_window<'a>(frame: &Frame<'a>, state: &mut State) -> bool {
+    if state.show_app_metrics {
+        state.show_app_metrics = frame.show_metrics_window();
+    }
     if state.show_app_main_menu_bar { show_example_app_main_menu_bar(frame, state) }
     if state.show_app_fixed_overlay {
         state.show_app_fixed_overlay = show_example_app_fixed_overlay(frame);
+    }
+    if state.show_app_manipulating_window_title {
+        show_example_app_manipulating_window_title(frame);
     }
     if state.show_app_about {
         state.show_app_about = frame.window()
@@ -252,4 +258,31 @@ fn show_example_app_fixed_overlay<'a>(frame: &Frame<'a>) -> bool {
             let mouse_pos = frame.imgui().mouse_pos();
             frame.text(im_str!("Mouse Position: ({:.1},{:.1})", mouse_pos.0, mouse_pos.1));
         })
+}
+
+fn show_example_app_manipulating_window_title<'a>(frame: &Frame<'a>) {
+    frame.window()
+        .name(im_str!("Same title as another window##1"))
+        .position((100.0, 100.0), ImGuiSetCond_FirstUseEver)
+        .build(|| {
+            frame.text(im_str!("This is window 1.
+My title is the same as window 2, but my identifier is unique."));
+        });
+    frame.window()
+        .name(im_str!("Same title as another window##2"))
+        .position((100.0, 200.0), ImGuiSetCond_FirstUseEver)
+        .build(|| {
+            frame.text(im_str!("This is window 2.
+My title is the same as window 1, but my identifier is unique."));
+        });
+    let chars = ['|', '/', '-', '\\'];
+    let ch_idx = (frame.imgui().get_time() / 0.25) as usize & 3;
+    let num = frame.imgui().get_frame_count(); // The C++ version uses rand() here
+    let title = im_str!("Animated title {} {}###AnimatedTitle", chars[ch_idx], num);
+    frame.window()
+        .name(title)
+        .position((100.0, 300.0), ImGuiSetCond_FirstUseEver)
+        .build(|| {
+            frame.text(im_str!("This window has a changing title"));
+        });
 }
