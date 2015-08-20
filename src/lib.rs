@@ -31,10 +31,12 @@ pub use ffi::{
    ImVec2, ImVec4
 };
 pub use menus::{Menu, MenuItem};
+pub use widgets::{CollapsingHeader};
 pub use window::{Window};
 
 pub mod ffi;
 mod menus;
+mod widgets;
 mod window;
 
 #[cfg(feature = "glium")]
@@ -201,10 +203,18 @@ impl<'fr> Frame<'fr> {
       }
       Ok(())
    }
+   pub fn show_user_guide(&self) { unsafe { ffi::igShowUserGuide() }; }
    pub fn show_test_window(&self) -> bool {
       let mut opened = true;
       unsafe {
          ffi::igShowTestWindow(&mut opened);
+      }
+      opened
+   }
+   pub fn show_metrics_window(&self) -> bool {
+      let mut opened = true;
+      unsafe {
+         ffi::igShowMetricsWindow(&mut opened);
       }
       opened
    }
@@ -213,6 +223,12 @@ impl<'fr> Frame<'fr> {
 // Window
 impl<'fr> Frame<'fr> {
    pub fn window<'p>(&self) -> Window<'fr, 'p> { Window::new() }
+}
+
+// Layout
+impl<'fr> Frame<'fr> {
+   pub fn separator(&self) { unsafe { ffi:: igSeparator() }; }
+   pub fn spacing(&self) { unsafe { ffi::igSpacing() }; }
 }
 
 // Widgets
@@ -253,6 +269,9 @@ impl<'fr> Frame<'fr> {
          ffi::igBulletText(fmt_ptr(), text.as_ptr());
       }
    }
+   pub fn collapsing_header<'p>(&self, label: ImStr<'p>) -> CollapsingHeader<'fr, 'p> {
+      CollapsingHeader::new(label)
+   }
 }
 
 // Widgets: Menus
@@ -273,12 +292,6 @@ impl<'fr> Frame<'fr> {
    }
    pub fn menu<'p>(&self, label: ImStr<'p>) -> Menu<'fr, 'p> { Menu::new(label) }
    pub fn menu_item<'p>(&self, label: ImStr<'p>) -> MenuItem<'fr, 'p> { MenuItem::new(label) }
-}
-
-impl<'fr> Frame<'fr> {
-   pub fn separator(&self) {
-      unsafe { ffi:: igSeparator() };
-   }
 }
 
 struct RenderDrawListsState(*mut ffi::ImDrawData);

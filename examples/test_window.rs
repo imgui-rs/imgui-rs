@@ -86,6 +86,25 @@ fn main() {
     }
 }
 
+fn show_user_guide<'a>(frame: &Frame<'a>) {
+    frame.bullet_text(im_str!("Double-click on title bar to collapse window."));
+    frame.bullet_text(im_str!("Click and drag on lower right corner to resize window."));
+    frame.bullet_text(im_str!("Click and drag on any empty space to move window."));
+    frame.bullet_text(im_str!("Mouse Wheel to scroll."));
+    frame.bullet_text(im_str!("TAB/SHIFT+TAB to cycle through keyboard editable fields."));
+    frame.bullet_text(im_str!("CTRL+Click on a slider or drag box to input text."));
+    frame.bullet_text(im_str!(
+"While editing text:
+- Hold SHIFT or use mouse to select text
+- CTRL+Left/Right to word jump
+- CTRL+A or double-click to select all
+- CTRL+X,CTRL+C,CTRL+V clipboard
+- CTRL+Z,CTRL+Y undo/redo
+- ESCAPE to revert
+- You can apply arithmetic operators +,*,/ on numerical values.
+  Use +- to subtract."));
+}
+
 fn show_test_window<'a>(frame: &Frame<'a>, state: &mut State) -> bool {
     if state.show_app_main_menu_bar { show_example_app_main_menu_bar(frame, state) }
     if state.show_app_fixed_overlay {
@@ -101,6 +120,7 @@ fn show_test_window<'a>(frame: &Frame<'a>, state: &mut State) -> bool {
                 frame.separator();
                 frame.text(im_str!("By Omar Cornut and all github contributors."));
                 frame.text(im_str!("ImGui is licensed under the MIT License, see LICENSE for more information."));
+                show_user_guide(frame);
             })
     }
 
@@ -157,6 +177,11 @@ fn show_test_window<'a>(frame: &Frame<'a>, state: &mut State) -> bool {
                     }
                 });
             });
+            frame.spacing();
+            if frame.collapsing_header(im_str!("Help")).build() {
+                frame.text_wrapped(im_str!("This window is being created by the show_test_window() function. Please refer to the code for programming reference.\n\nUser Guide:"));
+                show_user_guide(frame);
+            }
         })
 }
 
