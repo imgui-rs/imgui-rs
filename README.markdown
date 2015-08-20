@@ -2,8 +2,6 @@
 
 **Ultra hyper turbo cyber mega extra über experimental!!!**
 
-ffi module (low-level API) is complete, the safe API is not!
-
 ![Hello world](hello_world.png)
 
 ```rust
@@ -18,6 +16,28 @@ frame.window()
         frame.text(im_str!("Mouse Position: ({:.1},{:.1})", mouse_pos.0, mouse_pos.1));
     })
 ```
+
+## Currently implemented things
+
+* Low-level API (ffi module)
+* Renderer for easy integration with [Glium](https://github.com/tomaka/glium) projects (optional)
+* Parts of high-level API
+* Not horrible way of defining and passing null-terminated UTF-8 to ImGui
+* Parts of imgui\_demo.cpp reimplemented in Rust as an API usage example (examples/test\_window.rs)
+
+## Important but unimplemented things
+
+* Documentation (rustdoc)
+* Support passing a custom Program to Glium renderer (e.g. from a shader cache, or custom shader)
+
+## Core design questions and current choices
+
+* Closures VS begin/end pairs (current choice: closures)
+* Mutable references VS return values (current choice: return values)
+* Passing around Frame&lt;'fr&gt; VS passing around &amp;'fr Frame (current choice: Frame&lt;'fr&gt;)
+* Splitting the API to smaller pieces VS all draw calls in Frame (current choice: all draw calls in Frame)
+* Builder pattern for optional arguments VS something else (current choice: builder)
+* Mutation functions in builders VS self-consuming functions in builders (current choice: self-consuming)
 
 ## Compiling and running the demos
 
