@@ -1,4 +1,3 @@
-use libc::c_float;
 use std::marker::PhantomData;
 use std::ptr;
 
@@ -20,7 +19,7 @@ pub struct Window<'fr, 'p> {
    size: (f32, f32),
    size_cond: ImGuiSetCond,
    name: ImStr<'p>,
-   closable: bool,
+   opened: Option<&'p mut bool>,
    bg_alpha: f32,
    flags: ImGuiWindowFlags,
    _phantom: PhantomData<&'fr Frame<'fr>>
@@ -34,7 +33,7 @@ impl<'fr, 'p> Window<'fr, 'p> {
          size: (0.0, 0.0),
          size_cond: ImGuiSetCond::empty(),
          name: unsafe { ImStr::from_bytes(b"Debug\0") },
-         closable: false,
+         opened: None,
          bg_alpha: -1.0,
          flags: ImGuiWindowFlags::empty(),
          _phantom: PhantomData
@@ -64,9 +63,9 @@ impl<'fr, 'p> Window<'fr, 'p> {
       }
    }
    #[inline]
-   pub fn closable(self, closable: bool) -> Self {
+   pub fn opened(self, opened: &'p mut bool) -> Self {
       Window {
-         closable: closable,
+         opened: Some(opened),
          .. self
       }
    }
@@ -160,8 +159,7 @@ impl<'fr, 'p> Window<'fr, 'p> {
          .. self
       }
    }
-   pub fn build<F: FnOnce()>(self, f: F) -> bool {
-      let mut opened = true;
+   pub fn build<F: FnOnce()>(self, f: F) {
       let render = unsafe {
          if !self.pos_cond.is_empty() {
             ffi::igSetNextWindowPos(ImVec2::new(self.pos.0, self.pos.1), self.pos_cond);
@@ -170,7 +168,7 @@ impl<'fr, 'p> Window<'fr, 'p> {
             ffi::igSetNextWindowSize(ImVec2::new(self.size.0, self.size.1), self.size_cond);
          }
          ffi::igBegin2(self.name.as_ptr(),
-            if self.closable { &mut opened } else { ptr::null_mut() },
+            self.opened.map(|x| x as *mut bool).unwrap_or(ptr::null_mut()),
             ImVec2::new(0.0, 0.0), self.bg_alpha, self.flags
          )
       };
@@ -178,6 +176,5 @@ impl<'fr, 'p> Window<'fr, 'p> {
          f();
       }
       unsafe { ffi::igEnd() };
-      opened
    }
 }

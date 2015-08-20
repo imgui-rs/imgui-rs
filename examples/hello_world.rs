@@ -23,7 +23,7 @@ fn main() {
     }
 }
 
-fn hello_world<'a>(frame: &Frame<'a>) -> bool {
+fn hello_world<'a>(frame: &Frame<'a>) {
     frame.window()
         .name(im_str!("Hello world"))
         .size((300.0, 100.0), ImGuiSetCond_FirstUseEver)

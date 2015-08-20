@@ -33,7 +33,7 @@ frame.window()
 ## Core design questions and current choices
 
 * Closures VS begin/end pairs (current choice: closures)
-* Mutable references VS return values (current choice: return values)
+* Mutable references VS return values (current choice: mutable references)
 * Passing around Frame&lt;'fr&gt; VS passing around &amp;'fr Frame (current choice: Frame&lt;'fr&gt;)
 * Splitting the API to smaller pieces VS all draw calls in Frame (current choice: all draw calls in Frame)
 * Builder pattern for optional arguments VS something else (current choice: builder)

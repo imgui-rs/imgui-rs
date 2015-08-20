@@ -39,9 +39,8 @@ impl Support {
         self.imgui.set_mouse_down(&[self.mouse_pressed.0, self.mouse_pressed.1, self.mouse_pressed.2, false, false]);
     }
 
-    pub fn render<'fr, 'a: 'fr , F: FnMut(&Frame<'fr>) -> bool>(
+    pub fn render<'fr, 'a: 'fr , F: FnMut(&Frame<'fr>)>(
             &'a mut self, clear_color: (f32, f32, f32, f32), mut f: F) -> bool {
-        let mut result;
         let now = SteadyTime::now();
         let delta = now - self.last_frame;
         let delta_f = delta.num_nanoseconds().unwrap() as f32 / 1_000_000_000.0;
@@ -55,7 +54,7 @@ impl Support {
 
         let (width, height) = target.get_dimensions();
         let frame = self.imgui.frame(width, height, delta_f);
-        result = f(&frame);
+        f(&frame);
         self.renderer.render(&mut target, frame).unwrap();
 
         target.finish().unwrap();
@@ -64,7 +63,7 @@ impl Support {
             match event {
                 Event::Closed |
                     Event::KeyboardInput(ElementState::Pressed, _, Some(VirtualKeyCode::Escape))
-                    => result = false,
+                    => return false,
                     Event::MouseMoved(pos) => self.mouse_pos = pos,
                     Event::MouseInput(state, MouseButton::Left) =>
                         self.mouse_pressed.0 = state == ElementState::Pressed,
@@ -75,6 +74,6 @@ impl Support {
                     _ => ()
             }
         }
-        result
+        true
     }
 }

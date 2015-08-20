@@ -208,19 +208,15 @@ impl<'fr> Frame<'fr> {
       Ok(())
    }
    pub fn show_user_guide(&self) { unsafe { ffi::igShowUserGuide() }; }
-   pub fn show_test_window(&self) -> bool {
-      let mut opened = true;
+   pub fn show_test_window(&self, opened: &mut bool) {
       unsafe {
-         ffi::igShowTestWindow(&mut opened);
+         ffi::igShowTestWindow(opened);
       }
-      opened
    }
-   pub fn show_metrics_window(&self) -> bool {
-      let mut opened = true;
+   pub fn show_metrics_window(&self, opened: &mut bool) {
       unsafe {
-         ffi::igShowMetricsWindow(&mut opened);
+         ffi::igShowMetricsWindow(opened);
       }
-      opened
    }
 }
 
@@ -286,23 +282,19 @@ impl<'fr> Frame<'fr> {
    pub fn collapsing_header<'p>(&self, label: ImStr<'p>) -> CollapsingHeader<'fr, 'p> {
       CollapsingHeader::new(label)
    }
-   pub fn checkbox<'p>(&self, label: ImStr<'p>, value: bool) -> Option<bool> {
-      let mut result = value;
-      let changed = unsafe {
-         ffi::igCheckbox(label.as_ptr(), &mut result)
-      };
-      if changed { Some(result) } else { None }
+   pub fn checkbox<'p>(&self, label: ImStr<'p>, value: &'p mut bool) -> bool {
+      unsafe { ffi::igCheckbox(label.as_ptr(), value) }
    }
 }
 
 // Widgets: Sliders
 impl<'fr> Frame<'fr> {
    pub fn slider_f32<'p>(&self, label: ImStr<'p>,
-                         value: f32, min: f32, max: f32) -> SliderFloat<'fr, 'p> {
+                         value: &'p mut f32, min: f32, max: f32) -> SliderFloat<'fr, 'p> {
       SliderFloat::new(label, value, min, max)
    }
    pub fn slider_i32<'p>(&self, label: ImStr<'p>,
-                         value: i32, min: i32, max: i32) -> SliderInt<'fr, 'p> {
+                         value: &'p mut i32, min: i32, max: i32) -> SliderInt<'fr, 'p> {
       SliderInt::new(label, value, min, max)
    }
 }

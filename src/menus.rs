@@ -37,7 +37,7 @@ impl<'fr, 'p> Menu<'fr, 'p> {
 pub struct MenuItem<'fr, 'p> {
    label: ImStr<'p>,
    shortcut: Option<ImStr<'p>>,
-   selected: bool,
+   selected: Option<&'p mut bool>,
    enabled: bool,
    _phantom: PhantomData<&'fr Frame<'fr>>
 }
@@ -47,7 +47,7 @@ impl<'fr, 'p> MenuItem<'fr, 'p> {
       MenuItem {
          label: label,
          shortcut: None,
-         selected: false,
+         selected: None,
          enabled: true,
          _phantom: PhantomData
       }
@@ -60,9 +60,9 @@ impl<'fr, 'p> MenuItem<'fr, 'p> {
       }
    }
    #[inline]
-   pub fn selected(self, selected: bool) -> Self {
+   pub fn selected(self, selected: &'p mut bool) -> Self {
       MenuItem {
-         selected: selected,
+         selected: Some(selected),
          .. self
       }
    }
@@ -76,10 +76,10 @@ impl<'fr, 'p> MenuItem<'fr, 'p> {
    pub fn build(self) -> bool {
       let label = self.label.as_ptr();
       let shortcut = self.shortcut.map(|x| x.as_ptr()).unwrap_or(ptr::null());
-      let selected = self.selected;
+      let selected = self.selected.map(|x| x as *mut bool).unwrap_or(ptr::null_mut());
       let enabled = self.enabled;
       unsafe {
-         ffi::igMenuItem(label, shortcut, selected, enabled)
+         ffi::igMenuItemPtr(label, shortcut, selected, enabled)
       }
    }
 }

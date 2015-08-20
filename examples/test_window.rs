@@ -75,7 +75,7 @@ impl Default for FileMenuState {
 }
 
 struct AutoResizeState {
-    lines: usize
+    lines: i32
 }
 
 impl Default for AutoResizeState {
@@ -91,12 +91,13 @@ fn main() {
         .. Default::default()
     };
     let mut support = Support::init();
+    let mut opened = true;
 
     loop {
         let active = support.render(state.clear_color, |frame| {
-            show_test_window(frame, &mut state)
+            show_test_window(frame, &mut state, &mut opened);
         });
-        if !active { break }
+        if !active || !opened { break }
     }
 }
 
@@ -119,25 +120,25 @@ fn show_user_guide<'a>(frame: &Frame<'a>) {
   Use +- to subtract."));
 }
 
-fn show_test_window<'a>(frame: &Frame<'a>, state: &mut State) -> bool {
+fn show_test_window<'a>(frame: &Frame<'a>, state: &mut State, opened: &mut bool) {
     if state.show_app_metrics {
-        state.show_app_metrics = frame.show_metrics_window();
+        frame.show_metrics_window(&mut state.show_app_metrics);
     }
     if state.show_app_main_menu_bar { show_example_app_main_menu_bar(frame, state) }
     if state.show_app_auto_resize {
-        state.show_app_auto_resize = show_example_app_auto_resize(frame, &mut state.auto_resize_state);
+        show_example_app_auto_resize(frame, &mut state.auto_resize_state, &mut state.show_app_auto_resize);
     }
     if state.show_app_fixed_overlay {
-        state.show_app_fixed_overlay = show_example_app_fixed_overlay(frame);
+        show_example_app_fixed_overlay(frame, &mut state.show_app_fixed_overlay);
     }
     if state.show_app_manipulating_window_title {
         show_example_app_manipulating_window_title(frame);
     }
     if state.show_app_about {
-        state.show_app_about = frame.window()
+        frame.window()
             .name(im_str!("About ImGui"))
             .always_auto_resize(true)
-            .closable(true)
+            .opened(&mut state.show_app_about)
             .build(|| {
                 frame.text(ImStr::from_str(&format!("ImGui {}", imgui::get_version())));
                 frame.separator();
@@ -157,7 +158,7 @@ fn show_test_window<'a>(frame: &Frame<'a>, state: &mut State) -> bool {
         .menu_bar(!state.no_menu)
         .bg_alpha(state.bg_alpha)
         .size((550.0, 680.0), ImGuiSetCond_FirstUseEver)
-        .closable(true)
+        .opened(opened)
         .build(|| {
             frame.text(im_str!("ImGui says hello."));
             frame.menu_bar(|| {
@@ -165,39 +166,28 @@ fn show_test_window<'a>(frame: &Frame<'a>, state: &mut State) -> bool {
                     show_example_menu_file(frame, &mut state.file_menu);
                 });
                 frame.menu(im_str!("Examples")).build(|| {
-                    if frame.menu_item(im_str!("Main menu bar")).build() {
-                        state.show_app_main_menu_bar = !state.show_app_main_menu_bar;
-                    }
-                    if frame.menu_item(im_str!("Console")).build() {
-                        state.show_app_console = !state.show_app_console;
-                    }
-                    if frame.menu_item(im_str!("Simple layout")).build() {
-                        state.show_app_layout = !state.show_app_layout;
-                    }
-                    if frame.menu_item(im_str!("Long text display")).build() {
-                        state.show_app_long_text = !state.show_app_long_text;
-                    }
-                    if frame.menu_item(im_str!("Auto-resizing window")).build() {
-                        state.show_app_auto_resize = !state.show_app_auto_resize;
-                    }
-                    if frame.menu_item(im_str!("Simple overlay")).build() {
-                        state.show_app_fixed_overlay = !state.show_app_fixed_overlay;
-                    }
-                    if frame.menu_item(im_str!("Manipulating window title")).build() {
-                        state.show_app_manipulating_window_title =
-                            !state.show_app_manipulating_window_title;
-                    }
-                    if frame.menu_item(im_str!("Custom rendering")).build() {
-                        state.show_app_custom_rendering = !state.show_app_custom_rendering;
-                    }
+                    frame.menu_item(im_str!("Main menu bar"))
+                        .selected(&mut state.show_app_main_menu_bar).build();
+                    frame.menu_item(im_str!("Console"))
+                        .selected(&mut state.show_app_console).build();
+                    frame.menu_item(im_str!("Simple layout"))
+                        .selected(&mut state.show_app_layout).build();
+                    frame.menu_item(im_str!("Long text display"))
+                        .selected(&mut state.show_app_long_text).build();
+                    frame.menu_item(im_str!("Auto-resizing window"))
+                        .selected(&mut state.show_app_auto_resize).build();
+                    frame.menu_item(im_str!("Simple overlay"))
+                        .selected(&mut state.show_app_fixed_overlay).build();
+                    frame.menu_item(im_str!("Manipulating window title"))
+                        .selected(&mut state.show_app_manipulating_window_title).build();
+                    frame.menu_item(im_str!("Custom rendering"))
+                        .selected(&mut state.show_app_custom_rendering).build();
                 });
                 frame.menu(im_str!("Help")).build(|| {
-                    if frame.menu_item(im_str!("Metrics")).build() {
-                        state.show_app_metrics = !state.show_app_metrics;
-                    }
-                    if frame.menu_item(im_str!("About ImGui")).build() {
-                        state.show_app_about = !state.show_app_about;
-                    }
+                    frame.menu_item(im_str!("Metrics"))
+                        .selected(&mut state.show_app_metrics).build();
+                    frame.menu_item(im_str!("About ImGui"))
+                        .selected(&mut state.show_app_about).build();
                 });
             });
             frame.spacing();
@@ -207,35 +197,18 @@ fn show_test_window<'a>(frame: &Frame<'a>, state: &mut State) -> bool {
             }
 
             if frame.collapsing_header(im_str!("Window options")).build() {
-                if let Some(no_titlebar) = frame.checkbox(im_str!("no titlebar"), state.no_titlebar) {
-                    state.no_titlebar = no_titlebar;
-                }
+                frame.checkbox(im_str!("no titlebar"), &mut state.no_titlebar);
                 frame.same_line(150.0);
-                if let Some(no_border) = frame.checkbox(im_str!("no border"), state.no_border) {
-                    state.no_border = no_border;
-                }
+                frame.checkbox(im_str!("no border"), &mut state.no_border);
                 frame.same_line(300.0);
-                if let Some(no_resize) = frame.checkbox(im_str!("no resize"), state.no_resize) {
-                    state.no_resize = no_resize;
-                }
-                if let Some(no_move) = frame.checkbox(im_str!("no move"), state.no_move) {
-                    state.no_move = no_move;
-                }
+                frame.checkbox(im_str!("no resize"), &mut state.no_resize);
+                frame.checkbox(im_str!("no move"), &mut state.no_move);
                 frame.same_line(150.0);
-                if let Some(no_scrollbar) = frame.checkbox(im_str!("no scrollbar"), state.no_scrollbar) {
-                    state.no_scrollbar = no_scrollbar;
-                }
+                frame.checkbox(im_str!("no scrollbar"), &mut state.no_scrollbar);
                 frame.same_line(300.0);
-                if let Some(no_collapse) = frame.checkbox(im_str!("no collapse"), state.no_collapse) {
-                    state.no_collapse = no_collapse;
-                }
-                if let Some(no_menu) = frame.checkbox(im_str!("no menu"), state.no_menu) {
-                    state.no_menu = no_menu;
-                }
-                if let Some(bg_alpha) = frame.slider_f32(im_str!("bg alpha"),
-                                                         state.bg_alpha, 0.0, 1.0).build() {
-                    state.bg_alpha = bg_alpha;
-                }
+                frame.checkbox(im_str!("no collapse"), &mut state.no_collapse);
+                frame.checkbox(im_str!("no menu"), &mut state.no_menu);
+                frame.slider_f32(im_str!("bg alpha"), &mut state.bg_alpha, 0.0, 1.0).build();
             }
         })
 }
@@ -246,21 +219,21 @@ fn show_example_app_main_menu_bar<'a>(frame: &Frame<'a>, state: &mut State) {
             show_example_menu_file(frame, &mut state.file_menu);
         });
         frame.menu(im_str!("Edit")).build(|| {
-            if frame.menu_item(im_str!("Undo")).shortcut(im_str!("CTRL+Z")).build() { }
-            if frame.menu_item(im_str!("Redo"))
-                .shortcut(im_str!("CTRL+Y")).enabled(false).build() { }
+            frame.menu_item(im_str!("Undo")).shortcut(im_str!("CTRL+Z")).build();
+            frame.menu_item(im_str!("Redo"))
+                .shortcut(im_str!("CTRL+Y")).enabled(false).build();
             frame.separator();
-            if frame.menu_item(im_str!("Cut")).shortcut(im_str!("CTRL+X")).build() { }
-            if frame.menu_item(im_str!("Copy")).shortcut(im_str!("CTRL+C")).build() { }
-            if frame.menu_item(im_str!("Paste")).shortcut(im_str!("CTRL+V")).build() { }
+            frame.menu_item(im_str!("Cut")).shortcut(im_str!("CTRL+X")).build();
+            frame.menu_item(im_str!("Copy")).shortcut(im_str!("CTRL+C")).build();
+            frame.menu_item(im_str!("Paste")).shortcut(im_str!("CTRL+V")).build();
         });
     });
 }
 
 fn show_example_menu_file<'a>(frame: &Frame<'a>, state: &mut FileMenuState) {
     frame.menu_item(im_str!("(dummy menu)")).enabled(false).build();
-    if frame.menu_item(im_str!("New")).build() { }
-    if frame.menu_item(im_str!("Open")).shortcut(im_str!("Ctrl+O")).build() { }
+    frame.menu_item(im_str!("New")).build();
+    frame.menu_item(im_str!("Open")).shortcut(im_str!("Ctrl+O")).build();
     frame.menu(im_str!("Open Recent")).build(|| {
         frame.menu_item(im_str!("fish_hat.c")).build();
         frame.menu_item(im_str!("fish_hat.inl")).build();
@@ -273,13 +246,11 @@ fn show_example_menu_file<'a>(frame: &Frame<'a>, state: &mut FileMenuState) {
             });
         });
     });
-    if frame.menu_item(im_str!("Save")).shortcut(im_str!("Ctrl+S")).build() { }
-    if frame.menu_item(im_str!("Save As..")).build() { }
+    frame.menu_item(im_str!("Save")).shortcut(im_str!("Ctrl+S")).build();
+    frame.menu_item(im_str!("Save As..")).build();
     frame.separator();
     frame.menu(im_str!("Options")).build(|| {
-        if frame.menu_item(im_str!("Enabled")).selected(state.enabled).build() {
-            state.enabled = !state.enabled;
-        }
+        frame.menu_item(im_str!("Enabled")).selected(&mut state.enabled).build();
         // TODO
     });
     frame.menu(im_str!("Colors")).build(|| {
@@ -288,33 +259,31 @@ fn show_example_menu_file<'a>(frame: &Frame<'a>, state: &mut FileMenuState) {
     frame.menu(im_str!("Disabled")).enabled(false).build(|| {
         unreachable!();
     });
-    if frame.menu_item(im_str!("Checked")).selected(true).build() { }
-    if frame.menu_item(im_str!("Quit")).shortcut(im_str!("Alt+F4")).build() { }
+    let mut checked = true;
+    frame.menu_item(im_str!("Checked")).selected(&mut checked).build();
+    frame.menu_item(im_str!("Quit")).shortcut(im_str!("Alt+F4")).build();
 }
 
-fn show_example_app_auto_resize<'a>(frame: &Frame<'a>, state: &mut AutoResizeState) -> bool {
+fn show_example_app_auto_resize<'a>(frame: &Frame<'a>, state: &mut AutoResizeState, opened: &mut bool) {
     frame.window()
         .name(im_str!("Example: Auto-resizing window"))
-        .closable(true)
+        .opened(opened)
         .always_auto_resize(true)
         .build(|| {
             frame.text(im_str!("Window will resize every-frame to the size of its content.
 Note that you probably don't want to query the window size to
 output your content because that would create a feedback loop."));
-            if let Some(lines) = frame.slider_i32(im_str!("Number of lines"),
-                                                  state.lines as i32, 1, 20).build() {
-              state.lines = lines as usize;
-            }
+            frame.slider_i32(im_str!("Number of lines"), &mut state.lines, 1, 20).build();
             for i in 0 .. state.lines {
-                frame.text(im_str!("{:2$}This is line {}", "", i, i * 4));
+                frame.text(im_str!("{:2$}This is line {}", "", i, i as usize * 4));
             }
         })
 }
 
-fn show_example_app_fixed_overlay<'a>(frame: &Frame<'a>) -> bool {
+fn show_example_app_fixed_overlay<'a>(frame: &Frame<'a>, opened: &mut bool) {
     frame.window()
         .name(im_str!("Example: Fixed Overlay"))
-        .closable(true)
+        .opened(opened)
         .bg_alpha(0.3)
         .title_bar(false)
         .resizable(false)
