@@ -13,6 +13,7 @@ extern crate sdl2;
 use libc::{c_char, c_float, c_int, c_uchar};
 use std::borrow::Cow;
 use std::ffi::CStr;
+use std::fmt;
 use std::mem;
 use std::ptr;
 use std::slice;
@@ -53,7 +54,7 @@ macro_rules! im_str {
       unsafe { ::imgui::ImStr::from_bytes(value.as_bytes()) }
    });
    ($e:tt, $($arg:tt)*) => ({
-      ::imgui::ImStr::from_str(&format!($e, $($arg)*))
+      ::imgui::ImStr::from_fmt(format_args!($e, $($arg)*))
    })
 }
 
@@ -69,6 +70,13 @@ impl<'a> ImStr<'a> {
    }
    pub fn from_str(value: &str) -> ImStr<'a> {
       let mut bytes: Vec<u8> = value.bytes().collect();
+      bytes.push(0);
+      ImStr {
+         bytes: Cow::Owned(bytes)
+      }
+   }
+   pub fn from_fmt(args: fmt::Arguments) -> ImStr<'a> {
+      let mut bytes = fmt::format(args).into_bytes();
       bytes.push(0);
       ImStr {
          bytes: Cow::Owned(bytes)
