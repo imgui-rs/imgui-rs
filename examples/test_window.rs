@@ -87,9 +87,7 @@ impl Default for AutoResizeState {
 }
 
 fn main() {
-    let mut state = State {
-        .. Default::default()
-    };
+    let mut state = State::default();
     let mut support = Support::init();
     let mut opened = true;
 
