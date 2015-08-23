@@ -5,15 +5,15 @@
 ![Hello world](hello_world.png)
 
 ```rust
-frame.window()
+ui.window()
     .name(im_str!("Hello world"))
     .size((300.0, 100.0), ImGuiSetCond_FirstUseEver)
     .build(|| {
-        frame.text(im_str!("Hello world!"));
-        frame.text(im_str!("This...is...imgui-rs!"));
-        frame.separator();
-        let mouse_pos = frame.imgui().mouse_pos();
-        frame.text(im_str!("Mouse Position: ({:.1},{:.1})", mouse_pos.0, mouse_pos.1));
+        ui.text(im_str!("Hello world!"));
+        ui.text(im_str!("This...is...imgui-rs!"));
+        ui.separator();
+        let mouse_pos = ui.imgui().mouse_pos();
+        ui.text(im_str!("Mouse Position: ({:.1},{:.1})", mouse_pos.0, mouse_pos.1));
     })
 ```
 
@@ -34,8 +34,8 @@ frame.window()
 
 * Closures VS begin/end pairs (current choice: closures)
 * Mutable references VS return values (current choice: mutable references)
-* Passing around Frame&lt;'fr&gt; VS passing around &amp;'fr Frame (current choice: Frame&lt;'fr&gt;)
-* Splitting the API to smaller pieces VS all draw calls in Frame (current choice: all draw calls in Frame)
+* Passing around Ui&lt;'ui&gt; VS passing around &amp;'ui Ui (current choice: Ui&lt;'ui&gt;)
+* Splitting the API to smaller pieces VS all draw calls in Ui (current choice: all draw calls in Ui)
 * Builder pattern for optional arguments VS something else (current choice: builder)
 * Mutation functions in builders VS self-consuming functions in builders (current choice: self-consuming)
 

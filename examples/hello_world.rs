@@ -23,15 +23,15 @@ fn main() {
     }
 }
 
-fn hello_world<'a>(frame: &Frame<'a>) {
-    frame.window()
+fn hello_world<'a>(ui: &Ui<'a>) {
+    ui.window()
         .name(im_str!("Hello world"))
         .size((300.0, 100.0), ImGuiSetCond_FirstUseEver)
         .build(|| {
-            frame.text(im_str!("Hello world!"));
-            frame.text(im_str!("This...is...imgui-rs!"));
-            frame.separator();
-            let mouse_pos = frame.imgui().mouse_pos();
-            frame.text(im_str!("Mouse Position: ({:.1},{:.1})", mouse_pos.0, mouse_pos.1));
+            ui.text(im_str!("Hello world!"));
+            ui.text(im_str!("This...is...imgui-rs!"));
+            ui.separator();
+            let mouse_pos = ui.imgui().mouse_pos();
+            ui.text(im_str!("Mouse Position: ({:.1},{:.1})", mouse_pos.0, mouse_pos.1));
         })
 }

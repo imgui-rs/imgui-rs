@@ -1,20 +1,20 @@
 use std::marker::PhantomData;
 
 use super::ffi;
-use super::{Frame, ImStr};
+use super::{Ui, ImStr};
 
 // TODO: Consider using Range, even though it is half-open
 
-pub struct SliderInt<'fr, 'p> {
+pub struct SliderInt<'ui, 'p> {
    label: ImStr<'p>,
    value: &'p mut i32,
    min: i32,
    max: i32,
    display_format: ImStr<'p>,
-   _phantom: PhantomData<&'fr Frame<'fr>>
+   _phantom: PhantomData<&'ui Ui<'ui>>
 }
 
-impl<'fr, 'p> SliderInt<'fr, 'p> {
+impl<'ui, 'p> SliderInt<'ui, 'p> {
    pub fn new(label: ImStr<'p>, value: &'p mut i32, min: i32, max: i32) -> Self {
       SliderInt {
          label: label,
@@ -41,17 +41,17 @@ impl<'fr, 'p> SliderInt<'fr, 'p> {
    }
 }
 
-pub struct SliderFloat<'fr, 'p> {
+pub struct SliderFloat<'ui, 'p> {
    label: ImStr<'p>,
    value: &'p mut f32,
    min: f32,
    max: f32,
    display_format: ImStr<'p>,
    power: f32,
-   _phantom: PhantomData<&'fr Frame<'fr>>
+   _phantom: PhantomData<&'ui Ui<'ui>>
 }
 
-impl<'fr, 'p> SliderFloat<'fr, 'p> {
+impl<'ui, 'p> SliderFloat<'ui, 'p> {
    pub fn new(label: ImStr<'p>, value: &'p mut f32, min: f32, max: f32) -> Self {
       SliderFloat {
          label: label,

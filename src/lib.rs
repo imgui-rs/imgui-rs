@@ -139,7 +139,7 @@ impl ImGui {
    }
    pub fn get_time(&self) -> f32 { unsafe { ffi::igGetTime() } }
    pub fn get_frame_count(&self) -> i32 { unsafe { ffi::igGetFrameCount() } }
-   pub fn frame<'fr, 'a: 'fr>(&'a mut self, width: u32, height: u32, delta_time: f32) -> Frame<'fr> {
+   pub fn frame<'ui, 'a: 'ui>(&'a mut self, width: u32, height: u32, delta_time: f32) -> Ui<'ui> {
       unsafe {
          let io: &mut ffi::ImGuiIO = mem::transmute(ffi::igGetIO());
          io.display_size.x = width as c_float;
@@ -148,7 +148,7 @@ impl ImGui {
 
          ffi::igNewFrame();
       }
-      Frame {
+      Ui {
          imgui: self
       }
    }
@@ -185,18 +185,18 @@ pub struct DrawList<'a> {
    pub vtx_buffer: &'a [ffi::ImDrawVert]
 }
 
-pub struct Frame<'fr> {
-   imgui: &'fr ImGui
+pub struct Ui<'ui> {
+   imgui: &'ui ImGui
 }
 
 static FMT: &'static [u8] = b"%s\0";
 
 fn fmt_ptr() -> *const c_char { FMT.as_ptr() as *const c_char }
 
-impl<'fr> Frame<'fr> {
+impl<'ui> Ui<'ui> {
    pub fn imgui(&self) -> &ImGui { self.imgui }
    pub fn render<F, E>(self, mut f: F) -> Result<(), E>
-         where F: FnMut(DrawList<'fr>) -> Result<(), E> {
+         where F: FnMut(DrawList<'ui>) -> Result<(), E> {
       unsafe {
          let mut im_draw_data = mem::zeroed();
          RENDER_DRAW_LISTS_STATE.0 = &mut im_draw_data;
@@ -229,12 +229,12 @@ impl<'fr> Frame<'fr> {
 }
 
 // Window
-impl<'fr> Frame<'fr> {
-   pub fn window<'p>(&self) -> Window<'fr, 'p> { Window::new() }
+impl<'ui> Ui<'ui> {
+   pub fn window<'p>(&self) -> Window<'ui, 'p> { Window::new() }
 }
 
 // Layout
-impl<'fr> Frame<'fr> {
+impl<'ui> Ui<'ui> {
    pub fn separator(&self) { unsafe { ffi::igSeparator() }; }
    pub fn same_line(&self, pos_x: f32) {
       unsafe {
@@ -250,7 +250,7 @@ impl<'fr> Frame<'fr> {
 }
 
 // Widgets
-impl<'fr> Frame<'fr> {
+impl<'ui> Ui<'ui> {
    pub fn text<'b>(&self, text: ImStr<'b>) {
       // TODO: use igTextUnformatted
       unsafe {
@@ -287,7 +287,7 @@ impl<'fr> Frame<'fr> {
          ffi::igBulletText(fmt_ptr(), text.as_ptr());
       }
    }
-   pub fn collapsing_header<'p>(&self, label: ImStr<'p>) -> CollapsingHeader<'fr, 'p> {
+   pub fn collapsing_header<'p>(&self, label: ImStr<'p>) -> CollapsingHeader<'ui, 'p> {
       CollapsingHeader::new(label)
    }
    pub fn checkbox<'p>(&self, label: ImStr<'p>, value: &'p mut bool) -> bool {
@@ -296,19 +296,19 @@ impl<'fr> Frame<'fr> {
 }
 
 // Widgets: Sliders
-impl<'fr> Frame<'fr> {
+impl<'ui> Ui<'ui> {
    pub fn slider_f32<'p>(&self, label: ImStr<'p>,
-                         value: &'p mut f32, min: f32, max: f32) -> SliderFloat<'fr, 'p> {
+                         value: &'p mut f32, min: f32, max: f32) -> SliderFloat<'ui, 'p> {
       SliderFloat::new(label, value, min, max)
    }
    pub fn slider_i32<'p>(&self, label: ImStr<'p>,
-                         value: &'p mut i32, min: i32, max: i32) -> SliderInt<'fr, 'p> {
+                         value: &'p mut i32, min: i32, max: i32) -> SliderInt<'ui, 'p> {
       SliderInt::new(label, value, min, max)
    }
 }
 
 // Widgets: Menus
-impl<'fr> Frame<'fr> {
+impl<'ui> Ui<'ui> {
    pub fn main_menu_bar<F>(&self, f: F) where F: FnOnce() {
       let render = unsafe { ffi::igBeginMainMenuBar() };
       if render {
@@ -323,8 +323,8 @@ impl<'fr> Frame<'fr> {
          unsafe { ffi::igEndMenuBar() };
       }
    }
-   pub fn menu<'p>(&self, label: ImStr<'p>) -> Menu<'fr, 'p> { Menu::new(label) }
-   pub fn menu_item<'p>(&self, label: ImStr<'p>) -> MenuItem<'fr, 'p> { MenuItem::new(label) }
+   pub fn menu<'p>(&self, label: ImStr<'p>) -> Menu<'ui, 'p> { Menu::new(label) }
+   pub fn menu_item<'p>(&self, label: ImStr<'p>) -> MenuItem<'ui, 'p> { MenuItem::new(label) }
 }
 
 struct RenderDrawListsState(*mut ffi::ImDrawData);

@@ -94,21 +94,21 @@ fn main() {
     let mut opened = true;
 
     loop {
-        let active = support.render(state.clear_color, |frame| {
-            show_test_window(frame, &mut state, &mut opened);
+        let active = support.render(state.clear_color, |ui| {
+            show_test_window(ui, &mut state, &mut opened);
         });
         if !active || !opened { break }
     }
 }
 
-fn show_user_guide<'a>(frame: &Frame<'a>) {
-    frame.bullet_text(im_str!("Double-click on title bar to collapse window."));
-    frame.bullet_text(im_str!("Click and drag on lower right corner to resize window."));
-    frame.bullet_text(im_str!("Click and drag on any empty space to move window."));
-    frame.bullet_text(im_str!("Mouse Wheel to scroll."));
-    frame.bullet_text(im_str!("TAB/SHIFT+TAB to cycle through keyboard editable fields."));
-    frame.bullet_text(im_str!("CTRL+Click on a slider or drag box to input text."));
-    frame.bullet_text(im_str!(
+fn show_user_guide<'a>(ui: &Ui<'a>) {
+    ui.bullet_text(im_str!("Double-click on title bar to collapse window."));
+    ui.bullet_text(im_str!("Click and drag on lower right corner to resize window."));
+    ui.bullet_text(im_str!("Click and drag on any empty space to move window."));
+    ui.bullet_text(im_str!("Mouse Wheel to scroll."));
+    ui.bullet_text(im_str!("TAB/SHIFT+TAB to cycle through keyboard editable fields."));
+    ui.bullet_text(im_str!("CTRL+Click on a slider or drag box to input text."));
+    ui.bullet_text(im_str!(
 "While editing text:
 - Hold SHIFT or use mouse to select text
 - CTRL+Left/Right to word jump
@@ -120,35 +120,35 @@ fn show_user_guide<'a>(frame: &Frame<'a>) {
   Use +- to subtract."));
 }
 
-fn show_test_window<'a>(frame: &Frame<'a>, state: &mut State, opened: &mut bool) {
+fn show_test_window<'a>(ui: &Ui<'a>, state: &mut State, opened: &mut bool) {
     if state.show_app_metrics {
-        frame.show_metrics_window(&mut state.show_app_metrics);
+        ui.show_metrics_window(&mut state.show_app_metrics);
     }
-    if state.show_app_main_menu_bar { show_example_app_main_menu_bar(frame, state) }
+    if state.show_app_main_menu_bar { show_example_app_main_menu_bar(ui, state) }
     if state.show_app_auto_resize {
-        show_example_app_auto_resize(frame, &mut state.auto_resize_state, &mut state.show_app_auto_resize);
+        show_example_app_auto_resize(ui, &mut state.auto_resize_state, &mut state.show_app_auto_resize);
     }
     if state.show_app_fixed_overlay {
-        show_example_app_fixed_overlay(frame, &mut state.show_app_fixed_overlay);
+        show_example_app_fixed_overlay(ui, &mut state.show_app_fixed_overlay);
     }
     if state.show_app_manipulating_window_title {
-        show_example_app_manipulating_window_title(frame);
+        show_example_app_manipulating_window_title(ui);
     }
     if state.show_app_about {
-        frame.window()
+        ui.window()
             .name(im_str!("About ImGui"))
             .always_auto_resize(true)
             .opened(&mut state.show_app_about)
             .build(|| {
-                frame.text(ImStr::from_str(&format!("ImGui {}", imgui::get_version())));
-                frame.separator();
-                frame.text(im_str!("By Omar Cornut and all github contributors."));
-                frame.text(im_str!("ImGui is licensed under the MIT License, see LICENSE for more information."));
-                show_user_guide(frame);
+                ui.text(ImStr::from_str(&format!("ImGui {}", imgui::get_version())));
+                ui.separator();
+                ui.text(im_str!("By Omar Cornut and all github contributors."));
+                ui.text(im_str!("ImGui is licensed under the MIT License, see LICENSE for more information."));
+                show_user_guide(ui);
             })
     }
 
-    frame.window().name(im_str!("ImGui Demo"))
+    ui.window().name(im_str!("ImGui Demo"))
         .title_bar(!state.no_titlebar)
         .show_borders(!state.no_border)
         .resizable(!state.no_resize)
@@ -160,128 +160,128 @@ fn show_test_window<'a>(frame: &Frame<'a>, state: &mut State, opened: &mut bool)
         .size((550.0, 680.0), ImGuiSetCond_FirstUseEver)
         .opened(opened)
         .build(|| {
-            frame.text(im_str!("ImGui says hello."));
-            frame.menu_bar(|| {
-                frame.menu(im_str!("Menu")).build(|| {
-                    show_example_menu_file(frame, &mut state.file_menu);
+            ui.text(im_str!("ImGui says hello."));
+            ui.menu_bar(|| {
+                ui.menu(im_str!("Menu")).build(|| {
+                    show_example_menu_file(ui, &mut state.file_menu);
                 });
-                frame.menu(im_str!("Examples")).build(|| {
-                    frame.menu_item(im_str!("Main menu bar"))
+                ui.menu(im_str!("Examples")).build(|| {
+                    ui.menu_item(im_str!("Main menu bar"))
                         .selected(&mut state.show_app_main_menu_bar).build();
-                    frame.menu_item(im_str!("Console"))
+                    ui.menu_item(im_str!("Console"))
                         .selected(&mut state.show_app_console).build();
-                    frame.menu_item(im_str!("Simple layout"))
+                    ui.menu_item(im_str!("Simple layout"))
                         .selected(&mut state.show_app_layout).build();
-                    frame.menu_item(im_str!("Long text display"))
+                    ui.menu_item(im_str!("Long text display"))
                         .selected(&mut state.show_app_long_text).build();
-                    frame.menu_item(im_str!("Auto-resizing window"))
+                    ui.menu_item(im_str!("Auto-resizing window"))
                         .selected(&mut state.show_app_auto_resize).build();
-                    frame.menu_item(im_str!("Simple overlay"))
+                    ui.menu_item(im_str!("Simple overlay"))
                         .selected(&mut state.show_app_fixed_overlay).build();
-                    frame.menu_item(im_str!("Manipulating window title"))
+                    ui.menu_item(im_str!("Manipulating window title"))
                         .selected(&mut state.show_app_manipulating_window_title).build();
-                    frame.menu_item(im_str!("Custom rendering"))
+                    ui.menu_item(im_str!("Custom rendering"))
                         .selected(&mut state.show_app_custom_rendering).build();
                 });
-                frame.menu(im_str!("Help")).build(|| {
-                    frame.menu_item(im_str!("Metrics"))
+                ui.menu(im_str!("Help")).build(|| {
+                    ui.menu_item(im_str!("Metrics"))
                         .selected(&mut state.show_app_metrics).build();
-                    frame.menu_item(im_str!("About ImGui"))
+                    ui.menu_item(im_str!("About ImGui"))
                         .selected(&mut state.show_app_about).build();
                 });
             });
-            frame.spacing();
-            if frame.collapsing_header(im_str!("Help")).build() {
-                frame.text_wrapped(im_str!("This window is being created by the show_test_window() function. Please refer to the code for programming reference.\n\nUser Guide:"));
-                show_user_guide(frame);
+            ui.spacing();
+            if ui.collapsing_header(im_str!("Help")).build() {
+                ui.text_wrapped(im_str!("This window is being created by the show_test_window() function. Please refer to the code for programming reference.\n\nUser Guide:"));
+                show_user_guide(ui);
             }
 
-            if frame.collapsing_header(im_str!("Window options")).build() {
-                frame.checkbox(im_str!("no titlebar"), &mut state.no_titlebar);
-                frame.same_line(150.0);
-                frame.checkbox(im_str!("no border"), &mut state.no_border);
-                frame.same_line(300.0);
-                frame.checkbox(im_str!("no resize"), &mut state.no_resize);
-                frame.checkbox(im_str!("no move"), &mut state.no_move);
-                frame.same_line(150.0);
-                frame.checkbox(im_str!("no scrollbar"), &mut state.no_scrollbar);
-                frame.same_line(300.0);
-                frame.checkbox(im_str!("no collapse"), &mut state.no_collapse);
-                frame.checkbox(im_str!("no menu"), &mut state.no_menu);
-                frame.slider_f32(im_str!("bg alpha"), &mut state.bg_alpha, 0.0, 1.0).build();
+            if ui.collapsing_header(im_str!("Window options")).build() {
+                ui.checkbox(im_str!("no titlebar"), &mut state.no_titlebar);
+                ui.same_line(150.0);
+                ui.checkbox(im_str!("no border"), &mut state.no_border);
+                ui.same_line(300.0);
+                ui.checkbox(im_str!("no resize"), &mut state.no_resize);
+                ui.checkbox(im_str!("no move"), &mut state.no_move);
+                ui.same_line(150.0);
+                ui.checkbox(im_str!("no scrollbar"), &mut state.no_scrollbar);
+                ui.same_line(300.0);
+                ui.checkbox(im_str!("no collapse"), &mut state.no_collapse);
+                ui.checkbox(im_str!("no menu"), &mut state.no_menu);
+                ui.slider_f32(im_str!("bg alpha"), &mut state.bg_alpha, 0.0, 1.0).build();
             }
         })
 }
 
-fn show_example_app_main_menu_bar<'a>(frame: &Frame<'a>, state: &mut State) {
-    frame.main_menu_bar(|| {
-        frame.menu(im_str!("File")).build(|| {
-            show_example_menu_file(frame, &mut state.file_menu);
+fn show_example_app_main_menu_bar<'a>(ui: &Ui<'a>, state: &mut State) {
+    ui.main_menu_bar(|| {
+        ui.menu(im_str!("File")).build(|| {
+            show_example_menu_file(ui, &mut state.file_menu);
         });
-        frame.menu(im_str!("Edit")).build(|| {
-            frame.menu_item(im_str!("Undo")).shortcut(im_str!("CTRL+Z")).build();
-            frame.menu_item(im_str!("Redo"))
+        ui.menu(im_str!("Edit")).build(|| {
+            ui.menu_item(im_str!("Undo")).shortcut(im_str!("CTRL+Z")).build();
+            ui.menu_item(im_str!("Redo"))
                 .shortcut(im_str!("CTRL+Y")).enabled(false).build();
-            frame.separator();
-            frame.menu_item(im_str!("Cut")).shortcut(im_str!("CTRL+X")).build();
-            frame.menu_item(im_str!("Copy")).shortcut(im_str!("CTRL+C")).build();
-            frame.menu_item(im_str!("Paste")).shortcut(im_str!("CTRL+V")).build();
+            ui.separator();
+            ui.menu_item(im_str!("Cut")).shortcut(im_str!("CTRL+X")).build();
+            ui.menu_item(im_str!("Copy")).shortcut(im_str!("CTRL+C")).build();
+            ui.menu_item(im_str!("Paste")).shortcut(im_str!("CTRL+V")).build();
         });
     });
 }
 
-fn show_example_menu_file<'a>(frame: &Frame<'a>, state: &mut FileMenuState) {
-    frame.menu_item(im_str!("(dummy menu)")).enabled(false).build();
-    frame.menu_item(im_str!("New")).build();
-    frame.menu_item(im_str!("Open")).shortcut(im_str!("Ctrl+O")).build();
-    frame.menu(im_str!("Open Recent")).build(|| {
-        frame.menu_item(im_str!("fish_hat.c")).build();
-        frame.menu_item(im_str!("fish_hat.inl")).build();
-        frame.menu_item(im_str!("fish_hat.h")).build();
-        frame.menu(im_str!("More..")).build(|| {
-            frame.menu_item(im_str!("Hello"));
-            frame.menu_item(im_str!("Sailor"));
-            frame.menu(im_str!("Recurse..")).build(|| {
-                show_example_menu_file(frame, state);
+fn show_example_menu_file<'a>(ui: &Ui<'a>, state: &mut FileMenuState) {
+    ui.menu_item(im_str!("(dummy menu)")).enabled(false).build();
+    ui.menu_item(im_str!("New")).build();
+    ui.menu_item(im_str!("Open")).shortcut(im_str!("Ctrl+O")).build();
+    ui.menu(im_str!("Open Recent")).build(|| {
+        ui.menu_item(im_str!("fish_hat.c")).build();
+        ui.menu_item(im_str!("fish_hat.inl")).build();
+        ui.menu_item(im_str!("fish_hat.h")).build();
+        ui.menu(im_str!("More..")).build(|| {
+            ui.menu_item(im_str!("Hello"));
+            ui.menu_item(im_str!("Sailor"));
+            ui.menu(im_str!("Recurse..")).build(|| {
+                show_example_menu_file(ui, state);
             });
         });
     });
-    frame.menu_item(im_str!("Save")).shortcut(im_str!("Ctrl+S")).build();
-    frame.menu_item(im_str!("Save As..")).build();
-    frame.separator();
-    frame.menu(im_str!("Options")).build(|| {
-        frame.menu_item(im_str!("Enabled")).selected(&mut state.enabled).build();
+    ui.menu_item(im_str!("Save")).shortcut(im_str!("Ctrl+S")).build();
+    ui.menu_item(im_str!("Save As..")).build();
+    ui.separator();
+    ui.menu(im_str!("Options")).build(|| {
+        ui.menu_item(im_str!("Enabled")).selected(&mut state.enabled).build();
         // TODO
     });
-    frame.menu(im_str!("Colors")).build(|| {
+    ui.menu(im_str!("Colors")).build(|| {
         // TODO
     });
-    frame.menu(im_str!("Disabled")).enabled(false).build(|| {
+    ui.menu(im_str!("Disabled")).enabled(false).build(|| {
         unreachable!();
     });
     let mut checked = true;
-    frame.menu_item(im_str!("Checked")).selected(&mut checked).build();
-    frame.menu_item(im_str!("Quit")).shortcut(im_str!("Alt+F4")).build();
+    ui.menu_item(im_str!("Checked")).selected(&mut checked).build();
+    ui.menu_item(im_str!("Quit")).shortcut(im_str!("Alt+F4")).build();
 }
 
-fn show_example_app_auto_resize<'a>(frame: &Frame<'a>, state: &mut AutoResizeState, opened: &mut bool) {
-    frame.window()
+fn show_example_app_auto_resize<'a>(ui: &Ui<'a>, state: &mut AutoResizeState, opened: &mut bool) {
+    ui.window()
         .name(im_str!("Example: Auto-resizing window"))
         .opened(opened)
         .always_auto_resize(true)
         .build(|| {
-            frame.text(im_str!("Window will resize every-frame to the size of its content.
+            ui.text(im_str!("Window will resize every-ui to the size of its content.
 Note that you probably don't want to query the window size to
 output your content because that would create a feedback loop."));
-            frame.slider_i32(im_str!("Number of lines"), &mut state.lines, 1, 20).build();
+            ui.slider_i32(im_str!("Number of lines"), &mut state.lines, 1, 20).build();
             for i in 0 .. state.lines {
-                frame.text(im_str!("{:2$}This is line {}", "", i, i as usize * 4));
+                ui.text(im_str!("{:2$}This is line {}", "", i, i as usize * 4));
             }
         })
 }
 
-fn show_example_app_fixed_overlay<'a>(frame: &Frame<'a>, opened: &mut bool) {
-    frame.window()
+fn show_example_app_fixed_overlay<'a>(ui: &Ui<'a>, opened: &mut bool) {
+    ui.window()
         .name(im_str!("Example: Fixed Overlay"))
         .opened(opened)
         .bg_alpha(0.3)
@@ -290,36 +290,36 @@ fn show_example_app_fixed_overlay<'a>(frame: &Frame<'a>, opened: &mut bool) {
         .movable(false)
         .save_settings(false)
         .build(|| {
-            frame.text(im_str!("Simple overlay\non the top-left side of the screen."));
-            frame.separator();
-            let mouse_pos = frame.imgui().mouse_pos();
-            frame.text(im_str!("Mouse Position: ({:.1},{:.1})", mouse_pos.0, mouse_pos.1));
+            ui.text(im_str!("Simple overlay\non the top-left side of the screen."));
+            ui.separator();
+            let mouse_pos = ui.imgui().mouse_pos();
+            ui.text(im_str!("Mouse Position: ({:.1},{:.1})", mouse_pos.0, mouse_pos.1));
         })
 }
 
-fn show_example_app_manipulating_window_title<'a>(frame: &Frame<'a>) {
-    frame.window()
+fn show_example_app_manipulating_window_title<'a>(ui: &Ui<'a>) {
+    ui.window()
         .name(im_str!("Same title as another window##1"))
         .position((100.0, 100.0), ImGuiSetCond_FirstUseEver)
         .build(|| {
-            frame.text(im_str!("This is window 1.
+            ui.text(im_str!("This is window 1.
 My title is the same as window 2, but my identifier is unique."));
         });
-    frame.window()
+    ui.window()
         .name(im_str!("Same title as another window##2"))
         .position((100.0, 200.0), ImGuiSetCond_FirstUseEver)
         .build(|| {
-            frame.text(im_str!("This is window 2.
+            ui.text(im_str!("This is window 2.
 My title is the same as window 1, but my identifier is unique."));
         });
     let chars = ['|', '/', '-', '\\'];
-    let ch_idx = (frame.imgui().get_time() / 0.25) as usize & 3;
-    let num = frame.imgui().get_frame_count(); // The C++ version uses rand() here
+    let ch_idx = (ui.imgui().get_time() / 0.25) as usize & 3;
+    let num = ui.imgui().get_frame_count(); // The C++ version uses rand() here
     let title = im_str!("Animated title {} {}###AnimatedTitle", chars[ch_idx], num);
-    frame.window()
+    ui.window()
         .name(title)
         .position((100.0, 300.0), ImGuiSetCond_FirstUseEver)
         .build(|| {
-            frame.text(im_str!("This window has a changing title"));
+            ui.text(im_str!("This window has a changing title"));
         });
 }

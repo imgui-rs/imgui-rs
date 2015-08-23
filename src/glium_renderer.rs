@@ -13,7 +13,7 @@ use std::fmt;
 use std::mem;
 use std::rc::Rc;
 
-use super::{DrawList, Frame, ImDrawIdx, ImDrawVert, ImGui, ImVec2, ImVec4};
+use super::{DrawList, Ui, ImDrawIdx, ImDrawVert, ImGui, ImVec2, ImVec4};
 
 pub type RendererResult<T> = Result<T, RendererError>;
 
@@ -106,8 +106,8 @@ impl Renderer {
         })
     }
     pub fn render<'a, S: Surface>(&mut self, surface: &mut S,
-                                  frame: Frame<'a>) -> RendererResult<()> {
-        frame.render(|draw_list| self.render_draw_list(surface, draw_list))
+                                  ui: Ui<'a>) -> RendererResult<()> {
+        ui.render(|draw_list| self.render_draw_list(surface, draw_list))
     }
     fn render_draw_list<'a, S: Surface>(&mut self, surface: &mut S,
                                         draw_list: DrawList<'a>) -> RendererResult<()> {

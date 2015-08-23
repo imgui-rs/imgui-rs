@@ -2,15 +2,15 @@ use std::marker::PhantomData;
 use std::ptr;
 
 use super::ffi;
-use super::{Frame, ImStr};
+use super::{Ui, ImStr};
 
-pub struct Menu<'fr, 'p> {
+pub struct Menu<'ui, 'p> {
    label: ImStr<'p>,
    enabled: bool,
-   _phantom: PhantomData<&'fr Frame<'fr>>
+   _phantom: PhantomData<&'ui Ui<'ui>>
 }
 
-impl<'fr, 'p> Menu<'fr, 'p> {
+impl<'ui, 'p> Menu<'ui, 'p> {
    pub fn new(label: ImStr<'p>) -> Self {
       Menu {
          label: label,
@@ -34,15 +34,15 @@ impl<'fr, 'p> Menu<'fr, 'p> {
    }
 }
 
-pub struct MenuItem<'fr, 'p> {
+pub struct MenuItem<'ui, 'p> {
    label: ImStr<'p>,
    shortcut: Option<ImStr<'p>>,
    selected: Option<&'p mut bool>,
    enabled: bool,
-   _phantom: PhantomData<&'fr Frame<'fr>>
+   _phantom: PhantomData<&'ui Ui<'ui>>
 }
 
-impl<'fr, 'p> MenuItem<'fr, 'p> {
+impl<'ui, 'p> MenuItem<'ui, 'p> {
    pub fn new(label: ImStr<'p>) -> Self {
       MenuItem {
          label: label,

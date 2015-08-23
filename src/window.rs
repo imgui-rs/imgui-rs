@@ -3,7 +3,7 @@ use std::ptr;
 
 use super::ffi;
 use super::{
-   Frame,
+   Ui,
    ImGuiSetCond,
    ImGuiWindowFlags,
    ImGuiWindowFlags_NoTitleBar, ImGuiWindowFlags_NoResize, ImGuiWindowFlags_NoMove,
@@ -13,7 +13,7 @@ use super::{
    ImStr, ImVec2
 };
 
-pub struct Window<'fr, 'p> {
+pub struct Window<'ui, 'p> {
    pos: (f32, f32),
    pos_cond: ImGuiSetCond,
    size: (f32, f32),
@@ -22,11 +22,11 @@ pub struct Window<'fr, 'p> {
    opened: Option<&'p mut bool>,
    bg_alpha: f32,
    flags: ImGuiWindowFlags,
-   _phantom: PhantomData<&'fr Frame<'fr>>
+   _phantom: PhantomData<&'ui Ui<'ui>>
 }
 
-impl<'fr, 'p> Window<'fr, 'p> {
-   pub fn new() -> Window<'fr, 'p> {
+impl<'ui, 'p> Window<'ui, 'p> {
+   pub fn new() -> Window<'ui, 'p> {
       Window {
          pos: (0.0, 0.0),
          pos_cond: ImGuiSetCond::empty(),

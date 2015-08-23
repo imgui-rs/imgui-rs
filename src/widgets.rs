@@ -2,17 +2,17 @@ use std::marker::PhantomData;
 use std::ptr;
 
 use super::ffi;
-use super::{Frame, ImStr};
+use super::{Ui, ImStr};
 
-pub struct CollapsingHeader<'fr, 'p> {
+pub struct CollapsingHeader<'ui, 'p> {
    label: ImStr<'p>,
    str_id: Option<ImStr<'p>>,
    display_frame: bool,
    default_open: bool,
-   _phantom: PhantomData<&'fr Frame<'fr>>
+   _phantom: PhantomData<&'ui Ui<'ui>>
 }
 
-impl<'fr, 'p> CollapsingHeader<'fr, 'p> {
+impl<'ui, 'p> CollapsingHeader<'ui, 'p> {
    pub fn new(label: ImStr<'p>) -> Self {
       CollapsingHeader {
          label: label,

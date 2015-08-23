@@ -2,7 +2,7 @@ use glium::{DisplayBuild, Surface};
 use glium::backend::glutin_backend::GlutinFacade;
 use glium::glutin;
 use glium::glutin::{ElementState, Event, MouseButton, VirtualKeyCode};
-use imgui::{ImGui, Frame};
+use imgui::{ImGui, Ui};
 use imgui::glium_renderer::Renderer;
 use time::SteadyTime;
 
@@ -39,7 +39,7 @@ impl Support {
         self.imgui.set_mouse_down(&[self.mouse_pressed.0, self.mouse_pressed.1, self.mouse_pressed.2, false, false]);
     }
 
-    pub fn render<'fr, 'a: 'fr , F: FnMut(&Frame<'fr>)>(
+    pub fn render<'ui, 'a: 'ui , F: FnMut(&Ui<'ui>)>(
             &'a mut self, clear_color: (f32, f32, f32, f32), mut f: F) -> bool {
         let now = SteadyTime::now();
         let delta = now - self.last_frame;
@@ -53,9 +53,9 @@ impl Support {
                            clear_color.2, clear_color.3);
 
         let (width, height) = target.get_dimensions();
-        let frame = self.imgui.frame(width, height, delta_f);
-        f(&frame);
-        self.renderer.render(&mut target, frame).unwrap();
+        let ui = self.imgui.frame(width, height, delta_f);
+        f(&ui);
+        self.renderer.render(&mut target, ui).unwrap();
 
         target.finish().unwrap();
 
