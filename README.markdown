@@ -19,7 +19,7 @@ ui.window()
 
 ## Currently implemented things
 
-* Low-level API (ffi module)
+* Low-level API (imgui-sys)
 * Renderer for easy integration with [Glium](https://github.com/tomaka/glium) projects (optional)
 * Parts of high-level API
 * Not horrible way of defining and passing null-terminated UTF-8 to ImGui
