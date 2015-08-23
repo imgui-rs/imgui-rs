@@ -1,6 +1,6 @@
+use imgui_sys;
 use std::marker::PhantomData;
 
-use super::ffi;
 use super::{Ui, ImStr};
 
 // TODO: Consider using Range, even though it is half-open
@@ -34,7 +34,7 @@ impl<'ui, 'p> SliderInt<'ui, 'p> {
    }
    pub fn build(self) -> bool {
       unsafe {
-         ffi::igSliderInt(self.label.as_ptr(), self.value, self.min, self.max,
+         imgui_sys::igSliderInt(self.label.as_ptr(), self.value, self.min, self.max,
             self.display_format.as_ptr()
          )
       }
@@ -79,7 +79,7 @@ impl<'ui, 'p> SliderFloat<'ui, 'p> {
    }
    pub fn build(self) -> bool {
       unsafe {
-         ffi::igSliderFloat(self.label.as_ptr(), self.value, self.min, self.max,
+         imgui_sys::igSliderFloat(self.label.as_ptr(), self.value, self.min, self.max,
             self.display_format.as_ptr(),
             self.power
          )

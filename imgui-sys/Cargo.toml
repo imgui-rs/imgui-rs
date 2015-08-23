@@ -1,17 +1,19 @@
 [package]
-name = "imgui"
+name = "imgui-sys"
 version = "0.0.2"
 authors = ["Joonas Javanainen <joonas.javanainen@gmail.com>"]
-description = "Experimental bindings to ocornut/imgui"
+description = "Raw ocornut/imgui bindings for Rust"
 readme = "README.markdown"
 homepage = "https://github.com/gekkio/imgui-rs"
 repository = "https://github.com/gekkio/imgui-rs"
 license = "MIT"
+build = "build.rs"
 
 [features]
 default = ["glium"]
 
 [dependencies]
+bitflags = "0.3"
 libc = "0.1"
 
 [dependencies.glium]
@@ -19,21 +21,5 @@ version = "0.8"
 default-features = false
 optional = true
 
-[dependencies.imgui-sys]
-path = "imgui-sys"
-version = "0.0.2"
-
-[dependencies.sdl2]
-version = "0.7"
-optional = true
-
 [build-dependencies]
 gcc = "0.3"
-
-[dev-dependencies]
-time = "0.1"
-
-[dev-dependencies.glium]
-version = "0.8"
-features = ["glutin"]
-default-features = false

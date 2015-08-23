@@ -6,14 +6,11 @@ use glium::backend::{Context, Facade};
 use glium::draw_parameters::{BlendingFunction, LinearBlendingFactor};
 use glium::index::PrimitiveType;
 use glium::texture::{ClientFormat, RawImage2d};
-use glium::vertex::{Attribute, AttributeType, Vertex, VertexFormat};
-use libc::c_float;
 use std::borrow::Cow;
 use std::fmt;
-use std::mem;
 use std::rc::Rc;
 
-use super::{DrawList, Ui, ImDrawIdx, ImDrawVert, ImGui, ImVec2, ImVec4};
+use super::{DrawList, Ui, ImDrawIdx, ImDrawVert, ImGui};
 
 pub type RendererResult<T> = Result<T, RendererError>;
 
@@ -66,29 +63,6 @@ impl From<texture::TextureCreationError> for RendererError {
 impl From<DrawError> for RendererError {
     fn from(e: DrawError) -> RendererError {
         RendererError::Draw(e)
-    }
-}
-
-unsafe impl Attribute for ImVec2 {
-    fn get_type() -> AttributeType { <(c_float, c_float) as Attribute>::get_type() }
-}
-
-unsafe impl Attribute for ImVec4 {
-    fn get_type() -> AttributeType {
-        <(c_float, c_float, c_float, c_float) as Attribute>::get_type()
-    }
-}
-
-impl Vertex for ImDrawVert {
-    fn build_bindings() -> VertexFormat {
-        unsafe {
-            let dummy: &ImDrawVert = mem::transmute(0usize);
-            Cow::Owned(vec![
-                       ("pos".into(), mem::transmute(&dummy.pos), <ImVec2 as Attribute>::get_type()),
-                       ("uv".into(), mem::transmute(&dummy.uv), <ImVec2 as Attribute>::get_type()),
-                       ("col".into(), mem::transmute(&dummy.col), AttributeType::U8U8U8U8)
-            ])
-        }
     }
 }
 

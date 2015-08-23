@@ -1,7 +1,7 @@
+use imgui_sys;
 use std::marker::PhantomData;
 use std::ptr;
 
-use super::ffi;
 use super::{
    Ui,
    ImGuiSetCond,
@@ -162,12 +162,12 @@ impl<'ui, 'p> Window<'ui, 'p> {
    pub fn build<F: FnOnce()>(self, f: F) {
       let render = unsafe {
          if !self.pos_cond.is_empty() {
-            ffi::igSetNextWindowPos(ImVec2::new(self.pos.0, self.pos.1), self.pos_cond);
+            imgui_sys::igSetNextWindowPos(ImVec2::new(self.pos.0, self.pos.1), self.pos_cond);
          }
          if !self.size_cond.is_empty() {
-            ffi::igSetNextWindowSize(ImVec2::new(self.size.0, self.size.1), self.size_cond);
+            imgui_sys::igSetNextWindowSize(ImVec2::new(self.size.0, self.size.1), self.size_cond);
          }
-         ffi::igBegin2(self.name.as_ptr(),
+         imgui_sys::igBegin2(self.name.as_ptr(),
             self.opened.map(|x| x as *mut bool).unwrap_or(ptr::null_mut()),
             ImVec2::new(0.0, 0.0), self.bg_alpha, self.flags
          )
@@ -175,6 +175,6 @@ impl<'ui, 'p> Window<'ui, 'p> {
       if render {
          f();
       }
-      unsafe { ffi::igEnd() };
+      unsafe { imgui_sys::igEnd() };
    }
 }

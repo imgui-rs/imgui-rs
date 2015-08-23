@@ -1,7 +1,7 @@
+use imgui_sys;
 use std::marker::PhantomData;
 use std::ptr;
 
-use super::ffi;
 use super::{Ui, ImStr};
 
 pub struct Menu<'ui, 'p> {
@@ -26,10 +26,10 @@ impl<'ui, 'p> Menu<'ui, 'p> {
       }
    }
    pub fn build<F: FnOnce()>(self, f: F) {
-      let render = unsafe { ffi::igBeginMenu(self.label.as_ptr(), self.enabled) };
+      let render = unsafe { imgui_sys::igBeginMenu(self.label.as_ptr(), self.enabled) };
       if render {
          f();
-         unsafe { ffi::igEndMenu() };
+         unsafe { imgui_sys::igEndMenu() };
       }
    }
 }
@@ -79,7 +79,7 @@ impl<'ui, 'p> MenuItem<'ui, 'p> {
       let selected = self.selected.map(|x| x as *mut bool).unwrap_or(ptr::null_mut());
       let enabled = self.enabled;
       unsafe {
-         ffi::igMenuItemPtr(label, shortcut, selected, enabled)
+         imgui_sys::igMenuItemPtr(label, shortcut, selected, enabled)
       }
    }
 }

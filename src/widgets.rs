@@ -1,7 +1,7 @@
+use imgui_sys;
 use std::marker::PhantomData;
 use std::ptr;
 
-use super::ffi;
 use super::{Ui, ImStr};
 
 pub struct CollapsingHeader<'ui, 'p> {
@@ -45,7 +45,7 @@ impl<'ui, 'p> CollapsingHeader<'ui, 'p> {
    }
    pub fn build(self) -> bool {
       unsafe {
-         ffi::igCollapsingHeader(
+         imgui_sys::igCollapsingHeader(
             self.label.as_ptr(),
             self.str_id.map(|x| x.as_ptr()).unwrap_or(ptr::null()),
             self.display_frame,
