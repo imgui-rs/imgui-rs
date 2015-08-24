@@ -48,6 +48,7 @@ ui.window()
 
     target/debug/examples/hello_world
     target/debug/examples/test_window
+    target/debug/examples/test_window_impl
 
 ## License
 
