@@ -49,7 +49,7 @@ impl Default for State {
             show_app_manipulating_window_title: false,
             show_app_about: false,
             no_titlebar: false,
-            no_border: false,
+            no_border: true,
             no_resize: false,
             no_move: false,
             no_scrollbar: false,
