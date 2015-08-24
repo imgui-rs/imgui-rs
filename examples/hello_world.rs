@@ -16,9 +16,7 @@ fn main() {
     let mut support = Support::init();
 
     loop {
-        let active = support.render(CLEAR_COLOR, |frame| {
-            hello_world(frame)
-        });
+        let active = support.render(CLEAR_COLOR, hello_world);
         if !active { break }
     }
 }
