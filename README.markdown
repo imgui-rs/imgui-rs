@@ -23,7 +23,7 @@ ui.window()
 * Renderer for easy integration with [Glium](https://github.com/tomaka/glium) projects (optional)
 * Parts of high-level API
 * Not horrible way of defining and passing null-terminated UTF-8 to ImGui
-* Parts of imgui\_demo.cpp reimplemented in Rust as an API usage example (examples/test\_window.rs)
+* Parts of imgui\_demo.cpp reimplemented in Rust as an API usage example (examples/test\_window\_impl.rs)
 
 ## Important but unimplemented things
 
