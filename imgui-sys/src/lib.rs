@@ -112,15 +112,15 @@ pub enum ImGuiKey {
 pub const ImGuiKey_COUNT: usize = 19;
 
 bitflags!(
-   #[repr(C)]
-   flags ImGuiAlign: c_int {
-      const ImGuiAlign_Left    = 1 << 0,
-      const ImGuiAlign_Center  = 1 << 1,
-      const ImGuiAlign_Right   = 1 << 2,
-      const ImGuiAlign_Top     = 1 << 3,
-      const ImGuiAlign_VCenter = 1 << 4,
-      const ImGuiAlign_Default = ImGuiAlign_Left.bits | ImGuiAlign_Top.bits
-   }
+    #[repr(C)]
+    flags ImGuiAlign: c_int {
+        const ImGuiAlign_Left    = 1 << 0,
+        const ImGuiAlign_Center  = 1 << 1,
+        const ImGuiAlign_Right   = 1 << 2,
+        const ImGuiAlign_Top     = 1 << 3,
+        const ImGuiAlign_VCenter = 1 << 4,
+        const ImGuiAlign_Default = ImGuiAlign_Left.bits | ImGuiAlign_Top.bits
+    }
 );
 
 #[repr(C)]
@@ -148,80 +148,80 @@ pub enum ImGuiMouseCursor {
 pub const ImGuiMouseCursor_COUNT: usize = 7;
 
 bitflags!(
-   #[repr(C)]
-   flags ImGuiWindowFlags: c_int {
-      const ImGuiWindowFlags_NoTitleBar          = 1 << 0,
-      const ImGuiWindowFlags_NoResize            = 1 << 1,
-      const ImGuiWindowFlags_NoMove              = 1 << 2,
-      const ImGuiWindowFlags_NoScrollbar         = 1 << 3,
-      const ImGuiWindowFlags_NoScrollWithMouse   = 1 << 4,
-      const ImGuiWindowFlags_NoCollapse          = 1 << 5,
-      const ImGuiWindowFlags_AlwaysAutoResize    = 1 << 6,
-      const ImGuiWindowFlags_ShowBorders         = 1 << 7,
-      const ImGuiWindowFlags_NoSavedSettings     = 1 << 8,
-      const ImGuiWindowFlags_NoInputs            = 1 << 9,
-      const ImGuiWindowFlags_MenuBar             = 1 << 10,
+    #[repr(C)]
+    flags ImGuiWindowFlags: c_int {
+        const ImGuiWindowFlags_NoTitleBar          = 1 << 0,
+        const ImGuiWindowFlags_NoResize            = 1 << 1,
+        const ImGuiWindowFlags_NoMove              = 1 << 2,
+        const ImGuiWindowFlags_NoScrollbar         = 1 << 3,
+        const ImGuiWindowFlags_NoScrollWithMouse   = 1 << 4,
+        const ImGuiWindowFlags_NoCollapse          = 1 << 5,
+        const ImGuiWindowFlags_AlwaysAutoResize    = 1 << 6,
+        const ImGuiWindowFlags_ShowBorders         = 1 << 7,
+        const ImGuiWindowFlags_NoSavedSettings     = 1 << 8,
+        const ImGuiWindowFlags_NoInputs            = 1 << 9,
+        const ImGuiWindowFlags_MenuBar             = 1 << 10,
 
-      const ImGuiWindowFlags_ChildWindow         = 1 << 20,
-      const ImGuiWindowFlags_ChildWindowAutoFitX = 1 << 21,
-      const ImGuiWindowFlags_ChildWindowAutoFitY = 1 << 22,
-      const ImGuiWindowFlags_ComboBox            = 1 << 23,
-      const ImGuiWindowFlags_Tooltip             = 1 << 24,
-      const ImGuiWindowFlags_Popup               = 1 << 25,
-      const ImGuiWindowFlags_Modal               = 1 << 26,
-      const ImGuiWindowFlags_ChildMenu           = 1 << 27
-   }
+        const ImGuiWindowFlags_ChildWindow         = 1 << 20,
+        const ImGuiWindowFlags_ChildWindowAutoFitX = 1 << 21,
+        const ImGuiWindowFlags_ChildWindowAutoFitY = 1 << 22,
+        const ImGuiWindowFlags_ComboBox            = 1 << 23,
+        const ImGuiWindowFlags_Tooltip             = 1 << 24,
+        const ImGuiWindowFlags_Popup               = 1 << 25,
+        const ImGuiWindowFlags_Modal               = 1 << 26,
+        const ImGuiWindowFlags_ChildMenu           = 1 << 27
+    }
 );
 
 impl ImGuiWindowFlags {
-   #[inline]
-   pub fn with(self, mask: ImGuiWindowFlags, value: bool) -> ImGuiWindowFlags {
-      if value { self | mask } else { self - mask }
-   }
+    #[inline]
+    pub fn with(self, mask: ImGuiWindowFlags, value: bool) -> ImGuiWindowFlags {
+        if value { self | mask } else { self - mask }
+    }
 }
 
 bitflags!(
-   #[repr(C)]
-   flags ImGuiSetCond: c_int {
-      const ImGuiSetCond_Always       = 1 << 0,
-      const ImGuiSetCond_Once         = 1 << 1,
-      const ImGuiSetCond_FirstUseEver = 1 << 2,
-      const ImGuiSetCond_Appearing    = 1 << 3
-   }
+    #[repr(C)]
+    flags ImGuiSetCond: c_int {
+        const ImGuiSetCond_Always       = 1 << 0,
+        const ImGuiSetCond_Once         = 1 << 1,
+        const ImGuiSetCond_FirstUseEver = 1 << 2,
+        const ImGuiSetCond_Appearing    = 1 << 3
+    }
 );
 
 bitflags!(
-   #[repr(C)]
-   flags ImGuiInputTextFlags: c_int {
-      const ImGuiInputTextFlags_CharsDecimal        = 1 << 0,
-      const ImGuiInputTextFlags_CharsHexadecimal    = 1 << 1,
-      const ImGuiInputTextFlags_CharsUppercase      = 1 << 2,
-      const ImGuiInputTextFlags_CharsNoBlank        = 1 << 3,
-      const ImGuiInputTextFlags_AutoSelectAll       = 1 << 4,
-      const ImGuiInputTextFlags_EnterReturnsTrue    = 1 << 5,
-      const ImGuiInputTextFlags_CallbackCompletion  = 1 << 6,
-      const ImGuiInputTextFlags_CallbackHistory     = 1 << 7,
-      const ImGuiInputTextFlags_CallbackAlways      = 1 << 8,
-      const ImGuiInputTextFlags_CallbackCharFilter  = 1 << 9,
-      const ImGuiInputTextFlags_AllowTabInput       = 1 << 10,
-      const ImGuiInputTextFlags_CtrlEnterForNewLine = 1 << 11,
-      const ImGuiInputTextFlags_NoHorizontalScroll  = 1 << 12,
-      const ImGuiInputTextFlags_AlwaysInsertMode    = 1 << 13,
+    #[repr(C)]
+    flags ImGuiInputTextFlags: c_int {
+        const ImGuiInputTextFlags_CharsDecimal        = 1 << 0,
+        const ImGuiInputTextFlags_CharsHexadecimal    = 1 << 1,
+        const ImGuiInputTextFlags_CharsUppercase      = 1 << 2,
+        const ImGuiInputTextFlags_CharsNoBlank        = 1 << 3,
+        const ImGuiInputTextFlags_AutoSelectAll       = 1 << 4,
+        const ImGuiInputTextFlags_EnterReturnsTrue    = 1 << 5,
+        const ImGuiInputTextFlags_CallbackCompletion  = 1 << 6,
+        const ImGuiInputTextFlags_CallbackHistory     = 1 << 7,
+        const ImGuiInputTextFlags_CallbackAlways      = 1 << 8,
+        const ImGuiInputTextFlags_CallbackCharFilter  = 1 << 9,
+        const ImGuiInputTextFlags_AllowTabInput       = 1 << 10,
+        const ImGuiInputTextFlags_CtrlEnterForNewLine = 1 << 11,
+        const ImGuiInputTextFlags_NoHorizontalScroll  = 1 << 12,
+        const ImGuiInputTextFlags_AlwaysInsertMode    = 1 << 13,
 
-      const ImGuiInputTextFlags_Multiline           = 1 << 20,
-   }
+        const ImGuiInputTextFlags_Multiline           = 1 << 20,
+    }
 );
 
 bitflags!(
-   #[repr(C)]
-   flags ImGuiSelectableFlags: c_int {
-      const ImGuiSelectableFlags_DontClosePopups = 1 << 0,
-      const ImGuiSelectableFlags_SpanAllColumns  = 1 << 1
-   }
+    #[repr(C)]
+    flags ImGuiSelectableFlags: c_int {
+        const ImGuiSelectableFlags_DontClosePopups = 1 << 0,
+        const ImGuiSelectableFlags_SpanAllColumns  = 1 << 1
+    }
 );
 
 pub type ImGuiTextEditCallback =
-    Option<extern "C" fn(data: *mut ImGuiTextEditCallbackData) -> c_int>;
+Option<extern "C" fn(data: *mut ImGuiTextEditCallbackData) -> c_int>;
 
 #[repr(C)]
 #[derive(Copy, Clone, Debug, Default)]
@@ -231,12 +231,12 @@ pub struct ImVec2 {
 }
 
 impl ImVec2 {
-   pub fn new(x: f32, y: f32) -> ImVec2 {
-      ImVec2 {
-         x: x as c_float,
-         y: y as c_float
-      }
-   }
+    pub fn new(x: f32, y: f32) -> ImVec2 {
+        ImVec2 {
+            x: x as c_float,
+            y: y as c_float
+        }
+    }
 }
 
 #[cfg(feature = "glium")]
@@ -254,14 +254,14 @@ pub struct ImVec4 {
 }
 
 impl ImVec4 {
-   pub fn new(x: f32, y: f32, z: f32, w: f32) -> ImVec4 {
-      ImVec4 {
-         x: x as c_float,
-         y: y as c_float,
-         z: z as c_float,
-         w: w as c_float
-      }
-   }
+    pub fn new(x: f32, y: f32, z: f32, w: f32) -> ImVec4 {
+        ImVec4 {
+            x: x as c_float,
+            y: y as c_float,
+            z: z as c_float,
+            w: w as c_float
+        }
+    }
 }
 
 #[cfg(feature = "glium")]
@@ -368,9 +368,9 @@ pub struct ImVector<T> {
 }
 
 impl<T> ImVector<T> {
-   pub unsafe fn as_slice(&self) -> &[T] {
-      slice::from_raw_parts(self.data, self.size as usize)
-   }
+    pub unsafe fn as_slice(&self) -> &[T] {
+        slice::from_raw_parts(self.data, self.size as usize)
+    }
 }
 
 #[repr(C)]
@@ -500,10 +500,10 @@ pub struct ImDrawData {
 }
 
 impl ImDrawData {
-   pub unsafe fn cmd_lists(&self) -> &[*const ImDrawList] {
-      let cmd_lists: *const *const ImDrawList = mem::transmute(self.cmd_lists);
-      slice::from_raw_parts(cmd_lists, self.cmd_lists_count as usize)
-   }
+    pub unsafe fn cmd_lists(&self) -> &[*const ImDrawList] {
+        let cmd_lists: *const *const ImDrawList = mem::transmute(self.cmd_lists);
+        slice::from_raw_parts(cmd_lists, self.cmd_lists_count as usize)
+    }
 }
 
 #[repr(C)]
@@ -735,8 +735,7 @@ extern "C" {
                     items_separated_by_zeros: *const c_char, height_in_items: c_int) -> bool;
     pub fn igCombo3(label: *const c_char, current_item: *mut c_int,
                     items_getter: extern "C" fn(data: *mut c_void,
-                                                idx: c_int,
-                                                out_text: *mut *const c_char) -> bool,
+                                                idx: c_int, out_text: *mut *const c_char) -> bool,
                     data: *mut c_void, items_count: c_int,
                     height_in_items: c_int) -> bool;
     pub fn igColorButton(col: ImVec4, small_height: bool, outline_border: bool) -> bool;
@@ -749,8 +748,7 @@ extern "C" {
                        scale_min: c_float, scale_max: c_float,
                        graph_size: ImVec2, stride: c_int);
     pub fn igPlotLines2(label: *const c_char,
-                        values_getter: extern "C" fn(data: *mut c_void,
-                                                     idx: c_int) -> c_float,
+                        values_getter: extern "C" fn(data: *mut c_void, idx: c_int) -> c_float,
                         data: *mut c_void,
                         values_count: c_int, values_offset: c_int,
                         overlay_text: *const c_char,
@@ -761,8 +759,7 @@ extern "C" {
                            scale_min: c_float, scale_max: c_float,
                            graph_size: ImVec2, stride: c_int);
     pub fn igPlotHistogram2(label: *const c_char,
-                            values_getter: extern "C" fn(data: *mut c_void,
-                                                        idx: c_int) -> c_float,
+                            values_getter: extern "C" fn(data: *mut c_void, idx: c_int) -> c_float,
                             data: *mut c_void,
                             values_count: c_int, values_offset: c_int,
                             overlay_text: *const c_char,
@@ -845,7 +842,7 @@ extern "C" {
 
 // Widgets: Input
 extern "C" {
-   pub fn igInputText(label: *const c_char, buf: *mut c_char,
+    pub fn igInputText(label: *const c_char, buf: *mut c_char,
                        buf_size: size_t, flags: ImGuiInputTextFlags,
                        callback: ImGuiTextEditCallback, user_data: *mut c_void) -> bool;
     pub fn igInputTextMultiline(label: *const c_char,
@@ -1054,11 +1051,11 @@ extern "C" {
                                                       font_cfg: *const ImFontConfig,
                                                       glyph_ranges: *const ImWchar) -> *mut ImFont;
     pub fn ImFontAtlas_AddFontFromMemoryCompressedBase85TTF(
-       atlas: *mut ImFontAtlas,
-       compressed_ttf_data_base85: *const c_char,
-       size_pixels: c_float,
-       font_cfg: *const ImFontConfig,
-       glyph_ranges: *const ImWchar) -> *mut ImFont;
+        atlas: *mut ImFontAtlas,
+        compressed_ttf_data_base85: *const c_char,
+        size_pixels: c_float,
+        font_cfg: *const ImFontConfig,
+        glyph_ranges: *const ImWchar) -> *mut ImFont;
     pub fn ImFontAtlas_ClearTexData(atlas: *mut ImFontAtlas);
     pub fn ImFontAtlas_Clear(atlas: *mut ImFontAtlas);
     pub fn ImGuiIO_AddInputCharacter(c: c_ushort);

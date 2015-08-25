@@ -13,7 +13,7 @@ const CLEAR_COLOR: (f32, f32, f32, f32) = (1.0, 1.0, 1.0, 1.0);
 fn main() {
     let mut support = Support::init();
 
-     loop {
+    loop {
         let mut open = true;
         let active = support.render(CLEAR_COLOR, |ui| {
             ui.show_test_window(&mut open)
