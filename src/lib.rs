@@ -288,6 +288,11 @@ impl<'ui> Ui<'ui> {
             imgui_sys::igBulletText(fmt_ptr(), text.as_ptr());
         }
     }
+    pub fn small_button<'p>(&self, label: ImStr<'p>) -> bool {
+        unsafe {
+            imgui_sys::igSmallButton(label.as_ptr())
+        }
+    }
     pub fn collapsing_header<'p>(&self, label: ImStr<'p>) -> CollapsingHeader<'ui, 'p> {
         CollapsingHeader::new(label)
     }
