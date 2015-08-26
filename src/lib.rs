@@ -267,28 +267,28 @@ impl<'ui> Ui<'ui> {
 
 // Widgets
 impl<'ui> Ui<'ui> {
-    pub fn text<'b>(&self, text: ImStr<'b>) {
+    pub fn text<'p>(&self, text: ImStr<'p>) {
         // TODO: use igTextUnformatted
         unsafe {
             imgui_sys::igText(fmt_ptr(), text.as_ptr());
         }
     }
-    pub fn text_colored<'b, A>(&self, col: A, text: ImStr<'b>) where A: Into<ImVec4> {
+    pub fn text_colored<'p, A>(&self, col: A, text: ImStr<'p>) where A: Into<ImVec4> {
         unsafe {
             imgui_sys::igTextColored(col.into(), fmt_ptr(), text.as_ptr());
         }
     }
-    pub fn text_disabled<'b>(&self, text: ImStr<'b>) {
+    pub fn text_disabled<'p>(&self, text: ImStr<'p>) {
         unsafe {
             imgui_sys::igTextDisabled(fmt_ptr(), text.as_ptr());
         }
     }
-    pub fn text_wrapped<'b>(&self, text: ImStr<'b>) {
+    pub fn text_wrapped<'p>(&self, text: ImStr<'p>) {
         unsafe {
             imgui_sys::igTextWrapped(fmt_ptr(), text.as_ptr());
         }
     }
-    pub fn label_text<'b>(&self, label: ImStr<'b>, text: ImStr<'b>) {
+    pub fn label_text<'p>(&self, label: ImStr<'p>, text: ImStr<'p>) {
         unsafe {
             imgui_sys::igLabelText(label.as_ptr(), fmt_ptr(), text.as_ptr());
         }
@@ -298,7 +298,7 @@ impl<'ui> Ui<'ui> {
             imgui_sys::igBullet();
         }
     }
-    pub fn bullet_text<'b>(&self, text: ImStr<'b>) {
+    pub fn bullet_text<'p>(&self, text: ImStr<'p>) {
         unsafe {
             imgui_sys::igBulletText(fmt_ptr(), text.as_ptr());
         }
