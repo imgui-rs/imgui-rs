@@ -13,7 +13,6 @@ use libc::{c_char, c_float, c_int, c_uchar};
 use std::borrow::Cow;
 use std::convert::From;
 use std::ffi::CStr;
-use std::fmt;
 use std::mem;
 use std::ptr;
 use std::slice;
@@ -113,8 +112,14 @@ impl ImGui {
 
         ImGui
     }
+    fn io(&self) -> &imgui_sys::ImGuiIO {
+        unsafe { mem::transmute(imgui_sys::igGetIO()) }
+    }
+    fn io_mut(&mut self) -> &mut imgui_sys::ImGuiIO {
+        unsafe { mem::transmute(imgui_sys::igGetIO()) }
+    }
     pub fn prepare_texture<'a, F, T>(&mut self, f: F) -> T where F: FnOnce(TextureHandle<'a>) -> T {
-        let io: &mut imgui_sys::ImGuiIO = unsafe { mem::transmute(imgui_sys::igGetIO()) };
+        let io = self.io();
         let mut pixels: *mut c_uchar = ptr::null_mut();
         let mut width: c_int = 0;
         let mut height: c_int = 0;
@@ -129,33 +134,32 @@ impl ImGui {
         }
     }
     pub fn draw_mouse_cursor(&mut self, value: bool) {
-        let io: &mut imgui_sys::ImGuiIO = unsafe { mem::transmute(imgui_sys::igGetIO()) };
+        let io = self.io_mut();
         io.mouse_draw_cursor = value;
     }
     pub fn mouse_pos(&self) -> (f32, f32) {
-        let io: &mut imgui_sys::ImGuiIO = unsafe { mem::transmute(imgui_sys::igGetIO()) };
+        let io = self.io();
         (io.mouse_pos.x, io.mouse_pos.y)
     }
     pub fn set_mouse_pos(&mut self, x: f32, y: f32) {
-        let io: &mut imgui_sys::ImGuiIO = unsafe { mem::transmute(imgui_sys::igGetIO()) };
+        let io = self.io_mut();
         io.mouse_pos.x = x;
         io.mouse_pos.y = y;
     }
     pub fn set_mouse_down(&mut self, states: &[bool; 5]) {
-        let io: &mut imgui_sys::ImGuiIO = unsafe { mem::transmute(imgui_sys::igGetIO()) };
+        let io = self.io_mut();
         io.mouse_down = *states;
     }
     pub fn get_time(&self) -> f32 { unsafe { imgui_sys::igGetTime() } }
     pub fn get_frame_count(&self) -> i32 { unsafe { imgui_sys::igGetFrameCount() } }
     pub fn frame<'ui, 'a: 'ui>(&'a mut self, width: u32, height: u32, delta_time: f32) -> Ui<'ui> {
-        unsafe {
-            let io: &mut imgui_sys::ImGuiIO = mem::transmute(imgui_sys::igGetIO());
+        {
+            let io = self.io_mut();
             io.display_size.x = width as c_float;
             io.display_size.y = height as c_float;
             io.delta_time = delta_time;
-
-            imgui_sys::igNewFrame();
         }
+        unsafe { imgui_sys::igNewFrame() };
         Ui {
             imgui: self
         }
@@ -174,7 +178,7 @@ impl Drop for ImGui {
 impl ImGui {
     pub fn update_mouse(&mut self, mouse: &::sdl2::mouse::MouseUtil) {
         let (mouse_state, mouse_x, mouse_y) = mouse.get_mouse_state();
-        let io: &mut imgui_sys::ImGuiIO = unsafe { mem::transmute(imgui_sys::igGetIO()) };
+        let io = self.io_mut();
         io.mouse_pos.x = mouse_x as f32;
         io.mouse_pos.y = mouse_y as f32;
         io.mouse_down = [
