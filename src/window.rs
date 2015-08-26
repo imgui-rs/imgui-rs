@@ -77,6 +77,7 @@ impl<'ui, 'p> Window<'ui, 'p> {
             .. self
         }
     }
+    #[inline]
     pub fn flags(self, flags: ImGuiWindowFlags) -> Self {
         Window {
             flags: flags,
