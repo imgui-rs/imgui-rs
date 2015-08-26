@@ -138,11 +138,10 @@ fn show_test_window<'a>(ui: &Ui<'a>, state: &mut State, opened: &mut bool) {
             .always_auto_resize(true)
             .opened(&mut state.show_app_about)
             .build(|| {
-                ui.text(ImStr::from_str(&format!("ImGui {}", imgui::get_version())));
+                ui.text(im_str!("ImGui {}", imgui::get_version()));
                 ui.separator();
                 ui.text(im_str!("By Omar Cornut and all github contributors."));
                 ui.text(im_str!("ImGui is licensed under the MIT License, see LICENSE for more information."));
-                show_user_guide(ui);
             })
     }
 
@@ -207,6 +206,41 @@ fn show_test_window<'a>(ui: &Ui<'a>, state: &mut State, opened: &mut bool) {
                 ui.checkbox(im_str!("no collapse"), &mut state.no_collapse);
                 ui.checkbox(im_str!("no menu"), &mut state.no_menu);
                 ui.slider_f32(im_str!("bg alpha"), &mut state.bg_alpha, 0.0, 1.0).build();
+
+                ui.tree_node(im_str!("Style")).build(|| {
+                    // TODO: Reimplement style editor
+                    ui.show_default_style_editor();
+                });
+                ui.tree_node(im_str!("Fonts"))
+                    .label(im_str!("Fonts ({})", "TODO"))
+                    .build(|| {
+                    ui.text_wrapped(im_str!("Tip: Load fonts with io.Fonts->AddFontFromFileTTF()."));
+                    ui.tree_node(im_str!("Atlas texture")).build(|| {
+                        // TODO
+                    });
+                });
+            }
+            if ui.collapsing_header(im_str!("Widgets")).build() {
+                ui.tree_node(im_str!("Tree")).build(|| {
+                    for i in 0..5 {
+                        ui.tree_node(im_str!("Child {}", i)).build(|| {
+                            ui.text(im_str!("blah blah"));
+                            ui.same_line(0.0);
+                            if ui.small_button(im_str!("print")) {
+                                println!("Child {} pressed", i);
+                            }
+                        });
+                    }
+                });
+                ui.tree_node(im_str!("Bullets")).build(|| {
+                    ui.bullet_text(im_str!("Bullet point 1"));
+                    ui.bullet_text(im_str!("Bullet point 2\nOn multiple lines"));
+                    ui.bullet();
+                    ui.text(im_str!("Bullet point 3 (two calls)"));
+
+                    ui.bullet();
+                    ui.small_button(im_str!("Button"));
+                });
             }
         })
 }
@@ -237,8 +271,8 @@ fn show_example_menu_file<'a>(ui: &Ui<'a>, state: &mut FileMenuState) {
         ui.menu_item(im_str!("fish_hat.inl")).build();
         ui.menu_item(im_str!("fish_hat.h")).build();
         ui.menu(im_str!("More..")).build(|| {
-            ui.menu_item(im_str!("Hello"));
-            ui.menu_item(im_str!("Sailor"));
+            ui.menu_item(im_str!("Hello")).build();
+            ui.menu_item(im_str!("Sailor")).build();
             ui.menu(im_str!("Recurse..")).build(|| {
                 show_example_menu_file(ui, state);
             });
