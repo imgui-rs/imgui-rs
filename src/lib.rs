@@ -32,11 +32,13 @@ pub use imgui_sys::{
 };
 pub use menus::{Menu, MenuItem};
 pub use sliders::{SliderFloat, SliderInt};
+pub use trees::{TreeNode};
 pub use widgets::{CollapsingHeader};
 pub use window::{Window};
 
 mod menus;
 mod sliders;
+mod trees;
 mod widgets;
 mod window;
 
@@ -302,6 +304,13 @@ impl<'ui> Ui<'ui> {
     pub fn slider_i32<'p>(&self, label: ImStr<'p>,
                           value: &'p mut i32, min: i32, max: i32) -> SliderInt<'ui, 'p> {
         SliderInt::new(label, value, min, max)
+    }
+}
+
+// Widgets: Trees
+impl<'ui> Ui<'ui> {
+    pub fn tree_node<'p>(&self, id: ImStr<'p>) -> TreeNode<'ui, 'p> {
+        TreeNode::new(id)
     }
 }
 
