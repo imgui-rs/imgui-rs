@@ -58,6 +58,7 @@ macro_rules! im_str {
     })
 }
 
+#[derive(Clone)]
 pub struct ImStr<'a> {
     bytes: Cow<'a, [u8]>
 }
