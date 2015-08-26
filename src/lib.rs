@@ -23,6 +23,7 @@ pub use imgui_sys::{
     ImGuiSetCond,
     ImGuiSetCond_Always, ImGuiSetCond_Once,
     ImGuiSetCond_FirstUseEver, ImGuiSetCond_Appearing,
+    ImGuiStyle,
     ImGuiWindowFlags,
     ImGuiWindowFlags_NoTitleBar, ImGuiWindowFlags_NoResize, ImGuiWindowFlags_NoMove,
     ImGuiWindowFlags_NoScrollbar, ImGuiWindowFlags_NoScrollWithMouse, ImGuiWindowFlags_NoCollapse,
@@ -217,6 +218,14 @@ impl<'ui> Ui<'ui> {
             Ok(())
         }
     pub fn show_user_guide(&self) { unsafe { imgui_sys::igShowUserGuide() }; }
+    pub fn show_default_style_editor(&self) {
+        unsafe { imgui_sys::igShowStyleEditor(ptr::null_mut()) };
+    }
+    pub fn show_style_editor<'p>(&self, style: &'p mut ImGuiStyle) {
+        unsafe {
+            imgui_sys::igShowStyleEditor(style as *mut ImGuiStyle);
+        }
+    }
     pub fn show_test_window(&self, opened: &mut bool) {
         unsafe {
             imgui_sys::igShowTestWindow(opened);
