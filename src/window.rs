@@ -33,7 +33,7 @@ impl<'ui, 'p> Window<'ui, 'p> {
             pos_cond: ImGuiSetCond::empty(),
             size: (0.0, 0.0),
             size_cond: ImGuiSetCond::empty(),
-            name: unsafe { ImStr::from_bytes(b"Debug\0") },
+            name: unsafe { ImStr::from_bytes_unchecked(b"Debug\0") },
             opened: None,
             bg_alpha: -1.0,
             flags: ImGuiWindowFlags::empty(),

@@ -11,6 +11,7 @@ extern crate sdl2;
 
 use libc::{c_char, c_float, c_int, c_uchar};
 use std::borrow::Cow;
+use std::convert::From;
 use std::ffi::CStr;
 use std::fmt;
 use std::mem;
@@ -52,10 +53,10 @@ pub struct ImGui;
 macro_rules! im_str {
     ($e:tt) => ({
         let value = concat!($e, "\0");
-        unsafe { ::imgui::ImStr::from_bytes(value.as_bytes()) }
+        unsafe { ::imgui::ImStr::from_bytes_unchecked(value.as_bytes()) }
     });
     ($e:tt, $($arg:tt)*) => ({
-        ::imgui::ImStr::from_fmt(format_args!($e, $($arg)*))
+        ::imgui::ImStr::from(format!($e, $($arg)*))
     })
 }
 
@@ -65,26 +66,31 @@ pub struct ImStr<'a> {
 }
 
 impl<'a> ImStr<'a> {
-    pub unsafe fn from_bytes(bytes: &'a [u8]) -> ImStr<'a> {
+    pub unsafe fn from_bytes_unchecked(bytes: &'a [u8]) -> ImStr<'a> {
         ImStr {
             bytes: Cow::Borrowed(bytes)
         }
     }
-    pub fn from_str(value: &str) -> ImStr<'a> {
+    fn as_ptr(&self) -> *const c_char { self.bytes.as_ptr() as *const c_char }
+}
+
+impl<'a> From<&'a str> for ImStr<'a> {
+    fn from(value: &'a str) -> ImStr<'a> {
         let mut bytes: Vec<u8> = value.bytes().collect();
         bytes.push(0);
         ImStr {
             bytes: Cow::Owned(bytes)
         }
     }
-    pub fn from_fmt(args: fmt::Arguments) -> ImStr<'a> {
-        let mut bytes = fmt::format(args).into_bytes();
-        bytes.push(0);
+}
+
+impl From<String> for ImStr<'static> {
+    fn from(mut value: String) -> ImStr<'static> {
+        value.push('\0');
         ImStr {
-            bytes: Cow::Owned(bytes)
+            bytes: Cow::Owned(value.into_bytes())
         }
     }
-    fn as_ptr(&self) -> *const c_char { self.bytes.as_ptr() as *const c_char }
 }
 
 pub struct TextureHandle<'a> {
