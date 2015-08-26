@@ -13,6 +13,7 @@ use super::{
     ImStr, ImVec2
 };
 
+#[must_use]
 pub struct Window<'ui, 'p> {
     pos: (f32, f32),
     pos_cond: ImGuiSetCond,

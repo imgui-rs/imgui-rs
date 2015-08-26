@@ -4,6 +4,7 @@ use std::ptr;
 
 use super::{Ui, ImStr};
 
+#[must_use]
 pub struct CollapsingHeader<'ui, 'p> {
     label: ImStr<'p>,
     str_id: Option<ImStr<'p>>,

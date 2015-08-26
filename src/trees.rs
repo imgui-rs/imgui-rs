@@ -3,6 +3,7 @@ use std::marker::PhantomData;
 
 use super::{Ui, ImGuiSetCond, ImStr};
 
+#[must_use]
 pub struct TreeNode<'ui, 'p> {
     id: ImStr<'p>,
     label: Option<ImStr<'p>>,

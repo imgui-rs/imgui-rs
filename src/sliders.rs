@@ -5,6 +5,7 @@ use super::{Ui, ImStr};
 
 // TODO: Consider using Range, even though it is half-open
 
+#[must_use]
 pub struct SliderInt<'ui, 'p> {
     label: ImStr<'p>,
     value: &'p mut i32,
@@ -41,6 +42,7 @@ impl<'ui, 'p> SliderInt<'ui, 'p> {
     }
 }
 
+#[must_use]
 pub struct SliderFloat<'ui, 'p> {
     label: ImStr<'p>,
     value: &'p mut f32,

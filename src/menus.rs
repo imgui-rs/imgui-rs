@@ -4,6 +4,7 @@ use std::ptr;
 
 use super::{Ui, ImStr};
 
+#[must_use]
 pub struct Menu<'ui, 'p> {
     label: ImStr<'p>,
     enabled: bool,
@@ -34,6 +35,7 @@ impl<'ui, 'p> Menu<'ui, 'p> {
     }
 }
 
+#[must_use]
 pub struct MenuItem<'ui, 'p> {
     label: ImStr<'p>,
     shortcut: Option<ImStr<'p>>,
