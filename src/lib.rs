@@ -46,7 +46,12 @@ mod window;
 #[cfg(feature = "glium")]
 pub mod glium_renderer;
 
-pub struct ImGui;
+pub struct ImGui {
+    // We need to keep ownership of the ImStr values to ensure the *const char pointer
+    // lives long enough in case the ImStr contains a Cow::Owned
+    ini_filename: Option<ImStr<'static>>,
+    log_filename: Option<ImStr<'static>>
+}
 
 #[macro_export]
 macro_rules! im_str {
@@ -110,13 +115,22 @@ impl ImGui {
         let io: &mut imgui_sys::ImGuiIO = unsafe { mem::transmute(imgui_sys::igGetIO()) };
         io.render_draw_lists_fn = Some(render_draw_lists);
 
-        ImGui
+        ImGui {
+            ini_filename: None,
+            log_filename: None
+        }
     }
     fn io(&self) -> &imgui_sys::ImGuiIO {
         unsafe { mem::transmute(imgui_sys::igGetIO()) }
     }
     fn io_mut(&mut self) -> &mut imgui_sys::ImGuiIO {
         unsafe { mem::transmute(imgui_sys::igGetIO()) }
+    }
+    pub fn style(&self) -> &ImGuiStyle {
+        unsafe { mem::transmute(imgui_sys::igGetStyle()) }
+    }
+    pub fn style_mut(&self) -> &mut ImGuiStyle {
+        unsafe { mem::transmute(imgui_sys::igGetStyle()) }
     }
     pub fn prepare_texture<'a, F, T>(&mut self, f: F) -> T where F: FnOnce(TextureHandle<'a>) -> T {
         let io = self.io();
@@ -133,9 +147,49 @@ impl ImGui {
             })
         }
     }
-    pub fn draw_mouse_cursor(&mut self, value: bool) {
+    pub fn set_ini_filename(&mut self, value: Option<ImStr<'static>>) {
+        {
+            let io = self.io_mut();
+            io.ini_filename = match value {
+               Some(ref x) => x.as_ptr(),
+               None => ptr::null()
+            }
+        }
+        self.ini_filename = value;
+    }
+    pub fn set_log_filename(&mut self, value: Option<ImStr<'static>>) {
+        {
+            let io = self.io_mut();
+            io.log_filename = match value {
+               Some(ref x) => x.as_ptr(),
+               None => ptr::null()
+            }
+        }
+        self.log_filename = value;
+    }
+    pub fn set_ini_saving_rate(&mut self, value: f32) {
         let io = self.io_mut();
-        io.mouse_draw_cursor = value;
+        io.ini_saving_rate = value;
+    }
+    pub fn set_mouse_double_click_time(&mut self, value: f32) {
+        let io = self.io_mut();
+        io.mouse_double_click_time = value;
+    }
+    pub fn set_mouse_double_click_max_dist(&mut self, value: f32) {
+        let io = self.io_mut();
+        io.mouse_double_click_max_dist = value;
+    }
+    pub fn set_mouse_drag_threshold(&mut self, value: f32) {
+        let io = self.io_mut();
+        io.mouse_drag_threshold = value;
+    }
+    pub fn set_key_repeat_delay(&mut self, value: f32) {
+        let io = self.io_mut();
+        io.key_repeat_delay = value;
+    }
+    pub fn set_key_repeat_rate(&mut self, value: f32) {
+        let io = self.io_mut();
+        io.key_repeat_rate = value;
     }
     pub fn mouse_pos(&self) -> (f32, f32) {
         let io = self.io();
@@ -149,6 +203,26 @@ impl ImGui {
     pub fn set_mouse_down(&mut self, states: &[bool; 5]) {
         let io = self.io_mut();
         io.mouse_down = *states;
+    }
+    pub fn set_mouse_wheel(&mut self, value: f32) {
+        let io = self.io_mut();
+        io.mouse_wheel = value;
+    }
+    pub fn set_mouse_draw_cursor(&mut self, value: bool) {
+        let io = self.io_mut();
+        io.mouse_draw_cursor = value;
+    }
+    pub fn set_key_ctrl(&mut self, value: bool) {
+        let io = self.io_mut();
+        io.key_ctrl = value;
+    }
+    pub fn set_key_shift(&mut self, value: bool) {
+        let io = self.io_mut();
+        io.key_shift = value;
+    }
+    pub fn set_key_alt(&mut self, value: bool) {
+        let io = self.io_mut();
+        io.key_alt = value;
     }
     pub fn get_time(&self) -> f32 { unsafe { imgui_sys::igGetTime() } }
     pub fn get_frame_count(&self) -> i32 { unsafe { imgui_sys::igGetFrameCount() } }
@@ -207,6 +281,34 @@ fn fmt_ptr() -> *const c_char { FMT.as_ptr() as *const c_char }
 
 impl<'ui> Ui<'ui> {
     pub fn imgui(&self) -> &ImGui { self.imgui }
+    pub fn want_capture_mouse(&self) -> bool {
+        let io = self.imgui.io();
+        io.want_capture_mouse
+    }
+    pub fn want_capture_keyboard(&self) -> bool {
+        let io = self.imgui.io();
+        io.want_capture_keyboard
+    }
+    pub fn framerate(&self) -> f32 {
+        let io = self.imgui.io();
+        io.framerate
+    }
+    pub fn metrics_allocs(&self) -> i32 {
+        let io = self.imgui.io();
+        io.metrics_allocs
+    }
+    pub fn metrics_render_vertices(&self) -> i32 {
+        let io = self.imgui.io();
+        io.metrics_render_vertices
+    }
+    pub fn metrics_render_indices(&self) -> i32 {
+        let io = self.imgui.io();
+        io.metrics_render_indices
+    }
+    pub fn metrics_active_windows(&self) -> i32 {
+        let io = self.imgui.io();
+        io.metrics_active_windows
+    }
     pub fn render<F, E>(self, mut f: F) -> Result<(), E>
         where F: FnMut(DrawList<'ui>) -> Result<(), E> {
             unsafe {
