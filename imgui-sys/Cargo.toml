@@ -3,7 +3,6 @@ name = "imgui-sys"
 version = "0.0.2"
 authors = ["Joonas Javanainen <joonas.javanainen@gmail.com>"]
 description = "Raw ocornut/imgui bindings for Rust"
-readme = "README.markdown"
 homepage = "https://github.com/gekkio/imgui-rs"
 repository = "https://github.com/gekkio/imgui-rs"
 license = "MIT"
