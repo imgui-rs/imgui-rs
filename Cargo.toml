@@ -21,7 +21,7 @@ optional = true
 
 [dependencies.imgui-sys]
 path = "imgui-sys"
-version = "0.0.2"
+version = "0.0.3"
 
 [dependencies.sdl2]
 version = "0.7"
