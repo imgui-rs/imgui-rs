@@ -1,9 +1,8 @@
 use glium::{
     index, program, texture, vertex,
-    DrawError, DrawParameters, IndexBuffer, Program, Rect, Surface, Texture2d, VertexBuffer
+    Blend, DrawError, DrawParameters, IndexBuffer, Program, Rect, Surface, Texture2d, VertexBuffer
 };
 use glium::backend::{Context, Facade};
-use glium::draw_parameters::{BlendingFunction, LinearBlendingFactor};
 use glium::index::PrimitiveType;
 use glium::texture::{ClientFormat, RawImage2d};
 use std::borrow::Cow;
@@ -103,10 +102,7 @@ impl Renderer {
                 texture: self.device_objects.texture.sampled()
             };
             let draw_params = DrawParameters {
-                blending_function: Some(BlendingFunction::Addition {
-                    source: LinearBlendingFactor::SourceAlpha,
-                    destination: LinearBlendingFactor::OneMinusSourceAlpha
-                }),
+                blend: Blend::alpha_blending(),
                 scissor: Some(Rect {
                     left: cmd.clip_rect.x as u32,
                     bottom: (height as f32 - cmd.clip_rect.w) as u32,
