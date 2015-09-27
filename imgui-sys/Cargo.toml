@@ -1,6 +1,6 @@
 [package]
 name = "imgui-sys"
-version = "0.0.3-pre"
+version = "0.0.3"
 authors = ["Joonas Javanainen <joonas.javanainen@gmail.com>"]
 description = "Raw ocornut/imgui bindings for Rust"
 homepage = "https://github.com/gekkio/imgui-rs"
