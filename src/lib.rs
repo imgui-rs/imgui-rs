@@ -6,9 +6,6 @@ extern crate imgui_sys;
 
 extern crate libc;
 
-#[cfg(feature = "sdl2")]
-extern crate sdl2;
-
 use libc::{c_char, c_float, c_int, c_uchar};
 use std::borrow::Cow;
 use std::convert::From;
@@ -255,23 +252,6 @@ impl Drop for ImGui {
 }
 
 static mut CURRENT_UI: Option<Ui<'static>> = None;
-
-#[cfg(feature = "sdl2")]
-impl ImGui {
-    pub fn update_mouse(&mut self, mouse: &::sdl2::mouse::MouseUtil) {
-        let (mouse_state, mouse_x, mouse_y) = mouse.get_mouse_state();
-        let io = self.io_mut();
-        io.mouse_pos.x = mouse_x as f32;
-        io.mouse_pos.y = mouse_y as f32;
-        io.mouse_down = [
-            mouse_state.left(),
-            mouse_state.right(),
-            mouse_state.middle(),
-            mouse_state.x1(),
-            mouse_state.x2()
-        ];
-    }
-}
 
 pub struct DrawList<'a> {
     pub cmd_buffer: &'a [imgui_sys::ImDrawCmd],

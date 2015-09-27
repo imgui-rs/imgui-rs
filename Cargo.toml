@@ -23,10 +23,6 @@ optional = true
 path = "imgui-sys"
 version = "0.0.3"
 
-[dependencies.sdl2]
-version = "0.7"
-optional = true
-
 [build-dependencies]
 gcc = "0.3"
 
