@@ -233,7 +233,12 @@ impl ImGui {
             io.display_size.y = height as c_float;
             io.delta_time = delta_time;
         }
-        unsafe { imgui_sys::igNewFrame() };
+        unsafe {
+            imgui_sys::igNewFrame();
+            CURRENT_UI = Some(Ui {
+                imgui: mem::transmute(self as &'a ImGui)
+            });
+        }
         Ui {
             imgui: self
         }
@@ -243,10 +248,13 @@ impl ImGui {
 impl Drop for ImGui {
     fn drop(&mut self) {
         unsafe {
+            CURRENT_UI = None;
             imgui_sys::igShutdown();
         }
     }
 }
+
+static mut CURRENT_UI: Option<Ui<'static>> = None;
 
 #[cfg(feature = "sdl2")]
 impl ImGui {
@@ -315,7 +323,7 @@ impl<'ui> Ui<'ui> {
                 let mut im_draw_data = mem::zeroed();
                 RENDER_DRAW_LISTS_STATE.0 = &mut im_draw_data;
                 imgui_sys::igRender();
-                RENDER_DRAW_LISTS_STATE.0 = 0 as *mut imgui_sys::ImDrawData;
+                RENDER_DRAW_LISTS_STATE.0 = ptr::null_mut();
 
                 for &cmd_list in im_draw_data.cmd_lists() {
                     let draw_list =
@@ -326,6 +334,7 @@ impl<'ui> Ui<'ui> {
                         };
                     try!(f(draw_list));
                 }
+                CURRENT_UI = None;
             }
             Ok(())
         }
@@ -347,6 +356,12 @@ impl<'ui> Ui<'ui> {
         unsafe {
             imgui_sys::igShowMetricsWindow(opened);
         }
+    }
+}
+
+impl<'a> Ui<'a> {
+    pub unsafe fn current_ui() -> Option<&'a Ui<'a>> {
+        CURRENT_UI.as_ref()
     }
 }
 
