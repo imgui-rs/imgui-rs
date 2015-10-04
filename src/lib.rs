@@ -26,7 +26,8 @@ pub use imgui_sys::{
     ImGuiWindowFlags_NoScrollbar, ImGuiWindowFlags_NoScrollWithMouse, ImGuiWindowFlags_NoCollapse,
     ImGuiWindowFlags_AlwaysAutoResize, ImGuiWindowFlags_ShowBorders,
     ImGuiWindowFlags_NoSavedSettings, ImGuiWindowFlags_NoInputs, ImGuiWindowFlags_MenuBar,
-    ImVec2, ImVec4
+    ImVec2, ImVec4,
+    ImGuiKey
 };
 pub use menus::{Menu, MenuItem};
 pub use sliders::{SliderFloat, SliderInt};
@@ -220,6 +221,21 @@ impl ImGui {
     pub fn set_key_alt(&mut self, value: bool) {
         let io = self.io_mut();
         io.key_alt = value;
+    }
+    pub fn set_key(&mut self, key: u8, pressed: bool) {
+        let io = self.io_mut();
+        io.keys_down[key as usize] = pressed;
+    }
+    pub fn set_imgui_key(&mut self, key: ImGuiKey, mapping: u8) {
+        let io = self.io_mut();
+        io.key_map[key as usize] = mapping as i32;
+    }
+    pub fn add_input_character(&mut self, character: char) {
+        unsafe {
+            // TODO: This is not good. We should use char::encode_ut8 when it stabilizes
+            // (or whatever stabilizes to fill its place) and call ImGuiIO_AddInputCharactersUTF8
+            imgui_sys::ImGuiIO_AddInputCharacter(character as u16);
+        }
     }
     pub fn get_time(&self) -> f32 { unsafe { imgui_sys::igGetTime() } }
     pub fn get_frame_count(&self) -> i32 { unsafe { imgui_sys::igGetFrameCount() } }

@@ -92,9 +92,10 @@ fn main() {
     let mut opened = true;
 
     loop {
-        let active = support.render(state.clear_color, |ui| {
+        support.render(state.clear_color, |ui| {
             show_test_window(ui, &mut state, &mut opened);
         });
+        let active = support.update_events();
         if !active || !opened { break }
     }
 }
