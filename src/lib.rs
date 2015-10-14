@@ -231,10 +231,17 @@ impl ImGui {
         io.key_map[key as usize] = mapping as i32;
     }
     pub fn add_input_character(&mut self, character: char) {
-        unsafe {
-            // TODO: This is not good. We should use char::encode_ut8 when it stabilizes
-            // (or whatever stabilizes to fill its place) and call ImGuiIO_AddInputCharactersUTF8
-            imgui_sys::ImGuiIO_AddInputCharacter(character as u16);
+        if !character.is_control() {
+            // TODO: This is slightly better. We should use char::encode_utf8 when it stabilizes
+            // to allow us to skip the string intermediate since we can then go directly
+            // to bytes
+            let utf8_str: String = character.escape_default().collect();
+            let mut bytes = utf8_str.into_bytes();
+            // into_bytes does not produce a c-string, we must append the null terminator
+            bytes.push(0);
+            unsafe {
+                imgui_sys::ImGuiIO_AddInputCharactersUTF8(bytes.as_ptr()  as *const i8);
+            }
         }
     }
     pub fn get_time(&self) -> f32 { unsafe { imgui_sys::igGetTime() } }

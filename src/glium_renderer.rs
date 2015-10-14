@@ -131,7 +131,7 @@ pub struct DeviceObjects {
     texture: Texture2d
 }
 
-fn compile_default_program<F: Facade>(ctx: &F) -> Result<Program, program::ProgramCreationError> {
+fn compile_default_program<F: Facade>(ctx: &F) -> Result<Program, program::ProgramChooserCreationError> {
     program!(
         ctx,
         140 => {
@@ -152,7 +152,11 @@ impl DeviceObjects {
         let vertex_buffer = try!(VertexBuffer::empty_dynamic(ctx, 0));
         let index_buffer = try!(IndexBuffer::empty_dynamic(ctx, PrimitiveType::TrianglesList, 0));
 
-        let program = try!(compile_default_program(ctx));
+        let program = match compile_default_program(ctx) {
+            Ok(p) => p,
+            Err(program::ProgramChooserCreationError::NoVersion) => panic!("No version for GLSL program"),
+            Err(e) => panic!("Error compiling shaders {:?}", e),
+        };
         let texture = try!(im_gui.prepare_texture(|handle| {
             let data = RawImage2d {
                 data: Cow::Borrowed(handle.pixels),
