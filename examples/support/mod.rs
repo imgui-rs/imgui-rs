@@ -88,12 +88,8 @@ impl Support {
         for event in self.display.poll_events() {
             match event {
                 Event::Closed => return false,
-                Event::KeyboardInput(state, scancode, code) => {
-                    println!("KeyCode {:?} scancode {} pressed? {}", code, scancode,
-                             state == ElementState::Pressed);
+                Event::KeyboardInput(state, _, code) => {
                     let pressed = state == ElementState::Pressed;
-                    // TODO: glutin is missing some virtual key codes on windows 10 for Ctrl and
-                    // Shift
                     match code {
                         Some(VirtualKeyCode::Tab) => self.imgui.set_key(0, pressed),
                         Some(VirtualKeyCode::Left) => self.imgui.set_key(1, pressed),
@@ -130,12 +126,9 @@ impl Support {
                     self.mouse_pressed.1 = state == ElementState::Pressed,
                 Event::MouseInput(state, MouseButton::Middle) =>
                     self.mouse_pressed.2 = state == ElementState::Pressed,
-                Event::MouseWheel(MouseScrollDelta::LineDelta(_, y)) => self.mouse_wheel = y * 5.0,
+                Event::MouseWheel(MouseScrollDelta::LineDelta(_, y)) => self.mouse_wheel = y,
                 Event::MouseWheel(MouseScrollDelta::PixelDelta(_, y)) => self.mouse_wheel = y,
-                Event::ReceivedCharacter(c) => {
-                    println!("Got character {}", c);
-                    self.imgui.add_input_character(c);
-                },
+                Event::ReceivedCharacter(c) => self.imgui.add_input_character(c),
                 _ => ()
             }
         }
