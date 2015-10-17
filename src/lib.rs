@@ -223,6 +223,7 @@ impl ImGui {
     }
     pub fn get_time(&self) -> f32 { unsafe { imgui_sys::igGetTime() } }
     pub fn get_frame_count(&self) -> i32 { unsafe { imgui_sys::igGetFrameCount() } }
+    pub fn get_frame_rate(&self) -> f32 { self.io().framerate }
     pub fn frame<'ui, 'a: 'ui>(&'a mut self, width: u32, height: u32, delta_time: f32) -> Ui<'ui> {
         {
             let io = self.io_mut();
