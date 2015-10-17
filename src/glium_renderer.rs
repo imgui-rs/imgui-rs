@@ -17,7 +17,7 @@ pub type RendererResult<T> = Result<T, RendererError>;
 pub enum RendererError {
     Vertex(vertex::BufferCreationError),
     Index(index::BufferCreationError),
-    Program(program::ProgramCreationError),
+    Program(program::ProgramChooserCreationError),
     Texture(texture::TextureCreationError),
     Draw(DrawError)
 }
@@ -47,8 +47,8 @@ impl From<index::BufferCreationError> for RendererError {
     }
 }
 
-impl From<program::ProgramCreationError> for RendererError {
-    fn from(e: program::ProgramCreationError) -> RendererError {
+impl From<program::ProgramChooserCreationError> for RendererError {
+    fn from(e: program::ProgramChooserCreationError) -> RendererError {
         RendererError::Program(e)
     }
 }
@@ -152,11 +152,7 @@ impl DeviceObjects {
         let vertex_buffer = try!(VertexBuffer::empty_dynamic(ctx, 0));
         let index_buffer = try!(IndexBuffer::empty_dynamic(ctx, PrimitiveType::TrianglesList, 0));
 
-        let program = match compile_default_program(ctx) {
-            Ok(p) => p,
-            Err(program::ProgramChooserCreationError::NoVersion) => panic!("No version for GLSL program"),
-            Err(e) => panic!("Error compiling shaders {:?}", e),
-        };
+        let program = try!(compile_default_program(ctx));
         let texture = try!(im_gui.prepare_texture(|handle| {
             let data = RawImage2d {
                 data: Cow::Borrowed(handle.pixels),
