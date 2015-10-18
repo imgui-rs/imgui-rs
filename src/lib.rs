@@ -17,6 +17,13 @@ use std::str;
 
 pub use imgui_sys::{
     ImDrawIdx, ImDrawVert,
+    ImGuiInputTextFlags, ImGuiInputTextFlags_CharsDecimal, ImGuiInputTextFlags_CharsHexadecimal,
+    ImGuiInputTextFlags_CharsUppercase, ImGuiInputTextFlags_CharsNoBlank,
+    ImGuiInputTextFlags_AutoSelectAll, ImGuiInputTextFlags_EnterReturnsTrue,
+    ImGuiInputTextFlags_CallbackCompletion, ImGuiInputTextFlags_CallbackHistory,
+    ImGuiInputTextFlags_CallbackAlways, ImGuiInputTextFlags_CallbackCharFilter,
+    ImGuiInputTextFlags_AllowTabInput, ImGuiInputTextFlags_CtrlEnterForNewLine,
+    ImGuiInputTextFlags_NoHorizontalScroll, ImGuiInputTextFlags_AlwaysInsertMode,
     ImGuiSetCond,
     ImGuiSetCond_Always, ImGuiSetCond_Once,
     ImGuiSetCond_FirstUseEver, ImGuiSetCond_Appearing,
@@ -29,12 +36,14 @@ pub use imgui_sys::{
     ImVec2, ImVec4,
     ImGuiKey
 };
+pub use input::{InputText};
 pub use menus::{Menu, MenuItem};
 pub use sliders::{SliderFloat, SliderInt};
 pub use trees::{TreeNode};
 pub use widgets::{CollapsingHeader};
 pub use window::{Window};
 
+mod input;
 mod menus;
 mod sliders;
 mod trees;
@@ -435,6 +444,13 @@ impl<'ui> Ui<'ui> {
     }
     pub fn checkbox<'p>(&self, label: ImStr<'p>, value: &'p mut bool) -> bool {
         unsafe { imgui_sys::igCheckbox(label.as_ptr(), value) }
+    }
+}
+
+// Widgets: Input
+impl<'ui> Ui<'ui> {
+    pub fn input_text<'p>(&self, label: ImStr<'p>, buf: &'p mut str) -> InputText<'ui, 'p> {
+        InputText::new(label, buf)
     }
 }
 

@@ -212,6 +212,14 @@ bitflags!(
     }
 );
 
+impl ImGuiInputTextFlags {
+    #[inline]
+    pub fn with(self, mask: ImGuiInputTextFlags, value: bool) -> ImGuiInputTextFlags {
+        if value { self | mask } else { self - mask }
+    }
+}
+
+
 bitflags!(
     #[repr(C)]
     flags ImGuiSelectableFlags: c_int {
