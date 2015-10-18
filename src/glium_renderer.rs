@@ -17,7 +17,7 @@ pub type RendererResult<T> = Result<T, RendererError>;
 pub enum RendererError {
     Vertex(vertex::BufferCreationError),
     Index(index::BufferCreationError),
-    Program(program::ProgramCreationError),
+    Program(program::ProgramChooserCreationError),
     Texture(texture::TextureCreationError),
     Draw(DrawError)
 }
@@ -47,8 +47,8 @@ impl From<index::BufferCreationError> for RendererError {
     }
 }
 
-impl From<program::ProgramCreationError> for RendererError {
-    fn from(e: program::ProgramCreationError) -> RendererError {
+impl From<program::ProgramChooserCreationError> for RendererError {
+    fn from(e: program::ProgramChooserCreationError) -> RendererError {
         RendererError::Program(e)
     }
 }
@@ -131,7 +131,7 @@ pub struct DeviceObjects {
     texture: Texture2d
 }
 
-fn compile_default_program<F: Facade>(ctx: &F) -> Result<Program, program::ProgramCreationError> {
+fn compile_default_program<F: Facade>(ctx: &F) -> Result<Program, program::ProgramChooserCreationError> {
     program!(
         ctx,
         140 => {
