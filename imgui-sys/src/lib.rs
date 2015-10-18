@@ -13,6 +13,7 @@ use glium::vertex::{Attribute, AttributeType, Vertex, VertexFormat};
 use libc::*;
 #[cfg(feature = "glium")]
 use std::borrow::Cow;
+use std::convert::From;
 use std::mem;
 use std::slice;
 
@@ -247,6 +248,18 @@ impl ImVec2 {
     }
 }
 
+impl From<[f32; 2]> for ImVec2 {
+    fn from(array: [f32; 2]) -> ImVec2 {
+        ImVec2::new(array[0], array[1])
+    }
+}
+
+impl From<(f32, f32)> for ImVec2 {
+    fn from(tuple: (f32, f32)) -> ImVec2 {
+        ImVec2::new(tuple.0, tuple.1)
+    }
+}
+
 #[cfg(feature = "glium")]
 unsafe impl Attribute for ImVec2 {
     fn get_type() -> AttributeType { <(c_float, c_float) as Attribute>::get_type() }
@@ -269,6 +282,18 @@ impl ImVec4 {
             z: z as c_float,
             w: w as c_float
         }
+    }
+}
+
+impl From<[f32; 4]> for ImVec4 {
+    fn from(array: [f32; 4]) -> ImVec4 {
+        ImVec4::new(array[0], array[1], array[2], array[3])
+    }
+}
+
+impl From<(f32, f32, f32, f32)> for ImVec4 {
+    fn from(tuple: (f32, f32, f32, f32)) -> ImVec4 {
+        ImVec4::new(tuple.0, tuple.1, tuple.2, tuple.3)
     }
 }
 
