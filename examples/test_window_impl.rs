@@ -5,6 +5,7 @@ extern crate imgui;
 extern crate time;
 
 use imgui::*;
+use std::iter::repeat;
 
 use self::support::Support;
 
@@ -30,12 +31,17 @@ struct State {
     no_collapse: bool,
     no_menu: bool,
     bg_alpha: f32,
+    wrap_width: f32,
+    buf: String,
     auto_resize_state: AutoResizeState,
     file_menu: FileMenuState
 }
 
 impl Default for State {
     fn default() -> Self {
+        let mut buf = "日本語".to_owned();
+        buf.extend(repeat('\0').take(32));
+        buf.truncate(32);
         State {
             clear_color: (114.0 / 255.0, 144.0 / 255.0, 154.0 / 255.0, 1.0),
             show_app_metrics: false,
@@ -56,6 +62,8 @@ impl Default for State {
             no_collapse: false,
             no_menu: false,
             bg_alpha: 0.65,
+            wrap_width: 200.0,
+            buf: buf,
             auto_resize_state: Default::default(),
             file_menu: Default::default()
         }
@@ -241,6 +249,38 @@ fn show_test_window<'a>(ui: &Ui<'a>, state: &mut State, opened: &mut bool) {
 
                     ui.bullet();
                     ui.small_button(im_str!("Button"));
+                });
+                ui.tree_node(im_str!("Colored text")).build(|| {
+                    ui.text_colored((1.0, 0.0, 1.0, 1.0), im_str!("Pink"));
+                    ui.text_colored((1.0, 1.0, 0.0, 1.0), im_str!("Yellow"));
+                    ui.text_disabled(im_str!("Disabled"));
+                });
+                ui.tree_node(im_str!("Word Wrapping")).build(|| {
+                    ui.text_wrapped(im_str!(
+                            "This text should automatically wrap on the edge of the window.\
+                            The current implementation for text wrapping follows simple rules\
+                            suitable for English and possibly other languages."));
+                    ui.spacing();
+
+                    ui.slider_f32(im_str!("Wrap width"), &mut state.wrap_width, -20.0, 600.0)
+                        .display_format(im_str!("%.0f"))
+                        .build();
+
+                    ui.text(im_str!("Test paragraph 1:"));
+                    // TODO
+
+                    ui.text(im_str!("Test paragraph 2:"));
+                    // TODO
+                });
+                ui.tree_node(im_str!("UTF-8 Text")).build(|| {
+                    ui.text_wrapped(im_str!(
+                            "CJK text will only appear if the font was loaded with the\
+                            appropriate CJK character ranges. Call io.Font->LoadFromFileTTF()\
+                            manually to load extra character ranges."));
+
+                    ui.text(im_str!("Hiragana: かきくけこ (kakikukeko)"));
+                    ui.text(im_str!("Kanjis: 日本語 (nihongo)"));
+                    ui.input_text(im_str!("UTF-8 input"), &mut state.buf).build();
                 });
             }
         })
