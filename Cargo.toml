@@ -12,10 +12,10 @@ license = "MIT"
 default = ["glium"]
 
 [dependencies]
-libc = "0.1"
+libc = "0.2"
 
 [dependencies.glium]
-version = "0.10"
+version = "0.11"
 default-features = false
 optional = true
 
@@ -30,6 +30,6 @@ gcc = "0.3"
 time = "0.1"
 
 [dev-dependencies.glium]
-version = "0.10"
+version = "0.11"
 features = ["glutin"]
 default-features = false
