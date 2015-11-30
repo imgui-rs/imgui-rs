@@ -15,7 +15,7 @@ default = ["glium"]
 libc = "0.2"
 
 [dependencies.glium]
-version = "0.11"
+version = "0.12"
 default-features = false
 optional = true
 
@@ -30,6 +30,6 @@ gcc = "0.3"
 time = "0.1"
 
 [dev-dependencies.glium]
-version = "0.11"
+version = "0.12"
 features = ["glutin"]
 default-features = false
