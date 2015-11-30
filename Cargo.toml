@@ -1,6 +1,6 @@
 [package]
 name = "imgui"
-version = "0.0.5"
+version = "0.0.6-pre"
 authors = ["Joonas Javanainen <joonas.javanainen@gmail.com>"]
 description = "Experimental bindings to ocornut/imgui"
 readme = "README.markdown"
@@ -21,7 +21,7 @@ optional = true
 
 [dependencies.imgui-sys]
 path = "imgui-sys"
-version = "0.0.5"
+version = "0.0.6"
 
 [build-dependencies]
 gcc = "0.3"
