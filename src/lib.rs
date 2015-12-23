@@ -24,6 +24,7 @@ pub use imgui_sys::{
     ImGuiInputTextFlags_CallbackAlways, ImGuiInputTextFlags_CallbackCharFilter,
     ImGuiInputTextFlags_AllowTabInput, ImGuiInputTextFlags_CtrlEnterForNewLine,
     ImGuiInputTextFlags_NoHorizontalScroll, ImGuiInputTextFlags_AlwaysInsertMode,
+    ImGuiInputTextFlags_ReadOnly,
     ImGuiSetCond,
     ImGuiSetCond_Always, ImGuiSetCond_Once,
     ImGuiSetCond_FirstUseEver, ImGuiSetCond_Appearing,
@@ -33,7 +34,8 @@ pub use imgui_sys::{
     ImGuiWindowFlags_NoScrollbar, ImGuiWindowFlags_NoScrollWithMouse, ImGuiWindowFlags_NoCollapse,
     ImGuiWindowFlags_AlwaysAutoResize, ImGuiWindowFlags_ShowBorders,
     ImGuiWindowFlags_NoSavedSettings, ImGuiWindowFlags_NoInputs, ImGuiWindowFlags_MenuBar,
-    ImGuiWindowFlags_HorizontalScrollbar,
+    ImGuiWindowFlags_HorizontalScrollbar, ImGuiWindowFlags_NoFocusOnAppearing,
+    ImGuiWindowFlags_NoBringToFrontOnFocus,
     ImVec2, ImVec4,
     ImGuiKey
 };

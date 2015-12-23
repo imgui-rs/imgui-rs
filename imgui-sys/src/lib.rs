@@ -151,27 +151,29 @@ pub const ImGuiMouseCursor_COUNT: usize = 7;
 bitflags!(
     #[repr(C)]
     flags ImGuiWindowFlags: c_int {
-        const ImGuiWindowFlags_NoTitleBar          = 1 << 0,
-        const ImGuiWindowFlags_NoResize            = 1 << 1,
-        const ImGuiWindowFlags_NoMove              = 1 << 2,
-        const ImGuiWindowFlags_NoScrollbar         = 1 << 3,
-        const ImGuiWindowFlags_NoScrollWithMouse   = 1 << 4,
-        const ImGuiWindowFlags_NoCollapse          = 1 << 5,
-        const ImGuiWindowFlags_AlwaysAutoResize    = 1 << 6,
-        const ImGuiWindowFlags_ShowBorders         = 1 << 7,
-        const ImGuiWindowFlags_NoSavedSettings     = 1 << 8,
-        const ImGuiWindowFlags_NoInputs            = 1 << 9,
-        const ImGuiWindowFlags_MenuBar             = 1 << 10,
-        const ImGuiWindowFlags_HorizontalScrollbar = 1 << 11,
+        const ImGuiWindowFlags_NoTitleBar            = 1 << 0,
+        const ImGuiWindowFlags_NoResize              = 1 << 1,
+        const ImGuiWindowFlags_NoMove                = 1 << 2,
+        const ImGuiWindowFlags_NoScrollbar           = 1 << 3,
+        const ImGuiWindowFlags_NoScrollWithMouse     = 1 << 4,
+        const ImGuiWindowFlags_NoCollapse            = 1 << 5,
+        const ImGuiWindowFlags_AlwaysAutoResize      = 1 << 6,
+        const ImGuiWindowFlags_ShowBorders           = 1 << 7,
+        const ImGuiWindowFlags_NoSavedSettings       = 1 << 8,
+        const ImGuiWindowFlags_NoInputs              = 1 << 9,
+        const ImGuiWindowFlags_MenuBar               = 1 << 10,
+        const ImGuiWindowFlags_HorizontalScrollbar   = 1 << 11,
+        const ImGuiWindowFlags_NoFocusOnAppearing    = 1 << 12,
+        const ImGuiWindowFlags_NoBringToFrontOnFocus = 1 << 13,
 
-        const ImGuiWindowFlags_ChildWindow         = 1 << 20,
-        const ImGuiWindowFlags_ChildWindowAutoFitX = 1 << 21,
-        const ImGuiWindowFlags_ChildWindowAutoFitY = 1 << 22,
-        const ImGuiWindowFlags_ComboBox            = 1 << 23,
-        const ImGuiWindowFlags_Tooltip             = 1 << 24,
-        const ImGuiWindowFlags_Popup               = 1 << 25,
-        const ImGuiWindowFlags_Modal               = 1 << 26,
-        const ImGuiWindowFlags_ChildMenu           = 1 << 27
+        const ImGuiWindowFlags_ChildWindow           = 1 << 20,
+        const ImGuiWindowFlags_ChildWindowAutoFitX   = 1 << 21,
+        const ImGuiWindowFlags_ChildWindowAutoFitY   = 1 << 22,
+        const ImGuiWindowFlags_ComboBox              = 1 << 23,
+        const ImGuiWindowFlags_Tooltip               = 1 << 24,
+        const ImGuiWindowFlags_Popup                 = 1 << 25,
+        const ImGuiWindowFlags_Modal                 = 1 << 26,
+        const ImGuiWindowFlags_ChildMenu             = 1 << 27
     }
 );
 
@@ -209,6 +211,7 @@ bitflags!(
         const ImGuiInputTextFlags_CtrlEnterForNewLine = 1 << 11,
         const ImGuiInputTextFlags_NoHorizontalScroll  = 1 << 12,
         const ImGuiInputTextFlags_AlwaysInsertMode    = 1 << 13,
+        const ImGuiInputTextFlags_ReadOnly            = 1 << 14,
 
         const ImGuiInputTextFlags_Multiline           = 1 << 20,
     }
@@ -444,6 +447,8 @@ pub struct ImGuiTextEditCallbackData {
     pub event_flag: ImGuiInputTextFlags,
     pub flags: ImGuiInputTextFlags,
     pub user_data: *mut c_void,
+    pub read_only: bool,
+
     pub event_char: ImWchar,
     pub event_key: ImGuiKey,
     pub buf: *mut c_char,
@@ -531,6 +536,7 @@ pub struct ImDrawList {
 
 #[repr(C)]
 pub struct ImDrawData {
+    pub valid: bool,
     pub cmd_lists: *mut *mut ImDrawList,
     pub cmd_lists_count: c_int,
     pub total_vtx_count: c_int,
@@ -608,6 +614,7 @@ pub struct ImFont {
 extern "C" {
     pub fn igGetIO() -> *mut ImGuiIO;
     pub fn igGetStyle() -> *mut ImGuiStyle;
+    pub fn igGetDrawData() -> *mut ImDrawData;
     pub fn igNewFrame();
     pub fn igRender();
     pub fn igShutdown();
@@ -689,10 +696,10 @@ extern "C" {
     pub fn igPushItemWidth(item_width: c_float);
     pub fn igPopitemWidth();
     pub fn igCalcItemWidth() -> c_float;
-    pub fn igPushAllowKeyboardFocus(v: bool);
-    pub fn igPopAllowKeyboardFocus();
     pub fn igPushTextWrapPos(wrap_pos_x: c_float);
     pub fn igPopTextWrapPos();
+    pub fn igPushAllowKeyboardFocus(v: bool);
+    pub fn igPopAllowKeyboardFocus();
     pub fn igPushButtonRepeat(repeat: bool);
     pub fn igPopButtonRepeat();
 }
@@ -1030,7 +1037,7 @@ extern "C" {
                               out_items_display_start: *mut c_int,
                               out_items_display_end: *mut c_int);
 
-    pub fn igBeginChildFrame(id: ImGuiID, size: ImVec2) -> bool;
+    pub fn igBeginChildFrame(id: ImGuiID, size: ImVec2, extra_flags: ImGuiWindowFlags) -> bool;
     pub fn igEndChildFrame();
 
     pub fn igColorConvertU32ToFloat4(out: *mut ImVec4, color: ImU32);
@@ -1049,7 +1056,7 @@ extern "C" {
     pub fn igIsMouseReleased(button: c_int) -> bool;
     pub fn igIsMouseHoveringWindow() -> bool;
     pub fn igIsMouseHoveringAnyWindow() -> bool;
-    pub fn igIsMouseHoveringRect(pos_min: ImVec2, pos_max: ImVec2) -> bool;
+    pub fn igIsMouseHoveringRect(pos_min: ImVec2, pos_max: ImVec2, clip: bool) -> bool;
     pub fn igIsMouseDragging(button: c_int, lock_threshold: c_float) -> bool;
     pub fn igGetMousePos(out: *mut ImVec2);
     pub fn igGetMousePosOnOpeningCurrentPopup(out: *mut ImVec2);
@@ -1057,6 +1064,16 @@ extern "C" {
     pub fn igResetMouseDragDelta(button: c_int);
     pub fn igGetMouseCursor() -> ImGuiMouseCursor;
     pub fn igSetMouseCursor(cursor: ImGuiMouseCursor);
+    pub fn igCaptureKeyboardFromApp();
+    pub fn igCaptureMouseFromApp();
+}
+
+// Helpers functions to access functions pointers in ImGui::GetIO()
+extern "C" {
+    pub fn igMemAlloc(sz: size_t) -> *mut c_void;
+    pub fn igMemFree(ptr: *mut c_void);
+    pub fn igGetClipboardText() -> *const c_char;
+    pub fn igSetClipboardText(text: *const c_char);
 }
 
 // Internal state access

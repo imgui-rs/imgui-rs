@@ -10,7 +10,8 @@ use super::{
     ImGuiWindowFlags_NoScrollbar, ImGuiWindowFlags_NoScrollWithMouse, ImGuiWindowFlags_NoCollapse,
     ImGuiWindowFlags_AlwaysAutoResize, ImGuiWindowFlags_ShowBorders,
     ImGuiWindowFlags_NoSavedSettings, ImGuiWindowFlags_NoInputs, ImGuiWindowFlags_MenuBar,
-    ImGuiWindowFlags_HorizontalScrollbar,
+    ImGuiWindowFlags_HorizontalScrollbar, ImGuiWindowFlags_NoFocusOnAppearing,
+    ImGuiWindowFlags_NoBringToFrontOnFocus,
     ImStr, ImVec2
 };
 
@@ -159,6 +160,20 @@ impl<'ui, 'p> Window<'ui, 'p> {
     pub fn horizontal_scrollbar(self, value: bool) -> Self {
         Window {
             flags: self.flags.with(ImGuiWindowFlags_HorizontalScrollbar, value),
+            .. self
+        }
+    }
+    #[inline]
+    pub fn no_focus_on_appearing(self, value: bool) -> Self {
+        Window {
+            flags: self.flags.with(ImGuiWindowFlags_NoFocusOnAppearing, value),
+            .. self
+        }
+    }
+    #[inline]
+    pub fn no_bring_to_front_on_focus(self, value: bool) -> Self {
+        Window {
+            flags: self.flags.with(ImGuiWindowFlags_NoBringToFrontOnFocus, value),
             .. self
         }
     }
