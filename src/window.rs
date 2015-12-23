@@ -10,6 +10,7 @@ use super::{
     ImGuiWindowFlags_NoScrollbar, ImGuiWindowFlags_NoScrollWithMouse, ImGuiWindowFlags_NoCollapse,
     ImGuiWindowFlags_AlwaysAutoResize, ImGuiWindowFlags_ShowBorders,
     ImGuiWindowFlags_NoSavedSettings, ImGuiWindowFlags_NoInputs, ImGuiWindowFlags_MenuBar,
+    ImGuiWindowFlags_HorizontalScrollbar,
     ImStr, ImVec2
 };
 
@@ -27,13 +28,13 @@ pub struct Window<'ui, 'p> {
 }
 
 impl<'ui, 'p> Window<'ui, 'p> {
-    pub fn new() -> Window<'ui, 'p> {
+    pub fn new(name: ImStr<'p>) -> Window<'ui, 'p> {
         Window {
             pos: (0.0, 0.0),
             pos_cond: ImGuiSetCond::empty(),
             size: (0.0, 0.0),
             size_cond: ImGuiSetCond::empty(),
-            name: unsafe { ImStr::from_bytes_unchecked(b"Debug\0") },
+            name: name,
             opened: None,
             bg_alpha: -1.0,
             flags: ImGuiWindowFlags::empty(),
@@ -53,13 +54,6 @@ impl<'ui, 'p> Window<'ui, 'p> {
         Window {
             size: size,
             size_cond: cond,
-            .. self
-        }
-    }
-    #[inline]
-    pub fn name(self, name: ImStr<'p>) -> Self {
-        Window {
-            name: name,
             .. self
         }
     }
@@ -158,6 +152,13 @@ impl<'ui, 'p> Window<'ui, 'p> {
     pub fn menu_bar(self, value: bool) -> Self {
         Window {
             flags: self.flags.with(ImGuiWindowFlags_MenuBar, value),
+            .. self
+        }
+    }
+    #[inline]
+    pub fn horizontal_scrollbar(self, value: bool) -> Self {
+        Window {
+            flags: self.flags.with(ImGuiWindowFlags_HorizontalScrollbar, value),
             .. self
         }
     }

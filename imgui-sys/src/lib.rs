@@ -162,6 +162,7 @@ bitflags!(
         const ImGuiWindowFlags_NoSavedSettings     = 1 << 8,
         const ImGuiWindowFlags_NoInputs            = 1 << 9,
         const ImGuiWindowFlags_MenuBar             = 1 << 10,
+        const ImGuiWindowFlags_HorizontalScrollbar = 1 << 11,
 
         const ImGuiWindowFlags_ChildWindow         = 1 << 20,
         const ImGuiWindowFlags_ChildWindowAutoFitX = 1 << 21,
@@ -320,7 +321,7 @@ pub struct ImGuiStyle {
     pub window_fill_alpha_default: c_float,
     pub indent_spacing: c_float,
     pub columns_min_spacing: c_float,
-    pub scrollbar_width: c_float,
+    pub scrollbar_size: c_float,
     pub scrollbar_rounding: c_float,
     pub grab_min_size: c_float,
     pub grab_rounding: c_float,
@@ -328,6 +329,7 @@ pub struct ImGuiStyle {
     pub display_safe_area_padding: ImVec2,
     pub anti_aliased_lines: bool,
     pub anti_aliased_shapes: bool,
+    pub curve_tessellation_tol: c_float,
     pub colors: [ImVec4; ImGuiCol_COUNT]
 }
 
@@ -348,6 +350,7 @@ pub struct ImGuiIO {
     pub fonts: *mut ImFontAtlas,
     pub font_global_scale: c_float,
     pub font_allow_user_scaling: bool,
+    pub display_framebuffer_scale: ImVec2,
     pub display_visible_min: ImVec2,
     pub display_visible_max: ImVec2,
 
@@ -372,6 +375,7 @@ pub struct ImGuiIO {
 
     pub want_capture_mouse: bool,
     pub want_capture_keyboard: bool,
+    pub want_text_input: bool,
     pub framerate: c_float,
     pub metrics_allocs: c_int,
     pub metrics_render_vertices: c_int,
@@ -520,7 +524,8 @@ pub struct ImDrawList {
     clip_rect_stack: ImVector<ImVec4>,
     texture_id_stack: ImVector<ImTextureID>,
     path: ImVector<ImVec2>,
-    channel_current: c_int,
+    channels_current: c_int,
+    channels_count: c_int,
     channels: ImVector<ImDrawChannel>
 }
 
@@ -625,8 +630,10 @@ extern "C" {
     pub fn igEndChild();
     pub fn igGetContentRegionMax(out: *mut ImVec2);
     pub fn igGetContentRegionAvail(out: *mut ImVec2);
+    pub fn igGetContentRegionAvailWidth() -> c_float;
     pub fn igGetWindowContentRegionMin(out: *mut ImVec2);
     pub fn igGetWindowContentRegionMax(out: *mut ImVec2);
+    pub fn igGetWindowContentRegionWidth() -> c_float;
     pub fn igGetWindowDrawList() -> *mut ImDrawList;
     pub fn igGetWindowFont() -> *mut ImFont;
     pub fn igGetWindowFontSize() -> c_float;
@@ -634,11 +641,14 @@ extern "C" {
     pub fn igGetWindowPos(out: *mut ImVec2);
     pub fn igGetWindowSize(out: *mut ImVec2);
     pub fn igGetWindowWidth() -> c_float;
+    pub fn igGetWindowHeight() -> c_float;
     pub fn igIsWindowCollapsed() -> bool;
 
     pub fn igSetNextWindowPos(pos: ImVec2, cond: ImGuiSetCond);
     pub fn igSetNextWindowPosCenter(cond: ImGuiSetCond);
     pub fn igSetNextWindowSize(size: ImVec2, cond: ImGuiSetCond);
+    pub fn igSetNextWindowContentSize(size: ImVec2);
+    pub fn igSetNextWindowContentWidth(width: c_float);
     pub fn igSetNextWindowCollapsed(collapsed: bool, cond: ImGuiSetCond);
     pub fn igSetNextWindowFocus();
     pub fn igSetWindowPos(pos: ImVec2, cond: ImGuiSetCond);
@@ -650,8 +660,11 @@ extern "C" {
     pub fn igSetWindowCollapsed2(name: *const c_char, collapsed: bool, cond: ImGuiSetCond);
     pub fn igSetWindowFocus2(name: *const c_char);
 
+    pub fn igGetScrollX() -> c_float;
     pub fn igGetScrollY() -> c_float;
+    pub fn igGetScrollMaxX() -> c_float;
     pub fn igGetScrollMaxY() -> c_float;
+    pub fn igSetScrollX(scroll_x: c_float);
     pub fn igSetScrollY(scroll_y: c_float);
     pub fn igSetScrollHere(center_y_ratio: c_float);
     pub fn igSetScrollFromPosY(pos_y: c_float, center_y_ratio: c_float);
@@ -689,7 +702,7 @@ extern "C" {
     pub fn igBeginGroup();
     pub fn igEndGroup();
     pub fn igSeparator();
-    pub fn igSameLine(pos_x: c_float, spacing_w: c_float);
+    pub fn igSameLine(local_pos_x: c_float, spacing_w: c_float);
     pub fn igSpacing();
     pub fn igDummy(size: *const ImVec2);
     pub fn igIndent();
@@ -704,7 +717,7 @@ extern "C" {
     pub fn igGetCursorPos(out: *mut ImVec2);
     pub fn igGetCursorPosX() -> c_float;
     pub fn igGetCursorPosY() -> c_float;
-    pub fn igSetCursorPos(pos: ImVec2);
+    pub fn igSetCursorPos(local_pos: ImVec2);
     pub fn igSetCursorPosX(x: c_float);
     pub fn igSetCursorPosY(y: c_float);
     pub fn igGetCursorStartPos(out: *mut ImVec2);
@@ -1020,6 +1033,7 @@ extern "C" {
     pub fn igBeginChildFrame(id: ImGuiID, size: ImVec2) -> bool;
     pub fn igEndChildFrame();
 
+    pub fn igColorConvertU32ToFloat4(out: *mut ImVec4, color: ImU32);
     pub fn igColorConvertFloat4ToU32(color: ImVec4) -> ImU32;
     pub fn igColorConvertRGBtoHSV(r: c_float, g: c_float, b: c_float,
                                   out_h: *mut c_float, out_s: *mut c_float, out_v: *mut c_float);
@@ -1035,9 +1049,10 @@ extern "C" {
     pub fn igIsMouseReleased(button: c_int) -> bool;
     pub fn igIsMouseHoveringWindow() -> bool;
     pub fn igIsMouseHoveringAnyWindow() -> bool;
-    pub fn igIsMouseHoveringRect(rect_min: ImVec2, rect_max: ImVec2) -> bool;
+    pub fn igIsMouseHoveringRect(pos_min: ImVec2, pos_max: ImVec2) -> bool;
     pub fn igIsMouseDragging(button: c_int, lock_threshold: c_float) -> bool;
     pub fn igGetMousePos(out: *mut ImVec2);
+    pub fn igGetMousePosOnOpeningCurrentPopup(out: *mut ImVec2);
     pub fn igGetMouseDragDelta(out: *mut ImVec2, button: c_int, lock_threshold: c_float);
     pub fn igResetMouseDragDelta(button: c_int);
     pub fn igGetMouseCursor() -> ImGuiMouseCursor;

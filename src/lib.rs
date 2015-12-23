@@ -33,6 +33,7 @@ pub use imgui_sys::{
     ImGuiWindowFlags_NoScrollbar, ImGuiWindowFlags_NoScrollWithMouse, ImGuiWindowFlags_NoCollapse,
     ImGuiWindowFlags_AlwaysAutoResize, ImGuiWindowFlags_ShowBorders,
     ImGuiWindowFlags_NoSavedSettings, ImGuiWindowFlags_NoInputs, ImGuiWindowFlags_MenuBar,
+    ImGuiWindowFlags_HorizontalScrollbar,
     ImVec2, ImVec4,
     ImGuiKey
 };
@@ -377,7 +378,7 @@ impl<'a> Ui<'a> {
 
 // Window
 impl<'ui> Ui<'ui> {
-    pub fn window<'p>(&self) -> Window<'ui, 'p> { Window::new() }
+    pub fn window<'p>(&self, name: ImStr<'p>) -> Window<'ui, 'p> { Window::new(name) }
 }
 
 // Layout
@@ -497,7 +498,7 @@ struct RenderDrawListsState(*mut imgui_sys::ImDrawData);
 unsafe impl Sync for RenderDrawListsState {}
 
 static mut RENDER_DRAW_LISTS_STATE: RenderDrawListsState =
-   RenderDrawListsState(0 as *mut imgui_sys::ImDrawData);
+    RenderDrawListsState(0 as *mut imgui_sys::ImDrawData);
 
 extern "C" fn render_draw_lists(data: *mut imgui_sys::ImDrawData) {
     unsafe {

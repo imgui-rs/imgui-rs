@@ -23,8 +23,7 @@ fn main() {
 }
 
 fn hello_world<'a>(ui: &Ui<'a>) {
-    ui.window()
-        .name(im_str!("Hello world"))
+    ui.window(im_str!("Hello world"))
         .size((300.0, 100.0), ImGuiSetCond_FirstUseEver)
         .build(|| {
             ui.text(im_str!("Hello world!"));
