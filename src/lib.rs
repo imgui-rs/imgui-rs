@@ -122,9 +122,6 @@ pub fn get_version() -> &'static str {
 
 impl ImGui {
     pub fn init() -> ImGui {
-        let io: &mut imgui_sys::ImGuiIO = unsafe { mem::transmute(imgui_sys::igGetIO()) };
-        io.render_draw_lists_fn = Some(render_draw_lists);
-
         ImGui {
             ini_filename: None,
             log_filename: None
@@ -333,12 +330,10 @@ impl<'ui> Ui<'ui> {
     pub fn render<F, E>(self, mut f: F) -> Result<(), E>
         where F: FnMut(DrawList<'ui>) -> Result<(), E> {
             unsafe {
-                let mut im_draw_data = mem::zeroed();
-                RENDER_DRAW_LISTS_STATE.0 = &mut im_draw_data;
                 imgui_sys::igRender();
-                RENDER_DRAW_LISTS_STATE.0 = ptr::null_mut();
 
-                for &cmd_list in im_draw_data.cmd_lists() {
+                let draw_data = imgui_sys::igGetDrawData();
+                for &cmd_list in (*draw_data).cmd_lists() {
                     let draw_list =
                         DrawList {
                             cmd_buffer: (*cmd_list).cmd_buffer.as_slice(),
@@ -494,16 +489,4 @@ impl<'ui> Ui<'ui> {
     }
     pub fn menu<'p>(&self, label: ImStr<'p>) -> Menu<'ui, 'p> { Menu::new(label) }
     pub fn menu_item<'p>(&self, label: ImStr<'p>) -> MenuItem<'ui, 'p> { MenuItem::new(label) }
-}
-
-struct RenderDrawListsState(*mut imgui_sys::ImDrawData);
-unsafe impl Sync for RenderDrawListsState {}
-
-static mut RENDER_DRAW_LISTS_STATE: RenderDrawListsState =
-    RenderDrawListsState(0 as *mut imgui_sys::ImDrawData);
-
-extern "C" fn render_draw_lists(data: *mut imgui_sys::ImDrawData) {
-    unsafe {
-        ptr::copy_nonoverlapping(data, RENDER_DRAW_LISTS_STATE.0, 1);
-    }
 }
