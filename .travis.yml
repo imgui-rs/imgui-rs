@@ -6,3 +6,5 @@ rust:
 matrix:
   allow_failures:
     - rust: nightly
+before_install:
+  - git submodule update --init --recursive
