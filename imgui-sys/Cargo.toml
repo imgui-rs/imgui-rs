@@ -16,7 +16,7 @@ bitflags = "0.3"
 libc = "0.2"
 
 [dependencies.glium]
-version = "0.12"
+version = "0.13"
 default-features = false
 optional = true
 
