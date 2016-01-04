@@ -2,6 +2,8 @@
 
 **Ultra hyper turbo cyber mega extra über experimental!!!**
 
+[![Build Status](https://travis-ci.org/Gekkio/imgui-rs.svg?branch=master)](https://travis-ci.org/Gekkio/imgui-rs)
+
 ![Hello world](hello_world.png)
 
 ```rust
