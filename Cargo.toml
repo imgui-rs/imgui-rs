@@ -6,7 +6,7 @@ description = "Experimental bindings to ocornut/imgui"
 readme = "README.markdown"
 homepage = "https://github.com/gekkio/imgui-rs"
 repository = "https://github.com/gekkio/imgui-rs"
-license = "MIT"
+license = "MIT OR Apache-2.0"
 
 [features]
 default = ["glium"]
