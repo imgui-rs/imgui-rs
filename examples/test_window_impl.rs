@@ -33,6 +33,8 @@ struct State {
     bg_alpha: f32,
     wrap_width: f32,
     buf: String,
+    text: String,
+    int: i32,
     auto_resize_state: AutoResizeState,
     file_menu: FileMenuState
 }
@@ -42,6 +44,10 @@ impl Default for State {
         let mut buf = "日本語".to_owned();
         buf.extend(repeat('\0').take(32));
         buf.truncate(32);
+        let mut text = String::with_capacity(128);
+        text.push_str("Hello, world!");
+        let remaining = text.capacity() - text.len();
+        text.extend(repeat('\0').take(remaining));
         State {
             clear_color: (114.0 / 255.0, 144.0 / 255.0, 154.0 / 255.0, 1.0),
             show_app_metrics: false,
@@ -64,6 +70,8 @@ impl Default for State {
             bg_alpha: 0.65,
             wrap_width: 200.0,
             buf: buf,
+            text: text,
+            int: 123,
             auto_resize_state: Default::default(),
             file_menu: Default::default()
         }
@@ -281,6 +289,10 @@ fn show_test_window<'a>(ui: &Ui<'a>, state: &mut State, opened: &mut bool) {
                     ui.text(im_str!("Kanjis: 日本語 (nihongo)"));
                     ui.input_text(im_str!("UTF-8 input"), &mut state.buf).build();
                 });
+                ui.separator();
+                ui.label_text(im_str!("label"), im_str!("Value"));
+                ui.input_text(im_str!("input text"), &mut state.text).build();
+                ui.input_int(im_str!("input int"), &mut state.int).build();
             }
         })
 }

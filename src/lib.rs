@@ -39,7 +39,7 @@ pub use imgui_sys::{
     ImVec2, ImVec4,
     ImGuiKey
 };
-pub use input::{InputText};
+pub use input::{InputInt, InputText};
 pub use menus::{Menu, MenuItem};
 pub use sliders::{SliderFloat, SliderInt};
 pub use trees::{TreeNode};
@@ -447,6 +447,9 @@ impl<'ui> Ui<'ui> {
 
 // Widgets: Input
 impl<'ui> Ui<'ui> {
+    pub fn input_int<'p>(&self, label: ImStr<'p>, value: &'p mut i32) -> InputInt<'ui, 'p> {
+        InputInt::new(label, value)
+    }
     pub fn input_text<'p>(&self, label: ImStr<'p>, buf: &'p mut str) -> InputText<'ui, 'p> {
         InputText::new(label, buf)
     }
