@@ -40,6 +40,7 @@ pub use imgui_sys::{
     ImGuiKey
 };
 pub use input::{
+	ColorEdit3, ColorEdit4,
 	InputFloat, InputFloat2, InputFloat3, InputFloat4,
 	InputInt, InputInt2, InputInt3, InputInt4,
 	InputText
@@ -451,6 +452,12 @@ impl<'ui> Ui<'ui> {
 
 // Widgets: Input
 impl<'ui> Ui<'ui> {
+    pub fn color_edit3<'p>(&self, label: ImStr<'p>, value: &'p mut [f32;3]) -> ColorEdit3<'ui, 'p> {
+        ColorEdit3::new(label, value)
+    }
+    pub fn color_edit4<'p>(&self, label: ImStr<'p>, value: &'p mut [f32;4]) -> ColorEdit4<'ui, 'p> {
+        ColorEdit4::new(label, value)
+    }
     pub fn input_text<'p>(&self, label: ImStr<'p>, buf: &'p mut str) -> InputText<'ui, 'p> {
         InputText::new(label, buf)
     }

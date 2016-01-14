@@ -358,3 +358,56 @@ macro_rules! impl_input_intn {
 impl_input_intn!(InputInt2, 2, igInputInt2);
 impl_input_intn!(InputInt3, 3, igInputInt3);
 impl_input_intn!(InputInt4, 4, igInputInt4);
+
+#[must_use]
+pub struct ColorEdit3<'ui, 'p> {
+    label: ImStr<'p>,
+    value: &'p mut [f32;3],
+    _phantom: PhantomData<&'ui Ui<'ui>>
+}
+
+impl<'ui, 'p> ColorEdit3<'ui, 'p> {
+    pub fn new(label: ImStr<'p>, value: &'p mut [f32;3]) -> Self {
+        ColorEdit3 {
+            label: label,
+            value: value,
+            _phantom: PhantomData
+        }
+    }
+
+    pub fn build(self) -> bool {
+        unsafe {
+            imgui_sys::igColorEdit3(
+                self.label.as_ptr(),
+                self.value.as_mut_ptr())
+        }
+    }
+}
+
+#[must_use]
+pub struct ColorEdit4<'ui, 'p> {
+    label: ImStr<'p>,
+    value: &'p mut [f32;4],
+    show_alpha: bool,
+    _phantom: PhantomData<&'ui Ui<'ui>>
+}
+
+impl<'ui, 'p> ColorEdit4<'ui, 'p> {
+    pub fn new(label: ImStr<'p>, value: &'p mut [f32;4]) -> Self {
+        ColorEdit4 {
+            label: label,
+            value: value,
+            show_alpha: true,
+            _phantom: PhantomData
+        }
+    }
+
+    pub fn build(self) -> bool {
+        unsafe {
+            imgui_sys::igColorEdit4(
+                self.label.as_ptr(),
+                self.value.as_mut_ptr(),
+                self.show_alpha)
+        }
+    }
+}
