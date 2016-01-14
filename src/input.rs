@@ -211,9 +211,6 @@ impl<'ui, 'p> InputInt<'ui, 'p> {
         }
     }
 
-    impl_step_params!(InputInt, i32);
-    impl_text_flags!(InputInt);
-
     pub fn build(self) -> bool {
         unsafe {
             imgui_sys::igInputInt(
@@ -224,6 +221,9 @@ impl<'ui, 'p> InputInt<'ui, 'p> {
                 self.flags)
         }
     }
+
+    impl_step_params!(InputInt, i32);
+    impl_text_flags!(InputInt);
 }
 
 #[must_use]
@@ -250,8 +250,12 @@ impl<'ui, 'p> InputFloat<'ui, 'p> {
         }
     }
 
-    impl_step_params!(InputFloat, f32);
-    impl_text_flags!(InputFloat);
+    pub fn decimal_precision(self, value: i32) -> Self {
+        InputFloat {
+            decimal_precision: value,
+            .. self
+        }
+    }
 
     pub fn build(self) -> bool {
         unsafe {
@@ -264,4 +268,8 @@ impl<'ui, 'p> InputFloat<'ui, 'p> {
                 self.flags)
         }
     }
+
+    impl_step_params!(InputFloat, f32);
+    impl_text_flags!(InputFloat);
+
 }
