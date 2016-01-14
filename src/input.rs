@@ -16,10 +16,10 @@ use super::{
 };
 
 macro_rules! impl_text_flags {
-    ($T:ident) => {
+    ($InputType:ident) => {
         #[inline]
         pub fn flags(self, flags: ImGuiInputTextFlags) -> Self {
-            $T {
+            $InputType {
                 flags: flags,
                 .. self
             }
@@ -27,7 +27,7 @@ macro_rules! impl_text_flags {
 
         #[inline]
         pub fn chars_decimal(self, value: bool) -> Self {
-            $T {
+            $InputType {
                 flags: self.flags.with(ImGuiInputTextFlags_CharsDecimal, value),
                 .. self
             }
@@ -35,7 +35,7 @@ macro_rules! impl_text_flags {
 
         #[inline]
         pub fn chars_hexadecimal(self, value: bool) -> Self {
-            $T {
+            $InputType {
                 flags: self.flags.with(ImGuiInputTextFlags_CharsHexadecimal, value),
                 .. self
             }
@@ -43,7 +43,7 @@ macro_rules! impl_text_flags {
 
         #[inline]
         pub fn chars_uppercase(self, value: bool) -> Self {
-            $T {
+            $InputType {
                 flags: self.flags.with(ImGuiInputTextFlags_CharsUppercase, value),
                 .. self
             }
@@ -51,7 +51,7 @@ macro_rules! impl_text_flags {
 
         #[inline]
         pub fn chars_noblank(self, value: bool) -> Self {
-            $T {
+            $InputType {
                 flags: self.flags.with(ImGuiInputTextFlags_CharsNoBlank, value),
                 .. self
             }
@@ -59,7 +59,7 @@ macro_rules! impl_text_flags {
 
         #[inline]
         pub fn auto_select_all(self, value: bool) -> Self {
-            $T {
+            $InputType {
                 flags: self.flags.with(ImGuiInputTextFlags_AutoSelectAll, value),
                 .. self
             }
@@ -67,7 +67,7 @@ macro_rules! impl_text_flags {
 
         #[inline]
         pub fn enter_returns_true(self, value: bool) -> Self {
-            $T {
+            $InputType {
                 flags: self.flags.with(ImGuiInputTextFlags_EnterReturnsTrue, value),
                 .. self
             }
@@ -75,7 +75,7 @@ macro_rules! impl_text_flags {
 
         #[inline]
         pub fn callback_completion(self, value: bool) -> Self {
-            $T {
+            $InputType {
                 flags: self.flags.with(ImGuiInputTextFlags_CallbackCompletion, value),
                 .. self
             }
@@ -83,7 +83,7 @@ macro_rules! impl_text_flags {
 
         #[inline]
         pub fn callback_history(self, value: bool) -> Self {
-            $T {
+            $InputType {
                 flags: self.flags.with(ImGuiInputTextFlags_CallbackHistory, value),
                 .. self
             }
@@ -91,7 +91,7 @@ macro_rules! impl_text_flags {
 
         #[inline]
         pub fn callback_always(self, value: bool) -> Self {
-            $T {
+            $InputType {
                 flags: self.flags.with(ImGuiInputTextFlags_CallbackAlways, value),
                 .. self
             }
@@ -99,7 +99,7 @@ macro_rules! impl_text_flags {
 
         #[inline]
         pub fn callback_char_filter(self, value: bool) -> Self {
-            $T {
+            $InputType {
                 flags: self.flags.with(ImGuiInputTextFlags_CallbackCharFilter, value),
                 .. self
             }
@@ -107,7 +107,7 @@ macro_rules! impl_text_flags {
 
         #[inline]
         pub fn allow_tab_input(self, value: bool) -> Self {
-            $T {
+            $InputType {
                 flags: self.flags.with(ImGuiInputTextFlags_AllowTabInput, value),
                 .. self
             }
@@ -115,7 +115,7 @@ macro_rules! impl_text_flags {
 
         #[inline]
         pub fn no_horizontal_scroll(self, value: bool) -> Self {
-            $T {
+            $InputType {
                 flags: self.flags.with(ImGuiInputTextFlags_NoHorizontalScroll, value),
                 .. self
             }
@@ -123,12 +123,32 @@ macro_rules! impl_text_flags {
 
         #[inline]
         pub fn always_insert_mode(self, value: bool) -> Self {
-            $T {
+            $InputType {
                 flags: self.flags.with(ImGuiInputTextFlags_AlwaysInsertMode, value),
                 .. self
             }
         }
 
+    }
+}
+
+macro_rules! impl_step_params {
+    ($InputType:ident, $Value:ty) => {
+        #[inline]
+        pub fn step(self, value: $Value) -> Self {
+            $InputType {
+                step: value,
+                .. self
+            }
+        }
+
+        #[inline]
+        pub fn step_fast(self, value: $Value) -> Self {
+            $InputType {
+                step_fast: value,
+                .. self
+            }
+        }
     }
 }
 
@@ -173,8 +193,8 @@ impl<'ui, 'p> InputText<'ui, 'p> {
 pub struct InputInt<'ui, 'p> {
     label: ImStr<'p>,
     value: &'p mut i32,
-	step: i32,
-	step_fast: i32,
+    step: i32,
+    step_fast: i32,
     flags: ImGuiInputTextFlags,
     _phantom: PhantomData<&'ui Ui<'ui>>
 }
@@ -184,29 +204,14 @@ impl<'ui, 'p> InputInt<'ui, 'p> {
         InputInt {
             label: label,
             value: value,
-			step: 1,
-			step_fast: 100,
+            step: 1,
+            step_fast: 100,
             flags: ImGuiInputTextFlags::empty(),
             _phantom: PhantomData
         }
     }
 
-	#[inline]
-	pub fn step(self, value: i32) -> Self {
-		InputInt {
-			step: value,
-			.. self
-		}
-	}
-
-	#[inline]
-	pub fn step_fast(self, value: i32) -> Self {
-		InputInt {
-			step_fast: value,
-			.. self
-		}
-	}
-
+    impl_step_params!(InputInt, i32);
     impl_text_flags!(InputInt);
 
     pub fn build(self) -> bool {
@@ -214,8 +219,48 @@ impl<'ui, 'p> InputInt<'ui, 'p> {
             imgui_sys::igInputInt(
                 self.label.as_ptr(),
                 self.value as *mut i32,
-				self.step,
-				self.step_fast,
+                self.step,
+                self.step_fast,
+                self.flags)
+        }
+    }
+}
+
+#[must_use]
+pub struct InputFloat<'ui, 'p> {
+    label: ImStr<'p>,
+    value: &'p mut f32,
+    step: f32,
+    step_fast: f32,
+    decimal_precision: i32,
+    flags: ImGuiInputTextFlags,
+    _phantom: PhantomData<&'ui Ui<'ui>>
+}
+
+impl<'ui, 'p> InputFloat<'ui, 'p> {
+    pub fn new(label: ImStr<'p>, value: &'p mut f32) -> Self {
+        InputFloat {
+            label: label,
+            value: value,
+            step: 0.0,
+            step_fast: 0.0,
+            decimal_precision: -1,
+            flags: ImGuiInputTextFlags::empty(),
+            _phantom: PhantomData
+        }
+    }
+
+    impl_step_params!(InputFloat, f32);
+    impl_text_flags!(InputFloat);
+
+    pub fn build(self) -> bool {
+        unsafe {
+            imgui_sys::igInputFloat(
+                self.label.as_ptr(),
+                self.value as *mut f32,
+                self.step,
+                self.step_fast,
+                self.decimal_precision,
                 self.flags)
         }
     }

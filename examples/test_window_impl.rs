@@ -35,6 +35,7 @@ struct State {
     buf: String,
     text: String,
     int: i32,
+    float: f32,
     auto_resize_state: AutoResizeState,
     file_menu: FileMenuState
 }
@@ -72,6 +73,7 @@ impl Default for State {
             buf: buf,
             text: text,
             int: 123,
+            float: 0.001,
             auto_resize_state: Default::default(),
             file_menu: Default::default()
         }
@@ -293,6 +295,8 @@ fn show_test_window<'a>(ui: &Ui<'a>, state: &mut State, opened: &mut bool) {
                 ui.label_text(im_str!("label"), im_str!("Value"));
                 ui.input_text(im_str!("input text"), &mut state.text).build();
                 ui.input_int(im_str!("input int"), &mut state.int).build();
+                ui.input_float(im_str!("input float"), &mut state.float)
+                    .step(0.01).step_fast(1.0).build();
             }
         })
 }
