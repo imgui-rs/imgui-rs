@@ -152,6 +152,18 @@ macro_rules! impl_step_params {
     }
 }
 
+macro_rules! impl_precision_params {
+    ($InputType:ident) => {
+        #[inline]
+        pub fn decimal_precision(self, value: i32) -> Self {
+            $InputType {
+                decimal_precision: value,
+                .. self
+            }
+        }
+    }
+}
+
 #[must_use]
 pub struct InputText<'ui, 'p> {
     label: ImStr<'p>,
@@ -250,13 +262,6 @@ impl<'ui, 'p> InputFloat<'ui, 'p> {
         }
     }
 
-    pub fn decimal_precision(self, value: i32) -> Self {
-        InputFloat {
-            decimal_precision: value,
-            .. self
-        }
-    }
-
     pub fn build(self) -> bool {
         unsafe {
             imgui_sys::igInputFloat(
@@ -270,6 +275,48 @@ impl<'ui, 'p> InputFloat<'ui, 'p> {
     }
 
     impl_step_params!(InputFloat, f32);
+    impl_precision_params!(InputFloat);
     impl_text_flags!(InputFloat);
-
 }
+
+macro_rules! impl_input_floatn {
+    ($InputFloatN:ident, $N:expr, $igInputFloatN:ident) => {
+        #[must_use]
+        pub struct $InputFloatN<'ui, 'p> {
+            label: ImStr<'p>,
+            value: &'p mut [f32;$N],
+            decimal_precision: i32,
+            flags: ImGuiInputTextFlags,
+            _phantom: PhantomData<&'ui Ui<'ui>>
+        }
+
+        impl<'ui, 'p> $InputFloatN<'ui, 'p> {
+            pub fn new(label: ImStr<'p>, value: &'p mut [f32;$N]) -> Self {
+                $InputFloatN {
+                    label: label,
+                    value: value,
+                    decimal_precision: -1,
+                    flags: ImGuiInputTextFlags::empty(),
+                    _phantom: PhantomData
+                }
+            }
+
+            pub fn build(self) -> bool {
+                unsafe {
+                    imgui_sys::$igInputFloatN(
+                        self.label.as_ptr(),
+                        self.value.as_mut_ptr(),
+                        self.decimal_precision,
+                        self.flags)
+                }
+            }
+
+            impl_precision_params!($InputFloatN);
+            impl_text_flags!($InputFloatN);
+        }
+    }
+}
+
+impl_input_floatn!(InputFloat2, 2, igInputFloat2);
+impl_input_floatn!(InputFloat3, 3, igInputFloat3);
+impl_input_floatn!(InputFloat4, 4, igInputFloat4);
