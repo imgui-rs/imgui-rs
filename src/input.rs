@@ -320,3 +320,41 @@ macro_rules! impl_input_floatn {
 impl_input_floatn!(InputFloat2, 2, igInputFloat2);
 impl_input_floatn!(InputFloat3, 3, igInputFloat3);
 impl_input_floatn!(InputFloat4, 4, igInputFloat4);
+
+macro_rules! impl_input_intn {
+    ($InputIntN:ident, $N:expr, $igInputIntN:ident) => {
+        #[must_use]
+        pub struct $InputIntN<'ui, 'p> {
+            label: ImStr<'p>,
+            value: &'p mut [i32;$N],
+            flags: ImGuiInputTextFlags,
+            _phantom: PhantomData<&'ui Ui<'ui>>
+        }
+
+        impl<'ui, 'p> $InputIntN<'ui, 'p> {
+            pub fn new(label: ImStr<'p>, value: &'p mut [i32;$N]) -> Self {
+                $InputIntN {
+                    label: label,
+                    value: value,
+                    flags: ImGuiInputTextFlags::empty(),
+                    _phantom: PhantomData
+                }
+            }
+
+            pub fn build(self) -> bool {
+                unsafe {
+                    imgui_sys::$igInputIntN(
+                        self.label.as_ptr(),
+                        self.value.as_mut_ptr(),
+                        self.flags)
+                }
+            }
+
+            impl_text_flags!($InputIntN);
+        }
+    }
+}
+
+impl_input_intn!(InputInt2, 2, igInputInt2);
+impl_input_intn!(InputInt3, 3, igInputInt3);
+impl_input_intn!(InputInt4, 4, igInputInt4);

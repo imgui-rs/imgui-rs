@@ -36,7 +36,10 @@ struct State {
     text: String,
     i0: i32,
     f0: f32,
-    vec3: [f32;3],
+    vec2f: [f32;2],
+    vec3f: [f32;3],
+    vec2i: [i32;2],
+    vec3i: [i32;3],
     auto_resize_state: AutoResizeState,
     file_menu: FileMenuState
 }
@@ -75,7 +78,10 @@ impl Default for State {
             text: text,
             i0: 123,
             f0: 0.001,
-            vec3: [0.10, 0.20, 0.30],
+            vec2f: [0.10, 0.20],
+            vec3f: [0.10, 0.20, 0.30],
+            vec2i: [10, 20],
+            vec3i: [10, 20, 30],
             auto_resize_state: Default::default(),
             file_menu: Default::default()
         }
@@ -299,7 +305,17 @@ fn show_test_window<'a>(ui: &Ui<'a>, state: &mut State, opened: &mut bool) {
                 ui.input_int(im_str!("input int"), &mut state.i0).build();
                 ui.input_float(im_str!("input float"), &mut state.f0)
                     .step(0.01).step_fast(1.0).build();
-                ui.input_float3(im_str!("input float3"), &mut state.vec3).build();
+                ui.input_float3(im_str!("input float3"), &mut state.vec3f).build();
+
+                ui.tree_node(im_str!("Multi-component Widgets")).build(|| {
+                    ui.input_float2(im_str!("input float2"), &mut state.vec2f).build();
+                    ui.input_int2(im_str!("input int2"), &mut state.vec2i).build();
+                    ui.spacing();
+
+                    ui.input_float3(im_str!("input float3"), &mut state.vec3f).build();
+                    ui.input_int3(im_str!("input int3"), &mut state.vec3i).build();
+                    ui.spacing();
+                });
             }
         })
 }

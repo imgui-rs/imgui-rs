@@ -39,7 +39,11 @@ pub use imgui_sys::{
     ImVec2, ImVec4,
     ImGuiKey
 };
-pub use input::{InputFloat, InputFloat2, InputFloat3, InputFloat4, InputInt, InputText};
+pub use input::{
+	InputFloat, InputFloat2, InputFloat3, InputFloat4,
+	InputInt, InputInt2, InputInt3, InputInt4,
+	InputText
+};
 pub use menus::{Menu, MenuItem};
 pub use sliders::{SliderFloat, SliderInt};
 pub use trees::{TreeNode};
@@ -450,6 +454,9 @@ impl<'ui> Ui<'ui> {
     pub fn input_text<'p>(&self, label: ImStr<'p>, buf: &'p mut str) -> InputText<'ui, 'p> {
         InputText::new(label, buf)
     }
+    pub fn input_f32<'p>(&self, label: ImStr<'p>, value: &'p mut f32) -> InputFloat<'ui, 'p> {
+        InputFloat::new(label, value)
+    }
     pub fn input_float<'p>(&self, label: ImStr<'p>, value: &'p mut f32) -> InputFloat<'ui, 'p> {
         InputFloat::new(label, value)
     }
@@ -462,8 +469,20 @@ impl<'ui> Ui<'ui> {
     pub fn input_float4<'p>(&self, label: ImStr<'p>, value: &'p mut [f32;4]) -> InputFloat4<'ui, 'p> {
         InputFloat4::new(label, value)
     }
+    pub fn input_i32<'p>(&self, label: ImStr<'p>, value: &'p mut i32) -> InputInt<'ui, 'p> {
+        InputInt::new(label, value)
+    }
     pub fn input_int<'p>(&self, label: ImStr<'p>, value: &'p mut i32) -> InputInt<'ui, 'p> {
         InputInt::new(label, value)
+    }
+    pub fn input_int2<'p>(&self, label: ImStr<'p>, value: &'p mut [i32;2]) -> InputInt2<'ui, 'p> {
+        InputInt2::new(label, value)
+    }
+    pub fn input_int3<'p>(&self, label: ImStr<'p>, value: &'p mut [i32;3]) -> InputInt3<'ui, 'p> {
+        InputInt3::new(label, value)
+    }
+    pub fn input_int4<'p>(&self, label: ImStr<'p>, value: &'p mut [i32;4]) -> InputInt4<'ui, 'p> {
+        InputInt4::new(label, value)
     }
 }
 
