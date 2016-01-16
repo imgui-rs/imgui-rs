@@ -783,7 +783,7 @@ extern "C" {
     pub fn igRadioButton(label: *const c_char, v: *mut c_int,
                          v_button: c_int) -> bool;
     pub fn igCombo(label: *const c_char, current_item: *mut c_int,
-                   items: *mut *const c_char, items_count: c_int, height_in_items: c_int) -> bool;
+                   items: *const *const c_char, items_count: c_int, height_in_items: c_int) -> bool;
     pub fn igCombo2(label: *const c_char, current_item: *mut c_int,
                     items_separated_by_zeros: *const c_char, height_in_items: c_int) -> bool;
     pub fn igCombo3(label: *const c_char, current_item: *mut c_int,

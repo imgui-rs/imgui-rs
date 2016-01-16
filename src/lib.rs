@@ -437,6 +437,13 @@ impl<'ui> Ui<'ui> {
     pub fn checkbox<'p>(&self, label: ImStr<'p>, value: &'p mut bool) -> bool {
         unsafe { imgui_sys::igCheckbox(label.as_ptr(), value) }
     }
+    pub fn combo<'p>(&self, label: ImStr<'p>, current_item: &'p mut i32, items: &'p[ImStr<'p>]) -> bool {
+        // TODO: the callback version could avoid allocating this Vec
+        let c_items : Vec<*const c_char> = items.iter().map(|s| s.as_ptr()).collect();
+        unsafe {
+            imgui_sys::igCombo(label.as_ptr(), current_item, c_items.as_ptr(), c_items.len() as c_int, -1)
+        }
+    }
 }
 
 // Widgets: Input
