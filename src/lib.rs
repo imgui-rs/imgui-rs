@@ -92,6 +92,16 @@ impl<'a> ImStr<'a> {
     fn as_ptr(&self) -> *const c_char { self.bytes.as_ptr() as *const c_char }
 }
 
+impl<'a> From<&'a str> for ImStr<'a> {
+    fn from(value: &'a str) -> ImStr<'a> {
+        let mut bytes: Vec<u8> = value.bytes().collect();
+        bytes.push(0);
+        ImStr {
+            bytes: Cow::Owned(bytes)
+        }
+    }
+}
+
 impl From<String> for ImStr<'static> {
     fn from(mut value: String) -> ImStr<'static> {
         value.push('\0');
