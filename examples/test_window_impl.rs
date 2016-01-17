@@ -44,6 +44,7 @@ struct State {
     vec3i: [i32;3],
     col1: [f32;3],
     col2: [f32;4],
+    selected_fish: Option<usize>,
     auto_resize_state: AutoResizeState,
     file_menu: FileMenuState
 }
@@ -90,6 +91,7 @@ impl Default for State {
             vec3i: [10, 20, 30],
             col1: [1.0, 0.0, 0.2],
             col2: [0.4, 0.7, 0.0, 0.5],
+            selected_fish: None,
             auto_resize_state: Default::default(),
             file_menu: Default::default()
         }
@@ -333,6 +335,30 @@ fn show_test_window<'a>(ui: &Ui<'a>, state: &mut State, opened: &mut bool) {
                     ui.input_float3(im_str!("input float3"), &mut state.vec3f).build();
                     ui.input_int3(im_str!("input int3"), &mut state.vec3i).build();
                     ui.spacing();
+                });
+            }
+            if ui.collapsing_header(im_str!("Popups & Modal windows")).build() {
+                ui.tree_node(im_str!("Popups")).build(|| {
+                    ui.text_wrapped(im_str!("When a popup is active, it inhibits interacting with windows that are behind the popup. Clicking outside the popup closes it."));
+                    let names = [im_str!("Bream"), im_str!("Haddock"), im_str!("Mackerel"), im_str!("Pollock"), im_str!("Tilefish")];
+                    if ui.small_button(im_str!("Select..")) {
+                        ui.open_popup(im_str!("select"));
+                    }
+                    ui.same_line(0.0);
+                    ui.text(
+                        match state.selected_fish {
+                            Some(index) => names[index].clone(),
+                            None => im_str!("<None>")
+                        });
+                    ui.popup(im_str!("select"), || {
+                        ui.text(im_str!("Aquarium"));
+                        ui.separator();
+                        for (index, name) in names.iter().enumerate() {
+                            if ui.selectable(name.clone()) {
+                                state.selected_fish = Some(index);
+                            }
+                        }
+                    });
                 });
             }
         })

@@ -24,6 +24,8 @@ pub use imgui_sys::{
     ImGuiInputTextFlags_AllowTabInput, ImGuiInputTextFlags_CtrlEnterForNewLine,
     ImGuiInputTextFlags_NoHorizontalScroll, ImGuiInputTextFlags_AlwaysInsertMode,
     ImGuiInputTextFlags_ReadOnly,
+    ImGuiSelectableFlags,
+    ImGuiSelectableFlags_DontClosePopups, ImGuiSelectableFlags_SpanAllColumns,
     ImGuiSetCond,
     ImGuiSetCond_Always, ImGuiSetCond_Once,
     ImGuiSetCond_FirstUseEver, ImGuiSetCond_Appearing,
@@ -518,6 +520,13 @@ impl<'ui> Ui<'ui> {
     }
 }
 
+// Widgets: Selectable / Lists
+impl<'ui> Ui<'ui> {
+    pub fn selectable<'p>(&self, label: ImStr<'p>) -> bool {
+        unsafe { imgui_sys::igSelectable(label.as_ptr(), false, ImGuiSelectableFlags::empty(), ImVec2::new(0.0,0.0)) }
+    }
+}
+
 // Widgets: Menus
 impl<'ui> Ui<'ui> {
     pub fn main_menu_bar<F>(&self, f: F) where F: FnOnce() {
@@ -536,4 +545,18 @@ impl<'ui> Ui<'ui> {
     }
     pub fn menu<'p>(&self, label: ImStr<'p>) -> Menu<'ui, 'p> { Menu::new(label) }
     pub fn menu_item<'p>(&self, label: ImStr<'p>) -> MenuItem<'ui, 'p> { MenuItem::new(label) }
+}
+
+// Widgets: Popups
+impl<'ui> Ui<'ui> {
+    pub fn open_popup<'p>(&self, str_id: ImStr<'p>) {
+        unsafe { imgui_sys::igOpenPopup(str_id.as_ptr()) };
+    }
+    pub fn popup<'p, F>(&self, str_id: ImStr<'p>, f: F) where F: FnOnce() {
+        let render = unsafe { imgui_sys::igBeginPopup(str_id.as_ptr()) };
+        if render {
+            f();
+            unsafe { imgui_sys::igEndPopup() };
+        }
+    }
 }
