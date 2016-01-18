@@ -25,6 +25,7 @@ pub use imgui_sys::{
     ImGuiInputTextFlags_AllowTabInput, ImGuiInputTextFlags_CtrlEnterForNewLine,
     ImGuiInputTextFlags_NoHorizontalScroll, ImGuiInputTextFlags_AlwaysInsertMode,
     ImGuiInputTextFlags_ReadOnly,
+    ImGuiInputTextFlags_Password,
     ImGuiSetCond,
     ImGuiSetCond_Always, ImGuiSetCond_Once,
     ImGuiSetCond_FirstUseEver, ImGuiSetCond_Appearing,

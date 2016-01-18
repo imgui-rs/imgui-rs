@@ -212,7 +212,7 @@ bitflags!(
         const ImGuiInputTextFlags_NoHorizontalScroll  = 1 << 12,
         const ImGuiInputTextFlags_AlwaysInsertMode    = 1 << 13,
         const ImGuiInputTextFlags_ReadOnly            = 1 << 14,
-
+        const ImGuiInputTextFlags_Password            = 1 << 15,
         const ImGuiInputTextFlags_Multiline           = 1 << 20,
     }
 );
