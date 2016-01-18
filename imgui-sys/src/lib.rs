@@ -689,6 +689,8 @@ extern "C" {
     pub fn igPushStyleVar(idx: ImGuiStyleVar, val: c_float);
     pub fn igPushStyleVavrVec(idx: ImGuiStyleVar, val: ImVec2);
     pub fn igPopStyleVar(count: c_int);
+    pub fn igGetColorU32(idx: ImGuiCol, alpha_mul: c_float) -> ImU32;
+    pub fn igGetColorU32Vec(col: *const ImVec4) -> ImU32;
 }
 
 // Parameter stack (current window)
@@ -818,6 +820,7 @@ extern "C" {
                             overlay_text: *const c_char,
                             scale_min: c_float, scale_max: c_float,
                             graph_size: ImVec2);
+    pub fn igProgressBar(fraction: c_float, size_arg: *const ImVec2, overlay: *const c_char);
 }
 
 // Widgets: Sliders
@@ -960,8 +963,8 @@ extern "C" {
     pub fn igValueInt(prefix: *const c_char, v: c_int);
     pub fn igValueUInt(prefix: *const c_char, v: c_uint);
     pub fn igValueFloat(prefix: *const c_char, v: c_float, float_format: *const c_char);
-    pub fn igColor(prefix: *const c_char, v: ImVec4);
-    pub fn igColor2(prefix: *const c_char, v: c_uint);
+    pub fn igValueColor(prefix: *const c_char, v: ImVec4);
+    pub fn igValueColor2(prefix: *const c_char, v: c_uint);
 }
 
 // Tooltip
@@ -1123,13 +1126,96 @@ extern "C" {
         glyph_ranges: *const ImWchar) -> *mut ImFont;
     pub fn ImFontAtlas_ClearTexData(atlas: *mut ImFontAtlas);
     pub fn ImFontAtlas_Clear(atlas: *mut ImFontAtlas);
+
     pub fn ImGuiIO_AddInputCharacter(c: c_ushort);
     pub fn ImGuiIO_AddInputCharactersUTF8(utf8_chars: *const c_char);
+    pub fn ImGuiIO_ClearInputCharacters();
+}
+
+// ImDrawData
+extern "C" {
+    pub fn ImDrawData_DeIndexAllBuffers(drawData: *mut ImDrawData);
+}
+
+// ImDrawList
+extern "C" {
     pub fn ImDrawList_GetVertexBufferSize(list: *mut ImDrawList) -> c_int;
     pub fn ImDrawList_GetVertexPtr(list: *mut ImDrawList, n: c_int) -> *mut ImDrawVert;
     pub fn ImDrawList_GetIndexBufferSize(list: *mut ImDrawList) -> c_int;
     pub fn ImDrawList_GetIndexPtr(list: *mut ImDrawList, n: c_int) -> *mut ImDrawIdx;
     pub fn ImDrawList_GetCmdSize(list: *mut ImDrawList) -> c_int;
     pub fn ImDrawList_GetCmdPtr(list: *mut ImDrawList, n: c_int) -> *mut ImDrawCmd;
-    pub fn ImDrawData_DeIndexAllBuffers(drawData: *mut ImDrawData);
+
+    pub fn ImDrawList_Clear(list: *mut ImDrawList);
+    pub fn ImDrawList_ClearFreeMemory(list: *mut ImDrawList);
+    pub fn ImDrawList_PushClipRect(list: *mut ImDrawList, clip_rect: ImVec4);
+    pub fn ImDrawList_PushClipRectFullScreen(list: *mut ImDrawList);
+    pub fn ImDrawList_PopClipRect(list: *mut ImDrawList);
+    pub fn ImDrawList_PushTextureID(list: *mut ImDrawList, texture_id: ImTextureID);
+    pub fn ImDrawList_PopTextureID(list: *mut ImDrawList);
+
+    pub fn ImDrawList_AddLine(list: *mut ImDrawList, a: ImVec2, b: ImVec2,
+                              col: ImU32, thickness: c_float);
+    pub fn ImDrawList_AddRect(list: *mut ImDrawList, a: ImVec2, b: ImVec2,
+                              col: ImU32, rounding: c_float, rounding_corners: c_int);
+    pub fn ImDrawList_AddRectFilled(list: *mut ImDrawList, a: ImVec2, b: ImVec2,
+                                    col: ImU32, rounding: c_float, rounding_corners: c_int);
+    pub fn ImDrawList_AddRectFilledMultiColor(list: *mut ImDrawList, a: ImVec2, b: ImVec2,
+                                              col_upr_left: ImU32, col_upr_right: ImU32,
+                                              col_bot_right: ImU32, col_bot_left: ImU32);
+    pub fn ImDrawList_AddTriangleFilled(list: *mut ImDrawList, a: ImVec2, b: ImVec2, c: ImVec2,
+                                        col: ImU32);
+    pub fn ImDrawList_AddCircle(list: *mut ImDrawList, centre: ImVec2, radius: c_float,
+                                col: ImU32, num_segments: c_int);
+    pub fn ImDrawList_AddCircleFilled(list: *mut ImDrawList, centre: ImVec2, radius: c_float,
+                                      col: ImU32, num_segments: c_int);
+    pub fn ImDrawList_AddText(list: *mut ImDrawList, pos: ImVec2, col: ImU32,
+                              text_begin: *const c_char, text_end: *const c_char);
+    pub fn ImDrawList_AddTextExt(list: *mut ImDrawList, font: *const ImFont, font_size: c_float,
+                                 pos: ImVec2, col: ImU32,
+                                 text_begin: *const c_char, text_end: *const c_char,
+                                 wrap_width: c_float, cpu_fine_clip_rect: *const ImVec4);
+    pub fn ImDrawList_AddImage(list: *mut ImDrawList, user_texture_id: ImTextureID,
+                               a: ImVec2, b: ImVec2, uv0: ImVec2, uv1: ImVec2, col: ImU32);
+    pub fn ImDrawList_AddPolyLine(list: *mut ImDrawList, points: *const ImVec2, num_points: c_int,
+                                  col: ImU32, closed: bool, thickness: c_float,
+                                  anti_aliased: bool);
+    pub fn ImDrawList_AddConvexPolyFilled(list: *mut ImDrawList, points: *const ImVec2,
+                                          num_points: c_int, col: ImU32, anti_aliased: bool);
+    pub fn ImDrawList_AddBezierCurve(list: *mut ImDrawList,
+                                     pos0: ImVec2, cp0: ImVec2, cp1: ImVec2, pos1: ImVec2,
+                                     col: ImU32, thickness: c_float, num_segments: c_int);
+
+    pub fn ImDrawList_PathClear(list: *mut ImDrawList);
+    pub fn ImDrawList_PathLineTo(list: *mut ImDrawList, pos: ImVec2);
+    pub fn ImDrawList_PathLineToMergeDuplicate(list: *mut ImDrawList, pos: ImVec2);
+    pub fn ImDrawList_PathFill(list: *mut ImDrawList, col: ImU32);
+    pub fn ImDrawList_PathStroke(list: *mut ImDrawList, col: ImU32, closed: bool,
+                                 thickness: c_float);
+    pub fn ImDrawList_PathArcTo(list: *mut ImDrawList, centre: ImVec2, radius: c_float,
+                                a_min: c_float, a_max: c_float, num_segments: c_int);
+    pub fn ImDrawList_PathArcToFast(list: *mut ImDrawList, centre: ImVec2, radius: c_float,
+                                    a_min_of_12: c_int, a_max_of_12: c_int);
+    pub fn ImDrawList_PathBezierCurveTo(list: *mut ImDrawList,
+                                        p1: ImVec2, p2: ImVec2, p3: ImVec2, num_segments: c_int);
+    pub fn ImDrawList_PathRect(list: *mut ImDrawList, rect_min: ImVec2, rect_max: ImVec2,
+                               rounding: c_float, rounding_corners: c_int);
+
+    pub fn ImDrawList_ChannelsSplit(list: *mut ImDrawList, channels_count: c_int);
+    pub fn ImDrawList_ChannelsMerge(list: *mut ImDrawList);
+    pub fn ImDrawList_ChannelsSetCurrent(list: *mut ImDrawList, channel_index: c_int);
+
+    pub fn ImDrawList_AddCallback(list: *mut ImDrawList,
+                                  callback: ImDrawCallback, callback_data: *mut c_void);
+    pub fn ImDrawList_AddDrawCmd(list: *mut ImDrawList);
+
+    pub fn ImDrawList_PrimReserve(list: *mut ImDrawList, idx_count: c_int, vtx_count: c_int);
+    pub fn ImDrawList_PrimRect(list: *mut ImDrawList, a: ImVec2, b: ImVec2, col: ImU32);
+    pub fn ImDrawList_PrimRectUV(list: *mut ImDrawList, a: ImVec2, b: ImVec2,
+                                 uv_a: ImVec2, uv_b: ImVec2, col: ImU32);
+    pub fn ImDrawList_PrimVtx(list: *mut ImDrawList, pos: ImVec2, uv: ImVec2, col: ImU32);
+    pub fn ImDrawList_PrimWriteVtx(list: *mut ImDrawList, pos: ImVec2, uv: ImVec2, col: ImU32);
+    pub fn ImDrawList_PrimWriteIdx(list: *mut ImDrawList, idx: ImDrawIdx);
+    pub fn ImDrawList_UpdateClipRect(list: *mut ImDrawList);
+    pub fn ImDrawList_UpdateTextureID(list: *mut ImDrawList);
 }
