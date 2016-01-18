@@ -48,12 +48,24 @@ ui.window(im_str!("Hello world"))
     git submodule update --init --recursive
     cargo test
 
-    target/debug/examples/hello_world
-    target/debug/examples/test_window
-    target/debug/examples/test_window_impl
+    cargo run --example hello_world
+    cargo run --example test_window
+    cargo run --example test_window_impl
 
 ## License
 
-imgui-rs is licensed under the MIT license.
+Licensed under either of
+
+ * Apache License, Version 2.0, ([LICENSE-APACHE](LICENSE-APACHE) or http://www.apache.org/licenses/LICENSE-2.0)
+ * MIT license ([LICENSE-MIT](LICENSE-MIT) or http://opensource.org/licenses/MIT)
+
+at your option.
 
 Uses [ImGui](https://github.com/ocornut/imgui) and [cimgui](https://github.com/Extrawurst/cimgui).
+
+### Contribution
+
+Unless you explicitly state otherwise, any contribution intentionally
+submitted for inclusion in the work by you, as defined in the Apache-2.0
+license, shall be dual licensed as above, without any additional terms or
+conditions.
