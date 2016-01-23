@@ -8,6 +8,7 @@ extern crate libc;
 
 use libc::{c_char, c_float, c_int, c_uchar};
 use std::borrow::Cow;
+use std::convert::From;
 use std::ffi::CStr;
 use std::mem;
 use std::ptr;
@@ -24,6 +25,7 @@ pub use imgui_sys::{
     ImGuiInputTextFlags_AllowTabInput, ImGuiInputTextFlags_CtrlEnterForNewLine,
     ImGuiInputTextFlags_NoHorizontalScroll, ImGuiInputTextFlags_AlwaysInsertMode,
     ImGuiInputTextFlags_ReadOnly,
+    ImGuiInputTextFlags_Password,
     ImGuiSelectableFlags,
     ImGuiSelectableFlags_DontClosePopups, ImGuiSelectableFlags_SpanAllColumns,
     ImGuiSetCond,
