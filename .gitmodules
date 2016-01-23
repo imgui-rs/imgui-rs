@@ -1,3 +1,3 @@
 [submodule "imgui-sys/third-party/cimgui"]
 	path = imgui-sys/third-party/cimgui
-	url = https://github.com/Extrawurst/cimgui.git
+	url = https://github.com/bitshifter/cimgui.git
