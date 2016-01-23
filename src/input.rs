@@ -17,14 +17,14 @@ use super::{
 
 #[must_use]
 pub struct InputText<'ui, 'p> {
-    label: ImStr<'p>,
+    label: &'p str,
     buf: &'p mut str,
     flags: ImGuiInputTextFlags,
     _phantom: PhantomData<&'ui Ui<'ui>>
 }
 
 impl<'ui, 'p> InputText<'ui, 'p> {
-    pub fn new(label: ImStr<'p>, buf: &'p mut str) -> Self {
+    pub fn new(label: &'p str, buf: &'p mut str) -> Self {
         InputText {
             label: label,
             buf: buf,
@@ -151,7 +151,7 @@ impl<'ui, 'p> InputText<'ui, 'p> {
     pub fn build(self) -> bool {
         unsafe {
             imgui_sys::igInputText(
-                self.label.as_ptr(),
+                imgui_sys::ImStr::from(self.label),
                 // TODO: this is evil. Perhaps something else than &mut str is better
                 self.buf.as_ptr() as *mut i8,
                 self.buf.len() as size_t,

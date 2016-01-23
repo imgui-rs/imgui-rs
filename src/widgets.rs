@@ -1,20 +1,19 @@
 use imgui_sys;
 use std::marker::PhantomData;
-use std::ptr;
 
 use super::{Ui, ImStr};
 
 #[must_use]
 pub struct CollapsingHeader<'ui, 'p> {
-    label: ImStr<'p>,
-    str_id: Option<ImStr<'p>>,
+    label: &'p str,
+    str_id: Option<&'p str>,
     display_frame: bool,
     default_open: bool,
     _phantom: PhantomData<&'ui Ui<'ui>>
 }
 
 impl<'ui, 'p> CollapsingHeader<'ui, 'p> {
-    pub fn new(label: ImStr<'p>) -> Self {
+    pub fn new(label: &'p str) -> Self {
         CollapsingHeader {
             label: label,
             str_id: None,
@@ -24,7 +23,7 @@ impl<'ui, 'p> CollapsingHeader<'ui, 'p> {
         }
     }
     #[inline]
-    pub fn str_id(self, str_id: ImStr<'p>) -> Self {
+    pub fn str_id(self, str_id: &'p str) -> Self {
         CollapsingHeader {
             str_id: Some(str_id),
             .. self
@@ -47,8 +46,11 @@ impl<'ui, 'p> CollapsingHeader<'ui, 'p> {
     pub fn build(self) -> bool {
         unsafe {
             imgui_sys::igCollapsingHeader(
-                self.label.as_ptr(),
-                self.str_id.map(|x| x.as_ptr()).unwrap_or(ptr::null()),
+                imgui_sys::ImStr::from(self.label),
+                match self.str_id {
+                    Some(str_id) => imgui_sys::ImStr::from(str_id),
+                    None => imgui_sys::ImStr::null()
+                },
                 self.display_frame,
                 self.default_open
                 )

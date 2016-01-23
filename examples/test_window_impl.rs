@@ -109,22 +109,21 @@ fn main() {
 }
 
 fn show_user_guide<'a>(ui: &Ui<'a>) {
-    ui.bullet_text(im_str!("Double-click on title bar to collapse window."));
-    ui.bullet_text(im_str!("Click and drag on lower right corner to resize window."));
-    ui.bullet_text(im_str!("Click and drag on any empty space to move window."));
-    ui.bullet_text(im_str!("Mouse Wheel to scroll."));
-    ui.bullet_text(im_str!("TAB/SHIFT+TAB to cycle through keyboard editable fields."));
-    ui.bullet_text(im_str!("CTRL+Click on a slider or drag box to input text."));
-    ui.bullet_text(im_str!(
-"While editing text:
-- Hold SHIFT or use mouse to select text
+    ui.bullet_text("Double-click on title bar to collapse window.");
+    ui.bullet_text("Click and drag on lower right corner to resize window.");
+    ui.bullet_text("Click and drag on any empty space to move window.");
+    ui.bullet_text("Mouse Wheel to scroll.");
+    ui.bullet_text("TAB/SHIFT+TAB to cycle through keyboard editable fields.");
+    ui.bullet_text("CTRL+Click on a slider or drag box to input text.");
+    ui.bullet_text("While editing text:
+                   - Hold SHIFT or use mouse to select text
 - CTRL+Left/Right to word jump
 - CTRL+A or double-click to select all
 - CTRL+X,CTRL+C,CTRL+V clipboard
 - CTRL+Z,CTRL+Y undo/redo
 - ESCAPE to revert
 - You can apply arithmetic operators +,*,/ on numerical values.
-  Use +- to subtract."));
+  Use +- to subtract.");
 }
 
 fn show_test_window<'a>(ui: &Ui<'a>, state: &mut State, opened: &mut bool) {
@@ -142,18 +141,18 @@ fn show_test_window<'a>(ui: &Ui<'a>, state: &mut State, opened: &mut bool) {
         show_example_app_manipulating_window_title(ui);
     }
     if state.show_app_about {
-        ui.window(im_str!("About ImGui"))
+        ui.window("About ImGui")
             .always_auto_resize(true)
             .opened(&mut state.show_app_about)
             .build(|| {
-                ui.text(im_str!("ImGui {}", imgui::get_version()));
+                ui.text(&format!("ImGui {}", imgui::get_version()));
                 ui.separator();
-                ui.text(im_str!("By Omar Cornut and all github contributors."));
-                ui.text(im_str!("ImGui is licensed under the MIT License, see LICENSE for more information."));
+                ui.text("By Omar Cornut and all github contributors.");
+                ui.text("ImGui is licensed under the MIT License, see LICENSE for more information.");
             })
     }
 
-    ui.window(im_str!("ImGui Demo"))
+    ui.window("ImGui Demo")
         .title_bar(!state.no_titlebar)
         .show_borders(!state.no_border)
         .resizable(!state.no_resize)
@@ -165,121 +164,119 @@ fn show_test_window<'a>(ui: &Ui<'a>, state: &mut State, opened: &mut bool) {
         .size((550.0, 680.0), ImGuiSetCond_FirstUseEver)
         .opened(opened)
         .build(|| {
-            ui.text(im_str!("ImGui says hello."));
+            ui.text("ImGui says hello.");
             ui.menu_bar(|| {
-                ui.menu(im_str!("Menu")).build(|| {
+                ui.menu("Menu").build(|| {
                     show_example_menu_file(ui, &mut state.file_menu);
                 });
-                ui.menu(im_str!("Examples")).build(|| {
-                    ui.menu_item(im_str!("Main menu bar"))
+                ui.menu("Examples").build(|| {
+                    ui.menu_item("Main menu bar")
                         .selected(&mut state.show_app_main_menu_bar).build();
-                    ui.menu_item(im_str!("Console"))
+                    ui.menu_item("Console")
                         .selected(&mut state.show_app_console).build();
-                    ui.menu_item(im_str!("Simple layout"))
+                    ui.menu_item("Simple layout")
                         .selected(&mut state.show_app_layout).build();
-                    ui.menu_item(im_str!("Long text display"))
+                    ui.menu_item("Long text display")
                         .selected(&mut state.show_app_long_text).build();
-                    ui.menu_item(im_str!("Auto-resizing window"))
+                    ui.menu_item("Auto-resizing window")
                         .selected(&mut state.show_app_auto_resize).build();
-                    ui.menu_item(im_str!("Simple overlay"))
+                    ui.menu_item("Simple overlay")
                         .selected(&mut state.show_app_fixed_overlay).build();
-                    ui.menu_item(im_str!("Manipulating window title"))
+                    ui.menu_item("Manipulating window title")
                         .selected(&mut state.show_app_manipulating_window_title).build();
-                    ui.menu_item(im_str!("Custom rendering"))
+                    ui.menu_item("Custom rendering")
                         .selected(&mut state.show_app_custom_rendering).build();
                 });
-                ui.menu(im_str!("Help")).build(|| {
-                    ui.menu_item(im_str!("Metrics"))
+                ui.menu("Help").build(|| {
+                    ui.menu_item("Metrics")
                         .selected(&mut state.show_app_metrics).build();
-                    ui.menu_item(im_str!("About ImGui"))
+                    ui.menu_item("About ImGui")
                         .selected(&mut state.show_app_about).build();
                 });
             });
             ui.spacing();
-            if ui.collapsing_header(im_str!("Help")).build() {
-                ui.text_wrapped(im_str!("This window is being created by the show_test_window() function. Please refer to the code for programming reference.\n\nUser Guide:"));
+            if ui.collapsing_header("Help").build() {
+                ui.text_wrapped("This window is being created by the show_test_window() function. Please refer to the code for programming reference.\n\nUser Guide:");
                 show_user_guide(ui);
             }
 
-            if ui.collapsing_header(im_str!("Window options")).build() {
-                ui.checkbox(im_str!("no titlebar"), &mut state.no_titlebar);
+            if ui.collapsing_header("Window options").build() {
+                ui.checkbox("no titlebar", &mut state.no_titlebar);
                 ui.same_line(150.0);
-                ui.checkbox(im_str!("no border"), &mut state.no_border);
+                ui.checkbox("no border", &mut state.no_border);
                 ui.same_line(300.0);
-                ui.checkbox(im_str!("no resize"), &mut state.no_resize);
-                ui.checkbox(im_str!("no move"), &mut state.no_move);
+                ui.checkbox("no resize", &mut state.no_resize);
+                ui.checkbox("no move", &mut state.no_move);
                 ui.same_line(150.0);
-                ui.checkbox(im_str!("no scrollbar"), &mut state.no_scrollbar);
+                ui.checkbox("no scrollbar", &mut state.no_scrollbar);
                 ui.same_line(300.0);
-                ui.checkbox(im_str!("no collapse"), &mut state.no_collapse);
-                ui.checkbox(im_str!("no menu"), &mut state.no_menu);
-                ui.slider_f32(im_str!("bg alpha"), &mut state.bg_alpha, 0.0, 1.0).build();
+                ui.checkbox("no collapse", &mut state.no_collapse);
+                ui.checkbox("no menu", &mut state.no_menu);
+                ui.slider_f32("bg alpha", &mut state.bg_alpha, 0.0, 1.0).build();
 
-                ui.tree_node(im_str!("Style")).build(|| {
+                ui.tree_node("Style").build(|| {
                     // TODO: Reimplement style editor
                     ui.show_default_style_editor();
                 });
-                ui.tree_node(im_str!("Fonts"))
-                    .label(im_str!("Fonts ({})", "TODO"))
+                ui.tree_node("Fonts")
+                    .label(&format!("Fonts ({})", "TODO"))
                     .build(|| {
-                    ui.text_wrapped(im_str!("Tip: Load fonts with io.Fonts->AddFontFromFileTTF()."));
-                    ui.tree_node(im_str!("Atlas texture")).build(|| {
+                    ui.text_wrapped("Tip: Load fonts with io.Fonts->AddFontFromFileTTF().");
+                    ui.tree_node("Atlas texture").build(|| {
                         // TODO
                     });
                 });
             }
-            if ui.collapsing_header(im_str!("Widgets")).build() {
-                ui.tree_node(im_str!("Tree")).build(|| {
+            if ui.collapsing_header("Widgets").build() {
+                ui.tree_node("Tree").build(|| {
                     for i in 0..5 {
-                        ui.tree_node(im_str!("Child {}", i)).build(|| {
-                            ui.text(im_str!("blah blah"));
+                        ui.tree_node(&format!("Child {}", i)).build(|| {
+                            ui.text("blah blah");
                             ui.same_line(0.0);
-                            if ui.small_button(im_str!("print")) {
+                            if ui.small_button("print") {
                                 println!("Child {} pressed", i);
                             }
                         });
                     }
                 });
-                ui.tree_node(im_str!("Bullets")).build(|| {
-                    ui.bullet_text(im_str!("Bullet point 1"));
-                    ui.bullet_text(im_str!("Bullet point 2\nOn multiple lines"));
+                ui.tree_node("Bullets").build(|| {
+                    ui.bullet_text("Bullet point 1");
+                    ui.bullet_text("Bullet point 2\nOn multiple lines");
                     ui.bullet();
-                    ui.text(im_str!("Bullet point 3 (two calls)"));
+                    ui.text("Bullet point 3 (two calls)");
 
                     ui.bullet();
-                    ui.small_button(im_str!("Button"));
+                    ui.small_button("Button");
                 });
-                ui.tree_node(im_str!("Colored text")).build(|| {
-                    ui.text_colored((1.0, 0.0, 1.0, 1.0), im_str!("Pink"));
-                    ui.text_colored((1.0, 1.0, 0.0, 1.0), im_str!("Yellow"));
-                    ui.text_disabled(im_str!("Disabled"));
+                ui.tree_node("Colored text").build(|| {
+                    ui.text_colored((1.0, 0.0, 1.0, 1.0), "Pink");
+                    ui.text_colored((1.0, 1.0, 0.0, 1.0), "Yellow");
+                    ui.text_disabled("Disabled");
                 });
-                ui.tree_node(im_str!("Word Wrapping")).build(|| {
-                    ui.text_wrapped(im_str!(
-                            "This text should automatically wrap on the edge of the window.\
-                            The current implementation for text wrapping follows simple rules\
-                            suitable for English and possibly other languages."));
+                ui.tree_node("Word Wrapping").build(|| {
+                  ui.text_wrapped("This text should automatically wrap on the edge of the window.\
+                                  The current implementation for text wrapping follows simple rules\
+                            suitable for English and possibly other languages.");
                     ui.spacing();
 
-                    ui.slider_f32(im_str!("Wrap width"), &mut state.wrap_width, -20.0, 600.0)
-                        .display_format(im_str!("%.0f"))
+                    ui.slider_f32("Wrap width", &mut state.wrap_width, -20.0, 600.0)
+                        .display_format("%.0f")
                         .build();
 
-                    ui.text(im_str!("Test paragraph 1:"));
+                    ui.text("Test paragraph 1:");
                     // TODO
 
-                    ui.text(im_str!("Test paragraph 2:"));
+                    ui.text("Test paragraph 2:");
                     // TODO
                 });
-                ui.tree_node(im_str!("UTF-8 Text")).build(|| {
-                    ui.text_wrapped(im_str!(
-                            "CJK text will only appear if the font was loaded with the\
-                            appropriate CJK character ranges. Call io.Font->LoadFromFileTTF()\
-                            manually to load extra character ranges."));
+                ui.tree_node("UTF-8 Text").build(|| {
+                  ui.text_wrapped("CJK text will only appear if the font was loaded with the\
+                                  appropriate CJK character ranges. Call io.Font->LoadFromFileTTF()\
+                            manually to load extra character ranges.");
 
-                    ui.text(im_str!("Hiragana: かきくけこ (kakikukeko)"));
-                    ui.text(im_str!("Kanjis: 日本語 (nihongo)"));
-                    ui.input_text(im_str!("UTF-8 input"), &mut state.buf).build();
+                    ui.text("Hiragana: かきくけこ (kakikukeko)");
+                    ui.text("Kanjis: 日本語 (nihongo)");
+                    ui.input_text("UTF-8 input", &mut state.buf).build();
                 });
             }
         })
@@ -287,72 +284,72 @@ fn show_test_window<'a>(ui: &Ui<'a>, state: &mut State, opened: &mut bool) {
 
 fn show_example_app_main_menu_bar<'a>(ui: &Ui<'a>, state: &mut State) {
     ui.main_menu_bar(|| {
-        ui.menu(im_str!("File")).build(|| {
+        ui.menu("File").build(|| {
             show_example_menu_file(ui, &mut state.file_menu);
         });
-        ui.menu(im_str!("Edit")).build(|| {
-            ui.menu_item(im_str!("Undo")).shortcut(im_str!("CTRL+Z")).build();
-            ui.menu_item(im_str!("Redo"))
-                .shortcut(im_str!("CTRL+Y")).enabled(false).build();
+        ui.menu("Edit").build(|| {
+            ui.menu_item("Undo").shortcut("CTRL+Z").build();
+            ui.menu_item("Redo")
+                .shortcut("CTRL+Y").enabled(false).build();
             ui.separator();
-            ui.menu_item(im_str!("Cut")).shortcut(im_str!("CTRL+X")).build();
-            ui.menu_item(im_str!("Copy")).shortcut(im_str!("CTRL+C")).build();
-            ui.menu_item(im_str!("Paste")).shortcut(im_str!("CTRL+V")).build();
+            ui.menu_item("Cut").shortcut("CTRL+X").build();
+            ui.menu_item("Copy").shortcut("CTRL+C").build();
+            ui.menu_item("Paste").shortcut("CTRL+V").build();
         });
     });
 }
 
 fn show_example_menu_file<'a>(ui: &Ui<'a>, state: &mut FileMenuState) {
-    ui.menu_item(im_str!("(dummy menu)")).enabled(false).build();
-    ui.menu_item(im_str!("New")).build();
-    ui.menu_item(im_str!("Open")).shortcut(im_str!("Ctrl+O")).build();
-    ui.menu(im_str!("Open Recent")).build(|| {
-        ui.menu_item(im_str!("fish_hat.c")).build();
-        ui.menu_item(im_str!("fish_hat.inl")).build();
-        ui.menu_item(im_str!("fish_hat.h")).build();
-        ui.menu(im_str!("More..")).build(|| {
-            ui.menu_item(im_str!("Hello")).build();
-            ui.menu_item(im_str!("Sailor")).build();
-            ui.menu(im_str!("Recurse..")).build(|| {
+    ui.menu_item("(dummy menu)").enabled(false).build();
+    ui.menu_item("New").build();
+    ui.menu_item("Open").shortcut("Ctrl+O").build();
+    ui.menu("Open Recent").build(|| {
+        ui.menu_item("fish_hat.c").build();
+        ui.menu_item("fish_hat.inl").build();
+        ui.menu_item("fish_hat.h").build();
+        ui.menu("More..").build(|| {
+            ui.menu_item("Hello").build();
+            ui.menu_item("Sailor").build();
+            ui.menu("Recurse..").build(|| {
                 show_example_menu_file(ui, state);
             });
         });
     });
-    ui.menu_item(im_str!("Save")).shortcut(im_str!("Ctrl+S")).build();
-    ui.menu_item(im_str!("Save As..")).build();
+    ui.menu_item("Save").shortcut("Ctrl+S").build();
+    ui.menu_item("Save As..").build();
     ui.separator();
-    ui.menu(im_str!("Options")).build(|| {
-        ui.menu_item(im_str!("Enabled")).selected(&mut state.enabled).build();
+    ui.menu("Options").build(|| {
+        ui.menu_item("Enabled").selected(&mut state.enabled).build();
         // TODO
     });
-    ui.menu(im_str!("Colors")).build(|| {
+    ui.menu("Colors").build(|| {
         // TODO
     });
-    ui.menu(im_str!("Disabled")).enabled(false).build(|| {
+    ui.menu("Disabled").enabled(false).build(|| {
         unreachable!();
     });
     let mut checked = true;
-    ui.menu_item(im_str!("Checked")).selected(&mut checked).build();
-    ui.menu_item(im_str!("Quit")).shortcut(im_str!("Alt+F4")).build();
+    ui.menu_item("Checked").selected(&mut checked).build();
+    ui.menu_item("Quit").shortcut("Alt+F4").build();
 }
 
 fn show_example_app_auto_resize<'a>(ui: &Ui<'a>, state: &mut AutoResizeState, opened: &mut bool) {
-    ui.window(im_str!("Example: Auto-resizing window"))
+    ui.window("Example: Auto-resizing window")
         .opened(opened)
         .always_auto_resize(true)
         .build(|| {
-            ui.text(im_str!("Window will resize every-ui to the size of its content.
+            ui.text("Window will resize every-ui to the size of its content.
 Note that you probably don't want to query the window size to
-output your content because that would create a feedback loop."));
-            ui.slider_i32(im_str!("Number of lines"), &mut state.lines, 1, 20).build();
+output your content because that would create a feedback loop.");
+            ui.slider_i32("Number of lines", &mut state.lines, 1, 20).build();
             for i in 0 .. state.lines {
-                ui.text(im_str!("{:2$}This is line {}", "", i, i as usize * 4));
+                ui.text(&format!("{:2$}This is line {}", "", i, i as usize * 4));
             }
         })
 }
 
 fn show_example_app_fixed_overlay<'a>(ui: &Ui<'a>, opened: &mut bool) {
-    ui.window(im_str!("Example: Fixed Overlay"))
+    ui.window("Example: Fixed Overlay")
         .opened(opened)
         .bg_alpha(0.3)
         .title_bar(false)
@@ -360,33 +357,33 @@ fn show_example_app_fixed_overlay<'a>(ui: &Ui<'a>, opened: &mut bool) {
         .movable(false)
         .save_settings(false)
         .build(|| {
-            ui.text(im_str!("Simple overlay\non the top-left side of the screen."));
+            ui.text("Simple overlay\non the top-left side of the screen.");
             ui.separator();
             let mouse_pos = ui.imgui().mouse_pos();
-            ui.text(im_str!("Mouse Position: ({:.1},{:.1})", mouse_pos.0, mouse_pos.1));
+            ui.text(&format!("Mouse Position: ({:.1},{:.1})", mouse_pos.0, mouse_pos.1));
         })
 }
 
 fn show_example_app_manipulating_window_title<'a>(ui: &Ui<'a>) {
-    ui.window(im_str!("Same title as another window##1"))
+    ui.window("Same title as another window##1")
         .position((100.0, 100.0), ImGuiSetCond_FirstUseEver)
         .build(|| {
-            ui.text(im_str!("This is window 1.
-My title is the same as window 2, but my identifier is unique."));
+            ui.text("This is window 1.
+My title is the same as window 2, but my identifier is unique.");
         });
-    ui.window(im_str!("Same title as another window##2"))
+    ui.window("Same title as another window##2")
         .position((100.0, 200.0), ImGuiSetCond_FirstUseEver)
         .build(|| {
-            ui.text(im_str!("This is window 2.
-My title is the same as window 1, but my identifier is unique."));
+            ui.text("This is window 2.
+My title is the same as window 1, but my identifier is unique.");
         });
     let chars = ['|', '/', '-', '\\'];
     let ch_idx = (ui.imgui().get_time() / 0.25) as usize & 3;
     let num = ui.imgui().get_frame_count(); // The C++ version uses rand() here
-    let title = im_str!("Animated title {} {}###AnimatedTitle", chars[ch_idx], num);
-    ui.window(title)
+    let title = format!("Animated title {} {}###AnimatedTitle", chars[ch_idx], num);
+    ui.window(&title)
         .position((100.0, 300.0), ImGuiSetCond_FirstUseEver)
         .build(|| {
-            ui.text(im_str!("This window has a changing title"));
+            ui.text("This window has a changing title");
         });
 }

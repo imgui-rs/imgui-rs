@@ -3,6 +3,7 @@ extern crate gcc;
 fn main() {
     gcc::Config::new()
         .cpp(true)
+        .define("CIMGUI_ENABLE_IMSTR", None)
         .file("third-party/cimgui/cimgui/cimgui.cpp")
         .file("third-party/cimgui/cimgui/fontAtlas.cpp")
         .file("third-party/cimgui/cimgui/drawList.cpp")
