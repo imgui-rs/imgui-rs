@@ -6,13 +6,13 @@ use super::{Ui, ImStr};
 
 #[must_use]
 pub struct Menu<'ui, 'p> {
-    label: ImStr<'p>,
+    label: &'p str,
     enabled: bool,
     _phantom: PhantomData<&'ui Ui<'ui>>
 }
 
 impl<'ui, 'p> Menu<'ui, 'p> {
-    pub fn new(label: ImStr<'p>) -> Self {
+    pub fn new(label: &'p str) -> Self {
         Menu {
             label: label,
             enabled: true,
@@ -27,7 +27,7 @@ impl<'ui, 'p> Menu<'ui, 'p> {
         }
     }
     pub fn build<F: FnOnce()>(self, f: F) {
-        let render = unsafe { imgui_sys::igBeginMenu(self.label.as_ptr(), self.enabled) };
+        let render = unsafe { imgui_sys::igBeginMenu(imgui_sys::ImStr::from(self.label), self.enabled) };
         if render {
             f();
             unsafe { imgui_sys::igEndMenu() };
@@ -37,15 +37,15 @@ impl<'ui, 'p> Menu<'ui, 'p> {
 
 #[must_use]
 pub struct MenuItem<'ui, 'p> {
-    label: ImStr<'p>,
-    shortcut: Option<ImStr<'p>>,
+    label: &'p str,
+    shortcut: Option<&'p str>,
     selected: Option<&'p mut bool>,
     enabled: bool,
     _phantom: PhantomData<&'ui Ui<'ui>>
 }
 
 impl<'ui, 'p> MenuItem<'ui, 'p> {
-    pub fn new(label: ImStr<'p>) -> Self {
+    pub fn new(label: &'p str) -> Self {
         MenuItem {
             label: label,
             shortcut: None,
@@ -55,7 +55,7 @@ impl<'ui, 'p> MenuItem<'ui, 'p> {
         }
     }
     #[inline]
-    pub fn shortcut(self, shortcut: ImStr<'p>) -> Self {
+    pub fn shortcut(self, shortcut: &'p str) -> Self {
         MenuItem {
             shortcut: Some(shortcut),
             .. self
@@ -76,8 +76,8 @@ impl<'ui, 'p> MenuItem<'ui, 'p> {
         }
     }
     pub fn build(self) -> bool {
-        let label = self.label.as_ptr();
-        let shortcut = self.shortcut.map(|x| x.as_ptr()).unwrap_or(ptr::null());
+        let label = imgui_sys::ImStr::from(self.label);
+        let shortcut = self.shortcut.map(|x| imgui_sys::ImStr::from(x)).unwrap_or(imgui_sys::ImStr::null());
         let selected = self.selected.map(|x| x as *mut bool).unwrap_or(ptr::null_mut());
         let enabled = self.enabled;
         unsafe {

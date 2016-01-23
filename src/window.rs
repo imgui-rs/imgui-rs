@@ -12,7 +12,7 @@ use super::{
     ImGuiWindowFlags_NoSavedSettings, ImGuiWindowFlags_NoInputs, ImGuiWindowFlags_MenuBar,
     ImGuiWindowFlags_HorizontalScrollbar, ImGuiWindowFlags_NoFocusOnAppearing,
     ImGuiWindowFlags_NoBringToFrontOnFocus,
-    ImStr, ImVec2
+    ImVec2
 };
 
 #[must_use]
@@ -21,7 +21,7 @@ pub struct Window<'ui, 'p> {
     pos_cond: ImGuiSetCond,
     size: (f32, f32),
     size_cond: ImGuiSetCond,
-    name: ImStr<'p>,
+    name: &'p str,
     opened: Option<&'p mut bool>,
     bg_alpha: f32,
     flags: ImGuiWindowFlags,
@@ -29,7 +29,7 @@ pub struct Window<'ui, 'p> {
 }
 
 impl<'ui, 'p> Window<'ui, 'p> {
-    pub fn new(name: ImStr<'p>) -> Window<'ui, 'p> {
+    pub fn new(name: &'p str) -> Window<'ui, 'p> {
         Window {
             pos: (0.0, 0.0),
             pos_cond: ImGuiSetCond::empty(),
@@ -186,7 +186,7 @@ impl<'ui, 'p> Window<'ui, 'p> {
                 imgui_sys::igSetNextWindowSize(self.size.into(), self.size_cond);
             }
             imgui_sys::igBegin2(
-                self.name.as_ptr(),
+                imgui_sys::ImStr::from(self.name),
                 self.opened.map(|x| x as *mut bool).unwrap_or(ptr::null_mut()),
                 ImVec2::new(0.0, 0.0),
                 self.bg_alpha,
