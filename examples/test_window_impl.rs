@@ -144,7 +144,7 @@ fn show_user_guide<'a>(ui: &Ui<'a>) {
     ui.bullet_text("TAB/SHIFT+TAB to cycle through keyboard editable fields.");
     ui.bullet_text("CTRL+Click on a slider or drag box to input text.");
     ui.bullet_text("While editing text:
-                   - Hold SHIFT or use mouse to select text
+- Hold SHIFT or use mouse to select text
 - CTRL+Left/Right to word jump
 - CTRL+A or double-click to select all
 - CTRL+X,CTRL+C,CTRL+V clipboard
