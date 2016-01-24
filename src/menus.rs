@@ -2,7 +2,7 @@ use imgui_sys;
 use std::marker::PhantomData;
 use std::ptr;
 
-use super::{Ui, ImStr};
+use super::{Ui};
 
 #[must_use]
 pub struct Menu<'ui, 'p> {

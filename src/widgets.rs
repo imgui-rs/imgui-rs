@@ -1,7 +1,7 @@
 use imgui_sys;
 use std::marker::PhantomData;
 
-use super::{Ui, ImStr};
+use super::{Ui};
 
 #[must_use]
 pub struct CollapsingHeader<'ui, 'p> {

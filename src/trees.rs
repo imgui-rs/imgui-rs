@@ -1,7 +1,7 @@
 use imgui_sys;
 use std::marker::PhantomData;
 
-use super::{Ui, ImGuiSetCond, ImStr};
+use super::{Ui, ImGuiSetCond};
 
 #[must_use]
 pub struct TreeNode<'ui, 'p> {

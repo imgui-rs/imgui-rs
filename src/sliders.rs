@@ -1,7 +1,7 @@
 use imgui_sys;
 use std::marker::PhantomData;
 
-use super::{Ui, ImStr};
+use super::{Ui};
 
 // TODO: Consider using Range, even though it is half-open
 

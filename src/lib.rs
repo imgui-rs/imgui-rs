@@ -6,10 +6,9 @@ extern crate imgui_sys;
 
 extern crate libc;
 
-use libc::{c_char, c_float, c_int, c_uchar};
-use std::borrow::Cow;
+use libc::{c_float, c_int, c_uchar};
 use std::convert::From;
-use std::ffi::CStr;
+use std::ffi::{CStr, CString};
 use std::mem;
 use std::ptr;
 use std::slice;
@@ -65,54 +64,10 @@ mod window;
 pub mod glium_renderer;
 
 pub struct ImGui {
-    // We need to keep ownership of the ImStr values to ensure the *const char pointer
-    // lives long enough in case the ImStr contains a Cow::Owned
-    ini_filename: Option<ImStr<'static>>,
-    log_filename: Option<ImStr<'static>>
-}
-
-#[macro_export]
-macro_rules! im_str {
-    ($e:tt) => ({
-        let value = concat!($e, "\0");
-        unsafe { ::imgui::ImStr::from_bytes_unchecked(value.as_bytes()) }
-    });
-    ($e:tt, $($arg:tt)*) => ({
-        ::imgui::ImStr::from(format!($e, $($arg)*))
-    })
-}
-
-#[derive(Clone)]
-pub struct ImStr<'a> {
-    bytes: Cow<'a, [u8]>
-}
-
-impl<'a> ImStr<'a> {
-    pub unsafe fn from_bytes_unchecked(bytes: &'a [u8]) -> ImStr<'a> {
-        ImStr {
-            bytes: Cow::Borrowed(bytes)
-        }
-    }
-    fn as_ptr(&self) -> *const c_char { self.bytes.as_ptr() as *const c_char }
-}
-
-impl<'a> From<&'a str> for ImStr<'a> {
-    fn from(value: &'a str) -> ImStr<'a> {
-        let mut bytes: Vec<u8> = value.bytes().collect();
-        bytes.push(0);
-        ImStr {
-            bytes: Cow::Owned(bytes)
-        }
-    }
-}
-
-impl From<String> for ImStr<'static> {
-    fn from(mut value: String) -> ImStr<'static> {
-        value.push('\0');
-        ImStr {
-            bytes: Cow::Owned(value.into_bytes())
-        }
-    }
+    // We need to keep ownership of the CString values to ensure the *const char pointer
+    // lives long enough
+    ini_filename: Option<CString>,
+    log_filename: Option<CString>
 }
 
 pub struct TextureHandle<'a> {
@@ -162,25 +117,29 @@ impl ImGui {
             })
         }
     }
-    pub fn set_ini_filename(&mut self, value: Option<ImStr<'static>>) {
-        {
-            let io = self.io_mut();
-            io.ini_filename = match value {
-               Some(ref x) => x.as_ptr(),
-               None => ptr::null()
+    pub fn set_ini_filename(&mut self, value: Option<&str>) {
+        match value {
+            Some(s) => {
+                self.ini_filename = Some(CString::new(s).unwrap());
+                self.io_mut().ini_filename = self.ini_filename.as_ref().unwrap().as_ptr();
+            },
+            None => {
+                self.ini_filename = None;
+                self.io_mut().ini_filename = ptr::null();
             }
         }
-        self.ini_filename = value;
     }
-    pub fn set_log_filename(&mut self, value: Option<ImStr<'static>>) {
-        {
-            let io = self.io_mut();
-            io.log_filename = match value {
-               Some(ref x) => x.as_ptr(),
-               None => ptr::null()
+    pub fn set_log_filename(&mut self, value: Option<&str>) {
+        match value {
+            Some(s) => {
+                self.log_filename = Some(CString::new(s).unwrap());
+                self.io_mut().log_filename = self.log_filename.as_ref().unwrap().as_ptr();
+            },
+            None => {
+                self.log_filename = None;
+                self.io_mut().log_filename = ptr::null();
             }
         }
-        self.log_filename = value;
     }
     pub fn set_ini_saving_rate(&mut self, value: f32) {
         let io = self.io_mut();
