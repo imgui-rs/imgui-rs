@@ -781,17 +781,24 @@ extern "C" {
 extern "C" {
     pub fn igText(fmt: *const c_char, ...);
     // pub fn igTextV(fmt: *const c_char, args: va_list);
+    pub fn igText1(text: ImStr);
     pub fn igTextColored(col: ImVec4, fmt: *const c_char, ...);
     // pub fn igTextColoredV(col: ImVec4, fmt: *const c_char, args: va_list);
+    pub fn igTextColored1(col: ImVec4, text: ImStr);
     pub fn igTextDisabled(fmt: *const c_char, ...);
     // pub fn igTextDisabledV(fmt: *const c_char, args: va_list);
+    pub fn igTextDisabled1(text: ImStr);
     pub fn igTextWrapped(fmt: *const c_char, ...);
     // pub fn igTextWrappedV(fmt: *const c_char, args: va_list);
+    pub fn igTextWrapped1(text: ImStr);
     pub fn igTextUnformatted(text: *const c_char, text_end: *const c_char);
+    pub fn igTextUnformatted1(text: ImStr);
     pub fn igLabelText(label: ImStr, fmt: *const c_char, ...);
+    pub fn igLabelText1(label: ImStr, text: ImStr);
     // pub fn igLabelTextV(label: *const c_char, fmt: *const c_char, args: va_list);
     pub fn igBullet();
     pub fn igBulletText(fmt: *const c_char, ...);
+    pub fn igBulletText1(text: ImStr);
     // pub fn igBulletTextV(fmt: *const c_char, args: va_list);
     pub fn igButton(label: ImStr, size: ImVec2) -> bool;
     pub fn igSmallButton(label: ImStr) -> bool;
@@ -955,6 +962,7 @@ extern "C" {
 extern "C" {
     pub fn igTreeNode(str_label_id: ImStr) -> bool;
     pub fn igTreeNodeStr(str_id: ImStr, fmt: *const c_char, ...) -> bool;
+    pub fn igTreeNodeStr1(str_id: ImStr, text: ImStr) -> bool;
     pub fn igTreeNodePtr(ptr_id: *const c_void, fmt: *const c_char, ...) -> bool;
     // pub fn igTreeNodeStrV(str_id: *const c_char, fmt: *const c_char, args: va_list) -> bool;
     // pub fn igTreeNodePtrV(ptr_id: *const c_void, fmt: *const c_char, args: va_list) -> bool;

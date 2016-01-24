@@ -39,15 +39,14 @@ impl<'ui, 'p> TreeNode<'ui, 'p> {
     }
     pub fn build<F: FnOnce()>(self, f: F) {
         let id = imgui_sys::ImStr::from(self.id);
-        let (label, len) = match self.label {
-            Some(label) => (label.as_ptr(), label.len() as i32),
-            None => (self.id.as_ptr(), self.id.len() as i32)
-        };
         let render = unsafe {
             if !self.opened_cond.is_empty() {
                 imgui_sys::igSetNextTreeNodeOpened(self.opened, self.opened_cond);
             }
-            imgui_sys::igTreeNodeStr(id, super::fmt_ptr(), len, label)
+            match self.label {
+                Some(label) => imgui_sys::igTreeNodeStr1(id, imgui_sys::ImStr::from(label)),
+                None => imgui_sys::igTreeNode(id)
+            }
         };
         if render {
             f();

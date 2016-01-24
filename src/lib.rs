@@ -301,10 +301,6 @@ pub struct Ui<'ui> {
     imgui: &'ui ImGui
 }
 
-static FMT: &'static [u8] = b"%.*s\0";
-
-fn fmt_ptr() -> *const c_char { FMT.as_ptr() as *const c_char }
-
 impl<'ui> Ui<'ui> {
     pub fn imgui(&self) -> &ImGui { self.imgui }
     pub fn want_capture_mouse(&self) -> bool {
@@ -407,28 +403,28 @@ impl<'ui> Ui<'ui> {
     pub fn text<'p>(&self, text: &'p str) {
         // TODO: use igTextUnformatted
         unsafe {
-            imgui_sys::igText(fmt_ptr(), text.len() as i32, text.as_ptr());
+            imgui_sys::igText1(imgui_sys::ImStr::from(text));
         }
     }
     pub fn text_colored<'p, A>(&self, col: A, text: &'p str) where A: Into<ImVec4> {
         unsafe {
-            imgui_sys::igTextColored(col.into(), fmt_ptr(), text.len() as i32, text.as_ptr());
+            imgui_sys::igTextColored1(col.into(), imgui_sys::ImStr::from(text));
         }
     }
     pub fn text_disabled<'p>(&self, text: &'p str) {
         unsafe {
-            imgui_sys::igTextDisabled(fmt_ptr(), text.len() as i32, text.as_ptr());
+            imgui_sys::igTextDisabled1(imgui_sys::ImStr::from(text));
         }
     }
     pub fn text_wrapped<'p>(&self, text: &'p str) {
         unsafe {
-            imgui_sys::igTextWrapped(fmt_ptr(), text.len() as i32, text.as_ptr());
+            imgui_sys::igTextWrapped1(imgui_sys::ImStr::from(text));
         }
     }
     pub fn label_text<'p>(&self, label: &'p str, text: &'p str) {
         let label = imgui_sys::ImStr::from(label);
         unsafe {
-            imgui_sys::igLabelText(label, fmt_ptr(), text.len() as i32, text.as_ptr());
+            imgui_sys::igLabelText1(label, imgui_sys::ImStr::from(text));
         }
     }
     pub fn bullet(&self) {
@@ -438,7 +434,7 @@ impl<'ui> Ui<'ui> {
     }
     pub fn bullet_text<'p>(&self, text: &'p str) {
         unsafe {
-            imgui_sys::igBulletText(fmt_ptr(), text.len() as i32, text.as_ptr());
+            imgui_sys::igBulletText1(imgui_sys::ImStr::from(text));
         }
     }
     pub fn small_button<'p>(&self, label: &'p str) -> bool {
