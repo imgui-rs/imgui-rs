@@ -14,9 +14,9 @@ pub struct CollapsingHeader<'ui, 'p> {
 }
 
 impl<'ui, 'p> CollapsingHeader<'ui, 'p> {
-    pub fn new(label: ImStr<'p>) -> Self {
+    pub fn new<S>(label: S) -> Self where S: Into<ImStr<'p>> {
         CollapsingHeader {
-            label: label,
+            label: label.into(),
             str_id: None,
             display_frame: true,
             default_open: false,
@@ -24,9 +24,9 @@ impl<'ui, 'p> CollapsingHeader<'ui, 'p> {
         }
     }
     #[inline]
-    pub fn str_id(self, str_id: ImStr<'p>) -> Self {
+    pub fn str_id<S>(self, str_id: S) -> Self where S: Into<ImStr<'p>> {
         CollapsingHeader {
-            str_id: Some(str_id),
+            str_id: Some(str_id.into()),
             .. self
         }
     }

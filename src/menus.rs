@@ -12,9 +12,9 @@ pub struct Menu<'ui, 'p> {
 }
 
 impl<'ui, 'p> Menu<'ui, 'p> {
-    pub fn new(label: ImStr<'p>) -> Self {
+    pub fn new<S>(label: S) -> Self where S: Into<ImStr<'p>> {
         Menu {
-            label: label,
+            label: label.into(),
             enabled: true,
             _phantom: PhantomData
         }
@@ -45,9 +45,9 @@ pub struct MenuItem<'ui, 'p> {
 }
 
 impl<'ui, 'p> MenuItem<'ui, 'p> {
-    pub fn new(label: ImStr<'p>) -> Self {
+    pub fn new<S>(label: S) -> Self where S: Into<ImStr<'p>> {
         MenuItem {
-            label: label,
+            label: label.into(),
             shortcut: None,
             selected: None,
             enabled: true,
@@ -55,9 +55,9 @@ impl<'ui, 'p> MenuItem<'ui, 'p> {
         }
     }
     #[inline]
-    pub fn shortcut(self, shortcut: ImStr<'p>) -> Self {
+    pub fn shortcut<S>(self, shortcut: S) -> Self where S: Into<ImStr<'p>> {
         MenuItem {
-            shortcut: Some(shortcut),
+            shortcut: Some(shortcut.into()),
             .. self
         }
     }

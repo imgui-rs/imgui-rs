@@ -16,9 +16,9 @@ pub struct SliderInt<'ui, 'p> {
 }
 
 impl<'ui, 'p> SliderInt<'ui, 'p> {
-    pub fn new(label: ImStr<'p>, value: &'p mut i32, min: i32, max: i32) -> Self {
+    pub fn new<S>(label: S, value: &'p mut i32, min: i32, max: i32) -> Self where S: Into<ImStr<'p>> {
         SliderInt {
-            label: label,
+            label: label.into(),
             value: value,
             min: min,
             max: max,
@@ -27,9 +27,9 @@ impl<'ui, 'p> SliderInt<'ui, 'p> {
         }
     }
     #[inline]
-    pub fn display_format(self, display_format: ImStr<'p>) -> Self {
+    pub fn display_format<S>(self, display_format: S) -> Self where S: Into<ImStr<'p>> {
         SliderInt {
-            display_format: display_format,
+            display_format: display_format.into(),
             .. self
         }
     }
@@ -54,9 +54,9 @@ pub struct SliderFloat<'ui, 'p> {
 }
 
 impl<'ui, 'p> SliderFloat<'ui, 'p> {
-    pub fn new(label: ImStr<'p>, value: &'p mut f32, min: f32, max: f32) -> Self {
+    pub fn new<S>(label: S, value: &'p mut f32, min: f32, max: f32) -> Self where S: Into<ImStr<'p>> {
         SliderFloat {
-            label: label,
+            label: label.into(),
             value: value,
             min: min,
             max: max,
@@ -66,9 +66,9 @@ impl<'ui, 'p> SliderFloat<'ui, 'p> {
         }
     }
     #[inline]
-    pub fn display_format(self, display_format: ImStr<'p>) -> Self {
+    pub fn display_format<S>(self, display_format: S    ) -> Self where S: Into<ImStr<'p>> {
         SliderFloat {
-            display_format: display_format,
+            display_format: display_format.into(),
             .. self
         }
     }

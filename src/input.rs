@@ -24,9 +24,9 @@ pub struct InputText<'ui, 'p> {
 }
 
 impl<'ui, 'p> InputText<'ui, 'p> {
-    pub fn new(label: ImStr<'p>, buf: &'p mut str) -> Self {
+    pub fn new<S>(label: S, buf: &'p mut str) -> Self where S: Into<ImStr<'p>> {
         InputText {
-            label: label,
+            label: label.into(),
             buf: buf,
             flags: ImGuiInputTextFlags::empty(),
             _phantom: PhantomData
