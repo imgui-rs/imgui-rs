@@ -395,9 +395,12 @@ impl<'ui> Ui<'ui> {
             imgui_sys::igText(fmt_ptr(), text.into().as_ptr());
         }
     }
-    pub fn text_colored<'p, A, S>(&self, col: A, text: S) where A: Into<ImVec4>, S: Into<ImStr<'p>> {
+    pub fn text_colored<'p, V, S>(&self, color: V, text: S) where
+        V: Into<ImVec4>,
+        S: Into<ImStr<'p>>,
+    {
         unsafe {
-            imgui_sys::igTextColored(col.into(), fmt_ptr(), text.into().as_ptr());
+            imgui_sys::igTextColored(color.into(), fmt_ptr(), text.into().as_ptr());
         }
     }
     pub fn text_disabled<'p, S>(&self, text: S) where S: Into<ImStr<'p>> {
@@ -428,16 +431,46 @@ impl<'ui> Ui<'ui> {
             imgui_sys::igBulletText(fmt_ptr(), text.into().as_ptr());
         }
     }
+
+    pub fn button<'p, S, V>(&self, label: S, size: V) -> bool where
+        S: Into<ImStr<'p>>,
+        V: Into<ImVec2>,
+    {
+        unsafe {
+            imgui_sys::igButton(label.into().as_ptr(), size.into())
+        }
+    }
+
     pub fn small_button<'p, S>(&self, label: S) -> bool where S: Into<ImStr<'p>> {
         unsafe {
             imgui_sys::igSmallButton(label.into().as_ptr())
         }
     }
+
+    pub fn invisible_button<'p, S, V>(&self, label: S, size: V) -> bool where
+        S: Into<ImStr<'p>>,
+        V: Into<ImVec2>,
+    {
+        unsafe {
+            imgui_sys::igInvisibleButton(label.into().as_ptr(), size.into())
+        }
+    }
+
     pub fn collapsing_header<'p, S>(&self, label: S) -> CollapsingHeader<'ui, 'p> where S: Into<ImStr<'p>> {
         CollapsingHeader::new(label)
     }
+
     pub fn checkbox<'p, S>(&self, label: S, value: &'p mut bool) -> bool where S: Into<ImStr<'p>> {
         unsafe { imgui_sys::igCheckbox(label.into().as_ptr(), value) }
+    }
+
+    pub fn progress_bar<'p, V, S>(&self, fraction: f32, size: V, overlay: S) where
+        V: Into<ImVec2>,
+        S: Into<ImStr<'p>>,
+    {
+        unsafe {
+            imgui_sys::igProgressBar(fraction, &size.into(), overlay.into().as_ptr());
+        }
     }
 }
 

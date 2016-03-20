@@ -246,7 +246,13 @@ fn show_test_window<'a>(ui: &Ui<'a>, state: &mut State, opened: &mut bool) {
                     ui.text("Bullet point 3 (two calls)");
 
                     ui.bullet();
-                    ui.small_button("Button");
+                    ui.button("Button", (0.0, 0.0));
+
+                    ui.bullet();
+                    ui.small_button("Small Button");
+
+                    ui.bullet();
+                    ui.progress_bar(0.5, (-1.0, 0.0), "Progress");
                 });
                 ui.tree_node("Colored text").build(|| {
                     ui.text_colored((1.0, 0.0, 1.0, 1.0), "Pink");
