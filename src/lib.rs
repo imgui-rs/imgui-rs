@@ -64,17 +64,6 @@ pub struct ImGui {
     log_filename: Option<ImStr<'static>>
 }
 
-#[macro_export]
-macro_rules! im_str {
-    ($e:tt) => ({
-        let value = concat!($e, "\0");
-        unsafe { ::imgui::ImStr::from_bytes_unchecked(value.as_bytes()) }
-    });
-    ($e:tt, $($arg:tt)*) => ({
-        ::imgui::ImStr::from(format!($e, $($arg)*))
-    })
-}
-
 #[derive(Clone)]
 pub struct ImStr<'a> {
     bytes: Cow<'a, [u8]>
@@ -155,26 +144,29 @@ impl ImGui {
             })
         }
     }
-    pub fn set_ini_filename(&mut self, value: Option<ImStr<'static>>) {
-        {
-            let io = self.io_mut();
-            io.ini_filename = match value {
-               Some(ref x) => x.as_ptr(),
-               None => ptr::null()
-            }
-        }
-        self.ini_filename = value;
+
+    pub fn set_ini_filename<S>(&mut self, value: S) where S: Into<ImStr<'static>> {
+        let value = value.into();
+        self.io_mut().ini_filename = value.as_ptr();
+        self.ini_filename = Some(value);
     }
-    pub fn set_log_filename(&mut self, value: Option<ImStr<'static>>) {
-        {
-            let io = self.io_mut();
-            io.log_filename = match value {
-               Some(ref x) => x.as_ptr(),
-               None => ptr::null()
-            }
-        }
-        self.log_filename = value;
+
+    pub fn unset_ini_filename(&mut self) {
+        self.io_mut().ini_filename = ptr::null();
+        self.ini_filename = None;
     }
+
+    pub fn set_log_filename<S>(&mut self, value: S) where S: Into<ImStr<'static>> {
+        let value = value.into();
+        self.io_mut().log_filename = value.as_ptr();
+        self.log_filename = Some(value);
+    }
+
+    pub fn unset_log_filename(&mut self) {
+        self.io_mut().log_filename = ptr::null();
+        self.log_filename = None;
+    }
+
     pub fn set_ini_saving_rate(&mut self, value: f32) {
         let io = self.io_mut();
         io.ini_saving_rate = value;
@@ -376,7 +368,7 @@ impl<'a> Ui<'a> {
 
 // Window
 impl<'ui> Ui<'ui> {
-    pub fn window<'p>(&self, name: ImStr<'p>) -> Window<'ui, 'p> { Window::new(name) }
+    pub fn window<'p, S>(&self, name: S) -> Window<'ui, 'p> where S: Into<ImStr<'p>> { Window::new(name) }
 }
 
 // Layout
@@ -397,30 +389,36 @@ impl<'ui> Ui<'ui> {
 
 // Widgets
 impl<'ui> Ui<'ui> {
-    pub fn text<'p>(&self, text: ImStr<'p>) {
+    pub fn text<'p, S>(&self, text: S) where S: Into<ImStr<'p>> {
         // TODO: use igTextUnformatted
         unsafe {
-            imgui_sys::igText(fmt_ptr(), text.as_ptr());
+            imgui_sys::igText(fmt_ptr(), text.into().as_ptr());
         }
     }
-    pub fn text_colored<'p, A>(&self, col: A, text: ImStr<'p>) where A: Into<ImVec4> {
+    pub fn text_colored<'p, V, S>(&self, color: V, text: S) where
+        V: Into<ImVec4>,
+        S: Into<ImStr<'p>>,
+    {
         unsafe {
-            imgui_sys::igTextColored(col.into(), fmt_ptr(), text.as_ptr());
+            imgui_sys::igTextColored(color.into(), fmt_ptr(), text.into().as_ptr());
         }
     }
-    pub fn text_disabled<'p>(&self, text: ImStr<'p>) {
+    pub fn text_disabled<'p, S>(&self, text: S) where S: Into<ImStr<'p>> {
         unsafe {
-            imgui_sys::igTextDisabled(fmt_ptr(), text.as_ptr());
+            imgui_sys::igTextDisabled(fmt_ptr(), text.into().as_ptr());
         }
     }
-    pub fn text_wrapped<'p>(&self, text: ImStr<'p>) {
+    pub fn text_wrapped<'p, S>(&self, text: S) where S: Into<ImStr<'p>> {
         unsafe {
-            imgui_sys::igTextWrapped(fmt_ptr(), text.as_ptr());
+            imgui_sys::igTextWrapped(fmt_ptr(), text.into().as_ptr());
         }
     }
-    pub fn label_text<'p>(&self, label: ImStr<'p>, text: ImStr<'p>) {
+    pub fn label_text<'p, S0, S1>(&self, label: S0, text: S1) where
+        S0: Into<ImStr<'p>>,
+        S1: Into<ImStr<'p>>,
+    {
         unsafe {
-            imgui_sys::igLabelText(label.as_ptr(), fmt_ptr(), text.as_ptr());
+            imgui_sys::igLabelText(label.into().as_ptr(), fmt_ptr(), text.into().as_ptr());
         }
     }
     pub fn bullet(&self) {
@@ -428,46 +426,80 @@ impl<'ui> Ui<'ui> {
             imgui_sys::igBullet();
         }
     }
-    pub fn bullet_text<'p>(&self, text: ImStr<'p>) {
+    pub fn bullet_text<'p, S>(&self, text: S) where S: Into<ImStr<'p>> {
         unsafe {
-            imgui_sys::igBulletText(fmt_ptr(), text.as_ptr());
+            imgui_sys::igBulletText(fmt_ptr(), text.into().as_ptr());
         }
     }
-    pub fn small_button<'p>(&self, label: ImStr<'p>) -> bool {
+
+    pub fn button<'p, S, V>(&self, label: S, size: V) -> bool where
+        S: Into<ImStr<'p>>,
+        V: Into<ImVec2>,
+    {
         unsafe {
-            imgui_sys::igSmallButton(label.as_ptr())
+            imgui_sys::igButton(label.into().as_ptr(), size.into())
         }
     }
-    pub fn collapsing_header<'p>(&self, label: ImStr<'p>) -> CollapsingHeader<'ui, 'p> {
+
+    pub fn small_button<'p, S>(&self, label: S) -> bool where S: Into<ImStr<'p>> {
+        unsafe {
+            imgui_sys::igSmallButton(label.into().as_ptr())
+        }
+    }
+
+    pub fn invisible_button<'p, S, V>(&self, label: S, size: V) -> bool where
+        S: Into<ImStr<'p>>,
+        V: Into<ImVec2>,
+    {
+        unsafe {
+            imgui_sys::igInvisibleButton(label.into().as_ptr(), size.into())
+        }
+    }
+
+    pub fn collapsing_header<'p, S>(&self, label: S) -> CollapsingHeader<'ui, 'p> where S: Into<ImStr<'p>> {
         CollapsingHeader::new(label)
     }
-    pub fn checkbox<'p>(&self, label: ImStr<'p>, value: &'p mut bool) -> bool {
-        unsafe { imgui_sys::igCheckbox(label.as_ptr(), value) }
+
+    pub fn checkbox<'p, S>(&self, label: S, value: &'p mut bool) -> bool where S: Into<ImStr<'p>> {
+        unsafe { imgui_sys::igCheckbox(label.into().as_ptr(), value) }
+    }
+
+    pub fn progress_bar<'p, V, S>(&self, fraction: f32, size: V, overlay: S) where
+        V: Into<ImVec2>,
+        S: Into<ImStr<'p>>,
+    {
+        unsafe {
+            imgui_sys::igProgressBar(fraction, &size.into(), overlay.into().as_ptr());
+        }
     }
 }
 
 // Widgets: Input
 impl<'ui> Ui<'ui> {
-    pub fn input_text<'p>(&self, label: ImStr<'p>, buf: &'p mut str) -> InputText<'ui, 'p> {
+    pub fn input_text<'p, S>(&self, label: S, buf: &'p mut str) -> InputText<'ui, 'p> where
+        S: Into<ImStr<'p>>,
+    {
         InputText::new(label, buf)
     }
 }
 
 // Widgets: Sliders
 impl<'ui> Ui<'ui> {
-    pub fn slider_f32<'p>(&self, label: ImStr<'p>,
-                          value: &'p mut f32, min: f32, max: f32) -> SliderFloat<'ui, 'p> {
+    pub fn slider_f32<'p, S>(&self, label: S, value: &'p mut f32, min: f32, max: f32) -> SliderFloat<'ui, 'p> where
+        S: Into<ImStr<'p>>,
+    {
         SliderFloat::new(label, value, min, max)
     }
-    pub fn slider_i32<'p>(&self, label: ImStr<'p>,
-                          value: &'p mut i32, min: i32, max: i32) -> SliderInt<'ui, 'p> {
+    pub fn slider_i32<'p, S>(&self, label: S, value: &'p mut i32, min: i32, max: i32) -> SliderInt<'ui, 'p> where
+        S: Into<ImStr<'p>>,
+    {
         SliderInt::new(label, value, min, max)
     }
 }
 
 // Widgets: Trees
 impl<'ui> Ui<'ui> {
-    pub fn tree_node<'p>(&self, id: ImStr<'p>) -> TreeNode<'ui, 'p> {
+    pub fn tree_node<'p, S>(&self, id: S) -> TreeNode<'ui, 'p> where S: Into<ImStr<'p>> {
         TreeNode::new(id)
     }
 }
@@ -488,6 +520,14 @@ impl<'ui> Ui<'ui> {
             unsafe { imgui_sys::igEndMenuBar() };
         }
     }
-    pub fn menu<'p>(&self, label: ImStr<'p>) -> Menu<'ui, 'p> { Menu::new(label) }
-    pub fn menu_item<'p>(&self, label: ImStr<'p>) -> MenuItem<'ui, 'p> { MenuItem::new(label) }
+    pub fn menu<'p, S>(&self, label: S) -> Menu<'ui, 'p> where
+        S: Into<ImStr<'p>>,
+    {
+        Menu::new(label)
+    }
+    pub fn menu_item<'p, S>(&self, label: S) -> MenuItem<'ui, 'p> where
+        S: Into<ImStr<'p>>,
+    {
+        MenuItem::new(label)
+    }
 }

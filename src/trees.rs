@@ -13,9 +13,9 @@ pub struct TreeNode<'ui, 'p> {
 }
 
 impl<'ui, 'p> TreeNode<'ui, 'p> {
-    pub fn new(id: ImStr<'p>) -> Self {
+    pub fn new<S>(id: S) -> Self where S: Into<ImStr<'p>> {
         TreeNode {
-            id: id,
+            id: id.into(),
             label: None,
             opened: false,
             opened_cond: ImGuiSetCond::empty(),
@@ -23,9 +23,9 @@ impl<'ui, 'p> TreeNode<'ui, 'p> {
         }
     }
     #[inline]
-    pub fn label(self, label: ImStr<'p>) -> Self {
+    pub fn label<S>(self, label: S) -> Self where S: Into<ImStr<'p>> {
         TreeNode {
-            label: Some(label),
+            label: Some(label.into()),
             .. self
         }
     }

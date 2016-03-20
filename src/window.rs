@@ -29,13 +29,13 @@ pub struct Window<'ui, 'p> {
 }
 
 impl<'ui, 'p> Window<'ui, 'p> {
-    pub fn new(name: ImStr<'p>) -> Window<'ui, 'p> {
+    pub fn new<S>(name: S) -> Window<'ui, 'p> where S: Into<ImStr<'p>> {
         Window {
             pos: (0.0, 0.0),
             pos_cond: ImGuiSetCond::empty(),
             size: (0.0, 0.0),
             size_cond: ImGuiSetCond::empty(),
-            name: name,
+            name: name.into(),
             opened: None,
             bg_alpha: -1.0,
             flags: ImGuiWindowFlags::empty(),
