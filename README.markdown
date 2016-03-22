@@ -24,7 +24,9 @@ ui.window(im_str!("Hello world"))
 * Low-level API (imgui-sys)
 * Renderer for easy integration with [Glium](https://github.com/tomaka/glium) projects (optional)
 * Parts of high-level API
-* Not horrible way of defining and passing null-terminated UTF-8 to ImGui
+* Not horrible way of defining and passing null-terminated UTF-8 to ImGui.
+  The macro `im_str!` needs to be used most of the time. For more
+  information and justification for this design, please see issue #7
 * Parts of imgui\_demo.cpp reimplemented in Rust as an API usage example (examples/test\_window\_impl.rs)
 
 ## Important but unimplemented things
