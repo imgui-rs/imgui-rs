@@ -12,7 +12,7 @@ build = "build.rs"
 default = ["glium"]
 
 [dependencies]
-bitflags = "0.3"
+bitflags = "0.5"
 libc = "0.2"
 
 [dependencies.glium]
