@@ -99,7 +99,7 @@ impl Renderer {
             ];
             let uniforms = uniform! {
                 matrix: matrix,
-                texture: self.device_objects.texture.sampled()
+                tex: self.device_objects.texture.sampled()
             };
             let draw_params = DrawParameters {
                 blend: Blend::alpha_blending(),
