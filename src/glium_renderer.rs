@@ -88,19 +88,19 @@ impl Renderer {
         try!(self.device_objects.upload_index_buffer(&self.ctx, draw_list.idx_buffer));
 
         let (width, height) = surface.get_dimensions();
+        let matrix = [
+            [ 2.0 / (width as f32), 0.0, 0.0, 0.0 ],
+            [ 0.0, 2.0 / -(height as f32), 0.0, 0.0 ],
+            [ 0.0, 0.0, -1.0, 0.0 ],
+                [ -1.0, 1.0, 0.0, 1.0 ]
+        ];
+        let uniforms = uniform! {
+            matrix: matrix,
+            tex: &self.device_objects.texture
+        };
 
         let mut idx_start = 0;
         for cmd in draw_list.cmd_buffer {
-            let matrix = [
-                [ 2.0 / (width as f32), 0.0, 0.0, 0.0 ],
-                [ 0.0, 2.0 / -(height as f32), 0.0, 0.0 ],
-                [ 0.0, 0.0, -1.0, 0.0 ],
-                    [ -1.0, 1.0, 0.0, 1.0 ]
-            ];
-            let uniforms = uniform! {
-                matrix: matrix,
-                tex: &self.device_objects.texture
-            };
             let draw_params = DrawParameters {
                 blend: Blend::alpha_blending(),
                 scissor: Some(Rect {
