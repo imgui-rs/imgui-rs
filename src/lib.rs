@@ -6,7 +6,7 @@ extern crate imgui_sys;
 
 extern crate libc;
 
-use libc::{c_char, c_float, c_int, c_uchar};
+use libc::{c_char, c_float, c_int, c_uchar, c_void, uintptr_t};
 use std::borrow::Cow;
 use std::convert::From;
 use std::ffi::CStr;
@@ -153,6 +153,11 @@ impl ImGui {
                 height: height as u32,
                 pixels: slice::from_raw_parts(pixels, (width * height * bytes_per_pixel) as usize)
             })
+        }
+    }
+    pub fn set_texture_id(&mut self, value: uintptr_t) {
+        unsafe {
+            (*self.io_mut().fonts).tex_id = value as *mut c_void;
         }
     }
     pub fn set_ini_filename(&mut self, value: Option<ImStr<'static>>) {

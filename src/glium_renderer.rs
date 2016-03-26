@@ -1,10 +1,12 @@
 use glium::{
     index, program, texture, vertex,
-    Blend, DrawError, DrawParameters, IndexBuffer, Program, Rect, Surface, Texture2d, VertexBuffer
+    Blend, DrawError, DrawParameters, GlObject, IndexBuffer, Program, Rect, Surface, Texture2d,
+    VertexBuffer
 };
 use glium::backend::{Context, Facade};
 use glium::index::PrimitiveType;
 use glium::texture::{ClientFormat, RawImage2d};
+use libc::uintptr_t;
 use std::borrow::Cow;
 use std::fmt;
 use std::rc::Rc;
@@ -97,13 +99,16 @@ impl Renderer {
             [ 0.0, 0.0, -1.0, 0.0 ],
                 [ -1.0, 1.0, 0.0, 1.0 ]
         ];
-        let uniforms = uniform! {
-            matrix: matrix,
-            tex: &self.device_objects.texture
-        };
+        let font_texture_id = self.device_objects.texture.get_id() as uintptr_t;
 
         let mut idx_start = 0;
         for cmd in draw_list.cmd_buffer {
+            // We don't support custom textures...yet!
+            assert!(cmd.texture_id as uintptr_t == font_texture_id);
+            let uniforms = uniform! {
+                matrix: matrix,
+                tex: &self.device_objects.texture
+            };
             let draw_params = DrawParameters {
                 blend: Blend::alpha_blending(),
                 scissor: Some(Rect {
@@ -165,6 +170,7 @@ impl DeviceObjects {
             };
             Texture2d::new(ctx, data)
         }));
+        im_gui.set_texture_id(texture.get_id() as uintptr_t);
 
         Ok(DeviceObjects {
             vertex_buffer: vertex_buffer,
