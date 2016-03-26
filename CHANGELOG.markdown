@@ -14,7 +14,7 @@
 
 ### Fixed
 
-- Fix issue #17
+- Fix Glium rendering error when more than one texture is used ([issue #17](https://github.com/Gekkio/imgui-rs/issues/17))
 
 ## [0.0.6] - 2016-01-12
 
