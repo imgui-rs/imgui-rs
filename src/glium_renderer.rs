@@ -80,7 +80,10 @@ impl Renderer {
     }
     pub fn render<'a, S: Surface>(&mut self, surface: &mut S,
                                   ui: Ui<'a>) -> RendererResult<()> {
-        ui.render(|draw_list| self.render_draw_list(surface, draw_list))
+        let _ = self.ctx.insert_debug_marker("imgui-rs: starting rendering");
+        let result = ui.render(|draw_list| self.render_draw_list(surface, draw_list));
+        let _ = self.ctx.insert_debug_marker("imgui-rs: rendering finished");
+        result
     }
     fn render_draw_list<'a, S: Surface>(&mut self, surface: &mut S,
                                         draw_list: DrawList<'a>) -> RendererResult<()> {
@@ -178,6 +181,9 @@ impl DeviceObjects {
             return Ok(());
         }
         self.vertex_buffer = try!(VertexBuffer::dynamic(ctx, vtx_buffer));
+        let _ = ctx.get_context().insert_debug_marker(
+            &format!("imgui-rs: resized vertex buffer to {} bytes",
+                     self.vertex_buffer.get_size()));
         Ok(())
     }
     pub fn upload_index_buffer<F: Facade>(&mut self, ctx: &F,
@@ -189,6 +195,9 @@ impl DeviceObjects {
         }
         self.index_buffer =
             try!(IndexBuffer::dynamic(ctx, PrimitiveType::TrianglesList, idx_buffer));
+        let _ = ctx.get_context().insert_debug_marker(
+            &format!("imgui-rs: resized index buffer to {} bytes",
+                     self.index_buffer.get_size()));
         Ok(())
     }
 }
