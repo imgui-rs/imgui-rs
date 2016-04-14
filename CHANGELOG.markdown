@@ -6,6 +6,10 @@
 
 - Add a change log
 
+### Changed
+
+- Upgrade to glium 0.14
+
 ## [0.0.7] - 2016-03-26
 
 ### Changed
