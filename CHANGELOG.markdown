@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [0.0.8] - 2016-04-15
+
 ### Added
 
 - Add a change log
@@ -61,7 +63,8 @@
 
 - Initial release with cimgui/imgui 1.44, glium 0.9
 
-[Unreleased]: https://github.com/Gekkio/imgui-rs/compare/v0.0.7...HEAD
+[Unreleased]: https://github.com/Gekkio/imgui-rs/compare/v0.0.8...HEAD
+[0.0.7]: https://github.com/Gekkio/imgui-rs/compare/v0.0.7...v0.0.8
 [0.0.7]: https://github.com/Gekkio/imgui-rs/compare/v0.0.6...v0.0.7
 [0.0.6]: https://github.com/Gekkio/imgui-rs/compare/v0.0.5...v0.0.6
 [0.0.5]: https://github.com/Gekkio/imgui-rs/compare/v0.0.4...v0.0.5
