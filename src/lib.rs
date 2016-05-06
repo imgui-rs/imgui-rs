@@ -86,7 +86,7 @@ impl<'a> ImStr<'a> {
             bytes: Cow::Borrowed(bytes)
         }
     }
-    fn as_ptr(&self) -> *const c_char { self.bytes.as_ptr() as *const c_char }
+    pub fn as_ptr(&self) -> *const c_char { self.bytes.as_ptr() as *const c_char }
 }
 
 impl<'a> From<&'a str> for ImStr<'a> {
