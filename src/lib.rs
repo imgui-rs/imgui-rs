@@ -86,7 +86,7 @@ impl<'a> ImStr<'a> {
             bytes: Cow::Borrowed(bytes)
         }
     }
-    pub fn as_ptr(&self) -> *const c_char { self.bytes.as_ptr() as *const c_char }
+    fn as_ptr(&self) -> *const c_char { self.bytes.as_ptr() as *const c_char }
 }
 
 impl<'a> From<&'a str> for ImStr<'a> {
@@ -495,4 +495,22 @@ impl<'ui> Ui<'ui> {
     }
     pub fn menu<'p>(&self, label: ImStr<'p>) -> Menu<'ui, 'p> { Menu::new(label) }
     pub fn menu_item<'p>(&self, label: ImStr<'p>) -> MenuItem<'ui, 'p> { MenuItem::new(label) }
+}
+
+//Widgets: Combos 
+impl<'ui> Ui<'ui> {
+    pub fn combo<'p>(&self, label : ImStr<'p>, current_item :&mut i32, items : ImStr<'p>, height_in_items : i32) -> bool {
+        unsafe{
+            imgui_sys::igCombo2(label.as_ptr(), current_item,  items.as_ptr(),  height_in_items)
+        }
+    }
+}
+//Widgets: ListBox
+impl<'ui> Ui<'ui> {
+    pub fn list_box<'p>(&self, label : ImStr<'p>, current_item : &mut i32, items : &mut Vec<ImStr<'p>>, items_count : i32, height_in_items : i32)-> bool{
+        unsafe{
+            let items_inner : Vec<*const c_char> = items.into_iter().map(|item| item.as_ptr()).collect();
+            imgui_sys::igListBox(label.as_ptr(), current_item, items_inner.as_ptr() as *mut *const c_char,items_count, height_in_items)
+        }
+    } 
 }
