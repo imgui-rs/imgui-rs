@@ -38,7 +38,7 @@ pub use imgui_sys::{
     ImGuiWindowFlags_HorizontalScrollbar, ImGuiWindowFlags_NoFocusOnAppearing,
     ImGuiWindowFlags_NoBringToFrontOnFocus,
     ImVec2, ImVec4,
-    ImGuiKey
+    ImGuiKey 
 };
 pub use input::{InputText};
 pub use menus::{Menu, MenuItem};
@@ -398,7 +398,40 @@ impl<'ui> Ui<'ui> {
         }
     }
     pub fn spacing(&self) { unsafe { imgui_sys::igSpacing() }; }
+
+
+    pub fn columns(&self, i: i32, b: *const i8, b2: bool){
+        unsafe { imgui_sys::igColumns(i, b, b2 ) };
+    }
+
+    pub fn next_column(&self) {
+        unsafe { imgui_sys::igNextColumn() };
+    }
+
+    pub fn get_column_index(&self) {
+        unsafe { imgui_sys::igGetColumnIndex() };
+    }
+
+    pub fn get_column_offset(&self, i: i32) {
+        unsafe { imgui_sys::igGetColumnOffset(i) };
+    }
+
+    pub fn set_column_offset(&self, column_index: i32, offset_x: f32) {
+        unsafe { imgui_sys::igSetColumnOffset(column_index, offset_x ) };
+    }
+
+    pub fn get_column_width(&self, i: i32) {
+        unsafe { imgui_sys::igGetColumnWidth(i) };
+    }
+
+    pub fn get_columns_count(&self) {
+        unsafe { imgui_sys::igGetColumnsCount() };
+    }
+
+
 }
+
+
 
 // Widgets
 impl<'ui> Ui<'ui> {
