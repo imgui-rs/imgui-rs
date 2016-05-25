@@ -400,8 +400,8 @@ impl<'ui> Ui<'ui> {
     pub fn spacing(&self) { unsafe { imgui_sys::igSpacing() }; }
 
 
-    pub fn columns(&self, i: i32, b: *const i8, b2: bool){
-        unsafe { imgui_sys::igColumns(i, b, b2 ) };
+    pub fn columns<'p>(&self, i: i32, b:  ImStr<'p>, b2: bool){
+        unsafe { imgui_sys::igColumns(i, b.as_ptr(), b2 ) };
     }
 
     pub fn next_column(&self) {
