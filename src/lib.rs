@@ -497,13 +497,6 @@ impl<'ui> Ui<'ui> {
     pub fn menu_item<'p>(&self, label: ImStr<'p>) -> MenuItem<'ui, 'p> { MenuItem::new(label) }
 }
 
-
-    extern "C" fn combo_item_getter(closure : *mut c_void, idx : c_int, out_text : *mut *const c_char)->bool{
-        let inner_closure : &mut &mut FnMut(i32)->&'static str = unsafe { mem::transmute(closure)};
-        unsafe{*out_text = inner_closure(idx).as_bytes().as_ptr() as *const c_char;}
-        //unsafe{*out_text = "orhan\0".as_bytes().as_ptr() as *const c_char;}
-        true
-    } 
 //Widgets: Combos 
 impl<'ui> Ui<'ui> {
     pub fn combo<'p>(&self, label : ImStr<'p>, current_item : &mut i32, items : &mut Vec<ImStr<'p>>, items_count : i32, height_in_items : i32) -> bool{
@@ -518,14 +511,8 @@ impl<'ui> Ui<'ui> {
             imgui_sys::igCombo2(label.as_ptr(), current_item,  items.as_ptr(),  height_in_items)
         }
     }
-
-    pub fn combo3<'p, F>(&self, label : ImStr<'p>, current_item:&mut i32, mut items_getter : F, items_count : i32, height_in_items : i32) -> bool where F : FnMut(i32)->&'static str{
-        unsafe{
-            let callback : &mut FnMut(i32)->&'static str =  &mut items_getter;
-            imgui_sys::igCombo3(label.as_ptr(), current_item, combo_item_getter, callback as *mut _ as *mut c_void , items_count, height_in_items)
-        } 
-    }
 }
+
 //Widgets: ListBox
 impl<'ui> Ui<'ui> {
     pub fn list_box<'p>(&self, label : ImStr<'p>, current_item : &mut i32, items : &mut Vec<ImStr<'p>>, items_count : i32, height_in_items : i32)-> bool{
