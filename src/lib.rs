@@ -411,16 +411,16 @@ impl<'ui> Ui<'ui> {
         unsafe { imgui_sys::igGetColumnIndex() }
     }
 
-    pub fn get_column_offset(&self, i: i32) -> f32 {
-        unsafe { imgui_sys::igGetColumnOffset(i) }
+    pub fn get_column_offset(&self, column_index: i32) -> f32 {
+        unsafe { imgui_sys::igGetColumnOffset(column_index) }
     }
 
     pub fn set_column_offset(&self, column_index: i32, offset_x: f32) {
         unsafe { imgui_sys::igSetColumnOffset(column_index, offset_x) }
     }
 
-    pub fn get_column_width(&self, i: i32) -> f32 {
-        unsafe { imgui_sys::igGetColumnWidth(i) }
+    pub fn get_column_width(&self, column_index: i32) -> f32 {
+        unsafe { imgui_sys::igGetColumnWidth(column_index) }
     }
 
     pub fn get_columns_count(&self) -> i32 {
