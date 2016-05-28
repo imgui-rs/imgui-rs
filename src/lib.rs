@@ -499,26 +499,38 @@ impl<'ui> Ui<'ui> {
 
 //Widgets: Combos 
 impl<'ui> Ui<'ui> {
-    pub fn combo<'p>(&self, label : ImStr<'p>, current_item : &mut i32, items : &mut Vec<ImStr<'p>>, items_count : i32, height_in_items : i32) -> bool{
+    pub fn combo<'p>(&self, 
+                     label: ImStr<'p>,
+                     current_item: &mut i32,
+                     items: &'p [ImStr<'p>],
+                     height_in_items: i32) 
+                     -> bool {
         let items_inner : Vec<*const c_char> = items.into_iter().map(|item| item.as_ptr()).collect();
         unsafe {
-            imgui_sys::igCombo(label.as_ptr(), current_item, items_inner.as_ptr() as *mut *const c_char, items_count, height_in_items)
-        }
-    }
-
-    pub fn combo2<'p>(&self, label : ImStr<'p>, current_item :&mut i32, items : ImStr<'p>, height_in_items : i32) -> bool {
-        unsafe{
-            imgui_sys::igCombo2(label.as_ptr(), current_item,  items.as_ptr(),  height_in_items)
+            imgui_sys::igCombo(label.as_ptr(),
+                               current_item,
+                               items_inner.as_ptr() as *mut *const c_char,
+                               items_inner.len() as i32,
+                               height_in_items)
         }
     }
 }
 
 //Widgets: ListBox
 impl<'ui> Ui<'ui> {
-    pub fn list_box<'p>(&self, label : ImStr<'p>, current_item : &mut i32, items : &mut Vec<ImStr<'p>>, items_count : i32, height_in_items : i32)-> bool{
-            let items_inner : Vec<*const c_char> = items.into_iter().map(|item| item.as_ptr()).collect();
+    pub fn list_box<'p>(&self,
+                        label: ImStr<'p>,
+                        current_item: &mut i32,
+                        items: &'p [ImStr<'p>],
+                        height_in_items: i32)
+                        -> bool{
+        let items_inner : Vec<*const c_char> = items.into_iter().map(|item| item.as_ptr()).collect();
         unsafe{
-            imgui_sys::igListBox(label.as_ptr(), current_item, items_inner.as_ptr() as *mut *const c_char,items_count, height_in_items)
+            imgui_sys::igListBox(label.as_ptr(),
+                                 current_item,
+                                 items_inner.as_ptr() as *mut *const c_char,
+                                 items_inner.len() as i32,
+                                 height_in_items)
         }
     } 
 }
