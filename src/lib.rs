@@ -507,9 +507,6 @@ impl<'ui> Ui<'ui> {
     pub fn tree_node<'p>(&self, id: ImStr<'p>) -> TreeNode<'ui, 'p> {
         TreeNode::new(id)
     }
-    pub fn tree_pop<'p>(&self){
-        unsafe { imgui_sys::igTreePop() };
-    }
 }
 
 // Widgets: Menus
