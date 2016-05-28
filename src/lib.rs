@@ -38,7 +38,7 @@ pub use imgui_sys::{
     ImGuiWindowFlags_HorizontalScrollbar, ImGuiWindowFlags_NoFocusOnAppearing,
     ImGuiWindowFlags_NoBringToFrontOnFocus,
     ImVec2, ImVec4,
-    ImGuiKey 
+    ImGuiKey
 };
 pub use input::{InputText};
 pub use menus::{Menu, MenuItem};
@@ -399,33 +399,32 @@ impl<'ui> Ui<'ui> {
     }
     pub fn spacing(&self) { unsafe { imgui_sys::igSpacing() }; }
 
-
-    pub fn columns<'p>(&self, i: i32, b:  ImStr<'p>, b2: bool){
-        unsafe { imgui_sys::igColumns(i, b.as_ptr(), b2 ) };
+    pub fn columns<'p>(&self, count: i32, id:  ImStr<'p>, border: bool){
+        unsafe { imgui_sys::igColumns(count, id.as_ptr(), border ) }
     }
 
     pub fn next_column(&self) {
-        unsafe { imgui_sys::igNextColumn() };
+        unsafe { imgui_sys::igNextColumn() }
     }
 
-    pub fn get_column_index(&self) {
-        unsafe { imgui_sys::igGetColumnIndex() };
+    pub fn get_column_index(&self) -> i32 {
+        unsafe { imgui_sys::igGetColumnIndex() }
     }
 
-    pub fn get_column_offset(&self, i: i32) {
-        unsafe { imgui_sys::igGetColumnOffset(i) };
+    pub fn get_column_offset(&self, i: i32) -> f32 {
+        unsafe { imgui_sys::igGetColumnOffset(i) }
     }
 
     pub fn set_column_offset(&self, column_index: i32, offset_x: f32) {
-        unsafe { imgui_sys::igSetColumnOffset(column_index, offset_x ) };
+        unsafe { imgui_sys::igSetColumnOffset(column_index, offset_x ) }
     }
 
-    pub fn get_column_width(&self, i: i32) {
-        unsafe { imgui_sys::igGetColumnWidth(i) };
+    pub fn get_column_width(&self, i: i32) -> f32 {
+        unsafe { imgui_sys::igGetColumnWidth(i) }
     }
 
-    pub fn get_columns_count(&self) {
-        unsafe { imgui_sys::igGetColumnsCount() };
+    pub fn get_columns_count(&self) -> i32 {
+        unsafe { imgui_sys::igGetColumnsCount() }
     }
 
 
@@ -507,6 +506,9 @@ impl<'ui> Ui<'ui> {
 impl<'ui> Ui<'ui> {
     pub fn tree_node<'p>(&self, id: ImStr<'p>) -> TreeNode<'ui, 'p> {
         TreeNode::new(id)
+    }
+    pub fn tree_pop<'p>(&self){
+        unsafe { imgui_sys::igTreePop() };
     }
 }
 
