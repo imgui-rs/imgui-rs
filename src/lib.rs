@@ -399,8 +399,8 @@ impl<'ui> Ui<'ui> {
     }
     pub fn spacing(&self) { unsafe { imgui_sys::igSpacing() }; }
 
-    pub fn columns<'p>(&self, count: i32, id:  ImStr<'p>, border: bool){
-        unsafe { imgui_sys::igColumns(count, id.as_ptr(), border ) }
+    pub fn columns<'p>(&self, count: i32, id: ImStr<'p>, border: bool){
+        unsafe { imgui_sys::igColumns(count, id.as_ptr(), border) }
     }
 
     pub fn next_column(&self) {
@@ -416,7 +416,7 @@ impl<'ui> Ui<'ui> {
     }
 
     pub fn set_column_offset(&self, column_index: i32, offset_x: f32) {
-        unsafe { imgui_sys::igSetColumnOffset(column_index, offset_x ) }
+        unsafe { imgui_sys::igSetColumnOffset(column_index, offset_x) }
     }
 
     pub fn get_column_width(&self, i: i32) -> f32 {
