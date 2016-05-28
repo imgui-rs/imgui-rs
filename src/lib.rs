@@ -430,8 +430,6 @@ impl<'ui> Ui<'ui> {
 
 }
 
-
-
 // Widgets
 impl<'ui> Ui<'ui> {
     pub fn text<'p>(&self, text: ImStr<'p>) {
