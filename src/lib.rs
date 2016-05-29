@@ -398,6 +398,36 @@ impl<'ui> Ui<'ui> {
         }
     }
     pub fn spacing(&self) { unsafe { imgui_sys::igSpacing() }; }
+
+    pub fn columns<'p>(&self, count: i32, id: ImStr<'p>, border: bool){
+        unsafe { imgui_sys::igColumns(count, id.as_ptr(), border) }
+    }
+
+    pub fn next_column(&self) {
+        unsafe { imgui_sys::igNextColumn() }
+    }
+
+    pub fn get_column_index(&self) -> i32 {
+        unsafe { imgui_sys::igGetColumnIndex() }
+    }
+
+    pub fn get_column_offset(&self, column_index: i32) -> f32 {
+        unsafe { imgui_sys::igGetColumnOffset(column_index) }
+    }
+
+    pub fn set_column_offset(&self, column_index: i32, offset_x: f32) {
+        unsafe { imgui_sys::igSetColumnOffset(column_index, offset_x) }
+    }
+
+    pub fn get_column_width(&self, column_index: i32) -> f32 {
+        unsafe { imgui_sys::igGetColumnWidth(column_index) }
+    }
+
+    pub fn get_columns_count(&self) -> i32 {
+        unsafe { imgui_sys::igGetColumnsCount() }
+    }
+
+
 }
 
 // Widgets
