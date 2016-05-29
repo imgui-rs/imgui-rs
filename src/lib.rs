@@ -526,3 +526,41 @@ impl<'ui> Ui<'ui> {
     pub fn menu<'p>(&self, label: ImStr<'p>) -> Menu<'ui, 'p> { Menu::new(label) }
     pub fn menu_item<'p>(&self, label: ImStr<'p>) -> MenuItem<'ui, 'p> { MenuItem::new(label) }
 }
+
+//Widgets: Combos 
+impl<'ui> Ui<'ui> {
+    pub fn combo<'p>(&self, 
+                     label: ImStr<'p>,
+                     current_item: &mut i32,
+                     items: &'p [ImStr<'p>],
+                     height_in_items: i32) 
+                     -> bool {
+        let items_inner : Vec<*const c_char> = items.into_iter().map(|item| item.as_ptr()).collect();
+        unsafe {
+            imgui_sys::igCombo(label.as_ptr(),
+                               current_item,
+                               items_inner.as_ptr() as *mut *const c_char,
+                               items_inner.len() as i32,
+                               height_in_items)
+        }
+    }
+}
+
+//Widgets: ListBox
+impl<'ui> Ui<'ui> {
+    pub fn list_box<'p>(&self,
+                        label: ImStr<'p>,
+                        current_item: &mut i32,
+                        items: &'p [ImStr<'p>],
+                        height_in_items: i32)
+                        -> bool{
+        let items_inner : Vec<*const c_char> = items.into_iter().map(|item| item.as_ptr()).collect();
+        unsafe{
+            imgui_sys::igListBox(label.as_ptr(),
+                                 current_item,
+                                 items_inner.as_ptr() as *mut *const c_char,
+                                 items_inner.len() as i32,
+                                 height_in_items)
+        }
+    } 
+}
