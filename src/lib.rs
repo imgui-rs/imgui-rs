@@ -6,7 +6,7 @@ extern crate imgui_sys;
 
 extern crate libc;
 
-use libc::{c_char, c_float, c_int, c_uchar};
+use libc::{c_char, c_float, c_int, c_uchar, c_void, uintptr_t};
 use std::borrow::Cow;
 use std::convert::From;
 use std::ffi::CStr;
@@ -93,7 +93,7 @@ impl<'a> ImStr<'a> {
             bytes: Cow::Borrowed(bytes)
         }
     }
-    fn as_ptr(&self) -> *const c_char { self.bytes.as_ptr() as *const c_char }
+    pub fn as_ptr(&self) -> *const c_char { self.bytes.as_ptr() as *const c_char }
 }
 
 impl<'a> From<&'a str> for ImStr<'a> {
@@ -160,6 +160,11 @@ impl ImGui {
                 height: height as u32,
                 pixels: slice::from_raw_parts(pixels, (width * height * bytes_per_pixel) as usize)
             })
+        }
+    }
+    pub fn set_texture_id(&mut self, value: uintptr_t) {
+        unsafe {
+            (*self.io_mut().fonts).tex_id = value as *mut c_void;
         }
     }
     pub fn set_ini_filename(&mut self, value: Option<ImStr<'static>>) {
@@ -400,6 +405,36 @@ impl<'ui> Ui<'ui> {
         }
     }
     pub fn spacing(&self) { unsafe { imgui_sys::igSpacing() }; }
+
+    pub fn columns<'p>(&self, count: i32, id: ImStr<'p>, border: bool){
+        unsafe { imgui_sys::igColumns(count, id.as_ptr(), border) }
+    }
+
+    pub fn next_column(&self) {
+        unsafe { imgui_sys::igNextColumn() }
+    }
+
+    pub fn get_column_index(&self) -> i32 {
+        unsafe { imgui_sys::igGetColumnIndex() }
+    }
+
+    pub fn get_column_offset(&self, column_index: i32) -> f32 {
+        unsafe { imgui_sys::igGetColumnOffset(column_index) }
+    }
+
+    pub fn set_column_offset(&self, column_index: i32, offset_x: f32) {
+        unsafe { imgui_sys::igSetColumnOffset(column_index, offset_x) }
+    }
+
+    pub fn get_column_width(&self, column_index: i32) -> f32 {
+        unsafe { imgui_sys::igGetColumnWidth(column_index) }
+    }
+
+    pub fn get_columns_count(&self) -> i32 {
+        unsafe { imgui_sys::igGetColumnsCount() }
+    }
+
+
 }
 
 // Widgets
@@ -450,13 +485,6 @@ impl<'ui> Ui<'ui> {
     }
     pub fn checkbox<'p>(&self, label: ImStr<'p>, value: &'p mut bool) -> bool {
         unsafe { imgui_sys::igCheckbox(label.as_ptr(), value) }
-    }
-    pub fn combo<'p>(&self, label: ImStr<'p>, current_item: &'p mut i32, items: &'p[ImStr<'p>]) -> bool {
-        // TODO: the callback version could avoid allocating this Vec
-        let c_items : Vec<*const c_char> = items.iter().map(|s| s.as_ptr()).collect();
-        unsafe {
-            imgui_sys::igCombo(label.as_ptr(), current_item, c_items.as_ptr(), c_items.len() as c_int, -1)
-        }
     }
 }
 
@@ -561,4 +589,42 @@ impl<'ui> Ui<'ui> {
             unsafe { imgui_sys::igEndPopup() };
         }
     }
+}
+
+//Widgets: Combos 
+impl<'ui> Ui<'ui> {
+    pub fn combo<'p>(&self, 
+                     label: ImStr<'p>,
+                     current_item: &mut i32,
+                     items: &'p [ImStr<'p>],
+                     height_in_items: i32) 
+                     -> bool {
+        let items_inner : Vec<*const c_char> = items.into_iter().map(|item| item.as_ptr()).collect();
+        unsafe {
+            imgui_sys::igCombo(label.as_ptr(),
+                               current_item,
+                               items_inner.as_ptr() as *mut *const c_char,
+                               items_inner.len() as i32,
+                               height_in_items)
+        }
+    }
+}
+
+//Widgets: ListBox
+impl<'ui> Ui<'ui> {
+    pub fn list_box<'p>(&self,
+                        label: ImStr<'p>,
+                        current_item: &mut i32,
+                        items: &'p [ImStr<'p>],
+                        height_in_items: i32)
+                        -> bool{
+        let items_inner : Vec<*const c_char> = items.into_iter().map(|item| item.as_ptr()).collect();
+        unsafe{
+            imgui_sys::igListBox(label.as_ptr(),
+                                 current_item,
+                                 items_inner.as_ptr() as *mut *const c_char,
+                                 items_inner.len() as i32,
+                                 height_in_items)
+        }
+    } 
 }

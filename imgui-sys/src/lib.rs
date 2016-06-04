@@ -114,7 +114,7 @@ pub const ImGuiKey_COUNT: usize = 19;
 
 bitflags!(
     #[repr(C)]
-    flags ImGuiAlign: c_int {
+    pub flags ImGuiAlign: ::libc::c_int {
         const ImGuiAlign_Left    = 1 << 0,
         const ImGuiAlign_Center  = 1 << 1,
         const ImGuiAlign_Right   = 1 << 2,
@@ -150,7 +150,7 @@ pub const ImGuiMouseCursor_COUNT: usize = 7;
 
 bitflags!(
     #[repr(C)]
-    flags ImGuiWindowFlags: c_int {
+    pub flags ImGuiWindowFlags: ::libc::c_int {
         const ImGuiWindowFlags_NoTitleBar            = 1 << 0,
         const ImGuiWindowFlags_NoResize              = 1 << 1,
         const ImGuiWindowFlags_NoMove                = 1 << 2,
@@ -186,7 +186,7 @@ impl ImGuiWindowFlags {
 
 bitflags!(
     #[repr(C)]
-    flags ImGuiSetCond: c_int {
+    pub flags ImGuiSetCond: ::libc::c_int {
         const ImGuiSetCond_Always       = 1 << 0,
         const ImGuiSetCond_Once         = 1 << 1,
         const ImGuiSetCond_FirstUseEver = 1 << 2,
@@ -196,7 +196,7 @@ bitflags!(
 
 bitflags!(
     #[repr(C)]
-    flags ImGuiInputTextFlags: c_int {
+    pub flags ImGuiInputTextFlags: ::libc::c_int {
         const ImGuiInputTextFlags_CharsDecimal        = 1 << 0,
         const ImGuiInputTextFlags_CharsHexadecimal    = 1 << 1,
         const ImGuiInputTextFlags_CharsUppercase      = 1 << 2,
@@ -227,7 +227,7 @@ impl ImGuiInputTextFlags {
 
 bitflags!(
     #[repr(C)]
-    flags ImGuiSelectableFlags: c_int {
+    pub flags ImGuiSelectableFlags: ::libc::c_int {
         const ImGuiSelectableFlags_DontClosePopups = 1 << 0,
         const ImGuiSelectableFlags_SpanAllColumns  = 1 << 1
     }

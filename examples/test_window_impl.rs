@@ -313,12 +313,12 @@ fn show_test_window<'a>(ui: &Ui<'a>, state: &mut State, opened: &mut bool) {
                 ui.separator();
                 ui.label_text(im_str!("label"), im_str!("Value"));
                 ui.combo(im_str!("combo"), &mut state.item, &[im_str!("aaaa"), im_str!("bbbb"),
-                    im_str!("cccc"), im_str!("dddd"), im_str!("eeee")]);
+                    im_str!("cccc"), im_str!("dddd"), im_str!("eeee")], -1);
                 let items = [
                     im_str!("AAAA"), im_str!("BBBB"), im_str!("CCCC"), im_str!("DDDD"),
                     im_str!("EEEE"), im_str!("FFFF"), im_str!("GGGG"), im_str!("HHHH"),
                     im_str!("IIII"), im_str!("JJJJ"), im_str!("KKKK")];
-                ui.combo(im_str!("combo scroll"), &mut state.item2, &items);
+                ui.combo(im_str!("combo scroll"), &mut state.item2, &items, -1);
                 ui.input_text(im_str!("input text"), &mut state.text).build();
                 ui.input_int(im_str!("input int"), &mut state.i0).build();
                 ui.input_float(im_str!("input float"), &mut state.f0)
