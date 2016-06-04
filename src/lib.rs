@@ -552,8 +552,9 @@ impl<'ui> Ui<'ui> {
 
 // Widgets: Selectable / Lists
 impl<'ui> Ui<'ui> {
-    pub fn selectable<'p>(&self, label: ImStr<'p>) -> bool {
-        unsafe { imgui_sys::igSelectable(label.as_ptr(), false, ImGuiSelectableFlags::empty(), ImVec2::new(0.0,0.0)) }
+    pub fn selectable<'p>(&self, label: ImStr<'p>, selected: bool, flags: ImGuiSelectableFlags,
+                          size: ImVec2) -> bool {
+        unsafe { imgui_sys::igSelectable(label.as_ptr(), selected, flags, size) }
     }
 }
 

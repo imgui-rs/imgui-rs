@@ -354,7 +354,7 @@ fn show_test_window<'a>(ui: &Ui<'a>, state: &mut State, opened: &mut bool) {
                         ui.text(im_str!("Aquarium"));
                         ui.separator();
                         for (index, name) in names.iter().enumerate() {
-                            if ui.selectable(name.clone()) {
+                            if ui.selectable(name.clone(), false, ImGuiSelectableFlags::empty(), ImVec2::new(0.0, 0.0)) {
                                 state.selected_fish = Some(index);
                             }
                         }
