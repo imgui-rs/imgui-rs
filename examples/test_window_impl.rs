@@ -241,7 +241,7 @@ fn show_test_window<'a>(ui: &Ui<'a>, state: &mut State, opened: &mut bool) {
                 ui.same_line(300.0);
                 ui.checkbox(im_str!("no collapse"), &mut state.no_collapse);
                 ui.checkbox(im_str!("no menu"), &mut state.no_menu);
-                ui.slider_f32(im_str!("bg alpha"), &mut state.bg_alpha, 0.0, 1.0).build();
+                ui.slider_float(im_str!("bg alpha"), &mut state.bg_alpha, 0.0, 1.0).build();
 
                 ui.tree_node(im_str!("Style")).build(|| {
                     // TODO: Reimplement style editor
@@ -289,7 +289,7 @@ fn show_test_window<'a>(ui: &Ui<'a>, state: &mut State, opened: &mut bool) {
                             suitable for English and possibly other languages."));
                     ui.spacing();
 
-                    ui.slider_f32(im_str!("Wrap width"), &mut state.wrap_width, -20.0, 600.0)
+                    ui.slider_float(im_str!("Wrap width"), &mut state.wrap_width, -20.0, 600.0)
                         .display_format(im_str!("%.0f"))
                         .build();
 
@@ -423,7 +423,7 @@ fn show_example_app_auto_resize<'a>(ui: &Ui<'a>, state: &mut AutoResizeState, op
             ui.text(im_str!("Window will resize every-ui to the size of its content.
 Note that you probably don't want to query the window size to
 output your content because that would create a feedback loop."));
-            ui.slider_i32(im_str!("Number of lines"), &mut state.lines, 1, 20).build();
+            ui.slider_int(im_str!("Number of lines"), &mut state.lines, 1, 20).build();
             for i in 0 .. state.lines {
                 ui.text(im_str!("{:2$}This is line {}", "", i, i as usize * 4));
             }

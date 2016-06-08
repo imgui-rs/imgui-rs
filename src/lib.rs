@@ -499,9 +499,6 @@ impl<'ui> Ui<'ui> {
     pub fn input_text<'p>(&self, label: ImStr<'p>, buf: &'p mut str) -> InputText<'ui, 'p> {
         InputText::new(label, buf)
     }
-    pub fn input_f32<'p>(&self, label: ImStr<'p>, value: &'p mut f32) -> InputFloat<'ui, 'p> {
-        InputFloat::new(label, value)
-    }
     pub fn input_float<'p>(&self, label: ImStr<'p>, value: &'p mut f32) -> InputFloat<'ui, 'p> {
         InputFloat::new(label, value)
     }
@@ -513,9 +510,6 @@ impl<'ui> Ui<'ui> {
     }
     pub fn input_float4<'p>(&self, label: ImStr<'p>, value: &'p mut [f32;4]) -> InputFloat4<'ui, 'p> {
         InputFloat4::new(label, value)
-    }
-    pub fn input_i32<'p>(&self, label: ImStr<'p>, value: &'p mut i32) -> InputInt<'ui, 'p> {
-        InputInt::new(label, value)
     }
     pub fn input_int<'p>(&self, label: ImStr<'p>, value: &'p mut i32) -> InputInt<'ui, 'p> {
         InputInt::new(label, value)
@@ -533,11 +527,11 @@ impl<'ui> Ui<'ui> {
 
 // Widgets: Sliders
 impl<'ui> Ui<'ui> {
-    pub fn slider_f32<'p>(&self, label: ImStr<'p>,
+    pub fn slider_float<'p>(&self, label: ImStr<'p>,
                           value: &'p mut f32, min: f32, max: f32) -> SliderFloat<'ui, 'p> {
         SliderFloat::new(label, value, min, max)
     }
-    pub fn slider_i32<'p>(&self, label: ImStr<'p>,
+    pub fn slider_int<'p>(&self, label: ImStr<'p>,
                           value: &'p mut i32, min: i32, max: i32) -> SliderInt<'ui, 'p> {
         SliderInt::new(label, value, min, max)
     }
