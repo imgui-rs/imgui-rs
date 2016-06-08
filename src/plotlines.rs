@@ -7,12 +7,11 @@ use libc::c_float;
 pub struct PlotLines<'p> {
     label: ImStr<'p>,
     values: &'p [f32],
-    values_ofset: i32,
+    values_offset: usize,
     overlay_text: Option<ImStr<'p>>,
     scale_min: f32,
     scale_max: f32,
     graph_size: ImVec2,
-    stride: i32,
 }
 
 impl<'p> PlotLines<'p> {
@@ -20,18 +19,17 @@ impl<'p> PlotLines<'p> {
         PlotLines {
             label: label,
             values: values,
-            values_ofset: 0i32,
+            values_offset: 0usize,
             overlay_text: None,
             scale_min: f32::MAX,
             scale_max: f32::MAX,
             graph_size: ImVec2::new(0.0f32, 0.0f32),
-            stride: mem::size_of::<f32>() as i32,
         }
     }
 
     #[inline]
-    pub fn values_ofset(self, values_ofset: i32) -> Self {
-        PlotLines { values_ofset: values_ofset, ..self }
+    pub fn values_offset(self, values_offset: usize) -> Self {
+        PlotLines { values_offset: values_offset, ..self }
     }
 
     #[inline]
@@ -54,22 +52,17 @@ impl<'p> PlotLines<'p> {
         PlotLines { graph_size: graph_size, ..self }
     }
 
-    #[inline]
-    pub fn stride(self, stride: i32) -> Self {
-        PlotLines { stride: stride, ..self }
-    }
-
     pub fn build(self) {
         unsafe {
             imgui_sys::igPlotLines(self.label.as_ptr(),
                                    self.values.as_ptr() as *const c_float,
                                    self.values.len() as i32,
-                                   self.values_ofset,
+                                   self.values_offset as i32,
                                    self.overlay_text.map(|x| x.as_ptr()).unwrap_or(ptr::null()),
                                    self.scale_min,
                                    self.scale_max,
                                    self.graph_size,
-                                   self.stride);
+                                   mem::size_of::<f32>() as i32);
         }
     }
 }
