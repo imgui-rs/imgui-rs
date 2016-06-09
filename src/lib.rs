@@ -46,6 +46,7 @@ pub use sliders::{SliderFloat, SliderInt};
 pub use trees::{TreeNode};
 pub use widgets::{CollapsingHeader};
 pub use window::{Window};
+pub use plotlines::{PlotLines};
 
 mod input;
 mod menus;
@@ -53,6 +54,7 @@ mod sliders;
 mod trees;
 mod widgets;
 mod window;
+mod plotlines;
 
 #[cfg(feature = "glium")]
 pub mod glium_renderer;
@@ -563,4 +565,12 @@ impl<'ui> Ui<'ui> {
                                  height_in_items)
         }
     } 
+}
+
+impl<'ui> Ui<'ui> {
+    pub fn plot_lines<'p>(&self,
+                           label: ImStr<'p>,
+                           values: &'p[f32])->PlotLines<'p>{
+        PlotLines::new(label, values)
+    }
 }
