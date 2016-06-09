@@ -643,5 +643,3 @@ impl<'ui> Ui<'ui> {
         PlotHistogram::new(label, values)
     }
 }
-
-
