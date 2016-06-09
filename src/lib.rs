@@ -54,6 +54,7 @@ pub use trees::{TreeNode};
 pub use widgets::{CollapsingHeader};
 pub use window::{Window};
 pub use plotlines::{PlotLines};
+pub use plothistogram::{PlotHistogram};
 
 mod input;
 mod menus;
@@ -62,6 +63,7 @@ mod trees;
 mod widgets;
 mod window;
 mod plotlines;
+mod plothistogram;
 
 #[cfg(feature = "glium")]
 pub mod glium_renderer;
@@ -633,3 +635,13 @@ impl<'ui> Ui<'ui> {
         PlotLines::new(label, values)
     }
 }
+
+impl<'ui> Ui<'ui> {
+    pub fn plot_histogram<'p>(&self,
+                           label: ImStr<'p>,
+                           values: &'p[f32])->PlotHistogram<'p>{
+        PlotHistogram::new(label, values)
+    }
+}
+
+
