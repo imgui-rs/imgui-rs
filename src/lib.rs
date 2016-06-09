@@ -26,6 +26,8 @@ pub use imgui_sys::{
     ImGuiInputTextFlags_NoHorizontalScroll, ImGuiInputTextFlags_AlwaysInsertMode,
     ImGuiInputTextFlags_ReadOnly,
     ImGuiInputTextFlags_Password,
+    ImGuiSelectableFlags,
+    ImGuiSelectableFlags_DontClosePopups, ImGuiSelectableFlags_SpanAllColumns,
     ImGuiSetCond,
     ImGuiSetCond_Always, ImGuiSetCond_Once,
     ImGuiSetCond_FirstUseEver, ImGuiSetCond_Appearing,
@@ -40,7 +42,12 @@ pub use imgui_sys::{
     ImVec2, ImVec4,
     ImGuiKey
 };
-pub use input::{InputText};
+pub use input::{
+	ColorEdit3, ColorEdit4,
+	InputFloat, InputFloat2, InputFloat3, InputFloat4,
+	InputInt, InputInt2, InputInt3, InputInt4,
+	InputText
+};
 pub use menus::{Menu, MenuItem};
 pub use sliders::{SliderFloat, SliderInt};
 pub use trees::{TreeNode};
@@ -485,18 +492,48 @@ impl<'ui> Ui<'ui> {
 
 // Widgets: Input
 impl<'ui> Ui<'ui> {
+    pub fn color_edit3<'p>(&self, label: ImStr<'p>, value: &'p mut [f32;3]) -> ColorEdit3<'ui, 'p> {
+        ColorEdit3::new(label, value)
+    }
+    pub fn color_edit4<'p>(&self, label: ImStr<'p>, value: &'p mut [f32;4]) -> ColorEdit4<'ui, 'p> {
+        ColorEdit4::new(label, value)
+    }
     pub fn input_text<'p>(&self, label: ImStr<'p>, buf: &'p mut str) -> InputText<'ui, 'p> {
         InputText::new(label, buf)
+    }
+    pub fn input_float<'p>(&self, label: ImStr<'p>, value: &'p mut f32) -> InputFloat<'ui, 'p> {
+        InputFloat::new(label, value)
+    }
+    pub fn input_float2<'p>(&self, label: ImStr<'p>, value: &'p mut [f32;2]) -> InputFloat2<'ui, 'p> {
+        InputFloat2::new(label, value)
+    }
+    pub fn input_float3<'p>(&self, label: ImStr<'p>, value: &'p mut [f32;3]) -> InputFloat3<'ui, 'p> {
+        InputFloat3::new(label, value)
+    }
+    pub fn input_float4<'p>(&self, label: ImStr<'p>, value: &'p mut [f32;4]) -> InputFloat4<'ui, 'p> {
+        InputFloat4::new(label, value)
+    }
+    pub fn input_int<'p>(&self, label: ImStr<'p>, value: &'p mut i32) -> InputInt<'ui, 'p> {
+        InputInt::new(label, value)
+    }
+    pub fn input_int2<'p>(&self, label: ImStr<'p>, value: &'p mut [i32;2]) -> InputInt2<'ui, 'p> {
+        InputInt2::new(label, value)
+    }
+    pub fn input_int3<'p>(&self, label: ImStr<'p>, value: &'p mut [i32;3]) -> InputInt3<'ui, 'p> {
+        InputInt3::new(label, value)
+    }
+    pub fn input_int4<'p>(&self, label: ImStr<'p>, value: &'p mut [i32;4]) -> InputInt4<'ui, 'p> {
+        InputInt4::new(label, value)
     }
 }
 
 // Widgets: Sliders
 impl<'ui> Ui<'ui> {
-    pub fn slider_f32<'p>(&self, label: ImStr<'p>,
+    pub fn slider_float<'p>(&self, label: ImStr<'p>,
                           value: &'p mut f32, min: f32, max: f32) -> SliderFloat<'ui, 'p> {
         SliderFloat::new(label, value, min, max)
     }
-    pub fn slider_i32<'p>(&self, label: ImStr<'p>,
+    pub fn slider_int<'p>(&self, label: ImStr<'p>,
                           value: &'p mut i32, min: i32, max: i32) -> SliderInt<'ui, 'p> {
         SliderInt::new(label, value, min, max)
     }
@@ -506,6 +543,14 @@ impl<'ui> Ui<'ui> {
 impl<'ui> Ui<'ui> {
     pub fn tree_node<'p>(&self, id: ImStr<'p>) -> TreeNode<'ui, 'p> {
         TreeNode::new(id)
+    }
+}
+
+// Widgets: Selectable / Lists
+impl<'ui> Ui<'ui> {
+    pub fn selectable<'p>(&self, label: ImStr<'p>, selected: bool, flags: ImGuiSelectableFlags,
+                          size: ImVec2) -> bool {
+        unsafe { imgui_sys::igSelectable(label.as_ptr(), selected, flags, size) }
     }
 }
 
@@ -527,6 +572,20 @@ impl<'ui> Ui<'ui> {
     }
     pub fn menu<'p>(&self, label: ImStr<'p>) -> Menu<'ui, 'p> { Menu::new(label) }
     pub fn menu_item<'p>(&self, label: ImStr<'p>) -> MenuItem<'ui, 'p> { MenuItem::new(label) }
+}
+
+// Widgets: Popups
+impl<'ui> Ui<'ui> {
+    pub fn open_popup<'p>(&self, str_id: ImStr<'p>) {
+        unsafe { imgui_sys::igOpenPopup(str_id.as_ptr()) };
+    }
+    pub fn popup<'p, F>(&self, str_id: ImStr<'p>, f: F) where F: FnOnce() {
+        let render = unsafe { imgui_sys::igBeginPopup(str_id.as_ptr()) };
+        if render {
+            f();
+            unsafe { imgui_sys::igEndPopup() };
+        }
+    }
 }
 
 //Widgets: Combos 

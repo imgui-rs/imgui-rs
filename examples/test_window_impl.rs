@@ -33,6 +33,18 @@ struct State {
     bg_alpha: f32,
     wrap_width: f32,
     buf: String,
+    item: i32,
+    item2: i32,
+    text: String,
+    i0: i32,
+    f0: f32,
+    vec2f: [f32;2],
+    vec3f: [f32;3],
+    vec2i: [i32;2],
+    vec3i: [i32;3],
+    col1: [f32;3],
+    col2: [f32;4],
+    selected_fish: Option<usize>,
     auto_resize_state: AutoResizeState,
     file_menu: FileMenuState
 }
@@ -42,6 +54,10 @@ impl Default for State {
         let mut buf = "日本語".to_owned();
         buf.extend(repeat('\0').take(32));
         buf.truncate(32);
+        let mut text = String::with_capacity(128);
+        text.push_str("Hello, world!");
+        let remaining = text.capacity() - text.len();
+        text.extend(repeat('\0').take(remaining));
         State {
             clear_color: (114.0 / 255.0, 144.0 / 255.0, 154.0 / 255.0, 1.0),
             show_app_metrics: false,
@@ -64,6 +80,18 @@ impl Default for State {
             bg_alpha: 0.65,
             wrap_width: 200.0,
             buf: buf,
+            item: 0,
+            item2: 0,
+            text: text,
+            i0: 123,
+            f0: 0.001,
+            vec2f: [0.10, 0.20],
+            vec3f: [0.10, 0.20, 0.30],
+            vec2i: [10, 20],
+            vec3i: [10, 20, 30],
+            col1: [1.0, 0.0, 0.2],
+            col2: [0.4, 0.7, 0.0, 0.5],
+            selected_fish: None,
             auto_resize_state: Default::default(),
             file_menu: Default::default()
         }
@@ -213,7 +241,7 @@ fn show_test_window<'a>(ui: &Ui<'a>, state: &mut State, opened: &mut bool) {
                 ui.same_line(300.0);
                 ui.checkbox(im_str!("no collapse"), &mut state.no_collapse);
                 ui.checkbox(im_str!("no menu"), &mut state.no_menu);
-                ui.slider_f32(im_str!("bg alpha"), &mut state.bg_alpha, 0.0, 1.0).build();
+                ui.slider_float(im_str!("bg alpha"), &mut state.bg_alpha, 0.0, 1.0).build();
 
                 ui.tree_node(im_str!("Style")).build(|| {
                     // TODO: Reimplement style editor
@@ -261,7 +289,7 @@ fn show_test_window<'a>(ui: &Ui<'a>, state: &mut State, opened: &mut bool) {
                             suitable for English and possibly other languages."));
                     ui.spacing();
 
-                    ui.slider_f32(im_str!("Wrap width"), &mut state.wrap_width, -20.0, 600.0)
+                    ui.slider_float(im_str!("Wrap width"), &mut state.wrap_width, -20.0, 600.0)
                         .display_format(im_str!("%.0f"))
                         .build();
 
@@ -280,6 +308,57 @@ fn show_test_window<'a>(ui: &Ui<'a>, state: &mut State, opened: &mut bool) {
                     ui.text(im_str!("Hiragana: かきくけこ (kakikukeko)"));
                     ui.text(im_str!("Kanjis: 日本語 (nihongo)"));
                     ui.input_text(im_str!("UTF-8 input"), &mut state.buf).build();
+                });
+
+                ui.separator();
+                ui.label_text(im_str!("label"), im_str!("Value"));
+                ui.combo(im_str!("combo"), &mut state.item, &[im_str!("aaaa"), im_str!("bbbb"),
+                    im_str!("cccc"), im_str!("dddd"), im_str!("eeee")], -1);
+                let items = [
+                    im_str!("AAAA"), im_str!("BBBB"), im_str!("CCCC"), im_str!("DDDD"),
+                    im_str!("EEEE"), im_str!("FFFF"), im_str!("GGGG"), im_str!("HHHH"),
+                    im_str!("IIII"), im_str!("JJJJ"), im_str!("KKKK")];
+                ui.combo(im_str!("combo scroll"), &mut state.item2, &items, -1);
+                ui.input_text(im_str!("input text"), &mut state.text).build();
+                ui.input_int(im_str!("input int"), &mut state.i0).build();
+                ui.input_float(im_str!("input float"), &mut state.f0)
+                    .step(0.01).step_fast(1.0).build();
+                ui.input_float3(im_str!("input float3"), &mut state.vec3f).build();
+                ui.color_edit3(im_str!("color 1"), &mut state.col1).build();
+                ui.color_edit4(im_str!("color 2"), &mut state.col2).build();
+
+                ui.tree_node(im_str!("Multi-component Widgets")).build(|| {
+                    ui.input_float2(im_str!("input float2"), &mut state.vec2f).build();
+                    ui.input_int2(im_str!("input int2"), &mut state.vec2i).build();
+                    ui.spacing();
+
+                    ui.input_float3(im_str!("input float3"), &mut state.vec3f).build();
+                    ui.input_int3(im_str!("input int3"), &mut state.vec3i).build();
+                    ui.spacing();
+                });
+            }
+            if ui.collapsing_header(im_str!("Popups & Modal windows")).build() {
+                ui.tree_node(im_str!("Popups")).build(|| {
+                    ui.text_wrapped(im_str!("When a popup is active, it inhibits interacting with windows that are behind the popup. Clicking outside the popup closes it."));
+                    let names = [im_str!("Bream"), im_str!("Haddock"), im_str!("Mackerel"), im_str!("Pollock"), im_str!("Tilefish")];
+                    if ui.small_button(im_str!("Select..")) {
+                        ui.open_popup(im_str!("select"));
+                    }
+                    ui.same_line(0.0);
+                    ui.text(
+                        match state.selected_fish {
+                            Some(index) => names[index].clone(),
+                            None => im_str!("<None>")
+                        });
+                    ui.popup(im_str!("select"), || {
+                        ui.text(im_str!("Aquarium"));
+                        ui.separator();
+                        for (index, name) in names.iter().enumerate() {
+                            if ui.selectable(name.clone(), false, ImGuiSelectableFlags::empty(), ImVec2::new(0.0, 0.0)) {
+                                state.selected_fish = Some(index);
+                            }
+                        }
+                    });
                 });
             }
         })
@@ -344,7 +423,7 @@ fn show_example_app_auto_resize<'a>(ui: &Ui<'a>, state: &mut AutoResizeState, op
             ui.text(im_str!("Window will resize every-ui to the size of its content.
 Note that you probably don't want to query the window size to
 output your content because that would create a feedback loop."));
-            ui.slider_i32(im_str!("Number of lines"), &mut state.lines, 1, 20).build();
+            ui.slider_int(im_str!("Number of lines"), &mut state.lines, 1, 20).build();
             for i in 0 .. state.lines {
                 ui.text(im_str!("{:2$}This is line {}", "", i, i as usize * 4));
             }

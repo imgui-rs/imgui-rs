@@ -794,8 +794,8 @@ extern "C" {
                     data: *mut c_void, items_count: c_int,
                     height_in_items: c_int) -> bool;
     pub fn igColorButton(col: ImVec4, small_height: bool, outline_border: bool) -> bool;
-    pub fn igColorEdit3(label: *const c_char, col: [c_float; 3]) -> bool;
-    pub fn igColorEdit4(label: *const c_char, col: [c_float; 4], show_alpha: bool) -> bool;
+    pub fn igColorEdit3(label: *const c_char, col: *mut f32) -> bool;
+    pub fn igColorEdit4(label: *const c_char, col: *mut f32, show_alpha: bool) -> bool;
     pub fn igColorEditMode(mode: ImGuiColorEditMode);
     pub fn igPlotLines(label: *const c_char,
                        values: *const c_float, values_count: c_int, values_offset: c_int,
