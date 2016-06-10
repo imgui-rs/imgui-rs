@@ -116,6 +116,8 @@ impl Support {
                             self.imgui.set_key_shift(pressed),
                         Some(VirtualKeyCode::LAlt) | Some(VirtualKeyCode::RAlt) =>
                             self.imgui.set_key_alt(pressed),
+                        Some(VirtualKeyCode::LWin) | Some(VirtualKeyCode::RWin) =>
+                            self.imgui.set_key_super(pressed),
                         _ => {},
                     }
                 },

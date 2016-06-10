@@ -26,32 +26,39 @@ pub use imgui_sys::{ImDrawIdx, ImDrawVert, ImGuiInputTextFlags, ImGuiInputTextFl
                     ImGuiInputTextFlags_ReadOnly, ImGuiKey, ImGuiSelectableFlags,
                     ImGuiSelectableFlags_DontClosePopups, ImGuiSelectableFlags_SpanAllColumns,
                     ImGuiSetCond, ImGuiSetCond_Always, ImGuiSetCond_Appearing,
-                    ImGuiSetCond_FirstUseEver, ImGuiSetCond_Once, ImGuiStyle, ImGuiWindowFlags,
-                    ImGuiWindowFlags_AlwaysAutoResize, ImGuiWindowFlags_HorizontalScrollbar,
-                    ImGuiWindowFlags_MenuBar, ImGuiWindowFlags_NoBringToFrontOnFocus,
-                    ImGuiWindowFlags_NoCollapse, ImGuiWindowFlags_NoFocusOnAppearing,
-                    ImGuiWindowFlags_NoInputs, ImGuiWindowFlags_NoMove, ImGuiWindowFlags_NoResize,
+                    ImGuiSetCond_FirstUseEver, ImGuiSetCond_Once, ImGuiStyle, ImGuiTreeNodeFlags,
+                    ImGuiTreeNodeFlags_AllowOverlapMode, ImGuiTreeNodeFlags_Bullet,
+                    ImGuiTreeNodeFlags_CollapsingHeader, ImGuiTreeNodeFlags_DefaultOpen,
+                    ImGuiTreeNodeFlags_Framed, ImGuiTreeNodeFlags_Leaf,
+                    ImGuiTreeNodeFlags_NoAutoOpenOnLog, ImGuiTreeNodeFlags_NoTreePushOnOpen,
+                    ImGuiTreeNodeFlags_OpenOnArrow, ImGuiTreeNodeFlags_OpenOnDoubleClick,
+                    ImGuiTreeNodeFlags_Selected, ImGuiWindowFlags,
+                    ImGuiWindowFlags_AlwaysAutoResize, ImGuiWindowFlags_AlwaysHorizontalScrollbar,
+                    ImGuiWindowFlags_AlwaysUseWindowPadding,
+                    ImGuiWindowFlags_AlwaysVerticalScrollbar,
+                    ImGuiWindowFlags_HorizontalScrollbar, ImGuiWindowFlags_MenuBar,
+                    ImGuiWindowFlags_NoBringToFrontOnFocus, ImGuiWindowFlags_NoCollapse,
+                    ImGuiWindowFlags_NoFocusOnAppearing, ImGuiWindowFlags_NoInputs,
+                    ImGuiWindowFlags_NoMove, ImGuiWindowFlags_NoResize,
                     ImGuiWindowFlags_NoSavedSettings, ImGuiWindowFlags_NoScrollWithMouse,
                     ImGuiWindowFlags_NoScrollbar, ImGuiWindowFlags_NoTitleBar,
                     ImGuiWindowFlags_ShowBorders, ImVec2, ImVec4};
 pub use input::{ColorEdit3, ColorEdit4, InputFloat, InputFloat2, InputFloat3, InputFloat4,
                 InputInt, InputInt2, InputInt3, InputInt4, InputText};
 pub use menus::{Menu, MenuItem};
-pub use sliders::{SliderFloat, SliderInt};
-pub use trees::TreeNode;
-pub use widgets::CollapsingHeader;
-pub use window::Window;
-pub use plotlines::PlotLines;
 pub use plothistogram::PlotHistogram;
+pub use plotlines::PlotLines;
+pub use sliders::{SliderFloat, SliderInt};
+pub use trees::{CollapsingHeader, TreeNode};
+pub use window::Window;
 
 mod input;
 mod menus;
+mod plothistogram;
+mod plotlines;
 mod sliders;
 mod trees;
-mod widgets;
 mod window;
-mod plotlines;
-mod plothistogram;
 
 #[cfg(feature = "glium")]
 pub mod glium_renderer;
@@ -231,6 +238,10 @@ impl ImGui {
     pub fn set_key_alt(&mut self, value: bool) {
         let io = self.io_mut();
         io.key_alt = value;
+    }
+    pub fn set_key_super(&mut self, value: bool) {
+        let io = self.io_mut();
+        io.key_super = value;
     }
     pub fn set_key(&mut self, key: u8, pressed: bool) {
         let io = self.io_mut();
@@ -448,9 +459,6 @@ impl<'ui> Ui<'ui> {
     pub fn small_button<'p>(&self, label: ImStr<'p>) -> bool {
         unsafe { imgui_sys::igSmallButton(label.as_ptr()) }
     }
-    pub fn collapsing_header<'p>(&self, label: ImStr<'p>) -> CollapsingHeader<'ui, 'p> {
-        CollapsingHeader::new(label)
-    }
     pub fn checkbox<'p>(&self, label: ImStr<'p>, value: &'p mut bool) -> bool {
         unsafe { imgui_sys::igCheckbox(label.as_ptr(), value) }
     }
@@ -531,6 +539,9 @@ impl<'ui> Ui<'ui> {
 // Widgets: Trees
 impl<'ui> Ui<'ui> {
     pub fn tree_node<'p>(&self, id: ImStr<'p>) -> TreeNode<'ui, 'p> { TreeNode::new(id) }
+    pub fn collapsing_header<'p>(&self, label: ImStr<'p>) -> CollapsingHeader<'ui, 'p> {
+        CollapsingHeader::new(label)
+    }
 }
 
 // Widgets: Selectable / Lists

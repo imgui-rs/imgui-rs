@@ -16,6 +16,10 @@
 
 - ImStr::as_ptr is now part of the public API
 - Upgrade to bitflags 0.7
+- Upgrade to imgui/cimgui 1.49
+    * Several imgui_sys structs have changed
+    * CollapsingHeader API has changed
+    * New window flags are supported
 
 ## [0.0.8] - 2016-04-15
 

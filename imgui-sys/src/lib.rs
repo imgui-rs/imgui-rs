@@ -17,6 +17,8 @@ use std::convert::From;
 use std::mem;
 use std::slice;
 
+pub enum ImGuiContext { }
+
 pub type ImU32 = c_uint;
 pub type ImWchar = c_ushort;
 pub type ImTextureID = *mut c_void;
@@ -29,6 +31,7 @@ pub enum ImGuiCol {
     TextDisabled,
     WindowBg,
     ChildWindowBg,
+    PopupBg,
     Border,
     BorderShadow,
     FrameBg,
@@ -66,8 +69,7 @@ pub enum ImGuiCol {
     PlotHistogram,
     PlotHistogramHovered,
     TextSelectedBg,
-    TooltipBg,
-    ModalWindowDarkening
+    ModalWindowDarkening,
 }
 pub const ImGuiCol_COUNT: usize = 43;
 
@@ -127,11 +129,11 @@ bitflags!(
 #[repr(C)]
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
 pub enum ImGuiColorEditMode {
-    UserSelect,
-    UserSelectShowButton,
-    RGB,
-    HSV,
-    HEX
+    UserSelect = -2,
+    UserSelectShowButton = -1,
+    RGB = 0,
+    HSV = 1,
+    HEX = 2
 }
 
 #[repr(C)]
@@ -151,29 +153,32 @@ pub const ImGuiMouseCursor_COUNT: usize = 7;
 bitflags!(
     #[repr(C)]
     pub flags ImGuiWindowFlags: ::libc::c_int {
-        const ImGuiWindowFlags_NoTitleBar            = 1 << 0,
-        const ImGuiWindowFlags_NoResize              = 1 << 1,
-        const ImGuiWindowFlags_NoMove                = 1 << 2,
-        const ImGuiWindowFlags_NoScrollbar           = 1 << 3,
-        const ImGuiWindowFlags_NoScrollWithMouse     = 1 << 4,
-        const ImGuiWindowFlags_NoCollapse            = 1 << 5,
-        const ImGuiWindowFlags_AlwaysAutoResize      = 1 << 6,
-        const ImGuiWindowFlags_ShowBorders           = 1 << 7,
-        const ImGuiWindowFlags_NoSavedSettings       = 1 << 8,
-        const ImGuiWindowFlags_NoInputs              = 1 << 9,
-        const ImGuiWindowFlags_MenuBar               = 1 << 10,
-        const ImGuiWindowFlags_HorizontalScrollbar   = 1 << 11,
-        const ImGuiWindowFlags_NoFocusOnAppearing    = 1 << 12,
-        const ImGuiWindowFlags_NoBringToFrontOnFocus = 1 << 13,
+        const ImGuiWindowFlags_NoTitleBar                = 1 << 0,
+        const ImGuiWindowFlags_NoResize                  = 1 << 1,
+        const ImGuiWindowFlags_NoMove                    = 1 << 2,
+        const ImGuiWindowFlags_NoScrollbar               = 1 << 3,
+        const ImGuiWindowFlags_NoScrollWithMouse         = 1 << 4,
+        const ImGuiWindowFlags_NoCollapse                = 1 << 5,
+        const ImGuiWindowFlags_AlwaysAutoResize          = 1 << 6,
+        const ImGuiWindowFlags_ShowBorders               = 1 << 7,
+        const ImGuiWindowFlags_NoSavedSettings           = 1 << 8,
+        const ImGuiWindowFlags_NoInputs                  = 1 << 9,
+        const ImGuiWindowFlags_MenuBar                   = 1 << 10,
+        const ImGuiWindowFlags_HorizontalScrollbar       = 1 << 11,
+        const ImGuiWindowFlags_NoFocusOnAppearing        = 1 << 12,
+        const ImGuiWindowFlags_NoBringToFrontOnFocus     = 1 << 13,
+        const ImGuiWindowFlags_AlwaysVerticalScrollbar   = 1 << 14,
+        const ImGuiWindowFlags_AlwaysHorizontalScrollbar = 1 << 15,
+        const ImGuiWindowFlags_AlwaysUseWindowPadding    = 1 << 16,
 
-        const ImGuiWindowFlags_ChildWindow           = 1 << 20,
-        const ImGuiWindowFlags_ChildWindowAutoFitX   = 1 << 21,
-        const ImGuiWindowFlags_ChildWindowAutoFitY   = 1 << 22,
-        const ImGuiWindowFlags_ComboBox              = 1 << 23,
-        const ImGuiWindowFlags_Tooltip               = 1 << 24,
-        const ImGuiWindowFlags_Popup                 = 1 << 25,
-        const ImGuiWindowFlags_Modal                 = 1 << 26,
-        const ImGuiWindowFlags_ChildMenu             = 1 << 27
+        const ImGuiWindowFlags_ChildWindow               = 1 << 20,
+        const ImGuiWindowFlags_ChildWindowAutoFitX       = 1 << 21,
+        const ImGuiWindowFlags_ChildWindowAutoFitY       = 1 << 22,
+        const ImGuiWindowFlags_ComboBox                  = 1 << 23,
+        const ImGuiWindowFlags_Tooltip                   = 1 << 24,
+        const ImGuiWindowFlags_Popup                     = 1 << 25,
+        const ImGuiWindowFlags_Modal                     = 1 << 26,
+        const ImGuiWindowFlags_ChildMenu                 = 1 << 27,
     }
 );
 
@@ -213,6 +218,7 @@ bitflags!(
         const ImGuiInputTextFlags_AlwaysInsertMode    = 1 << 13,
         const ImGuiInputTextFlags_ReadOnly            = 1 << 14,
         const ImGuiInputTextFlags_Password            = 1 << 15,
+
         const ImGuiInputTextFlags_Multiline           = 1 << 20,
     }
 );
@@ -228,13 +234,41 @@ impl ImGuiInputTextFlags {
 bitflags!(
     #[repr(C)]
     pub flags ImGuiSelectableFlags: ::libc::c_int {
-        const ImGuiSelectableFlags_DontClosePopups = 1 << 0,
-        const ImGuiSelectableFlags_SpanAllColumns  = 1 << 1
+        const ImGuiSelectableFlags_DontClosePopups  = 1 << 0,
+        const ImGuiSelectableFlags_SpanAllColumns   = 1 << 1,
+        const ImGuiSelectableFlags_AllowDoubleClick = 1 << 2
     }
 );
 
+bitflags!(
+    #[repr(C)]
+    pub flags ImGuiTreeNodeFlags: ::libc::c_int {
+        const ImGuiTreeNodeFlags_Selected          = 1 << 0,
+        const ImGuiTreeNodeFlags_Framed            = 1 << 1,
+        const ImGuiTreeNodeFlags_AllowOverlapMode  = 1 << 2,
+        const ImGuiTreeNodeFlags_NoTreePushOnOpen  = 1 << 3,
+        const ImGuiTreeNodeFlags_NoAutoOpenOnLog   = 1 << 4,
+        const ImGuiTreeNodeFlags_DefaultOpen       = 1 << 5,
+        const ImGuiTreeNodeFlags_OpenOnDoubleClick = 1 << 6,
+        const ImGuiTreeNodeFlags_OpenOnArrow       = 1 << 7,
+        const ImGuiTreeNodeFlags_Leaf              = 1 << 8,
+        const ImGuiTreeNodeFlags_Bullet            = 1 << 9,
+        const ImGuiTreeNodeFlags_CollapsingHeader  = ImGuiTreeNodeFlags_Framed.bits | ImGuiTreeNodeFlags_NoAutoOpenOnLog.bits
+    }
+);
+
+impl ImGuiTreeNodeFlags {
+    #[inline]
+    pub fn with(self, mask: ImGuiTreeNodeFlags, value: bool) -> ImGuiTreeNodeFlags {
+        if value { self | mask } else { self - mask }
+    }
+}
+
 pub type ImGuiTextEditCallback =
-Option<extern "C" fn(data: *mut ImGuiTextEditCallbackData) -> c_int>;
+    Option<extern "C" fn(data: *mut ImGuiTextEditCallbackData) -> c_int>;
+
+pub type ImGuiSizeConstraintCallback =
+    Option<extern "C" fn(data: *mut ImGuiSizeConstraintCallbackData)>;
 
 #[repr(C)]
 #[derive(Copy, Clone, Debug, Default)]
@@ -317,7 +351,7 @@ pub struct ImGuiStyle {
     pub window_title_align: ImGuiAlign,
     pub child_window_rounding: c_float,
     pub frame_padding: ImVec2,
-    pub frame_rouding: c_float,
+    pub frame_rounding: c_float,
     pub item_spacing: ImVec2,
     pub item_inner_spacing: ImVec2,
     pub touch_extra_padding: ImVec2,
@@ -350,12 +384,18 @@ pub struct ImGuiIO {
     pub key_repeat_delay: c_float,
     pub key_repeat_rate: c_float,
     pub user_data: *mut c_void,
+
     pub fonts: *mut ImFontAtlas,
     pub font_global_scale: c_float,
     pub font_allow_user_scaling: bool,
     pub display_framebuffer_scale: ImVec2,
     pub display_visible_min: ImVec2,
     pub display_visible_max: ImVec2,
+
+    pub word_movement_uses_alt_key: bool,
+    pub shortcuts_use_super_key: bool,
+    pub double_click_selects_word: bool,
+    pub multi_select_uses_super_key: bool,
 
     pub render_draw_lists_fn: Option<extern "C" fn(data: *mut ImDrawData)>,
     pub get_clipboard_text_fn: Option<extern "C" fn() -> *const c_char>,
@@ -373,6 +413,7 @@ pub struct ImGuiIO {
     pub key_ctrl: bool,
     pub key_shift: bool,
     pub key_alt: bool,
+    pub key_super: bool,
     pub keys_down: [bool; 512],
     pub input_characters: [ImWchar; 16+1],
 
@@ -452,11 +493,20 @@ pub struct ImGuiTextEditCallbackData {
     pub event_char: ImWchar,
     pub event_key: ImGuiKey,
     pub buf: *mut c_char,
+    pub buf_text_len: c_int,
     pub buf_size: c_int,
     pub buf_dirty: bool,
     pub cursor_pos: c_int,
     pub selection_start: c_int,
-    pub selection_end: c_int
+    pub selection_end: c_int,
+}
+
+#[repr(C)]
+pub struct ImGuiSizeConstraintCallbackData {
+    pub user_data: *mut c_void,
+    pub pos: ImVec2,
+    pub current_size: ImVec2,
+    pub desired_size: ImVec2,
 }
 
 #[repr(C)]
@@ -468,14 +518,17 @@ pub struct ImColor {
 #[repr(C)]
 #[derive(Copy, Clone, Debug, Default)]
 pub struct ImGuiListClipper {
+    pub start_pos_y: c_float,
     pub items_height: c_float,
     pub items_count: c_int,
+    pub step_no: c_int,
     pub display_start: c_int,
     pub display_end: c_int
 }
 
 pub type ImDrawCallback =
     Option<extern "C" fn(parent_list: *const ImDrawList, cmd: *const ImDrawCmd)>;
+
 
 #[repr(C)]
 pub struct ImDrawCmd {
@@ -576,6 +629,7 @@ pub struct ImFontAtlas {
     pub tex_pixels_rgba32: *mut c_uint,
     pub tex_width: c_int,
     pub tex_height: c_int,
+    pub tex_desired_width: c_int,
     pub tex_uv_white_pixel: ImVec2,
     pub fonts: ImVector<*mut ImFont>,
 
@@ -598,17 +652,18 @@ pub struct ImFont {
     font_size: c_float,
     scale: c_float,
     display_offset: ImVec2,
-    fallback_char: ImWchar,
-    config_data: *mut ImFontConfig,
-    config_data_count: c_int,
-    ascent: c_float,
-    descent: c_float,
-    container_atlas: *mut ImFontAtlas,
     glyphs: ImVector<Glyph>,
+    index_x_advance: ImVector<c_float>,
+    index_lookup: ImVector<c_short>,
     fallback_glyph: *const Glyph,
     fallback_x_advance: c_float,
-    index_x_advance: ImVector<c_float>,
-    index_lookup: ImVector<c_int>
+    fallback_char: ImWchar,
+
+    config_data_count: c_short,
+    config_data: *mut ImFontConfig,
+    container_atlas: *mut ImFontAtlas,
+    ascent: c_float,
+    descent: c_float,
 }
 
 extern "C" {
@@ -626,8 +681,8 @@ extern "C" {
 
 // Window
 extern "C" {
-    pub fn igBegin(name: *const c_char, opened: *mut bool, flags: ImGuiWindowFlags) -> bool;
-    pub fn igBegin2(name: *const c_char, opened: *mut bool, size_on_first_use: ImVec2,
+    pub fn igBegin(name: *const c_char, open: *mut bool, flags: ImGuiWindowFlags) -> bool;
+    pub fn igBegin2(name: *const c_char, open: *mut bool, size_on_first_use: ImVec2,
                     bg_alpha: c_float, flags: ImGuiWindowFlags) -> bool;
     pub fn igEnd();
     pub fn igBeginChild(str_id: *const c_char, size: ImVec2, border: bool,
@@ -642,18 +697,19 @@ extern "C" {
     pub fn igGetWindowContentRegionMax(out: *mut ImVec2);
     pub fn igGetWindowContentRegionWidth() -> c_float;
     pub fn igGetWindowDrawList() -> *mut ImDrawList;
-    pub fn igGetWindowFont() -> *mut ImFont;
-    pub fn igGetWindowFontSize() -> c_float;
-    pub fn igSetWindowFontScale(scale: c_float);
     pub fn igGetWindowPos(out: *mut ImVec2);
     pub fn igGetWindowSize(out: *mut ImVec2);
     pub fn igGetWindowWidth() -> c_float;
     pub fn igGetWindowHeight() -> c_float;
     pub fn igIsWindowCollapsed() -> bool;
+    pub fn igSetWindowFontScale(scale: c_float);
 
     pub fn igSetNextWindowPos(pos: ImVec2, cond: ImGuiSetCond);
     pub fn igSetNextWindowPosCenter(cond: ImGuiSetCond);
     pub fn igSetNextWindowSize(size: ImVec2, cond: ImGuiSetCond);
+    pub fn igSetNextWindowConstraints(size_min: ImVec2, size_max: ImVec2,
+                                      custom_callback: ImGuiSizeConstraintCallback,
+                                      custom_callback_data: *mut c_void);
     pub fn igSetNextWindowContentSize(size: ImVec2);
     pub fn igSetNextWindowContentWidth(width: c_float);
     pub fn igSetNextWindowCollapsed(collapsed: bool, cond: ImGuiSetCond);
@@ -689,6 +745,9 @@ extern "C" {
     pub fn igPushStyleVar(idx: ImGuiStyleVar, val: c_float);
     pub fn igPushStyleVavrVec(idx: ImGuiStyleVar, val: ImVec2);
     pub fn igPopStyleVar(count: c_int);
+    pub fn igGetFont() -> *mut ImFont;
+    pub fn igGetFontSize() -> c_float;
+    pub fn igGetFontTexUvWhitePixel(out: *mut ImVec2);
     pub fn igGetColorU32(idx: ImGuiCol, alpha_mul: c_float) -> ImU32;
     pub fn igGetColorU32Vec(col: *const ImVec4) -> ImU32;
 }
@@ -708,21 +767,15 @@ extern "C" {
 
 // Layout
 extern "C" {
-    pub fn igBeginGroup();
-    pub fn igEndGroup();
     pub fn igSeparator();
-    pub fn igSameLine(local_pos_x: c_float, spacing_w: c_float);
+    pub fn igSameLine(pos_x: c_float, spacing_w: c_float);
+    pub fn igNewLine();
     pub fn igSpacing();
     pub fn igDummy(size: *const ImVec2);
-    pub fn igIndent();
-    pub fn igUnindent();
-    pub fn igColumns(count: c_int, id: *const c_char, border: bool);
-    pub fn igNextColumn();
-    pub fn igGetColumnIndex() -> c_int;
-    pub fn igGetColumnOffset(column_index: c_int) -> c_float;
-    pub fn igSetColumnOffset(column_index: c_int, offset_x: c_float);
-    pub fn igGetColumnWidth(column_index: c_int) -> c_float;
-    pub fn igGetColumnsCount() -> c_int;
+    pub fn igIndent(indent_w: c_float);
+    pub fn igUnindent(indent_w: c_float);
+    pub fn igBeginGroup();
+    pub fn igEndGroup();
     pub fn igGetCursorPos(out: *mut ImVec2);
     pub fn igGetCursorPosX() -> c_float;
     pub fn igGetCursorPosY() -> c_float;
@@ -736,6 +789,17 @@ extern "C" {
     pub fn igGetTextLineHeight() -> c_float;
     pub fn igGetTextLineHeightWithSpacing() -> c_float;
     pub fn igGetItemsLineHeightWithSpacing() -> c_float;
+}
+
+// Columns
+extern "C" {
+    pub fn igColumns(count: c_int, id: *const c_char, border: bool);
+    pub fn igNextColumn();
+    pub fn igGetColumnIndex() -> c_int;
+    pub fn igGetColumnOffset(column_index: c_int) -> c_float;
+    pub fn igSetColumnOffset(column_index: c_int, offset_x: c_float);
+    pub fn igGetColumnWidth(column_index: c_int) -> c_float;
+    pub fn igGetColumnsCount() -> c_int;
 }
 
 // ID scopes
@@ -776,8 +840,6 @@ extern "C" {
                          uv0: ImVec2, uv1: ImVec2,
                          frame_padding: c_int, bg_col: ImVec4,
                          tint_col: ImVec4) -> bool;
-    pub fn igCollapsingHeader(label: *const c_char, str_id: *const c_char,
-                              display_frame: bool, default_open: bool) -> bool;
     pub fn igCheckbox(label: *const c_char, v: *mut bool) -> bool;
     pub fn igCheckboxFlags(label: *const c_char,
                            flags: *mut c_uint, flags_value: c_uint) -> bool;
@@ -794,8 +856,8 @@ extern "C" {
                     data: *mut c_void, items_count: c_int,
                     height_in_items: c_int) -> bool;
     pub fn igColorButton(col: ImVec4, small_height: bool, outline_border: bool) -> bool;
-    pub fn igColorEdit3(label: *const c_char, col: *mut f32) -> bool;
-    pub fn igColorEdit4(label: *const c_char, col: *mut f32, show_alpha: bool) -> bool;
+    pub fn igColorEdit3(label: *const c_char, col: *mut c_float) -> bool;
+    pub fn igColorEdit4(label: *const c_char, col: *mut c_float, show_alpha: bool) -> bool;
     pub fn igColorEditMode(mode: ImGuiColorEditMode);
     pub fn igPlotLines(label: *const c_char,
                        values: *const c_float, values_count: c_int, values_offset: c_int,
@@ -926,15 +988,29 @@ extern "C" {
 
 // Widgets: Trees
 extern "C" {
-    pub fn igTreeNode(str_label_id: *const c_char) -> bool;
+    pub fn igTreeNode(label: *const c_char) -> bool;
     pub fn igTreeNodeStr(str_id: *const c_char, fmt: *const c_char, ...) -> bool;
     pub fn igTreeNodePtr(ptr_id: *const c_void, fmt: *const c_char, ...) -> bool;
     // pub fn igTreeNodeStrV(str_id: *const c_char, fmt: *const c_char, args: va_list) -> bool;
     // pub fn igTreeNodePtrV(ptr_id: *const c_void, fmt: *const c_char, args: va_list) -> bool;
+    pub fn igTreeNodeEx(label: *const c_char, flags: ImGuiTreeNodeFlags) -> bool;
+    pub fn igTreeNodeExStr(str_id: *const c_char, flags: ImGuiTreeNodeFlags,
+                           fmt: *const c_char, ...) -> bool;
+    pub fn igTreeNodeExPtr(ptr_id: *const c_void, flags: ImGuiTreeNodeFlags,
+                           fmt: *const c_char, ...) -> bool;
+    // pub fn igTreeNodeExV(str_id: *const c_char, flags: ImGuiTreeNodeFlags,
+    //                      fmt: *const c_char, args: va_list) -> bool;
+    // pub fn igTreeNodeExVPtr(ptr_id: *const c_void, flags: ImGuiTreeNodeFlags,
+    //                      fmt: *const c_char, args: va_list) -> bool;
     pub fn igTreePushStr(str_id: *const c_char);
     pub fn igTreePushPtr(ptr_id: *const c_void);
     pub fn igTreePop();
-    pub fn igSetNextTreeNodeOpened(opened: bool, cond: ImGuiSetCond);
+    pub fn igTreeAdvanceToLabelPos();
+    pub fn igGetTreeNodeToLabelSpacing() -> c_float;
+    pub fn igSetNextTreeNodeOpen(opened: bool, cond: ImGuiSetCond);
+    pub fn igCollapsingHeader(label: *const c_char, flags: ImGuiTreeNodeFlags) -> bool;
+    pub fn igCollapsingHeaderEx(label: *const c_char, open: *mut bool,
+                                flags: ImGuiTreeNodeFlags) -> bool;
 }
 
 // Widgets: Selectable / Lists
@@ -993,7 +1069,7 @@ extern "C" {
 extern "C" {
     pub fn igOpenPopup(str_id: *const c_char);
     pub fn igBeginPopup(str_id: *const c_char) -> bool;
-    pub fn igBeginPopupModal(name: *const c_char, p_opened: *mut bool,
+    pub fn igBeginPopupModal(name: *const c_char, open: *mut bool,
                              extra_flags: ImGuiWindowFlags) -> bool;
     pub fn igBeginPopupContextItem(str_id: *const c_char, mouse_button: c_int) -> bool;
     pub fn igBeginPopupContextWindow(also_over_items: bool,
@@ -1013,22 +1089,33 @@ extern "C" {
     pub fn igLogText(fmt: *const c_char, ...);
 }
 
+// Clipping
+extern "C" {
+    pub fn igPushClipRect(clip_rect_min: ImVec2, clip_rect_max: ImVec2,
+                          intersect_with_current_clip_rect: bool);
+    pub fn igPopClipRect();
+}
+
 // Utilities
 extern "C" {
     pub fn igIsItemHovered() -> bool;
     pub fn igIsItemHoveredRect() -> bool;
     pub fn igIsItemActive() -> bool;
+    pub fn igIsItemClicked(mouse_button: c_int) -> bool;
     pub fn igIsItemVisible() -> bool;
     pub fn igIsAnyItemHovered() -> bool;
     pub fn igIsAnyItemActive() -> bool;
     pub fn igGetItemRectMin(out: *mut ImVec2);
     pub fn igGetItemRectMax(out: *mut ImVec2);
     pub fn igGetItemRectSize(out: *mut ImVec2);
+    pub fn igSetItemAllowOverlap();
     pub fn igIsWindowHovered() -> bool;
     pub fn igIsWindowFocused() -> bool;
     pub fn igIsRootWindowFocused() -> bool;
     pub fn igIsRootWindowOrAnyChildFocused() -> bool;
+    pub fn igIsRootWindowOrAnyChildHovered() -> bool;
     pub fn igIsRectVisible(pos: ImVec2) -> bool;
+    pub fn igIsPosHoveringAnyWindow(pos: ImVec2) -> bool;
     pub fn igGetTime() -> c_float;
     pub fn igGetFrameCount() -> c_int;
     pub fn igGetStyleColName(idx: ImGuiCol) -> *const c_char;
@@ -1050,6 +1137,7 @@ extern "C" {
     pub fn igColorConvertHSVtoRGB(h: c_float, s: c_float, v: c_float,
                                   out_r: *mut c_float, out_g: *mut c_float, out_b: *mut c_float);
 
+    pub fn igGetKeyIndex(key: ImGuiKey) -> c_int;
     pub fn igIsKeyDown(key_index: c_int) -> bool;
     pub fn igIsKeyPressed(key_index: c_int, repeat: bool) -> bool;
     pub fn igIsKeyReleased(key_index: c_int) -> bool;
@@ -1059,7 +1147,7 @@ extern "C" {
     pub fn igIsMouseReleased(button: c_int) -> bool;
     pub fn igIsMouseHoveringWindow() -> bool;
     pub fn igIsMouseHoveringAnyWindow() -> bool;
-    pub fn igIsMouseHoveringRect(pos_min: ImVec2, pos_max: ImVec2, clip: bool) -> bool;
+    pub fn igIsMouseHoveringRect(r_min: ImVec2, r_max: ImVec2, clip: bool) -> bool;
     pub fn igIsMouseDragging(button: c_int, lock_threshold: c_float) -> bool;
     pub fn igGetMousePos(out: *mut ImVec2);
     pub fn igGetMousePosOnOpeningCurrentPopup(out: *mut ImVec2);
@@ -1067,8 +1155,8 @@ extern "C" {
     pub fn igResetMouseDragDelta(button: c_int);
     pub fn igGetMouseCursor() -> ImGuiMouseCursor;
     pub fn igSetMouseCursor(cursor: ImGuiMouseCursor);
-    pub fn igCaptureKeyboardFromApp();
-    pub fn igCaptureMouseFromApp();
+    pub fn igCaptureKeyboardFromApp(capture: bool);
+    pub fn igCaptureMouseFromApp(capture: bool);
 }
 
 // Helpers functions to access functions pointers in ImGui::GetIO()
@@ -1082,9 +1170,15 @@ extern "C" {
 // Internal state access
 extern "C" {
     pub fn igGetVersion() -> *const c_char;
-    pub fn igGetInternalState() -> *mut c_void;
-    pub fn igGetInternalStateSize() -> size_t;
-    pub fn igSetInternalState(state: *mut c_void, construct: bool);
+    pub fn igCreateContext(malloc_fn: Option<extern "C" fn(size: size_t) -> *mut c_void>,
+                           free_fn: Option<extern "C" fn(ptr: *mut c_void)>) -> *mut ImGuiContext;
+    pub fn igDestroyContext(ctx: *mut ImGuiContext);
+    pub fn igGetCurrentContext() -> *mut ImGuiContext;
+    pub fn igSetCurrentContext(ctx: *mut ImGuiContext);
+}
+
+extern "C" {
+    pub fn ImFontConfig_DefaultConstructor(config: *mut ImFontConfig);
 }
 
 extern "C" {
@@ -1148,7 +1242,9 @@ extern "C" {
 
     pub fn ImDrawList_Clear(list: *mut ImDrawList);
     pub fn ImDrawList_ClearFreeMemory(list: *mut ImDrawList);
-    pub fn ImDrawList_PushClipRect(list: *mut ImDrawList, clip_rect: ImVec4);
+    pub fn ImDrawList_PushClipRect(list: *mut ImDrawList,
+                                   clip_rect_min: ImVec2, clip_rect_max: ImVec2,
+                                   intersect_with_current_: bool);
     pub fn ImDrawList_PushClipRectFullScreen(list: *mut ImDrawList);
     pub fn ImDrawList_PopClipRect(list: *mut ImDrawList);
     pub fn ImDrawList_PushTextureID(list: *mut ImDrawList, texture_id: ImTextureID);
@@ -1157,12 +1253,21 @@ extern "C" {
     pub fn ImDrawList_AddLine(list: *mut ImDrawList, a: ImVec2, b: ImVec2,
                               col: ImU32, thickness: c_float);
     pub fn ImDrawList_AddRect(list: *mut ImDrawList, a: ImVec2, b: ImVec2,
-                              col: ImU32, rounding: c_float, rounding_corners: c_int);
+                              col: ImU32, rounding: c_float, rounding_corners: c_int,
+                              thickness: c_float);
     pub fn ImDrawList_AddRectFilled(list: *mut ImDrawList, a: ImVec2, b: ImVec2,
                                     col: ImU32, rounding: c_float, rounding_corners: c_int);
     pub fn ImDrawList_AddRectFilledMultiColor(list: *mut ImDrawList, a: ImVec2, b: ImVec2,
                                               col_upr_left: ImU32, col_upr_right: ImU32,
                                               col_bot_right: ImU32, col_bot_left: ImU32);
+    pub fn ImDrawLust_AddQuad(list: *mut ImDrawList,
+                              a: ImVec2, b: ImVec2, c: ImVec2, d: ImVec2,
+                              col: ImU32, thickness: c_float);
+    pub fn ImDrawLust_AddQuadFilled(list: *mut ImDrawList,
+                                    a: ImVec2, b: ImVec2, c: ImVec2, d: ImVec2,
+                                    col: ImU32);
+    pub fn ImDrawList_AddTriangle(list: *mut ImDrawList, a: ImVec2, b: ImVec2, c: ImVec2,
+                                  col: ImU32, thickness: c_float);
     pub fn ImDrawList_AddTriangleFilled(list: *mut ImDrawList, a: ImVec2, b: ImVec2, c: ImVec2,
                                         col: ImU32);
     pub fn ImDrawList_AddCircle(list: *mut ImDrawList, centre: ImVec2, radius: c_float,
@@ -1213,9 +1318,13 @@ extern "C" {
     pub fn ImDrawList_PrimRect(list: *mut ImDrawList, a: ImVec2, b: ImVec2, col: ImU32);
     pub fn ImDrawList_PrimRectUV(list: *mut ImDrawList, a: ImVec2, b: ImVec2,
                                  uv_a: ImVec2, uv_b: ImVec2, col: ImU32);
-    pub fn ImDrawList_PrimVtx(list: *mut ImDrawList, pos: ImVec2, uv: ImVec2, col: ImU32);
+    pub fn ImDrawList_PrimQuadUV(list: *mut ImDrawList, a: ImVec2, b: ImVec2,
+                                 c: ImVec2, d: ImVec2,
+                                 uv_a: ImVec2, uv_b: ImVec2, uv_c: ImVec2, uv_d: ImVec2,
+                                 col: ImU32);
     pub fn ImDrawList_PrimWriteVtx(list: *mut ImDrawList, pos: ImVec2, uv: ImVec2, col: ImU32);
     pub fn ImDrawList_PrimWriteIdx(list: *mut ImDrawList, idx: ImDrawIdx);
+    pub fn ImDrawList_PrimVtx(list: *mut ImDrawList, pos: ImVec2, uv: ImVec2, col: ImU32);
     pub fn ImDrawList_UpdateClipRect(list: *mut ImDrawList);
     pub fn ImDrawList_UpdateTextureID(list: *mut ImDrawList);
 }

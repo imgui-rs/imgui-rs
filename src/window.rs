@@ -3,12 +3,14 @@ use std::marker::PhantomData;
 use std::ptr;
 
 use super::{ImGuiSetCond, ImGuiWindowFlags, ImGuiWindowFlags_AlwaysAutoResize,
-            ImGuiWindowFlags_HorizontalScrollbar, ImGuiWindowFlags_MenuBar,
-            ImGuiWindowFlags_NoBringToFrontOnFocus, ImGuiWindowFlags_NoCollapse,
-            ImGuiWindowFlags_NoFocusOnAppearing, ImGuiWindowFlags_NoInputs,
-            ImGuiWindowFlags_NoMove, ImGuiWindowFlags_NoResize, ImGuiWindowFlags_NoSavedSettings,
-            ImGuiWindowFlags_NoScrollWithMouse, ImGuiWindowFlags_NoScrollbar,
-            ImGuiWindowFlags_NoTitleBar, ImGuiWindowFlags_ShowBorders, ImStr, ImVec2, Ui};
+            ImGuiWindowFlags_AlwaysHorizontalScrollbar, ImGuiWindowFlags_AlwaysUseWindowPadding,
+            ImGuiWindowFlags_AlwaysVerticalScrollbar, ImGuiWindowFlags_HorizontalScrollbar,
+            ImGuiWindowFlags_MenuBar, ImGuiWindowFlags_NoBringToFrontOnFocus,
+            ImGuiWindowFlags_NoCollapse, ImGuiWindowFlags_NoFocusOnAppearing,
+            ImGuiWindowFlags_NoInputs, ImGuiWindowFlags_NoMove, ImGuiWindowFlags_NoResize,
+            ImGuiWindowFlags_NoSavedSettings, ImGuiWindowFlags_NoScrollWithMouse,
+            ImGuiWindowFlags_NoScrollbar, ImGuiWindowFlags_NoTitleBar,
+            ImGuiWindowFlags_ShowBorders, ImStr, ImVec2, Ui};
 
 #[must_use]
 pub struct Window<'ui, 'p> {
@@ -114,6 +116,18 @@ impl<'ui, 'p> Window<'ui, 'p> {
     #[inline]
     pub fn no_bring_to_front_on_focus(self, value: bool) -> Self {
         Window { flags: self.flags.with(ImGuiWindowFlags_NoBringToFrontOnFocus, value), ..self }
+    }
+    #[inline]
+    pub fn always_vertical_scollbar(self, value: bool) -> Self {
+        Window { flags: self.flags.with(ImGuiWindowFlags_AlwaysVerticalScrollbar, value), ..self }
+    }
+    #[inline]
+    pub fn always_horizontal_scrollbar(self, value: bool) -> Self {
+        Window { flags: self.flags.with(ImGuiWindowFlags_AlwaysHorizontalScrollbar, value), ..self }
+    }
+    #[inline]
+    pub fn always_use_window_padding(self, value: bool) -> Self {
+        Window { flags: self.flags.with(ImGuiWindowFlags_AlwaysUseWindowPadding, value), ..self }
     }
     pub fn build<F: FnOnce()>(self, f: F) {
         let render = unsafe {
