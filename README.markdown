@@ -54,6 +54,16 @@ ui.window(im_str!("Hello world"))
     cargo run --example test_window
     cargo run --example test_window_impl
 
+## How to contribute
+
+1. Change or add something
+2. Run rustfmt to guarantee code style conformance
+
+        cargo install fmt
+        cargo fmt -- --write-mode=overwrite
+
+3. Open a pull request in Github
+
 ## License
 
 Licensed under either of
