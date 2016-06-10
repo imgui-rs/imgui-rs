@@ -15,6 +15,7 @@
 ### Changed
 
 - ImStr::as_ptr is now part of the public API
+- Upgrade to bitflags 0.7
 
 ## [0.0.8] - 2016-04-15
 
