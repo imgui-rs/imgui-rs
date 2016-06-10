@@ -15,46 +15,34 @@ use std::ptr;
 use std::slice;
 use std::str;
 
-pub use imgui_sys::{
-    ImDrawIdx, ImDrawVert,
-    ImGuiInputTextFlags, ImGuiInputTextFlags_CharsDecimal, ImGuiInputTextFlags_CharsHexadecimal,
-    ImGuiInputTextFlags_CharsUppercase, ImGuiInputTextFlags_CharsNoBlank,
-    ImGuiInputTextFlags_AutoSelectAll, ImGuiInputTextFlags_EnterReturnsTrue,
-    ImGuiInputTextFlags_CallbackCompletion, ImGuiInputTextFlags_CallbackHistory,
-    ImGuiInputTextFlags_CallbackAlways, ImGuiInputTextFlags_CallbackCharFilter,
-    ImGuiInputTextFlags_AllowTabInput, ImGuiInputTextFlags_CtrlEnterForNewLine,
-    ImGuiInputTextFlags_NoHorizontalScroll, ImGuiInputTextFlags_AlwaysInsertMode,
-    ImGuiInputTextFlags_ReadOnly,
-    ImGuiInputTextFlags_Password,
-    ImGuiSelectableFlags,
-    ImGuiSelectableFlags_DontClosePopups, ImGuiSelectableFlags_SpanAllColumns,
-    ImGuiSetCond,
-    ImGuiSetCond_Always, ImGuiSetCond_Once,
-    ImGuiSetCond_FirstUseEver, ImGuiSetCond_Appearing,
-    ImGuiStyle,
-    ImGuiWindowFlags,
-    ImGuiWindowFlags_NoTitleBar, ImGuiWindowFlags_NoResize, ImGuiWindowFlags_NoMove,
-    ImGuiWindowFlags_NoScrollbar, ImGuiWindowFlags_NoScrollWithMouse, ImGuiWindowFlags_NoCollapse,
-    ImGuiWindowFlags_AlwaysAutoResize, ImGuiWindowFlags_ShowBorders,
-    ImGuiWindowFlags_NoSavedSettings, ImGuiWindowFlags_NoInputs, ImGuiWindowFlags_MenuBar,
-    ImGuiWindowFlags_HorizontalScrollbar, ImGuiWindowFlags_NoFocusOnAppearing,
-    ImGuiWindowFlags_NoBringToFrontOnFocus,
-    ImVec2, ImVec4,
-    ImGuiKey
-};
-pub use input::{
-	ColorEdit3, ColorEdit4,
-	InputFloat, InputFloat2, InputFloat3, InputFloat4,
-	InputInt, InputInt2, InputInt3, InputInt4,
-	InputText
-};
+pub use imgui_sys::{ImDrawIdx, ImDrawVert, ImGuiInputTextFlags, ImGuiInputTextFlags_AllowTabInput,
+                    ImGuiInputTextFlags_AlwaysInsertMode, ImGuiInputTextFlags_AutoSelectAll,
+                    ImGuiInputTextFlags_CallbackAlways, ImGuiInputTextFlags_CallbackCharFilter,
+                    ImGuiInputTextFlags_CallbackCompletion, ImGuiInputTextFlags_CallbackHistory,
+                    ImGuiInputTextFlags_CharsDecimal, ImGuiInputTextFlags_CharsHexadecimal,
+                    ImGuiInputTextFlags_CharsNoBlank, ImGuiInputTextFlags_CharsUppercase,
+                    ImGuiInputTextFlags_CtrlEnterForNewLine, ImGuiInputTextFlags_EnterReturnsTrue,
+                    ImGuiInputTextFlags_NoHorizontalScroll, ImGuiInputTextFlags_Password,
+                    ImGuiInputTextFlags_ReadOnly, ImGuiKey, ImGuiSelectableFlags,
+                    ImGuiSelectableFlags_DontClosePopups, ImGuiSelectableFlags_SpanAllColumns,
+                    ImGuiSetCond, ImGuiSetCond_Always, ImGuiSetCond_Appearing,
+                    ImGuiSetCond_FirstUseEver, ImGuiSetCond_Once, ImGuiStyle, ImGuiWindowFlags,
+                    ImGuiWindowFlags_AlwaysAutoResize, ImGuiWindowFlags_HorizontalScrollbar,
+                    ImGuiWindowFlags_MenuBar, ImGuiWindowFlags_NoBringToFrontOnFocus,
+                    ImGuiWindowFlags_NoCollapse, ImGuiWindowFlags_NoFocusOnAppearing,
+                    ImGuiWindowFlags_NoInputs, ImGuiWindowFlags_NoMove, ImGuiWindowFlags_NoResize,
+                    ImGuiWindowFlags_NoSavedSettings, ImGuiWindowFlags_NoScrollWithMouse,
+                    ImGuiWindowFlags_NoScrollbar, ImGuiWindowFlags_NoTitleBar,
+                    ImGuiWindowFlags_ShowBorders, ImVec2, ImVec4};
+pub use input::{ColorEdit3, ColorEdit4, InputFloat, InputFloat2, InputFloat3, InputFloat4,
+                InputInt, InputInt2, InputInt3, InputInt4, InputText};
 pub use menus::{Menu, MenuItem};
 pub use sliders::{SliderFloat, SliderInt};
-pub use trees::{TreeNode};
-pub use widgets::{CollapsingHeader};
-pub use window::{Window};
-pub use plotlines::{PlotLines};
-pub use plothistogram::{PlotHistogram};
+pub use trees::TreeNode;
+pub use widgets::CollapsingHeader;
+pub use window::Window;
+pub use plotlines::PlotLines;
+pub use plothistogram::PlotHistogram;
 
 mod input;
 mod menus;
@@ -72,7 +60,7 @@ pub struct ImGui {
     // We need to keep ownership of the ImStr values to ensure the *const char pointer
     // lives long enough in case the ImStr contains a Cow::Owned
     ini_filename: Option<ImStr<'static>>,
-    log_filename: Option<ImStr<'static>>
+    log_filename: Option<ImStr<'static>>,
 }
 
 #[macro_export]
@@ -88,14 +76,12 @@ macro_rules! im_str {
 
 #[derive(Clone)]
 pub struct ImStr<'a> {
-    bytes: Cow<'a, [u8]>
+    bytes: Cow<'a, [u8]>,
 }
 
 impl<'a> ImStr<'a> {
     pub unsafe fn from_bytes_unchecked(bytes: &'a [u8]) -> ImStr<'a> {
-        ImStr {
-            bytes: Cow::Borrowed(bytes)
-        }
+        ImStr { bytes: Cow::Borrowed(bytes) }
     }
     pub fn as_ptr(&self) -> *const c_char { self.bytes.as_ptr() as *const c_char }
 }
@@ -104,25 +90,21 @@ impl<'a> From<&'a str> for ImStr<'a> {
     fn from(value: &'a str) -> ImStr<'a> {
         let mut bytes: Vec<u8> = value.bytes().collect();
         bytes.push(0);
-        ImStr {
-            bytes: Cow::Owned(bytes)
-        }
+        ImStr { bytes: Cow::Owned(bytes) }
     }
 }
 
 impl From<String> for ImStr<'static> {
     fn from(mut value: String) -> ImStr<'static> {
         value.push('\0');
-        ImStr {
-            bytes: Cow::Owned(value.into_bytes())
-        }
+        ImStr { bytes: Cow::Owned(value.into_bytes()) }
     }
 }
 
 pub struct TextureHandle<'a> {
     pub width: u32,
     pub height: u32,
-    pub pixels: &'a [c_uchar]
+    pub pixels: &'a [c_uchar],
 }
 
 pub fn get_version() -> &'static str {
@@ -136,33 +118,35 @@ impl ImGui {
     pub fn init() -> ImGui {
         ImGui {
             ini_filename: None,
-            log_filename: None
+            log_filename: None,
         }
     }
-    fn io(&self) -> &imgui_sys::ImGuiIO {
-        unsafe { mem::transmute(imgui_sys::igGetIO()) }
-    }
+    fn io(&self) -> &imgui_sys::ImGuiIO { unsafe { mem::transmute(imgui_sys::igGetIO()) } }
     fn io_mut(&mut self) -> &mut imgui_sys::ImGuiIO {
         unsafe { mem::transmute(imgui_sys::igGetIO()) }
     }
-    pub fn style(&self) -> &ImGuiStyle {
-        unsafe { mem::transmute(imgui_sys::igGetStyle()) }
-    }
+    pub fn style(&self) -> &ImGuiStyle { unsafe { mem::transmute(imgui_sys::igGetStyle()) } }
     pub fn style_mut(&self) -> &mut ImGuiStyle {
         unsafe { mem::transmute(imgui_sys::igGetStyle()) }
     }
-    pub fn prepare_texture<'a, F, T>(&mut self, f: F) -> T where F: FnOnce(TextureHandle<'a>) -> T {
+    pub fn prepare_texture<'a, F, T>(&mut self, f: F) -> T
+        where F: FnOnce(TextureHandle<'a>) -> T
+    {
         let io = self.io();
         let mut pixels: *mut c_uchar = ptr::null_mut();
         let mut width: c_int = 0;
         let mut height: c_int = 0;
         let mut bytes_per_pixel: c_int = 0;
         unsafe {
-            imgui_sys::ImFontAtlas_GetTexDataAsRGBA32(io.fonts, &mut pixels, &mut width, &mut height, &mut bytes_per_pixel);
+            imgui_sys::ImFontAtlas_GetTexDataAsRGBA32(io.fonts,
+                                                      &mut pixels,
+                                                      &mut width,
+                                                      &mut height,
+                                                      &mut bytes_per_pixel);
             f(TextureHandle {
                 width: width as u32,
                 height: height as u32,
-                pixels: slice::from_raw_parts(pixels, (width * height * bytes_per_pixel) as usize)
+                pixels: slice::from_raw_parts(pixels, (width * height * bytes_per_pixel) as usize),
             })
         }
     }
@@ -175,8 +159,8 @@ impl ImGui {
         {
             let io = self.io_mut();
             io.ini_filename = match value {
-               Some(ref x) => x.as_ptr(),
-               None => ptr::null()
+                Some(ref x) => x.as_ptr(),
+                None => ptr::null(),
             }
         }
         self.ini_filename = value;
@@ -185,8 +169,8 @@ impl ImGui {
         {
             let io = self.io_mut();
             io.log_filename = match value {
-               Some(ref x) => x.as_ptr(),
-               None => ptr::null()
+                Some(ref x) => x.as_ptr(),
+                None => ptr::null(),
             }
         }
         self.log_filename = value;
@@ -279,13 +263,9 @@ impl ImGui {
         }
         unsafe {
             imgui_sys::igNewFrame();
-            CURRENT_UI = Some(Ui {
-                imgui: mem::transmute(self as &'a ImGui)
-            });
+            CURRENT_UI = Some(Ui { imgui: mem::transmute(self as &'a ImGui) });
         }
-        Ui {
-            imgui: self
-        }
+        Ui { imgui: self }
     }
 }
 
@@ -303,11 +283,11 @@ static mut CURRENT_UI: Option<Ui<'static>> = None;
 pub struct DrawList<'a> {
     pub cmd_buffer: &'a [imgui_sys::ImDrawCmd],
     pub idx_buffer: &'a [imgui_sys::ImDrawIdx],
-    pub vtx_buffer: &'a [imgui_sys::ImDrawVert]
+    pub vtx_buffer: &'a [imgui_sys::ImDrawVert],
 }
 
 pub struct Ui<'ui> {
-    imgui: &'ui ImGui
+    imgui: &'ui ImGui,
 }
 
 static FMT: &'static [u8] = b"%s\0";
@@ -345,24 +325,24 @@ impl<'ui> Ui<'ui> {
         io.metrics_active_windows
     }
     pub fn render<F, E>(self, mut f: F) -> Result<(), E>
-        where F: FnMut(DrawList<'ui>) -> Result<(), E> {
-            unsafe {
-                imgui_sys::igRender();
+        where F: FnMut(DrawList<'ui>) -> Result<(), E>
+    {
+        unsafe {
+            imgui_sys::igRender();
 
-                let draw_data = imgui_sys::igGetDrawData();
-                for &cmd_list in (*draw_data).cmd_lists() {
-                    let draw_list =
-                        DrawList {
-                            cmd_buffer: (*cmd_list).cmd_buffer.as_slice(),
-                            idx_buffer: (*cmd_list).idx_buffer.as_slice(),
-                            vtx_buffer: (*cmd_list).vtx_buffer.as_slice()
-                        };
-                    try!(f(draw_list));
-                }
-                CURRENT_UI = None;
+            let draw_data = imgui_sys::igGetDrawData();
+            for &cmd_list in (*draw_data).cmd_lists() {
+                let draw_list = DrawList {
+                    cmd_buffer: (*cmd_list).cmd_buffer.as_slice(),
+                    idx_buffer: (*cmd_list).idx_buffer.as_slice(),
+                    vtx_buffer: (*cmd_list).vtx_buffer.as_slice(),
+                };
+                try!(f(draw_list));
             }
-            Ok(())
+            CURRENT_UI = None;
         }
+        Ok(())
+    }
     pub fn show_user_guide(&self) { unsafe { imgui_sys::igShowUserGuide() }; }
     pub fn show_default_style_editor(&self) {
         unsafe { imgui_sys::igShowStyleEditor(ptr::null_mut()) };
@@ -385,9 +365,7 @@ impl<'ui> Ui<'ui> {
 }
 
 impl<'a> Ui<'a> {
-    pub unsafe fn current_ui() -> Option<&'a Ui<'a>> {
-        CURRENT_UI.as_ref()
-    }
+    pub unsafe fn current_ui() -> Option<&'a Ui<'a>> { CURRENT_UI.as_ref() }
 }
 
 // Window
@@ -398,29 +376,19 @@ impl<'ui> Ui<'ui> {
 // Layout
 impl<'ui> Ui<'ui> {
     pub fn separator(&self) { unsafe { imgui_sys::igSeparator() }; }
-    pub fn same_line(&self, pos_x: f32) {
-        unsafe {
-            imgui_sys::igSameLine(pos_x, -1.0f32)
-        }
-    }
+    pub fn same_line(&self, pos_x: f32) { unsafe { imgui_sys::igSameLine(pos_x, -1.0f32) } }
     pub fn same_line_spacing(&self, pos_x: f32, spacing_w: f32) {
-        unsafe {
-            imgui_sys::igSameLine(pos_x, spacing_w)
-        }
+        unsafe { imgui_sys::igSameLine(pos_x, spacing_w) }
     }
     pub fn spacing(&self) { unsafe { imgui_sys::igSpacing() }; }
 
-    pub fn columns<'p>(&self, count: i32, id: ImStr<'p>, border: bool){
+    pub fn columns<'p>(&self, count: i32, id: ImStr<'p>, border: bool) {
         unsafe { imgui_sys::igColumns(count, id.as_ptr(), border) }
     }
 
-    pub fn next_column(&self) {
-        unsafe { imgui_sys::igNextColumn() }
-    }
+    pub fn next_column(&self) { unsafe { imgui_sys::igNextColumn() } }
 
-    pub fn get_column_index(&self) -> i32 {
-        unsafe { imgui_sys::igGetColumnIndex() }
-    }
+    pub fn get_column_index(&self) -> i32 { unsafe { imgui_sys::igGetColumnIndex() } }
 
     pub fn get_column_offset(&self, column_index: i32) -> f32 {
         unsafe { imgui_sys::igGetColumnOffset(column_index) }
@@ -434,11 +402,7 @@ impl<'ui> Ui<'ui> {
         unsafe { imgui_sys::igGetColumnWidth(column_index) }
     }
 
-    pub fn get_columns_count(&self) -> i32 {
-        unsafe { imgui_sys::igGetColumnsCount() }
-    }
-
-
+    pub fn get_columns_count(&self) -> i32 { unsafe { imgui_sys::igGetColumnsCount() } }
 }
 
 // Widgets
@@ -449,7 +413,9 @@ impl<'ui> Ui<'ui> {
             imgui_sys::igText(fmt_ptr(), text.as_ptr());
         }
     }
-    pub fn text_colored<'p, A>(&self, col: A, text: ImStr<'p>) where A: Into<ImVec4> {
+    pub fn text_colored<'p, A>(&self, col: A, text: ImStr<'p>)
+        where A: Into<ImVec4>
+    {
         unsafe {
             imgui_sys::igTextColored(col.into(), fmt_ptr(), text.as_ptr());
         }
@@ -480,9 +446,7 @@ impl<'ui> Ui<'ui> {
         }
     }
     pub fn small_button<'p>(&self, label: ImStr<'p>) -> bool {
-        unsafe {
-            imgui_sys::igSmallButton(label.as_ptr())
-        }
+        unsafe { imgui_sys::igSmallButton(label.as_ptr()) }
     }
     pub fn collapsing_header<'p>(&self, label: ImStr<'p>) -> CollapsingHeader<'ui, 'p> {
         CollapsingHeader::new(label)
@@ -494,10 +458,16 @@ impl<'ui> Ui<'ui> {
 
 // Widgets: Input
 impl<'ui> Ui<'ui> {
-    pub fn color_edit3<'p>(&self, label: ImStr<'p>, value: &'p mut [f32;3]) -> ColorEdit3<'ui, 'p> {
+    pub fn color_edit3<'p>(&self,
+                           label: ImStr<'p>,
+                           value: &'p mut [f32; 3])
+                           -> ColorEdit3<'ui, 'p> {
         ColorEdit3::new(label, value)
     }
-    pub fn color_edit4<'p>(&self, label: ImStr<'p>, value: &'p mut [f32;4]) -> ColorEdit4<'ui, 'p> {
+    pub fn color_edit4<'p>(&self,
+                           label: ImStr<'p>,
+                           value: &'p mut [f32; 4])
+                           -> ColorEdit4<'ui, 'p> {
         ColorEdit4::new(label, value)
     }
     pub fn input_text<'p>(&self, label: ImStr<'p>, buf: &'p mut str) -> InputText<'ui, 'p> {
@@ -506,66 +476,89 @@ impl<'ui> Ui<'ui> {
     pub fn input_float<'p>(&self, label: ImStr<'p>, value: &'p mut f32) -> InputFloat<'ui, 'p> {
         InputFloat::new(label, value)
     }
-    pub fn input_float2<'p>(&self, label: ImStr<'p>, value: &'p mut [f32;2]) -> InputFloat2<'ui, 'p> {
+    pub fn input_float2<'p>(&self,
+                            label: ImStr<'p>,
+                            value: &'p mut [f32; 2])
+                            -> InputFloat2<'ui, 'p> {
         InputFloat2::new(label, value)
     }
-    pub fn input_float3<'p>(&self, label: ImStr<'p>, value: &'p mut [f32;3]) -> InputFloat3<'ui, 'p> {
+    pub fn input_float3<'p>(&self,
+                            label: ImStr<'p>,
+                            value: &'p mut [f32; 3])
+                            -> InputFloat3<'ui, 'p> {
         InputFloat3::new(label, value)
     }
-    pub fn input_float4<'p>(&self, label: ImStr<'p>, value: &'p mut [f32;4]) -> InputFloat4<'ui, 'p> {
+    pub fn input_float4<'p>(&self,
+                            label: ImStr<'p>,
+                            value: &'p mut [f32; 4])
+                            -> InputFloat4<'ui, 'p> {
         InputFloat4::new(label, value)
     }
     pub fn input_int<'p>(&self, label: ImStr<'p>, value: &'p mut i32) -> InputInt<'ui, 'p> {
         InputInt::new(label, value)
     }
-    pub fn input_int2<'p>(&self, label: ImStr<'p>, value: &'p mut [i32;2]) -> InputInt2<'ui, 'p> {
+    pub fn input_int2<'p>(&self, label: ImStr<'p>, value: &'p mut [i32; 2]) -> InputInt2<'ui, 'p> {
         InputInt2::new(label, value)
     }
-    pub fn input_int3<'p>(&self, label: ImStr<'p>, value: &'p mut [i32;3]) -> InputInt3<'ui, 'p> {
+    pub fn input_int3<'p>(&self, label: ImStr<'p>, value: &'p mut [i32; 3]) -> InputInt3<'ui, 'p> {
         InputInt3::new(label, value)
     }
-    pub fn input_int4<'p>(&self, label: ImStr<'p>, value: &'p mut [i32;4]) -> InputInt4<'ui, 'p> {
+    pub fn input_int4<'p>(&self, label: ImStr<'p>, value: &'p mut [i32; 4]) -> InputInt4<'ui, 'p> {
         InputInt4::new(label, value)
     }
 }
 
 // Widgets: Sliders
 impl<'ui> Ui<'ui> {
-    pub fn slider_float<'p>(&self, label: ImStr<'p>,
-                          value: &'p mut f32, min: f32, max: f32) -> SliderFloat<'ui, 'p> {
+    pub fn slider_float<'p>(&self,
+                            label: ImStr<'p>,
+                            value: &'p mut f32,
+                            min: f32,
+                            max: f32)
+                            -> SliderFloat<'ui, 'p> {
         SliderFloat::new(label, value, min, max)
     }
-    pub fn slider_int<'p>(&self, label: ImStr<'p>,
-                          value: &'p mut i32, min: i32, max: i32) -> SliderInt<'ui, 'p> {
+    pub fn slider_int<'p>(&self,
+                          label: ImStr<'p>,
+                          value: &'p mut i32,
+                          min: i32,
+                          max: i32)
+                          -> SliderInt<'ui, 'p> {
         SliderInt::new(label, value, min, max)
     }
 }
 
 // Widgets: Trees
 impl<'ui> Ui<'ui> {
-    pub fn tree_node<'p>(&self, id: ImStr<'p>) -> TreeNode<'ui, 'p> {
-        TreeNode::new(id)
-    }
+    pub fn tree_node<'p>(&self, id: ImStr<'p>) -> TreeNode<'ui, 'p> { TreeNode::new(id) }
 }
 
 // Widgets: Selectable / Lists
 impl<'ui> Ui<'ui> {
-    pub fn selectable<'p>(&self, label: ImStr<'p>, selected: bool, flags: ImGuiSelectableFlags,
-                          size: ImVec2) -> bool {
+    pub fn selectable<'p>(&self,
+                          label: ImStr<'p>,
+                          selected: bool,
+                          flags: ImGuiSelectableFlags,
+                          size: ImVec2)
+                          -> bool {
         unsafe { imgui_sys::igSelectable(label.as_ptr(), selected, flags, size) }
     }
 }
 
 // Widgets: Menus
 impl<'ui> Ui<'ui> {
-    pub fn main_menu_bar<F>(&self, f: F) where F: FnOnce() {
+    pub fn main_menu_bar<F>(&self, f: F)
+        where F: FnOnce()
+    {
         let render = unsafe { imgui_sys::igBeginMainMenuBar() };
         if render {
             f();
             unsafe { imgui_sys::igEndMainMenuBar() };
         }
     }
-    pub fn menu_bar<F>(&self, f: F) where F: FnOnce() {
+    pub fn menu_bar<F>(&self, f: F)
+        where F: FnOnce()
+    {
         let render = unsafe { imgui_sys::igBeginMenuBar() };
         if render {
             f();
@@ -581,7 +574,9 @@ impl<'ui> Ui<'ui> {
     pub fn open_popup<'p>(&self, str_id: ImStr<'p>) {
         unsafe { imgui_sys::igOpenPopup(str_id.as_ptr()) };
     }
-    pub fn popup<'p, F>(&self, str_id: ImStr<'p>, f: F) where F: FnOnce() {
+    pub fn popup<'p, F>(&self, str_id: ImStr<'p>, f: F)
+        where F: FnOnce()
+    {
         let render = unsafe { imgui_sys::igBeginPopup(str_id.as_ptr()) };
         if render {
             f();
@@ -590,15 +585,15 @@ impl<'ui> Ui<'ui> {
     }
 }
 
-//Widgets: Combos 
+// Widgets: Combos
 impl<'ui> Ui<'ui> {
-    pub fn combo<'p>(&self, 
+    pub fn combo<'p>(&self,
                      label: ImStr<'p>,
                      current_item: &mut i32,
                      items: &'p [ImStr<'p>],
-                     height_in_items: i32) 
+                     height_in_items: i32)
                      -> bool {
-        let items_inner : Vec<*const c_char> = items.into_iter().map(|item| item.as_ptr()).collect();
+        let items_inner: Vec<*const c_char> = items.into_iter().map(|item| item.as_ptr()).collect();
         unsafe {
             imgui_sys::igCombo(label.as_ptr(),
                                current_item,
@@ -609,37 +604,33 @@ impl<'ui> Ui<'ui> {
     }
 }
 
-//Widgets: ListBox
+// Widgets: ListBox
 impl<'ui> Ui<'ui> {
     pub fn list_box<'p>(&self,
                         label: ImStr<'p>,
                         current_item: &mut i32,
                         items: &'p [ImStr<'p>],
                         height_in_items: i32)
-                        -> bool{
-        let items_inner : Vec<*const c_char> = items.into_iter().map(|item| item.as_ptr()).collect();
-        unsafe{
+                        -> bool {
+        let items_inner: Vec<*const c_char> = items.into_iter().map(|item| item.as_ptr()).collect();
+        unsafe {
             imgui_sys::igListBox(label.as_ptr(),
                                  current_item,
                                  items_inner.as_ptr() as *mut *const c_char,
                                  items_inner.len() as i32,
                                  height_in_items)
         }
-    } 
+    }
 }
 
 impl<'ui> Ui<'ui> {
-    pub fn plot_lines<'p>(&self,
-                           label: ImStr<'p>,
-                           values: &'p[f32])->PlotLines<'p>{
+    pub fn plot_lines<'p>(&self, label: ImStr<'p>, values: &'p [f32]) -> PlotLines<'p> {
         PlotLines::new(label, values)
     }
 }
 
 impl<'ui> Ui<'ui> {
-    pub fn plot_histogram<'p>(&self,
-                           label: ImStr<'p>,
-                           values: &'p[f32])->PlotHistogram<'p>{
+    pub fn plot_histogram<'p>(&self, label: ImStr<'p>, values: &'p [f32]) -> PlotHistogram<'p> {
         PlotHistogram::new(label, values)
     }
 }

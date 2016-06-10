@@ -1,5 +1,5 @@
 use imgui_sys;
-use super::{ImStr};
+use super::ImStr;
 use imgui_sys::ImVec2;
 use std::{f32, mem, ptr};
 use libc::c_float;
@@ -55,14 +55,16 @@ impl<'p> PlotHistogram<'p> {
     pub fn build(self) {
         unsafe {
             imgui_sys::igPlotHistogram(self.label.as_ptr(),
-                                   self.values.as_ptr() as *const c_float,
-                                   self.values.len() as i32,
-                                   self.values_offset as i32,
-                                   self.overlay_text.map(|x| x.as_ptr()).unwrap_or(ptr::null()),
-                                   self.scale_min,
-                                   self.scale_max,
-                                   self.graph_size,
-                                   mem::size_of::<f32>() as i32);
+                                       self.values.as_ptr() as *const c_float,
+                                       self.values.len() as i32,
+                                       self.values_offset as i32,
+                                       self.overlay_text
+                                           .map(|x| x.as_ptr())
+                                           .unwrap_or(ptr::null()),
+                                       self.scale_min,
+                                       self.scale_max,
+                                       self.graph_size,
+                                       mem::size_of::<f32>() as i32);
         }
     }
 }

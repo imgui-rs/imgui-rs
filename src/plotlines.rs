@@ -1,5 +1,5 @@
 use imgui_sys;
-use super::{ImStr};
+use super::ImStr;
 use imgui_sys::ImVec2;
 use std::{f32, mem, ptr};
 use libc::c_float;
@@ -38,14 +38,10 @@ impl<'p> PlotLines<'p> {
     }
 
     #[inline]
-    pub fn scale_min(self, scale_min: f32) -> Self {
-        PlotLines { scale_min: scale_min, ..self }
-    }
+    pub fn scale_min(self, scale_min: f32) -> Self { PlotLines { scale_min: scale_min, ..self } }
 
     #[inline]
-    pub fn scale_max(self, scale_max: f32) -> Self {
-        PlotLines { scale_max: scale_max, ..self }
-    }
+    pub fn scale_max(self, scale_max: f32) -> Self { PlotLines { scale_max: scale_max, ..self } }
 
     #[inline]
     pub fn graph_size(self, graph_size: ImVec2) -> Self {
