@@ -5,6 +5,12 @@
 ### Added
 
 - Support for columns, combo, listbox
+- Support for plothistogram, plotlines
+- Support for color edit widgets
+- Support for int and float inputs
+- Support for int and float array inputs
+- Support for popups
+- Support for selectable
 
 ### Changed
 
