@@ -24,7 +24,7 @@ ui.window("Hello world")
 * Low-level API (imgui-sys)
 * Renderer for easy integration with [Glium](https://github.com/tomaka/glium) projects (optional)
 * Parts of high-level API
-* Uses ImGui [fork](https://github.com/bitshifter/imgui/tree/imstr) with string slice supprt
+* Uses ImGui [fork](https://github.com/bitshifter/imgui/tree/imstr) with string slice support
   for passing Rust strings to ImGui. For more information and justification for this design, please see
   [issue #7 comments](https://github.com/Gekkio/imgui-rs/issues/7#issuecomment-174228805)
 * Parts of imgui\_demo.cpp reimplemented in Rust as an API usage example (examples/test\_window\_impl.rs)
