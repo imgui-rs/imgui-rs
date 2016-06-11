@@ -8,14 +8,14 @@
 ![Hello world](hello_world.png)
 
 ```rust
-ui.window(im_str!("Hello world"))
+ui.window("Hello world")
     .size((300.0, 100.0), ImGuiSetCond_FirstUseEver)
     .build(|| {
-        ui.text(im_str!("Hello world!"));
-        ui.text(im_str!("This...is...imgui-rs!"));
+        ui.text("Hello world!");
+        ui.text("This...is...imgui-rs!");
         ui.separator();
         let mouse_pos = ui.imgui().mouse_pos();
-        ui.text(im_str!("Mouse Position: ({:.1},{:.1})", mouse_pos.0, mouse_pos.1));
+        ui.text("Mouse Position: ({:.1},{:.1})", mouse_pos.0, mouse_pos.1);
     })
 ```
 
@@ -24,9 +24,9 @@ ui.window(im_str!("Hello world"))
 * Low-level API (imgui-sys)
 * Renderer for easy integration with [Glium](https://github.com/tomaka/glium) projects (optional)
 * Parts of high-level API
-* Not horrible way of defining and passing null-terminated UTF-8 to ImGui.
-  The macro `im_str!` needs to be used most of the time. For more
-  information and justification for this design, please see [issue #7](https://github.com/Gekkio/imgui-rs/issues/7)
+* Uses ImGui [fork](https://github.com/bitshifter/imgui/tree/imstr) with string slice supprt
+  for passing Rust strings to ImGui. For more information and justification for this design, please see
+  [issue #7 comments](https://github.com/Gekkio/imgui-rs/issues/7#issuecomment-174228805)
 * Parts of imgui\_demo.cpp reimplemented in Rust as an API usage example (examples/test\_window\_impl.rs)
 
 ## Important but unimplemented things

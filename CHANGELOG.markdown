@@ -6,10 +6,6 @@
 
 - Support for columns, combo, listbox
 
-### Changed
-
-- ImStr::as_ptr is now part of the public API
-
 ## [0.0.8] - 2016-04-15
 
 ### Added
