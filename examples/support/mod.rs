@@ -1,7 +1,7 @@
 use glium::{DisplayBuild, Surface};
 use glium::backend::glutin_backend::GlutinFacade;
 use glium::glutin;
-use glium::glutin::{ElementState, Event, MouseButton, MouseScrollDelta, VirtualKeyCode};
+use glium::glutin::{ElementState, Event, MouseButton, MouseScrollDelta, VirtualKeyCode, TouchPhase};
 use imgui::{ImGui, Ui, ImGuiKey};
 use imgui::glium_renderer::Renderer;
 use time::SteadyTime;
@@ -119,15 +119,17 @@ impl Support {
                         _ => {},
                     }
                 },
-                Event::MouseMoved(pos) => self.mouse_pos = pos,
+                Event::MouseMoved(x, y) => self.mouse_pos = (x, y),
                 Event::MouseInput(state, MouseButton::Left) =>
                     self.mouse_pressed.0 = state == ElementState::Pressed,
                 Event::MouseInput(state, MouseButton::Right) =>
                     self.mouse_pressed.1 = state == ElementState::Pressed,
                 Event::MouseInput(state, MouseButton::Middle) =>
                     self.mouse_pressed.2 = state == ElementState::Pressed,
-                Event::MouseWheel(MouseScrollDelta::LineDelta(_, y)) => self.mouse_wheel = y,
-                Event::MouseWheel(MouseScrollDelta::PixelDelta(_, y)) => self.mouse_wheel = y,
+                Event::MouseWheel(MouseScrollDelta::LineDelta(_, y), TouchPhase::Moved) =>
+                    self.mouse_wheel = y,
+                Event::MouseWheel(MouseScrollDelta::PixelDelta(_, y), TouchPhase::Moved) =>
+                    self.mouse_wheel = y,
                 Event::ReceivedCharacter(c) => self.imgui.add_input_character(c),
                 _ => ()
             }

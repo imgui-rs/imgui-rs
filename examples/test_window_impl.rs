@@ -240,7 +240,7 @@ fn show_test_window<'a>(ui: &Ui<'a>, state: &mut State, opened: &mut bool) {
                 ui.same_line(300.0);
                 ui.checkbox("no collapse", &mut state.no_collapse);
                 ui.checkbox("no menu", &mut state.no_menu);
-                ui.slider_f32("bg alpha", &mut state.bg_alpha, 0.0, 1.0).build();
+                ui.slider_float("bg alpha", &mut state.bg_alpha, 0.0, 1.0).build();
 
                 ui.tree_node("Style").build(|| {
                     // TODO: Reimplement style editor
@@ -287,7 +287,7 @@ fn show_test_window<'a>(ui: &Ui<'a>, state: &mut State, opened: &mut bool) {
                             suitable for English and possibly other languages.");
                     ui.spacing();
 
-                    ui.slider_f32("Wrap width", &mut state.wrap_width, -20.0, 600.0)
+                    ui.slider_float("Wrap width", &mut state.wrap_width, -20.0, 600.0)
                         .display_format("%.0f")
                         .build();
 
@@ -310,12 +310,12 @@ fn show_test_window<'a>(ui: &Ui<'a>, state: &mut State, opened: &mut bool) {
                 ui.separator();
                 ui.label_text("label", "Value");
                 ui.combo("combo", &mut state.item, &["aaaa", "bbbb",
-                    "cccc", "dddd", "eeee"]);
+                    "cccc", "dddd", "eeee"], -1);
                 let items = [
                     "AAAA", "BBBB", "CCCC", "DDDD",
                     "EEEE", "FFFF", "GGGG", "HHHH",
                     "IIII", "JJJJ", "KKKK"];
-                ui.combo("combo scroll", &mut state.item2, &items);
+                ui.combo("combo scroll", &mut state.item2, &items, -1);
                 ui.input_text("input text", &mut state.text).build();
                 ui.input_int("input int", &mut state.i0).build();
                 ui.input_float("input float", &mut state.f0)
@@ -351,7 +351,7 @@ fn show_test_window<'a>(ui: &Ui<'a>, state: &mut State, opened: &mut bool) {
                         ui.text("Aquarium");
                         ui.separator();
                         for (index, name) in names.iter().enumerate() {
-                            if ui.selectable(name.clone()) {
+                            if ui.selectable(name.clone(), false, ImGuiSelectableFlags::empty(), ImVec2::new(0.0, 0.0)) {
                                 state.selected_fish = Some(index);
                             }
                         }
@@ -420,7 +420,7 @@ fn show_example_app_auto_resize<'a>(ui: &Ui<'a>, state: &mut AutoResizeState, op
             ui.text("Window will resize every-ui to the size of its content.
 Note that you probably don't want to query the window size to
 output your content because that would create a feedback loop.");
-            ui.slider_i32("Number of lines", &mut state.lines, 1, 20).build();
+            ui.slider_int("Number of lines", &mut state.lines, 1, 20).build();
             for i in 0 .. state.lines {
                 ui.text(&format!("{:2$}This is line {}", "", i, i as usize * 4));
             }

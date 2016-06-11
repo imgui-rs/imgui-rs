@@ -1,10 +1,12 @@
 use glium::{
     index, program, texture, vertex,
-    Blend, DrawError, DrawParameters, IndexBuffer, Program, Rect, Surface, Texture2d, VertexBuffer
+    Blend, DrawError, DrawParameters, GlObject, IndexBuffer, Program, Rect, Surface, Texture2d,
+    VertexBuffer
 };
 use glium::backend::{Context, Facade};
 use glium::index::PrimitiveType;
 use glium::texture::{ClientFormat, RawImage2d};
+use libc::uintptr_t;
 use std::borrow::Cow;
 use std::fmt;
 use std::rc::Rc;
@@ -80,7 +82,10 @@ impl Renderer {
     }
     pub fn render<'a, S: Surface>(&mut self, surface: &mut S,
                                   ui: Ui<'a>) -> RendererResult<()> {
-        ui.render(|draw_list| self.render_draw_list(surface, draw_list))
+        let _ = self.ctx.insert_debug_marker("imgui-rs: starting rendering");
+        let result = ui.render(|draw_list| self.render_draw_list(surface, draw_list));
+        let _ = self.ctx.insert_debug_marker("imgui-rs: rendering finished");
+        result
     }
     fn render_draw_list<'a, S: Surface>(&mut self, surface: &mut S,
                                         draw_list: DrawList<'a>) -> RendererResult<()> {
@@ -88,18 +93,21 @@ impl Renderer {
         try!(self.device_objects.upload_index_buffer(&self.ctx, draw_list.idx_buffer));
 
         let (width, height) = surface.get_dimensions();
+        let matrix = [
+            [ 2.0 / (width as f32), 0.0, 0.0, 0.0 ],
+            [ 0.0, 2.0 / -(height as f32), 0.0, 0.0 ],
+            [ 0.0, 0.0, -1.0, 0.0 ],
+                [ -1.0, 1.0, 0.0, 1.0 ]
+        ];
+        let font_texture_id = self.device_objects.texture.get_id() as uintptr_t;
 
         let mut idx_start = 0;
         for cmd in draw_list.cmd_buffer {
-            let matrix = [
-                [ 2.0 / (width as f32), 0.0, 0.0, 0.0 ],
-                [ 0.0, 2.0 / -(height as f32), 0.0, 0.0 ],
-                [ 0.0, 0.0, -1.0, 0.0 ],
-                    [ -1.0, 1.0, 0.0, 1.0 ]
-            ];
+            // We don't support custom textures...yet!
+            assert!(cmd.texture_id as uintptr_t == font_texture_id);
             let uniforms = uniform! {
                 matrix: matrix,
-                texture: self.device_objects.texture.sampled()
+                tex: &self.device_objects.texture
             };
             let draw_params = DrawParameters {
                 blend: Blend::alpha_blending(),
@@ -162,6 +170,7 @@ impl DeviceObjects {
             };
             Texture2d::new(ctx, data)
         }));
+        im_gui.set_texture_id(texture.get_id() as uintptr_t);
 
         Ok(DeviceObjects {
             vertex_buffer: vertex_buffer,
@@ -178,6 +187,9 @@ impl DeviceObjects {
             return Ok(());
         }
         self.vertex_buffer = try!(VertexBuffer::dynamic(ctx, vtx_buffer));
+        let _ = ctx.get_context().insert_debug_marker(
+            &format!("imgui-rs: resized vertex buffer to {} bytes",
+                     self.vertex_buffer.get_size()));
         Ok(())
     }
     pub fn upload_index_buffer<F: Facade>(&mut self, ctx: &F,
@@ -189,6 +201,9 @@ impl DeviceObjects {
         }
         self.index_buffer =
             try!(IndexBuffer::dynamic(ctx, PrimitiveType::TrianglesList, idx_buffer));
+        let _ = ctx.get_context().insert_debug_marker(
+            &format!("imgui-rs: resized index buffer to {} bytes",
+                     self.index_buffer.get_size()));
         Ok(())
     }
 }
