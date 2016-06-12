@@ -5,7 +5,14 @@
 ### Added
 
 - Support for columns, combo, listbox
+- Support for plothistogram, plotlines
+- Support for color edit widgets
+- Support for int and float inputs
+- Support for int and float array inputs
+- Support for popups
+- Support for selectable
 
+- Upgrade to bitflags 0.7
 ## [0.0.8] - 2016-04-15
 
 ### Added
