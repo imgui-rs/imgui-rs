@@ -31,9 +31,13 @@ impl<'ui, 'p> SliderInt<'ui, 'p> {
         SliderInt { display_format: display_format, ..self }
     }
     pub fn build(self) -> bool {
-        let label = imgui_sys::ImStr::from(self.label);
-        let display_format = imgui_sys::ImStr::from(self.display_format);
-        unsafe { imgui_sys::igSliderInt(label, self.value, self.min, self.max, display_format) }
+        unsafe {
+            imgui_sys::igSliderInt(imgui_sys::ImStr::from(self.label),
+                                   self.value,
+                                   self.min,
+                                   self.max,
+                                   imgui_sys::ImStr::from(self.display_format))
+        }
     }
 }
 
@@ -67,14 +71,12 @@ impl<'ui, 'p> SliderFloat<'ui, 'p> {
     #[inline]
     pub fn power(self, power: f32) -> Self { SliderFloat { power: power, ..self } }
     pub fn build(self) -> bool {
-        let label = imgui_sys::ImStr::from(self.label);
-        let display_format = imgui_sys::ImStr::from(self.display_format);
         unsafe {
-            imgui_sys::igSliderFloat(label,
+            imgui_sys::igSliderFloat(imgui_sys::ImStr::from(self.label),
                                      self.value,
                                      self.min,
                                      self.max,
-                                     display_format,
+                                     imgui_sys::ImStr::from(self.display_format),
                                      self.power)
         }
     }

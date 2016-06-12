@@ -392,9 +392,8 @@ impl<'ui> Ui<'ui> {
         }
     }
     pub fn label_text<'p>(&self, label: &'p str, text: &'p str) {
-        let label = imgui_sys::ImStr::from(label);
         unsafe {
-            imgui_sys::igLabelText1(label, imgui_sys::ImStr::from(text));
+            imgui_sys::igLabelText1(imgui_sys::ImStr::from(label), imgui_sys::ImStr::from(text));
         }
     }
     pub fn bullet(&self) {
@@ -408,15 +407,13 @@ impl<'ui> Ui<'ui> {
         }
     }
     pub fn small_button<'p>(&self, label: &'p str) -> bool {
-        let label = imgui_sys::ImStr::from(label);
-        unsafe { imgui_sys::igSmallButton(label) }
+        unsafe { imgui_sys::igSmallButton(imgui_sys::ImStr::from(label)) }
     }
     pub fn collapsing_header<'p>(&self, label: &'p str) -> CollapsingHeader<'ui, 'p> {
         CollapsingHeader::new(label)
     }
     pub fn checkbox<'p>(&self, label: &'p str, value: &'p mut bool) -> bool {
-        let label = imgui_sys::ImStr::from(label);
-        unsafe { imgui_sys::igCheckbox(label, value) }
+        unsafe { imgui_sys::igCheckbox(imgui_sys::ImStr::from(label), value) }
     }
 }
 
@@ -530,14 +527,12 @@ impl<'ui> Ui<'ui> {
 // Widgets: Popups
 impl<'ui> Ui<'ui> {
     pub fn open_popup<'p>(&self, str_id: &'p str) {
-        let str_id = imgui_sys::ImStr::from(str_id);
-        unsafe { imgui_sys::igOpenPopup(str_id) };
+        unsafe { imgui_sys::igOpenPopup(imgui_sys::ImStr::from(str_id)) };
     }
     pub fn popup<'p, F>(&self, str_id: &'p str, f: F)
         where F: FnOnce()
     {
-        let str_id = imgui_sys::ImStr::from(str_id);
-        let render = unsafe { imgui_sys::igBeginPopup(str_id) };
+        let render = unsafe { imgui_sys::igBeginPopup(imgui_sys::ImStr::from(str_id)) };
         if render {
             f();
             unsafe { imgui_sys::igEndPopup() };

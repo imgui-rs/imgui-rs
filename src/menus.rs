@@ -61,11 +61,15 @@ impl<'ui, 'p> MenuItem<'ui, 'p> {
     #[inline]
     pub fn enabled(self, enabled: bool) -> Self { MenuItem { enabled: enabled, ..self } }
     pub fn build(self) -> bool {
-        let label = imgui_sys::ImStr::from(self.label);
-        let shortcut =
-            self.shortcut.map(|x| imgui_sys::ImStr::from(x)).unwrap_or(imgui_sys::ImStr::null());
-        let selected = self.selected.map(|x| x as *mut bool).unwrap_or(ptr::null_mut());
-        let enabled = self.enabled;
-        unsafe { imgui_sys::igMenuItemPtr(label, shortcut, selected, enabled) }
+        unsafe {
+            imgui_sys::igMenuItemPtr(imgui_sys::ImStr::from(self.label),
+                                     self.shortcut
+                                         .map(|x| imgui_sys::ImStr::from(x))
+                                         .unwrap_or(imgui_sys::ImStr::null()),
+                                     self.selected
+                                         .map(|x| x as *mut bool)
+                                         .unwrap_or(ptr::null_mut()),
+                                     self.enabled)
+        }
     }
 }
