@@ -1,7 +1,7 @@
 use imgui_sys;
 use std::marker::PhantomData;
 
-use super::{Ui, ImGuiSetCond};
+use super::{ImGuiSetCond, Ui};
 
 #[must_use]
 pub struct TreeNode<'ui, 'p> {
@@ -9,7 +9,7 @@ pub struct TreeNode<'ui, 'p> {
     label: Option<&'p str>,
     opened: bool,
     opened_cond: ImGuiSetCond,
-    _phantom: PhantomData<&'ui Ui<'ui>>
+    _phantom: PhantomData<&'ui Ui<'ui>>,
 }
 
 impl<'ui, 'p> TreeNode<'ui, 'p> {
@@ -19,22 +19,17 @@ impl<'ui, 'p> TreeNode<'ui, 'p> {
             label: None,
             opened: false,
             opened_cond: ImGuiSetCond::empty(),
-            _phantom: PhantomData
+            _phantom: PhantomData,
         }
     }
     #[inline]
-    pub fn label(self, label: &'p str) -> Self {
-        TreeNode {
-            label: Some(label),
-            .. self
-        }
-    }
+    pub fn label(self, label: &'p str) -> Self { TreeNode { label: Some(label), ..self } }
     #[inline]
     pub fn opened(self, opened: bool, cond: ImGuiSetCond) -> Self {
         TreeNode {
             opened: opened,
             opened_cond: cond,
-            .. self
+            ..self
         }
     }
     pub fn build<F: FnOnce()>(self, f: F) {
@@ -45,7 +40,7 @@ impl<'ui, 'p> TreeNode<'ui, 'p> {
             }
             match self.label {
                 Some(label) => imgui_sys::igTreeNodeStr1(id, imgui_sys::ImStr::from(label)),
-                None => imgui_sys::igTreeNode(id)
+                None => imgui_sys::igTreeNode(id),
             }
         };
         if render {

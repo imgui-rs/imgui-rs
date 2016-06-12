@@ -1,7 +1,7 @@
 use imgui_sys;
 use std::marker::PhantomData;
 
-use super::{Ui};
+use super::Ui;
 
 // TODO: Consider using Range, even though it is half-open
 
@@ -12,7 +12,7 @@ pub struct SliderInt<'ui, 'p> {
     min: i32,
     max: i32,
     display_format: &'p str,
-    _phantom: PhantomData<&'ui Ui<'ui>>
+    _phantom: PhantomData<&'ui Ui<'ui>>,
 }
 
 impl<'ui, 'p> SliderInt<'ui, 'p> {
@@ -23,22 +23,17 @@ impl<'ui, 'p> SliderInt<'ui, 'p> {
             min: min,
             max: max,
             display_format: "%.0f",
-            _phantom: PhantomData
+            _phantom: PhantomData,
         }
     }
     #[inline]
     pub fn display_format(self, display_format: &'p str) -> Self {
-        SliderInt {
-            display_format: display_format,
-            .. self
-        }
+        SliderInt { display_format: display_format, ..self }
     }
     pub fn build(self) -> bool {
         let label = imgui_sys::ImStr::from(self.label);
         let display_format = imgui_sys::ImStr::from(self.display_format);
-        unsafe {
-            imgui_sys::igSliderInt(label, self.value, self.min, self.max, display_format)
-        }
+        unsafe { imgui_sys::igSliderInt(label, self.value, self.min, self.max, display_format) }
     }
 }
 
@@ -50,7 +45,7 @@ pub struct SliderFloat<'ui, 'p> {
     max: f32,
     display_format: &'p str,
     power: f32,
-    _phantom: PhantomData<&'ui Ui<'ui>>
+    _phantom: PhantomData<&'ui Ui<'ui>>,
 }
 
 impl<'ui, 'p> SliderFloat<'ui, 'p> {
@@ -62,30 +57,25 @@ impl<'ui, 'p> SliderFloat<'ui, 'p> {
             max: max,
             display_format: "%.3f",
             power: 1.0,
-            _phantom: PhantomData
+            _phantom: PhantomData,
         }
     }
     #[inline]
     pub fn display_format(self, display_format: &'p str) -> Self {
-        SliderFloat {
-            display_format: display_format,
-            .. self
-        }
+        SliderFloat { display_format: display_format, ..self }
     }
     #[inline]
-    pub fn power(self, power: f32) -> Self {
-        SliderFloat {
-            power: power,
-            .. self
-        }
-    }
+    pub fn power(self, power: f32) -> Self { SliderFloat { power: power, ..self } }
     pub fn build(self) -> bool {
         let label = imgui_sys::ImStr::from(self.label);
         let display_format = imgui_sys::ImStr::from(self.display_format);
         unsafe {
-            imgui_sys::igSliderFloat(label, self.value, self.min, self.max, display_format,
+            imgui_sys::igSliderFloat(label,
+                                     self.value,
+                                     self.min,
+                                     self.max,
+                                     display_format,
                                      self.power)
         }
     }
 }
-

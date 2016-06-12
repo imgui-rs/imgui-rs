@@ -3,16 +3,14 @@ use libc::size_t;
 use std::marker::PhantomData;
 use std::ptr;
 
-use super::{
-    Ui,
-    ImGuiInputTextFlags, ImGuiInputTextFlags_CharsDecimal, ImGuiInputTextFlags_CharsHexadecimal,
-    ImGuiInputTextFlags_CharsUppercase, ImGuiInputTextFlags_CharsNoBlank,
-    ImGuiInputTextFlags_AutoSelectAll, ImGuiInputTextFlags_EnterReturnsTrue,
-    ImGuiInputTextFlags_CallbackCompletion, ImGuiInputTextFlags_CallbackHistory,
-    ImGuiInputTextFlags_CallbackAlways, ImGuiInputTextFlags_CallbackCharFilter,
-    ImGuiInputTextFlags_AllowTabInput, //ImGuiInputTextFlags_CtrlEnterForNewLine,
-    ImGuiInputTextFlags_NoHorizontalScroll, ImGuiInputTextFlags_AlwaysInsertMode,
-};
+use super::{ImGuiInputTextFlags,
+            ImGuiInputTextFlags_AllowTabInput /* ImGuiInputTextFlags_CtrlEnterForNewLine, */,
+            ImGuiInputTextFlags_AlwaysInsertMode, ImGuiInputTextFlags_AutoSelectAll,
+            ImGuiInputTextFlags_CallbackAlways, ImGuiInputTextFlags_CallbackCharFilter,
+            ImGuiInputTextFlags_CallbackCompletion, ImGuiInputTextFlags_CallbackHistory,
+            ImGuiInputTextFlags_CharsDecimal, ImGuiInputTextFlags_CharsHexadecimal,
+            ImGuiInputTextFlags_CharsNoBlank, ImGuiInputTextFlags_CharsUppercase,
+            ImGuiInputTextFlags_EnterReturnsTrue, ImGuiInputTextFlags_NoHorizontalScroll, Ui};
 
 macro_rules! impl_text_flags {
     ($InputType:ident) => {
@@ -168,7 +166,7 @@ pub struct InputText<'ui, 'p> {
     label: &'p str,
     buf: &'p mut str,
     flags: ImGuiInputTextFlags,
-    _phantom: PhantomData<&'ui Ui<'ui>>
+    _phantom: PhantomData<&'ui Ui<'ui>>,
 }
 
 impl<'ui, 'p> InputText<'ui, 'p> {
@@ -177,7 +175,7 @@ impl<'ui, 'p> InputText<'ui, 'p> {
             label: label,
             buf: buf,
             flags: ImGuiInputTextFlags::empty(),
-            _phantom: PhantomData
+            _phantom: PhantomData,
         }
     }
 
@@ -188,14 +186,14 @@ impl<'ui, 'p> InputText<'ui, 'p> {
 
     pub fn build(self) -> bool {
         unsafe {
-            imgui_sys::igInputText(
-                imgui_sys::ImStr::from(self.label),
-                // TODO: this is evil. Perhaps something else than &mut str is better
-                self.buf.as_ptr() as *mut i8,
-                self.buf.len() as size_t,
-                self.flags,
-                None,
-                ptr::null_mut())
+            imgui_sys::igInputText(imgui_sys::ImStr::from(self.label),
+                                   // TODO: this is evil.
+                                   // Perhaps something else than &mut str is better
+                                   self.buf.as_ptr() as *mut i8,
+                                   self.buf.len() as size_t,
+                                   self.flags,
+                                   None,
+                                   ptr::null_mut())
         }
     }
 }
@@ -207,7 +205,7 @@ pub struct InputInt<'ui, 'p> {
     step: i32,
     step_fast: i32,
     flags: ImGuiInputTextFlags,
-    _phantom: PhantomData<&'ui Ui<'ui>>
+    _phantom: PhantomData<&'ui Ui<'ui>>,
 }
 
 impl<'ui, 'p> InputInt<'ui, 'p> {
@@ -218,18 +216,17 @@ impl<'ui, 'p> InputInt<'ui, 'p> {
             step: 1,
             step_fast: 100,
             flags: ImGuiInputTextFlags::empty(),
-            _phantom: PhantomData
+            _phantom: PhantomData,
         }
     }
 
     pub fn build(self) -> bool {
         unsafe {
-            imgui_sys::igInputInt(
-                imgui_sys::ImStr::from(self.label),
-                self.value as *mut i32,
-                self.step,
-                self.step_fast,
-                self.flags)
+            imgui_sys::igInputInt(imgui_sys::ImStr::from(self.label),
+                                  self.value as *mut i32,
+                                  self.step,
+                                  self.step_fast,
+                                  self.flags)
         }
     }
 
@@ -245,7 +242,7 @@ pub struct InputFloat<'ui, 'p> {
     step_fast: f32,
     decimal_precision: i32,
     flags: ImGuiInputTextFlags,
-    _phantom: PhantomData<&'ui Ui<'ui>>
+    _phantom: PhantomData<&'ui Ui<'ui>>,
 }
 
 impl<'ui, 'p> InputFloat<'ui, 'p> {
@@ -257,19 +254,18 @@ impl<'ui, 'p> InputFloat<'ui, 'p> {
             step_fast: 0.0,
             decimal_precision: -1,
             flags: ImGuiInputTextFlags::empty(),
-            _phantom: PhantomData
+            _phantom: PhantomData,
         }
     }
 
     pub fn build(self) -> bool {
         unsafe {
-            imgui_sys::igInputFloat(
-                imgui_sys::ImStr::from(self.label),
-                self.value as *mut f32,
-                self.step,
-                self.step_fast,
-                self.decimal_precision,
-                self.flags)
+            imgui_sys::igInputFloat(imgui_sys::ImStr::from(self.label),
+                                    self.value as *mut f32,
+                                    self.step,
+                                    self.step_fast,
+                                    self.decimal_precision,
+                                    self.flags)
         }
     }
 
@@ -361,24 +357,22 @@ impl_input_intn!(InputInt4, 4, igInputInt4);
 #[must_use]
 pub struct ColorEdit3<'ui, 'p> {
     label: &'p str,
-    value: &'p mut [f32;3],
-    _phantom: PhantomData<&'ui Ui<'ui>>
+    value: &'p mut [f32; 3],
+    _phantom: PhantomData<&'ui Ui<'ui>>,
 }
 
 impl<'ui, 'p> ColorEdit3<'ui, 'p> {
-    pub fn new(label: &'p str, value: &'p mut [f32;3]) -> Self {
+    pub fn new(label: &'p str, value: &'p mut [f32; 3]) -> Self {
         ColorEdit3 {
             label: label,
             value: value,
-            _phantom: PhantomData
+            _phantom: PhantomData,
         }
     }
 
     pub fn build(self) -> bool {
         unsafe {
-            imgui_sys::igColorEdit3(
-                imgui_sys::ImStr::from(self.label),
-                self.value.as_mut_ptr())
+            imgui_sys::igColorEdit3(imgui_sys::ImStr::from(self.label), self.value.as_mut_ptr())
         }
     }
 }
@@ -386,27 +380,26 @@ impl<'ui, 'p> ColorEdit3<'ui, 'p> {
 #[must_use]
 pub struct ColorEdit4<'ui, 'p> {
     label: &'p str,
-    value: &'p mut [f32;4],
+    value: &'p mut [f32; 4],
     show_alpha: bool,
-    _phantom: PhantomData<&'ui Ui<'ui>>
+    _phantom: PhantomData<&'ui Ui<'ui>>,
 }
 
 impl<'ui, 'p> ColorEdit4<'ui, 'p> {
-    pub fn new(label: &'p str, value: &'p mut [f32;4]) -> Self {
+    pub fn new(label: &'p str, value: &'p mut [f32; 4]) -> Self {
         ColorEdit4 {
             label: label,
             value: value,
             show_alpha: true,
-            _phantom: PhantomData
+            _phantom: PhantomData,
         }
     }
 
     pub fn build(self) -> bool {
         unsafe {
-            imgui_sys::igColorEdit4(
-                imgui_sys::ImStr::from(self.label),
-                self.value.as_mut_ptr(),
-                self.show_alpha)
+            imgui_sys::igColorEdit4(imgui_sys::ImStr::from(self.label),
+                                    self.value.as_mut_ptr(),
+                                    self.show_alpha)
         }
     }
 }

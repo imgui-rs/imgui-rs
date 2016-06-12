@@ -37,14 +37,10 @@ impl<'p> PlotLines<'p> {
     }
 
     #[inline]
-    pub fn scale_min(self, scale_min: f32) -> Self {
-        PlotLines { scale_min: scale_min, ..self }
-    }
+    pub fn scale_min(self, scale_min: f32) -> Self { PlotLines { scale_min: scale_min, ..self } }
 
     #[inline]
-    pub fn scale_max(self, scale_max: f32) -> Self {
-        PlotLines { scale_max: scale_max, ..self }
-    }
+    pub fn scale_max(self, scale_max: f32) -> Self { PlotLines { scale_max: scale_max, ..self } }
 
     #[inline]
     pub fn graph_size(self, graph_size: ImVec2) -> Self {
@@ -57,8 +53,9 @@ impl<'p> PlotLines<'p> {
                                    self.values.as_ptr() as *const c_float,
                                    self.values.len() as i32,
                                    self.values_offset as i32,
-                                   self.overlay_text.map( |x| imgui_sys::ImStr::from(x)).unwrap_or(
-                                       imgui_sys::ImStr::null()),
+                                   self.overlay_text
+                                       .map(|x| imgui_sys::ImStr::from(x))
+                                       .unwrap_or(imgui_sys::ImStr::null()),
                                    self.scale_min,
                                    self.scale_max,
                                    self.graph_size,

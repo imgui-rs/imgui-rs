@@ -2,13 +2,13 @@ use imgui_sys;
 use std::marker::PhantomData;
 use std::ptr;
 
-use super::{Ui};
+use super::Ui;
 
 #[must_use]
 pub struct Menu<'ui, 'p> {
     label: &'p str,
     enabled: bool,
-    _phantom: PhantomData<&'ui Ui<'ui>>
+    _phantom: PhantomData<&'ui Ui<'ui>>,
 }
 
 impl<'ui, 'p> Menu<'ui, 'p> {
@@ -16,18 +16,14 @@ impl<'ui, 'p> Menu<'ui, 'p> {
         Menu {
             label: label,
             enabled: true,
-            _phantom: PhantomData
+            _phantom: PhantomData,
         }
     }
     #[inline]
-    pub fn enabled(self, enabled: bool) -> Self {
-        Menu {
-            enabled: enabled,
-            .. self
-        }
-    }
+    pub fn enabled(self, enabled: bool) -> Self { Menu { enabled: enabled, ..self } }
     pub fn build<F: FnOnce()>(self, f: F) {
-        let render = unsafe { imgui_sys::igBeginMenu(imgui_sys::ImStr::from(self.label), self.enabled) };
+        let render =
+            unsafe { imgui_sys::igBeginMenu(imgui_sys::ImStr::from(self.label), self.enabled) };
         if render {
             f();
             unsafe { imgui_sys::igEndMenu() };
@@ -41,7 +37,7 @@ pub struct MenuItem<'ui, 'p> {
     shortcut: Option<&'p str>,
     selected: Option<&'p mut bool>,
     enabled: bool,
-    _phantom: PhantomData<&'ui Ui<'ui>>
+    _phantom: PhantomData<&'ui Ui<'ui>>,
 }
 
 impl<'ui, 'p> MenuItem<'ui, 'p> {
@@ -51,37 +47,25 @@ impl<'ui, 'p> MenuItem<'ui, 'p> {
             shortcut: None,
             selected: None,
             enabled: true,
-            _phantom: PhantomData
+            _phantom: PhantomData,
         }
     }
     #[inline]
     pub fn shortcut(self, shortcut: &'p str) -> Self {
-        MenuItem {
-            shortcut: Some(shortcut),
-            .. self
-        }
+        MenuItem { shortcut: Some(shortcut), ..self }
     }
     #[inline]
     pub fn selected(self, selected: &'p mut bool) -> Self {
-        MenuItem {
-            selected: Some(selected),
-            .. self
-        }
+        MenuItem { selected: Some(selected), ..self }
     }
     #[inline]
-    pub fn enabled(self, enabled: bool) -> Self {
-        MenuItem {
-            enabled: enabled,
-            .. self
-        }
-    }
+    pub fn enabled(self, enabled: bool) -> Self { MenuItem { enabled: enabled, ..self } }
     pub fn build(self) -> bool {
         let label = imgui_sys::ImStr::from(self.label);
-        let shortcut = self.shortcut.map(|x| imgui_sys::ImStr::from(x)).unwrap_or(imgui_sys::ImStr::null());
+        let shortcut =
+            self.shortcut.map(|x| imgui_sys::ImStr::from(x)).unwrap_or(imgui_sys::ImStr::null());
         let selected = self.selected.map(|x| x as *mut bool).unwrap_or(ptr::null_mut());
         let enabled = self.enabled;
-        unsafe {
-            imgui_sys::igMenuItemPtr(label, shortcut, selected, enabled)
-        }
+        unsafe { imgui_sys::igMenuItemPtr(label, shortcut, selected, enabled) }
     }
 }
