@@ -1,6 +1,6 @@
 use imgui_sys;
 use imgui_sys::ImVec2;
-use std::{f32, mem, ptr};
+use std::{f32, mem};
 use libc::c_float;
 #[must_use]
 pub struct PlotLines<'p> {
