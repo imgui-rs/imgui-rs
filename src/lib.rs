@@ -343,7 +343,7 @@ impl<'ui> Ui<'ui> {
         io.metrics_active_windows
     }
     pub fn render<F, E>(self, mut f: F) -> Result<(), E>
-        where F: FnMut(DrawList<'ui>, f32) -> Result<(), E>
+        where F: FnMut(&Ui, DrawList) -> Result<(), E>
     {
         unsafe {
             imgui_sys::igRender();
@@ -355,7 +355,7 @@ impl<'ui> Ui<'ui> {
                     idx_buffer: (*cmd_list).idx_buffer.as_slice(),
                     vtx_buffer: (*cmd_list).vtx_buffer.as_slice(),
                 };
-                try!(f(draw_list, self.imgui.hidpi_factor));
+                try!(f(&self, draw_list));
             }
             CURRENT_UI = None;
         }

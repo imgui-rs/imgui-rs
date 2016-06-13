@@ -71,17 +71,15 @@ impl Renderer {
 
     pub fn render<'a, S: Surface>(&mut self, surface: &mut S, ui: Ui<'a>) -> RendererResult<()> {
         let _ = self.ctx.insert_debug_marker("imgui-rs: starting rendering");
-        let result = ui.render(|draw_list, hidpi_factor| {
-            self.render_draw_list(surface, draw_list, hidpi_factor)
-        });
+        let result = ui.render(|ui, draw_list| self.render_draw_list(surface, ui, draw_list));
         let _ = self.ctx.insert_debug_marker("imgui-rs: rendering finished");
         result
     }
 
     fn render_draw_list<'a, S: Surface>(&mut self,
                                         surface: &mut S,
-                                        draw_list: DrawList<'a>,
-                                        hidpi_factor: f32)
+                                        ui: &'a Ui<'a>,
+                                        draw_list: DrawList<'a>)
                                         -> RendererResult<()> {
         use glium::{Blend, DrawParameters, Rect};
         use glium::uniforms::MagnifySamplerFilter;
@@ -89,6 +87,7 @@ impl Renderer {
         try!(self.device_objects.upload_vertex_buffer(&self.ctx, draw_list.vtx_buffer));
         try!(self.device_objects.upload_index_buffer(&self.ctx, draw_list.idx_buffer));
 
+        let hidpi_factor = ui.imgui().hidpi_factor();
         let (width, height) = surface.get_dimensions();
 
         let matrix = [[2.0 / (width as f32 / hidpi_factor), 0.0, 0.0, 0.0],
