@@ -56,10 +56,10 @@ impl Support {
         }
     }
 
-    pub fn update_mouse(&mut self) {
-        self.imgui.set_mouse_pos(self.mouse_pos.0 as f32, self.mouse_pos.1 as f32);
+    pub fn update_mouse(&mut self, hidpi_factor: f32) {
+        self.imgui.set_mouse_pos(self.mouse_pos.0 as f32 / hidpi_factor, self.mouse_pos.1 as f32 / hidpi_factor);
         self.imgui.set_mouse_down(&[self.mouse_pressed.0, self.mouse_pressed.1, self.mouse_pressed.2, false, false]);
-        self.imgui.set_mouse_wheel(self.mouse_wheel);
+        self.imgui.set_mouse_wheel(self.mouse_wheel / hidpi_factor);
     }
 
     pub fn render<'ui, 'a: 'ui , F: FnMut(&Ui<'ui>)>(
@@ -69,7 +69,12 @@ impl Support {
         let delta_f = delta.num_nanoseconds().unwrap() as f32 / 1_000_000_000.0;
         self.last_frame = now;
 
-        self.update_mouse();
+        let hidpi_factor =
+            self.display.get_window()
+                .expect("Failed to get window")
+                .hidpi_factor();
+
+        self.update_mouse(hidpi_factor);
         self.mouse_wheel = 0.0;
 
         let mut target = self.display.draw();
@@ -77,8 +82,9 @@ impl Support {
                            clear_color.2, clear_color.3);
 
         let (width, height) = target.get_dimensions();
-        let ui = self.imgui.frame(width, height, delta_f);
+        let ui = self.imgui.frame(width, height, hidpi_factor, delta_f);
         f(&ui);
+
         self.renderer.render(&mut target, ui).unwrap();
 
         target.finish().unwrap();

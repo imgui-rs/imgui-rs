@@ -265,7 +265,12 @@ impl ImGui {
     pub fn get_time(&self) -> f32 { unsafe { imgui_sys::igGetTime() } }
     pub fn get_frame_count(&self) -> i32 { unsafe { imgui_sys::igGetFrameCount() } }
     pub fn get_frame_rate(&self) -> f32 { self.io().framerate }
-    pub fn frame<'ui, 'a: 'ui>(&'a mut self, width: u32, height: u32, delta_time: f32) -> Ui<'ui> {
+    pub fn frame<'ui, 'a: 'ui>(&'a mut self,
+                               width: u32,
+                               height: u32,
+                               hidpi_factor: f32,
+                               delta_time: f32)
+                               -> Ui<'ui> {
         {
             let io = self.io_mut();
             io.display_size.x = width as c_float;
@@ -274,9 +279,15 @@ impl ImGui {
         }
         unsafe {
             imgui_sys::igNewFrame();
-            CURRENT_UI = Some(Ui { imgui: mem::transmute(self as &'a ImGui) });
+            CURRENT_UI = Some(Ui {
+                imgui: mem::transmute(self as &'a ImGui),
+                hidpi_factor: hidpi_factor,
+            });
         }
-        Ui { imgui: self }
+        Ui {
+            imgui: self,
+            hidpi_factor: hidpi_factor,
+        }
     }
 }
 
@@ -299,6 +310,7 @@ pub struct DrawList<'a> {
 
 pub struct Ui<'ui> {
     imgui: &'ui ImGui,
+    hidpi_factor: f32,
 }
 
 static FMT: &'static [u8] = b"%s\0";
@@ -336,7 +348,7 @@ impl<'ui> Ui<'ui> {
         io.metrics_active_windows
     }
     pub fn render<F, E>(self, mut f: F) -> Result<(), E>
-        where F: FnMut(DrawList<'ui>) -> Result<(), E>
+        where F: FnMut(DrawList<'ui>, f32) -> Result<(), E>
     {
         unsafe {
             imgui_sys::igRender();
@@ -348,7 +360,7 @@ impl<'ui> Ui<'ui> {
                     idx_buffer: (*cmd_list).idx_buffer.as_slice(),
                     vtx_buffer: (*cmd_list).vtx_buffer.as_slice(),
                 };
-                try!(f(draw_list));
+                try!(f(draw_list, self.hidpi_factor));
             }
             CURRENT_UI = None;
         }
