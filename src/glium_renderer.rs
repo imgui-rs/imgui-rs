@@ -87,11 +87,15 @@ impl Renderer {
         try!(self.device_objects.upload_vertex_buffer(&self.ctx, draw_list.vtx_buffer));
         try!(self.device_objects.upload_index_buffer(&self.ctx, draw_list.idx_buffer));
 
-        let hidpi_factor = ui.imgui().hidpi_factor();
-        let (width, height) = surface.get_dimensions();
+        let (width, height) = ui.imgui().display_size();
+        let (scale_width, scale_height) = ui.imgui().display_framebuffer_scale();
 
-        let matrix = [[2.0 / (width as f32 / hidpi_factor), 0.0, 0.0, 0.0],
-                      [0.0, 2.0 / -(height as f32 / hidpi_factor), 0.0, 0.0],
+        if width == 0.0 || height == 0.0 {
+            return Ok(());
+        }
+
+        let matrix = [[2.0 / width as f32, 0.0, 0.0, 0.0],
+                      [0.0, 2.0 / -(height as f32), 0.0, 0.0],
                       [0.0, 0.0, -1.0, 0.0],
                       [-1.0, 1.0, 0.0, 1.0]];
         let font_texture_id = self.device_objects.texture.get_id() as uintptr_t;
@@ -117,10 +121,10 @@ impl Renderer {
                       &DrawParameters {
                           blend: Blend::alpha_blending(),
                           scissor: Some(Rect {
-                              left: (cmd.clip_rect.x * hidpi_factor) as u32,
-                              bottom: (height as f32 - (cmd.clip_rect.w * hidpi_factor)) as u32,
-                              width: ((cmd.clip_rect.z - cmd.clip_rect.x) * hidpi_factor) as u32,
-                              height: ((cmd.clip_rect.w - cmd.clip_rect.y) * hidpi_factor) as u32,
+                              left: (cmd.clip_rect.x * scale_width) as u32,
+                              bottom: ((height - cmd.clip_rect.w) * scale_height) as u32,
+                              width: ((cmd.clip_rect.z - cmd.clip_rect.x) * scale_width) as u32,
+                              height: ((cmd.clip_rect.w - cmd.clip_rect.y) * scale_height) as u32,
                           }),
                           ..DrawParameters::default()
                       }));

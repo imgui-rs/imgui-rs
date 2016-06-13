@@ -68,8 +68,6 @@ pub struct ImGui {
     // lives long enough in case the ImStr contains a Cow::Owned
     ini_filename: Option<ImStr<'static>>,
     log_filename: Option<ImStr<'static>>,
-    // Ideally this would be handled by imgui, but for now we have to keep track of it ourselves
-    hidpi_factor: f32,
 }
 
 #[macro_export]
@@ -128,7 +126,6 @@ impl ImGui {
         ImGui {
             ini_filename: None,
             log_filename: None,
-            hidpi_factor: 1.0,
         }
     }
     fn io(&self) -> &imgui_sys::ImGuiIO { unsafe { mem::transmute(imgui_sys::igGetIO()) } }
@@ -209,18 +206,22 @@ impl ImGui {
         let io = self.io_mut();
         io.key_repeat_rate = value;
     }
-    pub fn hidpi_factor(&self) -> f32 { self.hidpi_factor }
-    pub fn set_hidpi_factor(&mut self, hidpi_factor: f32) { self.hidpi_factor = hidpi_factor; }
-    pub fn mouse_pos(&self) -> (f32, f32) {
-        let hidpi_factor = self.hidpi_factor;
+    pub fn display_size(&self) -> (f32, f32) {
         let io = self.io();
-        (io.mouse_pos.x * hidpi_factor, io.mouse_pos.y * hidpi_factor)
+        (io.display_size.x, io.display_size.y)
+    }
+    pub fn display_framebuffer_scale(&self) -> (f32, f32) {
+        let io = self.io();
+        (io.display_framebuffer_scale.x, io.display_framebuffer_scale.y)
+    }
+    pub fn mouse_pos(&self) -> (f32, f32) {
+        let io = self.io();
+        (io.mouse_pos.x, io.mouse_pos.y)
     }
     pub fn set_mouse_pos(&mut self, x: f32, y: f32) {
-        let hidpi_factor = self.hidpi_factor;
         let io = self.io_mut();
-        io.mouse_pos.x = x / hidpi_factor;
-        io.mouse_pos.y = y / hidpi_factor;
+        io.mouse_pos.x = x;
+        io.mouse_pos.y = y;
     }
     pub fn set_mouse_down(&mut self, states: &[bool; 5]) {
         let io = self.io_mut();
@@ -272,11 +273,25 @@ impl ImGui {
     pub fn get_time(&self) -> f32 { unsafe { imgui_sys::igGetTime() } }
     pub fn get_frame_count(&self) -> i32 { unsafe { imgui_sys::igGetFrameCount() } }
     pub fn get_frame_rate(&self) -> f32 { self.io().framerate }
-    pub fn frame<'ui, 'a: 'ui>(&'a mut self, width: u32, height: u32, delta_time: f32) -> Ui<'ui> {
+    pub fn frame<'ui, 'a: 'ui>(&'a mut self,
+                               size_points: (u32, u32),
+                               size_pixels: (u32, u32),
+                               delta_time: f32)
+                               -> Ui<'ui> {
         {
             let io = self.io_mut();
-            io.display_size.x = width as c_float;
-            io.display_size.y = height as c_float;
+            io.display_size.x = size_points.0 as c_float;
+            io.display_size.y = size_points.1 as c_float;
+            io.display_framebuffer_scale.x = if size_points.0 > 0 {
+                size_pixels.0 as c_float / size_points.0 as c_float
+            } else {
+                0.0
+            };
+            io.display_framebuffer_scale.y = if size_points.1 > 0 {
+                size_pixels.1 as c_float / size_points.1 as c_float
+            } else {
+                0.0
+            };
             io.delta_time = delta_time;
         }
         unsafe {
