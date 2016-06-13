@@ -67,8 +67,7 @@ impl Support {
         self.imgui.set_mouse_wheel(self.mouse_wheel);
     }
 
-    pub fn render<'ui, 'a: 'ui , F: FnMut(&Ui<'ui>)>(
-            &'a mut self, clear_color: (f32, f32, f32, f32), mut f: F) {
+    pub fn render<F: FnMut(&Ui)>(&mut self, clear_color: (f32, f32, f32, f32), mut run_ui: F) {
         let now = SteadyTime::now();
         let delta = now - self.last_frame;
         let delta_f = delta.num_nanoseconds().unwrap() as f32 / 1_000_000_000.0;
@@ -84,7 +83,8 @@ impl Support {
 
         let (width, height) = target.get_dimensions();
         let ui = self.imgui.frame(width, height, delta_f);
-        f(&ui);
+
+        run_ui(&ui);
 
         self.renderer.render(&mut target, ui).unwrap();
 
