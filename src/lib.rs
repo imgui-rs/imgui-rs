@@ -68,6 +68,8 @@ pub struct ImGui {
     // lives long enough in case the ImStr contains a Cow::Owned
     ini_filename: Option<ImStr<'static>>,
     log_filename: Option<ImStr<'static>>,
+    // Ideally this would be handled by imgui, but for now we have to keep track of it ourselves
+    hidpi_factor: f32,
 }
 
 #[macro_export]
@@ -126,6 +128,7 @@ impl ImGui {
         ImGui {
             ini_filename: None,
             log_filename: None,
+            hidpi_factor: 1.0,
         }
     }
     fn io(&self) -> &imgui_sys::ImGuiIO { unsafe { mem::transmute(imgui_sys::igGetIO()) } }
@@ -206,14 +209,18 @@ impl ImGui {
         let io = self.io_mut();
         io.key_repeat_rate = value;
     }
+    pub fn hidpi_factor(&self) -> f32 { self.hidpi_factor }
+    pub fn set_hidpi_factor(&mut self, hidpi_factor: f32) { self.hidpi_factor = hidpi_factor; }
     pub fn mouse_pos(&self) -> (f32, f32) {
+        let hidpi_factor = self.hidpi_factor;
         let io = self.io();
-        (io.mouse_pos.x, io.mouse_pos.y)
+        (io.mouse_pos.x * hidpi_factor, io.mouse_pos.y * hidpi_factor)
     }
     pub fn set_mouse_pos(&mut self, x: f32, y: f32) {
+        let hidpi_factor = self.hidpi_factor;
         let io = self.io_mut();
-        io.mouse_pos.x = x;
-        io.mouse_pos.y = y;
+        io.mouse_pos.x = x / hidpi_factor;
+        io.mouse_pos.y = y / hidpi_factor;
     }
     pub fn set_mouse_down(&mut self, states: &[bool; 5]) {
         let io = self.io_mut();
@@ -265,12 +272,7 @@ impl ImGui {
     pub fn get_time(&self) -> f32 { unsafe { imgui_sys::igGetTime() } }
     pub fn get_frame_count(&self) -> i32 { unsafe { imgui_sys::igGetFrameCount() } }
     pub fn get_frame_rate(&self) -> f32 { self.io().framerate }
-    pub fn frame<'ui, 'a: 'ui>(&'a mut self,
-                               width: u32,
-                               height: u32,
-                               hidpi_factor: f32,
-                               delta_time: f32)
-                               -> Ui<'ui> {
+    pub fn frame<'ui, 'a: 'ui>(&'a mut self, width: u32, height: u32, delta_time: f32) -> Ui<'ui> {
         {
             let io = self.io_mut();
             io.display_size.x = width as c_float;
@@ -279,15 +281,9 @@ impl ImGui {
         }
         unsafe {
             imgui_sys::igNewFrame();
-            CURRENT_UI = Some(Ui {
-                imgui: mem::transmute(self as &'a ImGui),
-                hidpi_factor: hidpi_factor,
-            });
+            CURRENT_UI = Some(Ui { imgui: mem::transmute(self as &'a ImGui) });
         }
-        Ui {
-            imgui: self,
-            hidpi_factor: hidpi_factor,
-        }
+        Ui { imgui: self }
     }
 }
 
@@ -310,7 +306,6 @@ pub struct DrawList<'a> {
 
 pub struct Ui<'ui> {
     imgui: &'ui ImGui,
-    hidpi_factor: f32,
 }
 
 static FMT: &'static [u8] = b"%s\0";
@@ -360,7 +355,7 @@ impl<'ui> Ui<'ui> {
                     idx_buffer: (*cmd_list).idx_buffer.as_slice(),
                     vtx_buffer: (*cmd_list).vtx_buffer.as_slice(),
                 };
-                try!(f(draw_list, self.hidpi_factor));
+                try!(f(draw_list, self.imgui.hidpi_factor));
             }
             CURRENT_UI = None;
         }
