@@ -76,10 +76,9 @@ impl Support {
         target.clear_color(clear_color.0, clear_color.1,
                            clear_color.2, clear_color.3);
 
-        // Early return if the window closes before we get the sizes
-        let window = match self.display.get_window() { Some(x) => x, None => return };
-        let size_points = match window.get_inner_size_points() { Some(x) => x, None => return };
-        let size_pixels = match window.get_inner_size_pixels() { Some(x) => x, None => return };
+        let window = self.display.get_window().unwrap();
+        let size_points = window.get_inner_size_points().unwrap();
+        let size_pixels = window.get_inner_size_pixels().unwrap();
 
         let ui = self.imgui.frame(size_points, size_pixels, delta_f);
 
