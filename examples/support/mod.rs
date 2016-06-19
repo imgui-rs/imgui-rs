@@ -57,28 +57,33 @@ impl Support {
     }
 
     pub fn update_mouse(&mut self) {
-        self.imgui.set_mouse_pos(self.mouse_pos.0 as f32, self.mouse_pos.1 as f32);
+        let scale = self.imgui.display_framebuffer_scale();
+        self.imgui.set_mouse_pos(self.mouse_pos.0 as f32 / scale.0, self.mouse_pos.1 as f32 / scale.1);
         self.imgui.set_mouse_down(&[self.mouse_pressed.0, self.mouse_pressed.1, self.mouse_pressed.2, false, false]);
-        self.imgui.set_mouse_wheel(self.mouse_wheel);
+        self.imgui.set_mouse_wheel(self.mouse_wheel / scale.1);
+        self.mouse_wheel = 0.0;
     }
 
-    pub fn render<'ui, 'a: 'ui , F: FnMut(&Ui<'ui>)>(
-            &'a mut self, clear_color: (f32, f32, f32, f32), mut f: F) {
+    pub fn render<F: FnMut(&Ui)>(&mut self, clear_color: (f32, f32, f32, f32), mut run_ui: F) {
         let now = SteadyTime::now();
         let delta = now - self.last_frame;
         let delta_f = delta.num_nanoseconds().unwrap() as f32 / 1_000_000_000.0;
         self.last_frame = now;
 
         self.update_mouse();
-        self.mouse_wheel = 0.0;
 
         let mut target = self.display.draw();
         target.clear_color(clear_color.0, clear_color.1,
                            clear_color.2, clear_color.3);
 
-        let (width, height) = target.get_dimensions();
-        let ui = self.imgui.frame(width, height, delta_f);
-        f(&ui);
+        let window = self.display.get_window().unwrap();
+        let size_points = window.get_inner_size_points().unwrap();
+        let size_pixels = window.get_inner_size_pixels().unwrap();
+
+        let ui = self.imgui.frame(size_points, size_pixels, delta_f);
+
+        run_ui(&ui);
+
         self.renderer.render(&mut target, ui).unwrap();
 
         target.finish().unwrap();
