@@ -271,7 +271,7 @@ pub type ImGuiSizeConstraintCallback =
     Option<extern "C" fn(data: *mut ImGuiSizeConstraintCallbackData)>;
 
 #[repr(C)]
-#[derive(Copy, Clone, Debug, Default)]
+#[derive(Copy, Clone, Debug, Default, PartialEq)]
 pub struct ImVec2 {
     pub x: c_float,
     pub y: c_float
@@ -304,7 +304,7 @@ unsafe impl Attribute for ImVec2 {
 }
 
 #[repr(C)]
-#[derive(Copy, Clone, Debug, Default)]
+#[derive(Copy, Clone, Debug, Default, PartialEq)]
 pub struct ImVec4 {
     pub x: c_float,
     pub y: c_float,
@@ -355,7 +355,6 @@ pub struct ImGuiStyle {
     pub item_spacing: ImVec2,
     pub item_inner_spacing: ImVec2,
     pub touch_extra_padding: ImVec2,
-    pub window_fill_alpha_default: c_float,
     pub indent_spacing: c_float,
     pub columns_min_spacing: c_float,
     pub scrollbar_size: c_float,
@@ -1327,4 +1326,33 @@ extern "C" {
     pub fn ImDrawList_PrimVtx(list: *mut ImDrawList, pos: ImVec2, uv: ImVec2, col: ImU32);
     pub fn ImDrawList_UpdateClipRect(list: *mut ImDrawList);
     pub fn ImDrawList_UpdateTextureID(list: *mut ImDrawList);
+}
+
+// Although this test is sensitive to ImGui updates, it's useful to reveal potential
+// alignment errors
+#[test]
+fn test_default_style() {
+    let style = unsafe { &*igGetStyle() };
+    assert_eq!(style.alpha, 1.0);
+    assert_eq!(style.window_padding, ImVec2::new(8.0, 8.0));
+    assert_eq!(style.window_min_size, ImVec2::new(32.0, 32.0));
+    assert_eq!(style.window_rounding, 9.0);
+    assert_eq!(style.window_title_align, ImGuiAlign_Left);
+    assert_eq!(style.child_window_rounding, 0.0);
+    assert_eq!(style.frame_padding, ImVec2::new(4.0, 3.0));
+    assert_eq!(style.frame_rounding, 0.0);
+    assert_eq!(style.item_spacing, ImVec2::new(8.0, 4.0));
+    assert_eq!(style.item_inner_spacing, ImVec2::new(4.0, 4.0));
+    assert_eq!(style.touch_extra_padding, ImVec2::new(0.0, 0.0));
+    assert_eq!(style.indent_spacing, 21.0);
+    assert_eq!(style.columns_min_spacing, 6.0);
+    assert_eq!(style.scrollbar_size, 16.0);
+    assert_eq!(style.scrollbar_rounding, 9.0);
+    assert_eq!(style.grab_min_size, 10.0);
+    assert_eq!(style.grab_rounding, 0.0);
+    assert_eq!(style.display_window_padding, ImVec2::new(22.0, 22.0));
+    assert_eq!(style.display_safe_area_padding, ImVec2::new(4.0, 4.0));
+    assert_eq!(style.anti_aliased_lines, true);
+    assert_eq!(style.anti_aliased_shapes, true);
+    assert_eq!(style.curve_tessellation_tol, 1.25);
 }
