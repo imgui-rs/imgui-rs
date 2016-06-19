@@ -1499,14 +1499,14 @@ extern "C" {
                                               col_upr_right: ImU32,
                                               col_bot_right: ImU32,
                                               col_bot_left: ImU32);
-    pub fn ImDrawLust_AddQuad(list: *mut ImDrawList,
+    pub fn ImDrawList_AddQuad(list: *mut ImDrawList,
                               a: ImVec2,
                               b: ImVec2,
                               c: ImVec2,
                               d: ImVec2,
                               col: ImU32,
                               thickness: c_float);
-    pub fn ImDrawLust_AddQuadFilled(list: *mut ImDrawList,
+    pub fn ImDrawList_AddQuadFilled(list: *mut ImDrawList,
                                     a: ImVec2,
                                     b: ImVec2,
                                     c: ImVec2,
