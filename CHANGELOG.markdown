@@ -11,6 +11,7 @@
 - Support for int and float array inputs
 - Support for popups
 - Support for selectable
+- Better support for hidpi environments
 
 ### Changed
 
