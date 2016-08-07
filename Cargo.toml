@@ -25,9 +25,6 @@ path = "imgui-sys"
 [build-dependencies]
 gcc = "0.3"
 
-[dev-dependencies]
-time = "0.1"
-
 [dev-dependencies.glium]
 version = "0.15"
 features = ["glutin"]

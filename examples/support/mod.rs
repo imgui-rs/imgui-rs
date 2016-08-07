@@ -4,13 +4,13 @@ use glium::glutin;
 use glium::glutin::{ElementState, Event, MouseButton, MouseScrollDelta, VirtualKeyCode, TouchPhase};
 use imgui::{ImGui, Ui, ImGuiKey};
 use imgui::glium_renderer::Renderer;
-use time::SteadyTime;
+use std::time::Instant;
 
 pub struct Support {
     display: GlutinFacade,
     imgui: ImGui,
     renderer: Renderer,
-    last_frame: SteadyTime,
+    last_frame: Instant,
     mouse_pos: (i32, i32),
     mouse_pressed: (bool, bool, bool),
     mouse_wheel: f32,
@@ -49,7 +49,7 @@ impl Support {
             display: display,
             imgui: imgui,
             renderer: renderer,
-            last_frame: SteadyTime::now(),
+            last_frame: Instant::now(),
             mouse_pos: (0, 0),
             mouse_pressed: (false, false, false),
             mouse_wheel: 0.0
@@ -65,9 +65,9 @@ impl Support {
     }
 
     pub fn render<F: FnMut(&Ui)>(&mut self, clear_color: (f32, f32, f32, f32), mut run_ui: F) {
-        let now = SteadyTime::now();
+        let now = Instant::now();
         let delta = now - self.last_frame;
-        let delta_f = delta.num_nanoseconds().unwrap() as f32 / 1_000_000_000.0;
+        let delta_s = delta.as_secs() as f32 + delta.subsec_nanos() as f32 / 1_000_000_000.0;
         self.last_frame = now;
 
         self.update_mouse();
@@ -80,7 +80,7 @@ impl Support {
         let size_points = window.get_inner_size_points().unwrap();
         let size_pixels = window.get_inner_size_pixels().unwrap();
 
-        let ui = self.imgui.frame(size_points, size_pixels, delta_f);
+        let ui = self.imgui.frame(size_points, size_pixels, delta_s);
 
         run_ui(&ui);
 
