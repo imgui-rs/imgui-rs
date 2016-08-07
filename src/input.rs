@@ -16,136 +16,103 @@ use super::{ImGuiInputTextFlags,
 macro_rules! impl_text_flags {
     ($InputType:ident) => {
         #[inline]
-        pub fn flags(self, flags: ImGuiInputTextFlags) -> Self {
-            $InputType {
-                flags: flags,
-                .. self
-            }
+        pub fn flags(mut self, flags: ImGuiInputTextFlags) -> Self {
+            self.flags = flags;
+            self
         }
 
         #[inline]
-        pub fn chars_decimal(self, value: bool) -> Self {
-            $InputType {
-                flags: self.flags.with(ImGuiInputTextFlags_CharsDecimal, value),
-                .. self
-            }
+        pub fn chars_decimal(mut self, value: bool) -> Self {
+            self.flags.set(ImGuiInputTextFlags_CharsDecimal, value);
+            self
         }
 
         #[inline]
-        pub fn chars_hexadecimal(self, value: bool) -> Self {
-            $InputType {
-                flags: self.flags.with(ImGuiInputTextFlags_CharsHexadecimal, value),
-                .. self
-            }
+        pub fn chars_hexadecimal(mut self, value: bool) -> Self {
+            self.flags.set(ImGuiInputTextFlags_CharsHexadecimal, value);
+            self
         }
 
         #[inline]
-        pub fn chars_uppercase(self, value: bool) -> Self {
-            $InputType {
-                flags: self.flags.with(ImGuiInputTextFlags_CharsUppercase, value),
-                .. self
-            }
+        pub fn chars_uppercase(mut self, value: bool) -> Self {
+            self.flags.set(ImGuiInputTextFlags_CharsUppercase, value);
+            self
         }
 
         #[inline]
-        pub fn chars_noblank(self, value: bool) -> Self {
-            $InputType {
-                flags: self.flags.with(ImGuiInputTextFlags_CharsNoBlank, value),
-                .. self
-            }
+        pub fn chars_noblank(mut self, value: bool) -> Self {
+            self.flags.set(ImGuiInputTextFlags_CharsNoBlank, value);
+            self
         }
 
         #[inline]
-        pub fn auto_select_all(self, value: bool) -> Self {
-            $InputType {
-                flags: self.flags.with(ImGuiInputTextFlags_AutoSelectAll, value),
-                .. self
-            }
+        pub fn auto_select_all(mut self, value: bool) -> Self {
+            self.flags.set(ImGuiInputTextFlags_AutoSelectAll, value);
+            self
         }
 
         #[inline]
-        pub fn enter_returns_true(self, value: bool) -> Self {
-            $InputType {
-                flags: self.flags.with(ImGuiInputTextFlags_EnterReturnsTrue, value),
-                .. self
-            }
+        pub fn enter_returns_true(mut self, value: bool) -> Self {
+            self.flags.set(ImGuiInputTextFlags_EnterReturnsTrue, value);
+            self
         }
 
         #[inline]
-        pub fn callback_completion(self, value: bool) -> Self {
-            $InputType {
-                flags: self.flags.with(ImGuiInputTextFlags_CallbackCompletion, value),
-                .. self
-            }
+        pub fn callback_completion(mut self, value: bool) -> Self {
+            self.flags.set(ImGuiInputTextFlags_CallbackCompletion, value);
+            self
         }
 
         #[inline]
-        pub fn callback_history(self, value: bool) -> Self {
-            $InputType {
-                flags: self.flags.with(ImGuiInputTextFlags_CallbackHistory, value),
-                .. self
-            }
+        pub fn callback_history(mut self, value: bool) -> Self {
+            self.flags.set(ImGuiInputTextFlags_CallbackHistory, value);
+            self
         }
 
         #[inline]
-        pub fn callback_always(self, value: bool) -> Self {
-            $InputType {
-                flags: self.flags.with(ImGuiInputTextFlags_CallbackAlways, value),
-                .. self
-            }
+        pub fn callback_always(mut self, value: bool) -> Self {
+            self.flags.set(ImGuiInputTextFlags_CallbackAlways, value);
+            self
         }
 
         #[inline]
-        pub fn callback_char_filter(self, value: bool) -> Self {
-            $InputType {
-                flags: self.flags.with(ImGuiInputTextFlags_CallbackCharFilter, value),
-                .. self
-            }
+        pub fn callback_char_filter(mut self, value: bool) -> Self {
+            self.flags.set(ImGuiInputTextFlags_CallbackCharFilter, value);
+            self
         }
 
         #[inline]
-        pub fn allow_tab_input(self, value: bool) -> Self {
-            $InputType {
-                flags: self.flags.with(ImGuiInputTextFlags_AllowTabInput, value),
-                .. self
-            }
+        pub fn allow_tab_input(mut self, value: bool) -> Self {
+            self.flags.set(ImGuiInputTextFlags_AllowTabInput, value);
+            self
         }
 
         #[inline]
-        pub fn no_horizontal_scroll(self, value: bool) -> Self {
-            $InputType {
-                flags: self.flags.with(ImGuiInputTextFlags_NoHorizontalScroll, value),
-                .. self
-            }
+        pub fn no_horizontal_scroll(mut self, value: bool) -> Self {
+            self.flags.set(ImGuiInputTextFlags_NoHorizontalScroll, value);
+            self
         }
 
         #[inline]
-        pub fn always_insert_mode(self, value: bool) -> Self {
-            $InputType {
-                flags: self.flags.with(ImGuiInputTextFlags_AlwaysInsertMode, value),
-                .. self
-            }
+        pub fn always_insert_mode(mut self, value: bool) -> Self {
+            self.flags.set(ImGuiInputTextFlags_AlwaysInsertMode, value);
+            self
         }
-
     }
 }
 
 macro_rules! impl_step_params {
     ($InputType:ident, $Value:ty) => {
         #[inline]
-        pub fn step(self, value: $Value) -> Self {
-            $InputType {
-                step: value,
-                .. self
-            }
+        pub fn step(mut self, value: $Value) -> Self {
+            self.step = value;
+            self
         }
 
         #[inline]
-        pub fn step_fast(self, value: $Value) -> Self {
-            $InputType {
-                step_fast: value,
-                .. self
-            }
+        pub fn step_fast(mut self, value: $Value) -> Self {
+            self.step_fast = value;
+            self
         }
     }
 }
@@ -153,11 +120,9 @@ macro_rules! impl_step_params {
 macro_rules! impl_precision_params {
     ($InputType:ident) => {
         #[inline]
-        pub fn decimal_precision(self, value: i32) -> Self {
-            $InputType {
-                decimal_precision: value,
-                .. self
-            }
+        pub fn decimal_precision(mut self, value: i32) -> Self {
+            self.decimal_precision = value;
+            self
         }
     }
 }

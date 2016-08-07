@@ -191,6 +191,14 @@ impl ImGuiWindowFlags {
             self - mask
         }
     }
+    #[inline]
+    pub fn set(&mut self, mask: ImGuiWindowFlags, value: bool) {
+        if value {
+            *self |= mask;
+        } else {
+            *self -= mask;
+        }
+    }
 }
 
 bitflags!(
@@ -236,6 +244,14 @@ impl ImGuiInputTextFlags {
             self - mask
         }
     }
+    #[inline]
+    pub fn set(&mut self, mask: ImGuiInputTextFlags, value: bool) {
+        if value {
+            *self |= mask;
+        } else {
+            *self -= mask;
+        }
+    }
 }
 
 
@@ -273,6 +289,14 @@ impl ImGuiTreeNodeFlags {
             self | mask
         } else {
             self - mask
+        }
+    }
+    #[inline]
+    pub fn set(&mut self, mask: ImGuiTreeNodeFlags, value: bool) {
+        if value {
+            *self |= mask;
+        } else {
+            *self -= mask;
         }
     }
 }

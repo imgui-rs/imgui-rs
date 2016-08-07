@@ -27,8 +27,9 @@ impl<'ui, 'p> SliderInt<'ui, 'p> {
         }
     }
     #[inline]
-    pub fn display_format(self, display_format: ImStr<'p>) -> Self {
-        SliderInt { display_format: display_format, ..self }
+    pub fn display_format(mut self, display_format: ImStr<'p>) -> Self {
+        self.display_format = display_format;
+        self
     }
     pub fn build(self) -> bool {
         unsafe {
@@ -65,11 +66,15 @@ impl<'ui, 'p> SliderFloat<'ui, 'p> {
         }
     }
     #[inline]
-    pub fn display_format(self, display_format: ImStr<'p>) -> Self {
-        SliderFloat { display_format: display_format, ..self }
+    pub fn display_format(mut self, display_format: ImStr<'p>) -> Self {
+        self.display_format = display_format;
+        self
     }
     #[inline]
-    pub fn power(self, power: f32) -> Self { SliderFloat { power: power, ..self } }
+    pub fn power(mut self, power: f32) -> Self {
+        self.power = power;
+        self
+    }
     pub fn build(self) -> bool {
         unsafe {
             imgui_sys::igSliderFloat(self.label.as_ptr(),

@@ -40,94 +40,116 @@ impl<'ui, 'p> Window<'ui, 'p> {
         }
     }
     #[inline]
-    pub fn position(self, pos: (f32, f32), cond: ImGuiSetCond) -> Self {
-        Window {
-            pos: pos,
-            pos_cond: cond,
-            ..self
-        }
+    pub fn position(mut self, pos: (f32, f32), cond: ImGuiSetCond) -> Self {
+        self.pos = pos;
+        self.pos_cond = cond;
+        self
     }
     #[inline]
-    pub fn size(self, size: (f32, f32), cond: ImGuiSetCond) -> Self {
-        Window {
-            size: size,
-            size_cond: cond,
-            ..self
-        }
+    pub fn size(mut self, size: (f32, f32), cond: ImGuiSetCond) -> Self {
+        self.size = size;
+        self.size_cond = cond;
+        self
     }
     #[inline]
-    pub fn opened(self, opened: &'p mut bool) -> Self { Window { opened: Some(opened), ..self } }
-    #[inline]
-    pub fn bg_alpha(self, bg_alpha: f32) -> Self { Window { bg_alpha: bg_alpha, ..self } }
-    #[inline]
-    pub fn flags(self, flags: ImGuiWindowFlags) -> Self { Window { flags: flags, ..self } }
-    #[inline]
-    pub fn title_bar(self, value: bool) -> Self {
-        Window { flags: self.flags.with(ImGuiWindowFlags_NoTitleBar, !value), ..self }
+    pub fn opened(mut self, opened: &'p mut bool) -> Self {
+        self.opened = Some(opened);
+        self
     }
     #[inline]
-    pub fn resizable(self, value: bool) -> Self {
-        Window { flags: self.flags.with(ImGuiWindowFlags_NoResize, !value), ..self }
+    pub fn bg_alpha(mut self, bg_alpha: f32) -> Self {
+        self.bg_alpha = bg_alpha;
+        self
     }
     #[inline]
-    pub fn movable(self, value: bool) -> Self {
-        Window { flags: self.flags.with(ImGuiWindowFlags_NoMove, !value), ..self }
+    pub fn flags(mut self, flags: ImGuiWindowFlags) -> Self {
+        self.flags = flags;
+        self
     }
     #[inline]
-    pub fn scroll_bar(self, value: bool) -> Self {
-        Window { flags: self.flags.with(ImGuiWindowFlags_NoScrollbar, !value), ..self }
+    pub fn title_bar(mut self, value: bool) -> Self {
+        self.flags.set(ImGuiWindowFlags_NoTitleBar, !value);
+        self
     }
     #[inline]
-    pub fn scrollable(self, value: bool) -> Self {
-        Window { flags: self.flags.with(ImGuiWindowFlags_NoScrollWithMouse, !value), ..self }
+    pub fn resizable(mut self, value: bool) -> Self {
+        self.flags.set(ImGuiWindowFlags_NoResize, !value);
+        self
     }
     #[inline]
-    pub fn collapsible(self, value: bool) -> Self {
-        Window { flags: self.flags.with(ImGuiWindowFlags_NoCollapse, !value), ..self }
+    pub fn movable(mut self, value: bool) -> Self {
+        self.flags.set(ImGuiWindowFlags_NoMove, !value);
+        self
     }
     #[inline]
-    pub fn always_auto_resize(self, value: bool) -> Self {
-        Window { flags: self.flags.with(ImGuiWindowFlags_AlwaysAutoResize, value), ..self }
+    pub fn scroll_bar(mut self, value: bool) -> Self {
+        self.flags.set(ImGuiWindowFlags_NoScrollbar, !value);
+        self
     }
     #[inline]
-    pub fn show_borders(self, value: bool) -> Self {
-        Window { flags: self.flags.with(ImGuiWindowFlags_ShowBorders, value), ..self }
+    pub fn scrollable(mut self, value: bool) -> Self {
+        self.flags.set(ImGuiWindowFlags_NoScrollWithMouse, !value);
+        self
     }
     #[inline]
-    pub fn save_settings(self, value: bool) -> Self {
-        Window { flags: self.flags.with(ImGuiWindowFlags_NoSavedSettings, !value), ..self }
+    pub fn collapsible(mut self, value: bool) -> Self {
+        self.flags.set(ImGuiWindowFlags_NoCollapse, !value);
+        self
     }
     #[inline]
-    pub fn inputs(self, value: bool) -> Self {
-        Window { flags: self.flags.with(ImGuiWindowFlags_NoInputs, !value), ..self }
+    pub fn always_auto_resize(mut self, value: bool) -> Self {
+        self.flags.set(ImGuiWindowFlags_AlwaysAutoResize, value);
+        self
     }
     #[inline]
-    pub fn menu_bar(self, value: bool) -> Self {
-        Window { flags: self.flags.with(ImGuiWindowFlags_MenuBar, value), ..self }
+    pub fn show_borders(mut self, value: bool) -> Self {
+        self.flags.set(ImGuiWindowFlags_ShowBorders, value);
+        self
     }
     #[inline]
-    pub fn horizontal_scrollbar(self, value: bool) -> Self {
-        Window { flags: self.flags.with(ImGuiWindowFlags_HorizontalScrollbar, value), ..self }
+    pub fn save_settings(mut self, value: bool) -> Self {
+        self.flags.set(ImGuiWindowFlags_NoSavedSettings, !value);
+        self
     }
     #[inline]
-    pub fn no_focus_on_appearing(self, value: bool) -> Self {
-        Window { flags: self.flags.with(ImGuiWindowFlags_NoFocusOnAppearing, value), ..self }
+    pub fn inputs(mut self, value: bool) -> Self {
+        self.flags.set(ImGuiWindowFlags_NoInputs, !value);
+        self
     }
     #[inline]
-    pub fn no_bring_to_front_on_focus(self, value: bool) -> Self {
-        Window { flags: self.flags.with(ImGuiWindowFlags_NoBringToFrontOnFocus, value), ..self }
+    pub fn menu_bar(mut self, value: bool) -> Self {
+        self.flags.set(ImGuiWindowFlags_MenuBar, value);
+        self
     }
     #[inline]
-    pub fn always_vertical_scollbar(self, value: bool) -> Self {
-        Window { flags: self.flags.with(ImGuiWindowFlags_AlwaysVerticalScrollbar, value), ..self }
+    pub fn horizontal_scrollbar(mut self, value: bool) -> Self {
+        self.flags.set(ImGuiWindowFlags_HorizontalScrollbar, value);
+        self
     }
     #[inline]
-    pub fn always_horizontal_scrollbar(self, value: bool) -> Self {
-        Window { flags: self.flags.with(ImGuiWindowFlags_AlwaysHorizontalScrollbar, value), ..self }
+    pub fn no_focus_on_appearing(mut self, value: bool) -> Self {
+        self.flags.set(ImGuiWindowFlags_NoFocusOnAppearing, value);
+        self
     }
     #[inline]
-    pub fn always_use_window_padding(self, value: bool) -> Self {
-        Window { flags: self.flags.with(ImGuiWindowFlags_AlwaysUseWindowPadding, value), ..self }
+    pub fn no_bring_to_front_on_focus(mut self, value: bool) -> Self {
+        self.flags.set(ImGuiWindowFlags_NoBringToFrontOnFocus, value);
+        self
+    }
+    #[inline]
+    pub fn always_vertical_scollbar(mut self, value: bool) -> Self {
+        self.flags.set(ImGuiWindowFlags_AlwaysVerticalScrollbar, value);
+        self
+    }
+    #[inline]
+    pub fn always_horizontal_scrollbar(mut self, value: bool) -> Self {
+        self.flags.set(ImGuiWindowFlags_AlwaysHorizontalScrollbar, value);
+        self
+    }
+    #[inline]
+    pub fn always_use_window_padding(mut self, value: bool) -> Self {
+        self.flags.set(ImGuiWindowFlags_AlwaysUseWindowPadding, value);
+        self
     }
     pub fn build<F: FnOnce()>(self, f: F) {
         let render = unsafe {
