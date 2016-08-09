@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+### Changed
+
+- Upgrade to glium 0.15
+- Examples use std::time instead of the deprecated time crate
+
 ## [0.0.9] - 2016-07-07
 
 ### Added
