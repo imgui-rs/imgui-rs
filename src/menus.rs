@@ -20,7 +20,10 @@ impl<'ui, 'p> Menu<'ui, 'p> {
         }
     }
     #[inline]
-    pub fn enabled(self, enabled: bool) -> Self { Menu { enabled: enabled, ..self } }
+    pub fn enabled(mut self, enabled: bool) -> Self {
+        self.enabled = enabled;
+        self
+    }
     pub fn build<F: FnOnce()>(self, f: F) {
         let render =
             unsafe { imgui_sys::igBeginMenu(imgui_sys::ImStr::from(self.label), self.enabled) };
@@ -51,15 +54,20 @@ impl<'ui, 'p> MenuItem<'ui, 'p> {
         }
     }
     #[inline]
-    pub fn shortcut(self, shortcut: &'p str) -> Self {
-        MenuItem { shortcut: Some(shortcut), ..self }
+    pub fn shortcut(mut self, shortcut: &'p str) -> Self {
+        self.shortcut = Some(shortcut);
+        self
     }
     #[inline]
-    pub fn selected(self, selected: &'p mut bool) -> Self {
-        MenuItem { selected: Some(selected), ..self }
+    pub fn selected(mut self, selected: &'p mut bool) -> Self {
+        self.selected = Some(selected);
+        self
     }
     #[inline]
-    pub fn enabled(self, enabled: bool) -> Self { MenuItem { enabled: enabled, ..self } }
+    pub fn enabled(mut self, enabled: bool) -> Self {
+        self.enabled = enabled;
+        self
+    }
     pub fn build(self) -> bool {
         unsafe {
             imgui_sys::igMenuItemPtr(imgui_sys::ImStr::from(self.label),

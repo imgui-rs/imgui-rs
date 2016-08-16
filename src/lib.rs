@@ -171,6 +171,14 @@ impl ImGui {
         let io = self.io_mut();
         io.key_repeat_rate = value;
     }
+    pub fn display_size(&self) -> (f32, f32) {
+        let io = self.io();
+        (io.display_size.x, io.display_size.y)
+    }
+    pub fn display_framebuffer_scale(&self) -> (f32, f32) {
+        let io = self.io();
+        (io.display_framebuffer_scale.x, io.display_framebuffer_scale.y)
+    }
     pub fn mouse_pos(&self) -> (f32, f32) {
         let io = self.io();
         (io.mouse_pos.x, io.mouse_pos.y)
@@ -230,11 +238,25 @@ impl ImGui {
     pub fn get_time(&self) -> f32 { unsafe { imgui_sys::igGetTime() } }
     pub fn get_frame_count(&self) -> i32 { unsafe { imgui_sys::igGetFrameCount() } }
     pub fn get_frame_rate(&self) -> f32 { self.io().framerate }
-    pub fn frame<'ui, 'a: 'ui>(&'a mut self, width: u32, height: u32, delta_time: f32) -> Ui<'ui> {
+    pub fn frame<'ui, 'a: 'ui>(&'a mut self,
+                               size_points: (u32, u32),
+                               size_pixels: (u32, u32),
+                               delta_time: f32)
+                               -> Ui<'ui> {
         {
             let io = self.io_mut();
-            io.display_size.x = width as c_float;
-            io.display_size.y = height as c_float;
+            io.display_size.x = size_points.0 as c_float;
+            io.display_size.y = size_points.1 as c_float;
+            io.display_framebuffer_scale.x = if size_points.0 > 0 {
+                size_pixels.0 as c_float / size_points.0 as c_float
+            } else {
+                0.0
+            };
+            io.display_framebuffer_scale.y = if size_points.1 > 0 {
+                size_pixels.1 as c_float / size_points.1 as c_float
+            } else {
+                0.0
+            };
             io.delta_time = delta_time;
         }
         unsafe {
@@ -297,7 +319,7 @@ impl<'ui> Ui<'ui> {
         io.metrics_active_windows
     }
     pub fn render<F, E>(self, mut f: F) -> Result<(), E>
-        where F: FnMut(DrawList<'ui>) -> Result<(), E>
+        where F: FnMut(&Ui, DrawList) -> Result<(), E>
     {
         unsafe {
             imgui_sys::igRender();
@@ -309,7 +331,7 @@ impl<'ui> Ui<'ui> {
                     idx_buffer: (*cmd_list).idx_buffer.as_slice(),
                     vtx_buffer: (*cmd_list).vtx_buffer.as_slice(),
                 };
-                try!(f(draw_list));
+                try!(f(&self, draw_list));
             }
             CURRENT_UI = None;
         }

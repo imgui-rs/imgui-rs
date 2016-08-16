@@ -2,6 +2,15 @@
 
 ## [Unreleased]
 
+## [0.0.10] - 2016-08-09
+
+### Changed
+
+- Upgrade to glium 0.15
+- Examples use std::time instead of the deprecated time crate
+
+## [0.0.9] - 2016-07-07
+
 ### Added
 
 - Support for columns, combo, listbox
@@ -11,6 +20,7 @@
 - Support for int and float array inputs
 - Support for popups
 - Support for selectable
+- Better support for hidpi environments
 
 ### Changed
 
@@ -81,7 +91,9 @@
 
 - Initial release with cimgui/imgui 1.44, glium 0.9
 
-[Unreleased]: https://github.com/Gekkio/imgui-rs/compare/v0.0.8...HEAD
+[Unreleased]: https://github.com/Gekkio/imgui-rs/compare/v0.0.10...HEAD
+[0.0.10]: https://github.com/Gekkio/imgui-rs/compare/v0.0.9...v0.0.10
+[0.0.9]: https://github.com/Gekkio/imgui-rs/compare/v0.0.8...v0.0.9
 [0.0.8]: https://github.com/Gekkio/imgui-rs/compare/v0.0.7...v0.0.8
 [0.0.7]: https://github.com/Gekkio/imgui-rs/compare/v0.0.6...v0.0.7
 [0.0.6]: https://github.com/Gekkio/imgui-rs/compare/v0.0.5...v0.0.6

@@ -1,6 +1,6 @@
 [package]
 name = "imgui"
-version = "0.0.9-pre"
+version = "0.1.0-pre"
 authors = ["Joonas Javanainen <joonas.javanainen@gmail.com>"]
 description = "Experimental bindings to ocornut/imgui"
 readme = "README.markdown"
@@ -15,7 +15,7 @@ default = ["glium"]
 libc = "0.2"
 
 [dependencies.glium]
-version = "0.14"
+version = "0.15"
 default-features = false
 optional = true
 
@@ -25,10 +25,7 @@ path = "imgui-sys"
 [build-dependencies]
 gcc = "0.3"
 
-[dev-dependencies]
-time = "0.1"
-
 [dev-dependencies.glium]
-version = "0.14"
+version = "0.15"
 features = ["glutin"]
 default-features = false

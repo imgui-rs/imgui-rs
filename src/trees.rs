@@ -26,14 +26,15 @@ impl<'ui, 'p> TreeNode<'ui, 'p> {
         }
     }
     #[inline]
-    pub fn label(self, label: &'p str) -> Self { TreeNode { label: Some(label), ..self } }
+    pub fn label(mut self, label: &'p str) -> Self {
+        self.label = Some(label);
+        self
+    }
     #[inline]
-    pub fn opened(self, opened: bool, cond: ImGuiSetCond) -> Self {
-        TreeNode {
-            opened: opened,
-            opened_cond: cond,
-            ..self
-        }
+    pub fn opened(mut self, opened: bool, cond: ImGuiSetCond) -> Self {
+        self.opened = opened;
+        self.opened_cond = cond;
+        self
     }
     pub fn build<F: FnOnce()>(self, f: F) {
         let render = unsafe {
@@ -73,35 +74,39 @@ impl<'ui, 'p> CollapsingHeader<'ui, 'p> {
         }
     }
     #[inline]
-    pub fn flags(self, flags: ImGuiTreeNodeFlags) -> Self {
-        CollapsingHeader { flags: flags, ..self }
+    pub fn flags(mut self, flags: ImGuiTreeNodeFlags) -> Self {
+        self.flags = flags;
+        self
     }
     #[inline]
-    pub fn selected(self, value: bool) -> Self {
-        CollapsingHeader { flags: self.flags.with(ImGuiTreeNodeFlags_Selected, value), ..self }
+    pub fn selected(mut self, value: bool) -> Self {
+        self.flags.set(ImGuiTreeNodeFlags_Selected, value);
+        self
     }
     #[inline]
-    pub fn default_open(self, value: bool) -> Self {
-        CollapsingHeader { flags: self.flags.with(ImGuiTreeNodeFlags_DefaultOpen, value), ..self }
+    pub fn default_open(mut self, value: bool) -> Self {
+        self.flags.set(ImGuiTreeNodeFlags_DefaultOpen, value);
+        self
     }
     #[inline]
-    pub fn open_on_double_click(self, value: bool) -> Self {
-        CollapsingHeader {
-            flags: self.flags.with(ImGuiTreeNodeFlags_OpenOnDoubleClick, value),
-            ..self
-        }
+    pub fn open_on_double_click(mut self, value: bool) -> Self {
+        self.flags.set(ImGuiTreeNodeFlags_OpenOnDoubleClick, value);
+        self
     }
     #[inline]
-    pub fn open_on_arrow(self, value: bool) -> Self {
-        CollapsingHeader { flags: self.flags.with(ImGuiTreeNodeFlags_OpenOnArrow, value), ..self }
+    pub fn open_on_arrow(mut self, value: bool) -> Self {
+        self.flags.set(ImGuiTreeNodeFlags_OpenOnArrow, value);
+        self
     }
     #[inline]
-    pub fn leaf(self, value: bool) -> Self {
-        CollapsingHeader { flags: self.flags.with(ImGuiTreeNodeFlags_Leaf, value), ..self }
+    pub fn leaf(mut self, value: bool) -> Self {
+        self.flags.set(ImGuiTreeNodeFlags_Leaf, value);
+        self
     }
     #[inline]
-    pub fn bullet(self, value: bool) -> Self {
-        CollapsingHeader { flags: self.flags.with(ImGuiTreeNodeFlags_Bullet, value), ..self }
+    pub fn bullet(mut self, value: bool) -> Self {
+        self.flags.set(ImGuiTreeNodeFlags_Bullet, value);
+        self
     }
     pub fn build(self) -> bool {
         unsafe { imgui_sys::igCollapsingHeader(imgui_sys::ImStr::from(self.label), self.flags) }

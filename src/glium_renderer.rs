@@ -1,8 +1,9 @@
-use glium::{Blend, DrawError, DrawParameters, GlObject, IndexBuffer, Program, Rect, Surface,
-            Texture2d, VertexBuffer, index, program, texture, vertex};
+use glium::{DrawError, GlObject, IndexBuffer, Program, Surface, Texture2d, VertexBuffer};
 use glium::backend::{Context, Facade};
-use glium::index::PrimitiveType;
-use glium::texture::{ClientFormat, RawImage2d};
+use glium::program;
+use glium::index::{self, PrimitiveType};
+use glium::texture;
+use glium::vertex;
 use libc::uintptr_t;
 use std::borrow::Cow;
 use std::fmt;
@@ -67,21 +68,33 @@ impl Renderer {
             device_objects: device_objects,
         })
     }
+
     pub fn render<'a, S: Surface>(&mut self, surface: &mut S, ui: Ui<'a>) -> RendererResult<()> {
         let _ = self.ctx.insert_debug_marker("imgui-rs: starting rendering");
-        let result = ui.render(|draw_list| self.render_draw_list(surface, draw_list));
+        let result = ui.render(|ui, draw_list| self.render_draw_list(surface, ui, draw_list));
         let _ = self.ctx.insert_debug_marker("imgui-rs: rendering finished");
         result
     }
+
     fn render_draw_list<'a, S: Surface>(&mut self,
                                         surface: &mut S,
+                                        ui: &'a Ui<'a>,
                                         draw_list: DrawList<'a>)
                                         -> RendererResult<()> {
+        use glium::{Blend, DrawParameters, Rect};
+        use glium::uniforms::MagnifySamplerFilter;
+
         try!(self.device_objects.upload_vertex_buffer(&self.ctx, draw_list.vtx_buffer));
         try!(self.device_objects.upload_index_buffer(&self.ctx, draw_list.idx_buffer));
 
-        let (width, height) = surface.get_dimensions();
-        let matrix = [[2.0 / (width as f32), 0.0, 0.0, 0.0],
+        let (width, height) = ui.imgui().display_size();
+        let (scale_width, scale_height) = ui.imgui().display_framebuffer_scale();
+
+        if width == 0.0 || height == 0.0 {
+            return Ok(());
+        }
+
+        let matrix = [[2.0 / width as f32, 0.0, 0.0, 0.0],
                       [0.0, 2.0 / -(height as f32), 0.0, 0.0],
                       [0.0, 0.0, -1.0, 0.0],
                       [-1.0, 1.0, 0.0, 1.0]];
@@ -91,31 +104,34 @@ impl Renderer {
         for cmd in draw_list.cmd_buffer {
             // We don't support custom textures...yet!
             assert!(cmd.texture_id as uintptr_t == font_texture_id);
-            let uniforms = uniform! {
-                matrix: matrix,
-                tex: &self.device_objects.texture
-            };
-            let draw_params = DrawParameters {
-                blend: Blend::alpha_blending(),
-                scissor: Some(Rect {
-                    left: cmd.clip_rect.x as u32,
-                    bottom: (height as f32 - cmd.clip_rect.w) as u32,
-                    width: (cmd.clip_rect.z - cmd.clip_rect.x) as u32,
-                    height: (cmd.clip_rect.w - cmd.clip_rect.y) as u32,
-                }),
-                ..Default::default()
-            };
+
             let idx_end = idx_start + cmd.elem_count as usize;
+
             try!(surface.draw(&self.device_objects.vertex_buffer,
-                              &self.device_objects
-                                  .index_buffer
-                                  .slice(idx_start..idx_end)
-                                  .expect("Invalid index buffer range"),
-                              &self.device_objects.program,
-                              &uniforms,
-                              &draw_params));
+                      &self.device_objects
+                          .index_buffer
+                          .slice(idx_start..idx_end)
+                          .expect("Invalid index buffer range"),
+                      &self.device_objects.program,
+                      &uniform! {
+                          matrix: matrix,
+                          tex: self.device_objects.texture.sampled()
+                              .magnify_filter(MagnifySamplerFilter::Nearest),
+                      },
+                      &DrawParameters {
+                          blend: Blend::alpha_blending(),
+                          scissor: Some(Rect {
+                              left: (cmd.clip_rect.x * scale_width) as u32,
+                              bottom: ((height - cmd.clip_rect.w) * scale_height) as u32,
+                              width: ((cmd.clip_rect.z - cmd.clip_rect.x) * scale_width) as u32,
+                              height: ((cmd.clip_rect.w - cmd.clip_rect.y) * scale_height) as u32,
+                          }),
+                          ..DrawParameters::default()
+                      }));
+
             idx_start = idx_end;
         }
+
         Ok(())
     }
 }
@@ -134,18 +150,20 @@ fn compile_default_program<F: Facade>(ctx: &F)
         140 => {
             vertex: include_str!("shader/vert_140.glsl"),
             fragment: include_str!("shader/frag_140.glsl"),
-            outputs_srgb: true
+            outputs_srgb: true,
         },
         110 => {
             vertex: include_str!("shader/vert_110.glsl"),
             fragment: include_str!("shader/frag_110.glsl"),
-            outputs_srgb: true
-        }
+            outputs_srgb: true,
+        },
     )
 }
 
 impl DeviceObjects {
     pub fn init<F: Facade>(im_gui: &mut ImGui, ctx: &F) -> RendererResult<DeviceObjects> {
+        use glium::texture::{ClientFormat, RawImage2d};
+
         let vertex_buffer = try!(VertexBuffer::empty_dynamic(ctx, 0));
         let index_buffer = try!(IndexBuffer::empty_dynamic(ctx, PrimitiveType::TrianglesList, 0));
 

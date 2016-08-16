@@ -27,28 +27,33 @@ impl<'p> PlotHistogram<'p> {
     }
 
     #[inline]
-    pub fn values_offset(self, values_offset: usize) -> Self {
-        PlotHistogram { values_offset: values_offset, ..self }
+    pub fn values_offset(mut self, values_offset: usize) -> Self {
+        self.values_offset = values_offset;
+        self
     }
 
     #[inline]
-    pub fn overlay_text(self, overlay_text: &'p str) -> Self {
-        PlotHistogram { overlay_text: Some(overlay_text), ..self }
+    pub fn overlay_text(mut self, overlay_text: &'p str) -> Self {
+        self.overlay_text = Some(overlay_text);
+        self
     }
 
     #[inline]
-    pub fn scale_min(self, scale_min: f32) -> Self {
-        PlotHistogram { scale_min: scale_min, ..self }
+    pub fn scale_min(mut self, scale_min: f32) -> Self {
+        self.scale_min = scale_min;
+        self
     }
 
     #[inline]
-    pub fn scale_max(self, scale_max: f32) -> Self {
-        PlotHistogram { scale_max: scale_max, ..self }
+    pub fn scale_max(mut self, scale_max: f32) -> Self {
+        self.scale_max = scale_max;
+        self
     }
 
     #[inline]
-    pub fn graph_size(self, graph_size: ImVec2) -> Self {
-        PlotHistogram { graph_size: graph_size, ..self }
+    pub fn graph_size(mut self, graph_size: ImVec2) -> Self {
+        self.graph_size = graph_size;
+        self
     }
 
     pub fn build(self) {
