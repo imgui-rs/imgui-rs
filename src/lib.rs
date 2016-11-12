@@ -230,9 +230,9 @@ impl ImGui {
         // to bytes
         let mut string = String::new();
         string.push(character);
-        string.push('\0');
+        let s : &str = &string;
         unsafe {
-            imgui_sys::ImGuiIO_AddInputCharactersUTF8(string.as_ptr() as *const i8);
+            imgui_sys::ImGuiIO_AddInputCharactersUTF8(imgui_sys::ImStr::from(s));
         }
     }
     pub fn get_time(&self) -> f32 { unsafe { imgui_sys::igGetTime() } }

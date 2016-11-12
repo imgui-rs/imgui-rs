@@ -1463,7 +1463,7 @@ extern "C" {
     pub fn ImFontAtlas_Clear(atlas: *mut ImFontAtlas);
 
     pub fn ImGuiIO_AddInputCharacter(c: c_ushort);
-    pub fn ImGuiIO_AddInputCharactersUTF8(utf8_chars: *const c_char);
+    pub fn ImGuiIO_AddInputCharactersUTF8(utf8_chars: ImStr);
     pub fn ImGuiIO_ClearInputCharacters();
 }
 
