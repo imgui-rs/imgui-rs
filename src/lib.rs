@@ -616,6 +616,9 @@ impl<'ui> Ui<'ui> {
             unsafe { imgui_sys::igEndPopup() };
         }
     }
+    pub fn close_current_popup(&self) {
+        unsafe { imgui_sys::igCloseCurrentPopup() };
+    }
 }
 
 // Widgets: Combos
