@@ -137,7 +137,7 @@ impl<'ui, 'p> Window<'ui, 'p> {
         self
     }
     #[inline]
-    pub fn always_vertical_scollbar(mut self, value: bool) -> Self {
+    pub fn always_vertical_scrollbar(mut self, value: bool) -> Self {
         self.flags.set(ImGuiWindowFlags_AlwaysVerticalScrollbar, value);
         self
     }

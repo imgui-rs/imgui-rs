@@ -1,8 +1,13 @@
+sudo: false
+dist: trusty
 language: rust
 rust:
   - stable
   - beta
   - nightly
+os:
+  - linux
+  - osx
 cache: cargo
 matrix:
   allow_failures:
