@@ -4,7 +4,6 @@ extern crate glium;
 extern crate imgui;
 
 use imgui::*;
-use std::iter::repeat;
 
 use self::support::Support;
 
@@ -31,10 +30,10 @@ struct State {
     no_menu: bool,
     bg_alpha: f32,
     wrap_width: f32,
-    buf: String,
+    buf: ImInput,
     item: i32,
     item2: i32,
-    text: String,
+    text: ImInput,
     i0: i32,
     f0: f32,
     vec2f: [f32;2],
@@ -50,13 +49,10 @@ struct State {
 
 impl Default for State {
     fn default() -> Self {
-        let mut buf = "日本語".to_owned();
-        buf.extend(repeat('\0').take(32));
-        buf.truncate(32);
-        let mut text = String::with_capacity(128);
+        let mut buf = ImInput::with_capacity(32);
+        buf.push_str("日本語");
+        let mut text = ImInput::with_capacity(128);
         text.push_str("Hello, world!");
-        let remaining = text.capacity() - text.len();
-        text.extend(repeat('\0').take(remaining));
         State {
             clear_color: (114.0 / 255.0, 144.0 / 255.0, 154.0 / 255.0, 1.0),
             show_app_metrics: false,
@@ -319,6 +315,8 @@ fn show_test_window<'a>(ui: &Ui<'a>, state: &mut State, opened: &mut bool) {
                     im_str!("IIII"), im_str!("JJJJ"), im_str!("KKKK")];
                 ui.combo(im_str!("combo scroll"), &mut state.item2, &items, -1);
                 ui.input_text(im_str!("input text"), &mut state.text).build();
+                let inputted = format!("input text \"{}\"", state.text.to_str().unwrap());
+                ui.text(ImStr::from(inputted));
                 ui.input_int(im_str!("input int"), &mut state.i0).build();
                 ui.input_float(im_str!("input float"), &mut state.f0)
                     .step(0.01).step_fast(1.0).build();

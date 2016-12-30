@@ -10,8 +10,8 @@ use super::{ImGuiInputTextFlags,
             ImGuiInputTextFlags_CallbackCompletion, ImGuiInputTextFlags_CallbackHistory,
             ImGuiInputTextFlags_CharsDecimal, ImGuiInputTextFlags_CharsHexadecimal,
             ImGuiInputTextFlags_CharsNoBlank, ImGuiInputTextFlags_CharsUppercase,
-            ImGuiInputTextFlags_EnterReturnsTrue, ImGuiInputTextFlags_NoHorizontalScroll, ImStr,
-            Ui};
+            ImGuiInputTextFlags_EnterReturnsTrue, ImGuiInputTextFlags_NoHorizontalScroll,
+            ImInput, ImStr, Ui};
 
 macro_rules! impl_text_flags {
     ($InputType:ident) => {
@@ -130,13 +130,13 @@ macro_rules! impl_precision_params {
 #[must_use]
 pub struct InputText<'ui, 'p> {
     label: ImStr<'p>,
-    buf: &'p mut str,
+    buf: &'p mut ImInput,
     flags: ImGuiInputTextFlags,
     _phantom: PhantomData<&'ui Ui<'ui>>,
 }
 
 impl<'ui, 'p> InputText<'ui, 'p> {
-    pub fn new(label: ImStr<'p>, buf: &'p mut str) -> Self {
+    pub fn new(label: ImStr<'p>, buf: &'p mut ImInput) -> Self {
         InputText {
             label: label,
             buf: buf,
@@ -156,7 +156,7 @@ impl<'ui, 'p> InputText<'ui, 'p> {
                                    // TODO: this is evil.
                                    // Perhaps something else than &mut str is better
                                    self.buf.as_ptr() as *mut i8,
-                                   self.buf.len() as size_t,
+                                   self.buf.capacity() as size_t,
                                    self.flags,
                                    None,
                                    ptr::null_mut())
