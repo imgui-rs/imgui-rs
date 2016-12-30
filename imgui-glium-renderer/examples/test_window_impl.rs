@@ -4,7 +4,6 @@ extern crate imgui;
 extern crate imgui_glium_renderer;
 
 use imgui::*;
-use std::iter::repeat;
 
 use self::support::Support;
 
@@ -31,10 +30,10 @@ struct State {
     no_menu: bool,
     bg_alpha: f32,
     wrap_width: f32,
-    buf: String,
+    buf: ImString,
     item: i32,
     item2: i32,
-    text: String,
+    text: ImString,
     i0: i32,
     f0: f32,
     vec2f: [f32; 2],
@@ -50,13 +49,10 @@ struct State {
 
 impl Default for State {
     fn default() -> Self {
-        let mut buf = "日本語".to_owned();
-        buf.extend(repeat('\0').take(32));
-        buf.truncate(32);
-        let mut text = String::with_capacity(128);
+        let mut buf = ImString::with_capacity(32);
+        buf.push_str("日本語");
+        let mut text = ImString::with_capacity(128);
         text.push_str("Hello, world!");
-        let remaining = text.capacity() - text.len();
-        text.extend(repeat('\0').take(remaining));
         State {
             clear_color: (114.0 / 255.0, 144.0 / 255.0, 154.0 / 255.0, 1.0),
             show_app_metrics: false,

@@ -7,16 +7,16 @@ use super::{ImStr, Ui};
 
 #[must_use]
 pub struct SliderInt<'ui, 'p> {
-    label: ImStr<'p>,
+    label: &'p ImStr,
     value: &'p mut i32,
     min: i32,
     max: i32,
-    display_format: ImStr<'p>,
+    display_format: &'p ImStr,
     _phantom: PhantomData<&'ui Ui<'ui>>,
 }
 
 impl<'ui, 'p> SliderInt<'ui, 'p> {
-    pub fn new(label: ImStr<'p>, value: &'p mut i32, min: i32, max: i32) -> Self {
+    pub fn new(label: &'p ImStr, value: &'p mut i32, min: i32, max: i32) -> Self {
         SliderInt {
             label: label,
             value: value,
@@ -27,7 +27,7 @@ impl<'ui, 'p> SliderInt<'ui, 'p> {
         }
     }
     #[inline]
-    pub fn display_format(mut self, display_format: ImStr<'p>) -> Self {
+    pub fn display_format(mut self, display_format: &'p ImStr) -> Self {
         self.display_format = display_format;
         self
     }
@@ -46,16 +46,16 @@ macro_rules! impl_slider_intn {
     ($SliderIntN:ident, $N:expr, $igSliderIntN:ident) => {
         #[must_use]
         pub struct $SliderIntN<'ui, 'p> {
-            label: ImStr<'p>,
+            label: &'p ImStr,
             value: &'p mut [i32; $N],
             min: i32,
             max: i32,
-            display_format: ImStr<'p>,
+            display_format: &'p ImStr,
             _phantom: PhantomData<&'ui Ui<'ui>>,
         }
 
         impl<'ui, 'p> $SliderIntN<'ui, 'p> {
-            pub fn new(label: ImStr<'p>, value: &'p mut [i32; $N], min: i32, max: i32) -> Self {
+            pub fn new(label: &'p ImStr, value: &'p mut [i32; $N], min: i32, max: i32) -> Self {
                 $SliderIntN {
                     label: label,
                     value: value,
@@ -66,7 +66,7 @@ macro_rules! impl_slider_intn {
                 }
             }
             #[inline]
-            pub fn display_format(mut self, display_format: ImStr<'p>) -> Self {
+            pub fn display_format(mut self, display_format: &'p ImStr) -> Self {
                 self.display_format = display_format;
                 self
             }
@@ -90,17 +90,17 @@ impl_slider_intn!(SliderInt4, 4, igSliderInt4);
 
 #[must_use]
 pub struct SliderFloat<'ui, 'p> {
-    label: ImStr<'p>,
+    label: &'p ImStr,
     value: &'p mut f32,
     min: f32,
     max: f32,
-    display_format: ImStr<'p>,
+    display_format: &'p ImStr,
     power: f32,
     _phantom: PhantomData<&'ui Ui<'ui>>,
 }
 
 impl<'ui, 'p> SliderFloat<'ui, 'p> {
-    pub fn new(label: ImStr<'p>, value: &'p mut f32, min: f32, max: f32) -> Self {
+    pub fn new(label: &'p ImStr, value: &'p mut f32, min: f32, max: f32) -> Self {
         SliderFloat {
             label: label,
             value: value,
@@ -112,7 +112,7 @@ impl<'ui, 'p> SliderFloat<'ui, 'p> {
         }
     }
     #[inline]
-    pub fn display_format(mut self, display_format: ImStr<'p>) -> Self {
+    pub fn display_format(mut self, display_format: &'p ImStr) -> Self {
         self.display_format = display_format;
         self
     }
@@ -137,17 +137,17 @@ macro_rules! impl_slider_floatn {
     ($SliderFloatN:ident, $N:expr, $igSliderFloatN:ident) => {
         #[must_use]
         pub struct $SliderFloatN<'ui, 'p> {
-            label: ImStr<'p>,
+            label: &'p ImStr,
             value: &'p mut [f32; $N],
             min: f32,
             max: f32,
-            display_format: ImStr<'p>,
+            display_format: &'p ImStr,
             power: f32,
             _phantom: PhantomData<&'ui Ui<'ui>>,
         }
 
         impl<'ui, 'p> $SliderFloatN<'ui, 'p> {
-            pub fn new(label: ImStr<'p>, value: &'p mut [f32; $N], min: f32, max: f32) -> Self {
+            pub fn new(label: &'p ImStr, value: &'p mut [f32; $N], min: f32, max: f32) -> Self {
                 $SliderFloatN {
                     label: label,
                     value: value,
@@ -159,7 +159,7 @@ macro_rules! impl_slider_floatn {
                 }
             }
             #[inline]
-            pub fn display_format(mut self, display_format: ImStr<'p>) -> Self {
+            pub fn display_format(mut self, display_format: &'p ImStr) -> Self {
                 self.display_format = display_format;
                 self
             }

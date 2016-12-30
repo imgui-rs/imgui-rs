@@ -6,13 +6,13 @@ use super::{ImStr, Ui};
 
 #[must_use]
 pub struct Menu<'ui, 'p> {
-    label: ImStr<'p>,
+    label: &'p ImStr,
     enabled: bool,
     _phantom: PhantomData<&'ui Ui<'ui>>,
 }
 
 impl<'ui, 'p> Menu<'ui, 'p> {
-    pub fn new(label: ImStr<'p>) -> Self {
+    pub fn new(label: &'p ImStr) -> Self {
         Menu {
             label: label,
             enabled: true,
@@ -35,15 +35,15 @@ impl<'ui, 'p> Menu<'ui, 'p> {
 
 #[must_use]
 pub struct MenuItem<'ui, 'p> {
-    label: ImStr<'p>,
-    shortcut: Option<ImStr<'p>>,
+    label: &'p ImStr,
+    shortcut: Option<&'p ImStr>,
     selected: Option<&'p mut bool>,
     enabled: bool,
     _phantom: PhantomData<&'ui Ui<'ui>>,
 }
 
 impl<'ui, 'p> MenuItem<'ui, 'p> {
-    pub fn new(label: ImStr<'p>) -> Self {
+    pub fn new(label: &'p ImStr) -> Self {
         MenuItem {
             label: label,
             shortcut: None,
@@ -53,7 +53,7 @@ impl<'ui, 'p> MenuItem<'ui, 'p> {
         }
     }
     #[inline]
-    pub fn shortcut(mut self, shortcut: ImStr<'p>) -> Self {
+    pub fn shortcut(mut self, shortcut: &'p ImStr) -> Self {
         self.shortcut = Some(shortcut);
         self
     }
