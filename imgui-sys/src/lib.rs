@@ -322,6 +322,12 @@ impl ImVec2 {
             y: y as c_float,
         }
     }
+    pub fn zero() -> ImVec2 {
+        ImVec2 {
+            x: 0.0 as c_float,
+            y: 0.0 as c_float,
+        }
+    }
 }
 
 impl From<[f32; 2]> for ImVec2 {
