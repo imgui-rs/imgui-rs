@@ -478,6 +478,9 @@ impl<'ui> Ui<'ui> {
             imgui_sys::igBulletText(fmt_ptr(), text.as_ptr());
         }
     }
+    pub fn button<'p>(&self, label: ImStr<'p>, size: ImVec2) -> bool {
+        unsafe { imgui_sys::igButton(label.as_ptr(), size) }
+    }
     pub fn small_button<'p>(&self, label: ImStr<'p>) -> bool {
         unsafe { imgui_sys::igSmallButton(label.as_ptr()) }
     }
@@ -615,6 +618,9 @@ impl<'ui> Ui<'ui> {
             f();
             unsafe { imgui_sys::igEndPopup() };
         }
+    }
+    pub fn close_current_popup(&self) {
+        unsafe { imgui_sys::igCloseCurrentPopup() };
     }
 }
 
