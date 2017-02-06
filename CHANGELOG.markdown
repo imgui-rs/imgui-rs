@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+## [0.1.0-pre] - 2017-02-06
+
+- Upgrade to glium 0.16
+
 ## [0.0.10] - 2016-08-09
 
 ### Changed
