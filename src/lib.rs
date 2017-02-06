@@ -13,7 +13,7 @@ use std::ffi::CStr;
 use std::mem;
 use std::ptr;
 use std::slice;
-use std::str;
+use std::str::{self, Utf8Error};
 
 pub use imgui_sys::{ImDrawIdx, ImDrawVert, ImGuiInputTextFlags, ImGuiInputTextFlags_AllowTabInput,
                     ImGuiInputTextFlags_AlwaysInsertMode, ImGuiInputTextFlags_AutoSelectAll,
@@ -105,6 +105,40 @@ impl From<String> for ImStr<'static> {
     fn from(mut value: String) -> ImStr<'static> {
         value.push('\0');
         ImStr { bytes: Cow::Owned(value.into_bytes()) }
+    }
+}
+
+pub struct ImInput {
+    bytes: Vec<u8>,
+}
+
+impl ImInput {
+    pub fn with_capacity(capacity: usize) -> ImInput {
+        let mut bytes = Vec::with_capacity(capacity);
+        bytes.push(0);
+        ImInput {
+            bytes: bytes,
+        }
+    }
+    pub fn push_str(&mut self, s: &str) {
+        let len = self.len();
+        self.bytes.truncate(len);
+        self.bytes.extend(s.as_bytes());
+        self.bytes.push(0);
+    }
+    pub fn to_str(&self) -> Result<&str, Utf8Error> {
+        unsafe { CStr::from_ptr(self.bytes.as_ptr() as *const i8).to_str() }
+    }
+    pub fn as_ptr(&self) -> *const c_char { self.bytes.as_ptr() as *const c_char }
+    pub fn capacity(&self) -> usize {
+        self.bytes.capacity()
+    }
+    pub fn len(&self) -> usize {
+        let cstr = unsafe { CStr::from_ptr(self.bytes.as_ptr() as *const i8).to_str() };
+        match cstr {
+            Ok(ref cstr) => cstr.len(),
+            Err(_) => 0
+        }
     }
 }
 
@@ -503,7 +537,7 @@ impl<'ui> Ui<'ui> {
                            -> ColorEdit4<'ui, 'p> {
         ColorEdit4::new(label, value)
     }
-    pub fn input_text<'p>(&self, label: ImStr<'p>, buf: &'p mut str) -> InputText<'ui, 'p> {
+    pub fn input_text<'p>(&self, label: ImStr<'p>, buf: &'p mut ImInput) -> InputText<'ui, 'p> {
         InputText::new(label, buf)
     }
     pub fn input_float<'p>(&self, label: ImStr<'p>, value: &'p mut f32) -> InputFloat<'ui, 'p> {
