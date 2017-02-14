@@ -183,6 +183,7 @@ bitflags!(
 );
 
 impl ImGuiWindowFlags {
+    #[deprecated(since = "0.0.11")]
     #[inline]
     pub fn with(self, mask: ImGuiWindowFlags, value: bool) -> ImGuiWindowFlags {
         if value {
@@ -228,6 +229,7 @@ bitflags!(
 );
 
 impl ImGuiInputTextFlags {
+    #[deprecated(since = "0.0.11")]
     #[inline]
     pub fn with(self, mask: ImGuiInputTextFlags, value: bool) -> ImGuiInputTextFlags {
         if value {
@@ -267,6 +269,7 @@ bitflags!(
 );
 
 impl ImGuiTreeNodeFlags {
+    #[deprecated(since = "0.0.11")]
     #[inline]
     pub fn with(self, mask: ImGuiTreeNodeFlags, value: bool) -> ImGuiTreeNodeFlags {
         if value {

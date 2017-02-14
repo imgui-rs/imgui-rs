@@ -19,6 +19,9 @@
 
 - `Window::always_vertical_scollbar` (typo)
 - `igPushStyleVavrVec` (typo)
+- `ImGuiInputTextFlags::with`
+- `ImGuiTreeNodeFlags::with`
+- `ImGuiWindowFlags::with`
 
 ## [0.0.10] - 2016-08-09
 
