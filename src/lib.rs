@@ -4,13 +4,11 @@ extern crate glium;
 
 extern crate imgui_sys;
 
-extern crate libc;
-
-use libc::{c_char, c_float, c_int, c_uchar, c_void, uintptr_t};
 use std::borrow::Cow;
 use std::convert::From;
 use std::ffi::CStr;
 use std::mem;
+use std::os::raw::{c_char, c_float, c_int, c_uchar, c_void};
 use std::ptr;
 use std::slice;
 use std::str;
@@ -157,7 +155,7 @@ impl ImGui {
             })
         }
     }
-    pub fn set_texture_id(&mut self, value: uintptr_t) {
+    pub fn set_texture_id(&mut self, value: usize) {
         unsafe {
             (*self.io_mut().fonts).tex_id = value as *mut c_void;
         }

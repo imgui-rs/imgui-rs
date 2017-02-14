@@ -1,5 +1,4 @@
 use imgui_sys;
-use libc::size_t;
 use std::marker::PhantomData;
 use std::ptr;
 
@@ -156,7 +155,7 @@ impl<'ui, 'p> InputText<'ui, 'p> {
                                    // TODO: this is evil.
                                    // Perhaps something else than &mut str is better
                                    self.buf.as_ptr() as *mut i8,
-                                   self.buf.len() as size_t,
+                                   self.buf.len() as usize,
                                    self.flags,
                                    None,
                                    ptr::null_mut())

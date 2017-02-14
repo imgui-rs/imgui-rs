@@ -3,18 +3,17 @@
 #[macro_use]
 extern crate bitflags;
 
-extern crate libc;
 #[cfg(feature = "glium")]
 #[macro_use]
 extern crate glium;
 
 #[cfg(feature = "glium")]
 use glium::vertex::{Attribute, AttributeType, Vertex, VertexFormat};
-use libc::*;
 #[cfg(feature = "glium")]
 use std::borrow::Cow;
 use std::convert::From;
 use std::mem;
+use std::os::raw::{c_char, c_float, c_int, c_short, c_uchar, c_uint, c_ushort, c_void};
 use std::slice;
 
 pub enum ImGuiContext { }
@@ -116,7 +115,7 @@ pub const ImGuiKey_COUNT: usize = 19;
 
 bitflags!(
     #[repr(C)]
-    pub flags ImGuiAlign: ::libc::c_int {
+    pub flags ImGuiAlign: c_int {
         const ImGuiAlign_Left    = 1 << 0,
         const ImGuiAlign_Center  = 1 << 1,
         const ImGuiAlign_Right   = 1 << 2,
@@ -152,7 +151,7 @@ pub const ImGuiMouseCursor_COUNT: usize = 7;
 
 bitflags!(
     #[repr(C)]
-    pub flags ImGuiWindowFlags: ::libc::c_int {
+    pub flags ImGuiWindowFlags: c_int {
         const ImGuiWindowFlags_NoTitleBar                = 1 << 0,
         const ImGuiWindowFlags_NoResize                  = 1 << 1,
         const ImGuiWindowFlags_NoMove                    = 1 << 2,
@@ -196,7 +195,7 @@ impl ImGuiWindowFlags {
 
 bitflags!(
     #[repr(C)]
-    pub flags ImGuiSetCond: ::libc::c_int {
+    pub flags ImGuiSetCond: c_int {
         const ImGuiSetCond_Always       = 1 << 0,
         const ImGuiSetCond_Once         = 1 << 1,
         const ImGuiSetCond_FirstUseEver = 1 << 2,
@@ -206,7 +205,7 @@ bitflags!(
 
 bitflags!(
     #[repr(C)]
-    pub flags ImGuiInputTextFlags: ::libc::c_int {
+    pub flags ImGuiInputTextFlags: c_int {
         const ImGuiInputTextFlags_CharsDecimal        = 1 << 0,
         const ImGuiInputTextFlags_CharsHexadecimal    = 1 << 1,
         const ImGuiInputTextFlags_CharsUppercase      = 1 << 2,
@@ -243,7 +242,7 @@ impl ImGuiInputTextFlags {
 
 bitflags!(
     #[repr(C)]
-    pub flags ImGuiSelectableFlags: ::libc::c_int {
+    pub flags ImGuiSelectableFlags: c_int {
         const ImGuiSelectableFlags_DontClosePopups  = 1 << 0,
         const ImGuiSelectableFlags_SpanAllColumns   = 1 << 1,
         const ImGuiSelectableFlags_AllowDoubleClick = 1 << 2
@@ -252,7 +251,7 @@ bitflags!(
 
 bitflags!(
     #[repr(C)]
-    pub flags ImGuiTreeNodeFlags: ::libc::c_int {
+    pub flags ImGuiTreeNodeFlags: c_int {
         const ImGuiTreeNodeFlags_Selected          = 1 << 0,
         const ImGuiTreeNodeFlags_Framed            = 1 << 1,
         const ImGuiTreeNodeFlags_AllowOverlapMode  = 1 << 2,
@@ -415,7 +414,7 @@ pub struct ImGuiIO {
     pub render_draw_lists_fn: Option<extern "C" fn(data: *mut ImDrawData)>,
     pub get_clipboard_text_fn: Option<extern "C" fn() -> *const c_char>,
     pub set_clipboard_text_fn: Option<extern "C" fn(text: *const c_char)>,
-    pub mem_alloc_fn: Option<extern "C" fn(sz: size_t) -> *mut c_void>,
+    pub mem_alloc_fn: Option<extern "C" fn(sz: usize) -> *mut c_void>,
     pub mem_free_fn: Option<extern "C" fn(ptr: *mut c_void)>,
     pub ime_set_input_screen_pos_fn: Option<extern "C" fn(x: c_int, y: c_int)>,
 
@@ -1113,14 +1112,14 @@ extern "C" {
 extern "C" {
     pub fn igInputText(label: *const c_char,
                        buf: *mut c_char,
-                       buf_size: size_t,
+                       buf_size: usize,
                        flags: ImGuiInputTextFlags,
                        callback: ImGuiTextEditCallback,
                        user_data: *mut c_void)
                        -> bool;
     pub fn igInputTextMultiline(label: *const c_char,
                                 buf: *mut c_char,
-                                buf_size: size_t,
+                                buf_size: usize,
                                 size: ImVec2,
                                 flags: ImGuiInputTextFlags,
                                 callback: ImGuiTextEditCallback,
@@ -1392,7 +1391,7 @@ extern "C" {
 
 // Helpers functions to access functions pointers in ImGui::GetIO()
 extern "C" {
-    pub fn igMemAlloc(sz: size_t) -> *mut c_void;
+    pub fn igMemAlloc(sz: usize) -> *mut c_void;
     pub fn igMemFree(ptr: *mut c_void);
     pub fn igGetClipboardText() -> *const c_char;
     pub fn igSetClipboardText(text: *const c_char);
@@ -1401,7 +1400,7 @@ extern "C" {
 // Internal state access
 extern "C" {
     pub fn igGetVersion() -> *const c_char;
-    pub fn igCreateContext(malloc_fn: Option<extern "C" fn(size: size_t) -> *mut c_void>,
+    pub fn igCreateContext(malloc_fn: Option<extern "C" fn(size: usize) -> *mut c_void>,
                            free_fn: Option<extern "C" fn(ptr: *mut c_void)>)
                            -> *mut ImGuiContext;
     pub fn igDestroyContext(ctx: *mut ImGuiContext);

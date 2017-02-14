@@ -1,8 +1,9 @@
 use imgui_sys;
-use super::ImStr;
-use imgui_sys::ImVec2;
 use std::{f32, mem, ptr};
-use libc::c_float;
+use std::os::raw::c_float;
+
+use super::{ImStr, ImVec2};
+
 #[must_use]
 pub struct PlotHistogram<'p> {
     label: ImStr<'p>,

@@ -14,6 +14,7 @@
 
 - Upgrade to bitflags 0.8
 - Upgrade to glium 0.16
+- Replace libc dependency with `std::os::raw`
 
 ### Deprecated
 

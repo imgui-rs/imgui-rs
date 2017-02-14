@@ -13,7 +13,6 @@ default = ["glium"]
 
 [dependencies]
 bitflags = "0.8"
-libc = "0.2"
 
 [dependencies.glium]
 version = "0.16"

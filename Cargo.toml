@@ -11,9 +11,6 @@ license = "MIT OR Apache-2.0"
 [features]
 default = ["glium"]
 
-[dependencies]
-libc = "0.2"
-
 [dependencies.glium]
 version = "0.16"
 default-features = false
