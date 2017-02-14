@@ -801,6 +801,13 @@ extern "C" {
     pub fn igGetColorU32Vec(col: *const ImVec4) -> ImU32;
 }
 
+#[allow(non_snake_case)]
+#[deprecated(since = "0.0.11", note = "name has a typo, please use `igPushStyleVarVec` instead")]
+#[inline]
+pub unsafe fn igPushStyleVavrVec(idx: ImGuiStyleVar, val: ImVec2) {
+    igPushStyleVarVec(idx, val);
+}
+
 // Parameter stack (current window)
 extern "C" {
     pub fn igPushItemWidth(item_width: c_float);
