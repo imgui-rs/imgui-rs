@@ -1,6 +1,6 @@
 [package]
 name = "imgui"
-version = "0.1.0-pre"
+version = "0.0.11-pre"
 authors = ["Joonas Javanainen <joonas.javanainen@gmail.com>"]
 description = "Experimental bindings to ocornut/imgui"
 readme = "README.markdown"
