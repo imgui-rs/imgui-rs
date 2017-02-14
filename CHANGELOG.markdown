@@ -2,9 +2,22 @@
 
 ## [Unreleased]
 
-## [0.1.0-pre] - 2017-02-06
+### Added
+
+- `ImVec2::zero()`
+- Support for buttons
+- Support for closing current popup
+- `Window::always_vertical_scrollbar` (fix typo)
+- `igPushStyleVarVec` (fix typo)
+
+### Changed
 
 - Upgrade to glium 0.16
+
+### Deprecated
+
+- `Window::always_vertical_scollbar` (typo)
+- `igPushStyleVavrVec` (typo)
 
 ## [0.0.10] - 2016-08-09
 
