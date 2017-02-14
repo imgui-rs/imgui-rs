@@ -16,13 +16,21 @@ use std::mem;
 use std::os::raw::{c_char, c_float, c_int, c_short, c_uchar, c_uint, c_ushort, c_void};
 use std::slice;
 
+/// ImGui context (opaque)
 pub enum ImGuiContext { }
 
 pub type ImU32 = c_uint;
+
+/// Character for keyboard input/display
 pub type ImWchar = c_ushort;
+
+/// User data to identify a texture (this is whatever to you want it to be! read the FAQ about ImTextureID in imgui.cpp)
 pub type ImTextureID = *mut c_void;
+
+/// Unique ID used by widgets (typically hashed from a stack of string)
 pub type ImGuiID = ImU32;
 
+/// A color identifier for styling
 #[repr(C)]
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
 pub enum ImGuiCol {
@@ -72,6 +80,7 @@ pub enum ImGuiCol {
 }
 pub const ImGuiCol_COUNT: usize = 43;
 
+/// A variable identifier for styling
 #[repr(C)]
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
 pub enum ImGuiStyleVar {
@@ -88,6 +97,7 @@ pub enum ImGuiStyleVar {
     GrabMinSize,
 }
 
+/// A key identifier (ImGui-side enum)
 #[repr(C)]
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
 pub enum ImGuiKey {
@@ -114,6 +124,7 @@ pub enum ImGuiKey {
 pub const ImGuiKey_COUNT: usize = 19;
 
 bitflags!(
+    /// Alignment
     #[repr(C)]
     pub flags ImGuiAlign: c_int {
         const ImGuiAlign_Left    = 1 << 0,
@@ -125,6 +136,7 @@ bitflags!(
     }
 );
 
+/// Color edit mode
 #[repr(C)]
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
 pub enum ImGuiColorEditMode {
@@ -135,6 +147,7 @@ pub enum ImGuiColorEditMode {
     HEX = 2,
 }
 
+/// A mouse cursor identifier
 #[repr(C)]
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
 pub enum ImGuiMouseCursor {
@@ -150,6 +163,7 @@ pub enum ImGuiMouseCursor {
 pub const ImGuiMouseCursor_COUNT: usize = 7;
 
 bitflags!(
+    /// Window flags
     #[repr(C)]
     pub flags ImGuiWindowFlags: c_int {
         const ImGuiWindowFlags_NoTitleBar                = 1 << 0,
@@ -194,6 +208,7 @@ impl ImGuiWindowFlags {
 }
 
 bitflags!(
+    /// Condition flags
     #[repr(C)]
     pub flags ImGuiSetCond: c_int {
         const ImGuiSetCond_Always       = 1 << 0,
@@ -204,6 +219,7 @@ bitflags!(
 );
 
 bitflags!(
+    /// Flags for text inputs
     #[repr(C)]
     pub flags ImGuiInputTextFlags: c_int {
         const ImGuiInputTextFlags_CharsDecimal        = 1 << 0,
@@ -241,6 +257,7 @@ impl ImGuiInputTextFlags {
 
 
 bitflags!(
+    /// Flags for selectables
     #[repr(C)]
     pub flags ImGuiSelectableFlags: c_int {
         const ImGuiSelectableFlags_DontClosePopups  = 1 << 0,
@@ -250,6 +267,7 @@ bitflags!(
 );
 
 bitflags!(
+    /// Flags for trees and collapsing headers
     #[repr(C)]
     pub flags ImGuiTreeNodeFlags: c_int {
         const ImGuiTreeNodeFlags_Selected          = 1 << 0,
@@ -285,6 +303,7 @@ pub type ImGuiTextEditCallback =
 pub type ImGuiSizeConstraintCallback =
     Option<extern "C" fn(data: *mut ImGuiSizeConstraintCallbackData)>;
 
+/// A tuple of 2 floating-point values
 #[repr(C)]
 #[derive(Copy, Clone, Debug, Default, PartialEq)]
 pub struct ImVec2 {
@@ -320,6 +339,7 @@ unsafe impl Attribute for ImVec2 {
     fn get_type() -> AttributeType { <(c_float, c_float) as Attribute>::get_type() }
 }
 
+/// A tuple of 4 floating-point values
 #[repr(C)]
 #[derive(Copy, Clone, Debug, Default, PartialEq)]
 pub struct ImVec4 {
@@ -357,33 +377,58 @@ unsafe impl Attribute for ImVec4 {
     }
 }
 
+/// Runtime data for styling/colors
 #[repr(C)]
 pub struct ImGuiStyle {
+    /// Global alpha applies to everything in ImGui
     pub alpha: c_float,
+    /// Padding within a window
     pub window_padding: ImVec2,
+    /// Minimum window size
     pub window_min_size: ImVec2,
+    /// Radius of window corners rounding. Set to 0.0f to have rectangular windows
     pub window_rounding: c_float,
+    /// Alignment for title bar text
     pub window_title_align: ImGuiAlign,
+    /// Radius of child window corners rounding. Set to 0.0f to have rectangular child windows
     pub child_window_rounding: c_float,
+    /// Padding within a framed rectangle (used by most widgets)
     pub frame_padding: ImVec2,
+    /// Radius of frame corners rounding. Set to 0.0f to have rectangular frames (used by most widgets).
     pub frame_rounding: c_float,
+    /// Horizontal and vertical spacing between widgets/lines
     pub item_spacing: ImVec2,
+    /// Horizontal and vertical spacing between within elements of a composed widget (e.g. a slider and its label)
     pub item_inner_spacing: ImVec2,
+    /// Expand reactive bounding box for touch-based system where touch position is not accurate enough. Unfortunately we don't sort widgets so priority on overlap will always be given to the first widget. So don't grow this too much!
     pub touch_extra_padding: ImVec2,
+    /// Horizontal spacing when e.g. entering a tree node. Generally == (FontSize + FramePadding.x*2).
     pub indent_spacing: c_float,
+    /// Minimum horizontal spacing between two columns
     pub columns_min_spacing: c_float,
+    /// Width of the vertical scrollbar, Height of the horizontal scrollbar
     pub scrollbar_size: c_float,
+    /// Width of the vertical scrollbar, Height of the horizontal scrollbar
     pub scrollbar_rounding: c_float,
+    /// Minimum width/height of a grab box for slider/scrollbar
     pub grab_min_size: c_float,
+    /// Radius of grabs corners rounding. Set to 0.0f to have rectangular slider grabs.
     pub grab_rounding: c_float,
+    /// Window positions are clamped to be visible within the display area by at least this amount. Only covers regular windows.
     pub display_window_padding: ImVec2,
+    /// If you cannot see the edge of your screen (e.g. on a TV) increase the safe area padding. Covers popups/tooltips as well regular windows.
     pub display_safe_area_padding: ImVec2,
+    /// Enable anti-aliasing on lines/borders. Disable if you are really short on CPU/GPU.
     pub anti_aliased_lines: bool,
+    /// Enable anti-aliasing on filled shapes (rounded rectangles, circles, etc.)
     pub anti_aliased_shapes: bool,
+    /// Tessellation tolerance. Decrease for highly tessellated curves (higher quality, more polygons), increase to reduce quality.
     pub curve_tessellation_tol: c_float,
+    /// Colors for the user interface
     pub colors: [ImVec4; ImGuiCol_COUNT],
 }
 
+/// Main configuration and I/O between your application and ImGui
 #[repr(C)]
 pub struct ImGuiIO {
     pub display_size: ImVec2,
@@ -455,6 +500,7 @@ pub struct ImGuiIO {
     pub keys_down_duration_prev: [c_float; 512],
 }
 
+/// Lightweight vector struct
 #[repr(C)]
 pub struct ImVector<T> {
     pub size: c_int,
@@ -541,7 +587,7 @@ pub struct ImGuiListClipper {
 pub type ImDrawCallback = Option<extern "C" fn(parent_list: *const ImDrawList,
                                                cmd: *const ImDrawCmd)>;
 
-
+/// A single draw command within a parent ImDrawList (generally maps to 1 GPU draw call)
 #[repr(C)]
 pub struct ImDrawCmd {
     pub elem_count: c_uint,
@@ -551,8 +597,10 @@ pub struct ImDrawCmd {
     pub user_callback_data: *mut c_void,
 }
 
+/// Vertex index
 pub type ImDrawIdx = c_ushort;
 
+/// A single vertex
 #[repr(C)]
 #[derive(Copy, Clone, Debug, Default)]
 pub struct ImDrawVert {
@@ -575,12 +623,14 @@ impl Vertex for ImDrawVert {
     }
 }
 
+/// Temporary storage for outputting drawing commands out of order
 #[repr(C)]
 pub struct ImDrawChannel {
     pub cmd_buffer: ImVector<ImDrawCmd>,
     pub idx_buffer: ImVector<ImDrawIdx>,
 }
 
+/// A single draw command list (generally one per window)
 #[repr(C)]
 pub struct ImDrawList {
     pub cmd_buffer: ImVector<ImDrawCmd>,
@@ -599,6 +649,7 @@ pub struct ImDrawList {
     channels: ImVector<ImDrawChannel>,
 }
 
+/// All draw command lists required to render the frame
 #[repr(C)]
 pub struct ImDrawData {
     pub valid: bool,
@@ -615,6 +666,7 @@ impl ImDrawData {
     }
 }
 
+/// Configuration data when adding a font or merging fonts
 #[repr(C)]
 pub struct ImFontConfig {
     pub font_data: *mut c_void,
@@ -634,6 +686,7 @@ pub struct ImFontConfig {
     dst_font: *mut ImFont,
 }
 
+/// Runtime data for multiple fonts, bake multiple fonts into a single texture, TTF font loader
 #[repr(C)]
 pub struct ImFontAtlas {
     pub tex_id: *mut c_void,
@@ -663,6 +716,7 @@ pub struct Glyph {
     v1: c_float,
 }
 
+/// Runtime data for a single font within a parent ImFontAtlas
 #[repr(C)]
 pub struct ImFont {
     font_size: c_float,
