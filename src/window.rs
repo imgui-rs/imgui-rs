@@ -136,11 +136,6 @@ impl<'ui, 'p> Window<'ui, 'p> {
         self.flags.set(ImGuiWindowFlags_NoBringToFrontOnFocus, value);
         self
     }
-    #[deprecated(since = "0.0.11", note = "name has a typo, please use `always_vertical_scrollbar` instead")]
-    #[inline]
-    pub fn always_vertical_scollbar(self, value: bool) -> Self {
-        self.always_vertical_scrollbar(value)
-    }
     #[inline]
     pub fn always_vertical_scrollbar(mut self, value: bool) -> Self {
         self.flags.set(ImGuiWindowFlags_AlwaysVerticalScrollbar, value);

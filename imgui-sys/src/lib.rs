@@ -195,18 +195,6 @@ bitflags!(
     }
 );
 
-impl ImGuiWindowFlags {
-    #[deprecated(since = "0.0.11")]
-    #[inline]
-    pub fn with(self, mask: ImGuiWindowFlags, value: bool) -> ImGuiWindowFlags {
-        if value {
-            self | mask
-        } else {
-            self - mask
-        }
-    }
-}
-
 bitflags!(
     /// Condition flags
     #[repr(C)]
@@ -243,19 +231,6 @@ bitflags!(
     }
 );
 
-impl ImGuiInputTextFlags {
-    #[deprecated(since = "0.0.11")]
-    #[inline]
-    pub fn with(self, mask: ImGuiInputTextFlags, value: bool) -> ImGuiInputTextFlags {
-        if value {
-            self | mask
-        } else {
-            self - mask
-        }
-    }
-}
-
-
 bitflags!(
     /// Flags for selectables
     #[repr(C)]
@@ -284,18 +259,6 @@ bitflags!(
             ImGuiTreeNodeFlags_Framed.bits | ImGuiTreeNodeFlags_NoAutoOpenOnLog.bits
     }
 );
-
-impl ImGuiTreeNodeFlags {
-    #[deprecated(since = "0.0.11")]
-    #[inline]
-    pub fn with(self, mask: ImGuiTreeNodeFlags, value: bool) -> ImGuiTreeNodeFlags {
-        if value {
-            self | mask
-        } else {
-            self - mask
-        }
-    }
-}
 
 pub type ImGuiTextEditCallback =
     Option<extern "C" fn(data: *mut ImGuiTextEditCallbackData) -> c_int>;
@@ -831,13 +794,6 @@ extern "C" {
     pub fn igGetFontTexUvWhitePixel(out: *mut ImVec2);
     pub fn igGetColorU32(idx: ImGuiCol, alpha_mul: c_float) -> ImU32;
     pub fn igGetColorU32Vec(col: *const ImVec4) -> ImU32;
-}
-
-#[allow(non_snake_case)]
-#[deprecated(since = "0.0.11", note = "name has a typo, please use `igPushStyleVarVec` instead")]
-#[inline]
-pub unsafe fn igPushStyleVavrVec(idx: ImGuiStyleVar, val: ImVec2) {
-    igPushStyleVarVec(idx, val);
 }
 
 // Parameter stack (current window)

@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+### Removed
+
+- `Window::always_vertical_scollbar` (typo)
+- `igPushStyleVavrVec` (typo)
+- `ImGuiInputTextFlags::with`
+- `ImGuiTreeNodeFlags::with`
+- `ImGuiWindowFlags::with`
+
 ## [0.0.11] - 2017-02-15
 
 ### Added
