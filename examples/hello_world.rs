@@ -17,7 +17,9 @@ fn main() {
     loop {
         support.render(CLEAR_COLOR, hello_world);
         let active = support.update_events();
-        if !active { break }
+        if !active {
+            break;
+        }
     }
 }
 

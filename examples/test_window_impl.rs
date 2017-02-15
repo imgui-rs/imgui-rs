@@ -37,15 +37,15 @@ struct State {
     text: String,
     i0: i32,
     f0: f32,
-    vec2f: [f32;2],
-    vec3f: [f32;3],
-    vec2i: [i32;2],
-    vec3i: [i32;3],
-    col1: [f32;3],
-    col2: [f32;4],
+    vec2f: [f32; 2],
+    vec3f: [f32; 3],
+    vec2i: [i32; 2],
+    vec3i: [i32; 3],
+    col1: [f32; 3],
+    col2: [f32; 4],
     selected_fish: Option<usize>,
     auto_resize_state: AutoResizeState,
-    file_menu: FileMenuState
+    file_menu: FileMenuState,
 }
 
 impl Default for State {
@@ -92,33 +92,25 @@ impl Default for State {
             col2: [0.4, 0.7, 0.0, 0.5],
             selected_fish: None,
             auto_resize_state: Default::default(),
-            file_menu: Default::default()
+            file_menu: Default::default(),
         }
     }
 }
 
 struct FileMenuState {
-    enabled: bool
+    enabled: bool,
 }
 
 impl Default for FileMenuState {
-    fn default() -> Self {
-        FileMenuState {
-            enabled: true
-        }
-    }
+    fn default() -> Self { FileMenuState { enabled: true } }
 }
 
 struct AutoResizeState {
-    lines: i32
+    lines: i32,
 }
 
 impl Default for AutoResizeState {
-    fn default() -> Self {
-        AutoResizeState {
-            lines: 10
-        }
-    }
+    fn default() -> Self { AutoResizeState { lines: 10 } }
 }
 
 fn main() {
@@ -127,11 +119,12 @@ fn main() {
     let mut opened = true;
 
     loop {
-        support.render(state.clear_color, |ui| {
-            show_test_window(ui, &mut state, &mut opened);
-        });
+        support.render(state.clear_color,
+                       |ui| { show_test_window(ui, &mut state, &mut opened); });
         let active = support.update_events();
-        if !active || !opened { break }
+        if !active || !opened {
+            break;
+        }
     }
 }
 
@@ -142,15 +135,18 @@ fn show_user_guide<'a>(ui: &Ui<'a>) {
     ui.bullet_text(im_str!("Mouse Wheel to scroll."));
     ui.bullet_text(im_str!("TAB/SHIFT+TAB to cycle through keyboard editable fields."));
     ui.bullet_text(im_str!("CTRL+Click on a slider or drag box to input text."));
-    ui.bullet_text(im_str!(
-"While editing text:
+    ui.bullet_text(im_str!("While editing text:
 - Hold SHIFT or use mouse to select text
-- CTRL+Left/Right to word jump
+- \
+                            CTRL+Left/Right to word jump
 - CTRL+A or double-click to select all
-- CTRL+X,CTRL+C,CTRL+V clipboard
+\
+                            - CTRL+X,CTRL+C,CTRL+V clipboard
 - CTRL+Z,CTRL+Y undo/redo
-- ESCAPE to revert
-- You can apply arithmetic operators +,*,/ on numerical values.
+- ESCAPE \
+                            to revert
+- You can apply arithmetic operators +,*,/ on numerical \
+                            values.
   Use +- to subtract."));
 }
 
@@ -158,9 +154,13 @@ fn show_test_window<'a>(ui: &Ui<'a>, state: &mut State, opened: &mut bool) {
     if state.show_app_metrics {
         ui.show_metrics_window(&mut state.show_app_metrics);
     }
-    if state.show_app_main_menu_bar { show_example_app_main_menu_bar(ui, state) }
+    if state.show_app_main_menu_bar {
+        show_example_app_main_menu_bar(ui, state)
+    }
     if state.show_app_auto_resize {
-        show_example_app_auto_resize(ui, &mut state.auto_resize_state, &mut state.show_app_auto_resize);
+        show_example_app_auto_resize(ui,
+                                     &mut state.auto_resize_state,
+                                     &mut state.show_app_auto_resize);
     }
     if state.show_app_fixed_overlay {
         show_example_app_fixed_overlay(ui, &mut state.show_app_fixed_overlay);
@@ -176,7 +176,8 @@ fn show_test_window<'a>(ui: &Ui<'a>, state: &mut State, opened: &mut bool) {
                 ui.text(im_str!("ImGui {}", imgui::get_version()));
                 ui.separator();
                 ui.text(im_str!("By Omar Cornut and all github contributors."));
-                ui.text(im_str!("ImGui is licensed under the MIT License, see LICENSE for more information."));
+                ui.text(im_str!("ImGui is licensed under the MIT License, see LICENSE for more \
+                                 information."));
             })
     }
 
@@ -194,37 +195,48 @@ fn show_test_window<'a>(ui: &Ui<'a>, state: &mut State, opened: &mut bool) {
         .build(|| {
             ui.text(im_str!("ImGui says hello."));
             ui.menu_bar(|| {
-                ui.menu(im_str!("Menu")).build(|| {
-                    show_example_menu_file(ui, &mut state.file_menu);
-                });
+                ui.menu(im_str!("Menu"))
+                    .build(|| { show_example_menu_file(ui, &mut state.file_menu); });
                 ui.menu(im_str!("Examples")).build(|| {
                     ui.menu_item(im_str!("Main menu bar"))
-                        .selected(&mut state.show_app_main_menu_bar).build();
+                        .selected(&mut state.show_app_main_menu_bar)
+                        .build();
                     ui.menu_item(im_str!("Console"))
-                        .selected(&mut state.show_app_console).build();
+                        .selected(&mut state.show_app_console)
+                        .build();
                     ui.menu_item(im_str!("Simple layout"))
-                        .selected(&mut state.show_app_layout).build();
+                        .selected(&mut state.show_app_layout)
+                        .build();
                     ui.menu_item(im_str!("Long text display"))
-                        .selected(&mut state.show_app_long_text).build();
+                        .selected(&mut state.show_app_long_text)
+                        .build();
                     ui.menu_item(im_str!("Auto-resizing window"))
-                        .selected(&mut state.show_app_auto_resize).build();
+                        .selected(&mut state.show_app_auto_resize)
+                        .build();
                     ui.menu_item(im_str!("Simple overlay"))
-                        .selected(&mut state.show_app_fixed_overlay).build();
+                        .selected(&mut state.show_app_fixed_overlay)
+                        .build();
                     ui.menu_item(im_str!("Manipulating window title"))
-                        .selected(&mut state.show_app_manipulating_window_title).build();
+                        .selected(&mut state.show_app_manipulating_window_title)
+                        .build();
                     ui.menu_item(im_str!("Custom rendering"))
-                        .selected(&mut state.show_app_custom_rendering).build();
+                        .selected(&mut state.show_app_custom_rendering)
+                        .build();
                 });
                 ui.menu(im_str!("Help")).build(|| {
                     ui.menu_item(im_str!("Metrics"))
-                        .selected(&mut state.show_app_metrics).build();
+                        .selected(&mut state.show_app_metrics)
+                        .build();
                     ui.menu_item(im_str!("About ImGui"))
-                        .selected(&mut state.show_app_about).build();
+                        .selected(&mut state.show_app_about)
+                        .build();
                 });
             });
             ui.spacing();
             if ui.collapsing_header(im_str!("Help")).build() {
-                ui.text_wrapped(im_str!("This window is being created by the show_test_window() function. Please refer to the code for programming reference.\n\nUser Guide:"));
+                ui.text_wrapped(im_str!("This window is being created by the show_test_window() \
+                                         function. Please refer to the code for programming \
+                                         reference.\n\nUser Guide:"));
                 show_user_guide(ui);
             }
 
@@ -249,23 +261,22 @@ fn show_test_window<'a>(ui: &Ui<'a>, state: &mut State, opened: &mut bool) {
                 ui.tree_node(im_str!("Fonts"))
                     .label(im_str!("Fonts ({})", "TODO"))
                     .build(|| {
-                    ui.text_wrapped(im_str!("Tip: Load fonts with io.Fonts->AddFontFromFileTTF()."));
-                    ui.tree_node(im_str!("Atlas texture")).build(|| {
-                        // TODO
+                        ui.text_wrapped(im_str!("Tip: Load fonts with \
+                                                 io.Fonts->AddFontFromFileTTF()."));
+                        ui.tree_node(im_str!("Atlas texture")).build(|| {
+                            // TODO
+                        });
                     });
-                });
             }
             if ui.collapsing_header(im_str!("Widgets")).build() {
-                ui.tree_node(im_str!("Tree")).build(|| {
-                    for i in 0..5 {
-                        ui.tree_node(im_str!("Child {}", i)).build(|| {
-                            ui.text(im_str!("blah blah"));
-                            ui.same_line(0.0);
-                            if ui.small_button(im_str!("print")) {
-                                println!("Child {} pressed", i);
-                            }
-                        });
-                    }
+                ui.tree_node(im_str!("Tree")).build(|| for i in 0..5 {
+                    ui.tree_node(im_str!("Child {}", i)).build(|| {
+                        ui.text(im_str!("blah blah"));
+                        ui.same_line(0.0);
+                        if ui.small_button(im_str!("print")) {
+                            println!("Child {} pressed", i);
+                        }
+                    });
                 });
                 ui.tree_node(im_str!("Bullets")).build(|| {
                     ui.bullet_text(im_str!("Bullet point 1"));
@@ -282,10 +293,10 @@ fn show_test_window<'a>(ui: &Ui<'a>, state: &mut State, opened: &mut bool) {
                     ui.text_disabled(im_str!("Disabled"));
                 });
                 ui.tree_node(im_str!("Word Wrapping")).build(|| {
-                    ui.text_wrapped(im_str!(
-                            "This text should automatically wrap on the edge of the window.\
-                            The current implementation for text wrapping follows simple rules\
-                            suitable for English and possibly other languages."));
+                    ui.text_wrapped(im_str!("This text should automatically wrap on the edge of \
+                                             the window.The current implementation for text \
+                                             wrapping follows simple rulessuitable for English \
+                                             and possibly other languages."));
                     ui.spacing();
 
                     ui.slider_float(im_str!("Wrap width"), &mut state.wrap_width, -20.0, 600.0)
@@ -299,10 +310,10 @@ fn show_test_window<'a>(ui: &Ui<'a>, state: &mut State, opened: &mut bool) {
                     // TODO
                 });
                 ui.tree_node(im_str!("UTF-8 Text")).build(|| {
-                    ui.text_wrapped(im_str!(
-                            "CJK text will only appear if the font was loaded with the\
-                            appropriate CJK character ranges. Call io.Font->LoadFromFileTTF()\
-                            manually to load extra character ranges."));
+                    ui.text_wrapped(im_str!("CJK text will only appear if the font was loaded \
+                                             with theappropriate CJK character ranges. Call \
+                                             io.Font->LoadFromFileTTF()manually to load extra \
+                                             character ranges."));
 
                     ui.text(im_str!("Hiragana: かきくけこ (kakikukeko)"));
                     ui.text(im_str!("Kanjis: 日本語 (nihongo)"));
@@ -311,17 +322,32 @@ fn show_test_window<'a>(ui: &Ui<'a>, state: &mut State, opened: &mut bool) {
 
                 ui.separator();
                 ui.label_text(im_str!("label"), im_str!("Value"));
-                ui.combo(im_str!("combo"), &mut state.item, &[im_str!("aaaa"), im_str!("bbbb"),
-                    im_str!("cccc"), im_str!("dddd"), im_str!("eeee")], -1);
-                let items = [
-                    im_str!("AAAA"), im_str!("BBBB"), im_str!("CCCC"), im_str!("DDDD"),
-                    im_str!("EEEE"), im_str!("FFFF"), im_str!("GGGG"), im_str!("HHHH"),
-                    im_str!("IIII"), im_str!("JJJJ"), im_str!("KKKK")];
+                ui.combo(im_str!("combo"),
+                         &mut state.item,
+                         &[im_str!("aaaa"),
+                           im_str!("bbbb"),
+                           im_str!("cccc"),
+                           im_str!("dddd"),
+                           im_str!("eeee")],
+                         -1);
+                let items = [im_str!("AAAA"),
+                             im_str!("BBBB"),
+                             im_str!("CCCC"),
+                             im_str!("DDDD"),
+                             im_str!("EEEE"),
+                             im_str!("FFFF"),
+                             im_str!("GGGG"),
+                             im_str!("HHHH"),
+                             im_str!("IIII"),
+                             im_str!("JJJJ"),
+                             im_str!("KKKK")];
                 ui.combo(im_str!("combo scroll"), &mut state.item2, &items, -1);
                 ui.input_text(im_str!("input text"), &mut state.text).build();
                 ui.input_int(im_str!("input int"), &mut state.i0).build();
                 ui.input_float(im_str!("input float"), &mut state.f0)
-                    .step(0.01).step_fast(1.0).build();
+                    .step(0.01)
+                    .step_fast(1.0)
+                    .build();
                 ui.input_float3(im_str!("input float3"), &mut state.vec3f).build();
                 ui.color_edit3(im_str!("color 1"), &mut state.col1).build();
                 ui.color_edit4(im_str!("color 2"), &mut state.col2).build();
@@ -338,22 +364,30 @@ fn show_test_window<'a>(ui: &Ui<'a>, state: &mut State, opened: &mut bool) {
             }
             if ui.collapsing_header(im_str!("Popups & Modal windows")).build() {
                 ui.tree_node(im_str!("Popups")).build(|| {
-                    ui.text_wrapped(im_str!("When a popup is active, it inhibits interacting with windows that are behind the popup. Clicking outside the popup closes it."));
-                    let names = [im_str!("Bream"), im_str!("Haddock"), im_str!("Mackerel"), im_str!("Pollock"), im_str!("Tilefish")];
+                    ui.text_wrapped(im_str!("When a popup is active, it inhibits interacting \
+                                             with windows that are behind the popup. Clicking \
+                                             outside the popup closes it."));
+                    let names = [im_str!("Bream"),
+                                 im_str!("Haddock"),
+                                 im_str!("Mackerel"),
+                                 im_str!("Pollock"),
+                                 im_str!("Tilefish")];
                     if ui.small_button(im_str!("Select..")) {
                         ui.open_popup(im_str!("select"));
                     }
                     ui.same_line(0.0);
-                    ui.text(
-                        match state.selected_fish {
-                            Some(index) => names[index].clone(),
-                            None => im_str!("<None>")
-                        });
+                    ui.text(match state.selected_fish {
+                        Some(index) => names[index].clone(),
+                        None => im_str!("<None>"),
+                    });
                     ui.popup(im_str!("select"), || {
                         ui.text(im_str!("Aquarium"));
                         ui.separator();
                         for (index, name) in names.iter().enumerate() {
-                            if ui.selectable(name.clone(), false, ImGuiSelectableFlags::empty(), ImVec2::new(0.0, 0.0)) {
+                            if ui.selectable(name.clone(),
+                                             false,
+                                             ImGuiSelectableFlags::empty(),
+                                             ImVec2::new(0.0, 0.0)) {
                                 state.selected_fish = Some(index);
                             }
                         }
@@ -365,13 +399,13 @@ fn show_test_window<'a>(ui: &Ui<'a>, state: &mut State, opened: &mut bool) {
 
 fn show_example_app_main_menu_bar<'a>(ui: &Ui<'a>, state: &mut State) {
     ui.main_menu_bar(|| {
-        ui.menu(im_str!("File")).build(|| {
-            show_example_menu_file(ui, &mut state.file_menu);
-        });
+        ui.menu(im_str!("File")).build(|| { show_example_menu_file(ui, &mut state.file_menu); });
         ui.menu(im_str!("Edit")).build(|| {
             ui.menu_item(im_str!("Undo")).shortcut(im_str!("CTRL+Z")).build();
             ui.menu_item(im_str!("Redo"))
-                .shortcut(im_str!("CTRL+Y")).enabled(false).build();
+                .shortcut(im_str!("CTRL+Y"))
+                .enabled(false)
+                .build();
             ui.separator();
             ui.menu_item(im_str!("Cut")).shortcut(im_str!("CTRL+X")).build();
             ui.menu_item(im_str!("Copy")).shortcut(im_str!("CTRL+C")).build();
@@ -391,9 +425,7 @@ fn show_example_menu_file<'a>(ui: &Ui<'a>, state: &mut FileMenuState) {
         ui.menu(im_str!("More..")).build(|| {
             ui.menu_item(im_str!("Hello")).build();
             ui.menu_item(im_str!("Sailor")).build();
-            ui.menu(im_str!("Recurse..")).build(|| {
-                show_example_menu_file(ui, state);
-            });
+            ui.menu(im_str!("Recurse..")).build(|| { show_example_menu_file(ui, state); });
         });
     });
     ui.menu_item(im_str!("Save")).shortcut(im_str!("Ctrl+S")).build();
@@ -423,7 +455,7 @@ fn show_example_app_auto_resize<'a>(ui: &Ui<'a>, state: &mut AutoResizeState, op
 Note that you probably don't want to query the window size to
 output your content because that would create a feedback loop."));
             ui.slider_int(im_str!("Number of lines"), &mut state.lines, 1, 20).build();
-            for i in 0 .. state.lines {
+            for i in 0..state.lines {
                 ui.text(im_str!("{:2$}This is line {}", "", i, i as usize * 4));
             }
         })
@@ -464,7 +496,5 @@ My title is the same as window 1, but my identifier is unique."));
     let title = im_str!("Animated title {} {}###AnimatedTitle", chars[ch_idx], num);
     ui.window(title)
         .position((100.0, 300.0), ImGuiSetCond_FirstUseEver)
-        .build(|| {
-            ui.text(im_str!("This window has a changing title"));
-        });
+        .build(|| { ui.text(im_str!("This window has a changing title")); });
 }

@@ -33,16 +33,15 @@ pub use imgui_sys::{ImDrawIdx, ImDrawVert, ImGuiInputTextFlags, ImGuiInputTextFl
                     ImGuiTreeNodeFlags_Selected, ImGuiWindowFlags,
                     ImGuiWindowFlags_AlwaysAutoResize, ImGuiWindowFlags_AlwaysHorizontalScrollbar,
                     ImGuiWindowFlags_AlwaysUseWindowPadding,
-                    ImGuiWindowFlags_AlwaysVerticalScrollbar,
-                    ImGuiWindowFlags_HorizontalScrollbar, ImGuiWindowFlags_MenuBar,
-                    ImGuiWindowFlags_NoBringToFrontOnFocus, ImGuiWindowFlags_NoCollapse,
-                    ImGuiWindowFlags_NoFocusOnAppearing, ImGuiWindowFlags_NoInputs,
-                    ImGuiWindowFlags_NoMove, ImGuiWindowFlags_NoResize,
+                    ImGuiWindowFlags_AlwaysVerticalScrollbar, ImGuiWindowFlags_HorizontalScrollbar,
+                    ImGuiWindowFlags_MenuBar, ImGuiWindowFlags_NoBringToFrontOnFocus,
+                    ImGuiWindowFlags_NoCollapse, ImGuiWindowFlags_NoFocusOnAppearing,
+                    ImGuiWindowFlags_NoInputs, ImGuiWindowFlags_NoMove, ImGuiWindowFlags_NoResize,
                     ImGuiWindowFlags_NoSavedSettings, ImGuiWindowFlags_NoScrollWithMouse,
                     ImGuiWindowFlags_NoScrollbar, ImGuiWindowFlags_NoTitleBar,
                     ImGuiWindowFlags_ShowBorders, ImVec2, ImVec4};
-pub use input::{ColorEdit3, ColorEdit4, InputFloat, InputFloat2, InputFloat3, InputFloat4,
-                InputInt, InputInt2, InputInt3, InputInt4, InputText};
+pub use input::{ColorEdit3, ColorEdit4, InputFloat, InputFloat2, InputFloat3, InputFloat4, InputInt,
+                InputInt2, InputInt3, InputInt4, InputText};
 pub use menus::{Menu, MenuItem};
 pub use plothistogram::PlotHistogram;
 pub use plotlines::PlotLines;
@@ -617,9 +616,7 @@ impl<'ui> Ui<'ui> {
             unsafe { imgui_sys::igEndPopup() };
         }
     }
-    pub fn close_current_popup(&self) {
-        unsafe { imgui_sys::igCloseCurrentPopup() };
-    }
+    pub fn close_current_popup(&self) { unsafe { imgui_sys::igCloseCurrentPopup() }; }
 }
 
 // Widgets: Combos

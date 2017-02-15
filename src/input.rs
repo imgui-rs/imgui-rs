@@ -9,8 +9,7 @@ use super::{ImGuiInputTextFlags,
             ImGuiInputTextFlags_CallbackCompletion, ImGuiInputTextFlags_CallbackHistory,
             ImGuiInputTextFlags_CharsDecimal, ImGuiInputTextFlags_CharsHexadecimal,
             ImGuiInputTextFlags_CharsNoBlank, ImGuiInputTextFlags_CharsUppercase,
-            ImGuiInputTextFlags_EnterReturnsTrue, ImGuiInputTextFlags_NoHorizontalScroll, ImStr,
-            Ui};
+            ImGuiInputTextFlags_EnterReturnsTrue, ImGuiInputTextFlags_NoHorizontalScroll, ImStr, Ui};
 
 macro_rules! impl_text_flags {
     ($InputType:ident) => {

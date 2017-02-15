@@ -107,26 +107,29 @@ impl Renderer {
             let idx_end = idx_start + cmd.elem_count as usize;
 
             try!(surface.draw(&self.device_objects.vertex_buffer,
-                      &self.device_objects
-                          .index_buffer
-                          .slice(idx_start..idx_end)
-                          .expect("Invalid index buffer range"),
-                      &self.device_objects.program,
-                      &uniform! {
+                              &self.device_objects
+                                  .index_buffer
+                                  .slice(idx_start..idx_end)
+                                  .expect("Invalid index buffer range"),
+                              &self.device_objects.program,
+                              &uniform! {
                           matrix: matrix,
                           tex: self.device_objects.texture.sampled()
                               .magnify_filter(MagnifySamplerFilter::Nearest),
                       },
-                      &DrawParameters {
-                          blend: Blend::alpha_blending(),
-                          scissor: Some(Rect {
-                              left: (cmd.clip_rect.x * scale_width) as u32,
-                              bottom: ((height - cmd.clip_rect.w) * scale_height) as u32,
-                              width: ((cmd.clip_rect.z - cmd.clip_rect.x) * scale_width) as u32,
-                              height: ((cmd.clip_rect.w - cmd.clip_rect.y) * scale_height) as u32,
-                          }),
-                          ..DrawParameters::default()
-                      }));
+                              &DrawParameters {
+                                  blend: Blend::alpha_blending(),
+                                  scissor: Some(Rect {
+                                      left: (cmd.clip_rect.x * scale_width) as u32,
+                                      bottom: ((height - cmd.clip_rect.w) * scale_height) as u32,
+                                      width: ((cmd.clip_rect.z - cmd.clip_rect.x) * scale_width) as
+                                             u32,
+                                      height: ((cmd.clip_rect.w - cmd.clip_rect.y) *
+                                               scale_height) as
+                                              u32,
+                                  }),
+                                  ..DrawParameters::default()
+                              }));
 
             idx_start = idx_end;
         }

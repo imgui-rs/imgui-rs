@@ -24,7 +24,7 @@ pub type ImU32 = c_uint;
 /// Character for keyboard input/display
 pub type ImWchar = c_ushort;
 
-/// User data to identify a texture (this is whatever to you want it to be! read the FAQ about ImTextureID in imgui.cpp)
+/// User data to identify a texture
 pub type ImTextureID = *mut c_void;
 
 /// Unique ID used by widgets (typically hashed from a stack of string)
@@ -260,8 +260,7 @@ bitflags!(
     }
 );
 
-pub type ImGuiTextEditCallback =
-    Option<extern "C" fn(data: *mut ImGuiTextEditCallbackData) -> c_int>;
+pub type ImGuiTextEditCallback = Option<extern "C" fn(data: *mut ImGuiTextEditCallbackData) -> c_int>;
 
 pub type ImGuiSizeConstraintCallback =
     Option<extern "C" fn(data: *mut ImGuiSizeConstraintCallbackData)>;
@@ -357,15 +356,20 @@ pub struct ImGuiStyle {
     pub child_window_rounding: c_float,
     /// Padding within a framed rectangle (used by most widgets)
     pub frame_padding: ImVec2,
-    /// Radius of frame corners rounding. Set to 0.0f to have rectangular frames (used by most widgets).
+    /// Radius of frame corners rounding. Set to 0.0f to have rectangular frames (used by most
+    /// widgets).
     pub frame_rounding: c_float,
     /// Horizontal and vertical spacing between widgets/lines
     pub item_spacing: ImVec2,
-    /// Horizontal and vertical spacing between within elements of a composed widget (e.g. a slider and its label)
+    /// Horizontal and vertical spacing between within elements of a composed
+    /// widget (e.g. a slider and its label)
     pub item_inner_spacing: ImVec2,
-    /// Expand reactive bounding box for touch-based system where touch position is not accurate enough. Unfortunately we don't sort widgets so priority on overlap will always be given to the first widget. So don't grow this too much!
+    /// Expand reactive bounding box for touch-based system where touch position is not accurat
+    /// enough. Unfortunately we don't sort widgets so priority on overlap will always be given
+    /// to the first widget. So don't grow this too much!
     pub touch_extra_padding: ImVec2,
-    /// Horizontal spacing when e.g. entering a tree node. Generally == (FontSize + FramePadding.x*2).
+    /// Horizontal spacing when e.g. entering a tree node.
+    /// Generally == (FontSize + FramePadding.x*2).
     pub indent_spacing: c_float,
     /// Minimum horizontal spacing between two columns
     pub columns_min_spacing: c_float,
@@ -377,15 +381,18 @@ pub struct ImGuiStyle {
     pub grab_min_size: c_float,
     /// Radius of grabs corners rounding. Set to 0.0f to have rectangular slider grabs.
     pub grab_rounding: c_float,
-    /// Window positions are clamped to be visible within the display area by at least this amount. Only covers regular windows.
+    /// Window positions are clamped to be visible within the display area by at least this
+    /// amount. Only covers regular windows.
     pub display_window_padding: ImVec2,
-    /// If you cannot see the edge of your screen (e.g. on a TV) increase the safe area padding. Covers popups/tooltips as well regular windows.
+    /// If you cannot see the edge of your screen (e.g. on a TV) increase the safe area padding.
+    /// Covers popups/tooltips as well regular windows.
     pub display_safe_area_padding: ImVec2,
     /// Enable anti-aliasing on lines/borders. Disable if you are really short on CPU/GPU.
     pub anti_aliased_lines: bool,
     /// Enable anti-aliasing on filled shapes (rounded rectangles, circles, etc.)
     pub anti_aliased_shapes: bool,
-    /// Tessellation tolerance. Decrease for highly tessellated curves (higher quality, more polygons), increase to reduce quality.
+    /// Tessellation tolerance. Decrease for highly tessellated curves (higher quality, more
+    /// polygons), increase to reduce quality.
     pub curve_tessellation_tol: c_float,
     /// Colors for the user interface
     pub colors: [ImVec4; ImGuiCol_COUNT],
@@ -577,11 +584,13 @@ impl Vertex for ImDrawVert {
     fn build_bindings() -> VertexFormat {
         unsafe {
             let dummy: &ImDrawVert = mem::transmute(0usize);
-            Cow::Owned(vec![
-                ("pos".into(), mem::transmute(&dummy.pos), <ImVec2 as Attribute>::get_type()),
-                ("uv".into(), mem::transmute(&dummy.uv), <ImVec2 as Attribute>::get_type()),
-                ("col".into(), mem::transmute(&dummy.col), AttributeType::U8U8U8U8)
-            ])
+            Cow::Owned(vec![("pos".into(),
+                             mem::transmute(&dummy.pos),
+                             <ImVec2 as Attribute>::get_type()),
+                            ("uv".into(),
+                             mem::transmute(&dummy.uv),
+                             <ImVec2 as Attribute>::get_type()),
+                            ("col".into(), mem::transmute(&dummy.col), AttributeType::U8U8U8U8)])
         }
     }
 }

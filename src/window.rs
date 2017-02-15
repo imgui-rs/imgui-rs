@@ -9,8 +9,8 @@ use super::{ImGuiSetCond, ImGuiWindowFlags, ImGuiWindowFlags_AlwaysAutoResize,
             ImGuiWindowFlags_NoCollapse, ImGuiWindowFlags_NoFocusOnAppearing,
             ImGuiWindowFlags_NoInputs, ImGuiWindowFlags_NoMove, ImGuiWindowFlags_NoResize,
             ImGuiWindowFlags_NoSavedSettings, ImGuiWindowFlags_NoScrollWithMouse,
-            ImGuiWindowFlags_NoScrollbar, ImGuiWindowFlags_NoTitleBar,
-            ImGuiWindowFlags_ShowBorders, ImStr, ImVec2, Ui};
+            ImGuiWindowFlags_NoScrollbar, ImGuiWindowFlags_NoTitleBar, ImGuiWindowFlags_ShowBorders,
+            ImStr, ImVec2, Ui};
 
 #[must_use]
 pub struct Window<'ui, 'p> {

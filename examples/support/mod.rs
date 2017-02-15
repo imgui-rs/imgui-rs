@@ -52,14 +52,19 @@ impl Support {
             last_frame: Instant::now(),
             mouse_pos: (0, 0),
             mouse_pressed: (false, false, false),
-            mouse_wheel: 0.0
+            mouse_wheel: 0.0,
         }
     }
 
     pub fn update_mouse(&mut self) {
         let scale = self.imgui.display_framebuffer_scale();
-        self.imgui.set_mouse_pos(self.mouse_pos.0 as f32 / scale.0, self.mouse_pos.1 as f32 / scale.1);
-        self.imgui.set_mouse_down(&[self.mouse_pressed.0, self.mouse_pressed.1, self.mouse_pressed.2, false, false]);
+        self.imgui.set_mouse_pos(self.mouse_pos.0 as f32 / scale.0,
+                                 self.mouse_pos.1 as f32 / scale.1);
+        self.imgui.set_mouse_down(&[self.mouse_pressed.0,
+                                    self.mouse_pressed.1,
+                                    self.mouse_pressed.2,
+                                    false,
+                                    false]);
         self.imgui.set_mouse_wheel(self.mouse_wheel / scale.1);
         self.mouse_wheel = 0.0;
     }
@@ -73,8 +78,7 @@ impl Support {
         self.update_mouse();
 
         let mut target = self.display.draw();
-        target.clear_color(clear_color.0, clear_color.1,
-                           clear_color.2, clear_color.3);
+        target.clear_color(clear_color.0, clear_color.1, clear_color.2, clear_color.3);
 
         let window = self.display.get_window().unwrap();
         let size_points = window.get_inner_size_points().unwrap();
@@ -115,30 +119,35 @@ impl Support {
                         Some(VirtualKeyCode::X) => self.imgui.set_key(16, pressed),
                         Some(VirtualKeyCode::Y) => self.imgui.set_key(17, pressed),
                         Some(VirtualKeyCode::Z) => self.imgui.set_key(18, pressed),
-                        Some(VirtualKeyCode::LControl) | Some(VirtualKeyCode::RControl) =>
-                            self.imgui.set_key_ctrl(pressed),
-                        Some(VirtualKeyCode::LShift) | Some(VirtualKeyCode::RShift) =>
-                            self.imgui.set_key_shift(pressed),
-                        Some(VirtualKeyCode::LAlt) | Some(VirtualKeyCode::RAlt) =>
-                            self.imgui.set_key_alt(pressed),
-                        Some(VirtualKeyCode::LWin) | Some(VirtualKeyCode::RWin) =>
-                            self.imgui.set_key_super(pressed),
-                        _ => {},
+                        Some(VirtualKeyCode::LControl) |
+                        Some(VirtualKeyCode::RControl) => self.imgui.set_key_ctrl(pressed),
+                        Some(VirtualKeyCode::LShift) |
+                        Some(VirtualKeyCode::RShift) => self.imgui.set_key_shift(pressed),
+                        Some(VirtualKeyCode::LAlt) |
+                        Some(VirtualKeyCode::RAlt) => self.imgui.set_key_alt(pressed),
+                        Some(VirtualKeyCode::LWin) |
+                        Some(VirtualKeyCode::RWin) => self.imgui.set_key_super(pressed),
+                        _ => {}
                     }
-                },
+                }
                 Event::MouseMoved(x, y) => self.mouse_pos = (x, y),
-                Event::MouseInput(state, MouseButton::Left) =>
-                    self.mouse_pressed.0 = state == ElementState::Pressed,
-                Event::MouseInput(state, MouseButton::Right) =>
-                    self.mouse_pressed.1 = state == ElementState::Pressed,
-                Event::MouseInput(state, MouseButton::Middle) =>
-                    self.mouse_pressed.2 = state == ElementState::Pressed,
-                Event::MouseWheel(MouseScrollDelta::LineDelta(_, y), TouchPhase::Moved) =>
-                    self.mouse_wheel = y,
-                Event::MouseWheel(MouseScrollDelta::PixelDelta(_, y), TouchPhase::Moved) =>
-                    self.mouse_wheel = y,
+                Event::MouseInput(state, MouseButton::Left) => {
+                    self.mouse_pressed.0 = state == ElementState::Pressed
+                }
+                Event::MouseInput(state, MouseButton::Right) => {
+                    self.mouse_pressed.1 = state == ElementState::Pressed
+                }
+                Event::MouseInput(state, MouseButton::Middle) => {
+                    self.mouse_pressed.2 = state == ElementState::Pressed
+                }
+                Event::MouseWheel(MouseScrollDelta::LineDelta(_, y), TouchPhase::Moved) => {
+                    self.mouse_wheel = y
+                }
+                Event::MouseWheel(MouseScrollDelta::PixelDelta(_, y), TouchPhase::Moved) => {
+                    self.mouse_wheel = y
+                }
                 Event::ReceivedCharacter(c) => self.imgui.add_input_character(c),
-                _ => ()
+                _ => (),
             }
         }
         true

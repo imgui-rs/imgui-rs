@@ -14,10 +14,10 @@ fn main() {
 
     loop {
         let mut open = true;
-        support.render(CLEAR_COLOR, |ui| {
-            ui.show_test_window(&mut open)
-        });
+        support.render(CLEAR_COLOR, |ui| ui.show_test_window(&mut open));
         let active = support.update_events();
-        if !active || !open { break }
+        if !active || !open {
+            break;
+        }
     }
 }

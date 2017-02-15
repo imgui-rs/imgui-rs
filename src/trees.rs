@@ -2,9 +2,8 @@ use imgui_sys;
 use std::marker::PhantomData;
 
 use super::{ImGuiSetCond, ImGuiTreeNodeFlags, ImGuiTreeNodeFlags_Bullet,
-            ImGuiTreeNodeFlags_DefaultOpen, ImGuiTreeNodeFlags_Leaf,
-            ImGuiTreeNodeFlags_OpenOnArrow, ImGuiTreeNodeFlags_OpenOnDoubleClick,
-            ImGuiTreeNodeFlags_Selected, ImStr, Ui};
+            ImGuiTreeNodeFlags_DefaultOpen, ImGuiTreeNodeFlags_Leaf, ImGuiTreeNodeFlags_OpenOnArrow,
+            ImGuiTreeNodeFlags_OpenOnDoubleClick, ImGuiTreeNodeFlags_Selected, ImStr, Ui};
 
 #[must_use]
 pub struct TreeNode<'ui, 'p> {
