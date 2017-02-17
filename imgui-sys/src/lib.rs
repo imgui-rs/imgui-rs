@@ -7,14 +7,13 @@ extern crate bitflags;
 #[macro_use]
 extern crate glium;
 
-#[cfg(feature = "glium")]
-use glium::vertex::{Attribute, AttributeType, Vertex, VertexFormat};
-#[cfg(feature = "glium")]
-use std::borrow::Cow;
 use std::convert::From;
 use std::mem;
 use std::os::raw::{c_char, c_float, c_int, c_short, c_uchar, c_uint, c_ushort, c_void};
 use std::slice;
+
+#[cfg(feature = "glium")]
+mod glium_support;
 
 /// ImGui context (opaque)
 pub enum ImGuiContext { }
@@ -304,11 +303,6 @@ impl Into<(f32, f32)> for ImVec2 {
     fn into(self) -> (f32, f32) { (self.x, self.y) }
 }
 
-#[cfg(feature = "glium")]
-unsafe impl Attribute for ImVec2 {
-    fn get_type() -> AttributeType { <(c_float, c_float) as Attribute>::get_type() }
-}
-
 /// A tuple of 4 floating-point values
 #[repr(C)]
 #[derive(Copy, Clone, Debug, Default, PartialEq)]
@@ -352,13 +346,6 @@ impl Into<[f32; 4]> for ImVec4 {
 
 impl Into<(f32, f32, f32, f32)> for ImVec4 {
     fn into(self) -> (f32, f32, f32, f32) { (self.x, self.y, self.z, self.w) }
-}
-
-#[cfg(feature = "glium")]
-unsafe impl Attribute for ImVec4 {
-    fn get_type() -> AttributeType {
-        <(c_float, c_float, c_float, c_float) as Attribute>::get_type()
-    }
 }
 
 /// Runtime data for styling/colors
@@ -599,22 +586,6 @@ pub struct ImDrawVert {
     pub pos: ImVec2,
     pub uv: ImVec2,
     pub col: ImU32,
-}
-
-#[cfg(feature = "glium")]
-impl Vertex for ImDrawVert {
-    fn build_bindings() -> VertexFormat {
-        unsafe {
-            let dummy: &ImDrawVert = mem::transmute(0usize);
-            Cow::Owned(vec![("pos".into(),
-                             mem::transmute(&dummy.pos),
-                             <ImVec2 as Attribute>::get_type()),
-                            ("uv".into(),
-                             mem::transmute(&dummy.uv),
-                             <ImVec2 as Attribute>::get_type()),
-                            ("col".into(), mem::transmute(&dummy.col), AttributeType::U8U8U8U8)])
-        }
-    }
 }
 
 /// Temporary storage for outputting drawing commands out of order
