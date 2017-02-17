@@ -293,7 +293,15 @@ impl From<[f32; 2]> for ImVec2 {
 }
 
 impl From<(f32, f32)> for ImVec2 {
-    fn from(tuple: (f32, f32)) -> ImVec2 { ImVec2::new(tuple.0, tuple.1) }
+    fn from((x, y): (f32, f32)) -> ImVec2 { ImVec2::new(x, y) }
+}
+
+impl Into<[f32; 2]> for ImVec2 {
+    fn into(self) -> [f32; 2] { [self.x, self.y] }
+}
+
+impl Into<(f32, f32)> for ImVec2 {
+    fn into(self) -> (f32, f32) { (self.x, self.y) }
 }
 
 #[cfg(feature = "glium")]
@@ -320,6 +328,14 @@ impl ImVec4 {
             w: w as c_float,
         }
     }
+    pub fn zero() -> ImVec4 {
+        ImVec4 {
+            x: 0.0 as c_float,
+            y: 0.0 as c_float,
+            z: 0.0 as c_float,
+            w: 0.0 as c_float,
+        }
+    }
 }
 
 impl From<[f32; 4]> for ImVec4 {
@@ -327,9 +343,15 @@ impl From<[f32; 4]> for ImVec4 {
 }
 
 impl From<(f32, f32, f32, f32)> for ImVec4 {
-    fn from(tuple: (f32, f32, f32, f32)) -> ImVec4 {
-        ImVec4::new(tuple.0, tuple.1, tuple.2, tuple.3)
-    }
+    fn from((x, y, z, w): (f32, f32, f32, f32)) -> ImVec4 { ImVec4::new(x, y, z, w) }
+}
+
+impl Into<[f32; 4]> for ImVec4 {
+    fn into(self) -> [f32; 4] { [self.x, self.y, self.z, self.w] }
+}
+
+impl Into<(f32, f32, f32, f32)> for ImVec4 {
+    fn into(self) -> (f32, f32, f32, f32) { (self.x, self.y, self.z, self.w) }
 }
 
 #[cfg(feature = "glium")]
