@@ -45,6 +45,7 @@ pub use input::{ColorEdit3, ColorEdit4, InputFloat, InputFloat2, InputFloat3, In
 pub use menus::{Menu, MenuItem};
 pub use plothistogram::PlotHistogram;
 pub use plotlines::PlotLines;
+pub use progressbar::ProgressBar;
 pub use sliders::{SliderFloat, SliderInt};
 pub use trees::{CollapsingHeader, TreeNode};
 pub use window::Window;
@@ -53,6 +54,7 @@ mod input;
 mod menus;
 mod plothistogram;
 mod plotlines;
+mod progressbar;
 mod sliders;
 mod trees;
 mod window;
@@ -666,5 +668,20 @@ impl<'ui> Ui<'ui> {
 impl<'ui> Ui<'ui> {
     pub fn plot_histogram<'p>(&self, label: ImStr<'p>, values: &'p [f32]) -> PlotHistogram<'p> {
         PlotHistogram::new(label, values)
+    }
+}
+
+impl<'ui> Ui<'ui> {
+    /// Creates a progress bar. Fraction is the progress level with 0.0 = 0% and 1.0 = 100%.
+    ///
+    /// # Example
+    /// ```no_run
+    /// ui.progress_bar(0.6)
+    ///     .size(imgui::ImVec2::new(100.0, 12.0))
+    ///     .overlay_text(im_str!("Progress!"))
+    ///     .build();
+    /// ```
+    pub fn progress_bar<'p>(&self, fraction: f32) -> ProgressBar<'p> {
+        ProgressBar::new(fraction)
     }
 }
