@@ -1,14 +1,17 @@
+#[macro_use]
+extern crate glium;
+extern crate imgui;
+
 use glium::{DrawError, GlObject, IndexBuffer, Program, Surface, Texture2d, VertexBuffer};
 use glium::backend::{Context, Facade};
 use glium::program;
 use glium::index::{self, PrimitiveType};
 use glium::texture;
 use glium::vertex;
+use imgui::{DrawList, ImDrawIdx, ImDrawVert, ImGui, Ui};
 use std::borrow::Cow;
 use std::fmt;
 use std::rc::Rc;
-
-use super::{DrawList, ImDrawIdx, ImDrawVert, ImGui, Ui};
 
 pub type RendererResult<T> = Result<T, RendererError>;
 

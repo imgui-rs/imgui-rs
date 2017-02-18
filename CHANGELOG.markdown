@@ -8,6 +8,11 @@
 - `ImVec4::zero()`
 - `Into` array and tuple conversions for ImVec2 and ImVec4
 
+### Changed
+
+- imgui-sys no longer includes glium support by default
+- Move Glium renderer to a separate crate
+
 ### Removed
 
 - `Window::always_vertical_scollbar` (typo)

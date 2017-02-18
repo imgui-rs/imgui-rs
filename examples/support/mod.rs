@@ -3,7 +3,7 @@ use glium::backend::glutin_backend::GlutinFacade;
 use glium::glutin;
 use glium::glutin::{ElementState, Event, MouseButton, MouseScrollDelta, VirtualKeyCode, TouchPhase};
 use imgui::{ImGui, Ui, ImGuiKey};
-use imgui::glium_renderer::Renderer;
+use imgui_glium_renderer::Renderer;
 use std::time::Instant;
 
 pub struct Support {

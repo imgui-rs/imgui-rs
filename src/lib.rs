@@ -1,7 +1,3 @@
-#[cfg(feature = "glium")]
-#[macro_use]
-extern crate glium;
-
 extern crate imgui_sys;
 
 use std::borrow::Cow;
@@ -58,9 +54,6 @@ mod progressbar;
 mod sliders;
 mod trees;
 mod window;
-
-#[cfg(feature = "glium")]
-pub mod glium_renderer;
 
 pub struct ImGui {
     // We need to keep ownership of the ImStr values to ensure the *const char pointer

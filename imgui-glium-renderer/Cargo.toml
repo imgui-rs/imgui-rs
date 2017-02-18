@@ -1,16 +1,13 @@
 [package]
-name = "imgui-sys"
+name = "imgui-glium-renderer"
 version = "0.0.12-pre"
 authors = ["Joonas Javanainen <joonas.javanainen@gmail.com>"]
-description = "Raw ocornut/imgui bindings for Rust"
+description = "Glium renderer for imgui-rs"
 homepage = "https://github.com/gekkio/imgui-rs"
 repository = "https://github.com/gekkio/imgui-rs"
 license = "MIT"
-build = "build.rs"
 
 [dependencies]
-bitflags = "0.8"
-glium = { version = "0.16", default-features = false, optional = true }
-
-[build-dependencies]
-gcc = "0.3"
+glium = { version = "0.16", default-features = false }
+imgui = { path = "../" }
+imgui-sys = { path = "../imgui-sys", features = ["glium"] }
