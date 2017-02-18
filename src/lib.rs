@@ -675,7 +675,10 @@ impl<'ui> Ui<'ui> {
     /// Creates a progress bar. Fraction is the progress level with 0.0 = 0% and 1.0 = 100%.
     ///
     /// # Example
-    /// ```no_run
+    /// ```rust,no_run
+    /// # use imgui::*;
+    /// # let mut imgui = ImGui::init();
+    /// # let ui = imgui.frame((0, 0), (0, 0), 0.1);
     /// ui.progress_bar(0.6)
     ///     .size(imgui::ImVec2::new(100.0, 12.0))
     ///     .overlay_text(im_str!("Progress!"))
