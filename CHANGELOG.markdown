@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Added
+
+ - Support for progress bar
+
 ### Removed
 
 - `Window::always_vertical_scollbar` (typo)
