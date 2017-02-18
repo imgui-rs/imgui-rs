@@ -35,7 +35,7 @@ impl<'p> ProgressBar<'p> {
     }
 
     /// Sets the size of the progress bar. Negative values will automatically
-    /// align to the end of the axis, zero will let the progress bar choose a 
+    /// align to the end of the axis, zero will let the progress bar choose a
     /// size and positive values will use the given size.
     #[inline]
     pub fn size(mut self, size: ImVec2) -> Self {
@@ -49,8 +49,7 @@ impl<'p> ProgressBar<'p> {
         unsafe {
             imgui_sys::igProgressBar(self.fraction,
                                      &self.size,
-                                     self.overlay_text.map(|x| x.as_ptr()).unwrap_or(ptr::null())
-                                    );
+                                     self.overlay_text.map(|x| x.as_ptr()).unwrap_or(ptr::null()));
         }
     }
 }
