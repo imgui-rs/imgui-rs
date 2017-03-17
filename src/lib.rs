@@ -400,13 +400,22 @@ impl<'ui> Ui<'ui> {
 
 // Layout
 impl<'ui> Ui<'ui> {
+    /// Pushes a value to the item width stack.
     pub fn push_item_width(&self, width: f32) { unsafe { imgui_sys::igPushItemWidth(width) } }
+
+    /// Pops a value from the item width stack.
+    ///
+    /// # Aborts
+    /// The current process is aborted if the item width stack is empty.
     pub fn pop_item_width(&self) { unsafe { imgui_sys::igPopItemWidth() } }
+
+    /// Runs a function with a value temporarily pushed to the item width stack.
     pub fn with_item_width<F>(&self, width: f32, f: F) where F: FnOnce() {
         self.push_item_width(width);
         f();
         self.pop_item_width();
     }
+
     pub fn separator(&self) { unsafe { imgui_sys::igSeparator() }; }
     pub fn same_line(&self, pos_x: f32) { unsafe { imgui_sys::igSameLine(pos_x, -1.0f32) } }
     pub fn same_line_spacing(&self, pos_x: f32, spacing_w: f32) {
