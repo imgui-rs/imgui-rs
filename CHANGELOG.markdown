@@ -5,6 +5,7 @@
 ### Added
 
 - Support for progress bar
+- Support for push/pop item width
 - `ImVec4::zero()`
 - `Into` array and tuple conversions for ImVec2 and ImVec4
 
