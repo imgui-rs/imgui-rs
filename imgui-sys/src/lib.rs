@@ -4,7 +4,6 @@
 extern crate bitflags;
 
 #[cfg(feature = "glium")]
-#[macro_use]
 extern crate glium;
 
 use std::convert::From;
