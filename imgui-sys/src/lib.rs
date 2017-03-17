@@ -801,7 +801,7 @@ extern "C" {
 // Parameter stack (current window)
 extern "C" {
     pub fn igPushItemWidth(item_width: c_float);
-    pub fn igPopitemWidth();
+    pub fn igPopItemWidth();
     pub fn igCalcItemWidth() -> c_float;
     pub fn igPushTextWrapPos(wrap_pos_x: c_float);
     pub fn igPopTextWrapPos();
