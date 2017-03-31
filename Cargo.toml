@@ -7,6 +7,7 @@ readme = "README.markdown"
 homepage = "https://github.com/gekkio/imgui-rs"
 repository = "https://github.com/gekkio/imgui-rs"
 license = "MIT OR Apache-2.0"
+categories = ["gui", "api-bindings"]
 
 [dependencies]
 imgui-sys = { path = "imgui-sys" }
