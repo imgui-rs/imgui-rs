@@ -6,6 +6,7 @@ description = "gfx renderer for the imgui crate"
 homepage = "https://github.com/gekkio/imgui-rs"
 repository = "https://github.com/gekkio/imgui-rs"
 license = "MIT/Apache-2.0"
+categories = ["gui", "rendering"]
 
 [dependencies]
 gfx = "0.14"
