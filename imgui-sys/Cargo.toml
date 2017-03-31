@@ -5,7 +5,7 @@ authors = ["Joonas Javanainen <joonas.javanainen@gmail.com>"]
 description = "Raw ocornut/imgui bindings for Rust"
 homepage = "https://github.com/gekkio/imgui-rs"
 repository = "https://github.com/gekkio/imgui-rs"
-license = "MIT"
+license = "MIT OR Apache-2.0"
 build = "build.rs"
 
 [dependencies]

@@ -5,7 +5,7 @@ authors = ["Joonas Javanainen <joonas.javanainen@gmail.com>"]
 description = "Glium renderer for imgui-rs"
 homepage = "https://github.com/gekkio/imgui-rs"
 repository = "https://github.com/gekkio/imgui-rs"
-license = "MIT"
+license = "MIT OR Apache-2.0"
 
 [dependencies]
 glium = { version = "0.16", default-features = false }
