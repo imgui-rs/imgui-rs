@@ -152,10 +152,8 @@ impl<'ui, 'p> InputText<'ui, 'p> {
     pub fn build(self) -> bool {
         unsafe {
             imgui_sys::igInputText(self.label.as_ptr(),
-                                   // TODO: this is evil.
-                                   // Perhaps something else than &mut str is better
                                    self.buf.as_ptr() as *mut i8,
-                                   self.buf.capacity() + 1,
+                                   self.buf.capacity_with_nul(),
                                    self.flags,
                                    None,
                                    ptr::null_mut())

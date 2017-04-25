@@ -35,6 +35,7 @@ impl ImString {
         self.0.push(b'\0');
     }
     pub fn capacity(&self) -> usize { self.0.capacity() - 1 }
+    pub fn capacity_with_nul(&self) -> usize { self.0.capacity() }
     pub fn reserve(&mut self, additional: usize) {
         self.0.reserve(additional);
     }
