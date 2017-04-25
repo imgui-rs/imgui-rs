@@ -2,8 +2,9 @@ use imgui_sys;
 use std::marker::PhantomData;
 
 use super::{ImGuiSetCond, ImGuiTreeNodeFlags, ImGuiTreeNodeFlags_Bullet,
-            ImGuiTreeNodeFlags_DefaultOpen, ImGuiTreeNodeFlags_Leaf, ImGuiTreeNodeFlags_OpenOnArrow,
-            ImGuiTreeNodeFlags_OpenOnDoubleClick, ImGuiTreeNodeFlags_Selected, ImStr, Ui};
+            ImGuiTreeNodeFlags_DefaultOpen, ImGuiTreeNodeFlags_Leaf,
+            ImGuiTreeNodeFlags_OpenOnArrow, ImGuiTreeNodeFlags_OpenOnDoubleClick,
+            ImGuiTreeNodeFlags_Selected, ImStr, Ui};
 
 #[must_use]
 pub struct TreeNode<'ui, 'p> {
@@ -85,7 +86,8 @@ impl<'ui, 'p> CollapsingHeader<'ui, 'p> {
     }
     #[inline]
     pub fn open_on_double_click(mut self, value: bool) -> Self {
-        self.flags.set(ImGuiTreeNodeFlags_OpenOnDoubleClick, value);
+        self.flags
+            .set(ImGuiTreeNodeFlags_OpenOnDoubleClick, value);
         self
     }
     #[inline]

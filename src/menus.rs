@@ -70,7 +70,9 @@ impl<'ui, 'p> MenuItem<'ui, 'p> {
     pub fn build(self) -> bool {
         let label = self.label.as_ptr();
         let shortcut = self.shortcut.map(|x| x.as_ptr()).unwrap_or(ptr::null());
-        let selected = self.selected.map(|x| x as *mut bool).unwrap_or(ptr::null_mut());
+        let selected = self.selected
+            .map(|x| x as *mut bool)
+            .unwrap_or(ptr::null_mut());
         let enabled = self.enabled;
         unsafe { imgui_sys::igMenuItemPtr(label, shortcut, selected, enabled) }
     }

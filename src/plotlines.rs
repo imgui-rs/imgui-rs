@@ -63,7 +63,9 @@ impl<'p> PlotLines<'p> {
                                    self.values.as_ptr() as *const c_float,
                                    self.values.len() as i32,
                                    self.values_offset as i32,
-                                   self.overlay_text.map(|x| x.as_ptr()).unwrap_or(ptr::null()),
+                                   self.overlay_text
+                                       .map(|x| x.as_ptr())
+                                       .unwrap_or(ptr::null()),
                                    self.scale_min,
                                    self.scale_max,
                                    self.graph_size,
