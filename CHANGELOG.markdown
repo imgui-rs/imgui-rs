@@ -7,6 +7,8 @@
 - Support for progress bar
 - Support for push/pop item width
 - Support for ID stack manipulation (integer values)
+- Support for 2-4 -element int sliders
+- Support for 2-4 -element float sliders
 - `ImVec4::zero()`
 - `Into` array and tuple conversions for ImVec2 and ImVec4
 
