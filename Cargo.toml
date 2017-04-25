@@ -11,3 +11,6 @@ categories = ["gui", "api-bindings"]
 
 [dependencies]
 imgui-sys = { version = "0.0.13-pre", path = "imgui-sys" }
+
+[workspace]
+members = ["imgui-sys", "imgui-glium-renderer"]
