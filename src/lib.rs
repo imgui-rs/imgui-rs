@@ -42,7 +42,8 @@ pub use menus::{Menu, MenuItem};
 pub use plothistogram::PlotHistogram;
 pub use plotlines::PlotLines;
 pub use progressbar::ProgressBar;
-pub use sliders::{SliderFloat, SliderInt};
+pub use sliders::{SliderFloat, SliderFloat2, SliderFloat3, SliderFloat4, SliderInt, SliderInt2,
+                  SliderInt3, SliderInt4};
 pub use trees::{CollapsingHeader, TreeNode};
 pub use window::Window;
 
@@ -582,6 +583,30 @@ impl<'ui> Ui<'ui> {
                             -> SliderFloat<'ui, 'p> {
         SliderFloat::new(label, value, min, max)
     }
+    pub fn slider_float2<'p>(&self,
+                             label: ImStr<'p>,
+                             value: &'p mut [f32; 2],
+                             min: f32,
+                             max: f32)
+                             -> SliderFloat2<'ui, 'p> {
+        SliderFloat2::new(label, value, min, max)
+    }
+    pub fn slider_float3<'p>(&self,
+                             label: ImStr<'p>,
+                             value: &'p mut [f32; 3],
+                             min: f32,
+                             max: f32)
+                             -> SliderFloat3<'ui, 'p> {
+        SliderFloat3::new(label, value, min, max)
+    }
+    pub fn slider_float4<'p>(&self,
+                             label: ImStr<'p>,
+                             value: &'p mut [f32; 4],
+                             min: f32,
+                             max: f32)
+                             -> SliderFloat4<'ui, 'p> {
+        SliderFloat4::new(label, value, min, max)
+    }
     pub fn slider_int<'p>(&self,
                           label: ImStr<'p>,
                           value: &'p mut i32,
@@ -589,6 +614,30 @@ impl<'ui> Ui<'ui> {
                           max: i32)
                           -> SliderInt<'ui, 'p> {
         SliderInt::new(label, value, min, max)
+    }
+    pub fn slider_int2<'p>(&self,
+                           label: ImStr<'p>,
+                           value: &'p mut [i32; 2],
+                           min: i32,
+                           max: i32)
+                           -> SliderInt2<'ui, 'p> {
+        SliderInt2::new(label, value, min, max)
+    }
+    pub fn slider_int3<'p>(&self,
+                           label: ImStr<'p>,
+                           value: &'p mut [i32; 3],
+                           min: i32,
+                           max: i32)
+                           -> SliderInt3<'ui, 'p> {
+        SliderInt3::new(label, value, min, max)
+    }
+    pub fn slider_int4<'p>(&self,
+                           label: ImStr<'p>,
+                           value: &'p mut [i32; 4],
+                           min: i32,
+                           max: i32)
+                           -> SliderInt4<'ui, 'p> {
+        SliderInt4::new(label, value, min, max)
     }
 }
 
