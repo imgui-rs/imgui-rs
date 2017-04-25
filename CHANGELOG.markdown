@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+## [0.0.13] - 2017-04-25
+
+### Changed
+
+- Make the crates publishable again after the Glium renderer separation
+
 ## [0.0.12] - 2017-04-25 [YANKED]
 
 ### Added
@@ -142,7 +148,8 @@
 
 - Initial release with cimgui/imgui 1.44, glium 0.9
 
-[Unreleased]: https://github.com/Gekkio/imgui-rs/compare/v0.0.12...HEAD
+[Unreleased]: https://github.com/Gekkio/imgui-rs/compare/v0.0.13...HEAD
+[0.0.13]: https://github.com/Gekkio/imgui-rs/compare/v0.0.12...v0.0.13
 [0.0.12]: https://github.com/Gekkio/imgui-rs/compare/v0.0.11...v0.0.12
 [0.0.11]: https://github.com/Gekkio/imgui-rs/compare/v0.0.10...v0.0.11
 [0.0.10]: https://github.com/Gekkio/imgui-rs/compare/v0.0.9...v0.0.10
