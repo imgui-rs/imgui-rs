@@ -6,17 +6,17 @@ use super::{ImStr, ImVec2};
 
 #[must_use]
 pub struct PlotHistogram<'p> {
-    label: ImStr<'p>,
+    label: &'p ImStr,
     values: &'p [f32],
     values_offset: usize,
-    overlay_text: Option<ImStr<'p>>,
+    overlay_text: Option<&'p ImStr>,
     scale_min: f32,
     scale_max: f32,
     graph_size: ImVec2,
 }
 
 impl<'p> PlotHistogram<'p> {
-    pub fn new(label: ImStr<'p>, values: &'p [f32]) -> Self {
+    pub fn new(label: &'p ImStr, values: &'p [f32]) -> Self {
         PlotHistogram {
             label: label,
             values: values,
@@ -35,7 +35,7 @@ impl<'p> PlotHistogram<'p> {
     }
 
     #[inline]
-    pub fn overlay_text(mut self, overlay_text: ImStr<'p>) -> Self {
+    pub fn overlay_text(mut self, overlay_text: &'p ImStr) -> Self {
         self.overlay_text = Some(overlay_text);
         self
     }

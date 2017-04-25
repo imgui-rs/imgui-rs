@@ -8,15 +8,15 @@ use super::{ImGuiSetCond, ImGuiTreeNodeFlags, ImGuiTreeNodeFlags_Bullet,
 
 #[must_use]
 pub struct TreeNode<'ui, 'p> {
-    id: ImStr<'p>,
-    label: Option<ImStr<'p>>,
+    id: &'p ImStr,
+    label: Option<&'p ImStr>,
     opened: bool,
     opened_cond: ImGuiSetCond,
     _phantom: PhantomData<&'ui Ui<'ui>>,
 }
 
 impl<'ui, 'p> TreeNode<'ui, 'p> {
-    pub fn new(id: ImStr<'p>) -> Self {
+    pub fn new(id: &'p ImStr) -> Self {
         TreeNode {
             id: id,
             label: None,
@@ -26,7 +26,7 @@ impl<'ui, 'p> TreeNode<'ui, 'p> {
         }
     }
     #[inline]
-    pub fn label(mut self, label: ImStr<'p>) -> Self {
+    pub fn label(mut self, label: &'p ImStr) -> Self {
         self.label = Some(label);
         self
     }
@@ -54,7 +54,7 @@ impl<'ui, 'p> TreeNode<'ui, 'p> {
 
 #[must_use]
 pub struct CollapsingHeader<'ui, 'p> {
-    label: ImStr<'p>,
+    label: &'p ImStr,
     // Some flags are automatically set in ImGui::CollapsingHeader, so
     // we only support a sensible subset here
     flags: ImGuiTreeNodeFlags,
@@ -62,7 +62,7 @@ pub struct CollapsingHeader<'ui, 'p> {
 }
 
 impl<'ui, 'p> CollapsingHeader<'ui, 'p> {
-    pub fn new(label: ImStr<'p>) -> Self {
+    pub fn new(label: &'p ImStr) -> Self {
         CollapsingHeader {
             label: label,
             flags: ImGuiTreeNodeFlags::empty(),

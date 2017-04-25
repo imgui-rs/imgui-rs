@@ -1,7 +1,5 @@
 extern crate imgui_sys;
 
-use std::borrow::Cow;
-use std::convert::From;
 use std::ffi::CStr;
 use std::mem;
 use std::os::raw::{c_char, c_float, c_int, c_uchar, c_void};
@@ -45,6 +43,7 @@ pub use plotlines::PlotLines;
 pub use progressbar::ProgressBar;
 pub use sliders::{SliderFloat, SliderFloat2, SliderFloat3, SliderFloat4, SliderInt, SliderInt2,
                   SliderInt3, SliderInt4};
+pub use string::{ImStr, ImString};
 pub use trees::{CollapsingHeader, TreeNode};
 pub use window::Window;
 
@@ -54,52 +53,30 @@ mod plothistogram;
 mod plotlines;
 mod progressbar;
 mod sliders;
+mod string;
 mod trees;
 mod window;
 
 pub struct ImGui {
     // We need to keep ownership of the ImStr values to ensure the *const char pointer
     // lives long enough in case the ImStr contains a Cow::Owned
-    ini_filename: Option<ImStr<'static>>,
-    log_filename: Option<ImStr<'static>>,
+    ini_filename: Option<ImString>,
+    log_filename: Option<ImString>,
 }
 
 #[macro_export]
 macro_rules! im_str {
     ($e:tt) => ({
+        debug_assert!(!($e).as_bytes().contains(&0));
         let value = concat!($e, "\0");
         unsafe { ::imgui::ImStr::from_bytes_unchecked(value.as_bytes()) }
     });
     ($e:tt, $($arg:tt)*) => ({
-        ::imgui::ImStr::from(format!($e, $($arg)*))
+        let mut bytes: Vec<u8> = format!($e, $($arg)*).into();
+        debug_assert!(!bytes.contains(&0));
+        bytes.push(b'\0');
+        unsafe { &::imgui::ImString::from_vec_unchecked(bytes) }
     })
-}
-
-#[derive(Clone)]
-pub struct ImStr<'a> {
-    bytes: Cow<'a, [u8]>,
-}
-
-impl<'a> ImStr<'a> {
-    pub unsafe fn from_bytes_unchecked(bytes: &'a [u8]) -> ImStr<'a> {
-        ImStr { bytes: Cow::Borrowed(bytes) }
-    }
-    pub fn as_ptr(&self) -> *const c_char { self.bytes.as_ptr() as *const c_char }
-}
-
-impl<'a> From<&'a str> for ImStr<'a> {
-    fn from(value: &'a str) -> ImStr<'a> {
-        let mut bytes: Vec<u8> = value.bytes().collect();
-        bytes.push(0);
-        ImStr { bytes: Cow::Owned(bytes) }
-    }
-}
-
-impl From<String> for ImStr<'static> {
-    fn from(mut value: String) -> ImStr<'static> {
-        value.push('\0');
-        ImStr { bytes: Cow::Owned(value.into_bytes()) }
-    }
 }
 
 pub struct TextureHandle<'a> {
@@ -153,7 +130,7 @@ impl ImGui {
             (*self.io_mut().fonts).tex_id = value as *mut c_void;
         }
     }
-    pub fn set_ini_filename(&mut self, value: Option<ImStr<'static>>) {
+    pub fn set_ini_filename(&mut self, value: Option<ImString>) {
         {
             let io = self.io_mut();
             io.ini_filename = match value {
@@ -163,7 +140,7 @@ impl ImGui {
         }
         self.ini_filename = value;
     }
-    pub fn set_log_filename(&mut self, value: Option<ImStr<'static>>) {
+    pub fn set_log_filename(&mut self, value: Option<ImString>) {
         {
             let io = self.io_mut();
             io.log_filename = match value {
@@ -394,7 +371,7 @@ impl<'a> Ui<'a> {
 
 // Window
 impl<'ui> Ui<'ui> {
-    pub fn window<'p>(&self, name: ImStr<'p>) -> Window<'ui, 'p> { Window::new(name) }
+    pub fn window<'p>(&self, name: &'p ImStr) -> Window<'ui, 'p> { Window::new(name) }
 }
 
 // Layout
@@ -424,7 +401,7 @@ impl<'ui> Ui<'ui> {
     }
     pub fn spacing(&self) { unsafe { imgui_sys::igSpacing() }; }
 
-    pub fn columns<'p>(&self, count: i32, id: ImStr<'p>, border: bool) {
+    pub fn columns<'p>(&self, count: i32, id: &'p ImStr, border: bool) {
         unsafe { imgui_sys::igColumns(count, id.as_ptr(), border) }
     }
 
@@ -470,30 +447,30 @@ impl<'ui> Ui<'ui> {
 
 // Widgets
 impl<'ui> Ui<'ui> {
-    pub fn text<'p>(&self, text: ImStr<'p>) {
+    pub fn text<P: AsRef<ImStr>>(&self, text: P) {
         // TODO: use igTextUnformatted
         unsafe {
-            imgui_sys::igText(fmt_ptr(), text.as_ptr());
+            imgui_sys::igText(fmt_ptr(), text.as_ref().as_ptr());
         }
     }
-    pub fn text_colored<'p, A>(&self, col: A, text: ImStr<'p>)
+    pub fn text_colored<'p, A>(&self, col: A, text: &'p ImStr)
         where A: Into<ImVec4>
     {
         unsafe {
             imgui_sys::igTextColored(col.into(), fmt_ptr(), text.as_ptr());
         }
     }
-    pub fn text_disabled<'p>(&self, text: ImStr<'p>) {
+    pub fn text_disabled<'p>(&self, text: &'p ImStr) {
         unsafe {
             imgui_sys::igTextDisabled(fmt_ptr(), text.as_ptr());
         }
     }
-    pub fn text_wrapped<'p>(&self, text: ImStr<'p>) {
+    pub fn text_wrapped<'p>(&self, text: &'p ImStr) {
         unsafe {
             imgui_sys::igTextWrapped(fmt_ptr(), text.as_ptr());
         }
     }
-    pub fn label_text<'p>(&self, label: ImStr<'p>, text: ImStr<'p>) {
+    pub fn label_text<'p>(&self, label: &'p ImStr, text: &'p ImStr) {
         unsafe {
             imgui_sys::igLabelText(label.as_ptr(), fmt_ptr(), text.as_ptr());
         }
@@ -503,18 +480,18 @@ impl<'ui> Ui<'ui> {
             imgui_sys::igBullet();
         }
     }
-    pub fn bullet_text<'p>(&self, text: ImStr<'p>) {
+    pub fn bullet_text<'p>(&self, text: &'p ImStr) {
         unsafe {
             imgui_sys::igBulletText(fmt_ptr(), text.as_ptr());
         }
     }
-    pub fn button<'p>(&self, label: ImStr<'p>, size: ImVec2) -> bool {
+    pub fn button<'p>(&self, label: &'p ImStr, size: ImVec2) -> bool {
         unsafe { imgui_sys::igButton(label.as_ptr(), size) }
     }
-    pub fn small_button<'p>(&self, label: ImStr<'p>) -> bool {
+    pub fn small_button<'p>(&self, label: &'p ImStr) -> bool {
         unsafe { imgui_sys::igSmallButton(label.as_ptr()) }
     }
-    pub fn checkbox<'p>(&self, label: ImStr<'p>, value: &'p mut bool) -> bool {
+    pub fn checkbox<'p>(&self, label: &'p ImStr, value: &'p mut bool) -> bool {
         unsafe { imgui_sys::igCheckbox(label.as_ptr(), value) }
     }
 }
@@ -522,51 +499,51 @@ impl<'ui> Ui<'ui> {
 // Widgets: Input
 impl<'ui> Ui<'ui> {
     pub fn color_edit3<'p>(&self,
-                           label: ImStr<'p>,
+                           label: &'p ImStr,
                            value: &'p mut [f32; 3])
                            -> ColorEdit3<'ui, 'p> {
         ColorEdit3::new(label, value)
     }
     pub fn color_edit4<'p>(&self,
-                           label: ImStr<'p>,
+                           label: &'p ImStr,
                            value: &'p mut [f32; 4])
                            -> ColorEdit4<'ui, 'p> {
         ColorEdit4::new(label, value)
     }
-    pub fn input_text<'p>(&self, label: ImStr<'p>, buf: &'p mut str) -> InputText<'ui, 'p> {
+    pub fn input_text<'p>(&self, label: &'p ImStr, buf: &'p mut ImString) -> InputText<'ui, 'p> {
         InputText::new(label, buf)
     }
-    pub fn input_float<'p>(&self, label: ImStr<'p>, value: &'p mut f32) -> InputFloat<'ui, 'p> {
+    pub fn input_float<'p>(&self, label: &'p ImStr, value: &'p mut f32) -> InputFloat<'ui, 'p> {
         InputFloat::new(label, value)
     }
     pub fn input_float2<'p>(&self,
-                            label: ImStr<'p>,
+                            label: &'p ImStr,
                             value: &'p mut [f32; 2])
                             -> InputFloat2<'ui, 'p> {
         InputFloat2::new(label, value)
     }
     pub fn input_float3<'p>(&self,
-                            label: ImStr<'p>,
+                            label: &'p ImStr,
                             value: &'p mut [f32; 3])
                             -> InputFloat3<'ui, 'p> {
         InputFloat3::new(label, value)
     }
     pub fn input_float4<'p>(&self,
-                            label: ImStr<'p>,
+                            label: &'p ImStr,
                             value: &'p mut [f32; 4])
                             -> InputFloat4<'ui, 'p> {
         InputFloat4::new(label, value)
     }
-    pub fn input_int<'p>(&self, label: ImStr<'p>, value: &'p mut i32) -> InputInt<'ui, 'p> {
+    pub fn input_int<'p>(&self, label: &'p ImStr, value: &'p mut i32) -> InputInt<'ui, 'p> {
         InputInt::new(label, value)
     }
-    pub fn input_int2<'p>(&self, label: ImStr<'p>, value: &'p mut [i32; 2]) -> InputInt2<'ui, 'p> {
+    pub fn input_int2<'p>(&self, label: &'p ImStr, value: &'p mut [i32; 2]) -> InputInt2<'ui, 'p> {
         InputInt2::new(label, value)
     }
-    pub fn input_int3<'p>(&self, label: ImStr<'p>, value: &'p mut [i32; 3]) -> InputInt3<'ui, 'p> {
+    pub fn input_int3<'p>(&self, label: &'p ImStr, value: &'p mut [i32; 3]) -> InputInt3<'ui, 'p> {
         InputInt3::new(label, value)
     }
-    pub fn input_int4<'p>(&self, label: ImStr<'p>, value: &'p mut [i32; 4]) -> InputInt4<'ui, 'p> {
+    pub fn input_int4<'p>(&self, label: &'p ImStr, value: &'p mut [i32; 4]) -> InputInt4<'ui, 'p> {
         InputInt4::new(label, value)
     }
 }
@@ -574,7 +551,7 @@ impl<'ui> Ui<'ui> {
 // Widgets: Sliders
 impl<'ui> Ui<'ui> {
     pub fn slider_float<'p>(&self,
-                            label: ImStr<'p>,
+                            label: &'p ImStr,
                             value: &'p mut f32,
                             min: f32,
                             max: f32)
@@ -582,7 +559,7 @@ impl<'ui> Ui<'ui> {
         SliderFloat::new(label, value, min, max)
     }
     pub fn slider_float2<'p>(&self,
-                             label: ImStr<'p>,
+                             label: &'p ImStr,
                              value: &'p mut [f32; 2],
                              min: f32,
                              max: f32)
@@ -590,7 +567,7 @@ impl<'ui> Ui<'ui> {
         SliderFloat2::new(label, value, min, max)
     }
     pub fn slider_float3<'p>(&self,
-                             label: ImStr<'p>,
+                             label: &'p ImStr,
                              value: &'p mut [f32; 3],
                              min: f32,
                              max: f32)
@@ -598,7 +575,7 @@ impl<'ui> Ui<'ui> {
         SliderFloat3::new(label, value, min, max)
     }
     pub fn slider_float4<'p>(&self,
-                             label: ImStr<'p>,
+                             label: &'p ImStr,
                              value: &'p mut [f32; 4],
                              min: f32,
                              max: f32)
@@ -606,7 +583,7 @@ impl<'ui> Ui<'ui> {
         SliderFloat4::new(label, value, min, max)
     }
     pub fn slider_int<'p>(&self,
-                          label: ImStr<'p>,
+                          label: &'p ImStr,
                           value: &'p mut i32,
                           min: i32,
                           max: i32)
@@ -614,7 +591,7 @@ impl<'ui> Ui<'ui> {
         SliderInt::new(label, value, min, max)
     }
     pub fn slider_int2<'p>(&self,
-                           label: ImStr<'p>,
+                           label: &'p ImStr,
                            value: &'p mut [i32; 2],
                            min: i32,
                            max: i32)
@@ -622,7 +599,7 @@ impl<'ui> Ui<'ui> {
         SliderInt2::new(label, value, min, max)
     }
     pub fn slider_int3<'p>(&self,
-                           label: ImStr<'p>,
+                           label: &'p ImStr,
                            value: &'p mut [i32; 3],
                            min: i32,
                            max: i32)
@@ -630,7 +607,7 @@ impl<'ui> Ui<'ui> {
         SliderInt3::new(label, value, min, max)
     }
     pub fn slider_int4<'p>(&self,
-                           label: ImStr<'p>,
+                           label: &'p ImStr,
                            value: &'p mut [i32; 4],
                            min: i32,
                            max: i32)
@@ -641,8 +618,8 @@ impl<'ui> Ui<'ui> {
 
 // Widgets: Trees
 impl<'ui> Ui<'ui> {
-    pub fn tree_node<'p>(&self, id: ImStr<'p>) -> TreeNode<'ui, 'p> { TreeNode::new(id) }
-    pub fn collapsing_header<'p>(&self, label: ImStr<'p>) -> CollapsingHeader<'ui, 'p> {
+    pub fn tree_node<'p>(&self, id: &'p ImStr) -> TreeNode<'ui, 'p> { TreeNode::new(id) }
+    pub fn collapsing_header<'p>(&self, label: &'p ImStr) -> CollapsingHeader<'ui, 'p> {
         CollapsingHeader::new(label)
     }
 }
@@ -650,7 +627,7 @@ impl<'ui> Ui<'ui> {
 // Widgets: Selectable / Lists
 impl<'ui> Ui<'ui> {
     pub fn selectable<'p>(&self,
-                          label: ImStr<'p>,
+                          label: &'p ImStr,
                           selected: bool,
                           flags: ImGuiSelectableFlags,
                           size: ImVec2)
@@ -679,16 +656,16 @@ impl<'ui> Ui<'ui> {
             unsafe { imgui_sys::igEndMenuBar() };
         }
     }
-    pub fn menu<'p>(&self, label: ImStr<'p>) -> Menu<'ui, 'p> { Menu::new(label) }
-    pub fn menu_item<'p>(&self, label: ImStr<'p>) -> MenuItem<'ui, 'p> { MenuItem::new(label) }
+    pub fn menu<'p>(&self, label: &'p ImStr) -> Menu<'ui, 'p> { Menu::new(label) }
+    pub fn menu_item<'p>(&self, label: &'p ImStr) -> MenuItem<'ui, 'p> { MenuItem::new(label) }
 }
 
 // Widgets: Popups
 impl<'ui> Ui<'ui> {
-    pub fn open_popup<'p>(&self, str_id: ImStr<'p>) {
+    pub fn open_popup<'p>(&self, str_id: &'p ImStr) {
         unsafe { imgui_sys::igOpenPopup(str_id.as_ptr()) };
     }
-    pub fn popup<'p, F>(&self, str_id: ImStr<'p>, f: F)
+    pub fn popup<'p, F>(&self, str_id: &'p ImStr, f: F)
         where F: FnOnce()
     {
         let render = unsafe { imgui_sys::igBeginPopup(str_id.as_ptr()) };
@@ -703,9 +680,9 @@ impl<'ui> Ui<'ui> {
 // Widgets: Combos
 impl<'ui> Ui<'ui> {
     pub fn combo<'p>(&self,
-                     label: ImStr<'p>,
+                     label: &'p ImStr,
                      current_item: &mut i32,
-                     items: &'p [ImStr<'p>],
+                     items: &'p [&'p ImStr],
                      height_in_items: i32)
                      -> bool {
         let items_inner: Vec<*const c_char> = items.into_iter().map(|item| item.as_ptr()).collect();
@@ -722,9 +699,9 @@ impl<'ui> Ui<'ui> {
 // Widgets: ListBox
 impl<'ui> Ui<'ui> {
     pub fn list_box<'p>(&self,
-                        label: ImStr<'p>,
+                        label: &'p ImStr,
                         current_item: &mut i32,
-                        items: &'p [ImStr<'p>],
+                        items: &'p [&'p ImStr],
                         height_in_items: i32)
                         -> bool {
         let items_inner: Vec<*const c_char> = items.into_iter().map(|item| item.as_ptr()).collect();
@@ -739,13 +716,13 @@ impl<'ui> Ui<'ui> {
 }
 
 impl<'ui> Ui<'ui> {
-    pub fn plot_lines<'p>(&self, label: ImStr<'p>, values: &'p [f32]) -> PlotLines<'p> {
+    pub fn plot_lines<'p>(&self, label: &'p ImStr, values: &'p [f32]) -> PlotLines<'p> {
         PlotLines::new(label, values)
     }
 }
 
 impl<'ui> Ui<'ui> {
-    pub fn plot_histogram<'p>(&self, label: ImStr<'p>, values: &'p [f32]) -> PlotHistogram<'p> {
+    pub fn plot_histogram<'p>(&self, label: &'p ImStr, values: &'p [f32]) -> PlotHistogram<'p> {
         PlotHistogram::new(label, values)
     }
 }

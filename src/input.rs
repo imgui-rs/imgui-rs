@@ -10,7 +10,7 @@ use super::{ImGuiInputTextFlags,
             ImGuiInputTextFlags_CharsDecimal, ImGuiInputTextFlags_CharsHexadecimal,
             ImGuiInputTextFlags_CharsNoBlank, ImGuiInputTextFlags_CharsUppercase,
             ImGuiInputTextFlags_EnterReturnsTrue, ImGuiInputTextFlags_NoHorizontalScroll, ImStr,
-            Ui};
+            ImString, Ui};
 
 macro_rules! impl_text_flags {
     ($InputType:ident) => {
@@ -128,14 +128,14 @@ macro_rules! impl_precision_params {
 
 #[must_use]
 pub struct InputText<'ui, 'p> {
-    label: ImStr<'p>,
-    buf: &'p mut str,
+    label: &'p ImStr,
+    buf: &'p mut ImString,
     flags: ImGuiInputTextFlags,
     _phantom: PhantomData<&'ui Ui<'ui>>,
 }
 
 impl<'ui, 'p> InputText<'ui, 'p> {
-    pub fn new(label: ImStr<'p>, buf: &'p mut str) -> Self {
+    pub fn new(label: &'p ImStr, buf: &'p mut ImString) -> Self {
         InputText {
             label: label,
             buf: buf,
@@ -152,10 +152,8 @@ impl<'ui, 'p> InputText<'ui, 'p> {
     pub fn build(self) -> bool {
         unsafe {
             imgui_sys::igInputText(self.label.as_ptr(),
-                                   // TODO: this is evil.
-                                   // Perhaps something else than &mut str is better
                                    self.buf.as_ptr() as *mut i8,
-                                   self.buf.len() as usize,
+                                   self.buf.capacity_with_nul(),
                                    self.flags,
                                    None,
                                    ptr::null_mut())
@@ -165,7 +163,7 @@ impl<'ui, 'p> InputText<'ui, 'p> {
 
 #[must_use]
 pub struct InputInt<'ui, 'p> {
-    label: ImStr<'p>,
+    label: &'p ImStr,
     value: &'p mut i32,
     step: i32,
     step_fast: i32,
@@ -174,7 +172,7 @@ pub struct InputInt<'ui, 'p> {
 }
 
 impl<'ui, 'p> InputInt<'ui, 'p> {
-    pub fn new(label: ImStr<'p>, value: &'p mut i32) -> Self {
+    pub fn new(label: &'p ImStr, value: &'p mut i32) -> Self {
         InputInt {
             label: label,
             value: value,
@@ -201,7 +199,7 @@ impl<'ui, 'p> InputInt<'ui, 'p> {
 
 #[must_use]
 pub struct InputFloat<'ui, 'p> {
-    label: ImStr<'p>,
+    label: &'p ImStr,
     value: &'p mut f32,
     step: f32,
     step_fast: f32,
@@ -211,7 +209,7 @@ pub struct InputFloat<'ui, 'p> {
 }
 
 impl<'ui, 'p> InputFloat<'ui, 'p> {
-    pub fn new(label: ImStr<'p>, value: &'p mut f32) -> Self {
+    pub fn new(label: &'p ImStr, value: &'p mut f32) -> Self {
         InputFloat {
             label: label,
             value: value,
@@ -243,7 +241,7 @@ macro_rules! impl_input_floatn {
     ($InputFloatN:ident, $N:expr, $igInputFloatN:ident) => {
         #[must_use]
         pub struct $InputFloatN<'ui, 'p> {
-            label: ImStr<'p>,
+            label: &'p ImStr,
             value: &'p mut [f32;$N],
             decimal_precision: i32,
             flags: ImGuiInputTextFlags,
@@ -251,7 +249,7 @@ macro_rules! impl_input_floatn {
         }
 
         impl<'ui, 'p> $InputFloatN<'ui, 'p> {
-            pub fn new(label: ImStr<'p>, value: &'p mut [f32;$N]) -> Self {
+            pub fn new(label: &'p ImStr, value: &'p mut [f32;$N]) -> Self {
                 $InputFloatN {
                     label: label,
                     value: value,
@@ -285,14 +283,14 @@ macro_rules! impl_input_intn {
     ($InputIntN:ident, $N:expr, $igInputIntN:ident) => {
         #[must_use]
         pub struct $InputIntN<'ui, 'p> {
-            label: ImStr<'p>,
+            label: &'p ImStr,
             value: &'p mut [i32;$N],
             flags: ImGuiInputTextFlags,
             _phantom: PhantomData<&'ui Ui<'ui>>
         }
 
         impl<'ui, 'p> $InputIntN<'ui, 'p> {
-            pub fn new(label: ImStr<'p>, value: &'p mut [i32;$N]) -> Self {
+            pub fn new(label: &'p ImStr, value: &'p mut [i32;$N]) -> Self {
                 $InputIntN {
                     label: label,
                     value: value,
@@ -321,13 +319,13 @@ impl_input_intn!(InputInt4, 4, igInputInt4);
 
 #[must_use]
 pub struct ColorEdit3<'ui, 'p> {
-    label: ImStr<'p>,
+    label: &'p ImStr,
     value: &'p mut [f32; 3],
     _phantom: PhantomData<&'ui Ui<'ui>>,
 }
 
 impl<'ui, 'p> ColorEdit3<'ui, 'p> {
-    pub fn new(label: ImStr<'p>, value: &'p mut [f32; 3]) -> Self {
+    pub fn new(label: &'p ImStr, value: &'p mut [f32; 3]) -> Self {
         ColorEdit3 {
             label: label,
             value: value,
@@ -342,14 +340,14 @@ impl<'ui, 'p> ColorEdit3<'ui, 'p> {
 
 #[must_use]
 pub struct ColorEdit4<'ui, 'p> {
-    label: ImStr<'p>,
+    label: &'p ImStr,
     value: &'p mut [f32; 4],
     show_alpha: bool,
     _phantom: PhantomData<&'ui Ui<'ui>>,
 }
 
 impl<'ui, 'p> ColorEdit4<'ui, 'p> {
-    pub fn new(label: ImStr<'p>, value: &'p mut [f32; 4]) -> Self {
+    pub fn new(label: &'p ImStr, value: &'p mut [f32; 4]) -> Self {
         ColorEdit4 {
             label: label,
             value: value,

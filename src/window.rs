@@ -18,7 +18,7 @@ pub struct Window<'ui, 'p> {
     pos_cond: ImGuiSetCond,
     size: (f32, f32),
     size_cond: ImGuiSetCond,
-    name: ImStr<'p>,
+    name: &'p ImStr,
     opened: Option<&'p mut bool>,
     bg_alpha: f32,
     flags: ImGuiWindowFlags,
@@ -26,7 +26,7 @@ pub struct Window<'ui, 'p> {
 }
 
 impl<'ui, 'p> Window<'ui, 'p> {
-    pub fn new(name: ImStr<'p>) -> Window<'ui, 'p> {
+    pub fn new(name: &'p ImStr) -> Window<'ui, 'p> {
         Window {
             pos: (0.0, 0.0),
             pos_cond: ImGuiSetCond::empty(),
