@@ -1,6 +1,6 @@
 [package]
 name = "imgui-glium-renderer"
-version = "0.0.12"
+version = "0.0.13-pre"
 authors = ["Joonas Javanainen <joonas.javanainen@gmail.com>"]
 description = "Glium renderer for imgui-rs"
 homepage = "https://github.com/gekkio/imgui-rs"
@@ -10,5 +10,5 @@ categories = ["gui", "rendering"]
 
 [dependencies]
 glium = { version = "0.16", default-features = false }
-imgui = { version = "0.0.12", path = "../" }
-imgui-sys = { version = "0.0.12", path = "../imgui-sys", features = ["glium"] }
+imgui = { version = "0.0.13-pre", path = "../" }
+imgui-sys = { version = "0.0.13-pre", path = "../imgui-sys", features = ["glium"] }

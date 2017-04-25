@@ -1,6 +1,6 @@
 [package]
 name = "imgui"
-version = "0.0.12"
+version = "0.0.13-pre"
 authors = ["Joonas Javanainen <joonas.javanainen@gmail.com>"]
 description = "Experimental bindings to ocornut/imgui"
 readme = "README.markdown"
@@ -10,8 +10,8 @@ license = "MIT OR Apache-2.0"
 categories = ["gui", "api-bindings"]
 
 [dependencies]
-imgui-sys = { version = "0.0.12", path = "imgui-sys" }
+imgui-sys = { version = "0.0.13-pre", path = "imgui-sys" }
 
 [dev-dependencies]
 glium = "0.16"
-imgui-glium-renderer = { version = "0.0.12", path = "imgui-glium-renderer" }
+imgui-glium-renderer = { version = "0.0.13-pre", path = "imgui-glium-renderer" }
