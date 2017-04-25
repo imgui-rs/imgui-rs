@@ -11,7 +11,3 @@ categories = ["gui", "api-bindings"]
 
 [dependencies]
 imgui-sys = { version = "0.0.13-pre", path = "imgui-sys" }
-
-[dev-dependencies]
-glium = "0.16"
-imgui-glium-renderer = { version = "0.0.13-pre", path = "imgui-glium-renderer" }
