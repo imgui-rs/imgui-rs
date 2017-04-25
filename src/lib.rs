@@ -29,15 +29,16 @@ pub use imgui_sys::{ImDrawIdx, ImDrawVert, ImGuiInputTextFlags, ImGuiInputTextFl
                     ImGuiTreeNodeFlags_Selected, ImGuiWindowFlags,
                     ImGuiWindowFlags_AlwaysAutoResize, ImGuiWindowFlags_AlwaysHorizontalScrollbar,
                     ImGuiWindowFlags_AlwaysUseWindowPadding,
-                    ImGuiWindowFlags_AlwaysVerticalScrollbar, ImGuiWindowFlags_HorizontalScrollbar,
-                    ImGuiWindowFlags_MenuBar, ImGuiWindowFlags_NoBringToFrontOnFocus,
-                    ImGuiWindowFlags_NoCollapse, ImGuiWindowFlags_NoFocusOnAppearing,
-                    ImGuiWindowFlags_NoInputs, ImGuiWindowFlags_NoMove, ImGuiWindowFlags_NoResize,
+                    ImGuiWindowFlags_AlwaysVerticalScrollbar,
+                    ImGuiWindowFlags_HorizontalScrollbar, ImGuiWindowFlags_MenuBar,
+                    ImGuiWindowFlags_NoBringToFrontOnFocus, ImGuiWindowFlags_NoCollapse,
+                    ImGuiWindowFlags_NoFocusOnAppearing, ImGuiWindowFlags_NoInputs,
+                    ImGuiWindowFlags_NoMove, ImGuiWindowFlags_NoResize,
                     ImGuiWindowFlags_NoSavedSettings, ImGuiWindowFlags_NoScrollWithMouse,
                     ImGuiWindowFlags_NoScrollbar, ImGuiWindowFlags_NoTitleBar,
                     ImGuiWindowFlags_ShowBorders, ImVec2, ImVec4};
-pub use input::{ColorEdit3, ColorEdit4, InputFloat, InputFloat2, InputFloat3, InputFloat4, InputInt,
-                InputInt2, InputInt3, InputInt4, InputText};
+pub use input::{ColorEdit3, ColorEdit4, InputFloat, InputFloat2, InputFloat3, InputFloat4,
+                InputInt, InputInt2, InputInt3, InputInt4, InputText};
 pub use menus::{Menu, MenuItem};
 pub use plothistogram::PlotHistogram;
 pub use plotlines::PlotLines;
@@ -120,14 +121,10 @@ impl ImGui {
             log_filename: None,
         }
     }
-    fn io(&self) -> &imgui_sys::ImGuiIO { unsafe { mem::transmute(imgui_sys::igGetIO()) } }
-    fn io_mut(&mut self) -> &mut imgui_sys::ImGuiIO {
-        unsafe { mem::transmute(imgui_sys::igGetIO()) }
-    }
-    pub fn style(&self) -> &ImGuiStyle { unsafe { mem::transmute(imgui_sys::igGetStyle()) } }
-    pub fn style_mut(&self) -> &mut ImGuiStyle {
-        unsafe { mem::transmute(imgui_sys::igGetStyle()) }
-    }
+    fn io(&self) -> &imgui_sys::ImGuiIO { unsafe { &*imgui_sys::igGetIO() } }
+    fn io_mut(&mut self) -> &mut imgui_sys::ImGuiIO { unsafe { &mut *imgui_sys::igGetIO() } }
+    pub fn style(&self) -> &ImGuiStyle { unsafe { &*imgui_sys::igGetStyle() } }
+    pub fn style_mut(&mut self) -> &mut ImGuiStyle { unsafe { &mut *imgui_sys::igGetStyle() } }
     pub fn prepare_texture<'a, F, T>(&mut self, f: F) -> T
         where F: FnOnce(TextureHandle<'a>) -> T
     {
@@ -143,10 +140,11 @@ impl ImGui {
                                                       &mut height,
                                                       &mut bytes_per_pixel);
             f(TextureHandle {
-                width: width as u32,
-                height: height as u32,
-                pixels: slice::from_raw_parts(pixels, (width * height * bytes_per_pixel) as usize),
-            })
+                  width: width as u32,
+                  height: height as u32,
+                  pixels: slice::from_raw_parts(pixels,
+                                                (width * height * bytes_per_pixel) as usize),
+              })
         }
     }
     pub fn set_texture_id(&mut self, value: usize) {
@@ -410,7 +408,9 @@ impl<'ui> Ui<'ui> {
     pub fn pop_item_width(&self) { unsafe { imgui_sys::igPopItemWidth() } }
 
     /// Runs a function after temporarily pushing a value to the item width stack.
-    pub fn with_item_width<F>(&self, width: f32, f: F) where F: FnOnce() {
+    pub fn with_item_width<F>(&self, width: f32, f: F)
+        where F: FnOnce()
+    {
         self.push_item_width(width);
         f();
         self.pop_item_width();
@@ -449,20 +449,18 @@ impl<'ui> Ui<'ui> {
 // ID scopes
 impl<'ui> Ui<'ui> {
     /// Pushes an identifier to the ID stack.
-    pub fn push_id(&self, id: i32) {
-        unsafe { imgui_sys::igPushIdInt(id) };
-    }
+    pub fn push_id(&self, id: i32) { unsafe { imgui_sys::igPushIdInt(id) }; }
 
     /// Pops an identifier from the ID stack.
     ///
     /// # Aborts
     /// The current process is aborted if the ID stack is empty.
-    pub fn pop_id(&self) {
-        unsafe { imgui_sys::igPopId() };
-    }
+    pub fn pop_id(&self) { unsafe { imgui_sys::igPopId() }; }
 
     /// Runs a function after temporarily pushing a value to the ID stack.
-    pub fn with_id<F>(&self, id: i32, f: F) where F: FnOnce() {
+    pub fn with_id<F>(&self, id: i32, f: F)
+        where F: FnOnce()
+    {
         self.push_id(id);
         f();
         self.pop_id();
@@ -716,7 +714,5 @@ impl<'ui> Ui<'ui> {
     ///     .overlay_text(im_str!("Progress!"))
     ///     .build();
     /// ```
-    pub fn progress_bar<'p>(&self, fraction: f32) -> ProgressBar<'p> {
-        ProgressBar::new(fraction)
-    }
+    pub fn progress_bar<'p>(&self, fraction: f32) -> ProgressBar<'p> { ProgressBar::new(fraction) }
 }

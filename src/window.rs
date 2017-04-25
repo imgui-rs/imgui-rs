@@ -9,8 +9,8 @@ use super::{ImGuiSetCond, ImGuiWindowFlags, ImGuiWindowFlags_AlwaysAutoResize,
             ImGuiWindowFlags_NoCollapse, ImGuiWindowFlags_NoFocusOnAppearing,
             ImGuiWindowFlags_NoInputs, ImGuiWindowFlags_NoMove, ImGuiWindowFlags_NoResize,
             ImGuiWindowFlags_NoSavedSettings, ImGuiWindowFlags_NoScrollWithMouse,
-            ImGuiWindowFlags_NoScrollbar, ImGuiWindowFlags_NoTitleBar, ImGuiWindowFlags_ShowBorders,
-            ImStr, ImVec2, Ui};
+            ImGuiWindowFlags_NoScrollbar, ImGuiWindowFlags_NoTitleBar,
+            ImGuiWindowFlags_ShowBorders, ImStr, ImVec2, Ui};
 
 #[must_use]
 pub struct Window<'ui, 'p> {
@@ -88,7 +88,8 @@ impl<'ui, 'p> Window<'ui, 'p> {
     }
     #[inline]
     pub fn scrollable(mut self, value: bool) -> Self {
-        self.flags.set(ImGuiWindowFlags_NoScrollWithMouse, !value);
+        self.flags
+            .set(ImGuiWindowFlags_NoScrollWithMouse, !value);
         self
     }
     #[inline]
@@ -123,32 +124,38 @@ impl<'ui, 'p> Window<'ui, 'p> {
     }
     #[inline]
     pub fn horizontal_scrollbar(mut self, value: bool) -> Self {
-        self.flags.set(ImGuiWindowFlags_HorizontalScrollbar, value);
+        self.flags
+            .set(ImGuiWindowFlags_HorizontalScrollbar, value);
         self
     }
     #[inline]
     pub fn no_focus_on_appearing(mut self, value: bool) -> Self {
-        self.flags.set(ImGuiWindowFlags_NoFocusOnAppearing, value);
+        self.flags
+            .set(ImGuiWindowFlags_NoFocusOnAppearing, value);
         self
     }
     #[inline]
     pub fn no_bring_to_front_on_focus(mut self, value: bool) -> Self {
-        self.flags.set(ImGuiWindowFlags_NoBringToFrontOnFocus, value);
+        self.flags
+            .set(ImGuiWindowFlags_NoBringToFrontOnFocus, value);
         self
     }
     #[inline]
     pub fn always_vertical_scrollbar(mut self, value: bool) -> Self {
-        self.flags.set(ImGuiWindowFlags_AlwaysVerticalScrollbar, value);
+        self.flags
+            .set(ImGuiWindowFlags_AlwaysVerticalScrollbar, value);
         self
     }
     #[inline]
     pub fn always_horizontal_scrollbar(mut self, value: bool) -> Self {
-        self.flags.set(ImGuiWindowFlags_AlwaysHorizontalScrollbar, value);
+        self.flags
+            .set(ImGuiWindowFlags_AlwaysHorizontalScrollbar, value);
         self
     }
     #[inline]
     pub fn always_use_window_padding(mut self, value: bool) -> Self {
-        self.flags.set(ImGuiWindowFlags_AlwaysUseWindowPadding, value);
+        self.flags
+            .set(ImGuiWindowFlags_AlwaysUseWindowPadding, value);
         self
     }
     pub fn build<F: FnOnce()>(self, f: F) {
@@ -160,7 +167,9 @@ impl<'ui, 'p> Window<'ui, 'p> {
                 imgui_sys::igSetNextWindowSize(self.size.into(), self.size_cond);
             }
             imgui_sys::igBegin2(self.name.as_ptr(),
-                                self.opened.map(|x| x as *mut bool).unwrap_or(ptr::null_mut()),
+                                self.opened
+                                    .map(|x| x as *mut bool)
+                                    .unwrap_or(ptr::null_mut()),
                                 ImVec2::new(0.0, 0.0),
                                 self.bg_alpha,
                                 self.flags)
