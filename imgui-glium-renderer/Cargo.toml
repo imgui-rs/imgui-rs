@@ -1,11 +1,11 @@
 [package]
 name = "imgui-glium-renderer"
 version = "0.0.14-pre"
-authors = ["Joonas Javanainen <joonas.javanainen@gmail.com>"]
-description = "Glium renderer for imgui-rs"
+authors = ["Joonas Javanainen <joonas.javanainen@gmail.com>", "imgui-rs contributors"]
+description = "Glium renderer for the imgui crate"
 homepage = "https://github.com/gekkio/imgui-rs"
 repository = "https://github.com/gekkio/imgui-rs"
-license = "MIT OR Apache-2.0"
+license = "MIT/Apache-2.0"
 categories = ["gui", "rendering"]
 
 [dependencies]

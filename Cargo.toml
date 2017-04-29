@@ -1,13 +1,16 @@
 [package]
 name = "imgui"
 version = "0.0.14-pre"
-authors = ["Joonas Javanainen <joonas.javanainen@gmail.com>"]
-description = "Experimental bindings to ocornut/imgui"
-readme = "README.markdown"
+authors = ["Joonas Javanainen <joonas.javanainen@gmail.com>", "imgui-rs contributors"]
+description = "High-level Rust bindings to dear imgui"
 homepage = "https://github.com/gekkio/imgui-rs"
 repository = "https://github.com/gekkio/imgui-rs"
-license = "MIT OR Apache-2.0"
+license = "MIT/Apache-2.0"
 categories = ["gui", "api-bindings"]
+readme = "README.markdown"
+
+[badges]
+travis-ci = { repository = "gekkio/imgui-rs" }
 
 [dependencies]
 imgui-sys = { version = "0.0.14-pre", path = "imgui-sys" }
