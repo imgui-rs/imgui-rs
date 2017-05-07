@@ -152,7 +152,7 @@ impl<'ui, 'p> InputText<'ui, 'p> {
     pub fn build(self) -> bool {
         unsafe {
             imgui_sys::igInputText(self.label.as_ptr(),
-                                   self.buf.as_ptr() as *mut i8,
+                                   self.buf.as_ptr() as *mut _,
                                    self.buf.capacity_with_nul(),
                                    self.flags,
                                    None,

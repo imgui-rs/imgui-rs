@@ -235,7 +235,7 @@ impl ImGui {
         string.push(character);
         string.push('\0');
         unsafe {
-            imgui_sys::ImGuiIO_AddInputCharactersUTF8(string.as_ptr() as *const i8);
+            imgui_sys::ImGuiIO_AddInputCharactersUTF8(string.as_ptr() as *const _);
         }
     }
     pub fn get_time(&self) -> f32 { unsafe { imgui_sys::igGetTime() } }
