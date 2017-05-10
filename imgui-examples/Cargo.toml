@@ -9,8 +9,8 @@ license = "MIT/Apache-2.0"
 publish = false
 
 [dev-dependencies]
-gfx = "0.14"
-gfx_window_glutin = "0.14"
+gfx = "0.15"
+gfx_window_glutin = "0.15"
 glium = { version = "0.16", default-features = true }
 glutin = "0.7"
 imgui = { version = "0.0.14-pre", path = "../" }

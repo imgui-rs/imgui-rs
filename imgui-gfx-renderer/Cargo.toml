@@ -9,6 +9,6 @@ license = "MIT/Apache-2.0"
 categories = ["gui", "rendering"]
 
 [dependencies]
-gfx = "0.14"
+gfx = "0.15"
 imgui = { version = "0.0.14-pre", path = "../" }
 imgui-sys = { version = "0.0.14-pre", path = "../imgui-sys", features = ["gfx"] }
