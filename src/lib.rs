@@ -228,14 +228,10 @@ impl ImGui {
         io.key_map[key as usize] = mapping as i32;
     }
     pub fn add_input_character(&mut self, character: char) {
-        // TODO: This is slightly better. We should use char::encode_utf8 when it stabilizes
-        // to allow us to skip the string intermediate since we can then go directly
-        // to bytes
-        let mut string = String::new();
-        string.push(character);
-        string.push('\0');
+        let mut buf = [0; 5];
+        character.encode_utf8(&mut buf);
         unsafe {
-            imgui_sys::ImGuiIO_AddInputCharactersUTF8(string.as_ptr() as *const _);
+            imgui_sys::ImGuiIO_AddInputCharactersUTF8(buf.as_ptr() as *const _);
         }
     }
     pub fn get_time(&self) -> f32 { unsafe { imgui_sys::igGetTime() } }

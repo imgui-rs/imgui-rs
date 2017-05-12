@@ -29,6 +29,10 @@ impl ImString {
         self.0.clear();
         self.0.push(b'\0');
     }
+    pub fn push(&mut self, ch: char) {
+        let mut buf = [0; 4];
+        self.push_str(ch.encode_utf8(&mut buf));
+    }
     pub fn push_str(&mut self, string: &str) {
         self.refresh_len();
         self.0.extend_from_slice(string.as_bytes());
