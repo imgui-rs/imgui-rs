@@ -2,6 +2,19 @@
 
 ## [Unreleased]
 
+### Added
+
+- ImString owned type for strings
+
+### Changed
+
+- ImStr is now "a dear imgui -compatible string slice". This change
+  significantly affects how strings are handled.
+
+### Fixed
+
+- String pointer compilation problems on ARM
+
 ## [0.0.13] - 2017-04-25
 
 ### Changed
