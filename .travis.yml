@@ -5,6 +5,7 @@ rust:
   - stable
   - beta
   - nightly
+  - 1.15.1
 os:
   - linux
   - osx
