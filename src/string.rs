@@ -30,7 +30,7 @@ impl ImString {
         self.0.push(b'\0');
     }
     pub fn push_str(&mut self, string: &str) {
-        self.0.pop();
+        self.refresh_len();
         self.0.extend_from_slice(string.as_bytes());
         self.0.push(b'\0');
     }
@@ -41,6 +41,20 @@ impl ImString {
     }
     pub fn reserve_exact(&mut self, additional: usize) {
         self.0.reserve_exact(additional);
+    }
+    pub fn as_ptr(&self) -> *const c_char { self.0.as_ptr() as *const _ }
+    pub fn as_mut_ptr(&mut self) -> *mut c_char { self.0.as_mut_ptr() as *mut _ }
+
+    /// Updates the buffer length based on the current contents.
+    ///
+    /// Dear imgui accesses pointers directly, so the length doesn't get updated when the contents
+    /// change. This is normally OK, because Deref to ImStr always calculates the slice length
+    /// based on contents. However, we need to refresh the length in some ImString functions.
+    fn refresh_len(&mut self) {
+        let len = self.to_str().len();
+        unsafe {
+            self.0.set_len(len);
+        }
     }
 }
 
@@ -92,9 +106,9 @@ impl ImStr {
     pub unsafe fn from_bytes_unchecked<'a>(bytes: &'a [u8]) -> &'a ImStr {
         mem::transmute(bytes)
     }
-    pub fn as_ptr(&self) -> *const c_char { self.0.as_ptr() as *const c_char }
+    pub fn as_ptr(&self) -> *const c_char { self.0.as_ptr() }
     pub fn to_str(&self) -> &str {
-        unsafe { str::from_utf8_unchecked(&self.as_bytes()) }
+        unsafe { str::from_utf8_unchecked(&self.0.to_bytes()) }
     }
 }
 
