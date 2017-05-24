@@ -19,7 +19,7 @@ before_install:
 
 script:
   # 1.15 doesn't yet support cargo build --all
-  - cd imgui-sys && cargo build --verbose
-  - cd imgui-glium-renderer && cargo build --verbose
+  - cd imgui-sys && cargo build --verbose && cd ..
+  - cd imgui-glium-renderer && cargo build --verbose && cd ..
   - cargo build --verbose
   - cargo test --all --verbose
