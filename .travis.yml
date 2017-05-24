@@ -18,9 +18,8 @@ before_install:
   - git submodule update --init --recursive
 
 script:
-  - [ $TRAVIS_RUST_VERSION != 1.15.1 ] && cargo build --all --verbose
   # 1.15 doesn't yet support cargo build --all
-  - [ $TRAVIS_RUST_VERSION = 1.15.1 ] && cd imgui-sys && cargo build --verbose
-  - [ $TRAVIS_RUST_VERSION = 1.15.1 ] && cd imgui-glium-renderer && cargo build --verbose
-  - [ $TRAVIS_RUST_VERSION = 1.15.1 ] && cargo build --verbose
+  - cd imgui-sys && cargo build --verbose
+  - cd imgui-glium-renderer && cargo build --verbose
+  - cargo build --verbose
   - cargo test --all --verbose
