@@ -42,6 +42,7 @@ struct State {
     vec3i: [i32; 3],
     col1: [f32; 3],
     col2: [f32; 4],
+    button: i32,
     selected_fish: Option<usize>,
     auto_resize_state: AutoResizeState,
     file_menu: FileMenuState,
@@ -86,6 +87,7 @@ impl Default for State {
             vec3i: [10, 20, 30],
             col1: [1.0, 0.0, 0.2],
             col2: [0.4, 0.7, 0.0, 0.5],
+            button: 0,
             selected_fish: None,
             auto_resize_state: Default::default(),
             file_menu: Default::default(),
@@ -358,9 +360,22 @@ fn show_test_window<'a>(ui: &Ui<'a>, state: &mut State, opened: &mut bool) {
                     .build();
                 ui.input_float3(im_str!("input float3"), &mut state.vec3f)
                     .build();
-                ui.color_edit3(im_str!("color 1"), &mut state.col1)
+                ui.color_edit3(im_str!("color 1"), &mut state.col1).build();
+                ui.color_edit4(im_str!("color 2"), &mut state.col2).build();
+
+                ui.radio_button(im_str!("Button one"), &mut state.button, 0)
                     .build();
-                ui.color_edit4(im_str!("color 2"), &mut state.col2)
+                ui.same_line(0.0);
+                ui.radio_button(im_str!("Button two"), &mut state.button, 1)
+                    .build();
+                ui.same_line(0.0);
+                ui.radio_button(im_str!("Button three"), &mut state.button, 2)
+                    .build();
+
+                ui.radio_button_bool(im_str!("Boolean radio on"), true)
+                    .build();
+                ui.same_line(0.0);
+                ui.radio_button_bool(im_str!("Boolean radio off"), false)
                     .build();
 
                 ui.tree_node(im_str!("Multi-component Widgets"))
@@ -443,9 +458,7 @@ fn show_example_app_main_menu_bar<'a>(ui: &Ui<'a>, state: &mut State) {
 }
 
 fn show_example_menu_file<'a>(ui: &Ui<'a>, state: &mut FileMenuState) {
-    ui.menu_item(im_str!("(dummy menu)"))
-        .enabled(false)
-        .build();
+    ui.menu_item(im_str!("(dummy menu)")).enabled(false).build();
     ui.menu_item(im_str!("New")).build();
     ui.menu_item(im_str!("Open"))
         .shortcut(im_str!("Ctrl+O"))
