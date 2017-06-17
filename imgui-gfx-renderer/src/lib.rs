@@ -76,7 +76,7 @@ impl<R: Resources> Renderer<R> {
                      [0.0, 0.0, -1.0, 0.0],
                      [-1.0, 1.0, 0.0, 1.0]],
             tex: (texture, sampler),
-            out: out.clone(),
+            out,
             scissor: Rect {
                 x: 0,
                 y: 0,
@@ -95,6 +95,9 @@ impl<R: Resources> Renderer<R> {
             bundle: Bundle::new(slice, pso, data),
             index_buffer: index_buffer,
         })
+    }
+    pub fn update_render_target(&mut self, out: RenderTargetView<R, gfx::format::Rgba8>) {
+        self.bundle.data.out = out;
     }
     pub fn render<'a, F: Factory<R>, C: CommandBuffer<R>>(&mut self,
                                                           ui: Ui<'a>,

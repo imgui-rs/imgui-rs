@@ -39,6 +39,7 @@ pub fn main() {
                 glutin::Event::Closed => break 'main,
                 glutin::Event::Resized(_width, _height) => {
                     gfx_window_glutin::update_views(&window, &mut main_color, &mut main_depth);
+                    renderer.update_render_target(main_color.clone());
                 }
                 _ => (),
             }
