@@ -559,7 +559,7 @@ pub struct ImColor {
 }
 
 #[repr(C)]
-#[derive(Copy, Clone, Debug, Default)]
+#[derive(Copy, Clone, Debug)]
 pub struct ImGuiListClipper {
     pub start_pos_y: c_float,
     pub items_height: c_float,
@@ -567,6 +567,19 @@ pub struct ImGuiListClipper {
     pub step_no: c_int,
     pub display_start: c_int,
     pub display_end: c_int,
+}
+
+impl Default for ImGuiListClipper {
+    fn default() -> ImGuiListClipper {
+        ImGuiListClipper {
+            start_pos_y: 0.0,
+            items_height: -1.0,
+            items_count: -1,
+            step_no: 0,
+            display_start: 0,
+            display_end: 0,
+        }
+    }
 }
 
 pub type ImDrawCallback = Option<extern "C" fn(parent_list: *const ImDrawList,
@@ -1670,6 +1683,15 @@ extern "C" {
     pub fn ImDrawList_PrimVtx(list: *mut ImDrawList, pos: ImVec2, uv: ImVec2, col: ImU32);
     pub fn ImDrawList_UpdateClipRect(list: *mut ImDrawList);
     pub fn ImDrawList_UpdateTextureID(list: *mut ImDrawList);
+}
+
+// ImGuiListClipper
+extern "C" {
+    pub fn ImGuiListClipper_Begin(clipper: *mut ImGuiListClipper, count: c_int, items_height: c_float);
+    pub fn ImGuiListClipper_End(clipper: *mut ImGuiListClipper);
+    pub fn ImGuiListClipper_Step(clipper: *mut ImGuiListClipper) -> bool;
+    pub fn ImGuiListClipper_GetDisplayStart(clipper: *mut ImGuiListClipper) -> c_int;
+    pub fn ImGuiListClipper_GetDisplayEnd(clipper: *mut ImGuiListClipper) -> c_int;
 }
 
 // Although this test is sensitive to ImGui updates, it's useful to reveal potential
