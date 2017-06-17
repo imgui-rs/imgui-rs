@@ -5,6 +5,8 @@
 ### Added
 
 - ImString owned type for strings
+- Experimental support for gfx-rs in imgui-sys
+- Experimental renderer for gfx-rs
 
 ### Changed
 
