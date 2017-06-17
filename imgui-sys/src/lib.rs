@@ -24,6 +24,7 @@ mod glium_support;
 /// ImGui context (opaque)
 pub enum ImGuiContext { }
 
+/// 32-bit unsigned integer (typically used to store packed colors)
 pub type ImU32 = c_uint;
 
 /// Character for keyboard input/display
@@ -100,7 +101,9 @@ pub enum ImGuiStyleVar {
     ItemInnerSpacing,
     IndentSpacing,
     GrabMinSize,
+    ButtonTextAlign,
 }
+pub const ImGuiStyleVar_COUNT: usize = 12;
 
 /// A key identifier (ImGui-side enum)
 #[repr(C)]
@@ -128,19 +131,6 @@ pub enum ImGuiKey {
 }
 pub const ImGuiKey_COUNT: usize = 19;
 
-bitflags!(
-    /// Alignment
-    #[repr(C)]
-    pub flags ImGuiAlign: c_int {
-        const ImGuiAlign_Left    = 1 << 0,
-        const ImGuiAlign_Center  = 1 << 1,
-        const ImGuiAlign_Right   = 1 << 2,
-        const ImGuiAlign_Top     = 1 << 3,
-        const ImGuiAlign_VCenter = 1 << 4,
-        const ImGuiAlign_Default = ImGuiAlign_Left.bits | ImGuiAlign_Top.bits
-    }
-);
-
 /// Color edit mode
 #[repr(C)]
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
@@ -156,6 +146,7 @@ pub enum ImGuiColorEditMode {
 #[repr(C)]
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
 pub enum ImGuiMouseCursor {
+    None = -1,
     Arrow,
     TextInput,
     Move,
@@ -164,7 +155,6 @@ pub enum ImGuiMouseCursor {
     ResizeNESW,
     ResizeNWSE,
 }
-
 pub const ImGuiMouseCursor_COUNT: usize = 7;
 
 bitflags!(
@@ -365,8 +355,8 @@ pub struct ImGuiStyle {
     pub window_min_size: ImVec2,
     /// Radius of window corners rounding. Set to 0.0f to have rectangular windows
     pub window_rounding: c_float,
-    /// Alignment for title bar text
-    pub window_title_align: ImGuiAlign,
+    /// Alignment for title bar text. Defaults to (0.0f, 0.5f) for left-aligned, vertically centered
+    pub window_title_align: ImVec2,
     /// Radius of child window corners rounding. Set to 0.0f to have rectangular child windows
     pub child_window_rounding: c_float,
     /// Padding within a framed rectangle (used by most widgets)
@@ -379,7 +369,7 @@ pub struct ImGuiStyle {
     /// Horizontal and vertical spacing between within elements of a composed
     /// widget (e.g. a slider and its label)
     pub item_inner_spacing: ImVec2,
-    /// Expand reactive bounding box for touch-based system where touch position is not accurat
+    /// Expand reactive bounding box for touch-based system where touch position is not accurate
     /// enough. Unfortunately we don't sort widgets so priority on overlap will always be given
     /// to the first widget. So don't grow this too much!
     pub touch_extra_padding: ImVec2,
@@ -396,6 +386,9 @@ pub struct ImGuiStyle {
     pub grab_min_size: c_float,
     /// Radius of grabs corners rounding. Set to 0.0f to have rectangular slider grabs.
     pub grab_rounding: c_float,
+    /// Alignment of button text when button is larger than text. Defaults to (0.5f, 0.5f)
+    /// for horizontally + vertically centered
+    pub button_text_align: ImVec2,
     /// Window positions are clamped to be visible within the display area by at least this
     /// amount. Only covers regular windows.
     pub display_window_padding: ImVec2,
@@ -432,18 +425,17 @@ pub struct ImGuiIO {
     pub fonts: *mut ImFontAtlas,
     pub font_global_scale: c_float,
     pub font_allow_user_scaling: bool,
+    pub font_default: *mut ImFont,
     pub display_framebuffer_scale: ImVec2,
     pub display_visible_min: ImVec2,
     pub display_visible_max: ImVec2,
 
-    pub word_movement_uses_alt_key: bool,
-    pub shortcuts_use_super_key: bool,
-    pub double_click_selects_word: bool,
-    pub multi_select_uses_super_key: bool,
+    pub osx_behaviors: bool,
 
     pub render_draw_lists_fn: Option<extern "C" fn(data: *mut ImDrawData)>,
-    pub get_clipboard_text_fn: Option<extern "C" fn() -> *const c_char>,
-    pub set_clipboard_text_fn: Option<extern "C" fn(text: *const c_char)>,
+    pub get_clipboard_text_fn: Option<extern "C" fn(user_data: *mut c_void) -> *const c_char>,
+    pub set_clipboard_text_fn: Option<extern "C" fn(user_data: *mut c_void, text: *const c_char)>,
+    pub clipboard_user_data: *mut c_void,
     pub mem_alloc_fn: Option<extern "C" fn(sz: usize) -> *mut c_void>,
     pub mem_free_fn: Option<extern "C" fn(ptr: *mut c_void)>,
     pub ime_set_input_screen_pos_fn: Option<extern "C" fn(x: c_int, y: c_int)>,
@@ -470,8 +462,8 @@ pub struct ImGuiIO {
     pub metrics_render_indices: c_int,
     pub metrics_active_windows: c_int,
 
-    pub mouse_pos_prev: ImVec2,
     pub mouse_delta: ImVec2,
+    pub mouse_pos_prev: ImVec2,
     pub mouse_clicked: [bool; 5],
     pub mouse_clicked_pos: [ImVec2; 5],
     pub mouse_clicked_time: [c_float; 5],
@@ -558,6 +550,7 @@ pub struct ImColor {
     pub value: ImVec4,
 }
 
+/// Helper to manually clip large list of items
 #[repr(C)]
 #[derive(Copy, Clone, Debug)]
 pub struct ImGuiListClipper {
@@ -662,9 +655,9 @@ pub struct ImFontConfig {
     pub oversample_v: c_int,
     pub pixel_snap_h: bool,
     pub glyph_extra_spacing: ImVec2,
+    pub glyph_offset: ImVec2,
     pub glyph_ranges: *const ImWchar,
     pub merge_mode: bool,
-    pub merge_glyph_center_v: bool,
 
     name: [c_char; 32],
     dst_font: *mut ImFont,
@@ -918,7 +911,7 @@ extern "C" {
     pub fn igRadioButton(label: *const c_char, v: *mut c_int, v_button: c_int) -> bool;
     pub fn igCombo(label: *const c_char,
                    current_item: *mut c_int,
-                   items: *mut *const c_char,
+                   items: *const *const c_char,
                    items_count: c_int,
                    height_in_items: c_int)
                    -> bool;
@@ -1247,7 +1240,7 @@ extern "C" {
                           -> bool;
     pub fn igListBox(label: *const c_char,
                      current_item: *mut c_int,
-                     items: *mut *const c_char,
+                     items: *const *const c_char,
                      items_count: c_int,
                      height_in_items: c_int)
                      -> bool;
@@ -1276,7 +1269,7 @@ extern "C" {
     pub fn igValueUInt(prefix: *const c_char, v: c_uint);
     pub fn igValueFloat(prefix: *const c_char, v: c_float, float_format: *const c_char);
     pub fn igValueColor(prefix: *const c_char, v: ImVec4);
-    pub fn igValueColor2(prefix: *const c_char, v: c_uint);
+    pub fn igValueColor2(prefix: *const c_char, v: ImU32);
 }
 
 // Tooltip
@@ -1361,7 +1354,8 @@ extern "C" {
     pub fn igIsRootWindowFocused() -> bool;
     pub fn igIsRootWindowOrAnyChildFocused() -> bool;
     pub fn igIsRootWindowOrAnyChildHovered() -> bool;
-    pub fn igIsRectVisible(pos: ImVec2) -> bool;
+    pub fn igIsRectVisible(item_size: ImVec2) -> bool;
+    pub fn igIsRectVisible2(rect_min: *const ImVec2, rect_max: *const ImVec2) -> bool;
     pub fn igIsPosHoveringAnyWindow(pos: ImVec2) -> bool;
     pub fn igGetTime() -> c_float;
     pub fn igGetFrameCount() -> c_int;
@@ -1398,10 +1392,10 @@ extern "C" {
                                   out_g: *mut c_float,
                                   out_b: *mut c_float);
 
-    pub fn igGetKeyIndex(key: ImGuiKey) -> c_int;
-    pub fn igIsKeyDown(key_index: c_int) -> bool;
-    pub fn igIsKeyPressed(key_index: c_int, repeat: bool) -> bool;
-    pub fn igIsKeyReleased(key_index: c_int) -> bool;
+    pub fn igGetKeyIndex(imgui_key: ImGuiKey) -> c_int;
+    pub fn igIsKeyDown(user_key_index: c_int) -> bool;
+    pub fn igIsKeyPressed(user_key_index: c_int, repeat: bool) -> bool;
+    pub fn igIsKeyReleased(user_key_index: c_int) -> bool;
     pub fn igIsMouseDown(button: c_int) -> bool;
     pub fn igIsMouseClicked(button: c_int, repeat: bool) -> bool;
     pub fn igIsMouseDoubleClicked(button: c_int) -> bool;
@@ -1454,7 +1448,7 @@ extern "C" {
                                           out_width: *mut c_int,
                                           out_height: *mut c_int,
                                           out_bytes_per_pixel: *mut c_int);
-    pub fn ImFontAtlas_SetTexID(atlas: *mut ImFontAtlas, tex: *mut c_void);
+    pub fn ImFontAtlas_SetTexID(atlas: *mut ImFontAtlas, tex: ImTextureID);
     pub fn ImFontAtlas_AddFont(atlas: *mut ImFontAtlas,
                                font_cfg: *const ImFontConfig)
                                -> *mut ImFont;
@@ -1494,6 +1488,7 @@ extern "C" {
     pub fn ImFontAtlas_GetGlyphRangesJapanese(atlas: *mut ImFontAtlas) -> *const ImWchar;
     pub fn ImFontAtlas_GetGlyphRangesChinese(atlas: *mut ImFontAtlas) -> *const ImWchar;
     pub fn ImFontAtlas_GetGlyphRangesCyrillic(atlas: *mut ImFontAtlas) -> *const ImWchar;
+    pub fn ImFontAtlas_GetGlyphRangesThai(atlas: *mut ImFontAtlas) -> *const ImWchar;
 
     pub fn ImGuiIO_AddInputCharacter(c: c_ushort);
     pub fn ImGuiIO_AddInputCharactersUTF8(utf8_chars: *const c_char);
@@ -1536,14 +1531,14 @@ extern "C" {
                               b: ImVec2,
                               col: ImU32,
                               rounding: c_float,
-                              rounding_corners: c_int,
+                              rounding_corners_flags: c_int,
                               thickness: c_float);
     pub fn ImDrawList_AddRectFilled(list: *mut ImDrawList,
                                     a: ImVec2,
                                     b: ImVec2,
                                     col: ImU32,
                                     rounding: c_float,
-                                    rounding_corners: c_int);
+                                    rounding_corners_flags: c_int);
     pub fn ImDrawList_AddRectFilledMultiColor(list: *mut ImDrawList,
                                               a: ImVec2,
                                               b: ImVec2,
@@ -1603,9 +1598,20 @@ extern "C" {
                                user_texture_id: ImTextureID,
                                a: ImVec2,
                                b: ImVec2,
-                               uv0: ImVec2,
-                               uv1: ImVec2,
+                               uv_a: ImVec2,
+                               uv_b: ImVec2,
                                col: ImU32);
+    pub fn ImDrawList_AddImageQuad(list: *mut ImDrawList,
+                                   user_texture_id: ImTextureID,
+                                   a: ImVec2,
+                                   b: ImVec2,
+                                   c: ImVec2,
+                                   d: ImVec2,
+                                   uv_a: ImVec2,
+                                   uv_b: ImVec2,
+                                   uv_c: ImVec2,
+                                   uv_d: ImVec2,
+                                   col: ImU32);
     pub fn ImDrawList_AddPolyLine(list: *mut ImDrawList,
                                   points: *const ImVec2,
                                   num_points: c_int,
@@ -1630,7 +1636,7 @@ extern "C" {
     pub fn ImDrawList_PathClear(list: *mut ImDrawList);
     pub fn ImDrawList_PathLineTo(list: *mut ImDrawList, pos: ImVec2);
     pub fn ImDrawList_PathLineToMergeDuplicate(list: *mut ImDrawList, pos: ImVec2);
-    pub fn ImDrawList_PathFill(list: *mut ImDrawList, col: ImU32);
+    pub fn ImDrawList_PathFillConvex(list: *mut ImDrawList, col: ImU32);
     pub fn ImDrawList_PathStroke(list: *mut ImDrawList,
                                  col: ImU32,
                                  closed: bool,
@@ -1655,7 +1661,7 @@ extern "C" {
                                rect_min: ImVec2,
                                rect_max: ImVec2,
                                rounding: c_float,
-                               rounding_corners: c_int);
+                               rounding_corners_flags: c_int);
 
     pub fn ImDrawList_ChannelsSplit(list: *mut ImDrawList, channels_count: c_int);
     pub fn ImDrawList_ChannelsMerge(list: *mut ImDrawList);
@@ -1759,7 +1765,7 @@ fn test_default_style() {
     assert_eq!(style.window_padding, ImVec2::new(8.0, 8.0));
     assert_eq!(style.window_min_size, ImVec2::new(32.0, 32.0));
     assert_eq!(style.window_rounding, 9.0);
-    assert_eq!(style.window_title_align, ImGuiAlign_Left);
+    assert_eq!(style.window_title_align, ImVec2::new(0.0, 0.5));
     assert_eq!(style.child_window_rounding, 0.0);
     assert_eq!(style.frame_padding, ImVec2::new(4.0, 3.0));
     assert_eq!(style.frame_rounding, 0.0);
@@ -1772,6 +1778,7 @@ fn test_default_style() {
     assert_eq!(style.scrollbar_rounding, 9.0);
     assert_eq!(style.grab_min_size, 10.0);
     assert_eq!(style.grab_rounding, 0.0);
+    assert_eq!(style.button_text_align, ImVec2::new(0.5, 0.5));
     assert_eq!(style.display_window_padding, ImVec2::new(22.0, 22.0));
     assert_eq!(style.display_safe_area_padding, ImVec2::new(4.0, 4.0));
     assert_eq!(style.anti_aliased_lines, true);
