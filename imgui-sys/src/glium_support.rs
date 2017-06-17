@@ -1,7 +1,7 @@
 use glium::vertex::{Attribute, AttributeType, Vertex, VertexFormat};
 use std::borrow::Cow;
 use std::mem;
-use std::os::raw::{c_float};
+use std::os::raw::c_float;
 
 use super::{ImDrawVert, ImVec2, ImVec4};
 

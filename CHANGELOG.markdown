@@ -5,6 +5,8 @@
 ### Added
 
 - ImString owned type for strings
+- Experimental support for gfx-rs in imgui-sys
+- Experimental renderer for gfx-rs
 
 ### Changed
 
@@ -32,6 +34,8 @@
 - Support for 2-4 -element float sliders
 - `ImVec4::zero()`
 - `Into` array and tuple conversions for ImVec2 and ImVec4
+- gfx 0.15 support in imgui-sys
+- gfx 0.15 renderer implementation
 
 ### Changed
 
