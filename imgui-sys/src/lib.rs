@@ -1489,6 +1489,11 @@ extern "C" {
         glyph_ranges: *const ImWchar) -> *mut ImFont;
     pub fn ImFontAtlas_ClearTexData(atlas: *mut ImFontAtlas);
     pub fn ImFontAtlas_Clear(atlas: *mut ImFontAtlas);
+    pub fn ImFontAtlas_GetGlyphRangesDefault(atlas: *mut ImFontAtlas) -> *const ImWchar;
+    pub fn ImFontAtlas_GetGlyphRangesKorean(atlas: *mut ImFontAtlas) -> *const ImWchar;
+    pub fn ImFontAtlas_GetGlyphRangesJapanese(atlas: *mut ImFontAtlas) -> *const ImWchar;
+    pub fn ImFontAtlas_GetGlyphRangesChinese(atlas: *mut ImFontAtlas) -> *const ImWchar;
+    pub fn ImFontAtlas_GetGlyphRangesCyrillic(atlas: *mut ImFontAtlas) -> *const ImWchar;
 
     pub fn ImGuiIO_AddInputCharacter(c: c_ushort);
     pub fn ImGuiIO_AddInputCharactersUTF8(utf8_chars: *const c_char);
@@ -1498,6 +1503,7 @@ extern "C" {
 // ImDrawData
 extern "C" {
     pub fn ImDrawData_DeIndexAllBuffers(drawData: *mut ImDrawData);
+    pub fn ImDrawData_ScaleClipRects(drawData: *mut ImDrawData, sc: ImVec2);
 }
 
 // ImDrawList
@@ -1687,12 +1693,62 @@ extern "C" {
 
 // ImGuiListClipper
 extern "C" {
-    pub fn ImGuiListClipper_Begin(clipper: *mut ImGuiListClipper, count: c_int, items_height: c_float);
+    pub fn ImGuiListClipper_Begin(clipper: *mut ImGuiListClipper,
+                                  count: c_int, items_height: c_float);
     pub fn ImGuiListClipper_End(clipper: *mut ImGuiListClipper);
     pub fn ImGuiListClipper_Step(clipper: *mut ImGuiListClipper) -> bool;
     pub fn ImGuiListClipper_GetDisplayStart(clipper: *mut ImGuiListClipper) -> c_int;
     pub fn ImGuiListClipper_GetDisplayEnd(clipper: *mut ImGuiListClipper) -> c_int;
 }
+
+// ImGuiTextFilter
+extern "C" {
+    pub fn ImGuiTextFilter_Init(filter: *mut ImGuiTextFilter, default_filter: *const c_char);
+    pub fn ImGuiTextFilter_Clear(filter: *mut ImGuiTextFilter);
+    pub fn ImGuiTextFilter_Draw(filter: *mut ImGuiTextFilter,
+                                label: *const c_char, width: c_float) -> bool;
+    pub fn ImGuiTextFilter_PassFilter(filter: *mut ImGuiTextFilter,
+                                      text: *const c_char, text_end: *const c_char) -> bool;
+    pub fn ImGuiTextFilter_IsActive(filter: *mut ImGuiTextFilter) -> bool;
+    pub fn ImGuiTextFilter_Build(filter: *mut ImGuiTextFilter);
+}
+
+// ImGuiTextEditCallbackData
+extern "C" {
+    pub fn ImGuiTextEditCallbackData_DeleteChars(data: *mut ImGuiTextEditCallbackData,
+                                                 pos: c_int, bytes_count: c_int);
+    pub fn ImGuiTextEditCallbackData_InsertChars(data: *mut ImGuiTextEditCallbackData,
+                                                 pos: c_int,
+                                                 text: *const c_char, text_end: *const c_char);
+    pub fn ImGuiTextEditCallbackData_HasSelection(data: *mut ImGuiTextEditCallbackData) -> bool;
+}
+
+// ImGuiStorage
+extern "C" {
+    pub fn ImGuiStorage_Init(store: *mut ImGuiStorage);
+    pub fn ImGuiStorage_Clear(store: *mut ImGuiStorage);
+    pub fn ImGuiStorage_GetInt(store: *mut ImGuiStorage, key: ImGuiID,
+                               default_val: c_int) -> c_int;
+    pub fn ImGuiStorage_SetInt(store: *mut ImGuiStorage, key: ImGuiID, val: c_int);
+    pub fn ImGuiStorage_GetBool(store: *mut ImGuiStorage, key: ImGuiID,
+                                default_val: bool) -> bool;
+    pub fn ImGuiStorage_SetBool(store: *mut ImGuiStorage, key: ImGuiID, val: bool);
+    pub fn ImGuiStorage_GetFloat(store: *mut ImGuiStorage, key: ImGuiID,
+                                 default_val: c_float) -> c_float;
+    pub fn ImGuiStorage_SetFloat(store: *mut ImGuiStorage, key: ImGuiID, val: c_float);
+    pub fn ImGuiStorage_GetVoidPtr(store: *mut ImGuiStorage, key: ImGuiID);
+    pub fn ImGuiStorage_SetVoidPtr(store: *mut ImGuiStorage, key: ImGuiID, val: *mut c_void);
+    pub fn ImGuiStorage_GetIntRef(store: *mut ImGuiStorage, key: ImGuiID,
+                                  default_val: c_int) -> *mut c_int;
+    pub fn ImGuiStorage_GetBoolRef(store: *mut ImGuiStorage, key: ImGuiID,
+                                   default_val: bool) -> *mut bool;
+    pub fn ImGuiStorage_GetFloatRef(store: *mut ImGuiStorage, key: ImGuiID,
+                                    default_val: c_float) -> *mut c_float;
+    pub fn ImGuiStorage_GetVoidPtrRef(store: *mut ImGuiStorage, key: ImGuiID,
+                                      default_val: *mut c_void) -> *mut *mut c_void;
+    pub fn ImGuiStorage_SetAllInt(store: *mut ImGuiStorage, val: c_int);
+}
+
 
 // Although this test is sensitive to ImGui updates, it's useful to reveal potential
 // alignment errors
