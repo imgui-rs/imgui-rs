@@ -28,7 +28,8 @@ pub fn main() {
     let (window, mut device, mut factory, mut main_color, mut main_depth) =
         gfx_window_glutin::init::<ColorFormat, DepthFormat>(builder);
     let mut encoder: gfx::Encoder<_, _> = factory.create_command_buffer().into();
-    let mut renderer = Renderer::init(&mut support.imgui, &mut factory, main_color.clone());
+    let mut renderer = Renderer::init(&mut support.imgui, &mut factory, main_color.clone())
+        .expect("Failed to initialize renderer");
 
     'main: loop {
         for event in window.poll_events() {

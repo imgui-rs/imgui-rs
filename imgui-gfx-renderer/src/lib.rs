@@ -12,10 +12,25 @@ pub type RendererResult<T> = Result<T, RendererError>;
 #[derive(Clone, Debug)]
 pub enum RendererError {
     Update(gfx::UpdateError<usize>),
+    Buffer(gfx::buffer::CreationError),
+    Pipeline(gfx::PipelineStateError<String>),
+    Combined(gfx::CombinedError)
 }
 
 impl From<gfx::UpdateError<usize>> for RendererError {
     fn from(e: gfx::UpdateError<usize>) -> RendererError { RendererError::Update(e) }
+}
+
+impl From<gfx::buffer::CreationError> for RendererError {
+    fn from(e: gfx::buffer::CreationError) -> RendererError { RendererError::Buffer(e) }
+}
+
+impl From<gfx::PipelineStateError<String>> for RendererError {
+    fn from(e: gfx::PipelineStateError<String>) -> RendererError { RendererError::Pipeline(e) }
+}
+
+impl From<gfx::CombinedError> for RendererError {
+    fn from(e: gfx::CombinedError) -> RendererError { RendererError::Combined(e) }
 }
 
 gfx_defines!{
@@ -37,24 +52,21 @@ impl<R: Resources> Renderer<R> {
     pub fn init<F: Factory<R>>(imgui: &mut ImGui,
                                factory: &mut F,
                                out: RenderTargetView<R, gfx::format::Rgba8>)
-                               -> Renderer<R> {
+                               -> RendererResult<Renderer<R>> {
         let pso = factory.create_pipeline_simple(include_bytes!("shader/vert_110.glsl"),
                                     include_bytes!("shader/frag_110.glsl"),
-                                    pipe::new())
-            .expect("Failed to setup PSO");
+                                    pipe::new())?;
         let vertex_buffer = factory.create_buffer::<ImDrawVert>(256,
                                          gfx::buffer::Role::Vertex,
                                          gfx::memory::Usage::Dynamic,
-                                         Bind::empty())
-            .expect("Failed to create vertex buffer");
+                                         Bind::empty())?;
         let index_buffer = factory.create_buffer::<ImDrawIdx>(256,
                                         gfx::buffer::Role::Index,
                                         gfx::memory::Usage::Dynamic,
-                                        Bind::empty())
-            .expect("Failed to create index buffer");
+                                        Bind::empty())?;
         let (_, texture) = imgui.prepare_texture(|handle| {
             factory.create_texture_immutable_u8::<gfx::format::Rgba8>(gfx::texture::Kind::D2(handle.width as u16, handle.height as u16, gfx::texture::AaMode::Single), &[handle.pixels])
-        }).expect("Failed to create texture");
+        })?;
         // TODO: set texture id in imgui
         let sampler = factory.create_sampler_linear();
         let data = pipe::Data {
@@ -79,10 +91,10 @@ impl<R: Resources> Renderer<R> {
             instances: None,
             buffer: index_buffer.clone().into_index_buffer(factory),
         };
-        Renderer {
+        Ok(Renderer {
             bundle: Bundle::new(slice, pso, data),
             index_buffer: index_buffer,
-        }
+        })
     }
     pub fn render<'a, F: Factory<R>, C: CommandBuffer<R>>(&mut self,
                                                           ui: Ui<'a>,
@@ -137,10 +149,9 @@ impl<R: Resources> Renderer<R> {
             self.bundle.data.vertex_buffer = factory.create_buffer::<ImDrawVert>(vtx_buffer.len(),
                                              gfx::buffer::Role::Vertex,
                                              gfx::memory::Usage::Dynamic,
-                                             Bind::empty())
-                .expect("Failed to create vertex buffer");
+                                             Bind::empty())?;
         }
-        Ok(try!(encoder.update_buffer(&self.bundle.data.vertex_buffer, vtx_buffer, 0)))
+        Ok(encoder.update_buffer(&self.bundle.data.vertex_buffer, vtx_buffer, 0)?)
     }
     fn upload_index_buffer<F: Factory<R>, C: CommandBuffer<R>>(&mut self,
                                                                factory: &mut F,
@@ -151,10 +162,9 @@ impl<R: Resources> Renderer<R> {
             self.index_buffer = factory.create_buffer::<ImDrawIdx>(idx_buffer.len(),
                                             gfx::buffer::Role::Index,
                                             gfx::memory::Usage::Dynamic,
-                                            Bind::empty())
-                .expect("Failed to create index buffer");
+                                            Bind::empty())?;
             self.bundle.slice.buffer = self.index_buffer.clone().into_index_buffer(factory);
         }
-        Ok(try!(encoder.update_buffer(&self.index_buffer, idx_buffer, 0)))
+        Ok(encoder.update_buffer(&self.index_buffer, idx_buffer, 0)?)
     }
 }
