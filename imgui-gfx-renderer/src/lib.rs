@@ -76,7 +76,7 @@ impl<R: Resources> Renderer<R> {
                      [0.0, 0.0, -1.0, 0.0],
                      [-1.0, 1.0, 0.0, 1.0]],
             tex: (texture, sampler),
-            out,
+            out: out,
             scissor: Rect {
                 x: 0,
                 y: 0,
