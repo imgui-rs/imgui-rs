@@ -10,7 +10,7 @@ categories = ["gui", "external-ffi-bindings"]
 build = "build.rs"
 
 [dependencies]
-bitflags = "0.8"
+bitflags = "0.9"
 glium = { version = "0.16", default-features = false, optional = true }
 gfx = { version = "0.16", optional = true }
 

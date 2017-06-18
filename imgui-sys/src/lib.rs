@@ -160,98 +160,98 @@ pub const ImGuiMouseCursor_COUNT: usize = 7;
 bitflags!(
     /// Window flags
     #[repr(C)]
-    pub flags ImGuiWindowFlags: c_int {
-        const ImGuiWindowFlags_NoTitleBar                = 1 << 0,
-        const ImGuiWindowFlags_NoResize                  = 1 << 1,
-        const ImGuiWindowFlags_NoMove                    = 1 << 2,
-        const ImGuiWindowFlags_NoScrollbar               = 1 << 3,
-        const ImGuiWindowFlags_NoScrollWithMouse         = 1 << 4,
-        const ImGuiWindowFlags_NoCollapse                = 1 << 5,
-        const ImGuiWindowFlags_AlwaysAutoResize          = 1 << 6,
-        const ImGuiWindowFlags_ShowBorders               = 1 << 7,
-        const ImGuiWindowFlags_NoSavedSettings           = 1 << 8,
-        const ImGuiWindowFlags_NoInputs                  = 1 << 9,
-        const ImGuiWindowFlags_MenuBar                   = 1 << 10,
-        const ImGuiWindowFlags_HorizontalScrollbar       = 1 << 11,
-        const ImGuiWindowFlags_NoFocusOnAppearing        = 1 << 12,
-        const ImGuiWindowFlags_NoBringToFrontOnFocus     = 1 << 13,
-        const ImGuiWindowFlags_AlwaysVerticalScrollbar   = 1 << 14,
-        const ImGuiWindowFlags_AlwaysHorizontalScrollbar = 1 << 15,
-        const ImGuiWindowFlags_AlwaysUseWindowPadding    = 1 << 16,
+    pub struct ImGuiWindowFlags: c_int {
+        const ImGuiWindowFlags_NoTitleBar                = 1 << 0;
+        const ImGuiWindowFlags_NoResize                  = 1 << 1;
+        const ImGuiWindowFlags_NoMove                    = 1 << 2;
+        const ImGuiWindowFlags_NoScrollbar               = 1 << 3;
+        const ImGuiWindowFlags_NoScrollWithMouse         = 1 << 4;
+        const ImGuiWindowFlags_NoCollapse                = 1 << 5;
+        const ImGuiWindowFlags_AlwaysAutoResize          = 1 << 6;
+        const ImGuiWindowFlags_ShowBorders               = 1 << 7;
+        const ImGuiWindowFlags_NoSavedSettings           = 1 << 8;
+        const ImGuiWindowFlags_NoInputs                  = 1 << 9;
+        const ImGuiWindowFlags_MenuBar                   = 1 << 10;
+        const ImGuiWindowFlags_HorizontalScrollbar       = 1 << 11;
+        const ImGuiWindowFlags_NoFocusOnAppearing        = 1 << 12;
+        const ImGuiWindowFlags_NoBringToFrontOnFocus     = 1 << 13;
+        const ImGuiWindowFlags_AlwaysVerticalScrollbar   = 1 << 14;
+        const ImGuiWindowFlags_AlwaysHorizontalScrollbar = 1 << 15;
+        const ImGuiWindowFlags_AlwaysUseWindowPadding    = 1 << 16;
 
-        const ImGuiWindowFlags_ChildWindow               = 1 << 20,
-        const ImGuiWindowFlags_ChildWindowAutoFitX       = 1 << 21,
-        const ImGuiWindowFlags_ChildWindowAutoFitY       = 1 << 22,
-        const ImGuiWindowFlags_ComboBox                  = 1 << 23,
-        const ImGuiWindowFlags_Tooltip                   = 1 << 24,
-        const ImGuiWindowFlags_Popup                     = 1 << 25,
-        const ImGuiWindowFlags_Modal                     = 1 << 26,
-        const ImGuiWindowFlags_ChildMenu                 = 1 << 27,
+        const ImGuiWindowFlags_ChildWindow               = 1 << 20;
+        const ImGuiWindowFlags_ChildWindowAutoFitX       = 1 << 21;
+        const ImGuiWindowFlags_ChildWindowAutoFitY       = 1 << 22;
+        const ImGuiWindowFlags_ComboBox                  = 1 << 23;
+        const ImGuiWindowFlags_Tooltip                   = 1 << 24;
+        const ImGuiWindowFlags_Popup                     = 1 << 25;
+        const ImGuiWindowFlags_Modal                     = 1 << 26;
+        const ImGuiWindowFlags_ChildMenu                 = 1 << 27;
     }
 );
 
 bitflags!(
     /// Condition flags
     #[repr(C)]
-    pub flags ImGuiSetCond: c_int {
-        const ImGuiSetCond_Always       = 1 << 0,
-        const ImGuiSetCond_Once         = 1 << 1,
-        const ImGuiSetCond_FirstUseEver = 1 << 2,
-        const ImGuiSetCond_Appearing    = 1 << 3
+    pub struct ImGuiSetCond: c_int {
+        const ImGuiSetCond_Always       = 1 << 0;
+        const ImGuiSetCond_Once         = 1 << 1;
+        const ImGuiSetCond_FirstUseEver = 1 << 2;
+        const ImGuiSetCond_Appearing    = 1 << 3;
     }
 );
 
 bitflags!(
     /// Flags for text inputs
     #[repr(C)]
-    pub flags ImGuiInputTextFlags: c_int {
-        const ImGuiInputTextFlags_CharsDecimal        = 1 << 0,
-        const ImGuiInputTextFlags_CharsHexadecimal    = 1 << 1,
-        const ImGuiInputTextFlags_CharsUppercase      = 1 << 2,
-        const ImGuiInputTextFlags_CharsNoBlank        = 1 << 3,
-        const ImGuiInputTextFlags_AutoSelectAll       = 1 << 4,
-        const ImGuiInputTextFlags_EnterReturnsTrue    = 1 << 5,
-        const ImGuiInputTextFlags_CallbackCompletion  = 1 << 6,
-        const ImGuiInputTextFlags_CallbackHistory     = 1 << 7,
-        const ImGuiInputTextFlags_CallbackAlways      = 1 << 8,
-        const ImGuiInputTextFlags_CallbackCharFilter  = 1 << 9,
-        const ImGuiInputTextFlags_AllowTabInput       = 1 << 10,
-        const ImGuiInputTextFlags_CtrlEnterForNewLine = 1 << 11,
-        const ImGuiInputTextFlags_NoHorizontalScroll  = 1 << 12,
-        const ImGuiInputTextFlags_AlwaysInsertMode    = 1 << 13,
-        const ImGuiInputTextFlags_ReadOnly            = 1 << 14,
-        const ImGuiInputTextFlags_Password            = 1 << 15,
+    pub struct ImGuiInputTextFlags: c_int {
+        const ImGuiInputTextFlags_CharsDecimal        = 1 << 0;
+        const ImGuiInputTextFlags_CharsHexadecimal    = 1 << 1;
+        const ImGuiInputTextFlags_CharsUppercase      = 1 << 2;
+        const ImGuiInputTextFlags_CharsNoBlank        = 1 << 3;
+        const ImGuiInputTextFlags_AutoSelectAll       = 1 << 4;
+        const ImGuiInputTextFlags_EnterReturnsTrue    = 1 << 5;
+        const ImGuiInputTextFlags_CallbackCompletion  = 1 << 6;
+        const ImGuiInputTextFlags_CallbackHistory     = 1 << 7;
+        const ImGuiInputTextFlags_CallbackAlways      = 1 << 8;
+        const ImGuiInputTextFlags_CallbackCharFilter  = 1 << 9;
+        const ImGuiInputTextFlags_AllowTabInput       = 1 << 10;
+        const ImGuiInputTextFlags_CtrlEnterForNewLine = 1 << 11;
+        const ImGuiInputTextFlags_NoHorizontalScroll  = 1 << 12;
+        const ImGuiInputTextFlags_AlwaysInsertMode    = 1 << 13;
+        const ImGuiInputTextFlags_ReadOnly            = 1 << 14;
+        const ImGuiInputTextFlags_Password            = 1 << 15;
 
-        const ImGuiInputTextFlags_Multiline           = 1 << 20,
+        const ImGuiInputTextFlags_Multiline           = 1 << 20;
     }
 );
 
 bitflags!(
     /// Flags for selectables
     #[repr(C)]
-    pub flags ImGuiSelectableFlags: c_int {
-        const ImGuiSelectableFlags_DontClosePopups  = 1 << 0,
-        const ImGuiSelectableFlags_SpanAllColumns   = 1 << 1,
-        const ImGuiSelectableFlags_AllowDoubleClick = 1 << 2
+    pub struct ImGuiSelectableFlags: c_int {
+        const ImGuiSelectableFlags_DontClosePopups  = 1 << 0;
+        const ImGuiSelectableFlags_SpanAllColumns   = 1 << 1;
+        const ImGuiSelectableFlags_AllowDoubleClick = 1 << 2;
     }
 );
 
 bitflags!(
     /// Flags for trees and collapsing headers
     #[repr(C)]
-    pub flags ImGuiTreeNodeFlags: c_int {
-        const ImGuiTreeNodeFlags_Selected          = 1 << 0,
-        const ImGuiTreeNodeFlags_Framed            = 1 << 1,
-        const ImGuiTreeNodeFlags_AllowOverlapMode  = 1 << 2,
-        const ImGuiTreeNodeFlags_NoTreePushOnOpen  = 1 << 3,
-        const ImGuiTreeNodeFlags_NoAutoOpenOnLog   = 1 << 4,
-        const ImGuiTreeNodeFlags_DefaultOpen       = 1 << 5,
-        const ImGuiTreeNodeFlags_OpenOnDoubleClick = 1 << 6,
-        const ImGuiTreeNodeFlags_OpenOnArrow       = 1 << 7,
-        const ImGuiTreeNodeFlags_Leaf              = 1 << 8,
-        const ImGuiTreeNodeFlags_Bullet            = 1 << 9,
+    pub struct ImGuiTreeNodeFlags: c_int {
+        const ImGuiTreeNodeFlags_Selected          = 1 << 0;
+        const ImGuiTreeNodeFlags_Framed            = 1 << 1;
+        const ImGuiTreeNodeFlags_AllowOverlapMode  = 1 << 2;
+        const ImGuiTreeNodeFlags_NoTreePushOnOpen  = 1 << 3;
+        const ImGuiTreeNodeFlags_NoAutoOpenOnLog   = 1 << 4;
+        const ImGuiTreeNodeFlags_DefaultOpen       = 1 << 5;
+        const ImGuiTreeNodeFlags_OpenOnDoubleClick = 1 << 6;
+        const ImGuiTreeNodeFlags_OpenOnArrow       = 1 << 7;
+        const ImGuiTreeNodeFlags_Leaf              = 1 << 8;
+        const ImGuiTreeNodeFlags_Bullet            = 1 << 9;
         const ImGuiTreeNodeFlags_CollapsingHeader  =
-            ImGuiTreeNodeFlags_Framed.bits | ImGuiTreeNodeFlags_NoAutoOpenOnLog.bits
+            ImGuiTreeNodeFlags_Framed.bits | ImGuiTreeNodeFlags_NoAutoOpenOnLog.bits;
     }
 );
 

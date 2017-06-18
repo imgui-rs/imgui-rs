@@ -13,6 +13,7 @@
 - ImStr is now "a dear imgui -compatible string slice". This change
   significantly affects how strings are handled.
 - Upgrade to imgui/cimgui 1.50
+- Upgrade to bitflags 0.9
 
 ### Fixed
 
