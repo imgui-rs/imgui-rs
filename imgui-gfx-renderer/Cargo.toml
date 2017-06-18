@@ -1,6 +1,6 @@
 [package]
 name = "imgui-gfx-renderer"
-version = "0.0.14-pre"
+version = "0.0.14"
 authors = ["Joonas Javanainen <joonas.javanainen@gmail.com>", "imgui-rs contributors"]
 description = "gfx renderer for the imgui crate"
 homepage = "https://github.com/gekkio/imgui-rs"
@@ -10,5 +10,5 @@ categories = ["gui", "rendering"]
 
 [dependencies]
 gfx = "0.16"
-imgui = { version = "0.0.14-pre", path = "../" }
-imgui-sys = { version = "0.0.14-pre", path = "../imgui-sys", features = ["gfx"] }
+imgui = { version = "0.0.14", path = "../" }
+imgui-sys = { version = "0.0.14", path = "../imgui-sys", features = ["gfx"] }
