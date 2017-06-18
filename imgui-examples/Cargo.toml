@@ -3,8 +3,8 @@ name = "imgui-examples"
 version = "0.0.15-pre"
 authors = ["Joonas Javanainen <joonas.javanainen@gmail.com>", "imgui-rs contributors"]
 description = "imgui crate examples"
-homepage = "https://github.com/gekkio/imgui-rs"
-repository = "https://github.com/gekkio/imgui-rs"
+homepage = "https://github.com/Gekkio/imgui-rs"
+repository = "https://github.com/Gekkio/imgui-rs"
 license = "MIT/Apache-2.0"
 publish = false
 
