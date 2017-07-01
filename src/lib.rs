@@ -18,7 +18,7 @@ pub use imgui_sys::{ImDrawIdx, ImDrawVert, ImGuiInputTextFlags, ImGuiInputTextFl
                     ImGuiInputTextFlags_ReadOnly, ImGuiKey, ImGuiSelectableFlags,
                     ImGuiSelectableFlags_DontClosePopups, ImGuiSelectableFlags_SpanAllColumns,
                     ImGuiSetCond, ImGuiSetCond_Always, ImGuiSetCond_Appearing,
-                    ImGuiSetCond_FirstUseEver, ImGuiSetCond_Once, ImGuiStyle, ImGuiTreeNodeFlags,
+                    ImGuiSetCond_FirstUseEver, ImGuiSetCond_Once, ImGuiStyle, ImGuiStyleVar, ImGuiTreeNodeFlags,
                     ImGuiTreeNodeFlags_AllowOverlapMode, ImGuiTreeNodeFlags_Bullet,
                     ImGuiTreeNodeFlags_CollapsingHeader, ImGuiTreeNodeFlags_DefaultOpen,
                     ImGuiTreeNodeFlags_Framed, ImGuiTreeNodeFlags_Leaf,
@@ -391,6 +391,7 @@ impl<'ui> Ui<'ui> {
     }
 
     pub fn separator(&self) { unsafe { imgui_sys::igSeparator() }; }
+    pub fn new_line(&self) { unsafe { imgui_sys::igNewLine() } }
     pub fn same_line(&self, pos_x: f32) { unsafe { imgui_sys::igSameLine(pos_x, -1.0f32) } }
     pub fn same_line_spacing(&self, pos_x: f32, spacing_w: f32) {
         unsafe { imgui_sys::igSameLine(pos_x, spacing_w) }
@@ -724,6 +725,22 @@ impl<'ui> Ui<'ui> {
 }
 
 impl<'ui> Ui<'ui> {
+    pub fn calc_text_size_with_buffer<'p>(&self, buffer: &mut ImVec2, text: &ImStr, hide_text_after_double_hash: bool, wrap_width: f32) {
+        let buffer: *mut ImVec2 = buffer;
+
+        unsafe {
+            imgui_sys::igCalcTextSize(buffer, text.as_ptr(), std::ptr::null(), hide_text_after_double_hash, wrap_width);
+        }
+    }
+
+    pub fn calc_text_size<'p>(&self, text: &ImStr, hide_text_after_double_hash: bool, wrap_width: f32) -> ImVec2 {
+        let mut buffer = ImVec2::new(0.0, 0.0);
+        self.calc_text_size_with_buffer(&mut buffer, text, hide_text_after_double_hash, wrap_width);
+        buffer
+    }
+}
+
+impl<'ui> Ui<'ui> {
     /// Creates a progress bar. Fraction is the progress level with 0.0 = 0% and 1.0 = 100%.
     ///
     /// # Example
@@ -737,4 +754,47 @@ impl<'ui> Ui<'ui> {
     ///     .build();
     /// ```
     pub fn progress_bar<'p>(&self, fraction: f32) -> ProgressBar<'p> { ProgressBar::new(fraction) }
+}
+
+impl<'ui> Ui<'ui> {
+    /// Runs a function after temporarily pushing a value to the style stack.
+    ///
+    /// # Example
+    /// ```rust,no_run
+    /// # use imgui::*;
+    /// # let mut imgui = ImGui::init();
+    /// # let ui = imgui.frame((0, 0), (0, 0), 0.1);
+    /// ui.with_style_var_pushed_float(ImGuiStyleVar::Alpha, 0.2, || {
+    ///     ui.text(im_str!("A"));
+    /// });
+    /// ui.with_style_var_pushed_float(ImGuiStyleVar::Alpha, 0.4, || {
+    ///     ui.text(im_str!("B"));
+    /// });
+    /// ui.with_style_var_pushed_float(ImGuiStyleVar::Alpha, 0.6, || {
+    ///     ui.text(im_str!("C"));
+    /// });
+    /// ui.with_style_var_pushed_float(ImGuiStyleVar::Alpha, 0.8, || {
+    ///     ui.text(im_str!("D"));
+    /// });
+    /// ```
+    pub fn with_style_var_pushed_float<'p, F: FnOnce()>(&self, style: ImGuiStyleVar, val: f32, f: F) {
+        unsafe {
+            imgui_sys::igPushStyleVar(style, val)
+        }
+        f();
+        unsafe {
+            imgui_sys::igPopStyleVar(1);
+        }
+    }
+
+    /// Runs a function after temporarily pushing a value to the style stack.
+    pub fn with_style_var_pushed_vec2<'p, F: FnOnce()>(&self, style: ImGuiStyleVar, val: ImVec2, f: F) {
+        unsafe {
+            imgui_sys::igPushStyleVarVec(style, val)
+        }
+        f();
+        unsafe {
+            imgui_sys::igPopStyleVar(1);
+        }
+    }
 }
