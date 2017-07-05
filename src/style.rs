@@ -20,29 +20,6 @@ pub enum StyleVar {
     ButtonTextAlign(ImVec2),
 }
 
-trait IntoStyleVars {
-    fn into_style_var(self) -> StyleVar;
-}
-
-impl IntoStyleVars for StyleVar {
-    fn into_style_var(self) -> StyleVar {
-        match self {
-            StyleVar::Alpha(v) => StyleVar::Alpha(v),
-            StyleVar::WindowPadding(v) => StyleVar::WindowPadding(v),
-            StyleVar::WindowRounding(v) => StyleVar::WindowRounding(v),
-            StyleVar::WindowMinSize(v) => StyleVar::WindowMinSize(v),
-            StyleVar::ChildWindowRounding(v) => StyleVar::ChildWindowRounding(v),
-            StyleVar::FramePadding(v) => StyleVar::FramePadding(v),
-            StyleVar::FrameRounding(v) => StyleVar::FrameRounding(v),
-            StyleVar::ItemSpacing(v) => StyleVar::ItemSpacing(v),
-            StyleVar::ItemInnerSpacing(v) => StyleVar::ItemInnerSpacing(v),
-            StyleVar::IndentSpacing(v) => StyleVar::IndentSpacing(v),
-            StyleVar::GrabMinSize(v) => StyleVar::GrabMinSize(v),
-            StyleVar::ButtonTextAlign(v) => StyleVar::ButtonTextAlign(v)
-        }
-   }
-}
-
 impl<'ui> Ui<'ui> {
     fn push_style_var(&self, style_var: StyleVar) {
         use StyleVar::*;
