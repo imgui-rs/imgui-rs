@@ -1,5 +1,3 @@
-extern crate imgui_sys;
-
 use ImVec2;
 
 #[derive(Copy, Clone, Debug, PartialEq)]
