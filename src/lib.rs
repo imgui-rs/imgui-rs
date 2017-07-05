@@ -44,6 +44,7 @@ pub use progressbar::ProgressBar;
 pub use sliders::{SliderFloat, SliderFloat2, SliderFloat3, SliderFloat4, SliderInt, SliderInt2,
                   SliderInt3, SliderInt4};
 pub use string::{ImStr, ImString};
+pub use style::StyleVar;
 pub use trees::{CollapsingHeader, TreeNode};
 pub use window::Window;
 
@@ -54,6 +55,7 @@ mod plotlines;
 mod progressbar;
 mod sliders;
 mod string;
+mod style;
 mod trees;
 mod window;
 
@@ -725,17 +727,15 @@ impl<'ui> Ui<'ui> {
 }
 
 impl<'ui> Ui<'ui> {
-    pub fn calc_text_size_with_buffer<'p>(&self, buffer: &mut ImVec2, text: &ImStr, hide_text_after_double_hash: bool, wrap_width: f32) {
-        let buffer: *mut ImVec2 = buffer;
-
-        unsafe {
-            imgui_sys::igCalcTextSize(buffer, text.as_ptr(), std::ptr::null(), hide_text_after_double_hash, wrap_width);
-        }
-    }
-
-    pub fn calc_text_size<'p>(&self, text: &ImStr, hide_text_after_double_hash: bool, wrap_width: f32) -> ImVec2 {
+    /// Calculate the size required for a given text string.
+    ///
+    /// hide_text_after_double_hash allows the user to insert comments into their text, using a double hash-tag prefix.
+    /// This is a feature of imgui.
+    ///
+    /// wrap_width allows you to request a width at which to wrap the text to a newline for the calculation.
+    pub fn calc_text_size(&self, text: &ImStr, hide_text_after_double_hash: bool, wrap_width: f32) -> ImVec2 {
         let mut buffer = ImVec2::new(0.0, 0.0);
-        self.calc_text_size_with_buffer(&mut buffer, text, hide_text_after_double_hash, wrap_width);
+        unsafe { imgui_sys::igCalcTextSize(&mut buffer as *mut ImVec2, text.as_ptr(), std::ptr::null(), hide_text_after_double_hash, wrap_width); }
         buffer
     }
 }
@@ -754,47 +754,4 @@ impl<'ui> Ui<'ui> {
     ///     .build();
     /// ```
     pub fn progress_bar<'p>(&self, fraction: f32) -> ProgressBar<'p> { ProgressBar::new(fraction) }
-}
-
-impl<'ui> Ui<'ui> {
-    /// Runs a function after temporarily pushing a value to the style stack.
-    ///
-    /// # Example
-    /// ```rust,no_run
-    /// # use imgui::*;
-    /// # let mut imgui = ImGui::init();
-    /// # let ui = imgui.frame((0, 0), (0, 0), 0.1);
-    /// ui.with_style_var_pushed_float(ImGuiStyleVar::Alpha, 0.2, || {
-    ///     ui.text(im_str!("A"));
-    /// });
-    /// ui.with_style_var_pushed_float(ImGuiStyleVar::Alpha, 0.4, || {
-    ///     ui.text(im_str!("B"));
-    /// });
-    /// ui.with_style_var_pushed_float(ImGuiStyleVar::Alpha, 0.6, || {
-    ///     ui.text(im_str!("C"));
-    /// });
-    /// ui.with_style_var_pushed_float(ImGuiStyleVar::Alpha, 0.8, || {
-    ///     ui.text(im_str!("D"));
-    /// });
-    /// ```
-    pub fn with_style_var_pushed_float<'p, F: FnOnce()>(&self, style: ImGuiStyleVar, val: f32, f: F) {
-        unsafe {
-            imgui_sys::igPushStyleVar(style, val)
-        }
-        f();
-        unsafe {
-            imgui_sys::igPopStyleVar(1);
-        }
-    }
-
-    /// Runs a function after temporarily pushing a value to the style stack.
-    pub fn with_style_var_pushed_vec2<'p, F: FnOnce()>(&self, style: ImGuiStyleVar, val: ImVec2, f: F) {
-        unsafe {
-            imgui_sys::igPushStyleVarVec(style, val)
-        }
-        f();
-        unsafe {
-            imgui_sys::igPopStyleVar(1);
-        }
-    }
 }
