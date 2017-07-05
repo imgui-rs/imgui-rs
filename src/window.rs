@@ -158,7 +158,6 @@ impl<'ui, 'p> Window<'ui, 'p> {
             .set(ImGuiWindowFlags_AlwaysUseWindowPadding, value);
         self
     }
-
     pub fn build<F: FnOnce()>(self, f: F) {
         let render = unsafe {
             if !self.pos_cond.is_empty() {
