@@ -35,6 +35,7 @@ pub use imgui_sys::{ImDrawIdx, ImDrawVert, ImGuiInputTextFlags, ImGuiInputTextFl
                     ImGuiWindowFlags_NoSavedSettings, ImGuiWindowFlags_NoScrollWithMouse,
                     ImGuiWindowFlags_NoScrollbar, ImGuiWindowFlags_NoTitleBar,
                     ImGuiWindowFlags_ShowBorders, ImVec2, ImVec4};
+pub use child_frame::ChildFrame;
 pub use input::{ColorEdit3, ColorEdit4, InputFloat, InputFloat2, InputFloat3, InputFloat4,
                 InputInt, InputInt2, InputInt3, InputInt4, InputText};
 pub use menus::{Menu, MenuItem};
@@ -48,6 +49,7 @@ pub use style::StyleVar;
 pub use trees::{CollapsingHeader, TreeNode};
 pub use window::Window;
 
+mod child_frame;
 mod input;
 mod menus;
 mod plothistogram;
