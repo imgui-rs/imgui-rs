@@ -12,6 +12,8 @@ extern crate glium;
 
 use std::convert::From;
 use std::mem;
+use std::ops::{Add, Sub, Mul, Div, Rem};
+use std::ops::{AddAssign, SubAssign, MulAssign, DivAssign, RemAssign};
 use std::os::raw::{c_char, c_float, c_int, c_short, c_uchar, c_uint, c_ushort, c_void};
 use std::slice;
 
@@ -299,6 +301,44 @@ impl Into<(f32, f32)> for ImVec2 {
     fn into(self) -> (f32, f32) { (self.x, self.y) }
 }
 
+/// Implement arithmetic operator overloads.
+macro_rules! impl_operator_overloads_vec2 {
+    ($trait_name:ident, $fn_name:ident, $type_name:ident) => (
+        impl $trait_name for $type_name {
+            type Output = $type_name;
+
+            fn $fn_name(self, other: $type_name) -> $type_name {
+                $type_name::new(
+                    $trait_name::$fn_name(self.x, other.x),
+                    $trait_name::$fn_name(self.y, other.y),
+                    )
+            }
+        }
+    );
+}
+macro_rules! impl_assign_overloads_vec2 {
+    ($trait_name:ident, $fn_name:ident, $type_name:ident) => (
+        impl $trait_name for $type_name {
+            fn $fn_name(&mut self, other: $type_name) {
+                $trait_name::$fn_name(&mut self.x, other.x);
+                $trait_name::$fn_name(&mut self.y, other.y);
+            }
+        }
+    )
+}
+
+impl_operator_overloads_vec2!(Add, add, ImVec2);
+impl_operator_overloads_vec2!(Sub, sub, ImVec2);
+impl_operator_overloads_vec2!(Mul, mul, ImVec2);
+impl_operator_overloads_vec2!(Div, div, ImVec2);
+impl_operator_overloads_vec2!(Rem, rem, ImVec2);
+
+impl_assign_overloads_vec2!(AddAssign, add_assign, ImVec2);
+impl_assign_overloads_vec2!(SubAssign, sub_assign, ImVec2);
+impl_assign_overloads_vec2!(MulAssign, mul_assign, ImVec2);
+impl_assign_overloads_vec2!(DivAssign, div_assign, ImVec2);
+impl_assign_overloads_vec2!(RemAssign, rem_assign, ImVec2);
+
 /// A tuple of 4 floating-point values
 #[repr(C)]
 #[derive(Copy, Clone, Debug, Default, PartialEq)]
@@ -343,6 +383,47 @@ impl Into<[f32; 4]> for ImVec4 {
 impl Into<(f32, f32, f32, f32)> for ImVec4 {
     fn into(self) -> (f32, f32, f32, f32) { (self.x, self.y, self.z, self.w) }
 }
+
+/// Implement arithmetic operator overloads.
+macro_rules! impl_operator_overloads_vec4 {
+    ($trait_name:ident, $fn_name:ident, $type_name:ident) => (
+        impl $trait_name for $type_name {
+            type Output = $type_name;
+
+            fn $fn_name(self, other: $type_name) -> $type_name {
+                $type_name::new(
+                    $trait_name::$fn_name(self.x, other.x),
+                    $trait_name::$fn_name(self.y, other.y),
+                    $trait_name::$fn_name(self.z, other.z),
+                    $trait_name::$fn_name(self.w, other.w),
+                    )
+            }
+        }
+    );
+}
+macro_rules! impl_assign_overloads_vec4 {
+    ($trait_name:ident, $fn_name:ident, $type_name:ident) => (
+        impl $trait_name for $type_name {
+            fn $fn_name(&mut self, other: $type_name) {
+                $trait_name::$fn_name(&mut self.x, other.x);
+                $trait_name::$fn_name(&mut self.y, other.y);
+                $trait_name::$fn_name(&mut self.z, other.z);
+                $trait_name::$fn_name(&mut self.w, other.w);
+            }
+        }
+    )
+}
+impl_operator_overloads_vec4!(Add, add, ImVec4);
+impl_operator_overloads_vec4!(Sub, sub, ImVec4);
+impl_operator_overloads_vec4!(Mul, mul, ImVec4);
+impl_operator_overloads_vec4!(Div, div, ImVec4);
+impl_operator_overloads_vec4!(Rem, rem, ImVec4);
+
+impl_assign_overloads_vec4!(AddAssign, add_assign, ImVec4);
+impl_assign_overloads_vec4!(SubAssign, sub_assign, ImVec4);
+impl_assign_overloads_vec4!(MulAssign, mul_assign, ImVec4);
+impl_assign_overloads_vec4!(DivAssign, div_assign, ImVec4);
+impl_assign_overloads_vec4!(RemAssign, rem_assign, ImVec4);
 
 /// Runtime data for styling/colors
 #[repr(C)]
@@ -1784,4 +1865,58 @@ fn test_default_style() {
     assert_eq!(style.anti_aliased_lines, true);
     assert_eq!(style.anti_aliased_shapes, true);
     assert_eq!(style.curve_tessellation_tol, 1.25);
+}
+
+macro_rules! test_operator_imvec2 {
+    ($a:ident, $b:ident, $operator:tt) => (
+        assert_eq!($a $operator $b, ImVec2::new($a.x $operator $b.x, $a.y $operator $b.y));
+    )
+}
+
+macro_rules! test_operator_imvec4 {
+    ($a:ident, $b:ident, $operator:tt) => (
+        assert_eq!($a $operator $b, ImVec4::new($a.x $operator $b.x, $a.y $operator $b.y, $a.z $operator $b.z, $a.w $operator $b.w));
+    )
+}
+
+macro_rules! test_operator_assign {
+    ($value:ident, $operator:tt, $operator_assign:tt) => (
+        let mut ma = $value;
+        ma $operator_assign ma;
+        assert_eq!(ma, $value $operator $value);
+    )
+}
+
+#[test]
+fn test_imvec_operators() {
+    // check ImVec2 versions.
+    let a = ImVec2::new(1.0, 3.0);
+    let b = ImVec2::new(15.0, 16.0);
+
+    test_operator_imvec2!(a, b, +);
+    test_operator_imvec2!(a, b, -);
+    test_operator_imvec2!(a, b, *);
+    test_operator_imvec2!(a, b, /);
+    test_operator_imvec2!(a, b, %);
+
+    test_operator_assign!(a, +, +=);
+    test_operator_assign!(a, -, -=);
+    test_operator_assign!(a, *, *=);
+    test_operator_assign!(a, /, /=);
+    test_operator_assign!(a, %, %=);
+
+    // check ImVec4 versions.
+    let a = ImVec4::new(1.0, 2.0, 3.0, 4.0);
+    let b = ImVec4::new(2.0, 4.0, 6.0, 8.0);
+    test_operator_imvec4!(a, b, +);
+    test_operator_imvec4!(a, b, -);
+    test_operator_imvec4!(a, b, *);
+    test_operator_imvec4!(a, b, /);
+    test_operator_imvec4!(a, b, %);
+
+    test_operator_assign!(a, +, +=);
+    test_operator_assign!(a, -, -=);
+    test_operator_assign!(a, *, *=);
+    test_operator_assign!(a, /, /=);
+    test_operator_assign!(a, %, %=);
 }

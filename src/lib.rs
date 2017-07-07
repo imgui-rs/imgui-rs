@@ -18,7 +18,7 @@ pub use imgui_sys::{ImDrawIdx, ImDrawVert, ImGuiInputTextFlags, ImGuiInputTextFl
                     ImGuiInputTextFlags_ReadOnly, ImGuiKey, ImGuiSelectableFlags,
                     ImGuiSelectableFlags_DontClosePopups, ImGuiSelectableFlags_SpanAllColumns,
                     ImGuiSetCond, ImGuiSetCond_Always, ImGuiSetCond_Appearing,
-                    ImGuiSetCond_FirstUseEver, ImGuiSetCond_Once, ImGuiStyle, ImGuiTreeNodeFlags,
+                    ImGuiSetCond_FirstUseEver, ImGuiSetCond_Once, ImGuiStyle, ImGuiStyleVar, ImGuiTreeNodeFlags,
                     ImGuiTreeNodeFlags_AllowOverlapMode, ImGuiTreeNodeFlags_Bullet,
                     ImGuiTreeNodeFlags_CollapsingHeader, ImGuiTreeNodeFlags_DefaultOpen,
                     ImGuiTreeNodeFlags_Framed, ImGuiTreeNodeFlags_Leaf,
@@ -44,6 +44,7 @@ pub use progressbar::ProgressBar;
 pub use sliders::{SliderFloat, SliderFloat2, SliderFloat3, SliderFloat4, SliderInt, SliderInt2,
                   SliderInt3, SliderInt4};
 pub use string::{ImStr, ImString};
+pub use style::StyleVar;
 pub use trees::{CollapsingHeader, TreeNode};
 pub use window::Window;
 
@@ -54,6 +55,7 @@ mod plotlines;
 mod progressbar;
 mod sliders;
 mod string;
+mod style;
 mod trees;
 mod window;
 
@@ -391,6 +393,7 @@ impl<'ui> Ui<'ui> {
     }
 
     pub fn separator(&self) { unsafe { imgui_sys::igSeparator() }; }
+    pub fn new_line(&self) { unsafe { imgui_sys::igNewLine() } }
     pub fn same_line(&self, pos_x: f32) { unsafe { imgui_sys::igSameLine(pos_x, -1.0f32) } }
     pub fn same_line_spacing(&self, pos_x: f32, spacing_w: f32) {
         unsafe { imgui_sys::igSameLine(pos_x, spacing_w) }
@@ -724,6 +727,20 @@ impl<'ui> Ui<'ui> {
 }
 
 impl<'ui> Ui<'ui> {
+    /// Calculate the size required for a given text string.
+    ///
+    /// hide_text_after_double_hash allows the user to insert comments into their text, using a double hash-tag prefix.
+    /// This is a feature of imgui.
+    ///
+    /// wrap_width allows you to request a width at which to wrap the text to a newline for the calculation.
+    pub fn calc_text_size(&self, text: &ImStr, hide_text_after_double_hash: bool, wrap_width: f32) -> ImVec2 {
+        let mut buffer = ImVec2::new(0.0, 0.0);
+        unsafe { imgui_sys::igCalcTextSize(&mut buffer as *mut ImVec2, text.as_ptr(), std::ptr::null(), hide_text_after_double_hash, wrap_width); }
+        buffer
+    }
+}
+
+impl<'ui> Ui<'ui> {
     /// Creates a progress bar. Fraction is the progress level with 0.0 = 0% and 1.0 = 100%.
     ///
     /// # Example
@@ -737,4 +754,69 @@ impl<'ui> Ui<'ui> {
     ///     .build();
     /// ```
     pub fn progress_bar<'p>(&self, fraction: f32) -> ProgressBar<'p> { ProgressBar::new(fraction) }
+}
+
+impl<'ui> Ui<'ui> {
+    fn push_style_var(&self, style_var: StyleVar) {
+        use StyleVar::*;
+        use imgui_sys::{igPushStyleVar, igPushStyleVarVec};
+        match style_var {
+            Alpha(v) => unsafe { igPushStyleVar(ImGuiStyleVar::Alpha, v) },
+            WindowPadding(v) => unsafe { igPushStyleVarVec(ImGuiStyleVar::WindowPadding, v) },
+            WindowRounding(v) => unsafe { igPushStyleVar(ImGuiStyleVar::WindowRounding, v) },
+            WindowMinSize(v) => unsafe { igPushStyleVarVec(ImGuiStyleVar::WindowMinSize, v) },
+            ChildWindowRounding(v) => unsafe { igPushStyleVar(ImGuiStyleVar::ChildWindowRounding, v) },
+            FramePadding(v) => unsafe { igPushStyleVarVec(ImGuiStyleVar::FramePadding, v) },
+            FrameRounding(v) => unsafe { igPushStyleVar(ImGuiStyleVar::FrameRounding, v) },
+            ItemSpacing(v) => unsafe { igPushStyleVarVec(ImGuiStyleVar::ItemSpacing, v) },
+            ItemInnerSpacing(v) => unsafe { igPushStyleVarVec(ImGuiStyleVar::ItemInnerSpacing, v) },
+            IndentSpacing(v) => unsafe { igPushStyleVar(ImGuiStyleVar::IndentSpacing, v) },
+            GrabMinSize(v) => unsafe { igPushStyleVar(ImGuiStyleVar::GrabMinSize, v) },
+            ButtonTextAlign(v) => unsafe { igPushStyleVarVec(ImGuiStyleVar::ButtonTextAlign, v) }
+        }
+    }
+
+    /// Runs a function after temporarily pushing a value to the style stack.
+    ///
+    /// # Example
+    /// ```rust,no_run
+    /// # use imgui::*;
+    /// # let mut imgui = ImGui::init();
+    /// # let ui = imgui.frame((0, 0), (0, 0), 0.1);
+    /// ui.with_style_var(StyleVar::Alpha(0.2), || {
+    ///     ui.text(im_str!("AB"));
+    /// });
+    /// ui.with_style_var(StyleVar::Alpha(0.4), || {
+    ///     ui.text(im_str!("CD"));
+    /// });
+    /// ```
+    pub fn with_style_var<F: FnOnce()>(&self, style_var: StyleVar, f: F) {
+        self.push_style_var(style_var);
+        f();
+        unsafe { imgui_sys::igPopStyleVar(1) }
+    }
+
+    /// Runs a function after temporarily pushing an array of values into the stack. Supporting
+    /// multiple is also easy since you can freely mix and match them in a safe manner.
+    ///
+    /// # Example
+    /// ```rust,no_run
+    /// # use imgui::*;
+    /// # let mut imgui = ImGui::init();
+    /// # let ui = imgui.frame((0, 0), (0, 0), 0.1);
+    /// # let styles = [StyleVar::Alpha(0.2), StyleVar::WindowPadding(ImVec2::new(1.0, 1.0))];
+    /// ui.with_style_vars(&styles, || {
+    ///     ui.text(im_str!("A"));
+    ///     ui.text(im_str!("B"));
+    ///     ui.text(im_str!("C"));
+    ///     ui.text(im_str!("D"));
+    /// });
+    /// ```
+    pub fn with_style_vars<F: FnOnce()>(&self, style_vars: &[StyleVar], f: F) {
+        for &style_var in style_vars {
+            self.push_style_var(style_var);
+        }
+        f();
+        unsafe { imgui_sys::igPopStyleVar(style_vars.len() as i32) };
+    }
 }
