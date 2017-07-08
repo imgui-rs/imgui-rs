@@ -18,7 +18,6 @@ pub use imgui_sys::{ImDrawIdx, ImDrawVert, ImGuiInputTextFlags, ImGuiInputTextFl
                     ImGuiInputTextFlags_ReadOnly, ImGuiKey, ImGuiSelectableFlags,
                     ImGuiSelectableFlags_DontClosePopups, ImGuiSelectableFlags_SpanAllColumns,
                     ImGuiSetCond, ImGuiSetCond_Always, ImGuiSetCond_Appearing,
-                    ImGuiSetCond_FirstUseEver, ImGuiSetCond_Once, ImGuiCol, ImGuiStyle, ImGuiTreeNodeFlags,
                     ImGuiSetCond_FirstUseEver, ImGuiSetCond_Once, ImGuiCol, ImGuiStyle, ImGuiStyleVar, ImGuiTreeNodeFlags,
                     ImGuiTreeNodeFlags_AllowOverlapMode, ImGuiTreeNodeFlags_Bullet,
                     ImGuiTreeNodeFlags_CollapsingHeader, ImGuiTreeNodeFlags_DefaultOpen,
