@@ -747,12 +747,12 @@ impl<'ui> Ui<'ui> {
     /// # use imgui::*;
     /// # let mut imgui = ImGui::init();
     /// # let ui = imgui.frame((0, 0), (0, 0), 0.1);
-    /// ui.with_color_var(ImGuiCol::Text, ImVec4::from((1.0, 0.0, 0.0, 1.0)), || {
+    /// ui.with_color_var(ImGuiCol::Text, (1.0, 0.0, 0.0, 1.0), || {
     ///     ui.text_wrapped(im_str!("AB"));
     /// });
     /// ```
-    pub fn with_color_var<F: FnOnce()>(&self, var: ImGuiCol, color: ImVec4, f: F) {
-        unsafe { imgui_sys::igPushStyleColor(var, color); }
+    pub fn with_color_var<F: FnOnce(), C: Into<ImVec4> + Copy>(&self, var: ImGuiCol, color: C, f: F) {
+        unsafe { imgui_sys::igPushStyleColor(var, color.into()); }
         f();
         unsafe {imgui_sys::igPopStyleColor(1); }
     }
@@ -764,14 +764,16 @@ impl<'ui> Ui<'ui> {
     /// # use imgui::*;
     /// # let mut imgui = ImGui::init();
     /// # let ui = imgui.frame((0, 0), (0, 0), 0.1);
-    /// # let vars = [ImGuiCol::Text, ImGuiCol::TextDisabled];
-    /// ui.with_color_vars(&vars, ImVec4::from((1.0, 0.0, 0.0, 1.0)), || {
+    /// let red = (1.0, 0.0, 0.0, 1.0);
+    /// let green = (0.0, 1.0, 0.0, 1.0);
+    /// # let vars = [(ImGuiCol::Text, red), (ImGuiCol::TextDisabled, green)];
+    /// ui.with_color_vars(&vars, || {
     ///     ui.text_wrapped(im_str!("AB"));
     /// });
     /// ```
-    pub fn with_color_vars<F: FnOnce()>(&self, color_vars: &[ImGuiCol], color: ImVec4, f: F) {
-        for &color_var in color_vars {
-            unsafe { imgui_sys::igPushStyleColor(color_var, color); }
+    pub fn with_color_vars<F: FnOnce(), C: Into<ImVec4> + Copy>(&self, color_vars: &[(ImGuiCol, C)], f: F) {
+        for &(color_var, color) in color_vars {
+            unsafe { imgui_sys::igPushStyleColor(color_var, color.into()); }
         }
         f();
         unsafe { imgui_sys::igPopStyleColor(color_vars.len() as i32) };
