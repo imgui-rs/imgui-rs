@@ -757,10 +757,9 @@ impl<'ui> Ui<'ui> {
     ///     ui.child_frame(im_str!("child frame"), ImVec2::new(400.0, 100.0))
     ///         .show_borders(true)
     ///         .always_show_vertical_scroll_bar(true)
-    ///         .show_title(true)
     ///         .build(|| {
     ///             ui.text_colored((1.0, 0.0, 0.0, 1.0), im_str!("hello mate!"));
     ///         });
     /// });
-    pub fn child_frame<'p>(&self, name: &'p ImStr, size: ImVec2) -> ChildFrame<'p> { ChildFrame::new(name, size) }
+    pub fn child_frame<'p, S: Into<ImVec2>>(&self, name: &'p ImStr, size: S) -> ChildFrame<'p> { ChildFrame::new(name, size.into()) }
 }

@@ -3,11 +3,9 @@ use ImStr;
 use ImVec2;
 use ImGuiWindowFlags;
 
-use super::{ImGuiWindowFlags_NoTitleBar, ImGuiWindowFlags_NoResize, ImGuiWindowFlags_NoMove,
-            ImGuiWindowFlags_NoScrollbar, ImGuiWindowFlags_NoScrollWithMouse,
+use super::{ImGuiWindowFlags_NoMove, ImGuiWindowFlags_NoScrollbar, ImGuiWindowFlags_NoScrollWithMouse,
             ImGuiWindowFlags_NoCollapse, ImGuiWindowFlags_AlwaysAutoResize,
-            ImGuiWindowFlags_ShowBorders, ImGuiWindowFlags_NoSavedSettings,
-            ImGuiWindowFlags_NoInputs, ImGuiWindowFlags_MenuBar,
+            ImGuiWindowFlags_ShowBorders, ImGuiWindowFlags_NoInputs, ImGuiWindowFlags_MenuBar,
             ImGuiWindowFlags_HorizontalScrollbar, ImGuiWindowFlags_NoFocusOnAppearing,
             ImGuiWindowFlags_NoBringToFrontOnFocus, ImGuiWindowFlags_AlwaysVerticalScrollbar,
             ImGuiWindowFlags_AlwaysHorizontalScrollbar, ImGuiWindowFlags_AlwaysUseWindowPadding};
@@ -26,16 +24,6 @@ impl<'p> ChildFrame<'p> {
             size: size,
             flags: ImGuiWindowFlags::empty(),
         }
-    }
-    #[inline]
-    pub fn show_title(mut self, value: bool) -> Self {
-        self.flags.set(ImGuiWindowFlags_NoTitleBar, !value);
-        self
-    }
-    #[inline]
-    pub fn resizable(mut self, value: bool) -> Self {
-        self.flags.set(ImGuiWindowFlags_NoResize, !value);
-        self
     }
     #[inline]
     pub fn movable(mut self, value: bool) -> Self {
@@ -65,11 +53,6 @@ impl<'p> ChildFrame<'p> {
     #[inline]
     pub fn show_borders(mut self, value: bool) -> Self {
         self.flags.set(ImGuiWindowFlags_ShowBorders, value);
-        self
-    }
-    #[inline]
-    pub fn save_settings(mut self, value: bool) -> Self {
-        self.flags.set(ImGuiWindowFlags_NoSavedSettings, !value);
         self
     }
     #[inline]
@@ -125,7 +108,10 @@ impl<'p> ChildFrame<'p> {
         self
     }
     pub fn build<F: FnOnce()>(self, f: F) {
-        let show_border = self.flags.contains(ImGuiWindowFlags_ShowBorders);
+        // See issue for history.
+        // https://github.com/Gekkio/imgui-rs/pull/58
+        let show_border = false;
+
         let render_child_frame = unsafe { imgui_sys::igBeginChild(self.name.as_ptr(), self.size, show_border, self.flags) };
         if render_child_frame {
             f();
