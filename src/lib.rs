@@ -18,7 +18,7 @@ pub use imgui_sys::{ImDrawIdx, ImDrawVert, ImGuiInputTextFlags, ImGuiInputTextFl
                     ImGuiInputTextFlags_ReadOnly, ImGuiKey, ImGuiSelectableFlags,
                     ImGuiSelectableFlags_DontClosePopups, ImGuiSelectableFlags_SpanAllColumns,
                     ImGuiSetCond, ImGuiSetCond_Always, ImGuiSetCond_Appearing,
-                    ImGuiSetCond_FirstUseEver, ImGuiSetCond_Once, ImGuiStyle, ImGuiTreeNodeFlags,
+                    ImGuiSetCond_FirstUseEver, ImGuiSetCond_Once, ImGuiCol, ImGuiStyle, ImGuiTreeNodeFlags,
                     ImGuiTreeNodeFlags_AllowOverlapMode, ImGuiTreeNodeFlags_Bullet,
                     ImGuiTreeNodeFlags_CollapsingHeader, ImGuiTreeNodeFlags_DefaultOpen,
                     ImGuiTreeNodeFlags_Framed, ImGuiTreeNodeFlags_Leaf,
@@ -737,4 +737,43 @@ impl<'ui> Ui<'ui> {
     ///     .build();
     /// ```
     pub fn progress_bar<'p>(&self, fraction: f32) -> ProgressBar<'p> { ProgressBar::new(fraction) }
+}
+
+impl<'ui> Ui<'ui> {
+    /// Runs a function after temporarily pushing a value to the color stack.
+    ///
+    /// # Example
+    /// ```rust,no_run
+    /// # use imgui::*;
+    /// # let mut imgui = ImGui::init();
+    /// # let ui = imgui.frame((0, 0), (0, 0), 0.1);
+    /// ui.with_color_var(ImGuiCol::Text, ImVec4::from((1.0, 0.0, 0.0, 1.0)), || {
+    ///     ui.text_wrapped(im_str!("AB"));
+    /// });
+    /// ```
+    pub fn with_color_var<F: FnOnce()>(&self, var: ImGuiCol, color: ImVec4, f: F) {
+        unsafe { imgui_sys::igPushStyleColor(var, color); }
+        f();
+        unsafe {imgui_sys::igPopStyleColor(1); }
+    }
+
+    /// Runs a function after temporarily pushing an array of values to the color stack.
+    ///
+    /// # Example
+    /// ```rust,no_run
+    /// # use imgui::*;
+    /// # let mut imgui = ImGui::init();
+    /// # let ui = imgui.frame((0, 0), (0, 0), 0.1);
+    /// # let vars = [ImGuiCol::Text, ImGuiCol::TextDisabled];
+    /// ui.with_color_vars(&vars, ImVec4::from((1.0, 0.0, 0.0, 1.0)), || {
+    ///     ui.text_wrapped(im_str!("AB"));
+    /// });
+    /// ```
+    pub fn with_color_vars<F: FnOnce()>(&self, color_vars: &[ImGuiCol], color: ImVec4, f: F) {
+        for &color_var in color_vars {
+            unsafe { imgui_sys::igPushStyleColor(color_var, color); }
+        }
+        f();
+        unsafe { imgui_sys::igPopStyleColor(color_vars.len() as i32) };
+    }
 }
