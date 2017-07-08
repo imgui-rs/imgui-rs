@@ -18,7 +18,7 @@ pub use imgui_sys::{ImDrawIdx, ImDrawVert, ImGuiInputTextFlags, ImGuiInputTextFl
                     ImGuiInputTextFlags_ReadOnly, ImGuiKey, ImGuiSelectableFlags,
                     ImGuiSelectableFlags_DontClosePopups, ImGuiSelectableFlags_SpanAllColumns,
                     ImGuiSetCond, ImGuiSetCond_Always, ImGuiSetCond_Appearing,
-                    ImGuiSetCond_FirstUseEver, ImGuiSetCond_Once, ImGuiStyle, ImGuiStyleVar, ImGuiTreeNodeFlags,
+                    ImGuiSetCond_FirstUseEver, ImGuiSetCond_Once, ImGuiCol, ImGuiStyle, ImGuiStyleVar, ImGuiTreeNodeFlags,
                     ImGuiTreeNodeFlags_AllowOverlapMode, ImGuiTreeNodeFlags_Bullet,
                     ImGuiTreeNodeFlags_CollapsingHeader, ImGuiTreeNodeFlags_DefaultOpen,
                     ImGuiTreeNodeFlags_Framed, ImGuiTreeNodeFlags_Leaf,
@@ -759,50 +759,30 @@ impl<'ui> Ui<'ui> {
 }
 
 impl<'ui> Ui<'ui> {
-    /// Creates a child frame. Size is size of child_frame within parent window.
-    ///
-    /// # Example
-    /// ```rust,no_run
-    /// # use imgui::*;
-    /// # let mut imgui = ImGui::init();
-    /// # let ui = imgui.frame((0, 0), (0, 0), 0.1);
-    /// ui.window(im_str!("ChatWindow"))
-    /// .title_bar(true)
-    /// .scrollable(false)
-    /// .build(|| {
-    ///     ui.separator();
-    ///
-    ///     ui.child_frame(im_str!("child frame"), (400.0, 100.0))
-    ///         .show_borders(true)
-    ///         .always_show_vertical_scroll_bar(true)
-    ///         .build(|| {
-    ///             ui.text_colored((1.0, 0.0, 0.0, 1.0), im_str!("hello mate!"));
-    ///         });
-    /// });
-    pub fn child_frame<'p, S: Into<ImVec2>>(&self, name: &'p ImStr, size: S) -> ChildFrame<'p> { ChildFrame::new(name, size.into()) }
+  /// Creates a child frame. Size is size of child_frame within parent window.
+  ///
+  /// # Example
+  /// ```rust,no_run
+  /// # use imgui::*;
+  /// # let mut imgui = ImGui::init();
+  /// # let ui = imgui.frame((0, 0), (0, 0), 0.1);
+  /// ui.window(im_str!("ChatWindow"))
+  ///     .title_bar(true)
+  ///     .scrollable(false)
+  ///     .build(|| {
+  ///         ui.separator();
+  ///
+  ///         ui.child_frame(im_str!("child frame"), (400.0, 100.0))
+  ///             .show_borders(true)
+  ///             .always_show_vertical_scroll_bar(true)
+  ///             .build(|| {
+  ///                 ui.text_colored((1.0, 0.0, 0.0, 1.0), im_str!("hello mate!"));
+  ///             });
+  /// });
+  pub fn child_frame<'p, S: Into<ImVec2>>(&self, name: &'p ImStr, size: S) -> ChildFrame<'p> { ChildFrame::new(name, size.into()) }
 }
 
 impl<'ui> Ui<'ui> {
-    #[inline]
-    fn push_style_var(&self, style_var: StyleVar) {
-        use StyleVar::*;
-        use imgui_sys::{igPushStyleVar, igPushStyleVarVec};
-        match style_var {
-            Alpha(v) => unsafe { igPushStyleVar(ImGuiStyleVar::Alpha, v) },
-            WindowPadding(v) => unsafe { igPushStyleVarVec(ImGuiStyleVar::WindowPadding, v) },
-            WindowRounding(v) => unsafe { igPushStyleVar(ImGuiStyleVar::WindowRounding, v) },
-            WindowMinSize(v) => unsafe { igPushStyleVarVec(ImGuiStyleVar::WindowMinSize, v) },
-            ChildWindowRounding(v) => unsafe { igPushStyleVar(ImGuiStyleVar::ChildWindowRounding, v) },
-            FramePadding(v) => unsafe { igPushStyleVarVec(ImGuiStyleVar::FramePadding, v) },
-            FrameRounding(v) => unsafe { igPushStyleVar(ImGuiStyleVar::FrameRounding, v) },
-            ItemSpacing(v) => unsafe { igPushStyleVarVec(ImGuiStyleVar::ItemSpacing, v) },
-            ItemInnerSpacing(v) => unsafe { igPushStyleVarVec(ImGuiStyleVar::ItemInnerSpacing, v) },
-            IndentSpacing(v) => unsafe { igPushStyleVar(ImGuiStyleVar::IndentSpacing, v) },
-            GrabMinSize(v) => unsafe { igPushStyleVar(ImGuiStyleVar::GrabMinSize, v) },
-            ButtonTextAlign(v) => unsafe { igPushStyleVarVec(ImGuiStyleVar::ButtonTextAlign, v) }
-        }
-    }
-
     /// Runs a function after temporarily pushing a value to the style stack.
     ///
     /// # Example
@@ -812,9 +792,6 @@ impl<'ui> Ui<'ui> {
     /// # let ui = imgui.frame((0, 0), (0, 0), 0.1);
     /// ui.with_style_var(StyleVar::Alpha(0.2), || {
     ///     ui.text(im_str!("AB"));
-    /// });
-    /// ui.with_style_var(StyleVar::Alpha(0.4), || {
-    ///     ui.text(im_str!("CD"));
     /// });
     /// ```
     pub fn with_style_var<F: FnOnce()>(&self, style_var: StyleVar, f: F) {
@@ -845,5 +822,66 @@ impl<'ui> Ui<'ui> {
         }
         f();
         unsafe { imgui_sys::igPopStyleVar(style_vars.len() as i32) };
+    }
+
+    #[inline]
+    fn push_style_var(&self, style_var: StyleVar) {
+        use StyleVar::*;
+        use imgui_sys::{igPushStyleVar, igPushStyleVarVec};
+        match style_var {
+            Alpha(v) => unsafe { igPushStyleVar(ImGuiStyleVar::Alpha, v) },
+            WindowPadding(v) => unsafe { igPushStyleVarVec(ImGuiStyleVar::WindowPadding, v) },
+            WindowRounding(v) => unsafe { igPushStyleVar(ImGuiStyleVar::WindowRounding, v) },
+            WindowMinSize(v) => unsafe { igPushStyleVarVec(ImGuiStyleVar::WindowMinSize, v) },
+            ChildWindowRounding(v) => unsafe { igPushStyleVar(ImGuiStyleVar::ChildWindowRounding, v) },
+            FramePadding(v) => unsafe { igPushStyleVarVec(ImGuiStyleVar::FramePadding, v) },
+            FrameRounding(v) => unsafe { igPushStyleVar(ImGuiStyleVar::FrameRounding, v) },
+            ItemSpacing(v) => unsafe { igPushStyleVarVec(ImGuiStyleVar::ItemSpacing, v) },
+            ItemInnerSpacing(v) => unsafe { igPushStyleVarVec(ImGuiStyleVar::ItemInnerSpacing, v) },
+            IndentSpacing(v) => unsafe { igPushStyleVar(ImGuiStyleVar::IndentSpacing, v) },
+            GrabMinSize(v) => unsafe { igPushStyleVar(ImGuiStyleVar::GrabMinSize, v) },
+            ButtonTextAlign(v) => unsafe { igPushStyleVarVec(ImGuiStyleVar::ButtonTextAlign, v) }
+        }
+    }
+}
+
+impl<'ui> Ui<'ui> {
+    /// Runs a function after temporarily pushing a value to the color stack.
+    ///
+    /// # Example
+    /// ```rust,no_run
+    /// # use imgui::*;
+    /// # let mut imgui = ImGui::init();
+    /// # let ui = imgui.frame((0, 0), (0, 0), 0.1);
+    /// ui.with_color_var(ImGuiCol::Text, (1.0, 0.0, 0.0, 1.0), || {
+    ///     ui.text_wrapped(im_str!("AB"));
+    /// });
+    /// ```
+    pub fn with_color_var<F: FnOnce(), C: Into<ImVec4> + Copy>(&self, var: ImGuiCol, color: C, f: F) {
+        unsafe { imgui_sys::igPushStyleColor(var, color.into()); }
+        f();
+        unsafe {imgui_sys::igPopStyleColor(1); }
+    }
+
+    /// Runs a function after temporarily pushing an array of values to the color stack.
+    ///
+    /// # Example
+    /// ```rust,no_run
+    /// # use imgui::*;
+    /// # let mut imgui = ImGui::init();
+    /// # let ui = imgui.frame((0, 0), (0, 0), 0.1);
+    /// let red = (1.0, 0.0, 0.0, 1.0);
+    /// let green = (0.0, 1.0, 0.0, 1.0);
+    /// # let vars = [(ImGuiCol::Text, red), (ImGuiCol::TextDisabled, green)];
+    /// ui.with_color_vars(&vars, || {
+    ///     ui.text_wrapped(im_str!("AB"));
+    /// });
+    /// ```
+    pub fn with_color_vars<F: FnOnce(), C: Into<ImVec4> + Copy>(&self, color_vars: &[(ImGuiCol, C)], f: F) {
+        for &(color_var, color) in color_vars {
+            unsafe { imgui_sys::igPushStyleColor(color_var, color.into()); }
+        }
+        f();
+        unsafe { imgui_sys::igPopStyleColor(color_vars.len() as i32) };
     }
 }
