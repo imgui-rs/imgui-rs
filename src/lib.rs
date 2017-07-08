@@ -757,6 +757,7 @@ impl<'ui> Ui<'ui> {
 }
 
 impl<'ui> Ui<'ui> {
+    #[inline]
     fn push_style_var(&self, style_var: StyleVar) {
         use StyleVar::*;
         use imgui_sys::{igPushStyleVar, igPushStyleVarVec};
@@ -790,7 +791,6 @@ impl<'ui> Ui<'ui> {
     ///     ui.text(im_str!("CD"));
     /// });
     /// ```
-    #[inline]
     pub fn with_style_var<F: FnOnce()>(&self, style_var: StyleVar, f: F) {
         self.push_style_var(style_var);
         f();
@@ -813,7 +813,6 @@ impl<'ui> Ui<'ui> {
     ///     ui.text(im_str!("D"));
     /// });
     /// ```
-    #[inline]
     pub fn with_style_vars<F: FnOnce()>(&self, style_vars: &[StyleVar], f: F) {
         for &style_var in style_vars {
             self.push_style_var(style_var);
