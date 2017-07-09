@@ -38,8 +38,8 @@ impl<'p> ProgressBar<'p> {
     /// align to the end of the axis, zero will let the progress bar choose a
     /// size and positive values will use the given size.
     #[inline]
-    pub fn size(mut self, size: ImVec2) -> Self {
-        self.size = size;
+    pub fn size<S: Into<ImVec2>>(mut self, size: S) -> Self {
+        self.size = size.into();
         self
     }
 

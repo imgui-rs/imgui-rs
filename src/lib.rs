@@ -486,8 +486,8 @@ impl<'ui> Ui<'ui> {
             imgui_sys::igBulletText(fmt_ptr(), text.as_ptr());
         }
     }
-    pub fn button<'p>(&self, label: &'p ImStr, size: ImVec2) -> bool {
-        unsafe { imgui_sys::igButton(label.as_ptr(), size) }
+    pub fn button<'p, S: Into<ImVec2>>(&self, label: &'p ImStr, size: S) -> bool {
+        unsafe { imgui_sys::igButton(label.as_ptr(), size.into()) }
     }
     pub fn small_button<'p>(&self, label: &'p ImStr) -> bool {
         unsafe { imgui_sys::igSmallButton(label.as_ptr()) }
@@ -627,13 +627,13 @@ impl<'ui> Ui<'ui> {
 
 // Widgets: Selectable / Lists
 impl<'ui> Ui<'ui> {
-    pub fn selectable<'p>(&self,
+    pub fn selectable<'p, S: Into<ImVec2>>(&self,
                           label: &'p ImStr,
                           selected: bool,
                           flags: ImGuiSelectableFlags,
-                          size: ImVec2)
+                          size: S)
                           -> bool {
-        unsafe { imgui_sys::igSelectable(label.as_ptr(), selected, flags, size) }
+        unsafe { imgui_sys::igSelectable(label.as_ptr(), selected, flags, size.into()) }
     }
 }
 
@@ -751,7 +751,7 @@ impl<'ui> Ui<'ui> {
     /// # let mut imgui = ImGui::init();
     /// # let ui = imgui.frame((0, 0), (0, 0), 0.1);
     /// ui.progress_bar(0.6)
-    ///     .size(imgui::ImVec2::new(100.0, 12.0))
+    ///     .size((100.0, 12.0))
     ///     .overlay_text(im_str!("Progress!"))
     ///     .build();
     /// ```
