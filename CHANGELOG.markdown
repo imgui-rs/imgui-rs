@@ -2,6 +2,18 @@
 
 ## [Unreleased]
 
+### Added
+
+- Support for new_line function
+- Support for text size calculation
+- Support for scoped style customization
+- Support for scoped color customization
+- Support for child frames
+
+### Changed
+
+- Button, selectable, and progress bar accept size with `Into<ImVec2>`
+
 ## [0.0.14] - 2017-06-18
 
 ### Added
