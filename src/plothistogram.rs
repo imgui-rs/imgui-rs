@@ -53,8 +53,8 @@ impl<'p> PlotHistogram<'p> {
     }
 
     #[inline]
-    pub fn graph_size(mut self, graph_size: ImVec2) -> Self {
-        self.graph_size = graph_size;
+    pub fn graph_size<S: Into<ImVec2>>(mut self, graph_size: S) -> Self {
+        self.graph_size = graph_size.into();
         self
     }
 

@@ -16,7 +16,7 @@
 
 ### Changed
 
-- Button, selectable, and progress bar accept size with `Into<ImVec2>`
+- Button, selectable, histogram, plotlines, and progress bar accept size with `Into<ImVec2>`
 - `ImString::new` always succeeds and any interior NULs truncate the string. **Breaking change**
 
 ### Deprecated

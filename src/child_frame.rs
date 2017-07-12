@@ -18,10 +18,10 @@ pub struct ChildFrame<'p> {
 }
 
 impl<'p> ChildFrame<'p> {
-    pub fn new(name: &'p ImStr, size: ImVec2) -> ChildFrame<'p> {
+    pub fn new<S: Into<ImVec2>>(name: &'p ImStr, size: S) -> ChildFrame<'p> {
         ChildFrame {
-            name: name,
-            size: size,
+            name,
+            size: size.into(),
             flags: ImGuiWindowFlags::empty(),
         }
     }
