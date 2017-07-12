@@ -9,10 +9,21 @@
 - Support for scoped style customization
 - Support for scoped color customization
 - Support for child frames
+- Unsafe ImString/ImStr creation functions for advanced users:
+  + `ImString::from_utf8_unchecked` (renamed from `ImString::from_bytes_unchecked`)
+  + `ImString::from_utf8_with_nul_unchecked`)
+  + `ImStr::from_utf8_with_nul_unchecked` (renamed from `ImStr::from_bytes_unchecked`)
 
 ### Changed
 
 - Button, selectable, and progress bar accept size with `Into<ImVec2>`
+- `ImString::new` always succeeds and any interior NULs truncate the string. **Breaking change**
+
+### Deprecated
+
+- `ImString::from_string_unchecked` (please use `ImString::new`)
+- `ImString::from_bytes_unchecked` (renamed to `ImString::from_utf8_unchecked`)
+- `ImStr::from_bytes_unchecked` (renamed to `ImStr::from_utf8_with_nul_unchecked`)
 
 ## [0.0.14] - 2017-06-18
 

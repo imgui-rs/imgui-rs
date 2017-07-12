@@ -22,7 +22,7 @@ impl<'ui, 'p> SliderInt<'ui, 'p> {
             value: value,
             min: min,
             max: max,
-            display_format: unsafe { ImStr::from_bytes_unchecked(b"%.0f\0") },
+            display_format: unsafe { ImStr::from_utf8_with_nul_unchecked(b"%.0f\0") },
             _phantom: PhantomData,
         }
     }
@@ -61,7 +61,7 @@ macro_rules! impl_slider_intn {
                     value: value,
                     min: min,
                     max: max,
-                    display_format: unsafe { ImStr::from_bytes_unchecked(b"%.0f\0") },
+                    display_format: unsafe { ImStr::from_utf8_with_nul_unchecked(b"%.0f\0") },
                     _phantom: PhantomData,
                 }
             }
@@ -106,7 +106,7 @@ impl<'ui, 'p> SliderFloat<'ui, 'p> {
             value: value,
             min: min,
             max: max,
-            display_format: unsafe { ImStr::from_bytes_unchecked(b"%.3f\0") },
+            display_format: unsafe { ImStr::from_utf8_with_nul_unchecked(b"%.3f\0") },
             power: 1.0,
             _phantom: PhantomData,
         }
@@ -153,7 +153,7 @@ macro_rules! impl_slider_floatn {
                     value: value,
                     min: min,
                     max: max,
-                    display_format: unsafe { ImStr::from_bytes_unchecked(b"%.3f\0") },
+                    display_format: unsafe { ImStr::from_utf8_with_nul_unchecked(b"%.3f\0") },
                     power: 1.0,
                     _phantom: PhantomData,
                 }

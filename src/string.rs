@@ -1,5 +1,5 @@
 use std::borrow::Borrow;
-use std::ffi::{CStr, CString, NulError};
+use std::ffi::{CStr};
 use std::fmt;
 use std::mem;
 use std::ops::Deref;
@@ -10,19 +10,27 @@ use std::str;
 pub struct ImString(Vec<u8>);
 
 impl ImString {
-    pub fn new<T: Into<String>>(t: T) -> Result<ImString, NulError> {
-        CString::new(t.into()).map(|cstring| ImString(cstring.into_bytes_with_nul()))
+    pub fn new<T: Into<String>>(value: T) -> ImString {
+        unsafe { ImString::from_utf8_unchecked(value.into().into_bytes()) }
     }
     pub fn with_capacity(capacity: usize) -> ImString {
         let mut v = Vec::with_capacity(capacity + 1);
         v.push(b'\0');
         ImString(v)
     }
+    #[deprecated(since = "0.0.15", note = "please use ImString::new instead")]
     pub unsafe fn from_string_unchecked(s: String) -> ImString {
-        ImString::from_vec_unchecked(s.into())
+        ImString::new(s)
     }
-    pub unsafe fn from_vec_unchecked(mut v: Vec<u8>) -> ImString {
+    #[deprecated(since = "0.0.15", note = "please use ImString::from_utf8_unchecked instead")]
+    pub unsafe fn from_vec_unchecked(v: Vec<u8>) -> ImString {
+        ImString::from_utf8_unchecked(v)
+    }
+    pub unsafe fn from_utf8_unchecked(mut v: Vec<u8>) -> ImString {
         v.push(b'\0');
+        ImString(v)
+    }
+    pub unsafe fn from_utf8_with_nul_unchecked(v: Vec<u8>) -> ImString {
         ImString(v)
     }
     pub fn clear(&mut self) {
@@ -96,7 +104,7 @@ pub struct ImStr(CStr);
 impl<'a> Default for &'a ImStr {
     fn default() -> &'a ImStr {
         static SLICE: &'static [u8] = &[0];
-        unsafe { ImStr::from_bytes_unchecked(SLICE) }
+        unsafe { ImStr::from_utf8_with_nul_unchecked(SLICE) }
     }
 }
 
@@ -107,7 +115,11 @@ impl fmt::Debug for ImStr {
 }
 
 impl ImStr {
+    #[deprecated(since = "0.0.15", note = "please use ImStr::from_bytes_with_nul_unchecked instead")]
     pub unsafe fn from_bytes_unchecked<'a>(bytes: &'a [u8]) -> &'a ImStr {
+        ImStr::from_utf8_with_nul_unchecked(bytes)
+    }
+    pub unsafe fn from_utf8_with_nul_unchecked<'a>(bytes: &'a [u8]) -> &'a ImStr {
         mem::transmute(bytes)
     }
     pub fn as_ptr(&self) -> *const c_char { self.0.as_ptr() }
