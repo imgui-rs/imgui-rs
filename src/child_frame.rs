@@ -1,8 +1,7 @@
 use imgui_sys;
-use ImStr;
-use ImVec2;
-use ImGuiWindowFlags;
+use std::marker::PhantomData;
 
+use super::{ImStr, ImVec2, ImGuiWindowFlags, Ui};
 use super::{ImGuiWindowFlags_NoMove, ImGuiWindowFlags_NoScrollbar, ImGuiWindowFlags_NoScrollWithMouse,
             ImGuiWindowFlags_NoCollapse, ImGuiWindowFlags_AlwaysAutoResize,
             ImGuiWindowFlags_ShowBorders, ImGuiWindowFlags_NoInputs, ImGuiWindowFlags_MenuBar,
@@ -11,18 +10,20 @@ use super::{ImGuiWindowFlags_NoMove, ImGuiWindowFlags_NoScrollbar, ImGuiWindowFl
             ImGuiWindowFlags_AlwaysHorizontalScrollbar, ImGuiWindowFlags_AlwaysUseWindowPadding};
 
 #[must_use]
-pub struct ChildFrame<'p> {
+pub struct ChildFrame<'ui, 'p> {
     name: &'p ImStr,
     size: ImVec2,
     flags: ImGuiWindowFlags,
+    _phantom: PhantomData<&'ui Ui<'ui>>,
 }
 
-impl<'p> ChildFrame<'p> {
-    pub(crate) fn new<S: Into<ImVec2>>(name: &'p ImStr, size: S) -> ChildFrame<'p> {
+impl<'ui, 'p> ChildFrame<'ui, 'p> {
+    pub(crate) fn new<S: Into<ImVec2>>(name: &'p ImStr, size: S) -> ChildFrame<'ui, 'p> {
         ChildFrame {
             name,
             size: size.into(),
             flags: ImGuiWindowFlags::empty(),
+            _phantom: PhantomData,
         }
     }
     #[inline]

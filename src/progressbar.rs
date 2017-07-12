@@ -1,19 +1,20 @@
 #![warn(missing_docs)]
-
 use imgui_sys;
+use std::marker::PhantomData;
 use std::ptr;
-use super::{ImStr, ImVec2};
 
+use super::{ImStr, ImVec2, Ui};
 
 /// Progress bar widget.
 #[must_use]
-pub struct ProgressBar<'p> {
+pub struct ProgressBar<'ui, 'p> {
     fraction: f32,
     size: ImVec2,
     overlay_text: Option<&'p ImStr>,
+    _phantom: PhantomData<&'ui Ui<'ui>>,
 }
 
-impl<'p> ProgressBar<'p> {
+impl<'ui, 'p> ProgressBar<'ui, 'p> {
     /// Creates a progress bar with a given fraction showing
     /// the progress (0.0 = 0%, 1.0 = 100%).
     /// The progress bar will be automatically sized to fill
@@ -24,6 +25,7 @@ impl<'p> ProgressBar<'p> {
             fraction: fraction,
             size: ImVec2::new(-1.0, 0.0),
             overlay_text: None,
+            _phantom: PhantomData,
         }
     }
 

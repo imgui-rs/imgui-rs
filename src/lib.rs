@@ -715,13 +715,13 @@ impl<'ui> Ui<'ui> {
 }
 
 impl<'ui> Ui<'ui> {
-    pub fn plot_lines<'p>(&self, label: &'p ImStr, values: &'p [f32]) -> PlotLines<'p> {
+    pub fn plot_lines<'p>(&self, label: &'p ImStr, values: &'p [f32]) -> PlotLines<'ui, 'p> {
         PlotLines::new(label, values)
     }
 }
 
 impl<'ui> Ui<'ui> {
-    pub fn plot_histogram<'p>(&self, label: &'p ImStr, values: &'p [f32]) -> PlotHistogram<'p> {
+    pub fn plot_histogram<'p>(&self, label: &'p ImStr, values: &'p [f32]) -> PlotHistogram<'ui, 'p> {
         PlotHistogram::new(label, values)
     }
 }
@@ -753,7 +753,7 @@ impl<'ui> Ui<'ui> {
     ///     .overlay_text(im_str!("Progress!"))
     ///     .build();
     /// ```
-    pub fn progress_bar<'p>(&self, fraction: f32) -> ProgressBar<'p> { ProgressBar::new(fraction) }
+    pub fn progress_bar<'p>(&self, fraction: f32) -> ProgressBar<'ui, 'p> { ProgressBar::new(fraction) }
 }
 
 impl<'ui> Ui<'ui> {
@@ -777,7 +777,7 @@ impl<'ui> Ui<'ui> {
   ///                 ui.text_colored((1.0, 0.0, 0.0, 1.0), im_str!("hello mate!"));
   ///             });
   /// });
-  pub fn child_frame<'p, S: Into<ImVec2>>(&self, name: &'p ImStr, size: S) -> ChildFrame<'p> { ChildFrame::new(name, size.into()) }
+  pub fn child_frame<'p, S: Into<ImVec2>>(&self, name: &'p ImStr, size: S) -> ChildFrame<'ui, 'p> { ChildFrame::new(name, size.into()) }
 }
 
 impl<'ui> Ui<'ui> {

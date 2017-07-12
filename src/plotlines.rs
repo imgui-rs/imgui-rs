@@ -1,10 +1,12 @@
 use imgui_sys;
 use std::{f32, mem, ptr};
+use std::marker::PhantomData;
 use std::os::raw::c_float;
 
-use super::{ImStr, ImVec2};
+use super::{ImStr, ImVec2, Ui};
+
 #[must_use]
-pub struct PlotLines<'p> {
+pub struct PlotLines<'ui, 'p> {
     label: &'p ImStr,
     values: &'p [f32],
     values_offset: usize,
@@ -12,9 +14,10 @@ pub struct PlotLines<'p> {
     scale_min: f32,
     scale_max: f32,
     graph_size: ImVec2,
+    _phantom: PhantomData<&'ui Ui<'ui>>,
 }
 
-impl<'p> PlotLines<'p> {
+impl<'ui, 'p> PlotLines<'ui, 'p> {
     pub(crate) fn new(label: &'p ImStr, values: &'p [f32]) -> Self {
         PlotLines {
             label: label,
@@ -24,6 +27,7 @@ impl<'p> PlotLines<'p> {
             scale_min: f32::MAX,
             scale_max: f32::MAX,
             graph_size: ImVec2::new(0.0f32, 0.0f32),
+            _phantom: PhantomData,
         }
     }
 
