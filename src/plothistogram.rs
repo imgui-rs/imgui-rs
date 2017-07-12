@@ -16,7 +16,7 @@ pub struct PlotHistogram<'p> {
 }
 
 impl<'p> PlotHistogram<'p> {
-    pub fn new(label: &'p ImStr, values: &'p [f32]) -> Self {
+    pub(crate) fn new(label: &'p ImStr, values: &'p [f32]) -> Self {
         PlotHistogram {
             label: label,
             values: values,

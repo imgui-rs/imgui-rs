@@ -18,7 +18,7 @@ pub struct ChildFrame<'p> {
 }
 
 impl<'p> ChildFrame<'p> {
-    pub fn new<S: Into<ImVec2>>(name: &'p ImStr, size: S) -> ChildFrame<'p> {
+    pub(crate) fn new<S: Into<ImVec2>>(name: &'p ImStr, size: S) -> ChildFrame<'p> {
         ChildFrame {
             name,
             size: size.into(),

@@ -26,7 +26,7 @@ pub struct Window<'ui, 'p> {
 }
 
 impl<'ui, 'p> Window<'ui, 'p> {
-    pub fn new(name: &'p ImStr) -> Window<'ui, 'p> {
+    pub(crate) fn new(name: &'p ImStr) -> Window<'ui, 'p> {
         Window {
             pos: (0.0, 0.0),
             pos_cond: ImGuiSetCond::empty(),

@@ -15,7 +15,7 @@ pub struct PlotLines<'p> {
 }
 
 impl<'p> PlotLines<'p> {
-    pub fn new(label: &'p ImStr, values: &'p [f32]) -> Self {
+    pub(crate) fn new(label: &'p ImStr, values: &'p [f32]) -> Self {
         PlotLines {
             label: label,
             values: values,

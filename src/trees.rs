@@ -16,7 +16,7 @@ pub struct TreeNode<'ui, 'p> {
 }
 
 impl<'ui, 'p> TreeNode<'ui, 'p> {
-    pub fn new(id: &'p ImStr) -> Self {
+    pub(crate) fn new(id: &'p ImStr) -> Self {
         TreeNode {
             id: id,
             label: None,
@@ -62,7 +62,7 @@ pub struct CollapsingHeader<'ui, 'p> {
 }
 
 impl<'ui, 'p> CollapsingHeader<'ui, 'p> {
-    pub fn new(label: &'p ImStr) -> Self {
+    pub(crate) fn new(label: &'p ImStr) -> Self {
         CollapsingHeader {
             label: label,
             flags: ImGuiTreeNodeFlags::empty(),

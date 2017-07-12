@@ -135,7 +135,7 @@ pub struct InputText<'ui, 'p> {
 }
 
 impl<'ui, 'p> InputText<'ui, 'p> {
-    pub fn new(label: &'p ImStr, buf: &'p mut ImString) -> Self {
+    pub(crate) fn new(label: &'p ImStr, buf: &'p mut ImString) -> Self {
         InputText {
             label: label,
             buf: buf,
@@ -172,7 +172,7 @@ pub struct InputInt<'ui, 'p> {
 }
 
 impl<'ui, 'p> InputInt<'ui, 'p> {
-    pub fn new(label: &'p ImStr, value: &'p mut i32) -> Self {
+    pub(crate) fn new(label: &'p ImStr, value: &'p mut i32) -> Self {
         InputInt {
             label: label,
             value: value,
@@ -209,7 +209,7 @@ pub struct InputFloat<'ui, 'p> {
 }
 
 impl<'ui, 'p> InputFloat<'ui, 'p> {
-    pub fn new(label: &'p ImStr, value: &'p mut f32) -> Self {
+    pub(crate) fn new(label: &'p ImStr, value: &'p mut f32) -> Self {
         InputFloat {
             label: label,
             value: value,
@@ -249,7 +249,7 @@ macro_rules! impl_input_floatn {
         }
 
         impl<'ui, 'p> $InputFloatN<'ui, 'p> {
-            pub fn new(label: &'p ImStr, value: &'p mut [f32;$N]) -> Self {
+            pub(crate) fn new(label: &'p ImStr, value: &'p mut [f32;$N]) -> Self {
                 $InputFloatN {
                     label: label,
                     value: value,
@@ -290,7 +290,7 @@ macro_rules! impl_input_intn {
         }
 
         impl<'ui, 'p> $InputIntN<'ui, 'p> {
-            pub fn new(label: &'p ImStr, value: &'p mut [i32;$N]) -> Self {
+            pub(crate) fn new(label: &'p ImStr, value: &'p mut [i32;$N]) -> Self {
                 $InputIntN {
                     label: label,
                     value: value,
@@ -325,7 +325,7 @@ pub struct ColorEdit3<'ui, 'p> {
 }
 
 impl<'ui, 'p> ColorEdit3<'ui, 'p> {
-    pub fn new(label: &'p ImStr, value: &'p mut [f32; 3]) -> Self {
+    pub(crate) fn new(label: &'p ImStr, value: &'p mut [f32; 3]) -> Self {
         ColorEdit3 {
             label: label,
             value: value,
@@ -347,7 +347,7 @@ pub struct ColorEdit4<'ui, 'p> {
 }
 
 impl<'ui, 'p> ColorEdit4<'ui, 'p> {
-    pub fn new(label: &'p ImStr, value: &'p mut [f32; 4]) -> Self {
+    pub(crate) fn new(label: &'p ImStr, value: &'p mut [f32; 4]) -> Self {
         ColorEdit4 {
             label: label,
             value: value,
