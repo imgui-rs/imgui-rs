@@ -18,8 +18,8 @@
 
 - Button, selectable, histogram, plotlines, and progress bar accept size with `Into<ImVec2>`
 - `ImString::new` always succeeds and any interior NULs truncate the string. **Breaking change**
-- All builder constructor functions (e.g. Window::new) are no longer public.
-  The only safe way to construct builders is through a `&Ui` reference.
+- All builder constructor functions (e.g. Window::new) now take `&Ui` reference
+  to tie the lifetime of the builder to it.
 
 ### Deprecated
 

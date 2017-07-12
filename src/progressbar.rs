@@ -20,7 +20,7 @@ impl<'ui, 'p> ProgressBar<'ui, 'p> {
     /// The progress bar will be automatically sized to fill
     /// the entire width of the window if no custom size is
     /// specified.
-    pub(crate) fn new(fraction: f32) -> Self {
+    pub fn new(_: &Ui<'ui>, fraction: f32) -> Self {
         ProgressBar {
             fraction: fraction,
             size: ImVec2::new(-1.0, 0.0),

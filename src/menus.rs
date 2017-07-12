@@ -12,7 +12,7 @@ pub struct Menu<'ui, 'p> {
 }
 
 impl<'ui, 'p> Menu<'ui, 'p> {
-    pub(crate) fn new(label: &'p ImStr) -> Self {
+    pub fn new(_: &Ui<'ui>, label: &'p ImStr) -> Self {
         Menu {
             label: label,
             enabled: true,
@@ -43,7 +43,7 @@ pub struct MenuItem<'ui, 'p> {
 }
 
 impl<'ui, 'p> MenuItem<'ui, 'p> {
-    pub(crate) fn new(label: &'p ImStr) -> Self {
+    pub fn new(_: &Ui<'ui>, label: &'p ImStr) -> Self {
         MenuItem {
             label: label,
             shortcut: None,

@@ -116,15 +116,15 @@ impl fmt::Debug for ImStr {
 
 impl ImStr {
     #[deprecated(since = "0.0.15", note = "please use ImStr::from_bytes_with_nul_unchecked instead")]
-    pub unsafe fn from_bytes_unchecked<'a>(bytes: &'a [u8]) -> &'a ImStr {
+    pub unsafe fn from_bytes_unchecked(bytes: &[u8]) -> &ImStr {
         ImStr::from_utf8_with_nul_unchecked(bytes)
     }
-    pub unsafe fn from_utf8_with_nul_unchecked<'a>(bytes: &'a [u8]) -> &'a ImStr {
+    pub unsafe fn from_utf8_with_nul_unchecked(bytes: &[u8]) -> &ImStr {
         mem::transmute(bytes)
     }
     pub fn as_ptr(&self) -> *const c_char { self.0.as_ptr() }
     pub fn to_str(&self) -> &str {
-        unsafe { str::from_utf8_unchecked(&self.0.to_bytes()) }
+        unsafe { str::from_utf8_unchecked(self.0.to_bytes()) }
     }
 }
 

@@ -369,7 +369,7 @@ impl<'a> Ui<'a> {
 
 // Window
 impl<'ui> Ui<'ui> {
-    pub fn window<'p>(&self, name: &'p ImStr) -> Window<'ui, 'p> { Window::new(name) }
+    pub fn window<'p>(&self, name: &'p ImStr) -> Window<'ui, 'p> { Window::new(self, name) }
 }
 
 // Layout
@@ -501,49 +501,49 @@ impl<'ui> Ui<'ui> {
                            label: &'p ImStr,
                            value: &'p mut [f32; 3])
                            -> ColorEdit3<'ui, 'p> {
-        ColorEdit3::new(label, value)
+        ColorEdit3::new(self, label, value)
     }
     pub fn color_edit4<'p>(&self,
                            label: &'p ImStr,
                            value: &'p mut [f32; 4])
                            -> ColorEdit4<'ui, 'p> {
-        ColorEdit4::new(label, value)
+        ColorEdit4::new(self, label, value)
     }
     pub fn input_text<'p>(&self, label: &'p ImStr, buf: &'p mut ImString) -> InputText<'ui, 'p> {
-        InputText::new(label, buf)
+        InputText::new(self, label, buf)
     }
     pub fn input_float<'p>(&self, label: &'p ImStr, value: &'p mut f32) -> InputFloat<'ui, 'p> {
-        InputFloat::new(label, value)
+        InputFloat::new(self, label, value)
     }
     pub fn input_float2<'p>(&self,
                             label: &'p ImStr,
                             value: &'p mut [f32; 2])
                             -> InputFloat2<'ui, 'p> {
-        InputFloat2::new(label, value)
+        InputFloat2::new(self, label, value)
     }
     pub fn input_float3<'p>(&self,
                             label: &'p ImStr,
                             value: &'p mut [f32; 3])
                             -> InputFloat3<'ui, 'p> {
-        InputFloat3::new(label, value)
+        InputFloat3::new(self, label, value)
     }
     pub fn input_float4<'p>(&self,
                             label: &'p ImStr,
                             value: &'p mut [f32; 4])
                             -> InputFloat4<'ui, 'p> {
-        InputFloat4::new(label, value)
+        InputFloat4::new(self, label, value)
     }
     pub fn input_int<'p>(&self, label: &'p ImStr, value: &'p mut i32) -> InputInt<'ui, 'p> {
-        InputInt::new(label, value)
+        InputInt::new(self, label, value)
     }
     pub fn input_int2<'p>(&self, label: &'p ImStr, value: &'p mut [i32; 2]) -> InputInt2<'ui, 'p> {
-        InputInt2::new(label, value)
+        InputInt2::new(self, label, value)
     }
     pub fn input_int3<'p>(&self, label: &'p ImStr, value: &'p mut [i32; 3]) -> InputInt3<'ui, 'p> {
-        InputInt3::new(label, value)
+        InputInt3::new(self, label, value)
     }
     pub fn input_int4<'p>(&self, label: &'p ImStr, value: &'p mut [i32; 4]) -> InputInt4<'ui, 'p> {
-        InputInt4::new(label, value)
+        InputInt4::new(self, label, value)
     }
 }
 
@@ -555,7 +555,7 @@ impl<'ui> Ui<'ui> {
                             min: f32,
                             max: f32)
                             -> SliderFloat<'ui, 'p> {
-        SliderFloat::new(label, value, min, max)
+        SliderFloat::new(self, label, value, min, max)
     }
     pub fn slider_float2<'p>(&self,
                              label: &'p ImStr,
@@ -563,7 +563,7 @@ impl<'ui> Ui<'ui> {
                              min: f32,
                              max: f32)
                              -> SliderFloat2<'ui, 'p> {
-        SliderFloat2::new(label, value, min, max)
+        SliderFloat2::new(self, label, value, min, max)
     }
     pub fn slider_float3<'p>(&self,
                              label: &'p ImStr,
@@ -571,7 +571,7 @@ impl<'ui> Ui<'ui> {
                              min: f32,
                              max: f32)
                              -> SliderFloat3<'ui, 'p> {
-        SliderFloat3::new(label, value, min, max)
+        SliderFloat3::new(self, label, value, min, max)
     }
     pub fn slider_float4<'p>(&self,
                              label: &'p ImStr,
@@ -579,7 +579,7 @@ impl<'ui> Ui<'ui> {
                              min: f32,
                              max: f32)
                              -> SliderFloat4<'ui, 'p> {
-        SliderFloat4::new(label, value, min, max)
+        SliderFloat4::new(self, label, value, min, max)
     }
     pub fn slider_int<'p>(&self,
                           label: &'p ImStr,
@@ -587,7 +587,7 @@ impl<'ui> Ui<'ui> {
                           min: i32,
                           max: i32)
                           -> SliderInt<'ui, 'p> {
-        SliderInt::new(label, value, min, max)
+        SliderInt::new(self, label, value, min, max)
     }
     pub fn slider_int2<'p>(&self,
                            label: &'p ImStr,
@@ -595,7 +595,7 @@ impl<'ui> Ui<'ui> {
                            min: i32,
                            max: i32)
                            -> SliderInt2<'ui, 'p> {
-        SliderInt2::new(label, value, min, max)
+        SliderInt2::new(self, label, value, min, max)
     }
     pub fn slider_int3<'p>(&self,
                            label: &'p ImStr,
@@ -603,7 +603,7 @@ impl<'ui> Ui<'ui> {
                            min: i32,
                            max: i32)
                            -> SliderInt3<'ui, 'p> {
-        SliderInt3::new(label, value, min, max)
+        SliderInt3::new(self, label, value, min, max)
     }
     pub fn slider_int4<'p>(&self,
                            label: &'p ImStr,
@@ -611,15 +611,15 @@ impl<'ui> Ui<'ui> {
                            min: i32,
                            max: i32)
                            -> SliderInt4<'ui, 'p> {
-        SliderInt4::new(label, value, min, max)
+        SliderInt4::new(self, label, value, min, max)
     }
 }
 
 // Widgets: Trees
 impl<'ui> Ui<'ui> {
-    pub fn tree_node<'p>(&self, id: &'p ImStr) -> TreeNode<'ui, 'p> { TreeNode::new(id) }
+    pub fn tree_node<'p>(&self, id: &'p ImStr) -> TreeNode<'ui, 'p> { TreeNode::new(self, id) }
     pub fn collapsing_header<'p>(&self, label: &'p ImStr) -> CollapsingHeader<'ui, 'p> {
-        CollapsingHeader::new(label)
+        CollapsingHeader::new(self, label)
     }
 }
 
@@ -655,8 +655,8 @@ impl<'ui> Ui<'ui> {
             unsafe { imgui_sys::igEndMenuBar() };
         }
     }
-    pub fn menu<'p>(&self, label: &'p ImStr) -> Menu<'ui, 'p> { Menu::new(label) }
-    pub fn menu_item<'p>(&self, label: &'p ImStr) -> MenuItem<'ui, 'p> { MenuItem::new(label) }
+    pub fn menu<'p>(&self, label: &'p ImStr) -> Menu<'ui, 'p> { Menu::new(self, label) }
+    pub fn menu_item<'p>(&self, label: &'p ImStr) -> MenuItem<'ui, 'p> { MenuItem::new(self, label) }
 }
 
 // Widgets: Popups
@@ -716,13 +716,13 @@ impl<'ui> Ui<'ui> {
 
 impl<'ui> Ui<'ui> {
     pub fn plot_lines<'p>(&self, label: &'p ImStr, values: &'p [f32]) -> PlotLines<'ui, 'p> {
-        PlotLines::new(label, values)
+        PlotLines::new(self, label, values)
     }
 }
 
 impl<'ui> Ui<'ui> {
     pub fn plot_histogram<'p>(&self, label: &'p ImStr, values: &'p [f32]) -> PlotHistogram<'ui, 'p> {
-        PlotHistogram::new(label, values)
+        PlotHistogram::new(self, label, values)
     }
 }
 
@@ -753,7 +753,7 @@ impl<'ui> Ui<'ui> {
     ///     .overlay_text(im_str!("Progress!"))
     ///     .build();
     /// ```
-    pub fn progress_bar<'p>(&self, fraction: f32) -> ProgressBar<'ui, 'p> { ProgressBar::new(fraction) }
+    pub fn progress_bar<'p>(&self, fraction: f32) -> ProgressBar<'ui, 'p> { ProgressBar::new(self, fraction) }
 }
 
 impl<'ui> Ui<'ui> {
@@ -777,7 +777,7 @@ impl<'ui> Ui<'ui> {
   ///                 ui.text_colored((1.0, 0.0, 0.0, 1.0), im_str!("hello mate!"));
   ///             });
   /// });
-  pub fn child_frame<'p, S: Into<ImVec2>>(&self, name: &'p ImStr, size: S) -> ChildFrame<'ui, 'p> { ChildFrame::new(name, size.into()) }
+  pub fn child_frame<'p, S: Into<ImVec2>>(&self, name: &'p ImStr, size: S) -> ChildFrame<'ui, 'p> { ChildFrame::new(self, name, size.into()) }
 }
 
 impl<'ui> Ui<'ui> {
