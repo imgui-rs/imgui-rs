@@ -20,7 +20,7 @@ pub struct ChildFrame<'ui, 'p> {
 impl<'ui, 'p> ChildFrame<'ui, 'p> {
     pub fn new<S: Into<ImVec2>>(_: &Ui<'ui>, name: &'p ImStr, size: S) -> ChildFrame<'ui, 'p> {
         ChildFrame {
-            name,
+            name: name,
             size: size.into(),
             flags: ImGuiWindowFlags::empty(),
             _phantom: PhantomData,
