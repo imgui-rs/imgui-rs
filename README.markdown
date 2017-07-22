@@ -2,7 +2,7 @@
 
 **Still fairly experimental!**
 
-Minimum Rust version: 1.16
+Minimum Rust version: 1.17
 
 [![Build Status](https://travis-ci.org/Gekkio/imgui-rs.svg?branch=master)](https://travis-ci.org/Gekkio/imgui-rs)
 [![Latest release on crates.io](https://meritbadge.herokuapp.com/imgui)](https://crates.io/crates/imgui)
@@ -59,8 +59,8 @@ Examples are under the imgui-examples directory.
     cargo run --example test_window
     cargo run --example test_window_impl
 
-Note to Windows users:  You will need to use the *MSVC ABI* version of the Rust compiler along 
-with its associated [dependencies](https://www.rust-lang.org/en-US/downloads.html#win-foot) to 
+Note to Windows users:  You will need to use the *MSVC ABI* version of the Rust compiler along
+with its associated [dependencies](https://www.rust-lang.org/en-US/downloads.html#win-foot) to
 build this libary and run the examples.
 
 ## How to contribute
