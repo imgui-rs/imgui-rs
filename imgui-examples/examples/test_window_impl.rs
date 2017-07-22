@@ -5,12 +5,9 @@ extern crate imgui_glium_renderer;
 
 use imgui::*;
 
-use self::support::Support;
-
 mod support;
 
 struct State {
-    clear_color: (f32, f32, f32, f32),
     show_app_metrics: bool,
     show_app_main_menu_bar: bool,
     show_app_console: bool,
@@ -54,7 +51,6 @@ impl Default for State {
         let mut text = ImString::with_capacity(128);
         text.push_str("Hello, world!");
         State {
-            clear_color: (114.0 / 255.0, 144.0 / 255.0, 154.0 / 255.0, 1.0),
             show_app_metrics: false,
             show_app_main_menu_bar: false,
             show_app_console: false,
@@ -109,19 +105,16 @@ impl Default for AutoResizeState {
     fn default() -> Self { AutoResizeState { lines: 10 } }
 }
 
+const CLEAR_COLOR: [f32; 4] = [114.0 / 255.0, 144.0 / 255.0, 154.0 / 255.0, 1.0];
+
 fn main() {
     let mut state = State::default();
-    let mut support = Support::init();
-    let mut opened = true;
 
-    loop {
-        support.render(state.clear_color,
-                       |ui| { show_test_window(ui, &mut state, &mut opened); });
-        let active = support.update_events();
-        if !active || !opened {
-            break;
-        }
-    }
+    support::run("test_window.rs".to_owned(), CLEAR_COLOR, |ui| {
+        let mut open = true;
+        show_test_window(ui, &mut state, &mut open);
+        open
+    });
 }
 
 fn show_user_guide<'a>(ui: &Ui<'a>) {
