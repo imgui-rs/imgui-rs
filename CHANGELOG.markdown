@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [0.0.15] - 2017-07-23
+
 ### Added
 
 - Support for new_line function
@@ -201,7 +203,8 @@
 
 - Initial release with cimgui/imgui 1.44, glium 0.9
 
-[Unreleased]: https://github.com/Gekkio/imgui-rs/compare/v0.0.14...HEAD
+[Unreleased]: https://github.com/Gekkio/imgui-rs/compare/v0.0.15...HEAD
+[0.0.15]: https://github.com/Gekkio/imgui-rs/compare/v0.0.14...v0.0.15
 [0.0.14]: https://github.com/Gekkio/imgui-rs/compare/v0.0.13...v0.0.14
 [0.0.13]: https://github.com/Gekkio/imgui-rs/compare/v0.0.12...v0.0.13
 [0.0.12]: https://github.com/Gekkio/imgui-rs/compare/v0.0.11...v0.0.12
