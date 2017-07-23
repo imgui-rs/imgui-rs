@@ -20,6 +20,8 @@
 - `ImString::new` always succeeds and any interior NULs truncate the string. **Breaking change**
 - All builder constructor functions (e.g. Window::new) now take `&Ui` reference
   to tie the lifetime of the builder to it.
+- Bumped minimum Rust version to 1.17 because some dependencies require it.
+- Upgrade to glium 0.17
 
 ### Deprecated
 
