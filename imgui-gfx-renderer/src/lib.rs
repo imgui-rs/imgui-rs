@@ -1,5 +1,6 @@
 #[macro_use]
 extern crate gfx;
+extern crate gfx_app;
 extern crate imgui;
 
 use gfx::{Bind, Bundle, CommandBuffer, Encoder, Factory, IntoIndexBuffer, Rect, Resources, Slice};
@@ -51,11 +52,26 @@ pub struct Renderer<R: Resources> {
 impl<R: Resources> Renderer<R> {
     pub fn init<F: Factory<R>>(imgui: &mut ImGui,
                                factory: &mut F,
+                               backend: gfx_app::shade::Backend,
                                out: RenderTargetView<R, gfx::format::Rgba8>)
                                -> RendererResult<Renderer<R>> {
-        let pso = factory.create_pipeline_simple(include_bytes!("shader/vert_110.glsl"),
-                                    include_bytes!("shader/frag_110.glsl"),
-                                    pipe::new())?;
+
+        let vs = gfx_app::shade::Source {
+            glsl_120: include_bytes!("shader/vert_110.glsl"),
+            glsl_140: include_bytes!("shader/vert_140.glsl"),
+            .. gfx_app::shade::Source::empty()
+        };
+        let ps = gfx_app::shade::Source {
+            glsl_120: include_bytes!("shader/frag_110.glsl"),
+            glsl_140: include_bytes!("shader/frag_140.glsl"),
+            .. gfx_app::shade::Source::empty()
+        };
+
+        let pso = factory.create_pipeline_simple(
+            vs.select(backend).unwrap(),
+            ps.select(backend).unwrap(),
+            pipe::new()
+        ).unwrap();
         let vertex_buffer = factory.create_buffer::<ImDrawVert>(256,
                                          gfx::buffer::Role::Vertex,
                                          gfx::memory::Usage::Dynamic,
