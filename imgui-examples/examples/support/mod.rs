@@ -37,7 +37,6 @@ pub fn run<F: FnMut(&Ui) -> bool>(title: String, clear_color: [f32; 4], mut run_
 
             if let Event::WindowEvent { event, .. } = event {
                 match event {
-                    Resized(_, _) => unimplemented!(),
                     Closed => quit = true,
                     KeyboardInput { input, .. } => {
                         use glium::glutin::VirtualKeyCode as Key;
