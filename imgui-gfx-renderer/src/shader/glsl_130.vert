@@ -1,4 +1,4 @@
-#version 140
+#version 130
 
 uniform mat4 matrix;
 
@@ -8,6 +8,9 @@ in vec4 col;
 
 out vec2 f_uv;
 out vec4 f_color;
+
+// Built-in:
+// vec4 gl_Position
 
 void main() {
   f_uv = uv;

@@ -43,6 +43,43 @@ gfx_defines!{
     }
 }
 
+#[derive(Copy, Clone, Debug, PartialEq, Eq)]
+pub enum Shaders {
+    GlSl400, // OpenGL 4.0+
+    GlSl130, // OpenGL 3.0+
+    GlSl110, // OpenGL 2.0+
+    GlSlEs300, // OpenGL ES 3.0+
+    GlSlEs100, // OpenGL ES 2.0+
+}
+
+impl Shaders {
+    fn get_program_code(self) -> (&'static [u8], &'static [u8]) {
+        use Shaders::*;
+        match self {
+            GlSl400 => (
+                include_bytes!("shader/glsl_400.vert"),
+                include_bytes!("shader/glsl_400.frag"),
+            ),
+            GlSl130 => (
+                include_bytes!("shader/glsl_130.vert"),
+                include_bytes!("shader/glsl_130.frag"),
+            ),
+            GlSl110 => (
+                include_bytes!("shader/glsl_110.vert"),
+                include_bytes!("shader/glsl_110.frag"),
+            ),
+            GlSlEs300 => (
+                include_bytes!("shader/glsles_300.vert"),
+                include_bytes!("shader/glsles_300.frag"),
+            ),
+            GlSlEs100 => (
+                include_bytes!("shader/glsles_100.vert"),
+                include_bytes!("shader/glsles_100.frag"),
+            ),
+        }
+    }
+}
+
 pub struct Renderer<R: Resources> {
     bundle: Bundle<R, pipe::Data<R>>,
     index_buffer: Buffer<R, u16>,
@@ -51,11 +88,11 @@ pub struct Renderer<R: Resources> {
 impl<R: Resources> Renderer<R> {
     pub fn init<F: Factory<R>>(imgui: &mut ImGui,
                                factory: &mut F,
+                               shaders: Shaders,
                                out: RenderTargetView<R, gfx::format::Rgba8>)
                                -> RendererResult<Renderer<R>> {
-        let pso = factory.create_pipeline_simple(include_bytes!("shader/vert_110.glsl"),
-                                    include_bytes!("shader/frag_110.glsl"),
-                                    pipe::new())?;
+        let (vs_code, ps_code) = shaders.get_program_code();
+        let pso = factory.create_pipeline_simple(vs_code, ps_code, pipe::new())?;
         let vertex_buffer = factory.create_buffer::<ImDrawVert>(256,
                                          gfx::buffer::Role::Vertex,
                                          gfx::memory::Usage::Dynamic,

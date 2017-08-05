@@ -152,14 +152,29 @@ fn compile_default_program<F: Facade>(ctx: &F)
                                       -> Result<Program, program::ProgramChooserCreationError> {
     program!(
         ctx,
-        140 => {
-            vertex: include_str!("shader/vert_140.glsl"),
-            fragment: include_str!("shader/frag_140.glsl"),
+        400 => {
+            vertex: include_str!("shader/glsl_400.vert"),
+            fragment: include_str!("shader/glsl_400.frag"),
+            outputs_srgb: true,
+        },
+        130 => {
+            vertex: include_str!("shader/glsl_130.vert"),
+            fragment: include_str!("shader/glsl_130.frag"),
             outputs_srgb: true,
         },
         110 => {
-            vertex: include_str!("shader/vert_110.glsl"),
-            fragment: include_str!("shader/frag_110.glsl"),
+            vertex: include_str!("shader/glsl_110.vert"),
+            fragment: include_str!("shader/glsl_110.frag"),
+            outputs_srgb: true,
+        },
+        300 es => {
+            vertex: include_str!("shader/glsles_300.vert"),
+            fragment: include_str!("shader/glsles_300.frag"),
+            outputs_srgb: true,
+        },
+        100 es => {
+            vertex: include_str!("shader/glsles_100.vert"),
+            fragment: include_str!("shader/glsles_100.frag"),
             outputs_srgb: true,
         },
     )

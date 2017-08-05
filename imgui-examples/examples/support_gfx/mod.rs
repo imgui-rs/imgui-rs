@@ -1,4 +1,5 @@
 use imgui::{ImGui, Ui};
+use imgui_gfx_renderer::{Renderer, Shaders};
 use std::time::Instant;
 
 #[derive(Copy, Clone, PartialEq, Debug, Default)]
@@ -12,7 +13,6 @@ pub fn run<F: FnMut(&Ui) -> bool>(title: String, clear_color: [f32; 4], mut run_
     use gfx::{self, Device};
     use gfx_window_glutin;
     use glutin::{self, GlContext};
-    use imgui_gfx_renderer::Renderer;
 
     type ColorFormat = gfx::format::Rgba8;
     type DepthFormat = gfx::format::DepthStencil;
@@ -26,9 +26,27 @@ pub fn run<F: FnMut(&Ui) -> bool>(title: String, clear_color: [f32; 4], mut run_
     let (window, mut device, mut factory, mut main_color, mut main_depth) =
         gfx_window_glutin::init::<ColorFormat, DepthFormat>(window, context, &events_loop);
     let mut encoder: gfx::Encoder<_, _> = factory.create_command_buffer().into();
+    let shaders = {
+        let version = device.get_info().shading_language;
+        if version.is_embedded {
+            if version.major >= 3 {
+                Shaders::GlSlEs300
+            } else {
+                Shaders::GlSlEs100
+            }
+        } else {
+            if version.major >= 4 {
+                Shaders::GlSl400
+            } else if version.major >= 3 {
+                Shaders::GlSl130
+            } else {
+                Shaders::GlSl110
+            }
+        }
+    };
 
     let mut imgui = ImGui::init();
-    let mut renderer = Renderer::init(&mut imgui, &mut factory, main_color.clone())
+    let mut renderer = Renderer::init(&mut imgui, &mut factory, shaders, main_color.clone())
         .expect("Failed to initialize renderer");
 
     configure_keys(&mut imgui);

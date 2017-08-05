@@ -2,6 +2,19 @@
 
 ## [Unreleased]
 
+### Added
+
+- OpenGL ES 2.0+ support in gfx and glium renderers
+- Separate OpenGL 2.0, 3.0, 4.0 shaders in both renderers. This should fix an
+  issue with some systems that refuse to use old GLSL shaders with modern
+  OpenGL contexts
+
+### Changed
+
+- imgui-gfx-renderer `Renderer::init` now requires a `shaders: Shaders`
+  parameter. Please see examples/support_gfx/mod.rs for a shader resolution
+  example
+
 ## [0.0.15] - 2017-07-23
 
 ### Added
