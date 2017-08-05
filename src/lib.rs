@@ -48,6 +48,7 @@ pub use string::{ImStr, ImString};
 pub use style::StyleVar;
 pub use trees::{CollapsingHeader, TreeNode};
 pub use window::Window;
+pub use radio::{RadioButton, RadioButtonBool};
 
 mod child_frame;
 mod input;
@@ -60,6 +61,7 @@ mod string;
 mod style;
 mod trees;
 mod window;
+mod radio;
 
 pub struct ImGui {
     // We need to keep ownership of the ImStr values to ensure the *const char pointer
@@ -711,6 +713,20 @@ impl<'ui> Ui<'ui> {
                                  items_inner.len() as i32,
                                  height_in_items)
         }
+    }
+}
+
+// Widgets: Radios
+impl<'ui> Ui<'ui> {
+    pub fn radio_button<'p>(&self,
+                            label: &'p ImStr,
+                            value: &'p mut i32,
+                            wanted: i32)
+                            -> RadioButton<'ui, 'p> {
+        RadioButton::new(label, value, wanted)
+    }
+    pub fn radio_button_bool<'p>(&self, label: &'p ImStr, value: bool) -> RadioButtonBool<'ui, 'p> {
+        RadioButtonBool::new(label, value)
     }
 }
 
