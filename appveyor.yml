@@ -10,8 +10,11 @@ install:
   - SET PATH=%PATH%;C:\MinGW\bin
   - rustc -V
   - cargo -V
+  - git submodule update --init --recursive
 
 build: false
 
 test_script:
+
+  - cd imgui-examples
   - cargo test --verbose
