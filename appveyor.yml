@@ -48,7 +48,7 @@ install:
   - echo "Now running git submodule update"
   - git submodule update --init --recursive
 
-build: 
+build_script: 
   - cd imgui-examples
   - cargo test --verbose
 
