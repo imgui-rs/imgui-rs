@@ -28,9 +28,7 @@ environment:
     C:\\Program Files\\AppVeyor\\BuildAgent;"
   
   matrix:
-    allow_failures:
-      - TARGET: stable-i686-pc-windows-msvc
-      configuration: Debug
+    - TARGET: stable-i686-pc-windows-msvc
     - TARGET: stable-x86_64-pc-windows-msvc
     # - TARGET: nightly-i686-pc-windows-msvc
     # - TARGET: nightly-x86_64-pc-windows-msvc
