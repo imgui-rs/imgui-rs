@@ -48,7 +48,8 @@ install:
   - git submodule update --init --recursive
   # Install rustup, Should use i686-pc-windows-gnu triple for first install
   - ps: Start-FileDownload "https://static.rust-lang.org/rustup/dist/i686-pc-windows-gnu/rustup-init.exe"
-  - ps: ./rustup-init.exe --verbose -y --default-host $env:TARGET
+  - ps: ./rustup-init.exe --verbose -y --default-host stable-x86_64-pc-windows-msvc
+  - ps: echo "What is my `$env:TARGET ?: $env:Target"
   - ps: rustup set $env:TARGET
   
   # Get latest toolchain
