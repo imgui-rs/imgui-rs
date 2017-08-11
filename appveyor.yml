@@ -29,8 +29,8 @@ environment:
   
   matrix:
     - TARGET: x86_64-pc-windows-msvc
-    # - TARGET: i686-pc-windows-msvc
-    # - TARGET: i686-pc-windows-gnu
+    - TARGET: i686-pc-windows-msvc
+    - TARGET: i686-pc-windows-gnu
 
 #Set cache, so qe can be fast and efficient
 cache:
@@ -39,14 +39,14 @@ cache:
 
 #Install and configure 
 install:
+  #update repository submodules
+  - git submodule update --init --recursive
+  #install rust
   - ps: Start-FileDownload "https://static.rust-lang.org/dist/rust-nightly-${env:TARGET}.exe"
   - rust-nightly-%TARGET%.exe /VERYSILENT /NORESTART /DIR="C:\Program Files (x86)\Rust"
   - SET PATH=%PATH%;C:\Program Files (x86)\Rust\bin
   - rustc -V
   - cargo -V
-  - echo ""
-  - echo "Now running git submodule update"
-  - git submodule update --init --recursive
 
 build_script: 
   - cd imgui-examples
