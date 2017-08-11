@@ -46,8 +46,8 @@ cache:
 install:
   # Update git submodules
   - git submodule update --init --recursive
-  # Install rustup
-  - ps: Start-FileDownload "https://static.rust-lang.org/rustup/dist/${env:TARGET}/rustup-init.exe"
+  # Install rustup, Should use i686-pc-windows-gnu triple for first install
+  - ps: Start-FileDownload "https://static.rust-lang.org/rustup/dist/i686-pc-windows-gnu/rustup-init.exe"
   - rustup-init.exe --verbose -y --default-host %TARGET%
   - rustup set ${env:TARGET}
   
