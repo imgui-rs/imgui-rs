@@ -34,8 +34,8 @@ environment:
 
 #Set cache, so qe can be fast and efficient
 cache:
-  - .servo -> rust-commit-hash
-  - .cargo -> rust-commit-hash
+  # - C:\\Users\\appveyor\\.rustup -> rust-commit-hash
+  - C:\\Users\\appveyor\\.cargo -> appveyor.yml
 
 #Install and configure 
 install:
