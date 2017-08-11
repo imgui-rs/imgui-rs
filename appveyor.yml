@@ -38,7 +38,7 @@ environment:
     #   - TARGET: stable-i686-pc-pc-windows-gnu
     - platform: x64
       build: Debug #,Release
-      - TARGET: stable-x86_64-pc-windows-msvc
+      TARGET: stable-x86_64-pc-windows-msvc
       # - TARGET: stable-x86_64-pc-windows-gnu
       # - TARGET: nightly-x86_64-pc-windows-gnu
 
