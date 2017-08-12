@@ -56,7 +56,7 @@ install:
   - ps: Start-FileDownload "https://static.rust-lang.org/rustup/dist/i686-pc-windows-gnu/rustup-init.exe"
   # - ps: ./rustup-init.exe -y  --verbose --default-host stable-x86_64-pc-windows-msvc
   - rustup-init.exe -y
-  - rustup set $env:TARGET
+  - rustup set %TARGET%
   
   # Get latest toolchain
   - rustup update
