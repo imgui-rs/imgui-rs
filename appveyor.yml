@@ -69,3 +69,5 @@ build_script:
   - cargo build --all --verbose
 
 test: off
+
+#should recompile nothing !
