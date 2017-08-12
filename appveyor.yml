@@ -1,6 +1,3 @@
-init:
-  - ps: iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
-
 environment:
   APPVEYOR_RDP_PASSWORD: running_rdp_goolic
   RUST_BACKTRACE: 1
@@ -31,6 +28,9 @@ environment:
     C:\\Program Files\\Git\\usr\\bin;\
     C:\\Program Files\\AppVeyor\\BuildAgent;"
   
+  init:
+  - ps: iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
+
   matrix:
     # - platform: x86
     #   configuration: Debug #,Release
