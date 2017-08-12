@@ -45,8 +45,8 @@ init:
 
 # Set cache, so qe can be fast and efficient
 cache:
-  - C:\\Users\\appveyor\\.rustup -> appveyor.yml
-  - C:\\Users\\appveyor\\.cargo -> appveyor.yml
+  - C:\Users\appveyor\.rustup -> appveyor.yml
+  - C:\Users\appveyor\.cargo -> appveyor.yml
 
 # Install and configure 
 install:
@@ -59,9 +59,9 @@ install:
   - ps: Start-FileDownload "https://static.rust-lang.org/rustup/dist/i686-pc-windows-gnu/rustup-init.exe"
   # - ps: ./rustup-init.exe -y  --verbose --default-host stable-x86_64-pc-windows-msvc
   - rustup-init.exe --verbose -y
-  - dir C:\\Users\\appveyor\\.cargo\\bin
+  - dir C:\Users\appveyor\.cargo\bin
   - ps: Get-ChildItem env:path
-  - C:\\Users\\appveyor\\.cargo\\bin\\rustup set %TARGET%
+  - C:\Users\appveyor\.cargo\bin\rustup set %TARGET%
   
   # Get latest toolchain
   - rustup update
