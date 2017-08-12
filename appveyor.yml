@@ -27,16 +27,16 @@ environment:
     C:\\Program Files\\Git\\cmd;\
     C:\\Program Files\\Git\\usr\\bin;\
     C:\\Program Files\\AppVeyor\\BuildAgent;"
-    matrix:
-      # - platform: x86
-      #   configuration: Debug #,Release
-      #   - TARGET: stable-i686-pc-windows-msvc
-      #   - TARGET: nightly-i686-pc-windows-msvc
-      #   - TARGET: nightly-i686-pc-pc-windows-gnu
-      #   - TARGET: stable-i686-pc-pc-windows-gnu
-      - TARGET: stable-x86_64-pc-windows-msvc
-      # - TARGET: stable-x86_64-pc-windows-gnu
-      # - TARGET: nightly-x86_64-pc-windows-gnu
+  matrix:
+    - TARGET: stable-x86_64-pc-windows-msvc
+    # - TARGET: stable-i686-pc-windows-msvc
+    # - TARGET: nightly-i686-pc-windows-msvc
+    # - TARGET: nightly-i686-pc-pc-windows-gnu
+    # - TARGET: stable-i686-pc-pc-windows-gnu
+    # - TARGET: stable-x86_64-pc-windows-msvc
+    # - TARGET: stable-x86_64-pc-windows-gnu
+    # - TARGET: nightly-x86_64-pc-windows-gnu
+  
   
 init:
   - ps: iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
