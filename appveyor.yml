@@ -35,7 +35,7 @@ environment:
     #   - TARGET: nightly-i686-pc-pc-windows-gnu
     #   - TARGET: stable-i686-pc-pc-windows-gnu
     - platform: x64
-      build: Debug #,Release
+      build: Debug 
       TARGET: stable-x86_64-pc-windows-msvc
       # - TARGET: stable-x86_64-pc-windows-gnu
       # - TARGET: nightly-x86_64-pc-windows-gnu
@@ -56,7 +56,7 @@ install:
   - ps: Start-FileDownload "https://static.rust-lang.org/rustup/dist/i686-pc-windows-gnu/rustup-init.exe"
   # - ps: ./rustup-init.exe -y  --verbose --default-host stable-x86_64-pc-windows-msvc
   - rustup-init.exe -y
-  - ps: rustup set $env:TARGET
+  - rustup set $env:TARGET
   
   # Get latest toolchain
   - rustup update
