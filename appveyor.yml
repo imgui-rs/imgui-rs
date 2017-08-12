@@ -1,5 +1,4 @@
 environment:
-  APPVEYOR_RDP_PASSWORD: 192_big_AND_BAD_p$$word_
   RUST_BACKTRACE: 1
   # The appveyor image we use has a pretty huge set of things installed... we make the
   # initial PATH something sane so we know what to expect
@@ -26,7 +25,8 @@ environment:
     C:\\Program Files\\Git LFS;\
     C:\\Program Files\\Git\\cmd;\
     C:\\Program Files\\Git\\usr\\bin;\
-    C:\\Program Files\\AppVeyor\\BuildAgent;"
+    C:\\Program Files\\AppVeyor\\BuildAgent;\
+    C:\\Users\\appveyor\\.cargo\\bin;"
   matrix:
     - TARGET: stable-x86_64-pc-windows-msvc
     # - TARGET: stable-i686-pc-windows-msvc
@@ -36,12 +36,6 @@ environment:
     # - TARGET: stable-x86_64-pc-windows-msvc
     # - TARGET: stable-x86_64-pc-windows-gnu
     # - TARGET: nightly-x86_64-pc-windows-gnu
-  
-  
-init:
-  - ps: iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
-
-
 
 # Set cache, so qe can be fast and efficient
 cache:
@@ -59,9 +53,8 @@ install:
   - ps: Start-FileDownload "https://static.rust-lang.org/rustup/dist/i686-pc-windows-gnu/rustup-init.exe"
   # - ps: ./rustup-init.exe -y  --verbose --default-host stable-x86_64-pc-windows-msvc
   - rustup-init.exe --verbose -y
-  - dir C:\Users\appveyor\.cargo\bin
   - ps: Get-ChildItem env:path
-  - C:\Users\appveyor\.cargo\bin\rustup override set %TARGET%
+  - rustup override set %TARGET%
   
   # Get latest toolchain
   - rustup update
@@ -76,6 +69,3 @@ build_script:
   - cargo build --all --verbose
 
 test: off
-
-on_finish:
-  - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
