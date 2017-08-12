@@ -38,11 +38,9 @@ matrix:
   #   - TARGET: nightly-i686-pc-windows-msvc
   #   - TARGET: nightly-i686-pc-pc-windows-gnu
   #   - TARGET: stable-i686-pc-pc-windows-gnu
-  - platform: x64
-    build: Debug 
-    TARGET: stable-x86_64-pc-windows-msvc
-    # - TARGET: stable-x86_64-pc-windows-gnu
-    # - TARGET: nightly-x86_64-pc-windows-gnu
+  - TARGET: stable-x86_64-pc-windows-msvc
+  # - TARGET: stable-x86_64-pc-windows-gnu
+  # - TARGET: nightly-x86_64-pc-windows-gnu
 
 # Set cache, so qe can be fast and efficient
 cache:
