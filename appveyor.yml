@@ -61,7 +61,7 @@ install:
   - rustup-init.exe --verbose -y
   - dir C:\Users\appveyor\.cargo\bin
   - ps: Get-ChildItem env:path
-  - C:\Users\appveyor\.cargo\bin\rustup set %TARGET%
+  - C:\Users\appveyor\.cargo\bin\rustup override set %TARGET%
   
   # Get latest toolchain
   - rustup update
