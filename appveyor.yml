@@ -57,7 +57,7 @@ install:
   # Install rustup, Should use i686-pc-windows-gnu triple for first install
   - ps: Start-FileDownload "https://static.rust-lang.org/rustup/dist/i686-pc-windows-gnu/rustup-init.exe"
   # - ps: ./rustup-init.exe -y  --verbose --default-host stable-x86_64-pc-windows-msvc
-  - ps: ./rustup-init.exe -y
+  - rustup-init.exe -y
   - ps: rustup set $env:TARGET
   
   # Get latest toolchain
@@ -68,7 +68,8 @@ install:
   - cargo -V
 
 build_script: 
-  - cd imgui-examples
-  - cargo test --verbose
+  # - cd imgui-examples
+  - cargo test --all --verbose
+  - cargo build --all --verbose
 
 test: off
