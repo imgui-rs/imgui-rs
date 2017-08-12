@@ -158,7 +158,7 @@ fn show_test_window<'a>(ui: &Ui<'a>, state: &mut State, opened: &mut bool) {
         show_example_app_manipulating_window_title(ui);
     }
     if state.show_app_about {
-        ui.window(im_str!("About ImGui"))
+        ui.window(im_str!("About ImGui The forced recompilation !"))
             .always_auto_resize(true)
             .opened(&mut state.show_app_about)
             .build(|| {
