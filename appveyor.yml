@@ -29,18 +29,18 @@ environment:
     C:\\Users\\appveyor\\.cargo\\bin;"
   matrix:
     - TARGET: stable-x86_64-pc-windows-msvc
+    # - TARGET: stable-x86_64-pc-windows-gnu
     # - TARGET: stable-i686-pc-windows-msvc
+    # - TARGET: stable-i686-pc-pc-windows-gnu
+    - TARGET: nightly-x86_64-pc-windows-msvc
+    # - TARGET: nightly-x86_64-pc-windows-gnu
     # - TARGET: nightly-i686-pc-windows-msvc
     # - TARGET: nightly-i686-pc-pc-windows-gnu
-    # - TARGET: stable-i686-pc-pc-windows-gnu
-    # - TARGET: stable-x86_64-pc-windows-msvc
-    # - TARGET: stable-x86_64-pc-windows-gnu
-    # - TARGET: nightly-x86_64-pc-windows-gnu
 
 # Set cache, so qe can be fast and efficient
 cache:
-  - C:\Users\appveyor\.rustup -> appveyor.yml
-  - C:\Users\appveyor\.cargo -> appveyor.yml
+  - C:\Users\appveyor\.rustup
+  - C:\Users\appveyor\.cargo
 
 # Install and configure 
 install:
