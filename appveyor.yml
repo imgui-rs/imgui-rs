@@ -32,13 +32,9 @@ environment:
 
   matrix:
     - TARGET: stable-x86_64-pc-windows-msvc
-    - TARGET: stable-x86_64-pc-windows-gnu
     - TARGET: stable-i686-pc-windows-msvc
-    - TARGET: stable-i686-pc-pc-windows-gnu
     - TARGET: nightly-x86_64-pc-windows-msvc
-    - TARGET: nightly-x86_64-pc-windows-gnu
     - TARGET: nightly-i686-pc-windows-msvc
-    - TARGET: nightly-i686-pc-pc-windows-gnu
 
 # Set cache, so qe can be fast and efficient
 cache:
@@ -46,14 +42,13 @@ cache:
   # Cargo seems to be dumb and ignore the cache, probably doesn't like different timestamps from the restored cache
   # - C:\Users\appveyor\.cargo
 
-# Install and configure 
 install:
   # Update git submodules
   - git submodule update --init --recursive
 
   # Install rustup, Should use i686-pc-windows-gnu triple for first install
   - ps: Start-FileDownload "https://static.rust-lang.org/rustup/dist/i686-pc-windows-gnu/rustup-init.exe"
-  - rustup-init.exe --verbose -y
+  - rustup-init.exe -y
 
   #Set toolchain for current target
   - rustup override set %TARGET%
@@ -68,5 +63,3 @@ install:
 build_script: 
   - cargo test --all --verbose
   - cargo build --all --verbose
-
-test: off

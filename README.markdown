@@ -4,7 +4,8 @@
 
 Minimum Rust version: 1.17
 
-[![Build Status](https://travis-ci.org/Gekkio/imgui-rs.svg?branch=master)](https://travis-ci.org/Gekkio/imgui-rs)
+[![Build Status on travis ci](https://travis-ci.org/Gekkio/imgui-rs.svg?branch=master)](https://travis-ci.org/Gekkio/imgui-rs)
+[![Build Status on App Veyor ci](https://ci.appveyor.com/api/projects/status/github/goolic/imgui-rs?branch=master&svg=true)](https://ci.appveyor.com/project/goolic/imgui-rs)
 [![Latest release on crates.io](https://meritbadge.herokuapp.com/imgui)](https://crates.io/crates/imgui)
 
 ![Hello world](hello_world.png)
