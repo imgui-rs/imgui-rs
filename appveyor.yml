@@ -1,6 +1,7 @@
 environment:
+  # Lets get some usefull backtraces on miscompiles
   RUST_BACKTRACE: 1
-  CARGO_INCREMENTAL: 1
+  
   # The appveyor image we use has a pretty huge set of things installed... we make the
   # initial PATH something sane so we know what to expect
   PATH: "C:\\windows\\system32;\
@@ -28,36 +29,36 @@ environment:
     C:\\Program Files\\Git\\usr\\bin;\
     C:\\Program Files\\AppVeyor\\BuildAgent;\
     C:\\Users\\appveyor\\.cargo\\bin;"
+
   matrix:
     - TARGET: stable-x86_64-pc-windows-msvc
-    # - TARGET: stable-x86_64-pc-windows-gnu
-    # - TARGET: stable-i686-pc-windows-msvc
-    # - TARGET: stable-i686-pc-pc-windows-gnu
+    - TARGET: stable-x86_64-pc-windows-gnu
+    - TARGET: stable-i686-pc-windows-msvc
+    - TARGET: stable-i686-pc-pc-windows-gnu
     - TARGET: nightly-x86_64-pc-windows-msvc
-    # - TARGET: nightly-x86_64-pc-windows-gnu
-    # - TARGET: nightly-i686-pc-windows-msvc
-    # - TARGET: nightly-i686-pc-pc-windows-gnu
+    - TARGET: nightly-x86_64-pc-windows-gnu
+    - TARGET: nightly-i686-pc-windows-msvc
+    - TARGET: nightly-i686-pc-pc-windows-gnu
 
 # Set cache, so qe can be fast and efficient
 cache:
   - C:\Users\appveyor\.rustup
-  - C:\Users\appveyor\.cargo
+  # Cargo seems to be dumb and ignore the cache, probably doesn't like different timestamps from the restored cache
+  # - C:\Users\appveyor\.cargo
 
 # Install and configure 
 install:
-  - ps: echo "What is my `$env:RUST_BACKTRACE ? $env:RUST_BACKTRACE"
-  - ps: echo "What is my `$env:TARGET ? $env:Target"
-
   # Update git submodules
   - git submodule update --init --recursive
+
   # Install rustup, Should use i686-pc-windows-gnu triple for first install
   - ps: Start-FileDownload "https://static.rust-lang.org/rustup/dist/i686-pc-windows-gnu/rustup-init.exe"
-  # - ps: ./rustup-init.exe -y  --verbose --default-host stable-x86_64-pc-windows-msvc
   - rustup-init.exe --verbose -y
-  - ps: Get-ChildItem env:path
+
+  #Set toolchain for current target
   - rustup override set %TARGET%
   
-  # Get latest toolchain
+  # Get latest toolchains
   - rustup update
   
   # Show current version
@@ -65,10 +66,7 @@ install:
   - cargo -V
 
 build_script: 
-  # - cd imgui-examples
   - cargo test --all --verbose
   - cargo build --all --verbose
 
 test: off
-
-#should recompile nothing !
