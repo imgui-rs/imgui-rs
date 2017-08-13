@@ -33,6 +33,8 @@ environment:
   matrix:
     - TARGET: stable-x86_64-pc-windows-msvc
     - TARGET: stable-i686-pc-windows-msvc
+    - TARGET: beta-x86_64-pc-windows-msvc
+    - TARGET: beta-i686-pc-windows-msvc
     - TARGET: nightly-x86_64-pc-windows-msvc
     - TARGET: nightly-i686-pc-windows-msvc
 
