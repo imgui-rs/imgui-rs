@@ -1,0 +1,18 @@
+[package]
+name = "imgui-gfx-renderer"
+version = "0.0.16-pre"
+authors = ["Joonas Javanainen <joonas.javanainen@gmail.com>", "imgui-rs contributors"]
+description = "gfx renderer for the imgui crate"
+homepage = "https://github.com/Gekkio/imgui-rs"
+repository = "https://github.com/Gekkio/imgui-rs"
+license = "MIT/Apache-2.0"
+categories = ["gui", "rendering"]
+workspace = "../.."
+
+[badges]
+travis-ci = { repository = "Gekkio/imgui-rs" }
+
+[dependencies]
+gfx = "0.16"
+imgui = { version = "0.0.16-pre", path = "../imgui" }
+imgui-sys = { version = "0.0.16-pre", path = "../sys", features = ["gfx"] }

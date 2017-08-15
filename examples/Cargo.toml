@@ -7,13 +7,14 @@ homepage = "https://github.com/Gekkio/imgui-rs"
 repository = "https://github.com/Gekkio/imgui-rs"
 license = "MIT/Apache-2.0"
 publish = false
+workspace = ".."
 
 [dev-dependencies]
 gfx = "0.16"
 gfx_window_glutin = "0.17"
 glium = { version = "0.17", default-features = true }
 glutin = "0.9"
-imgui = { version = "0.0.16-pre", path = "../" }
-imgui-gfx-renderer = { version = "0.0.16-pre", path = "../imgui-gfx-renderer" }
-imgui-glium-renderer = { version = "0.0.16-pre", path = "../imgui-glium-renderer" }
-imgui-sys = { version = "0.0.16-pre", path = "../imgui-sys", features = ["gfx", "glium"] }
+imgui = { version = "0.0.16-pre", path = "../src/imgui" }
+imgui-gfx-renderer = { version = "0.0.16-pre", path = "../src/gfx" }
+imgui-glium-renderer = { version = "0.0.16-pre", path = "../src/glium" }
+imgui-sys = { version = "0.0.16-pre", path = "../src/sys", features = ["gfx", "glium"] }

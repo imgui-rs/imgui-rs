@@ -1,17 +1,22 @@
 [package]
-name = "imgui-glium-renderer"
+name = "imgui-sys"
 version = "0.0.16-pre"
 authors = ["Joonas Javanainen <joonas.javanainen@gmail.com>", "imgui-rs contributors"]
-description = "Glium renderer for the imgui crate"
+description = "Raw FFI bindings to dear imgui"
 homepage = "https://github.com/Gekkio/imgui-rs"
 repository = "https://github.com/Gekkio/imgui-rs"
 license = "MIT/Apache-2.0"
-categories = ["gui", "rendering"]
+categories = ["gui", "external-ffi-bindings"]
+build = "build.rs"
+workspace = "../.."
 
 [badges]
 travis-ci = { repository = "Gekkio/imgui-rs" }
 
 [dependencies]
-glium = { version = "0.17", default-features = false }
-imgui = { version = "0.0.16-pre", path = "../" }
-imgui-sys = { version = "0.0.16-pre", path = "../imgui-sys", features = ["glium"] }
+bitflags = "0.9"
+glium = { version = "0.17", default-features = false, optional = true }
+gfx = { version = "0.16", optional = true }
+
+[build-dependencies]
+gcc = "0.3"

@@ -1,17 +1,17 @@
 [package]
-name = "imgui-gfx-renderer"
+name = "imgui"
 version = "0.0.16-pre"
 authors = ["Joonas Javanainen <joonas.javanainen@gmail.com>", "imgui-rs contributors"]
-description = "gfx renderer for the imgui crate"
+description = "High-level Rust bindings to dear imgui"
 homepage = "https://github.com/Gekkio/imgui-rs"
 repository = "https://github.com/Gekkio/imgui-rs"
 license = "MIT/Apache-2.0"
-categories = ["gui", "rendering"]
+categories = ["gui", "api-bindings"]
+readme = "README.markdown"
+workspace = "../.."
 
 [badges]
 travis-ci = { repository = "Gekkio/imgui-rs" }
 
 [dependencies]
-gfx = "0.16"
-imgui = { version = "0.0.16-pre", path = "../" }
-imgui-sys = { version = "0.0.16-pre", path = "../imgui-sys", features = ["gfx"] }
+imgui-sys = { version = "0.0.16-pre", path = "../sys" }
