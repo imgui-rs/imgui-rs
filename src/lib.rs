@@ -714,6 +714,23 @@ impl<'ui> Ui<'ui> {
     }
 }
 
+// Widgets: Radio
+impl<'ui> Ui<'ui> {
+    pub fn radio_button<'p>(&self,
+                            label: &'p ImStr,
+                            value: &'p mut i32,
+                            wanted: i32) {
+        unsafe {
+            imgui_sys::igRadioButton(label.as_ptr(), value, wanted);
+        }
+    }
+    pub fn radio_button_bool<'p>(&self, label: &'p ImStr, value: bool) {
+        unsafe {
+            imgui_sys::igRadioButtonBool(label.as_ptr(), value);
+        }
+    }
+}
+
 impl<'ui> Ui<'ui> {
     pub fn plot_lines<'p>(&self, label: &'p ImStr, values: &'p [f32]) -> PlotLines<'ui, 'p> {
         PlotLines::new(self, label, values)
