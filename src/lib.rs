@@ -734,7 +734,7 @@ impl<'ui> Ui<'ui> {
                             value: &'p mut i32,
                             wanted: i32) -> bool {
         unsafe {
-            return imgui_sys::igRadioButton(label.as_ptr(), value, wanted);
+            imgui_sys::igRadioButton(label.as_ptr(), value, wanted)
         }
     }
 
@@ -756,7 +756,7 @@ impl<'ui> Ui<'ui> {
     /// ```
     pub fn radio_button_bool<'p>(&self, label: &'p ImStr, value: bool) -> bool {
         unsafe {
-            return imgui_sys::igRadioButtonBool(label.as_ptr(), value);
+            imgui_sys::igRadioButtonBool(label.as_ptr(), value)
         }
     }
 }
