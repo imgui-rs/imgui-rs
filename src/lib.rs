@@ -724,7 +724,7 @@ impl<'ui> Ui<'ui> {
     /// # use imgui::*;
     /// # let mut imgui = ImGui::init();
     /// # let ui = imgui.frame((0, 0), (0, 0), 0.1);
-    /// # let selected_radio_value = 2;
+    /// # let mut selected_radio_value = 2;
     /// ui.radio_button(im_str!("Item 1"), &mut selected_radio_value, 1);
     /// ui.radio_button(im_str!("Item 2"), &mut selected_radio_value, 2);
     /// ui.radio_button(im_str!("Item 3"), &mut selected_radio_value, 3);
@@ -746,12 +746,12 @@ impl<'ui> Ui<'ui> {
     /// # use imgui::*;
     /// # let mut imgui = ImGui::init();
     /// # let ui = imgui.frame((0, 0), (0, 0), 0.1);
-    /// # let selected_radio_value = "cats".to_string();
-    /// if ui.radio_button_bool(im_str!("Cats"), state.radio_button_test == "cats") {
-    ///     state.radio_button_test = "cats".to_string();
+    /// # let mut radio_button_test = "cats".to_string();
+    /// if ui.radio_button_bool(im_str!("Cats"), radio_button_test == "cats") {
+    ///     radio_button_test = "cats".to_string();
     /// }
-    /// if ui.radio_button_bool(im_str!("Dogs"), state.radio_button_test == "dogs") {
-    ///     state.radio_button_test = "dogs".to_string();
+    /// if ui.radio_button_bool(im_str!("Dogs"), radio_button_test == "dogs") {
+    ///     radio_button_test = "dogs".to_string();
     /// }
     /// ```
     pub fn radio_button_bool<'p>(&self, label: &'p ImStr, value: bool) -> bool {
