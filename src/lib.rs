@@ -714,6 +714,53 @@ impl<'ui> Ui<'ui> {
     }
 }
 
+// Widgets: Radio
+impl<'ui> Ui<'ui> {
+    /// Creates a radio button for selecting an integer value.
+    /// Returns true if pressed.
+    ///
+    /// # Example
+    /// ```rust,no_run
+    /// # use imgui::*;
+    /// # let mut imgui = ImGui::init();
+    /// # let ui = imgui.frame((0, 0), (0, 0), 0.1);
+    /// # let mut selected_radio_value = 2;
+    /// ui.radio_button(im_str!("Item 1"), &mut selected_radio_value, 1);
+    /// ui.radio_button(im_str!("Item 2"), &mut selected_radio_value, 2);
+    /// ui.radio_button(im_str!("Item 3"), &mut selected_radio_value, 3);
+    /// ```
+    pub fn radio_button<'p>(&self,
+                            label: &'p ImStr,
+                            value: &'p mut i32,
+                            wanted: i32) -> bool {
+        unsafe {
+            imgui_sys::igRadioButton(label.as_ptr(), value, wanted)
+        }
+    }
+
+    /// Creates a radio button that shows as selected if the given value is true.
+    /// Returns true if pressed.
+    ///
+    /// # Example
+    /// ```rust,no_run
+    /// # use imgui::*;
+    /// # let mut imgui = ImGui::init();
+    /// # let ui = imgui.frame((0, 0), (0, 0), 0.1);
+    /// # let mut radio_button_test = "cats".to_string();
+    /// if ui.radio_button_bool(im_str!("Cats"), radio_button_test == "cats") {
+    ///     radio_button_test = "cats".to_string();
+    /// }
+    /// if ui.radio_button_bool(im_str!("Dogs"), radio_button_test == "dogs") {
+    ///     radio_button_test = "dogs".to_string();
+    /// }
+    /// ```
+    pub fn radio_button_bool<'p>(&self, label: &'p ImStr, value: bool) -> bool {
+        unsafe {
+            imgui_sys::igRadioButtonBool(label.as_ptr(), value)
+        }
+    }
+}
+
 impl<'ui> Ui<'ui> {
     pub fn plot_lines<'p>(&self, label: &'p ImStr, values: &'p [f32]) -> PlotLines<'ui, 'p> {
         PlotLines::new(self, label, values)

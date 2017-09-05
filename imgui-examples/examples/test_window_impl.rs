@@ -42,6 +42,7 @@ struct State {
     selected_fish: Option<usize>,
     auto_resize_state: AutoResizeState,
     file_menu: FileMenuState,
+    radio_button: i32,
 }
 
 impl Default for State {
@@ -85,6 +86,7 @@ impl Default for State {
             selected_fish: None,
             auto_resize_state: Default::default(),
             file_menu: Default::default(),
+            radio_button: 0,
         }
     }
 }
@@ -319,6 +321,12 @@ fn show_test_window<'a>(ui: &Ui<'a>, state: &mut State, opened: &mut bool) {
                         ui.input_text(im_str!("UTF-8 input"), &mut state.buf)
                             .build();
                     });
+
+                ui.radio_button(im_str!("radio a"), &mut state.radio_button, 0);
+                ui.same_line(0.0);
+                ui.radio_button(im_str!("radio b"), &mut state.radio_button, 1);
+                ui.same_line(0.0);
+                ui.radio_button(im_str!("radio c"), &mut state.radio_button, 2);
 
                 ui.separator();
                 ui.label_text(im_str!("label"), im_str!("Value"));
