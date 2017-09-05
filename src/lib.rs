@@ -156,6 +156,10 @@ impl ImGui {
         let io = self.io_mut();
         io.ini_saving_rate = value;
     }
+    pub fn set_font_global_scale(&mut self, value: f32) {
+        let io = self.io_mut();
+        io.font_global_scale = value;
+    }
     pub fn set_mouse_double_click_time(&mut self, value: f32) {
         let io = self.io_mut();
         io.mouse_double_click_time = value;
