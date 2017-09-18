@@ -2,9 +2,9 @@
 extern crate gfx;
 extern crate imgui;
 
-use gfx::{Bind, Bundle, CommandBuffer, Encoder, Factory, IntoIndexBuffer, Rect, Resources, Slice};
+use gfx::{Backend, Bind, Bundle, Device, GraphicsEncoder, IntoIndexBuffer, Rect, Slice};
+use gfx::traits::DeviceExt;
 use gfx::handle::{Buffer, RenderTargetView};
-use gfx::traits::FactoryExt;
 use imgui::{DrawList, ImDrawIdx, ImDrawVert, ImGui, Ui};
 
 pub type RendererResult<T> = Result<T, RendererError>;
@@ -80,17 +80,17 @@ impl Shaders {
     }
 }
 
-pub struct Renderer<R: Resources> {
-    bundle: Bundle<R, pipe::Data<R>>,
-    index_buffer: Buffer<R, u16>,
+pub struct Renderer<B: Backend> {
+    bundle: Bundle<B, pipe::Data<B::Resources>>,
+    index_buffer: Buffer<B::Resources, u16>,
 }
 
-impl<R: Resources> Renderer<R> {
-    pub fn init<F: Factory<R>>(imgui: &mut ImGui,
-                               factory: &mut F,
-                               shaders: Shaders,
-                               out: RenderTargetView<R, gfx::format::Rgba8>)
-                               -> RendererResult<Renderer<R>> {
+impl<B: Backend> Renderer<B> {
+    pub fn init<D: Device<B::Resources>>(imgui: &mut ImGui,
+                                         factory: &mut D,
+                                         shaders: Shaders,
+                                         out: RenderTargetView<B::Resources, gfx::format::Rgba8>)
+                                         -> RendererResult<Renderer<B>> {
         let (vs_code, ps_code) = shaders.get_program_code();
         let pso = factory.create_pipeline_simple(vs_code, ps_code, pipe::new())?;
         let vertex_buffer = factory.create_buffer::<ImDrawVert>(256,
@@ -128,19 +128,22 @@ impl<R: Resources> Renderer<R> {
             instances: None,
             buffer: index_buffer.clone().into_index_buffer(factory),
         };
+
+
+
         Ok(Renderer {
             bundle: Bundle::new(slice, pso, data),
             index_buffer: index_buffer,
         })
     }
-    pub fn update_render_target(&mut self, out: RenderTargetView<R, gfx::format::Rgba8>) {
+    pub fn update_render_target(&mut self, out: RenderTargetView<B::Resources, gfx::format::Rgba8>) {
         self.bundle.data.out = out;
     }
-    pub fn render<'a, F: Factory<R>, C: CommandBuffer<R>>(&mut self,
-                                                          ui: Ui<'a>,
-                                                          factory: &mut F,
-                                                          encoder: &mut Encoder<R, C>)
-                                                          -> RendererResult<()> {
+    pub fn render<'a, D: Device<B::Resources>>(&mut self,
+                                               ui: Ui<'a>,
+                                               factory: &mut D,
+                                               encoder: &mut GraphicsEncoder<B>)
+                                               -> RendererResult<()> {
         let (width, height) = ui.imgui().display_size();
 
         if width == 0.0 || height == 0.0 {
@@ -152,13 +155,14 @@ impl<R: Resources> Renderer<R> {
                                    [-1.0, 1.0, 0.0, 1.0]];
 
         ui.render(|ui, draw_list| self.render_draw_list(ui, factory, encoder, draw_list))
+
     }
-    fn render_draw_list<'a, F: Factory<R>, C: CommandBuffer<R>>(&mut self,
-                                                                ui: &'a Ui<'a>,
-                                                                factory: &mut F,
-                                                                encoder: &mut Encoder<R, C>,
-                                                                draw_list: DrawList<'a>)
-                                                                -> RendererResult<()> {
+    fn render_draw_list<'a, D: Device<B::Resources>>(&mut self,
+                                                     ui: &'a Ui<'a>,
+                                                     factory: &mut D,
+                                                     encoder: &mut GraphicsEncoder<B>,
+                                                     draw_list: DrawList<'a>)
+                                                     -> RendererResult<()> {
         let (scale_width, scale_height) = ui.imgui().display_framebuffer_scale();
 
         self.bundle.slice.start = 0;
@@ -180,11 +184,11 @@ impl<R: Resources> Renderer<R> {
         }
         Ok(())
     }
-    fn upload_vertex_buffer<F: Factory<R>, C: CommandBuffer<R>>(&mut self,
-                                                                factory: &mut F,
-                                                                encoder: &mut Encoder<R, C>,
-                                                                vtx_buffer: &[ImDrawVert])
-                                                                -> RendererResult<()> {
+    fn upload_vertex_buffer<D: Device<B::Resources>>(&mut self,
+                                                     factory: &mut D,
+                                                     encoder: &mut GraphicsEncoder<B>,
+                                                     vtx_buffer: &[ImDrawVert])
+                                                     -> RendererResult<()> {
         if self.bundle.data.vertex_buffer.len() < vtx_buffer.len() {
             self.bundle.data.vertex_buffer = factory.create_buffer::<ImDrawVert>(vtx_buffer.len(),
                                              gfx::buffer::Role::Vertex,
@@ -193,11 +197,11 @@ impl<R: Resources> Renderer<R> {
         }
         Ok(encoder.update_buffer(&self.bundle.data.vertex_buffer, vtx_buffer, 0)?)
     }
-    fn upload_index_buffer<F: Factory<R>, C: CommandBuffer<R>>(&mut self,
-                                                               factory: &mut F,
-                                                               encoder: &mut Encoder<R, C>,
-                                                               idx_buffer: &[ImDrawIdx])
-                                                               -> RendererResult<()> {
+    fn upload_index_buffer<D: Device<B::Resources>>(&mut self,
+                                                    factory: &mut D,
+                                                    encoder: &mut GraphicsEncoder<B>,
+                                                    idx_buffer: &[ImDrawIdx])
+                                                    -> RendererResult<()> {
         if self.index_buffer.len() < idx_buffer.len() {
             self.index_buffer = factory.create_buffer::<ImDrawIdx>(idx_buffer.len(),
                                             gfx::buffer::Role::Index,

@@ -2,6 +2,8 @@ use imgui::{ImGui, Ui};
 use imgui_gfx_renderer::{Renderer, Shaders};
 use std::time::Instant;
 
+use gfx::{GraphicsPoolExt, CommandQueue, WindowExt, FrameSync, Adapter, Surface, Swapchain, SwapchainExt};
+
 #[derive(Copy, Clone, PartialEq, Debug, Default)]
 struct MouseState {
     pos: (i32, i32),
@@ -12,20 +14,41 @@ struct MouseState {
 pub fn run<F: FnMut(&Ui) -> bool>(title: String, clear_color: [f32; 4], mut run_ui: F) {
     use gfx::{self, Device};
     use gfx_window_glutin;
-    use glutin::{self, GlContext};
+    use glutin;
 
     type ColorFormat = gfx::format::Rgba8;
     type DepthFormat = gfx::format::DepthStencil;
 
-
     let mut events_loop = glutin::EventsLoop::new();
-    let context = glutin::ContextBuilder::new().with_vsync(true);
-    let window = glutin::WindowBuilder::new()
+    let wb = glutin::WindowBuilder::new()
         .with_title(title)
         .with_dimensions(1024, 768);
-    let (window, mut device, mut factory, mut main_color, mut main_depth) =
-        gfx_window_glutin::init::<ColorFormat, DepthFormat>(window, context, &events_loop);
-    let mut encoder: gfx::Encoder<_, _> = factory.create_command_buffer().into();
+    let gl_builder = glutin::ContextBuilder::new().with_vsync(true);
+    let gl_window = glutin::GlWindow::new(wb, gl_builder, &events_loop).unwrap();
+    let mut glutin_window = gfx_window_glutin::Window::new(gl_window);
+
+    // Acquire surface and adapters
+    let (mut surface, adapters) = glutin_window.get_surface_and_adapters();
+
+    // Open gpu (device and queues)
+    let gfx::Gpu { mut device, mut graphics_queues, .. } =
+        adapters[0].open_with(|family, ty| {
+            ((ty.supports_graphics() && surface.supports_queue(&family)) as u32, gfx::QueueType::Graphics)
+        });
+    let mut graphics_queue = graphics_queues.pop().expect("Unable to find a graphics queue.");
+
+    // Create swapchain
+    let config = gfx::SwapchainConfig::new()
+        .with_color::<ColorFormat>()
+        .with_depth_stencil::<DepthFormat>();
+    let mut swap_chain = surface.build_swapchain(config, &graphics_queue);
+    let views = swap_chain.create_color_views(&mut device);
+
+    let mut graphics_pool = graphics_queue.create_graphics_pool(1);
+    let frame_semaphore = device.create_semaphore();
+    let draw_semaphore = device.create_semaphore();
+    let frame_fence = device.create_fence(false);
+
     let shaders = {
         let version = device.get_info().shading_language;
         if version.is_embedded {
@@ -46,7 +69,7 @@ pub fn run<F: FnMut(&Ui) -> bool>(title: String, clear_color: [f32; 4], mut run_
     };
 
     let mut imgui = ImGui::init();
-    let mut renderer = Renderer::init(&mut imgui, &mut factory, shaders, main_color.clone())
+    let mut renderer = Renderer::init(&mut imgui, &mut device, shaders, views[0].clone())
         .expect("Failed to initialize renderer");
 
     configure_keys(&mut imgui);
@@ -63,10 +86,6 @@ pub fn run<F: FnMut(&Ui) -> bool>(title: String, clear_color: [f32; 4], mut run_
 
             if let Event::WindowEvent { event, .. } = event {
                 match event {
-                    Resized(_, _) => {
-                        gfx_window_glutin::update_views(&window, &mut main_color, &mut main_depth);
-                        renderer.update_render_target(main_color.clone());
-                    }
                     Closed => quit = true,
                     KeyboardInput { input, .. } => {
                         use glutin::VirtualKeyCode as Key;
@@ -126,6 +145,10 @@ pub fn run<F: FnMut(&Ui) -> bool>(title: String, clear_color: [f32; 4], mut run_
             }
         });
 
+        if quit {
+            break;
+        }
+
         let now = Instant::now();
         let delta = now - last_frame;
         let delta_s = delta.as_secs() as f32 + delta.subsec_nanos() as f32 / 1_000_000_000.0;
@@ -133,25 +156,36 @@ pub fn run<F: FnMut(&Ui) -> bool>(title: String, clear_color: [f32; 4], mut run_
 
         update_mouse(&mut imgui, &mut mouse_state);
 
-        let size_points = window.get_inner_size_points().unwrap();
-        let size_pixels = window.get_inner_size_pixels().unwrap();
+        let size_points = glutin_window.raw().get_inner_size_points().unwrap();
+        let size_pixels = glutin_window.raw().get_inner_size_pixels().unwrap();
 
         let ui = imgui.frame(size_points, size_pixels, delta_s);
         if !run_ui(&ui) {
             break;
         }
 
-        encoder.clear(&mut main_color, clear_color);
-        renderer.render(ui, &mut factory, &mut encoder).expect(
-            "Rendering failed",
-        );
-        encoder.flush(&mut device);
-        window.context().swap_buffers().unwrap();
-        device.cleanup();
+        // Get next frame
+        let frame = swap_chain.acquire_frame(FrameSync::Semaphore(&frame_semaphore));
+        renderer.update_render_target(views[frame.id()].clone());
 
-        if quit {
-            break;
+        // draw a frame
+        // wait for frame -> draw -> signal -> present
+        {
+            let mut encoder = graphics_pool.acquire_graphics_encoder();
+            encoder.clear(&views[0].clone(), clear_color);
+
+            renderer.render(ui, &mut device, &mut encoder).expect(
+                "Rendering failed",
+            );
+
+            encoder.synced_flush(&mut graphics_queue, &[&frame_semaphore], &[&draw_semaphore], Some(&frame_fence))
+                .expect("Could not flush encoder");
         }
+
+        swap_chain.present(&mut graphics_queue, &[&draw_semaphore]);
+        device.wait_for_fences(&[&frame_fence], gfx::WaitFor::All, 1_000_000);
+        graphics_queue.cleanup();
+        graphics_pool.reset();
     }
 }
 
