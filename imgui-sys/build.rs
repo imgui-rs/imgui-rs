@@ -1,7 +1,7 @@
 extern crate gcc;
 
 fn main() {
-    gcc::Config::new()
+    gcc::Build::new()
         .cpp(true)
         .file("third-party/cimgui/cimgui/cimgui.cpp")
         .file("third-party/cimgui/cimgui/fontAtlas.cpp")
