@@ -8,6 +8,8 @@
 - Separate OpenGL 2.0, 3.0, 4.0 shaders in both renderers. This should fix an
   issue with some systems that refuse to use old GLSL shaders with modern
   OpenGL contexts
+- `ImGui::add_font_global_scale`
+- Support for radio buttons
 
 ### Changed
 
