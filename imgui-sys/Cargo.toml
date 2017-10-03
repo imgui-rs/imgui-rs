@@ -18,4 +18,4 @@ glium = { version = "0.17", default-features = false, optional = true }
 gfx = { version = "0.16", optional = true }
 
 [build-dependencies]
-gcc = "0.3"
+cc = "1.0"
