@@ -9,11 +9,20 @@ license = "MIT/Apache-2.0"
 publish = false
 
 [dev-dependencies]
-gfx = "0.16"
-gfx_window_glutin = "0.17"
+gfx = { git = "https://github.com/gfx-rs/gfx.git" }
+gfx_window_glutin = { git = "https://github.com/gfx-rs/gfx.git" }
 glium = { version = "0.17", default-features = true }
 glutin = "0.9"
 imgui = { version = "0.0.16-pre", path = "../" }
 imgui-gfx-renderer = { version = "0.0.16-pre", path = "../imgui-gfx-renderer" }
 imgui-glium-renderer = { version = "0.0.16-pre", path = "../imgui-glium-renderer" }
 imgui-sys = { version = "0.0.16-pre", path = "../imgui-sys", features = ["gfx", "glium"] }
+
+[[example]]
+name = "hello_world"
+
+[[example]]
+name = "hello_gfx"
+
+[[example]]
+name = "test_window"
