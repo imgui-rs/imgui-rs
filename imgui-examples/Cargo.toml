@@ -11,7 +11,7 @@ publish = false
 [dev-dependencies]
 gfx = "0.16"
 gfx_window_glutin = "0.17"
-glium = { version = "0.17", default-features = true }
+glium = { version = "0.18", default-features = true }
 glutin = "0.9"
 imgui = { version = "0.0.16-pre", path = "../" }
 imgui-gfx-renderer = { version = "0.0.16-pre", path = "../imgui-gfx-renderer" }
