@@ -71,13 +71,12 @@ pub struct ImGui {
 #[macro_export]
 macro_rules! im_str {
     ($e:tt) => ({
-        let value = concat!($e, "\0");
-        unsafe { ::imgui::ImStr::from_utf8_with_nul_unchecked(value.as_bytes()) }
+        unsafe {
+          ::imgui::ImStr::from_utf8_with_nul_unchecked(concat!($e, "\0").as_bytes())
+        }
     });
     ($e:tt, $($arg:tt)*) => ({
-        let mut bytes: Vec<u8> = format!($e, $($arg)*).into();
-        bytes.push(b'\0');
-        unsafe { &::imgui::ImString::from_utf8_unchecked(bytes) }
+        &::imgui::ImString::new(format!($e, $($arg)*))
     })
 }
 
