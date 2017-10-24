@@ -84,7 +84,7 @@ impl Renderer {
                                         draw_list: DrawList<'a>)
                                         -> RendererResult<()> {
         use glium::{Blend, DrawParameters, Rect};
-        use glium::uniforms::MagnifySamplerFilter;
+        use glium::uniforms::{MinifySamplerFilter, MagnifySamplerFilter};
 
         try!(self.device_objects.upload_vertex_buffer(&self.ctx, draw_list.vtx_buffer));
         try!(self.device_objects.upload_index_buffer(&self.ctx, draw_list.idx_buffer));
@@ -118,7 +118,8 @@ impl Renderer {
                               &uniform! {
                           matrix: matrix,
                           tex: self.device_objects.texture.sampled()
-                              .magnify_filter(MagnifySamplerFilter::Nearest),
+                              .magnify_filter(MagnifySamplerFilter::Nearest)
+                              .minify_filter(MinifySamplerFilter::Nearest),
                       },
                               &DrawParameters {
                                   blend: Blend::alpha_blending(),
