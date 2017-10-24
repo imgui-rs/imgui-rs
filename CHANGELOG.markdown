@@ -13,9 +13,15 @@
 
 ### Changed
 
+- Upgrade to glium 0.18
 - imgui-gfx-renderer `Renderer::init` now requires a `shaders: Shaders`
   parameter. Please see examples/support_gfx/mod.rs for a shader resolution
   example
+
+### Fixed
+
+- Glium renderer now uses MinifySamplerFilter::Nearest. This fixes a blurry font
+  issue in some configurations
 
 ## [0.0.15] - 2017-07-23
 
