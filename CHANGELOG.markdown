@@ -17,6 +17,7 @@
 - imgui-gfx-renderer `Renderer::init` now requires a `shaders: Shaders`
   parameter. Please see examples/support_gfx/mod.rs for a shader resolution
   example
+- Bump minimum Rust version to 1.19 because some dependencies require it.
 
 ### Fixed
 
