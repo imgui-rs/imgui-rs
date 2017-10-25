@@ -76,7 +76,10 @@ macro_rules! im_str {
         }
     });
     ($e:tt, $($arg:tt)*) => ({
-        &::imgui::ImString::new(format!($e, $($arg)*))
+        unsafe {
+          &::imgui::ImString::from_utf8_with_nul_unchecked(
+            format!(concat!($e, "\0"), $($arg)*).into_bytes())
+        }
     })
 }
 
