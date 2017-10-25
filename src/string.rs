@@ -18,14 +18,6 @@ impl ImString {
         v.push(b'\0');
         ImString(v)
     }
-    #[deprecated(since = "0.0.15", note = "please use ImString::new instead")]
-    pub unsafe fn from_string_unchecked(s: String) -> ImString {
-        ImString::new(s)
-    }
-    #[deprecated(since = "0.0.15", note = "please use ImString::from_utf8_unchecked instead")]
-    pub unsafe fn from_vec_unchecked(v: Vec<u8>) -> ImString {
-        ImString::from_utf8_unchecked(v)
-    }
     pub unsafe fn from_utf8_unchecked(mut v: Vec<u8>) -> ImString {
         v.push(b'\0');
         ImString(v)
@@ -115,10 +107,6 @@ impl fmt::Debug for ImStr {
 }
 
 impl ImStr {
-    #[deprecated(since = "0.0.15", note = "please use ImStr::from_bytes_with_nul_unchecked instead")]
-    pub unsafe fn from_bytes_unchecked(bytes: &[u8]) -> &ImStr {
-        ImStr::from_utf8_with_nul_unchecked(bytes)
-    }
     pub unsafe fn from_utf8_with_nul_unchecked(bytes: &[u8]) -> &ImStr {
         mem::transmute(bytes)
     }

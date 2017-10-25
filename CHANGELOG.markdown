@@ -23,6 +23,12 @@
 - Glium renderer now uses MinifySamplerFilter::Nearest. This fixes a blurry font
   issue in some configurations
 
+### Removed
+
+- `ImString::from_string_unchecked`
+- `ImString::from_bytes_unchecked`
+- `ImStr::from_bytes_unchecked`
+
 ## [0.0.15] - 2017-07-23
 
 ### Added
