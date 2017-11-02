@@ -30,6 +30,13 @@ pub enum EditableColorFormat {
     Float,
 }
 
+#[derive(Copy, Clone, Debug, PartialEq, Eq)]
+pub enum EditableColorPreview {
+    Opaque,
+    HalfAlpha,
+    Alpha,
+}
+
 #[must_use]
 pub struct ColorEdit<'ui, 'p> {
     label: &'p ImStr,
@@ -93,13 +100,15 @@ impl<'ui, 'p> ColorEdit<'ui, 'p> {
         self
     }
     #[inline]
-    pub fn alpha_preview(mut self, value: bool) -> Self {
-        self.flags.set(ImGuiColorEditFlags::AlphaPreview, value);
-        self
-    }
-    #[inline]
-    pub fn alpha_preview_half(mut self, value: bool) -> Self {
-        self.flags.set(ImGuiColorEditFlags::AlphaPreviewHalf, value);
+    pub fn preview(mut self, preview: EditableColorPreview) -> Self {
+        self.flags.set(
+            ImGuiColorEditFlags::AlphaPreviewHalf,
+            preview == EditableColorPreview::HalfAlpha,
+        );
+        self.flags.set(
+            ImGuiColorEditFlags::AlphaPreview,
+            preview == EditableColorPreview::Alpha,
+        );
         self
     }
     #[inline]
