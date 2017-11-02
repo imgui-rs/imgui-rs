@@ -68,9 +68,9 @@ pub enum ImGuiCol {
     Header,
     HeaderHovered,
     HeaderActive,
-    Column,
-    ColumnHovered,
-    ColumnActive,
+    Separator,
+    SeparatorHovered,
+    SeparatorActive,
     ResizeGrip,
     ResizeGripHovered,
     ResizeGripActive,
@@ -83,6 +83,14 @@ pub enum ImGuiCol {
     PlotHistogramHovered,
     TextSelectedBg,
     ModalWindowDarkening,
+}
+impl ImGuiCol {
+    #[deprecated(since = "0.0.17", note = "please use ImGuiCol::Separator instead")]
+    pub const Column: ImGuiCol = ImGuiCol::Separator;
+    #[deprecated(since = "0.0.17", note = "please use ImGuiCol::SeparatorHovered instead")]
+    pub const ColumnHovered: ImGuiCol = ImGuiCol::SeparatorHovered;
+    #[deprecated(since = "0.0.17", note = "please use ImGuiCol::SeparatorActive instead")]
+    pub const ColumnActive: ImGuiCol = ImGuiCol::SeparatorActive;
 }
 pub const ImGuiCol_COUNT: usize = 43;
 
@@ -131,16 +139,31 @@ pub enum ImGuiKey {
 }
 pub const ImGuiKey_COUNT: usize = 19;
 
-/// Color edit mode
-#[repr(C)]
-#[derive(Copy, Clone, Debug, PartialEq, Eq)]
-pub enum ImGuiColorEditMode {
-    UserSelect = -2,
-    UserSelectShowButton = -1,
-    RGB = 0,
-    HSV = 1,
-    HEX = 2,
-}
+bitflags!(
+    /// Color edit flags
+    #[repr(C)]
+    pub struct ImGuiColorEditFlags: c_int {
+        const ImGuiColorEditFlags_NoAlpha         = 1 << 1;
+        const ImGuiColorEditFlags_NoPicker        = 1 << 2;
+        const ImGuiColorEditFlags_NoOptions       = 1 << 3;
+        const ImGuiColorEditFlags_NoSmallPreview  = 1 << 4;
+        const ImGuiColorEditFlags_NoInputs        = 1 << 5;
+        const ImGuiColorEditFlags_NoTooltip       = 1 << 6;
+        const ImGuiColorEditFlags_NoLabel         = 1 << 7;
+        const ImGuiColorEditFlags_NoSidePreview   = 1 << 8;
+        const ImGuiColorEditFlags_AlphaBar        = 1 << 9;
+        const ImGuiColorEditFlags_AlphaPreview    = 1 << 10;
+        const ImGuiColorEditFlags_AlphaPreviewHalf= 1 << 11;
+        const ImGuiColorEditFlags_HDR             = 1 << 12;
+        const ImGuiColorEditFlags_RGB             = 1 << 13;
+        const ImGuiColorEditFlags_HSV             = 1 << 14;
+        const ImGuiColorEditFlags_HEX             = 1 << 15;
+        const ImGuiColorEditFlags_Uint8           = 1 << 16;
+        const ImGuiColorEditFlags_Float           = 1 << 17;
+        const ImGuiColorEditFlags_PickerHueBar    = 1 << 18;
+        const ImGuiColorEditFlags_PickerHueWheel  = 1 << 19;
+    }
+);
 
 /// A mouse cursor identifier
 #[repr(C)]
@@ -179,9 +202,7 @@ bitflags!(
         const ImGuiWindowFlags_AlwaysHorizontalScrollbar = 1 << 15;
         const ImGuiWindowFlags_AlwaysUseWindowPadding    = 1 << 16;
 
-        const ImGuiWindowFlags_ChildWindow               = 1 << 20;
-        const ImGuiWindowFlags_ChildWindowAutoFitX       = 1 << 21;
-        const ImGuiWindowFlags_ChildWindowAutoFitY       = 1 << 22;
+        const ImGuiWindowFlags_ChildWindow               = 1 << 22;
         const ImGuiWindowFlags_ComboBox                  = 1 << 23;
         const ImGuiWindowFlags_Tooltip                   = 1 << 24;
         const ImGuiWindowFlags_Popup                     = 1 << 25;
@@ -193,11 +214,37 @@ bitflags!(
 bitflags!(
     /// Condition flags
     #[repr(C)]
-    pub struct ImGuiSetCond: c_int {
-        const ImGuiSetCond_Always       = 1 << 0;
-        const ImGuiSetCond_Once         = 1 << 1;
-        const ImGuiSetCond_FirstUseEver = 1 << 2;
-        const ImGuiSetCond_Appearing    = 1 << 3;
+    pub struct ImGuiCond: c_int {
+        const ImGuiCond_Always       = 1 << 0;
+        const ImGuiCond_Once         = 1 << 1;
+        const ImGuiCond_FirstUseEver = 1 << 2;
+        const ImGuiCond_Appearing    = 1 << 3;
+    }
+);
+
+#[deprecated(since = "0.0.17", note = "please use ImGuiCond instead")]
+pub type ImGuiSetCond = ImGuiCond;
+#[deprecated(since = "0.0.17", note = "please use ImGuiCond_Always instead")]
+pub const ImGuiSetCond_Always: ImGuiCond = ImGuiCond_Always;
+#[deprecated(since = "0.0.17", note = "please use ImGuiCond_Once instead")]
+pub const ImGuiSetCond_Once: ImGuiCond = ImGuiCond_Once;
+#[deprecated(since = "0.0.17", note = "please use ImGuiCond_FirstUseEver instead")]
+pub const ImGuiSetCond_FirstUseEver: ImGuiCond = ImGuiCond_FirstUseEver;
+#[deprecated(since = "0.0.17", note = "please use ImGuiCond_Appearing instead")]
+pub const ImGuiSetCond_Appearing: ImGuiCond = ImGuiCond_Appearing;
+
+bitflags!(
+    /// Flags for column functions
+    #[repr(C)]
+    pub struct ImGuiColumnsFlags: c_int {
+        /// Disable column dividers
+        const ImGuiColumnsFlags_NoBorder            = 1 << 0;
+        /// Disable resizing columns when clicking on the dividers
+        const ImGuiColumnsFlags_NoResize            = 1 << 1;
+        /// Disable column width preservation when adjusting columns
+        const ImGuiColumnsFlags_NoPreserveWidths    = 1 << 2;
+        /// Disable forcing columns to fit within window
+        const ImGuiColumnsFlags_NoForceWithinWindow = 1 << 3;
     }
 );
 
@@ -663,7 +710,7 @@ pub struct ImFontConfig {
     dst_font: *mut ImFont,
 }
 
-/// Runtime data for multiple fonts, bake multiple fonts into a single texture, TTF font loader
+/// Runtime data for multiple fonts, bake multiple fonts into a single texture, TTF/OTF font loader
 #[repr(C)]
 pub struct ImFontAtlas {
     pub tex_id: *mut c_void,
@@ -672,6 +719,7 @@ pub struct ImFontAtlas {
     pub tex_width: c_int,
     pub tex_height: c_int,
     pub tex_desired_width: c_int,
+    pub tex_glyph_padding: c_int,
     pub tex_uv_white_pixel: ImVec2,
     pub fonts: ImVector<*mut ImFont>,
 
@@ -761,24 +809,24 @@ extern "C" {
     pub fn igIsWindowCollapsed() -> bool;
     pub fn igSetWindowFontScale(scale: c_float);
 
-    pub fn igSetNextWindowPos(pos: ImVec2, cond: ImGuiSetCond);
-    pub fn igSetNextWindowPosCenter(cond: ImGuiSetCond);
-    pub fn igSetNextWindowSize(size: ImVec2, cond: ImGuiSetCond);
+    pub fn igSetNextWindowPos(pos: ImVec2, cond: ImGuiCond);
+    pub fn igSetNextWindowPosCenter(cond: ImGuiCond);
+    pub fn igSetNextWindowSize(size: ImVec2, cond: ImGuiCond);
     pub fn igSetNextWindowConstraints(size_min: ImVec2,
                                       size_max: ImVec2,
                                       custom_callback: ImGuiSizeConstraintCallback,
                                       custom_callback_data: *mut c_void);
     pub fn igSetNextWindowContentSize(size: ImVec2);
     pub fn igSetNextWindowContentWidth(width: c_float);
-    pub fn igSetNextWindowCollapsed(collapsed: bool, cond: ImGuiSetCond);
+    pub fn igSetNextWindowCollapsed(collapsed: bool, cond: ImGuiCond);
     pub fn igSetNextWindowFocus();
-    pub fn igSetWindowPos(pos: ImVec2, cond: ImGuiSetCond);
-    pub fn igSetWindowSize(size: ImVec2, cond: ImGuiSetCond);
-    pub fn igSetWindowCollapsed(collapsed: bool, cond: ImGuiSetCond);
+    pub fn igSetWindowPos(pos: ImVec2, cond: ImGuiCond);
+    pub fn igSetWindowSize(size: ImVec2, cond: ImGuiCond);
+    pub fn igSetWindowCollapsed(collapsed: bool, cond: ImGuiCond);
     pub fn igSetWindowFocus();
-    pub fn igSetWindowPosByName(name: *const c_char, pos: ImVec2, cond: ImGuiSetCond);
-    pub fn igSetWindowSize2(name: *const c_char, size: ImVec2, cond: ImGuiSetCond);
-    pub fn igSetWindowCollapsed2(name: *const c_char, collapsed: bool, cond: ImGuiSetCond);
+    pub fn igSetWindowPosByName(name: *const c_char, pos: ImVec2, cond: ImGuiCond);
+    pub fn igSetWindowSize2(name: *const c_char, size: ImVec2, cond: ImGuiCond);
+    pub fn igSetWindowCollapsed2(name: *const c_char, collapsed: bool, cond: ImGuiCond);
     pub fn igSetWindowFocus2(name: *const c_char);
 
     pub fn igGetScrollX() -> c_float;
@@ -798,16 +846,19 @@ extern "C" {
 extern "C" {
     pub fn igPushFont(font: *mut ImFont);
     pub fn igPopFont();
+    pub fn igPushStyleColorU32(idx: ImGuiCol, col: ImU32);
     pub fn igPushStyleColor(idx: ImGuiCol, col: ImVec4);
     pub fn igPopStyleColor(count: c_int);
     pub fn igPushStyleVar(idx: ImGuiStyleVar, val: c_float);
     pub fn igPushStyleVarVec(idx: ImGuiStyleVar, val: ImVec2);
     pub fn igPopStyleVar(count: c_int);
+    pub fn igGetStyleColorVec4(out: *mut ImVec4, idx: ImGuiCol);
     pub fn igGetFont() -> *mut ImFont;
     pub fn igGetFontSize() -> c_float;
     pub fn igGetFontTexUvWhitePixel(out: *mut ImVec2);
     pub fn igGetColorU32(idx: ImGuiCol, alpha_mul: c_float) -> ImU32;
     pub fn igGetColorU32Vec(col: *const ImVec4) -> ImU32;
+    pub fn igGetColorU32U32(col: ImU32) -> ImU32;
 }
 
 // Parameter stack (current window)
@@ -854,9 +905,10 @@ extern "C" {
     pub fn igColumns(count: c_int, id: *const c_char, border: bool);
     pub fn igNextColumn();
     pub fn igGetColumnIndex() -> c_int;
+    pub fn igGetColumnWidth(column_index: c_int) -> c_float;
+    pub fn igSetColumnWidth(column_index: c_int, width: c_float);
     pub fn igGetColumnOffset(column_index: c_int) -> c_float;
     pub fn igSetColumnOffset(column_index: c_int, offset_x: c_float);
-    pub fn igGetColumnWidth(column_index: c_int) -> c_float;
     pub fn igGetColumnsCount() -> c_int;
 }
 
@@ -930,10 +982,6 @@ extern "C" {
                     items_count: c_int,
                     height_in_items: c_int)
                     -> bool;
-    pub fn igColorButton(col: ImVec4, small_height: bool, outline_border: bool) -> bool;
-    pub fn igColorEdit3(label: *const c_char, col: *mut c_float) -> bool;
-    pub fn igColorEdit4(label: *const c_char, col: *mut c_float, show_alpha: bool) -> bool;
-    pub fn igColorEditMode(mode: ImGuiColorEditMode);
     pub fn igPlotLines(label: *const c_char,
                        values: *const c_float,
                        values_count: c_int,
@@ -1047,6 +1095,21 @@ extern "C" {
                         v_max: c_int,
                         display_format: *const c_char)
                         -> bool;
+}
+
+// Widgets: Color Editor/Picker
+extern "C" {
+    pub fn igColorEdit3(label: *const c_char, col: *mut c_float,
+                        flags: ImGuiColorEditFlags) -> bool;
+    pub fn igColorEdit4(label: *const c_char, col: *mut c_float,
+                        flags: ImGuiColorEditFlags) -> bool;
+    pub fn igColorPicker3(label: *const c_char, col: *mut c_float,
+                          flags: ImGuiColorEditFlags) -> bool;
+    pub fn igColorPicker4(label: *const c_char, col: *mut c_float,
+                          flags: ImGuiColorEditFlags, ref_col: *const c_float) -> bool;
+    pub fn igColorButton(desc_id: *const c_char, col: ImVec4,
+                         flags: ImGuiColorEditFlags, size: ImVec2) -> bool;
+    pub fn igSetColorEditOptions(flags: ImGuiColorEditFlags);
 }
 
 // Widgets: Drags
@@ -1218,7 +1281,7 @@ extern "C" {
     pub fn igTreePop();
     pub fn igTreeAdvanceToLabelPos();
     pub fn igGetTreeNodeToLabelSpacing() -> c_float;
-    pub fn igSetNextTreeNodeOpen(opened: bool, cond: ImGuiSetCond);
+    pub fn igSetNextTreeNodeOpen(opened: bool, cond: ImGuiCond);
     pub fn igCollapsingHeader(label: *const c_char, flags: ImGuiTreeNodeFlags) -> bool;
     pub fn igCollapsingHeaderEx(label: *const c_char,
                                 open: *mut bool,
@@ -1268,8 +1331,6 @@ extern "C" {
     pub fn igValueInt(prefix: *const c_char, v: c_int);
     pub fn igValueUInt(prefix: *const c_char, v: c_uint);
     pub fn igValueFloat(prefix: *const c_char, v: c_float, float_format: *const c_char);
-    pub fn igValueColor(prefix: *const c_char, v: ImVec4);
-    pub fn igValueColor2(prefix: *const c_char, v: ImU32);
 }
 
 // Tooltip
@@ -1309,12 +1370,13 @@ extern "C" {
                              extra_flags: ImGuiWindowFlags)
                              -> bool;
     pub fn igBeginPopupContextItem(str_id: *const c_char, mouse_button: c_int) -> bool;
-    pub fn igBeginPopupContextWindow(also_over_items: bool,
-                                     str_id: *const c_char,
-                                     mouse_button: c_int)
+    pub fn igBeginPopupContextWindow(str_id: *const c_char,
+                                     mouse_button: c_int,
+                                     also_over_items: bool)
                                      -> bool;
     pub fn igBeginPopupContextVoid(str_id: *const c_char, mouse_button: c_int) -> bool;
     pub fn igEndPopup();
+    pub fn igIsPopupOpen(str_id: *const c_char) -> bool;
     pub fn igCloseCurrentPopup();
 }
 
@@ -1336,10 +1398,23 @@ extern "C" {
     pub fn igPopClipRect();
 }
 
+#[allow(non_snake_case)]
+#[deprecated(since = "0.0.17", note = "please use igIsItemRectHovered instead")]
+pub unsafe fn igIsItemHoveredRect() -> bool { igIsItemRectHovered() }
+#[allow(non_snake_case)]
+#[deprecated(since = "0.0.17", note = "please use igIsWindowRectHovered instead")]
+pub unsafe fn igIsMouseHoveringWindow() -> bool { igIsWindowRectHovered() }
+#[allow(non_snake_case)]
+#[deprecated(since = "0.0.17", note = "please use igIsAnyWindowHovered instead")]
+pub unsafe fn igIsMouseHoveringAnyWindow() -> bool { igIsAnyWindowHovered() }
+#[allow(non_snake_case)]
+#[deprecated(since = "0.0.17", note = "please use igGetStyleColorName instead")]
+pub unsafe fn igGetStyleColName(idx: ImGuiCol) -> *const c_char { igGetStyleColorName(idx) }
+
 // Utilities
 extern "C" {
     pub fn igIsItemHovered() -> bool;
-    pub fn igIsItemHoveredRect() -> bool;
+    pub fn igIsItemRectHovered() -> bool;
     pub fn igIsItemActive() -> bool;
     pub fn igIsItemClicked(mouse_button: c_int) -> bool;
     pub fn igIsItemVisible() -> bool;
@@ -1349,17 +1424,19 @@ extern "C" {
     pub fn igGetItemRectMax(out: *mut ImVec2);
     pub fn igGetItemRectSize(out: *mut ImVec2);
     pub fn igSetItemAllowOverlap();
-    pub fn igIsWindowHovered() -> bool;
     pub fn igIsWindowFocused() -> bool;
+    pub fn igIsWindowHovered() -> bool;
+    pub fn igIsWindowRectHovered() -> bool;
     pub fn igIsRootWindowFocused() -> bool;
     pub fn igIsRootWindowOrAnyChildFocused() -> bool;
     pub fn igIsRootWindowOrAnyChildHovered() -> bool;
+    pub fn igIsAnyWindowHovered() -> bool;
     pub fn igIsRectVisible(item_size: ImVec2) -> bool;
     pub fn igIsRectVisible2(rect_min: *const ImVec2, rect_max: *const ImVec2) -> bool;
     pub fn igIsPosHoveringAnyWindow(pos: ImVec2) -> bool;
     pub fn igGetTime() -> c_float;
     pub fn igGetFrameCount() -> c_int;
-    pub fn igGetStyleColName(idx: ImGuiCol) -> *const c_char;
+    pub fn igGetStyleColorName(idx: ImGuiCol) -> *const c_char;
     pub fn igCalcItemRectClosestPoint(out: *mut ImVec2,
                                       pos: ImVec2,
                                       on_edge: bool,
@@ -1400,10 +1477,8 @@ extern "C" {
     pub fn igIsMouseClicked(button: c_int, repeat: bool) -> bool;
     pub fn igIsMouseDoubleClicked(button: c_int) -> bool;
     pub fn igIsMouseReleased(button: c_int) -> bool;
-    pub fn igIsMouseHoveringWindow() -> bool;
-    pub fn igIsMouseHoveringAnyWindow() -> bool;
-    pub fn igIsMouseHoveringRect(r_min: ImVec2, r_max: ImVec2, clip: bool) -> bool;
     pub fn igIsMouseDragging(button: c_int, lock_threshold: c_float) -> bool;
+    pub fn igIsMouseHoveringRect(r_min: ImVec2, r_max: ImVec2, clip: bool) -> bool;
     pub fn igGetMousePos(out: *mut ImVec2);
     pub fn igGetMousePosOnOpeningCurrentPopup(out: *mut ImVec2);
     pub fn igGetMouseDragDelta(out: *mut ImVec2, button: c_int, lock_threshold: c_float);
@@ -1462,22 +1537,22 @@ extern "C" {
                                           glyph_ranges: *const ImWchar)
                                           -> *mut ImFont;
     pub fn ImFontAtlas_AddFontFromMemoryTTF(atlas: *mut ImFontAtlas,
-                                            ttf_data: *mut c_void,
-                                            ttf_size: c_int,
+                                            font_data: *mut c_void,
+                                            font_size: c_int,
                                             size_pixels: c_float,
                                             font_cfg: *const ImFontConfig,
                                             glyph_ranges: *const ImWchar)
                                             -> *mut ImFont;
     pub fn ImFontAtlas_AddFontFromMemoryCompressedTTF(atlas: *mut ImFontAtlas,
-                                                      compressed_ttf_data: *const c_void,
-                                                      compressed_ttf_size: c_int,
+                                                      compressed_font_data: *const c_void,
+                                                      compressed_font_size: c_int,
                                                       size_pixels: c_float,
                                                       font_cfg: *const ImFontConfig,
                                                       glyph_ranges: *const ImWchar)
                                                       -> *mut ImFont;
     pub fn ImFontAtlas_AddFontFromMemoryCompressedBase85TTF(
         atlas: *mut ImFontAtlas,
-        compressed_ttf_data_base85: *const c_char,
+        compressed_font_data_base85: *const c_char,
         size_pixels: c_float,
         font_cfg: *const ImFontConfig,
         glyph_ranges: *const ImWchar) -> *mut ImFont;
@@ -1520,6 +1595,8 @@ extern "C" {
     pub fn ImDrawList_PopClipRect(list: *mut ImDrawList);
     pub fn ImDrawList_PushTextureID(list: *mut ImDrawList, texture_id: ImTextureID);
     pub fn ImDrawList_PopTextureID(list: *mut ImDrawList);
+    pub fn ImDrawList_GetClipRectMin(out: *mut ImVec2, list: *mut ImDrawList);
+    pub fn ImDrawList_GetClipRectMax(out: *mut ImVec2, list: *mut ImDrawList);
 
     pub fn ImDrawList_AddLine(list: *mut ImDrawList,
                               a: ImVec2,
