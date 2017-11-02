@@ -143,25 +143,25 @@ bitflags!(
     /// Color edit flags
     #[repr(C)]
     pub struct ImGuiColorEditFlags: c_int {
-        const NoAlpha         = 1 << 1;
-        const NoPicker        = 1 << 2;
-        const NoOptions       = 1 << 3;
-        const NoSmallPreview  = 1 << 4;
-        const NoInputs        = 1 << 5;
-        const NoTooltip       = 1 << 6;
-        const NoLabel         = 1 << 7;
-        const NoSidePreview   = 1 << 8;
-        const AlphaBar        = 1 << 9;
-        const AlphaPreview    = 1 << 10;
-        const AlphaPreviewHalf= 1 << 11;
-        const HDR             = 1 << 12;
-        const RGB             = 1 << 13;
-        const HSV             = 1 << 14;
-        const HEX             = 1 << 15;
-        const Uint8           = 1 << 16;
-        const Float           = 1 << 17;
-        const PickerHueBar    = 1 << 18;
-        const PickerHueWheel  = 1 << 19;
+        const NoAlpha          = 1 << 1;
+        const NoPicker         = 1 << 2;
+        const NoOptions        = 1 << 3;
+        const NoSmallPreview   = 1 << 4;
+        const NoInputs         = 1 << 5;
+        const NoTooltip        = 1 << 6;
+        const NoLabel          = 1 << 7;
+        const NoSidePreview    = 1 << 8;
+        const AlphaBar         = 1 << 9;
+        const AlphaPreview     = 1 << 10;
+        const AlphaPreviewHalf = 1 << 11;
+        const HDR              = 1 << 12;
+        const RGB              = 1 << 13;
+        const HSV              = 1 << 14;
+        const HEX              = 1 << 15;
+        const Uint8            = 1 << 16;
+        const Float            = 1 << 17;
+        const PickerHueBar     = 1 << 18;
+        const PickerHueWheel   = 1 << 19;
     }
 );
 

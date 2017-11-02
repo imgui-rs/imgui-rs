@@ -43,6 +43,27 @@ struct State {
     auto_resize_state: AutoResizeState,
     file_menu: FileMenuState,
     radio_button: i32,
+    color_picker: ColorPickerState,
+}
+
+struct ColorPickerState {
+    color: [f32; 4],
+    hdr: bool,
+    alpha_preview: bool,
+    alpha_half_preview: bool,
+    options_menu: bool,
+}
+
+impl Default for ColorPickerState {
+    fn default() -> Self {
+        ColorPickerState {
+            color: [114.0 / 255.0, 144.0 / 255.0, 154.0 / 255.0, 200.0 / 255.0],
+            hdr: false,
+            alpha_preview: true,
+            alpha_half_preview: false,
+            options_menu: true,
+        }
+    }
 }
 
 impl Default for State {
@@ -87,6 +108,7 @@ impl Default for State {
             auto_resize_state: Default::default(),
             file_menu: Default::default(),
             radio_button: 0,
+            color_picker: ColorPickerState::default(),
         }
     }
 }
@@ -117,6 +139,11 @@ fn main() {
         show_test_window(ui, &mut state, &mut open);
         open
     });
+}
+
+fn show_help_marker(ui: &Ui, _: &ImStr) {
+    ui.text_disabled(im_str!("(?)"));
+    // TODO
 }
 
 fn show_user_guide<'a>(ui: &Ui<'a>) {
@@ -392,6 +419,58 @@ fn show_test_window<'a>(ui: &Ui<'a>, state: &mut State, opened: &mut bool) {
                     ui.input_int3(im_str!("input int3"), &mut state.vec3i)
                         .build();
                     ui.spacing();
+                });
+
+                ui.tree_node(im_str!("Color/Picker Widgets")).build(|| {
+                  let ref mut s = state.color_picker;
+                  ui.checkbox(im_str!("With HDR"), &mut s.hdr);
+                  ui.same_line(0.0);
+                  show_help_marker(ui, im_str!("Currently all this does is to lift the 0..1 limits on dragging widgets."));
+
+                  ui.checkbox(im_str!("With Alpha Preview"), &mut s.alpha_preview);
+                  ui.checkbox(im_str!("With Half Alpha Preview"), &mut s.alpha_half_preview);
+                  ui.checkbox(im_str!("With Options Menu"), &mut s.options_menu);
+                  ui.same_line(0.0);
+                  show_help_marker(ui, im_str!("Right-click on the individual color widget to show options."));
+                  let misc_flags = {
+                    let mut f = ImGuiColorEditFlags::empty();
+                    f.set(ImGuiColorEditFlags::HDR, s.hdr);
+                    f.set(ImGuiColorEditFlags::AlphaPreviewHalf, s.alpha_half_preview);
+                    if !s.alpha_half_preview {
+                      f.set(ImGuiColorEditFlags::AlphaPreview, s.alpha_preview);
+                    }
+                    f.set(ImGuiColorEditFlags::NoOptions, !s.options_menu);
+                    f
+                  };
+
+                  ui.text(im_str!("Color widget:"));
+                  ui.same_line(0.0);
+                  show_help_marker(ui, im_str!("Click on the colored square to open a color picker.\nCTRL+click on individual component to input value.\n"));
+                  ui.color_edit(im_str!("MyColor##1"), &mut s.color)
+                    .flags(misc_flags)
+                    .alpha(false)                    
+                    .build();
+
+                  ui.text(im_str!("Color widget HSV with Alpha:"));
+                  ui.color_edit(im_str!("MyColor##2"), &mut s.color)
+                    .flags(misc_flags)
+                    .mode(ColorEditMode::HSV)
+                    .build();
+
+                  ui.text(im_str!("Color widget with Float Display:"));
+                  ui.color_edit(im_str!("MyColor##2f"), &mut s.color)
+                    .flags(misc_flags)
+                    .format(EditableColorFormat::Float)
+                    .build();
+
+                  ui.text(im_str!("Color button with Picker:"));
+                  ui.same_line(0.0);
+                  show_help_marker(ui, im_str!("With the inputs(false) function you can hide all the slider/text inputs.\nWith the label(false) function you can pass a non-empty label which will only be used for the tooltip and picker popup."));
+                  ui.color_edit(im_str!("MyColor##3"), &mut s.color)
+                    .flags(misc_flags)
+                    .inputs(false)
+                    .label(false)
+                    .build();
                 });
             }
             if ui.collapsing_header(im_str!("Popups & Modal windows"))
