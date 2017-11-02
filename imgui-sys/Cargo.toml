@@ -13,7 +13,7 @@ build = "build.rs"
 travis-ci = { repository = "Gekkio/imgui-rs" }
 
 [dependencies]
-bitflags = "0.9"
+bitflags = "1.0"
 glium = { version = "0.18", default-features = false, optional = true }
 gfx = { version = "0.16", optional = true }
 

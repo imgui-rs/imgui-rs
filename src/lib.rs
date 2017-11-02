@@ -6,8 +6,10 @@ use std::os::raw::{c_char, c_float, c_int, c_uchar, c_void};
 use std::ptr;
 use std::slice;
 use std::str;
+use imgui_sys::ImGuiStyleVar;
 
-pub use imgui_sys::{ImDrawIdx, ImDrawVert, ImGuiInputTextFlags, ImGuiInputTextFlags_AllowTabInput,
+#[allow(deprecated)]
+pub use imgui_sys::{ImGuiInputTextFlags_AllowTabInput,
                     ImGuiInputTextFlags_AlwaysInsertMode, ImGuiInputTextFlags_AutoSelectAll,
                     ImGuiInputTextFlags_CallbackAlways, ImGuiInputTextFlags_CallbackCharFilter,
                     ImGuiInputTextFlags_CallbackCompletion, ImGuiInputTextFlags_CallbackHistory,
@@ -15,17 +17,16 @@ pub use imgui_sys::{ImDrawIdx, ImDrawVert, ImGuiInputTextFlags, ImGuiInputTextFl
                     ImGuiInputTextFlags_CharsNoBlank, ImGuiInputTextFlags_CharsUppercase,
                     ImGuiInputTextFlags_CtrlEnterForNewLine, ImGuiInputTextFlags_EnterReturnsTrue,
                     ImGuiInputTextFlags_NoHorizontalScroll, ImGuiInputTextFlags_Password,
-                    ImGuiInputTextFlags_ReadOnly, ImGuiKey, ImGuiSelectableFlags,
+                    ImGuiInputTextFlags_ReadOnly,
                     ImGuiSelectableFlags_DontClosePopups, ImGuiSelectableFlags_SpanAllColumns,
-                    ImGuiCond, ImGuiCond_Always, ImGuiCond_Appearing,
-                    ImGuiCond_FirstUseEver, ImGuiCond_Once,
-                    ImGuiCol, ImGuiStyle, ImGuiStyleVar, ImGuiTreeNodeFlags,
+                    ImGuiSetCond_Always, ImGuiSetCond_Appearing,
+                    ImGuiSetCond_FirstUseEver, ImGuiSetCond_Once,
                     ImGuiTreeNodeFlags_AllowOverlapMode, ImGuiTreeNodeFlags_Bullet,
                     ImGuiTreeNodeFlags_CollapsingHeader, ImGuiTreeNodeFlags_DefaultOpen,
                     ImGuiTreeNodeFlags_Framed, ImGuiTreeNodeFlags_Leaf,
                     ImGuiTreeNodeFlags_NoAutoOpenOnLog, ImGuiTreeNodeFlags_NoTreePushOnOpen,
                     ImGuiTreeNodeFlags_OpenOnArrow, ImGuiTreeNodeFlags_OpenOnDoubleClick,
-                    ImGuiTreeNodeFlags_Selected, ImGuiWindowFlags,
+                    ImGuiTreeNodeFlags_Selected,
                     ImGuiWindowFlags_AlwaysAutoResize, ImGuiWindowFlags_AlwaysHorizontalScrollbar,
                     ImGuiWindowFlags_AlwaysUseWindowPadding,
                     ImGuiWindowFlags_AlwaysVerticalScrollbar,
@@ -35,7 +36,11 @@ pub use imgui_sys::{ImDrawIdx, ImDrawVert, ImGuiInputTextFlags, ImGuiInputTextFl
                     ImGuiWindowFlags_NoMove, ImGuiWindowFlags_NoResize,
                     ImGuiWindowFlags_NoSavedSettings, ImGuiWindowFlags_NoScrollWithMouse,
                     ImGuiWindowFlags_NoScrollbar, ImGuiWindowFlags_NoTitleBar,
-                    ImGuiWindowFlags_ShowBorders, ImVec2, ImVec4};
+                    ImGuiWindowFlags_ShowBorders};
+
+pub use imgui_sys::{ImDrawIdx, ImDrawVert, ImGuiInputTextFlags, ImGuiKey, ImGuiSelectableFlags,
+                    ImGuiCond, ImGuiCol, ImGuiStyle, ImGuiTreeNodeFlags, ImGuiWindowFlags,
+                    ImVec2, ImVec4};
 pub use child_frame::ChildFrame;
 pub use input::{InputFloat, InputFloat2, InputFloat3, InputFloat4, InputInt, InputInt2, InputInt3, InputInt4, InputText};
 pub use menus::{Menu, MenuItem};
@@ -48,22 +53,6 @@ pub use string::{ImStr, ImString};
 pub use style::StyleVar;
 pub use trees::{CollapsingHeader, TreeNode};
 pub use window::Window;
-
-#[allow(non_upper_case_globals)]
-#[deprecated(since = "0.0.17", note = "please use ImGuiCond instead")]
-pub type ImGuiSetCond = ImGuiCond;
-#[allow(non_upper_case_globals)]
-#[deprecated(since = "0.0.17", note = "please use ImGuiCond_Always instead")]
-pub const ImGuiSetCond_Always: ImGuiCond = ImGuiCond_Always;
-#[allow(non_upper_case_globals)]
-#[deprecated(since = "0.0.17", note = "please use ImGuiCond_Once instead")]
-pub const ImGuiSetCond_Once: ImGuiCond = ImGuiCond_Once;
-#[allow(non_upper_case_globals)]
-#[deprecated(since = "0.0.17", note = "please use ImGuiCond_FirstUseEver instead")]
-pub const ImGuiSetCond_FirstUseEver: ImGuiCond = ImGuiCond_FirstUseEver;
-#[allow(non_upper_case_globals)]
-#[deprecated(since = "0.0.17", note = "please use ImGuiCond_Appearing instead")]
-pub const ImGuiSetCond_Appearing: ImGuiCond = ImGuiCond_Appearing;
 
 mod child_frame;
 mod input;

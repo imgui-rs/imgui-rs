@@ -2,7 +2,7 @@
 
 **Still fairly experimental!**
 
-Minimum Rust version: 1.19
+Minimum Rust version: 1.20
 
 [![Build Status](https://travis-ci.org/Gekkio/imgui-rs.svg?branch=master)](https://travis-ci.org/Gekkio/imgui-rs)
 [![Latest release on crates.io](https://meritbadge.herokuapp.com/imgui)](https://crates.io/crates/imgui)
@@ -11,7 +11,7 @@ Minimum Rust version: 1.19
 
 ```rust
 ui.window(im_str!("Hello world"))
-    .size((300.0, 100.0), ImGuiSetCond_FirstUseEver)
+    .size((300.0, 100.0), ImGuiCond::FirstUseEver)
     .build(|| {
         ui.text(im_str!("Hello world!"));
         ui.text(im_str!("This...is...imgui-rs!"));

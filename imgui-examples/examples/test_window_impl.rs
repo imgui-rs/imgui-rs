@@ -177,7 +177,7 @@ fn show_test_window<'a>(ui: &Ui<'a>, state: &mut State, opened: &mut bool) {
         .collapsible(!state.no_collapse)
         .menu_bar(!state.no_menu)
         .bg_alpha(state.bg_alpha)
-        .size((550.0, 680.0), ImGuiCond_FirstUseEver)
+        .size((550.0, 680.0), ImGuiCond::FirstUseEver)
         .opened(opened)
         .build(|| {
             ui.text(im_str!("ImGui says hello."));
@@ -520,13 +520,13 @@ fn show_example_app_fixed_overlay<'a>(ui: &Ui<'a>, opened: &mut bool) {
 
 fn show_example_app_manipulating_window_title<'a>(ui: &Ui<'a>) {
     ui.window(im_str!("Same title as another window##1"))
-        .position((100.0, 100.0), ImGuiCond_FirstUseEver)
+        .position((100.0, 100.0), ImGuiCond::FirstUseEver)
         .build(|| {
                    ui.text(im_str!("This is window 1.
 My title is the same as window 2, but my identifier is unique."));
                });
     ui.window(im_str!("Same title as another window##2"))
-        .position((100.0, 200.0), ImGuiCond_FirstUseEver)
+        .position((100.0, 200.0), ImGuiCond::FirstUseEver)
         .build(|| {
                    ui.text(im_str!("This is window 2.
 My title is the same as window 1, but my identifier is unique."));
@@ -536,6 +536,6 @@ My title is the same as window 1, but my identifier is unique."));
     let num = ui.imgui().get_frame_count(); // The C++ version uses rand() here
     let title = im_str!("Animated title {} {}###AnimatedTitle", chars[ch_idx], num);
     ui.window(title)
-        .position((100.0, 300.0), ImGuiCond_FirstUseEver)
+        .position((100.0, 300.0), ImGuiCond::FirstUseEver)
         .build(|| { ui.text(im_str!("This window has a changing title")); });
 }

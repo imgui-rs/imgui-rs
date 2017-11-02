@@ -1,10 +1,7 @@
 use imgui_sys;
 use std::marker::PhantomData;
 
-use super::{ImGuiCond, ImGuiTreeNodeFlags, ImGuiTreeNodeFlags_Bullet,
-            ImGuiTreeNodeFlags_DefaultOpen, ImGuiTreeNodeFlags_Leaf,
-            ImGuiTreeNodeFlags_OpenOnArrow, ImGuiTreeNodeFlags_OpenOnDoubleClick,
-            ImGuiTreeNodeFlags_Selected, ImStr, Ui};
+use super::{ImGuiCond, ImGuiTreeNodeFlags, ImStr, Ui};
 
 #[must_use]
 pub struct TreeNode<'ui, 'p> {
@@ -76,33 +73,33 @@ impl<'ui, 'p> CollapsingHeader<'ui, 'p> {
     }
     #[inline]
     pub fn selected(mut self, value: bool) -> Self {
-        self.flags.set(ImGuiTreeNodeFlags_Selected, value);
+        self.flags.set(ImGuiTreeNodeFlags::Selected, value);
         self
     }
     #[inline]
     pub fn default_open(mut self, value: bool) -> Self {
-        self.flags.set(ImGuiTreeNodeFlags_DefaultOpen, value);
+        self.flags.set(ImGuiTreeNodeFlags::DefaultOpen, value);
         self
     }
     #[inline]
     pub fn open_on_double_click(mut self, value: bool) -> Self {
         self.flags
-            .set(ImGuiTreeNodeFlags_OpenOnDoubleClick, value);
+            .set(ImGuiTreeNodeFlags::OpenOnDoubleClick, value);
         self
     }
     #[inline]
     pub fn open_on_arrow(mut self, value: bool) -> Self {
-        self.flags.set(ImGuiTreeNodeFlags_OpenOnArrow, value);
+        self.flags.set(ImGuiTreeNodeFlags::OpenOnArrow, value);
         self
     }
     #[inline]
     pub fn leaf(mut self, value: bool) -> Self {
-        self.flags.set(ImGuiTreeNodeFlags_Leaf, value);
+        self.flags.set(ImGuiTreeNodeFlags::Leaf, value);
         self
     }
     #[inline]
     pub fn bullet(mut self, value: bool) -> Self {
-        self.flags.set(ImGuiTreeNodeFlags_Bullet, value);
+        self.flags.set(ImGuiTreeNodeFlags::Bullet, value);
         self
     }
     pub fn build(self) -> bool {

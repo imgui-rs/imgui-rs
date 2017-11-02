@@ -2,15 +2,7 @@ use imgui_sys;
 use std::marker::PhantomData;
 use std::ptr;
 
-use super::{ImGuiInputTextFlags,
-            ImGuiInputTextFlags_AllowTabInput /* ImGuiInputTextFlags_CtrlEnterForNewLine, */,
-            ImGuiInputTextFlags_AlwaysInsertMode, ImGuiInputTextFlags_AutoSelectAll,
-            ImGuiInputTextFlags_CallbackAlways, ImGuiInputTextFlags_CallbackCharFilter,
-            ImGuiInputTextFlags_CallbackCompletion, ImGuiInputTextFlags_CallbackHistory,
-            ImGuiInputTextFlags_CharsDecimal, ImGuiInputTextFlags_CharsHexadecimal,
-            ImGuiInputTextFlags_CharsNoBlank, ImGuiInputTextFlags_CharsUppercase,
-            ImGuiInputTextFlags_EnterReturnsTrue, ImGuiInputTextFlags_NoHorizontalScroll, ImStr,
-            ImString, Ui};
+use super::{ImGuiInputTextFlags, ImStr, ImString, Ui};
 
 macro_rules! impl_text_flags {
     ($InputType:ident) => {
@@ -22,79 +14,79 @@ macro_rules! impl_text_flags {
 
         #[inline]
         pub fn chars_decimal(mut self, value: bool) -> Self {
-            self.flags.set(ImGuiInputTextFlags_CharsDecimal, value);
+            self.flags.set(ImGuiInputTextFlags::CharsDecimal, value);
             self
         }
 
         #[inline]
         pub fn chars_hexadecimal(mut self, value: bool) -> Self {
-            self.flags.set(ImGuiInputTextFlags_CharsHexadecimal, value);
+            self.flags.set(ImGuiInputTextFlags::CharsHexadecimal, value);
             self
         }
 
         #[inline]
         pub fn chars_uppercase(mut self, value: bool) -> Self {
-            self.flags.set(ImGuiInputTextFlags_CharsUppercase, value);
+            self.flags.set(ImGuiInputTextFlags::CharsUppercase, value);
             self
         }
 
         #[inline]
         pub fn chars_noblank(mut self, value: bool) -> Self {
-            self.flags.set(ImGuiInputTextFlags_CharsNoBlank, value);
+            self.flags.set(ImGuiInputTextFlags::CharsNoBlank, value);
             self
         }
 
         #[inline]
         pub fn auto_select_all(mut self, value: bool) -> Self {
-            self.flags.set(ImGuiInputTextFlags_AutoSelectAll, value);
+            self.flags.set(ImGuiInputTextFlags::AutoSelectAll, value);
             self
         }
 
         #[inline]
         pub fn enter_returns_true(mut self, value: bool) -> Self {
-            self.flags.set(ImGuiInputTextFlags_EnterReturnsTrue, value);
+            self.flags.set(ImGuiInputTextFlags::EnterReturnsTrue, value);
             self
         }
 
         #[inline]
         pub fn callback_completion(mut self, value: bool) -> Self {
-            self.flags.set(ImGuiInputTextFlags_CallbackCompletion, value);
+            self.flags.set(ImGuiInputTextFlags::CallbackCompletion, value);
             self
         }
 
         #[inline]
         pub fn callback_history(mut self, value: bool) -> Self {
-            self.flags.set(ImGuiInputTextFlags_CallbackHistory, value);
+            self.flags.set(ImGuiInputTextFlags::CallbackHistory, value);
             self
         }
 
         #[inline]
         pub fn callback_always(mut self, value: bool) -> Self {
-            self.flags.set(ImGuiInputTextFlags_CallbackAlways, value);
+            self.flags.set(ImGuiInputTextFlags::CallbackAlways, value);
             self
         }
 
         #[inline]
         pub fn callback_char_filter(mut self, value: bool) -> Self {
-            self.flags.set(ImGuiInputTextFlags_CallbackCharFilter, value);
+            self.flags.set(ImGuiInputTextFlags::CallbackCharFilter, value);
             self
         }
 
         #[inline]
         pub fn allow_tab_input(mut self, value: bool) -> Self {
-            self.flags.set(ImGuiInputTextFlags_AllowTabInput, value);
+            self.flags.set(ImGuiInputTextFlags::AllowTabInput, value);
             self
         }
 
         #[inline]
         pub fn no_horizontal_scroll(mut self, value: bool) -> Self {
-            self.flags.set(ImGuiInputTextFlags_NoHorizontalScroll, value);
+            self.flags.set(ImGuiInputTextFlags::NoHorizontalScroll, value);
             self
         }
 
         #[inline]
         pub fn always_insert_mode(mut self, value: bool) -> Self {
-            self.flags.set(ImGuiInputTextFlags_AlwaysInsertMode, value);
+            self.flags.set(ImGuiInputTextFlags::AlwaysInsertMode, value);
             self
         }
     }

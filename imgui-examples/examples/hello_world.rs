@@ -13,7 +13,7 @@ fn main() { support::run("hellow_world.rs".to_owned(), CLEAR_COLOR, hello_world)
 
 fn hello_world<'a>(ui: &Ui<'a>) -> bool {
     ui.window(im_str!("Hello world"))
-        .size((300.0, 100.0), ImGuiCond_FirstUseEver)
+        .size((300.0, 100.0), ImGuiCond::FirstUseEver)
         .build(|| {
             ui.text(im_str!("Hello world!"));
             ui.text(im_str!("This...is...imgui-rs!"));
