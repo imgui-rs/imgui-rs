@@ -37,10 +37,11 @@ pub use imgui_sys::{ImGuiInputTextFlags_AllowTabInput, ImGuiInputTextFlags_Alway
                     ImGuiWindowFlags_NoScrollbar, ImGuiWindowFlags_NoTitleBar,
                     ImGuiWindowFlags_ShowBorders};
 
-pub use imgui_sys::{ImDrawIdx, ImDrawVert, ImGuiInputTextFlags, ImGuiKey, ImGuiSelectableFlags,
-                    ImGuiCond, ImGuiCol, ImGuiStyle, ImGuiTreeNodeFlags, ImGuiWindowFlags, ImVec2,
-                    ImVec4};
+pub use imgui_sys::{ImDrawIdx, ImDrawVert, ImGuiColorEditFlags, ImGuiInputTextFlags, ImGuiKey,
+                    ImGuiSelectableFlags, ImGuiCond, ImGuiCol, ImGuiStyle, ImGuiTreeNodeFlags,
+                    ImGuiWindowFlags, ImVec2, ImVec4};
 pub use child_frame::ChildFrame;
+pub use color_editors::{ColorEdit, ColorEditMode, EditableColor, EditableColorFormat};
 pub use input::{InputFloat, InputFloat2, InputFloat3, InputFloat4, InputInt, InputInt2, InputInt3,
                 InputInt4, InputText};
 pub use menus::{Menu, MenuItem};
@@ -55,6 +56,7 @@ pub use trees::{CollapsingHeader, TreeNode};
 pub use window::Window;
 
 mod child_frame;
+mod color_editors;
 mod input;
 mod menus;
 mod plothistogram;
@@ -632,6 +634,26 @@ impl<'ui> Ui<'ui> {
         max: i32,
     ) -> SliderInt4<'ui, 'p> {
         SliderInt4::new(self, label, value, min, max)
+    }
+}
+
+// Widgets: Color Editor/Picker
+impl<'ui> Ui<'ui> {
+    pub fn color_edit<'p, V: Into<EditableColor<'p>>>(
+        &self,
+        label: &'p ImStr,
+        value: V,
+    ) -> ColorEdit<'ui, 'p> {
+        ColorEdit::new(self, label, value.into())
+    }
+    #[deprecated(since = "0.0.17", note = "please use color_edit instead")]
+    pub fn color_edit3<'p>(&self, label: &'p ImStr, value: &'p mut [f32; 3]) -> ColorEdit<'ui, 'p> {
+
+        self.color_edit(label, value)
+    }
+    #[deprecated(since = "0.0.17", note = "please use color_edit instead")]
+    pub fn color_edit4<'p>(&self, label: &'p ImStr, value: &'p mut [f32; 4]) -> ColorEdit<'ui, 'p> {
+        self.color_edit(label, value)
     }
 }
 

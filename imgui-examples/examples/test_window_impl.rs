@@ -37,6 +37,8 @@ struct State {
     vec3f: [f32; 3],
     vec2i: [i32; 2],
     vec3i: [i32; 3],
+    col1: [f32; 3],
+    col2: [f32; 4],
     selected_fish: Option<usize>,
     auto_resize_state: AutoResizeState,
     file_menu: FileMenuState,
@@ -79,6 +81,8 @@ impl Default for State {
             vec3f: [0.10, 0.20, 0.30],
             vec2i: [10, 20],
             vec3i: [10, 20, 30],
+            col1: [1.0, 0.0, 0.2],
+            col2: [0.4, 0.7, 0.0, 0.5],
             selected_fish: None,
             auto_resize_state: Default::default(),
             file_menu: Default::default(),
@@ -370,6 +374,10 @@ fn show_test_window<'a>(ui: &Ui<'a>, state: &mut State, opened: &mut bool) {
                     .step_fast(1.0)
                     .build();
                 ui.input_float3(im_str!("input float3"), &mut state.vec3f)
+                    .build();
+                ui.color_edit(im_str!("color 1"), &mut state.col1)
+                    .build();
+                ui.color_edit(im_str!("color 2"), &mut state.col2)
                     .build();
 
                 ui.tree_node(im_str!("Multi-component Widgets")).build(|| {
