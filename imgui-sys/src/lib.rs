@@ -914,14 +914,55 @@ extern "C" {
 
 // ID scopes
 extern "C" {
-    pub fn igPushIdStr(str_id: *const c_char);
-    pub fn igPushIdStrRange(str_begin: *const c_char, str_end: *const c_char);
-    pub fn igPushIdPtr(ptr_id: *const c_void);
-    pub fn igPushIdInt(int_id: c_int);
-    pub fn igPopId();
-    pub fn igGetIdStr(str_id: *const c_char) -> ImGuiID;
-    pub fn igGetIdstrRange(str_begin: *const c_char, str_end: *const c_char) -> ImGuiID;
-    pub fn igGetIdPtr(ptr_id: *const c_void) -> ImGuiID;
+    pub fn igPushIDStr(str_id: *const c_char);
+    pub fn igPushIDStrRange(str_begin: *const c_char, str_end: *const c_char);
+    pub fn igPushIDPtr(ptr_id: *const c_void);
+    pub fn igPushIDInt(int_id: c_int);
+    pub fn igPopID();
+    pub fn igGetIDStr(str_id: *const c_char) -> ImGuiID;
+    pub fn igGetIDStrRange(str_begin: *const c_char, str_end: *const c_char) -> ImGuiID;
+    pub fn igGetIDPtr(ptr_id: *const c_void) -> ImGuiID;
+}
+
+#[allow(non_snake_case)]
+#[deprecated(since = "0.0.17", note = "please use igPushIDStr instead")]
+pub unsafe fn igPushIdStr(str_id: *const c_char) {
+    igPushIDStr(str_id)
+}
+#[allow(non_snake_case)]
+#[deprecated(since = "0.0.17", note = "please use igPushIDStrRange instead")]
+pub unsafe fn igPushIdStrRange(str_begin: *const c_char, str_end: *const c_char) {
+    igPushIDStrRange(str_begin, str_end)
+}
+#[allow(non_snake_case)]
+#[deprecated(since = "0.0.17", note = "please use igPushIDPtr instead")]
+pub unsafe fn igPushIdPtr(ptr_id: *const c_void) {
+    igPushIDPtr(ptr_id)
+}
+#[allow(non_snake_case)]
+#[deprecated(since = "0.0.17", note = "please use igPushIDInt instead")]
+pub unsafe fn igPushIdInt(int_id: c_int) {
+    igPushIDInt(int_id)
+}
+#[allow(non_snake_case)]
+#[deprecated(since = "0.0.17", note = "please use igPopID instead")]
+pub unsafe fn igPopId() {
+    igPopID()
+}
+#[allow(non_snake_case)]
+#[deprecated(since = "0.0.17", note = "please use igGetIDStr instead")]
+pub unsafe fn igGetIdStr(str_id: *const c_char) -> ImGuiID {
+    igGetIDStr(str_id)
+}
+#[allow(non_snake_case)]
+#[deprecated(since = "0.0.17", note = "please use igGetIDStrRange instead")]
+pub unsafe fn igGetIdstrRange(str_begin: *const c_char, str_end: *const c_char) -> ImGuiID {
+    igGetIDStrRange(str_begin, str_end)
+}
+#[allow(non_snake_case)]
+#[deprecated(since = "0.0.17", note = "please use igGetIDPtr instead")]
+pub unsafe fn igGetIdPtr(ptr_id: *const c_void) -> ImGuiID {
+    igGetIDPtr(ptr_id)
 }
 
 // Widgets
@@ -1508,72 +1549,86 @@ extern "C" {
     pub fn igSetCurrentContext(ctx: *mut ImGuiContext);
 }
 
+// ImGuiIO
 extern "C" {
-    pub fn ImFontConfig_DefaultConstructor(config: *mut ImFontConfig);
-}
-
-extern "C" {
-    pub fn ImFontAtlas_GetTexDataAsRGBA32(atlas: *mut ImFontAtlas,
-                                          out_pixels: *mut *mut c_uchar,
-                                          out_width: *mut c_int,
-                                          out_height: *mut c_int,
-                                          out_bytes_per_pixel: *mut c_int);
-    pub fn ImFontAtlas_GetTexDataAsAlpha8(atlas: *mut ImFontAtlas,
-                                          out_pixels: *mut *mut c_uchar,
-                                          out_width: *mut c_int,
-                                          out_height: *mut c_int,
-                                          out_bytes_per_pixel: *mut c_int);
-    pub fn ImFontAtlas_SetTexID(atlas: *mut ImFontAtlas, tex: ImTextureID);
-    pub fn ImFontAtlas_AddFont(atlas: *mut ImFontAtlas,
-                               font_cfg: *const ImFontConfig)
-                               -> *mut ImFont;
-    pub fn ImFontAtlas_AddFontDefault(atlas: *mut ImFontAtlas,
-                                      font_cfg: *const ImFontConfig)
-                                      -> *mut ImFont;
-    pub fn ImFontAtlas_AddFontFromFileTTF(atlas: *mut ImFontAtlas,
-                                          filename: *const c_char,
-                                          size_pixels: c_float,
-                                          font_cfg: *const ImFontConfig,
-                                          glyph_ranges: *const ImWchar)
-                                          -> *mut ImFont;
-    pub fn ImFontAtlas_AddFontFromMemoryTTF(atlas: *mut ImFontAtlas,
-                                            font_data: *mut c_void,
-                                            font_size: c_int,
-                                            size_pixels: c_float,
-                                            font_cfg: *const ImFontConfig,
-                                            glyph_ranges: *const ImWchar)
-                                            -> *mut ImFont;
-    pub fn ImFontAtlas_AddFontFromMemoryCompressedTTF(atlas: *mut ImFontAtlas,
-                                                      compressed_font_data: *const c_void,
-                                                      compressed_font_size: c_int,
-                                                      size_pixels: c_float,
-                                                      font_cfg: *const ImFontConfig,
-                                                      glyph_ranges: *const ImWchar)
-                                                      -> *mut ImFont;
-    pub fn ImFontAtlas_AddFontFromMemoryCompressedBase85TTF(
-        atlas: *mut ImFontAtlas,
-        compressed_font_data_base85: *const c_char,
-        size_pixels: c_float,
-        font_cfg: *const ImFontConfig,
-        glyph_ranges: *const ImWchar) -> *mut ImFont;
-    pub fn ImFontAtlas_ClearTexData(atlas: *mut ImFontAtlas);
-    pub fn ImFontAtlas_Clear(atlas: *mut ImFontAtlas);
-    pub fn ImFontAtlas_GetGlyphRangesDefault(atlas: *mut ImFontAtlas) -> *const ImWchar;
-    pub fn ImFontAtlas_GetGlyphRangesKorean(atlas: *mut ImFontAtlas) -> *const ImWchar;
-    pub fn ImFontAtlas_GetGlyphRangesJapanese(atlas: *mut ImFontAtlas) -> *const ImWchar;
-    pub fn ImFontAtlas_GetGlyphRangesChinese(atlas: *mut ImFontAtlas) -> *const ImWchar;
-    pub fn ImFontAtlas_GetGlyphRangesCyrillic(atlas: *mut ImFontAtlas) -> *const ImWchar;
-    pub fn ImFontAtlas_GetGlyphRangesThai(atlas: *mut ImFontAtlas) -> *const ImWchar;
-
     pub fn ImGuiIO_AddInputCharacter(c: c_ushort);
     pub fn ImGuiIO_AddInputCharactersUTF8(utf8_chars: *const c_char);
     pub fn ImGuiIO_ClearInputCharacters();
 }
 
-// ImDrawData
+// ImGuiTextFilter
 extern "C" {
-    pub fn ImDrawData_DeIndexAllBuffers(drawData: *mut ImDrawData);
-    pub fn ImDrawData_ScaleClipRects(drawData: *mut ImDrawData, sc: ImVec2);
+    pub fn ImGuiTextFilter_Create(default_filter: *const c_char) -> *mut ImGuiTextFilter;
+    pub fn ImGuiTextFilter_Destroy(filter: *mut ImGuiTextFilter);
+    pub fn ImGuiTextFilter_Clear(filter: *mut ImGuiTextFilter);
+    pub fn ImGuiTextFilter_Draw(filter: *mut ImGuiTextFilter,
+                                label: *const c_char, width: c_float) -> bool;
+    pub fn ImGuiTextFilter_PassFilter(filter: *const ImGuiTextFilter,
+                                      text: *const c_char, text_end: *const c_char) -> bool;
+    pub fn ImGuiTextFilter_IsActive(filter: *const ImGuiTextFilter) -> bool;
+    pub fn ImGuiTextFilter_Build(filter: *const ImGuiTextFilter);
+    pub fn ImGuiTextFilter_GetInputBuf(filter: *mut ImGuiTextFilter) -> *const c_char;
+}
+
+// ImGuiTextBuffer
+extern "C" {
+    pub fn ImGuiTextBuffer_Create() -> *mut ImGuiTextBuffer;
+    pub fn ImGuiTextBuffer_Destroy(buffer: *mut ImGuiTextBuffer);
+    pub fn ImGuiTextBuffer_index(buffer: *mut ImGuiTextBuffer, i: c_int) -> c_char;
+    pub fn ImGuiTextBuffer_begin(buffer: *const ImGuiTextBuffer) -> *const c_char;
+    pub fn ImGuiTextBuffer_end(buffer: *const ImGuiTextBuffer) -> *const c_char;
+    pub fn ImGuiTextBuffer_size(buffer: *const ImGuiTextBuffer) -> c_int;
+    pub fn ImGuiTextBuffer_empty(buffer: *mut ImGuiTextBuffer) -> bool;
+    pub fn ImGuiTextBuffer_clear(buffer: *mut ImGuiTextBuffer);
+    pub fn ImGuiTextBuffer_c_str(buffer: *const ImGuiTextBuffer) -> *const c_char;
+    pub fn ImGuiTextBuffer_append(buffer: *const ImGuiTextBuffer, fmt: *const c_char, ...);
+    // pub fn ImGuiTextBuffer_appendv(buffer: *const ImGuiTextBuffer, fmt: *const c_char, args: va_list);
+}
+
+// ImGuiStorage
+extern "C" {
+    pub fn ImGuiStorage_Create() -> *mut ImGuiStorage;
+    pub fn ImGuiStorage_Destroy(storage: *mut ImGuiStorage);
+    pub fn ImGuiStorage_GetInt(storage: *mut ImGuiStorage, key: ImGuiID,
+                               default_val: c_int) -> c_int;
+    pub fn ImGuiStorage_SetInt(storage: *mut ImGuiStorage, key: ImGuiID, val: c_int);
+    pub fn ImGuiStorage_GetBool(storage: *mut ImGuiStorage, key: ImGuiID,
+                                default_val: bool) -> bool;
+    pub fn ImGuiStorage_SetBool(storage: *mut ImGuiStorage, key: ImGuiID, val: bool);
+    pub fn ImGuiStorage_GetFloat(storage: *mut ImGuiStorage, key: ImGuiID,
+                                 default_val: c_float) -> c_float;
+    pub fn ImGuiStorage_SetFloat(storage: *mut ImGuiStorage, key: ImGuiID, val: c_float);
+    pub fn ImGuiStorage_GetVoidPtr(storage: *mut ImGuiStorage, key: ImGuiID);
+    pub fn ImGuiStorage_SetVoidPtr(storage: *mut ImGuiStorage, key: ImGuiID, val: *mut c_void);
+    pub fn ImGuiStorage_GetIntRef(storage: *mut ImGuiStorage, key: ImGuiID,
+                                  default_val: c_int) -> *mut c_int;
+    pub fn ImGuiStorage_GetBoolRef(storage: *mut ImGuiStorage, key: ImGuiID,
+                                   default_val: bool) -> *mut bool;
+    pub fn ImGuiStorage_GetFloatRef(storage: *mut ImGuiStorage, key: ImGuiID,
+                                    default_val: c_float) -> *mut c_float;
+    pub fn ImGuiStorage_GetVoidPtrRef(storage: *mut ImGuiStorage, key: ImGuiID,
+                                      default_val: *mut c_void) -> *mut *mut c_void;
+    pub fn ImGuiStorage_SetAllInt(storage: *mut ImGuiStorage, val: c_int);
+}
+
+// ImGuiTextEditCallbackData
+extern "C" {
+    pub fn ImGuiTextEditCallbackData_DeleteChars(data: *mut ImGuiTextEditCallbackData,
+                                                 pos: c_int, bytes_count: c_int);
+    pub fn ImGuiTextEditCallbackData_InsertChars(data: *mut ImGuiTextEditCallbackData,
+                                                 pos: c_int,
+                                                 text: *const c_char, text_end: *const c_char);
+    pub fn ImGuiTextEditCallbackData_HasSelection(data: *mut ImGuiTextEditCallbackData) -> bool;
+}
+
+// ImGuiListClipper
+extern "C" {
+    pub fn ImGuiListClipper_Begin(clipper: *mut ImGuiListClipper,
+                                  count: c_int, items_height: c_float);
+    pub fn ImGuiListClipper_End(clipper: *mut ImGuiListClipper);
+    pub fn ImGuiListClipper_Step(clipper: *mut ImGuiListClipper) -> bool;
+    pub fn ImGuiListClipper_GetDisplayStart(clipper: *mut ImGuiListClipper) -> c_int;
+    pub fn ImGuiListClipper_GetDisplayEnd(clipper: *mut ImGuiListClipper) -> c_int;
 }
 
 // ImDrawList
@@ -1774,64 +1829,137 @@ extern "C" {
     pub fn ImDrawList_UpdateTextureID(list: *mut ImDrawList);
 }
 
-// ImGuiListClipper
+// ImDrawData
 extern "C" {
-    pub fn ImGuiListClipper_Begin(clipper: *mut ImGuiListClipper,
-                                  count: c_int, items_height: c_float);
-    pub fn ImGuiListClipper_End(clipper: *mut ImGuiListClipper);
-    pub fn ImGuiListClipper_Step(clipper: *mut ImGuiListClipper) -> bool;
-    pub fn ImGuiListClipper_GetDisplayStart(clipper: *mut ImGuiListClipper) -> c_int;
-    pub fn ImGuiListClipper_GetDisplayEnd(clipper: *mut ImGuiListClipper) -> c_int;
+    pub fn ImDrawData_DeIndexAllBuffers(drawData: *mut ImDrawData);
+    pub fn ImDrawData_ScaleClipRects(drawData: *mut ImDrawData, sc: ImVec2);
 }
 
-// ImGuiTextFilter
 extern "C" {
-    pub fn ImGuiTextFilter_Init(filter: *mut ImGuiTextFilter, default_filter: *const c_char);
-    pub fn ImGuiTextFilter_Clear(filter: *mut ImGuiTextFilter);
-    pub fn ImGuiTextFilter_Draw(filter: *mut ImGuiTextFilter,
-                                label: *const c_char, width: c_float) -> bool;
-    pub fn ImGuiTextFilter_PassFilter(filter: *mut ImGuiTextFilter,
-                                      text: *const c_char, text_end: *const c_char) -> bool;
-    pub fn ImGuiTextFilter_IsActive(filter: *mut ImGuiTextFilter) -> bool;
-    pub fn ImGuiTextFilter_Build(filter: *mut ImGuiTextFilter);
+    pub fn ImFontAtlas_GetTexDataAsRGBA32(atlas: *mut ImFontAtlas,
+                                          out_pixels: *mut *mut c_uchar,
+                                          out_width: *mut c_int,
+                                          out_height: *mut c_int,
+                                          out_bytes_per_pixel: *mut c_int);
+    pub fn ImFontAtlas_GetTexDataAsAlpha8(atlas: *mut ImFontAtlas,
+                                          out_pixels: *mut *mut c_uchar,
+                                          out_width: *mut c_int,
+                                          out_height: *mut c_int,
+                                          out_bytes_per_pixel: *mut c_int);
+    pub fn ImFontAtlas_SetTexID(atlas: *mut ImFontAtlas, tex: ImTextureID);
+    pub fn ImFontAtlas_AddFont(atlas: *mut ImFontAtlas,
+                               font_cfg: *const ImFontConfig)
+                               -> *mut ImFont;
+    pub fn ImFontAtlas_AddFontDefault(atlas: *mut ImFontAtlas,
+                                      font_cfg: *const ImFontConfig)
+                                      -> *mut ImFont;
+    pub fn ImFontAtlas_AddFontFromFileTTF(atlas: *mut ImFontAtlas,
+                                          filename: *const c_char,
+                                          size_pixels: c_float,
+                                          font_cfg: *const ImFontConfig,
+                                          glyph_ranges: *const ImWchar)
+                                          -> *mut ImFont;
+    pub fn ImFontAtlas_AddFontFromMemoryTTF(atlas: *mut ImFontAtlas,
+                                            font_data: *mut c_void,
+                                            font_size: c_int,
+                                            size_pixels: c_float,
+                                            font_cfg: *const ImFontConfig,
+                                            glyph_ranges: *const ImWchar)
+                                            -> *mut ImFont;
+    pub fn ImFontAtlas_AddFontFromMemoryCompressedTTF(atlas: *mut ImFontAtlas,
+                                                      compressed_font_data: *const c_void,
+                                                      compressed_font_size: c_int,
+                                                      size_pixels: c_float,
+                                                      font_cfg: *const ImFontConfig,
+                                                      glyph_ranges: *const ImWchar)
+                                                      -> *mut ImFont;
+    pub fn ImFontAtlas_AddFontFromMemoryCompressedBase85TTF(
+        atlas: *mut ImFontAtlas,
+        compressed_font_data_base85: *const c_char,
+        size_pixels: c_float,
+        font_cfg: *const ImFontConfig,
+        glyph_ranges: *const ImWchar) -> *mut ImFont;
+    pub fn ImFontAtlas_ClearTexData(atlas: *mut ImFontAtlas);
+    pub fn ImFontAtlas_Clear(atlas: *mut ImFontAtlas);
+    pub fn ImFontAtlas_GetGlyphRangesDefault(atlas: *mut ImFontAtlas) -> *const ImWchar;
+    pub fn ImFontAtlas_GetGlyphRangesKorean(atlas: *mut ImFontAtlas) -> *const ImWchar;
+    pub fn ImFontAtlas_GetGlyphRangesJapanese(atlas: *mut ImFontAtlas) -> *const ImWchar;
+    pub fn ImFontAtlas_GetGlyphRangesChinese(atlas: *mut ImFontAtlas) -> *const ImWchar;
+    pub fn ImFontAtlas_GetGlyphRangesCyrillic(atlas: *mut ImFontAtlas) -> *const ImWchar;
+    pub fn ImFontAtlas_GetGlyphRangesThai(atlas: *mut ImFontAtlas) -> *const ImWchar;
+    pub fn ImFontAtlas_GetTexID(atlas: *mut ImFontAtlas) -> ImTextureID;
+    pub fn ImFontAtlas_GetTexPixelsAlpha8(atlas: *mut ImFontAtlas) -> *mut c_uchar;
+    pub fn ImFontAtlas_GetTexPixelsRGBA32(altas: *mut ImFontAtlas) -> *mut c_uint;
+    pub fn ImFontAtlas_GetTexWidth(atlas: *mut ImFontAtlas) -> c_int;
+    pub fn ImFontAtlas_GetTexHeight(atlas: *mut ImFontAtlas) -> c_int;
+    pub fn ImFontAtlas_GetTexDesiredWidth(atlas: *mut ImFontAtlas) -> c_int;
+    pub fn ImFontAtlas_SetTexDesiredWidth(atlas: *mut ImFontAtlas, TexDesiredWidth_: c_int);
+    pub fn ImFontAtlas_GetTexGlyphPadding(atlas: *mut ImFontAtlas) -> c_int;
+    pub fn ImFontAtlas_SetTexGlyphPadding(atlas: *mut ImFontAtlas, TexGlyphPadding_: c_int);
+    pub fn ImFontAtlas_GetTexUvWhitePixel(atlas: *mut ImFontAtlas, out: *mut ImVec2);
 }
 
-// ImGuiTextEditCallbackData
+// ImFontAtlas::Fonts
 extern "C" {
-    pub fn ImGuiTextEditCallbackData_DeleteChars(data: *mut ImGuiTextEditCallbackData,
-                                                 pos: c_int, bytes_count: c_int);
-    pub fn ImGuiTextEditCallbackData_InsertChars(data: *mut ImGuiTextEditCallbackData,
-                                                 pos: c_int,
-                                                 text: *const c_char, text_end: *const c_char);
-    pub fn ImGuiTextEditCallbackData_HasSelection(data: *mut ImGuiTextEditCallbackData) -> bool;
+    pub fn ImFontAtlas_Fonts_size(atlas: *mut ImFontAtlas) -> c_int;
+    pub fn ImFontAtlas_Fonts_index(atlas: *mut ImFontAtlas, index: c_int) -> *mut ImFont;
 }
 
-// ImGuiStorage
+// ImFont
 extern "C" {
-    pub fn ImGuiStorage_Init(store: *mut ImGuiStorage);
-    pub fn ImGuiStorage_Clear(store: *mut ImGuiStorage);
-    pub fn ImGuiStorage_GetInt(store: *mut ImGuiStorage, key: ImGuiID,
-                               default_val: c_int) -> c_int;
-    pub fn ImGuiStorage_SetInt(store: *mut ImGuiStorage, key: ImGuiID, val: c_int);
-    pub fn ImGuiStorage_GetBool(store: *mut ImGuiStorage, key: ImGuiID,
-                                default_val: bool) -> bool;
-    pub fn ImGuiStorage_SetBool(store: *mut ImGuiStorage, key: ImGuiID, val: bool);
-    pub fn ImGuiStorage_GetFloat(store: *mut ImGuiStorage, key: ImGuiID,
-                                 default_val: c_float) -> c_float;
-    pub fn ImGuiStorage_SetFloat(store: *mut ImGuiStorage, key: ImGuiID, val: c_float);
-    pub fn ImGuiStorage_GetVoidPtr(store: *mut ImGuiStorage, key: ImGuiID);
-    pub fn ImGuiStorage_SetVoidPtr(store: *mut ImGuiStorage, key: ImGuiID, val: *mut c_void);
-    pub fn ImGuiStorage_GetIntRef(store: *mut ImGuiStorage, key: ImGuiID,
-                                  default_val: c_int) -> *mut c_int;
-    pub fn ImGuiStorage_GetBoolRef(store: *mut ImGuiStorage, key: ImGuiID,
-                                   default_val: bool) -> *mut bool;
-    pub fn ImGuiStorage_GetFloatRef(store: *mut ImGuiStorage, key: ImGuiID,
-                                    default_val: c_float) -> *mut c_float;
-    pub fn ImGuiStorage_GetVoidPtrRef(store: *mut ImGuiStorage, key: ImGuiID,
-                                      default_val: *mut c_void) -> *mut *mut c_void;
-    pub fn ImGuiStorage_SetAllInt(store: *mut ImGuiStorage, val: c_int);
+    pub fn ImFont_GetFontSize(font: *const ImFont) -> c_float;
+    pub fn ImFont_SetFontSize(font: *mut ImFont, FontSize_: c_float);
+    pub fn ImFont_GetScale(font: *const ImFont) -> c_float;
+    pub fn ImFont_SetScale(font: *mut ImFont, Scale_: c_float);
+    pub fn ImFont_GetDisplayOffset(font: *const ImFont, out: *mut ImVec2);
+    pub fn ImFont_GetFallbackGlyph(font: *const ImFont) -> *const Glyph;
+    pub fn ImFont_SetFallbackGlyph(font: *mut ImFont, FallbackGlyph: *const Glyph);
+    pub fn ImFont_GetFallbackXAdvance(font: *const ImFont) -> c_float;
+    pub fn ImFont_GetFallbackChar(font: *const ImFont) -> ImWchar;
+    pub fn ImFont_GetConfigDataCount(font: *const ImFont) -> c_short;
+    pub fn ImFont_GetConfigData(font: *mut ImFont) -> *mut ImFontConfig;
+    pub fn ImFont_GetContainerAtlas(font: *mut ImFont) -> *mut ImFontAtlas;
+    pub fn ImFont_GetAscent(font: *const ImFont) -> c_float;
+    pub fn ImFont_GetDescent(font: *const ImFont) -> c_float;
+    pub fn ImFont_GetMetricsTotalSurface(font: *const ImFont) -> c_int;
+    pub fn ImFont_Clear(font: *mut ImFont);
+    pub fn ImFont_BuildLookupTable(font: *mut ImFont);
+    pub fn ImFont_FindGlyph(font: *const ImFont, c: ImWchar) -> *const Glyph;
+    pub fn ImFont_SetFallbackChar(font: *mut ImFont, c: ImWchar);
+    pub fn ImFont_GetCharAdvance(font: *const ImFont, c: ImWchar) -> c_float;
+    pub fn ImFont_IsLoaded(font: *const ImFont) -> bool;
+    pub fn ImFont_CalcTextSizeA(font: *const ImFont, out: *mut ImVec2, size: c_float,
+                                max_width: c_float, wrap_width: c_float,
+                                text_begin: *const c_char, text_end: *const c_char,
+                                remaining: *mut *const c_char);
+    pub fn ImFont_CalcWordWrapPositionA(font: *const ImFont, scale: c_float,
+                                        text: *const c_char, text_end: *const c_char,
+                                        wrap_width: c_float) -> *const c_char;
+    pub fn ImFont_RenderChar(font: *const ImFont, draw_list: *mut ImDrawList, size: c_float,
+                             pos: ImVec2, col: ImU32, c: c_ushort);
+    pub fn ImFont_RenderText(font: *const ImFont, draw_list: *mut ImDrawList, size: c_float,
+                             pos: ImVec2, col: ImU32, clip_rect: *const ImVec4,
+                             text_begin: *const c_char, text_end: *const c_char,
+                             wrap_width: c_float, cpu_fine_clip: bool);
 }
 
+// ImFont::Glyph
+extern "C" {
+    pub fn ImFont_Glyphs_size(font: *const ImFont) -> c_int;
+    pub fn ImFont_Glyphs_index(font: *mut ImFont, index: c_int) -> *mut Glyph;
+}
+
+// ImFont::IndexXAdvance
+extern "C" {
+    pub fn ImFont_IndexXAdvance_size(font: *const ImFont) -> c_int;
+    pub fn ImFont_IndexXAdvance_index(font: *const ImFont, index: c_int) -> c_float;
+}
+
+// ImFont::IndexLookup
+extern "C" {
+    pub fn ImFont_IndexLookup_size(ofnt: *const ImFont) -> c_int;
+    pub fn ImFont_IndexLookup_index(font: *const ImFont, index: c_int) -> c_ushort;
+}
 
 // Although this test is sensitive to ImGui updates, it's useful to reveal potential
 // alignment errors

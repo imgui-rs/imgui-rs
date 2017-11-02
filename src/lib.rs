@@ -448,13 +448,13 @@ impl<'ui> Ui<'ui> {
 // ID scopes
 impl<'ui> Ui<'ui> {
     /// Pushes an identifier to the ID stack.
-    pub fn push_id(&self, id: i32) { unsafe { imgui_sys::igPushIdInt(id) }; }
+    pub fn push_id(&self, id: i32) { unsafe { imgui_sys::igPushIDInt(id) }; }
 
     /// Pops an identifier from the ID stack.
     ///
     /// # Aborts
     /// The current process is aborted if the ID stack is empty.
-    pub fn pop_id(&self) { unsafe { imgui_sys::igPopId() }; }
+    pub fn pop_id(&self) { unsafe { imgui_sys::igPopID() }; }
 
     /// Runs a function after temporarily pushing a value to the ID stack.
     pub fn with_id<F>(&self, id: i32, f: F)
