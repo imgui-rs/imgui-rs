@@ -2,7 +2,7 @@ use imgui_sys;
 use std::marker::PhantomData;
 use std::ptr;
 
-use super::{ImGuiSetCond, ImGuiWindowFlags, ImGuiWindowFlags_AlwaysAutoResize,
+use super::{ImGuiCond, ImGuiWindowFlags, ImGuiWindowFlags_AlwaysAutoResize,
             ImGuiWindowFlags_AlwaysHorizontalScrollbar, ImGuiWindowFlags_AlwaysUseWindowPadding,
             ImGuiWindowFlags_AlwaysVerticalScrollbar, ImGuiWindowFlags_HorizontalScrollbar,
             ImGuiWindowFlags_MenuBar, ImGuiWindowFlags_NoBringToFrontOnFocus,
@@ -15,9 +15,9 @@ use super::{ImGuiSetCond, ImGuiWindowFlags, ImGuiWindowFlags_AlwaysAutoResize,
 #[must_use]
 pub struct Window<'ui, 'p> {
     pos: (f32, f32),
-    pos_cond: ImGuiSetCond,
+    pos_cond: ImGuiCond,
     size: (f32, f32),
-    size_cond: ImGuiSetCond,
+    size_cond: ImGuiCond,
     name: &'p ImStr,
     opened: Option<&'p mut bool>,
     bg_alpha: f32,
@@ -29,9 +29,9 @@ impl<'ui, 'p> Window<'ui, 'p> {
     pub fn new(_: &Ui<'ui>, name: &'p ImStr) -> Window<'ui, 'p> {
         Window {
             pos: (0.0, 0.0),
-            pos_cond: ImGuiSetCond::empty(),
+            pos_cond: ImGuiCond::empty(),
             size: (0.0, 0.0),
-            size_cond: ImGuiSetCond::empty(),
+            size_cond: ImGuiCond::empty(),
             name: name,
             opened: None,
             bg_alpha: -1.0,
@@ -40,13 +40,13 @@ impl<'ui, 'p> Window<'ui, 'p> {
         }
     }
     #[inline]
-    pub fn position(mut self, pos: (f32, f32), cond: ImGuiSetCond) -> Self {
+    pub fn position(mut self, pos: (f32, f32), cond: ImGuiCond) -> Self {
         self.pos = pos;
         self.pos_cond = cond;
         self
     }
     #[inline]
-    pub fn size(mut self, size: (f32, f32), cond: ImGuiSetCond) -> Self {
+    pub fn size(mut self, size: (f32, f32), cond: ImGuiCond) -> Self {
         self.size = size;
         self.size_cond = cond;
         self

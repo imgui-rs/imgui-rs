@@ -37,8 +37,6 @@ struct State {
     vec3f: [f32; 3],
     vec2i: [i32; 2],
     vec3i: [i32; 3],
-    col1: [f32; 3],
-    col2: [f32; 4],
     selected_fish: Option<usize>,
     auto_resize_state: AutoResizeState,
     file_menu: FileMenuState,
@@ -81,8 +79,6 @@ impl Default for State {
             vec3f: [0.10, 0.20, 0.30],
             vec2i: [10, 20],
             vec3i: [10, 20, 30],
-            col1: [1.0, 0.0, 0.2],
-            col2: [0.4, 0.7, 0.0, 0.5],
             selected_fish: None,
             auto_resize_state: Default::default(),
             file_menu: Default::default(),
@@ -181,7 +177,7 @@ fn show_test_window<'a>(ui: &Ui<'a>, state: &mut State, opened: &mut bool) {
         .collapsible(!state.no_collapse)
         .menu_bar(!state.no_menu)
         .bg_alpha(state.bg_alpha)
-        .size((550.0, 680.0), ImGuiSetCond_FirstUseEver)
+        .size((550.0, 680.0), ImGuiCond_FirstUseEver)
         .opened(opened)
         .build(|| {
             ui.text(im_str!("ImGui says hello."));
@@ -359,10 +355,6 @@ fn show_test_window<'a>(ui: &Ui<'a>, state: &mut State, opened: &mut bool) {
                     .build();
                 ui.input_float3(im_str!("input float3"), &mut state.vec3f)
                     .build();
-                ui.color_edit3(im_str!("color 1"), &mut state.col1)
-                    .build();
-                ui.color_edit4(im_str!("color 2"), &mut state.col2)
-                    .build();
 
                 ui.tree_node(im_str!("Multi-component Widgets"))
                     .build(|| {
@@ -528,13 +520,13 @@ fn show_example_app_fixed_overlay<'a>(ui: &Ui<'a>, opened: &mut bool) {
 
 fn show_example_app_manipulating_window_title<'a>(ui: &Ui<'a>) {
     ui.window(im_str!("Same title as another window##1"))
-        .position((100.0, 100.0), ImGuiSetCond_FirstUseEver)
+        .position((100.0, 100.0), ImGuiCond_FirstUseEver)
         .build(|| {
                    ui.text(im_str!("This is window 1.
 My title is the same as window 2, but my identifier is unique."));
                });
     ui.window(im_str!("Same title as another window##2"))
-        .position((100.0, 200.0), ImGuiSetCond_FirstUseEver)
+        .position((100.0, 200.0), ImGuiCond_FirstUseEver)
         .build(|| {
                    ui.text(im_str!("This is window 2.
 My title is the same as window 1, but my identifier is unique."));
@@ -544,6 +536,6 @@ My title is the same as window 1, but my identifier is unique."));
     let num = ui.imgui().get_frame_count(); // The C++ version uses rand() here
     let title = im_str!("Animated title {} {}###AnimatedTitle", chars[ch_idx], num);
     ui.window(title)
-        .position((100.0, 300.0), ImGuiSetCond_FirstUseEver)
+        .position((100.0, 300.0), ImGuiCond_FirstUseEver)
         .build(|| { ui.text(im_str!("This window has a changing title")); });
 }

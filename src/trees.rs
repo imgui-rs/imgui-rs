@@ -1,7 +1,7 @@
 use imgui_sys;
 use std::marker::PhantomData;
 
-use super::{ImGuiSetCond, ImGuiTreeNodeFlags, ImGuiTreeNodeFlags_Bullet,
+use super::{ImGuiCond, ImGuiTreeNodeFlags, ImGuiTreeNodeFlags_Bullet,
             ImGuiTreeNodeFlags_DefaultOpen, ImGuiTreeNodeFlags_Leaf,
             ImGuiTreeNodeFlags_OpenOnArrow, ImGuiTreeNodeFlags_OpenOnDoubleClick,
             ImGuiTreeNodeFlags_Selected, ImStr, Ui};
@@ -11,7 +11,7 @@ pub struct TreeNode<'ui, 'p> {
     id: &'p ImStr,
     label: Option<&'p ImStr>,
     opened: bool,
-    opened_cond: ImGuiSetCond,
+    opened_cond: ImGuiCond,
     _phantom: PhantomData<&'ui Ui<'ui>>,
 }
 
@@ -21,7 +21,7 @@ impl<'ui, 'p> TreeNode<'ui, 'p> {
             id: id,
             label: None,
             opened: false,
-            opened_cond: ImGuiSetCond::empty(),
+            opened_cond: ImGuiCond::empty(),
             _phantom: PhantomData,
         }
     }
@@ -31,7 +31,7 @@ impl<'ui, 'p> TreeNode<'ui, 'p> {
         self
     }
     #[inline]
-    pub fn opened(mut self, opened: bool, cond: ImGuiSetCond) -> Self {
+    pub fn opened(mut self, opened: bool, cond: ImGuiCond) -> Self {
         self.opened = opened;
         self.opened_cond = cond;
         self

@@ -17,8 +17,9 @@ pub use imgui_sys::{ImDrawIdx, ImDrawVert, ImGuiInputTextFlags, ImGuiInputTextFl
                     ImGuiInputTextFlags_NoHorizontalScroll, ImGuiInputTextFlags_Password,
                     ImGuiInputTextFlags_ReadOnly, ImGuiKey, ImGuiSelectableFlags,
                     ImGuiSelectableFlags_DontClosePopups, ImGuiSelectableFlags_SpanAllColumns,
-                    ImGuiSetCond, ImGuiSetCond_Always, ImGuiSetCond_Appearing,
-                    ImGuiSetCond_FirstUseEver, ImGuiSetCond_Once, ImGuiCol, ImGuiStyle, ImGuiStyleVar, ImGuiTreeNodeFlags,
+                    ImGuiCond, ImGuiCond_Always, ImGuiCond_Appearing,
+                    ImGuiCond_FirstUseEver, ImGuiCond_Once,
+                    ImGuiCol, ImGuiStyle, ImGuiStyleVar, ImGuiTreeNodeFlags,
                     ImGuiTreeNodeFlags_AllowOverlapMode, ImGuiTreeNodeFlags_Bullet,
                     ImGuiTreeNodeFlags_CollapsingHeader, ImGuiTreeNodeFlags_DefaultOpen,
                     ImGuiTreeNodeFlags_Framed, ImGuiTreeNodeFlags_Leaf,
@@ -36,8 +37,7 @@ pub use imgui_sys::{ImDrawIdx, ImDrawVert, ImGuiInputTextFlags, ImGuiInputTextFl
                     ImGuiWindowFlags_NoScrollbar, ImGuiWindowFlags_NoTitleBar,
                     ImGuiWindowFlags_ShowBorders, ImVec2, ImVec4};
 pub use child_frame::ChildFrame;
-pub use input::{ColorEdit3, ColorEdit4, InputFloat, InputFloat2, InputFloat3, InputFloat4,
-                InputInt, InputInt2, InputInt3, InputInt4, InputText};
+pub use input::{InputFloat, InputFloat2, InputFloat3, InputFloat4, InputInt, InputInt2, InputInt3, InputInt4, InputText};
 pub use menus::{Menu, MenuItem};
 pub use plothistogram::PlotHistogram;
 pub use plotlines::PlotLines;
@@ -48,6 +48,22 @@ pub use string::{ImStr, ImString};
 pub use style::StyleVar;
 pub use trees::{CollapsingHeader, TreeNode};
 pub use window::Window;
+
+#[allow(non_upper_case_globals)]
+#[deprecated(since = "0.0.17", note = "please use ImGuiCond instead")]
+pub type ImGuiSetCond = ImGuiCond;
+#[allow(non_upper_case_globals)]
+#[deprecated(since = "0.0.17", note = "please use ImGuiCond_Always instead")]
+pub const ImGuiSetCond_Always: ImGuiCond = ImGuiCond_Always;
+#[allow(non_upper_case_globals)]
+#[deprecated(since = "0.0.17", note = "please use ImGuiCond_Once instead")]
+pub const ImGuiSetCond_Once: ImGuiCond = ImGuiCond_Once;
+#[allow(non_upper_case_globals)]
+#[deprecated(since = "0.0.17", note = "please use ImGuiCond_FirstUseEver instead")]
+pub const ImGuiSetCond_FirstUseEver: ImGuiCond = ImGuiCond_FirstUseEver;
+#[allow(non_upper_case_globals)]
+#[deprecated(since = "0.0.17", note = "please use ImGuiCond_Appearing instead")]
+pub const ImGuiSetCond_Appearing: ImGuiCond = ImGuiCond_Appearing;
 
 mod child_frame;
 mod input;
@@ -503,18 +519,6 @@ impl<'ui> Ui<'ui> {
 
 // Widgets: Input
 impl<'ui> Ui<'ui> {
-    pub fn color_edit3<'p>(&self,
-                           label: &'p ImStr,
-                           value: &'p mut [f32; 3])
-                           -> ColorEdit3<'ui, 'p> {
-        ColorEdit3::new(self, label, value)
-    }
-    pub fn color_edit4<'p>(&self,
-                           label: &'p ImStr,
-                           value: &'p mut [f32; 4])
-                           -> ColorEdit4<'ui, 'p> {
-        ColorEdit4::new(self, label, value)
-    }
     pub fn input_text<'p>(&self, label: &'p ImStr, buf: &'p mut ImString) -> InputText<'ui, 'p> {
         InputText::new(self, label, buf)
     }
