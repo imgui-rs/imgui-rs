@@ -2,6 +2,22 @@
 
 ## [Unreleased]
 
+### Added
+
+- Namespaced flags (e.g. `ImGuiWindowFlags`)
+
+### Changed
+
+- Upgrade to imgui/cimgui 1.51
+- Adapt to latest cimgui API changes
+- Bump minimum Rust version to 1.20
+- Upgrade to bitflags 1.0
+
+### Deprecated
+
+- Non-namespaced flags
+- Various imgui-sys things that were deprecated in imgui/cimgui 1.51
+
 ## [0.0.16] - 2017-10-26
 
 ### Added
