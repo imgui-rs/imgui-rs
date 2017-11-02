@@ -469,9 +469,11 @@ impl<'ui> Ui<'ui> {
 // Widgets
 impl<'ui> Ui<'ui> {
     pub fn text<P: AsRef<ImStr>>(&self, text: P) {
-        // TODO: use igTextUnformatted
+        let s = text.as_ref();
         unsafe {
-            imgui_sys::igText(fmt_ptr(), text.as_ref().as_ptr());
+            let start = s.as_ptr();
+            let end = start.offset(s.len() as isize);
+            imgui_sys::igTextUnformatted(start as *const c_char, end as *const c_char);
         }
     }
     pub fn text_colored<'p, A>(&self, col: A, text: &'p ImStr)
