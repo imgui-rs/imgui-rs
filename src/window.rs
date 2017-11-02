@@ -48,6 +48,8 @@ impl<'ui, 'p> Window<'ui, 'p> {
         self.opened = Some(opened);
         self
     }
+    #[deprecated(since = "0.0.17",
+                 note = "please use with_color_var and ImGuiCol::WindowBg instead")]
     #[inline]
     pub fn bg_alpha(mut self, bg_alpha: f32) -> Self {
         self.bg_alpha = bg_alpha;

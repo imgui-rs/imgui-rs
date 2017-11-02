@@ -17,6 +17,7 @@
 
 - Non-namespaced flags
 - Various imgui-sys things that were deprecated in imgui/cimgui 1.51
+- `Window::bg_alpha`. Push a color change with `with_color_var` instead
 
 ## [0.0.16] - 2017-10-26
 
