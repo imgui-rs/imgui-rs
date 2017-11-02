@@ -143,12 +143,14 @@ impl<'ui, 'p> InputText<'ui, 'p> {
 
     pub fn build(self) -> bool {
         unsafe {
-            imgui_sys::igInputText(self.label.as_ptr(),
-                                   self.buf.as_mut_ptr(),
-                                   self.buf.capacity_with_nul(),
-                                   self.flags,
-                                   None,
-                                   ptr::null_mut())
+            imgui_sys::igInputText(
+                self.label.as_ptr(),
+                self.buf.as_mut_ptr(),
+                self.buf.capacity_with_nul(),
+                self.flags,
+                None,
+                ptr::null_mut(),
+            )
         }
     }
 }
@@ -177,11 +179,13 @@ impl<'ui, 'p> InputInt<'ui, 'p> {
 
     pub fn build(self) -> bool {
         unsafe {
-            imgui_sys::igInputInt(self.label.as_ptr(),
-                                  self.value as *mut i32,
-                                  self.step,
-                                  self.step_fast,
-                                  self.flags)
+            imgui_sys::igInputInt(
+                self.label.as_ptr(),
+                self.value as *mut i32,
+                self.step,
+                self.step_fast,
+                self.flags,
+            )
         }
     }
 
@@ -215,12 +219,14 @@ impl<'ui, 'p> InputFloat<'ui, 'p> {
 
     pub fn build(self) -> bool {
         unsafe {
-            imgui_sys::igInputFloat(self.label.as_ptr(),
-                                    self.value as *mut f32,
-                                    self.step,
-                                    self.step_fast,
-                                    self.decimal_precision,
-                                    self.flags)
+            imgui_sys::igInputFloat(
+                self.label.as_ptr(),
+                self.value as *mut f32,
+                self.step,
+                self.step_fast,
+                self.decimal_precision,
+                self.flags,
+            )
         }
     }
 

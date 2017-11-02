@@ -49,11 +49,11 @@ impl<'ui, 'p> ProgressBar<'ui, 'p> {
     /// of the progress bar, otherwise the it will not be shown.
     pub fn build(self) {
         unsafe {
-            imgui_sys::igProgressBar(self.fraction,
-                                     &self.size,
-                                     self.overlay_text
-                                         .map(|x| x.as_ptr())
-                                         .unwrap_or(ptr::null()));
+            imgui_sys::igProgressBar(
+                self.fraction,
+                &self.size,
+                self.overlay_text.map(|x| x.as_ptr()).unwrap_or(ptr::null()),
+            );
         }
     }
 }

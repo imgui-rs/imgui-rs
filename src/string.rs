@@ -1,5 +1,5 @@
 use std::borrow::Borrow;
-use std::ffi::{CStr};
+use std::ffi::CStr;
 use std::fmt;
 use std::mem;
 use std::ops::Deref;
@@ -22,9 +22,7 @@ impl ImString {
         v.push(b'\0');
         ImString(v)
     }
-    pub unsafe fn from_utf8_with_nul_unchecked(v: Vec<u8>) -> ImString {
-        ImString(v)
-    }
+    pub unsafe fn from_utf8_with_nul_unchecked(v: Vec<u8>) -> ImString { ImString(v) }
     pub fn clear(&mut self) {
         self.0.clear();
         self.0.push(b'\0');
@@ -40,12 +38,8 @@ impl ImString {
     }
     pub fn capacity(&self) -> usize { self.0.capacity() - 1 }
     pub fn capacity_with_nul(&self) -> usize { self.0.capacity() }
-    pub fn reserve(&mut self, additional: usize) {
-        self.0.reserve(additional);
-    }
-    pub fn reserve_exact(&mut self, additional: usize) {
-        self.0.reserve_exact(additional);
-    }
+    pub fn reserve(&mut self, additional: usize) { self.0.reserve(additional); }
+    pub fn reserve_exact(&mut self, additional: usize) { self.0.reserve_exact(additional); }
     pub fn as_ptr(&self) -> *const c_char { self.0.as_ptr() as *const _ }
     pub fn as_mut_ptr(&mut self) -> *mut c_char { self.0.as_mut_ptr() as *mut _ }
 
@@ -101,19 +95,13 @@ impl<'a> Default for &'a ImStr {
 }
 
 impl fmt::Debug for ImStr {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        fmt::Debug::fmt(&self.0, f)
-    }
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result { fmt::Debug::fmt(&self.0, f) }
 }
 
 impl ImStr {
-    pub unsafe fn from_utf8_with_nul_unchecked(bytes: &[u8]) -> &ImStr {
-        mem::transmute(bytes)
-    }
+    pub unsafe fn from_utf8_with_nul_unchecked(bytes: &[u8]) -> &ImStr { mem::transmute(bytes) }
     pub fn as_ptr(&self) -> *const c_char { self.0.as_ptr() }
-    pub fn to_str(&self) -> &str {
-        unsafe { str::from_utf8_unchecked(self.0.to_bytes()) }
-    }
+    pub fn to_str(&self) -> &str { unsafe { str::from_utf8_unchecked(self.0.to_bytes()) } }
 }
 
 impl<'a> Into<&'a CStr> for &'a ImStr {
@@ -135,7 +123,5 @@ impl ToOwned for ImStr {
 
 impl Deref for ImStr {
     type Target = str;
-    fn deref(&self) -> &str {
-        unsafe { str::from_utf8_unchecked(self.0.to_bytes()) }
-    }
+    fn deref(&self) -> &str { unsafe { str::from_utf8_unchecked(self.0.to_bytes()) } }
 }

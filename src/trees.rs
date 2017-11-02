@@ -38,9 +38,11 @@ impl<'ui, 'p> TreeNode<'ui, 'p> {
             if !self.opened_cond.is_empty() {
                 imgui_sys::igSetNextTreeNodeOpen(self.opened, self.opened_cond);
             }
-            imgui_sys::igTreeNodeStr(self.id.as_ptr(),
-                                     super::fmt_ptr(),
-                                     self.label.unwrap_or(self.id).as_ptr())
+            imgui_sys::igTreeNodeStr(
+                self.id.as_ptr(),
+                super::fmt_ptr(),
+                self.label.unwrap_or(self.id).as_ptr(),
+            )
         };
         if render {
             f();
@@ -83,8 +85,7 @@ impl<'ui, 'p> CollapsingHeader<'ui, 'p> {
     }
     #[inline]
     pub fn open_on_double_click(mut self, value: bool) -> Self {
-        self.flags
-            .set(ImGuiTreeNodeFlags::OpenOnDoubleClick, value);
+        self.flags.set(ImGuiTreeNodeFlags::OpenOnDoubleClick, value);
         self
     }
     #[inline]

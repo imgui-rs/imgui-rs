@@ -107,7 +107,9 @@ impl<'ui, 'p> ChildFrame<'ui, 'p> {
         // https://github.com/Gekkio/imgui-rs/pull/58
         let show_border = false;
 
-        let render_child_frame = unsafe { imgui_sys::igBeginChild(self.name.as_ptr(), self.size, show_border, self.flags) };
+        let render_child_frame = unsafe {
+            imgui_sys::igBeginChild(self.name.as_ptr(), self.size, show_border, self.flags)
+        };
         if render_child_frame {
             f();
         }

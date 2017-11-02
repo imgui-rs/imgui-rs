@@ -20,7 +20,10 @@ impl Structure<Format> for ImDrawVert {
                         Some(s) if s.starts_with('.') => &s[1..],
                         _ => name,
                     };
-                    (sub_name, array_id * (mem::size_of::<ImDrawVert>() as ElemOffset))
+                    (
+                        sub_name,
+                        array_id * (mem::size_of::<ImDrawVert>() as ElemOffset),
+                    )
                 }
                 None => (name, 0),
             }
@@ -31,21 +34,21 @@ impl Structure<Format> for ImDrawVert {
                 Some(Element {
                     format: <ImVec2 as Formatted>::get_format(),
                     offset: unsafe { mem::transmute::<_, usize>(&dummy.pos) } as ElemOffset +
-                            big_offset,
+                        big_offset,
                 })
             }
             "uv" => {
                 Some(Element {
                     format: <ImVec2 as Formatted>::get_format(),
                     offset: unsafe { mem::transmute::<_, usize>(&dummy.uv) } as ElemOffset +
-                            big_offset,
+                        big_offset,
                 })
             }
             "col" => {
                 Some(Element {
                     format: <[U8Norm; 4] as Formatted>::get_format(),
                     offset: unsafe { mem::transmute::<_, usize>(&dummy.col) } as ElemOffset +
-                            big_offset,
+                        big_offset,
                 })
             }
             _ => None,

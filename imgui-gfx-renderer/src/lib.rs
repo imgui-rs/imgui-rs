@@ -14,7 +14,7 @@ pub enum RendererError {
     Update(gfx::UpdateError<usize>),
     Buffer(gfx::buffer::CreationError),
     Pipeline(gfx::PipelineStateError<String>),
-    Combined(gfx::CombinedError)
+    Combined(gfx::CombinedError),
 }
 
 impl From<gfx::UpdateError<usize>> for RendererError {
@@ -86,32 +86,50 @@ pub struct Renderer<R: Resources> {
 }
 
 impl<R: Resources> Renderer<R> {
-    pub fn init<F: Factory<R>>(imgui: &mut ImGui,
-                               factory: &mut F,
-                               shaders: Shaders,
-                               out: RenderTargetView<R, gfx::format::Rgba8>)
-                               -> RendererResult<Renderer<R>> {
+    pub fn init<F: Factory<R>>(
+        imgui: &mut ImGui,
+        factory: &mut F,
+        shaders: Shaders,
+        out: RenderTargetView<R, gfx::format::Rgba8>,
+    ) -> RendererResult<Renderer<R>> {
         let (vs_code, ps_code) = shaders.get_program_code();
-        let pso = factory.create_pipeline_simple(vs_code, ps_code, pipe::new())?;
-        let vertex_buffer = factory.create_buffer::<ImDrawVert>(256,
-                                         gfx::buffer::Role::Vertex,
-                                         gfx::memory::Usage::Dynamic,
-                                         Bind::empty())?;
-        let index_buffer = factory.create_buffer::<ImDrawIdx>(256,
-                                        gfx::buffer::Role::Index,
-                                        gfx::memory::Usage::Dynamic,
-                                        Bind::empty())?;
+        let pso = factory.create_pipeline_simple(
+            vs_code,
+            ps_code,
+            pipe::new(),
+        )?;
+        let vertex_buffer = factory.create_buffer::<ImDrawVert>(
+            256,
+            gfx::buffer::Role::Vertex,
+            gfx::memory::Usage::Dynamic,
+            Bind::empty(),
+        )?;
+        let index_buffer = factory.create_buffer::<ImDrawIdx>(
+            256,
+            gfx::buffer::Role::Index,
+            gfx::memory::Usage::Dynamic,
+            Bind::empty(),
+        )?;
         let (_, texture) = imgui.prepare_texture(|handle| {
-            factory.create_texture_immutable_u8::<gfx::format::Rgba8>(gfx::texture::Kind::D2(handle.width as u16, handle.height as u16, gfx::texture::AaMode::Single), &[handle.pixels])
+            factory.create_texture_immutable_u8::<gfx::format::Rgba8>(
+                gfx::texture::Kind::D2(
+                    handle.width as u16,
+                    handle.height as u16,
+                    gfx::texture::AaMode::Single,
+                ),
+                &[handle.pixels],
+            )
         })?;
         // TODO: set texture id in imgui
         let sampler = factory.create_sampler_linear();
         let data = pipe::Data {
             vertex_buffer: vertex_buffer,
-            matrix: [[0.0, 0.0, 0.0, 0.0],
-                     [0.0, 0.0, 0.0, 0.0],
-                     [0.0, 0.0, -1.0, 0.0],
-                     [-1.0, 1.0, 0.0, 1.0]],
+            matrix: [
+                [0.0, 0.0, 0.0, 0.0],
+                [0.0, 0.0, 0.0, 0.0],
+                [0.0, 0.0, -1.0, 0.0],
+                [-1.0, 1.0, 0.0, 1.0],
+            ],
             tex: (texture, sampler),
             out: out,
             scissor: Rect {
@@ -136,37 +154,51 @@ impl<R: Resources> Renderer<R> {
     pub fn update_render_target(&mut self, out: RenderTargetView<R, gfx::format::Rgba8>) {
         self.bundle.data.out = out;
     }
-    pub fn render<'a, F: Factory<R>, C: CommandBuffer<R>>(&mut self,
-                                                          ui: Ui<'a>,
-                                                          factory: &mut F,
-                                                          encoder: &mut Encoder<R, C>)
-                                                          -> RendererResult<()> {
+    pub fn render<'a, F: Factory<R>, C: CommandBuffer<R>>(
+        &mut self,
+        ui: Ui<'a>,
+        factory: &mut F,
+        encoder: &mut Encoder<R, C>,
+    ) -> RendererResult<()> {
         let (width, height) = ui.imgui().display_size();
 
         if width == 0.0 || height == 0.0 {
             return Ok(());
         }
-        self.bundle.data.matrix = [[2.0 / width as f32, 0.0, 0.0, 0.0],
-                                   [0.0, -2.0 / height as f32, 0.0, 0.0],
-                                   [0.0, 0.0, -1.0, 0.0],
-                                   [-1.0, 1.0, 0.0, 1.0]];
+        self.bundle.data.matrix = [
+            [2.0 / width as f32, 0.0, 0.0, 0.0],
+            [0.0, -2.0 / height as f32, 0.0, 0.0],
+            [0.0, 0.0, -1.0, 0.0],
+            [-1.0, 1.0, 0.0, 1.0],
+        ];
 
-        ui.render(|ui, draw_list| self.render_draw_list(ui, factory, encoder, draw_list))
+        ui.render(|ui, draw_list| {
+            self.render_draw_list(ui, factory, encoder, draw_list)
+        })
     }
-    fn render_draw_list<'a, F: Factory<R>, C: CommandBuffer<R>>(&mut self,
-                                                                ui: &'a Ui<'a>,
-                                                                factory: &mut F,
-                                                                encoder: &mut Encoder<R, C>,
-                                                                draw_list: DrawList<'a>)
-                                                                -> RendererResult<()> {
+    fn render_draw_list<'a, F: Factory<R>, C: CommandBuffer<R>>(
+        &mut self,
+        ui: &'a Ui<'a>,
+        factory: &mut F,
+        encoder: &mut Encoder<R, C>,
+        draw_list: DrawList<'a>,
+    ) -> RendererResult<()> {
         let (scale_width, scale_height) = ui.imgui().display_framebuffer_scale();
 
         self.bundle.slice.start = 0;
         for cmd in draw_list.cmd_buffer {
             // TODO: check cmd.texture_id
 
-            self.upload_vertex_buffer(factory, encoder, draw_list.vtx_buffer)?;
-            self.upload_index_buffer(factory, encoder, draw_list.idx_buffer)?;
+            self.upload_vertex_buffer(
+                factory,
+                encoder,
+                draw_list.vtx_buffer,
+            )?;
+            self.upload_index_buffer(
+                factory,
+                encoder,
+                draw_list.idx_buffer,
+            )?;
 
             self.bundle.slice.end = self.bundle.slice.start + cmd.elem_count;
             self.bundle.data.scissor = Rect {
@@ -180,29 +212,39 @@ impl<R: Resources> Renderer<R> {
         }
         Ok(())
     }
-    fn upload_vertex_buffer<F: Factory<R>, C: CommandBuffer<R>>(&mut self,
-                                                                factory: &mut F,
-                                                                encoder: &mut Encoder<R, C>,
-                                                                vtx_buffer: &[ImDrawVert])
-                                                                -> RendererResult<()> {
+    fn upload_vertex_buffer<F: Factory<R>, C: CommandBuffer<R>>(
+        &mut self,
+        factory: &mut F,
+        encoder: &mut Encoder<R, C>,
+        vtx_buffer: &[ImDrawVert],
+    ) -> RendererResult<()> {
         if self.bundle.data.vertex_buffer.len() < vtx_buffer.len() {
-            self.bundle.data.vertex_buffer = factory.create_buffer::<ImDrawVert>(vtx_buffer.len(),
-                                             gfx::buffer::Role::Vertex,
-                                             gfx::memory::Usage::Dynamic,
-                                             Bind::empty())?;
+            self.bundle.data.vertex_buffer = factory.create_buffer::<ImDrawVert>(
+                vtx_buffer.len(),
+                gfx::buffer::Role::Vertex,
+                gfx::memory::Usage::Dynamic,
+                Bind::empty(),
+            )?;
         }
-        Ok(encoder.update_buffer(&self.bundle.data.vertex_buffer, vtx_buffer, 0)?)
+        Ok(encoder.update_buffer(
+            &self.bundle.data.vertex_buffer,
+            vtx_buffer,
+            0,
+        )?)
     }
-    fn upload_index_buffer<F: Factory<R>, C: CommandBuffer<R>>(&mut self,
-                                                               factory: &mut F,
-                                                               encoder: &mut Encoder<R, C>,
-                                                               idx_buffer: &[ImDrawIdx])
-                                                               -> RendererResult<()> {
+    fn upload_index_buffer<F: Factory<R>, C: CommandBuffer<R>>(
+        &mut self,
+        factory: &mut F,
+        encoder: &mut Encoder<R, C>,
+        idx_buffer: &[ImDrawIdx],
+    ) -> RendererResult<()> {
         if self.index_buffer.len() < idx_buffer.len() {
-            self.index_buffer = factory.create_buffer::<ImDrawIdx>(idx_buffer.len(),
-                                            gfx::buffer::Role::Index,
-                                            gfx::memory::Usage::Dynamic,
-                                            Bind::empty())?;
+            self.index_buffer = factory.create_buffer::<ImDrawIdx>(
+                idx_buffer.len(),
+                gfx::buffer::Role::Index,
+                gfx::memory::Usage::Dynamic,
+                Bind::empty(),
+            )?;
             self.bundle.slice.buffer = self.index_buffer.clone().into_index_buffer(factory);
         }
         Ok(encoder.update_buffer(&self.index_buffer, idx_buffer, 0)?)

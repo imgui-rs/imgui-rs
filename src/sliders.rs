@@ -33,11 +33,13 @@ impl<'ui, 'p> SliderInt<'ui, 'p> {
     }
     pub fn build(self) -> bool {
         unsafe {
-            imgui_sys::igSliderInt(self.label.as_ptr(),
-                                   self.value,
-                                   self.min,
-                                   self.max,
-                                   self.display_format.as_ptr())
+            imgui_sys::igSliderInt(
+                self.label.as_ptr(),
+                self.value,
+                self.min,
+                self.max,
+                self.display_format.as_ptr(),
+            )
         }
     }
 }
@@ -123,12 +125,14 @@ impl<'ui, 'p> SliderFloat<'ui, 'p> {
     }
     pub fn build(self) -> bool {
         unsafe {
-            imgui_sys::igSliderFloat(self.label.as_ptr(),
-                                     self.value,
-                                     self.min,
-                                     self.max,
-                                     self.display_format.as_ptr(),
-                                     self.power)
+            imgui_sys::igSliderFloat(
+                self.label.as_ptr(),
+                self.value,
+                self.min,
+                self.max,
+                self.display_format.as_ptr(),
+                self.power,
+            )
         }
     }
 }

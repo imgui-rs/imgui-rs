@@ -80,8 +80,7 @@ impl<'ui, 'p> Window<'ui, 'p> {
     }
     #[inline]
     pub fn scrollable(mut self, value: bool) -> Self {
-        self.flags
-            .set(ImGuiWindowFlags::NoScrollWithMouse, !value);
+        self.flags.set(ImGuiWindowFlags::NoScrollWithMouse, !value);
         self
     }
     #[inline]
@@ -116,38 +115,44 @@ impl<'ui, 'p> Window<'ui, 'p> {
     }
     #[inline]
     pub fn horizontal_scrollbar(mut self, value: bool) -> Self {
-        self.flags
-            .set(ImGuiWindowFlags::HorizontalScrollbar, value);
+        self.flags.set(ImGuiWindowFlags::HorizontalScrollbar, value);
         self
     }
     #[inline]
     pub fn no_focus_on_appearing(mut self, value: bool) -> Self {
-        self.flags
-            .set(ImGuiWindowFlags::NoFocusOnAppearing, value);
+        self.flags.set(ImGuiWindowFlags::NoFocusOnAppearing, value);
         self
     }
     #[inline]
     pub fn no_bring_to_front_on_focus(mut self, value: bool) -> Self {
-        self.flags
-            .set(ImGuiWindowFlags::NoBringToFrontOnFocus, value);
+        self.flags.set(
+            ImGuiWindowFlags::NoBringToFrontOnFocus,
+            value,
+        );
         self
     }
     #[inline]
     pub fn always_vertical_scrollbar(mut self, value: bool) -> Self {
-        self.flags
-            .set(ImGuiWindowFlags::AlwaysVerticalScrollbar, value);
+        self.flags.set(
+            ImGuiWindowFlags::AlwaysVerticalScrollbar,
+            value,
+        );
         self
     }
     #[inline]
     pub fn always_horizontal_scrollbar(mut self, value: bool) -> Self {
-        self.flags
-            .set(ImGuiWindowFlags::AlwaysHorizontalScrollbar, value);
+        self.flags.set(
+            ImGuiWindowFlags::AlwaysHorizontalScrollbar,
+            value,
+        );
         self
     }
     #[inline]
     pub fn always_use_window_padding(mut self, value: bool) -> Self {
-        self.flags
-            .set(ImGuiWindowFlags::AlwaysUseWindowPadding, value);
+        self.flags.set(
+            ImGuiWindowFlags::AlwaysUseWindowPadding,
+            value,
+        );
         self
     }
     pub fn build<F: FnOnce()>(self, f: F) {
@@ -158,13 +163,15 @@ impl<'ui, 'p> Window<'ui, 'p> {
             if !self.size_cond.is_empty() {
                 imgui_sys::igSetNextWindowSize(self.size.into(), self.size_cond);
             }
-            imgui_sys::igBegin2(self.name.as_ptr(),
-                                self.opened
-                                    .map(|x| x as *mut bool)
-                                    .unwrap_or(ptr::null_mut()),
-                                ImVec2::new(0.0, 0.0),
-                                self.bg_alpha,
-                                self.flags)
+            imgui_sys::igBegin2(
+                self.name.as_ptr(),
+                self.opened.map(|x| x as *mut bool).unwrap_or(
+                    ptr::null_mut(),
+                ),
+                ImVec2::new(0.0, 0.0),
+                self.bg_alpha,
+                self.flags,
+            )
         };
         if render {
             f();
