@@ -41,7 +41,8 @@ pub use imgui_sys::{ImDrawIdx, ImDrawVert, ImGuiColorEditFlags, ImGuiInputTextFl
                     ImGuiSelectableFlags, ImGuiCond, ImGuiCol, ImGuiStyle, ImGuiTreeNodeFlags,
                     ImGuiWindowFlags, ImVec2, ImVec4};
 pub use child_frame::ChildFrame;
-pub use color_editors::{ColorEdit, ColorEditMode, ColorPicker, EditableColor, EditableColorFormat};
+pub use color_editors::{ColorEdit, ColorEditMode, ColorPicker, ColorPickerMode, EditableColor,
+                        EditableColorFormat, EditableColorPreview};
 pub use input::{InputFloat, InputFloat2, InputFloat3, InputFloat4, InputInt, InputInt2, InputInt3,
                 InputInt4, InputText};
 pub use menus::{Menu, MenuItem};
@@ -641,6 +642,7 @@ impl<'ui> Ui<'ui> {
 
 // Widgets: Color Editor/Picker
 impl<'ui> Ui<'ui> {
+    /// Constructs a new color editor builder.
     pub fn color_edit<'p, V: Into<EditableColor<'p>>>(
         &self,
         label: &'p ImStr,
@@ -657,6 +659,7 @@ impl<'ui> Ui<'ui> {
     pub fn color_edit4<'p>(&self, label: &'p ImStr, value: &'p mut [f32; 4]) -> ColorEdit<'ui, 'p> {
         self.color_edit(label, value)
     }
+    /// Constructs a new color picker builder.
     pub fn color_picker<'p, V: Into<EditableColor<'p>>>(
         &self,
         label: &'p ImStr,
