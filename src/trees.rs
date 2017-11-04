@@ -1,4 +1,4 @@
-use imgui_sys;
+use sys;
 use std::marker::PhantomData;
 
 use super::{ImGuiCond, ImGuiTreeNodeFlags, ImStr, Ui};
@@ -36,9 +36,9 @@ impl<'ui, 'p> TreeNode<'ui, 'p> {
     pub fn build<F: FnOnce()>(self, f: F) {
         let render = unsafe {
             if !self.opened_cond.is_empty() {
-                imgui_sys::igSetNextTreeNodeOpen(self.opened, self.opened_cond);
+                sys::igSetNextTreeNodeOpen(self.opened, self.opened_cond);
             }
-            imgui_sys::igTreeNodeStr(
+            sys::igTreeNodeStr(
                 self.id.as_ptr(),
                 super::fmt_ptr(),
                 self.label.unwrap_or(self.id).as_ptr(),
@@ -46,7 +46,7 @@ impl<'ui, 'p> TreeNode<'ui, 'p> {
         };
         if render {
             f();
-            unsafe { imgui_sys::igTreePop() };
+            unsafe { sys::igTreePop() };
         }
     }
 }
@@ -104,6 +104,6 @@ impl<'ui, 'p> CollapsingHeader<'ui, 'p> {
         self
     }
     pub fn build(self) -> bool {
-        unsafe { imgui_sys::igCollapsingHeader(self.label.as_ptr(), self.flags) }
+        unsafe { sys::igCollapsingHeader(self.label.as_ptr(), self.flags) }
     }
 }

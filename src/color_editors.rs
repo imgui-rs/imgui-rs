@@ -1,5 +1,5 @@
 #![warn(missing_docs)]
-use imgui_sys;
+use sys;
 use std::marker::PhantomData;
 use std::ptr;
 
@@ -202,10 +202,10 @@ impl<'ui, 'p> ColorEdit<'ui, 'p> {
     pub fn build(self) -> bool {
         match self.value {
             EditableColor::Float3(value) => unsafe {
-                imgui_sys::igColorEdit3(self.label.as_ptr(), value.as_mut_ptr(), self.flags)
+                sys::igColorEdit3(self.label.as_ptr(), value.as_mut_ptr(), self.flags)
             },
             EditableColor::Float4(value) => unsafe {
-                imgui_sys::igColorEdit4(self.label.as_ptr(), value.as_mut_ptr(), self.flags)
+                sys::igColorEdit4(self.label.as_ptr(), value.as_mut_ptr(), self.flags)
             },
         }
     }
@@ -351,7 +351,7 @@ impl<'ui, 'p> ColorPicker<'ui, 'p> {
         }
         let ref_color = self.ref_color.map(|c| c.as_ptr()).unwrap_or(ptr::null());
         unsafe {
-            imgui_sys::igColorPicker4(
+            sys::igColorPicker4(
                 self.label.as_ptr(),
                 self.value.as_mut_ptr(),
                 self.flags,

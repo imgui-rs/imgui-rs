@@ -1,4 +1,4 @@
-use imgui_sys;
+use sys;
 use std::marker::PhantomData;
 use std::ptr;
 
@@ -160,12 +160,12 @@ impl<'ui, 'p> Window<'ui, 'p> {
     pub fn build<F: FnOnce()>(self, f: F) {
         let render = unsafe {
             if !self.pos_cond.is_empty() {
-                imgui_sys::igSetNextWindowPos(self.pos.into(), self.pos_cond);
+                sys::igSetNextWindowPos(self.pos.into(), self.pos_cond);
             }
             if !self.size_cond.is_empty() {
-                imgui_sys::igSetNextWindowSize(self.size.into(), self.size_cond);
+                sys::igSetNextWindowSize(self.size.into(), self.size_cond);
             }
-            imgui_sys::igBegin2(
+            sys::igBegin2(
                 self.name.as_ptr(),
                 self.opened.map(|x| x as *mut bool).unwrap_or(
                     ptr::null_mut(),
@@ -178,6 +178,6 @@ impl<'ui, 'p> Window<'ui, 'p> {
         if render {
             f();
         }
-        unsafe { imgui_sys::igEnd() };
+        unsafe { sys::igEnd() };
     }
 }

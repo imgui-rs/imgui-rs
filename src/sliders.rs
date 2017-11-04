@@ -1,4 +1,4 @@
-use imgui_sys;
+use sys;
 use std::marker::PhantomData;
 
 use super::{ImStr, Ui};
@@ -33,7 +33,7 @@ impl<'ui, 'p> SliderInt<'ui, 'p> {
     }
     pub fn build(self) -> bool {
         unsafe {
-            imgui_sys::igSliderInt(
+            sys::igSliderInt(
                 self.label.as_ptr(),
                 self.value,
                 self.min,
@@ -74,7 +74,7 @@ macro_rules! impl_slider_intn {
             }
             pub fn build(self) -> bool {
                 unsafe {
-                    imgui_sys::$igSliderIntN(
+                    sys::$igSliderIntN(
                         self.label.as_ptr(),
                         self.value.as_mut_ptr(),
                         self.min,
@@ -125,7 +125,7 @@ impl<'ui, 'p> SliderFloat<'ui, 'p> {
     }
     pub fn build(self) -> bool {
         unsafe {
-            imgui_sys::igSliderFloat(
+            sys::igSliderFloat(
                 self.label.as_ptr(),
                 self.value,
                 self.min,
@@ -174,7 +174,7 @@ macro_rules! impl_slider_floatn {
             }
             pub fn build(self) -> bool {
                 unsafe {
-                    imgui_sys::$igSliderFloatN(
+                    sys::$igSliderFloatN(
                         self.label.as_ptr(),
                         self.value.as_mut_ptr(),
                         self.min,

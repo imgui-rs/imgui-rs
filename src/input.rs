@@ -1,4 +1,4 @@
-use imgui_sys;
+use sys;
 use std::marker::PhantomData;
 use std::ptr;
 
@@ -143,7 +143,7 @@ impl<'ui, 'p> InputText<'ui, 'p> {
 
     pub fn build(self) -> bool {
         unsafe {
-            imgui_sys::igInputText(
+            sys::igInputText(
                 self.label.as_ptr(),
                 self.buf.as_mut_ptr(),
                 self.buf.capacity_with_nul(),
@@ -179,7 +179,7 @@ impl<'ui, 'p> InputInt<'ui, 'p> {
 
     pub fn build(self) -> bool {
         unsafe {
-            imgui_sys::igInputInt(
+            sys::igInputInt(
                 self.label.as_ptr(),
                 self.value as *mut i32,
                 self.step,
@@ -219,7 +219,7 @@ impl<'ui, 'p> InputFloat<'ui, 'p> {
 
     pub fn build(self) -> bool {
         unsafe {
-            imgui_sys::igInputFloat(
+            sys::igInputFloat(
                 self.label.as_ptr(),
                 self.value as *mut f32,
                 self.step,
@@ -259,7 +259,7 @@ macro_rules! impl_input_floatn {
 
             pub fn build(self) -> bool {
                 unsafe {
-                    imgui_sys::$igInputFloatN(
+                    sys::$igInputFloatN(
                         self.label.as_ptr(),
                         self.value.as_mut_ptr(),
                         self.decimal_precision,
@@ -299,7 +299,7 @@ macro_rules! impl_input_intn {
 
             pub fn build(self) -> bool {
                 unsafe {
-                    imgui_sys::$igInputIntN(
+                    sys::$igInputIntN(
                         self.label.as_ptr(),
                         self.value.as_mut_ptr(),
                         self.flags)

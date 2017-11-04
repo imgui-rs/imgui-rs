@@ -1,4 +1,4 @@
-use imgui_sys;
+use sys;
 use std::marker::PhantomData;
 
 use super::{ImStr, ImVec2, ImGuiWindowFlags, Ui};
@@ -108,11 +108,11 @@ impl<'ui, 'p> ChildFrame<'ui, 'p> {
         let show_border = false;
 
         let render_child_frame = unsafe {
-            imgui_sys::igBeginChild(self.name.as_ptr(), self.size, show_border, self.flags)
+            sys::igBeginChild(self.name.as_ptr(), self.size, show_border, self.flags)
         };
         if render_child_frame {
             f();
         }
-        unsafe { imgui_sys::igEndChild() };
+        unsafe { sys::igEndChild() };
     }
 }

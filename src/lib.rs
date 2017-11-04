@@ -1,4 +1,4 @@
-extern crate imgui_sys;
+pub extern crate imgui_sys as sys;
 
 use std::ffi::CStr;
 use std::mem;
@@ -6,10 +6,10 @@ use std::os::raw::{c_char, c_float, c_int, c_uchar, c_void};
 use std::ptr;
 use std::slice;
 use std::str;
-use imgui_sys::ImGuiStyleVar;
+use sys::ImGuiStyleVar;
 
 #[allow(deprecated)]
-pub use imgui_sys::{ImGuiInputTextFlags_AllowTabInput, ImGuiInputTextFlags_AlwaysInsertMode,
+pub use sys::{ImGuiInputTextFlags_AllowTabInput, ImGuiInputTextFlags_AlwaysInsertMode,
                     ImGuiInputTextFlags_AutoSelectAll, ImGuiInputTextFlags_CallbackAlways,
                     ImGuiInputTextFlags_CallbackCharFilter,
                     ImGuiInputTextFlags_CallbackCompletion, ImGuiInputTextFlags_CallbackHistory,
@@ -37,7 +37,7 @@ pub use imgui_sys::{ImGuiInputTextFlags_AllowTabInput, ImGuiInputTextFlags_Alway
                     ImGuiWindowFlags_NoScrollbar, ImGuiWindowFlags_NoTitleBar,
                     ImGuiWindowFlags_ShowBorders};
 
-pub use imgui_sys::{ImDrawIdx, ImDrawVert, ImGuiColorEditFlags, ImGuiInputTextFlags, ImGuiKey,
+pub use sys::{ImDrawIdx, ImDrawVert, ImGuiColorEditFlags, ImGuiInputTextFlags, ImGuiKey,
                     ImGuiSelectableFlags, ImGuiCond, ImGuiCol, ImGuiStyle, ImGuiTreeNodeFlags,
                     ImGuiWindowFlags, ImVec2, ImVec4};
 pub use child_frame::ChildFrame;
@@ -99,7 +99,7 @@ pub struct TextureHandle<'a> {
 
 pub fn get_version() -> &'static str {
     unsafe {
-        let bytes = CStr::from_ptr(imgui_sys::igGetVersion()).to_bytes();
+        let bytes = CStr::from_ptr(sys::igGetVersion()).to_bytes();
         str::from_utf8_unchecked(bytes)
     }
 }
@@ -111,10 +111,10 @@ impl ImGui {
             log_filename: None,
         }
     }
-    fn io(&self) -> &imgui_sys::ImGuiIO { unsafe { &*imgui_sys::igGetIO() } }
-    fn io_mut(&mut self) -> &mut imgui_sys::ImGuiIO { unsafe { &mut *imgui_sys::igGetIO() } }
-    pub fn style(&self) -> &ImGuiStyle { unsafe { &*imgui_sys::igGetStyle() } }
-    pub fn style_mut(&mut self) -> &mut ImGuiStyle { unsafe { &mut *imgui_sys::igGetStyle() } }
+    fn io(&self) -> &sys::ImGuiIO { unsafe { &*sys::igGetIO() } }
+    fn io_mut(&mut self) -> &mut sys::ImGuiIO { unsafe { &mut *sys::igGetIO() } }
+    pub fn style(&self) -> &ImGuiStyle { unsafe { &*sys::igGetStyle() } }
+    pub fn style_mut(&mut self) -> &mut ImGuiStyle { unsafe { &mut *sys::igGetStyle() } }
     pub fn prepare_texture<'a, F, T>(&mut self, f: F) -> T
     where
         F: FnOnce(TextureHandle<'a>) -> T,
@@ -125,7 +125,7 @@ impl ImGui {
         let mut height: c_int = 0;
         let mut bytes_per_pixel: c_int = 0;
         unsafe {
-            imgui_sys::ImFontAtlas_GetTexDataAsRGBA32(
+            sys::ImFontAtlas_GetTexDataAsRGBA32(
                 io.fonts,
                 &mut pixels,
                 &mut width,
@@ -252,11 +252,11 @@ impl ImGui {
         let mut buf = [0; 5];
         character.encode_utf8(&mut buf);
         unsafe {
-            imgui_sys::ImGuiIO_AddInputCharactersUTF8(buf.as_ptr() as *const _);
+            sys::ImGuiIO_AddInputCharactersUTF8(buf.as_ptr() as *const _);
         }
     }
-    pub fn get_time(&self) -> f32 { unsafe { imgui_sys::igGetTime() } }
-    pub fn get_frame_count(&self) -> i32 { unsafe { imgui_sys::igGetFrameCount() } }
+    pub fn get_time(&self) -> f32 { unsafe { sys::igGetTime() } }
+    pub fn get_frame_count(&self) -> i32 { unsafe { sys::igGetFrameCount() } }
     pub fn get_frame_rate(&self) -> f32 { self.io().framerate }
     pub fn frame<'ui, 'a: 'ui>(
         &'a mut self,
@@ -281,7 +281,7 @@ impl ImGui {
             io.delta_time = delta_time;
         }
         unsafe {
-            imgui_sys::igNewFrame();
+            sys::igNewFrame();
             CURRENT_UI = Some(Ui { imgui: mem::transmute(self as &'a ImGui) });
         }
         Ui { imgui: self }
@@ -292,7 +292,7 @@ impl Drop for ImGui {
     fn drop(&mut self) {
         unsafe {
             CURRENT_UI = None;
-            imgui_sys::igShutdown();
+            sys::igShutdown();
         }
     }
 }
@@ -300,9 +300,9 @@ impl Drop for ImGui {
 static mut CURRENT_UI: Option<Ui<'static>> = None;
 
 pub struct DrawList<'a> {
-    pub cmd_buffer: &'a [imgui_sys::ImDrawCmd],
-    pub idx_buffer: &'a [imgui_sys::ImDrawIdx],
-    pub vtx_buffer: &'a [imgui_sys::ImDrawVert],
+    pub cmd_buffer: &'a [sys::ImDrawCmd],
+    pub idx_buffer: &'a [sys::ImDrawIdx],
+    pub vtx_buffer: &'a [sys::ImDrawVert],
 }
 
 pub struct Ui<'ui> {
@@ -348,9 +348,9 @@ impl<'ui> Ui<'ui> {
         F: FnMut(&Ui, DrawList) -> Result<(), E>,
     {
         unsafe {
-            imgui_sys::igRender();
+            sys::igRender();
 
-            let draw_data = imgui_sys::igGetDrawData();
+            let draw_data = sys::igGetDrawData();
             for &cmd_list in (*draw_data).cmd_lists() {
                 let draw_list = DrawList {
                     cmd_buffer: (*cmd_list).cmd_buffer.as_slice(),
@@ -363,23 +363,23 @@ impl<'ui> Ui<'ui> {
         }
         Ok(())
     }
-    pub fn show_user_guide(&self) { unsafe { imgui_sys::igShowUserGuide() }; }
+    pub fn show_user_guide(&self) { unsafe { sys::igShowUserGuide() }; }
     pub fn show_default_style_editor(&self) {
-        unsafe { imgui_sys::igShowStyleEditor(ptr::null_mut()) };
+        unsafe { sys::igShowStyleEditor(ptr::null_mut()) };
     }
     pub fn show_style_editor<'p>(&self, style: &'p mut ImGuiStyle) {
         unsafe {
-            imgui_sys::igShowStyleEditor(style as *mut ImGuiStyle);
+            sys::igShowStyleEditor(style as *mut ImGuiStyle);
         }
     }
     pub fn show_test_window(&self, opened: &mut bool) {
         unsafe {
-            imgui_sys::igShowTestWindow(opened);
+            sys::igShowTestWindow(opened);
         }
     }
     pub fn show_metrics_window(&self, opened: &mut bool) {
         unsafe {
-            imgui_sys::igShowMetricsWindow(opened);
+            sys::igShowMetricsWindow(opened);
         }
     }
 }
@@ -396,13 +396,13 @@ impl<'ui> Ui<'ui> {
 // Layout
 impl<'ui> Ui<'ui> {
     /// Pushes a value to the item width stack.
-    pub fn push_item_width(&self, width: f32) { unsafe { imgui_sys::igPushItemWidth(width) } }
+    pub fn push_item_width(&self, width: f32) { unsafe { sys::igPushItemWidth(width) } }
 
     /// Pops a value from the item width stack.
     ///
     /// # Aborts
     /// The current process is aborted if the item width stack is empty.
-    pub fn pop_item_width(&self) { unsafe { imgui_sys::igPopItemWidth() } }
+    pub fn pop_item_width(&self) { unsafe { sys::igPopItemWidth() } }
 
     /// Runs a function after temporarily pushing a value to the item width stack.
     pub fn with_item_width<F>(&self, width: f32, f: F)
@@ -414,47 +414,47 @@ impl<'ui> Ui<'ui> {
         self.pop_item_width();
     }
 
-    pub fn separator(&self) { unsafe { imgui_sys::igSeparator() }; }
-    pub fn new_line(&self) { unsafe { imgui_sys::igNewLine() } }
-    pub fn same_line(&self, pos_x: f32) { unsafe { imgui_sys::igSameLine(pos_x, -1.0f32) } }
+    pub fn separator(&self) { unsafe { sys::igSeparator() }; }
+    pub fn new_line(&self) { unsafe { sys::igNewLine() } }
+    pub fn same_line(&self, pos_x: f32) { unsafe { sys::igSameLine(pos_x, -1.0f32) } }
     pub fn same_line_spacing(&self, pos_x: f32, spacing_w: f32) {
-        unsafe { imgui_sys::igSameLine(pos_x, spacing_w) }
+        unsafe { sys::igSameLine(pos_x, spacing_w) }
     }
-    pub fn spacing(&self) { unsafe { imgui_sys::igSpacing() }; }
+    pub fn spacing(&self) { unsafe { sys::igSpacing() }; }
 
     pub fn columns<'p>(&self, count: i32, id: &'p ImStr, border: bool) {
-        unsafe { imgui_sys::igColumns(count, id.as_ptr(), border) }
+        unsafe { sys::igColumns(count, id.as_ptr(), border) }
     }
 
-    pub fn next_column(&self) { unsafe { imgui_sys::igNextColumn() } }
+    pub fn next_column(&self) { unsafe { sys::igNextColumn() } }
 
-    pub fn get_column_index(&self) -> i32 { unsafe { imgui_sys::igGetColumnIndex() } }
+    pub fn get_column_index(&self) -> i32 { unsafe { sys::igGetColumnIndex() } }
 
     pub fn get_column_offset(&self, column_index: i32) -> f32 {
-        unsafe { imgui_sys::igGetColumnOffset(column_index) }
+        unsafe { sys::igGetColumnOffset(column_index) }
     }
 
     pub fn set_column_offset(&self, column_index: i32, offset_x: f32) {
-        unsafe { imgui_sys::igSetColumnOffset(column_index, offset_x) }
+        unsafe { sys::igSetColumnOffset(column_index, offset_x) }
     }
 
     pub fn get_column_width(&self, column_index: i32) -> f32 {
-        unsafe { imgui_sys::igGetColumnWidth(column_index) }
+        unsafe { sys::igGetColumnWidth(column_index) }
     }
 
-    pub fn get_columns_count(&self) -> i32 { unsafe { imgui_sys::igGetColumnsCount() } }
+    pub fn get_columns_count(&self) -> i32 { unsafe { sys::igGetColumnsCount() } }
 }
 
 // ID scopes
 impl<'ui> Ui<'ui> {
     /// Pushes an identifier to the ID stack.
-    pub fn push_id(&self, id: i32) { unsafe { imgui_sys::igPushIDInt(id) }; }
+    pub fn push_id(&self, id: i32) { unsafe { sys::igPushIDInt(id) }; }
 
     /// Pops an identifier from the ID stack.
     ///
     /// # Aborts
     /// The current process is aborted if the ID stack is empty.
-    pub fn pop_id(&self) { unsafe { imgui_sys::igPopID() }; }
+    pub fn pop_id(&self) { unsafe { sys::igPopID() }; }
 
     /// Runs a function after temporarily pushing a value to the ID stack.
     pub fn with_id<F>(&self, id: i32, f: F)
@@ -474,7 +474,7 @@ impl<'ui> Ui<'ui> {
         unsafe {
             let start = s.as_ptr();
             let end = start.offset(s.len() as isize);
-            imgui_sys::igTextUnformatted(start as *const c_char, end as *const c_char);
+            sys::igTextUnformatted(start as *const c_char, end as *const c_char);
         }
     }
     pub fn text_colored<'p, A>(&self, col: A, text: &'p ImStr)
@@ -482,42 +482,42 @@ impl<'ui> Ui<'ui> {
         A: Into<ImVec4>,
     {
         unsafe {
-            imgui_sys::igTextColored(col.into(), fmt_ptr(), text.as_ptr());
+            sys::igTextColored(col.into(), fmt_ptr(), text.as_ptr());
         }
     }
     pub fn text_disabled<'p>(&self, text: &'p ImStr) {
         unsafe {
-            imgui_sys::igTextDisabled(fmt_ptr(), text.as_ptr());
+            sys::igTextDisabled(fmt_ptr(), text.as_ptr());
         }
     }
     pub fn text_wrapped<'p>(&self, text: &'p ImStr) {
         unsafe {
-            imgui_sys::igTextWrapped(fmt_ptr(), text.as_ptr());
+            sys::igTextWrapped(fmt_ptr(), text.as_ptr());
         }
     }
     pub fn label_text<'p>(&self, label: &'p ImStr, text: &'p ImStr) {
         unsafe {
-            imgui_sys::igLabelText(label.as_ptr(), fmt_ptr(), text.as_ptr());
+            sys::igLabelText(label.as_ptr(), fmt_ptr(), text.as_ptr());
         }
     }
     pub fn bullet(&self) {
         unsafe {
-            imgui_sys::igBullet();
+            sys::igBullet();
         }
     }
     pub fn bullet_text<'p>(&self, text: &'p ImStr) {
         unsafe {
-            imgui_sys::igBulletText(fmt_ptr(), text.as_ptr());
+            sys::igBulletText(fmt_ptr(), text.as_ptr());
         }
     }
     pub fn button<'p, S: Into<ImVec2>>(&self, label: &'p ImStr, size: S) -> bool {
-        unsafe { imgui_sys::igButton(label.as_ptr(), size.into()) }
+        unsafe { sys::igButton(label.as_ptr(), size.into()) }
     }
     pub fn small_button<'p>(&self, label: &'p ImStr) -> bool {
-        unsafe { imgui_sys::igSmallButton(label.as_ptr()) }
+        unsafe { sys::igSmallButton(label.as_ptr()) }
     }
     pub fn checkbox<'p>(&self, label: &'p ImStr, value: &'p mut bool) -> bool {
-        unsafe { imgui_sys::igCheckbox(label.as_ptr(), value) }
+        unsafe { sys::igCheckbox(label.as_ptr(), value) }
     }
 }
 
@@ -686,7 +686,7 @@ impl<'ui> Ui<'ui> {
         flags: ImGuiSelectableFlags,
         size: S,
     ) -> bool {
-        unsafe { imgui_sys::igSelectable(label.as_ptr(), selected, flags, size.into()) }
+        unsafe { sys::igSelectable(label.as_ptr(), selected, flags, size.into()) }
     }
 }
 
@@ -696,20 +696,20 @@ impl<'ui> Ui<'ui> {
     where
         F: FnOnce(),
     {
-        let render = unsafe { imgui_sys::igBeginMainMenuBar() };
+        let render = unsafe { sys::igBeginMainMenuBar() };
         if render {
             f();
-            unsafe { imgui_sys::igEndMainMenuBar() };
+            unsafe { sys::igEndMainMenuBar() };
         }
     }
     pub fn menu_bar<F>(&self, f: F)
     where
         F: FnOnce(),
     {
-        let render = unsafe { imgui_sys::igBeginMenuBar() };
+        let render = unsafe { sys::igBeginMenuBar() };
         if render {
             f();
-            unsafe { imgui_sys::igEndMenuBar() };
+            unsafe { sys::igEndMenuBar() };
         }
     }
     pub fn menu<'p>(&self, label: &'p ImStr) -> Menu<'ui, 'p> { Menu::new(self, label) }
@@ -721,19 +721,19 @@ impl<'ui> Ui<'ui> {
 // Widgets: Popups
 impl<'ui> Ui<'ui> {
     pub fn open_popup<'p>(&self, str_id: &'p ImStr) {
-        unsafe { imgui_sys::igOpenPopup(str_id.as_ptr()) };
+        unsafe { sys::igOpenPopup(str_id.as_ptr()) };
     }
     pub fn popup<'p, F>(&self, str_id: &'p ImStr, f: F)
     where
         F: FnOnce(),
     {
-        let render = unsafe { imgui_sys::igBeginPopup(str_id.as_ptr()) };
+        let render = unsafe { sys::igBeginPopup(str_id.as_ptr()) };
         if render {
             f();
-            unsafe { imgui_sys::igEndPopup() };
+            unsafe { sys::igEndPopup() };
         }
     }
-    pub fn close_current_popup(&self) { unsafe { imgui_sys::igCloseCurrentPopup() }; }
+    pub fn close_current_popup(&self) { unsafe { sys::igCloseCurrentPopup() }; }
 }
 
 // Widgets: Combos
@@ -747,7 +747,7 @@ impl<'ui> Ui<'ui> {
     ) -> bool {
         let items_inner: Vec<*const c_char> = items.into_iter().map(|item| item.as_ptr()).collect();
         unsafe {
-            imgui_sys::igCombo(
+            sys::igCombo(
                 label.as_ptr(),
                 current_item,
                 items_inner.as_ptr() as *mut *const c_char,
@@ -769,7 +769,7 @@ impl<'ui> Ui<'ui> {
     ) -> bool {
         let items_inner: Vec<*const c_char> = items.into_iter().map(|item| item.as_ptr()).collect();
         unsafe {
-            imgui_sys::igListBox(
+            sys::igListBox(
                 label.as_ptr(),
                 current_item,
                 items_inner.as_ptr() as *mut *const c_char,
@@ -796,7 +796,7 @@ impl<'ui> Ui<'ui> {
     /// ui.radio_button(im_str!("Item 3"), &mut selected_radio_value, 3);
     /// ```
     pub fn radio_button<'p>(&self, label: &'p ImStr, value: &'p mut i32, wanted: i32) -> bool {
-        unsafe { imgui_sys::igRadioButton(label.as_ptr(), value, wanted) }
+        unsafe { sys::igRadioButton(label.as_ptr(), value, wanted) }
     }
 
     /// Creates a radio button that shows as selected if the given value is true.
@@ -816,7 +816,7 @@ impl<'ui> Ui<'ui> {
     /// }
     /// ```
     pub fn radio_button_bool<'p>(&self, label: &'p ImStr, value: bool) -> bool {
-        unsafe { imgui_sys::igRadioButtonBool(label.as_ptr(), value) }
+        unsafe { sys::igRadioButtonBool(label.as_ptr(), value) }
     }
 }
 
@@ -851,7 +851,7 @@ impl<'ui> Ui<'ui> {
     ) -> ImVec2 {
         let mut buffer = ImVec2::new(0.0, 0.0);
         unsafe {
-            imgui_sys::igCalcTextSize(
+            sys::igCalcTextSize(
                 &mut buffer as *mut ImVec2,
                 text.as_ptr(),
                 std::ptr::null(),
@@ -926,7 +926,7 @@ impl<'ui> Ui<'ui> {
     pub fn with_style_var<F: FnOnce()>(&self, style_var: StyleVar, f: F) {
         self.push_style_var(style_var);
         f();
-        unsafe { imgui_sys::igPopStyleVar(1) }
+        unsafe { sys::igPopStyleVar(1) }
     }
 
     /// Runs a function after temporarily pushing an array of values into the stack. Supporting
@@ -950,13 +950,13 @@ impl<'ui> Ui<'ui> {
             self.push_style_var(style_var);
         }
         f();
-        unsafe { imgui_sys::igPopStyleVar(style_vars.len() as i32) };
+        unsafe { sys::igPopStyleVar(style_vars.len() as i32) };
     }
 
     #[inline]
     fn push_style_var(&self, style_var: StyleVar) {
         use StyleVar::*;
-        use imgui_sys::{igPushStyleVar, igPushStyleVarVec};
+        use sys::{igPushStyleVar, igPushStyleVarVec};
         match style_var {
             Alpha(v) => unsafe { igPushStyleVar(ImGuiStyleVar::Alpha, v) },
             WindowPadding(v) => unsafe { igPushStyleVarVec(ImGuiStyleVar::WindowPadding, v) },
@@ -995,11 +995,11 @@ impl<'ui> Ui<'ui> {
         f: F,
     ) {
         unsafe {
-            imgui_sys::igPushStyleColor(var, color.into());
+            sys::igPushStyleColor(var, color.into());
         }
         f();
         unsafe {
-            imgui_sys::igPopStyleColor(1);
+            sys::igPopStyleColor(1);
         }
     }
 
@@ -1024,10 +1024,10 @@ impl<'ui> Ui<'ui> {
     ) {
         for &(color_var, color) in color_vars {
             unsafe {
-                imgui_sys::igPushStyleColor(color_var, color.into());
+                sys::igPushStyleColor(color_var, color.into());
             }
         }
         f();
-        unsafe { imgui_sys::igPopStyleColor(color_vars.len() as i32) };
+        unsafe { sys::igPopStyleColor(color_vars.len() as i32) };
     }
 }
