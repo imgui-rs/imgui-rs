@@ -5,6 +5,7 @@
 ### Added
 
 - Namespaced flags (e.g. `ImGuiWindowFlags`)
+- Color picker widget
 
 ### Changed
 

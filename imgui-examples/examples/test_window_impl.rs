@@ -43,25 +43,35 @@ struct State {
     auto_resize_state: AutoResizeState,
     file_menu: FileMenuState,
     radio_button: i32,
-    color_picker: ColorPickerState,
+    color_edit: ColorEditState,
 }
 
-struct ColorPickerState {
+struct ColorEditState {
     color: [f32; 4],
     hdr: bool,
     alpha_preview: bool,
     alpha_half_preview: bool,
     options_menu: bool,
+    alpha: bool,
+    alpha_bar: bool,
+    side_preview: bool,
+    ref_color: bool,
+    ref_color_v: [f32; 4],
 }
 
-impl Default for ColorPickerState {
+impl Default for ColorEditState {
     fn default() -> Self {
-        ColorPickerState {
+        ColorEditState {
             color: [114.0 / 255.0, 144.0 / 255.0, 154.0 / 255.0, 200.0 / 255.0],
             hdr: false,
             alpha_preview: true,
             alpha_half_preview: false,
             options_menu: true,
+            alpha: true,
+            alpha_bar: true,
+            side_preview: true,
+            ref_color: false,
+            ref_color_v: [1.0, 0.0, 1.0, 0.5],
         }
     }
 }
@@ -108,7 +118,7 @@ impl Default for State {
             auto_resize_state: Default::default(),
             file_menu: Default::default(),
             radio_button: 0,
-            color_picker: ColorPickerState::default(),
+            color_edit: ColorEditState::default(),
         }
     }
 }
@@ -422,7 +432,7 @@ fn show_test_window<'a>(ui: &Ui<'a>, state: &mut State, opened: &mut bool) {
                 });
 
                 ui.tree_node(im_str!("Color/Picker Widgets")).build(|| {
-                  let ref mut s = state.color_picker;
+                  let ref mut s = state.color_edit;
                   ui.checkbox(im_str!("With HDR"), &mut s.hdr);
                   ui.same_line(0.0);
                   show_help_marker(ui, im_str!("Currently all this does is to lift the 0..1 limits on dragging widgets."));
@@ -471,6 +481,33 @@ fn show_test_window<'a>(ui: &Ui<'a>, state: &mut State, opened: &mut bool) {
                     .inputs(false)
                     .label(false)
                     .build();
+
+                  ui.text(im_str!("Color picker:"));
+                  ui.checkbox(im_str!("With Alpha"), &mut s.alpha);
+                  ui.checkbox(im_str!("With Alpha Bar"), &mut s.alpha_bar);
+                  ui.checkbox(im_str!("With Side Preview"), &mut s.side_preview);
+                  if s.side_preview {
+                    ui.same_line(0.0);
+                    ui.checkbox(im_str!("With Ref Color"), &mut s.ref_color);
+                    if s.ref_color {
+                      ui.same_line(0.0);
+                      ui.color_edit(im_str!("##RefColor"), &mut s.ref_color_v)
+                        .flags(misc_flags)
+                        .inputs(false)
+                        .build();
+                    }
+                  }
+                  let mut b = ui.color_picker(im_str!("MyColor##4"), &mut s.color)
+                    .flags(misc_flags)
+                    .alpha(s.alpha)
+                    .alpha_bar(s.alpha_bar)
+                    .side_preview(s.side_preview)
+                    .rgb(true);
+
+                  if s.ref_color {
+                    b = b.reference_color(s.ref_color_v)
+                  }
+                  b.build();
                 });
             }
             if ui.collapsing_header(im_str!("Popups & Modal windows"))
