@@ -292,9 +292,7 @@ impl<'ui, 'p> ColorPicker<'ui, 'p> {
         if let EditableColor::Float3(_) = self.value {
             self.flags.insert(ImGuiColorEditFlags::NoAlpha);
         }
-        let ref_color = self.ref_color.map(|c| c.as_ptr()).unwrap_or(
-            ptr::null(),
-        );
+        let ref_color = self.ref_color.map(|c| c.as_ptr()).unwrap_or(ptr::null());
         unsafe {
             imgui_sys::igColorPicker4(
                 self.label.as_ptr(),
