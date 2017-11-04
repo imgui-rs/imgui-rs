@@ -10,36 +10,33 @@ use sys::ImGuiStyleVar;
 
 #[allow(deprecated)]
 pub use sys::{ImGuiInputTextFlags_AllowTabInput, ImGuiInputTextFlags_AlwaysInsertMode,
-                    ImGuiInputTextFlags_AutoSelectAll, ImGuiInputTextFlags_CallbackAlways,
-                    ImGuiInputTextFlags_CallbackCharFilter,
-                    ImGuiInputTextFlags_CallbackCompletion, ImGuiInputTextFlags_CallbackHistory,
-                    ImGuiInputTextFlags_CharsDecimal, ImGuiInputTextFlags_CharsHexadecimal,
-                    ImGuiInputTextFlags_CharsNoBlank, ImGuiInputTextFlags_CharsUppercase,
-                    ImGuiInputTextFlags_CtrlEnterForNewLine, ImGuiInputTextFlags_EnterReturnsTrue,
-                    ImGuiInputTextFlags_NoHorizontalScroll, ImGuiInputTextFlags_Password,
-                    ImGuiInputTextFlags_ReadOnly, ImGuiSelectableFlags_DontClosePopups,
-                    ImGuiSelectableFlags_SpanAllColumns, ImGuiSetCond_Always,
-                    ImGuiSetCond_Appearing, ImGuiSetCond_FirstUseEver, ImGuiSetCond_Once,
-                    ImGuiTreeNodeFlags_AllowOverlapMode, ImGuiTreeNodeFlags_Bullet,
-                    ImGuiTreeNodeFlags_CollapsingHeader, ImGuiTreeNodeFlags_DefaultOpen,
-                    ImGuiTreeNodeFlags_Framed, ImGuiTreeNodeFlags_Leaf,
-                    ImGuiTreeNodeFlags_NoAutoOpenOnLog, ImGuiTreeNodeFlags_NoTreePushOnOpen,
-                    ImGuiTreeNodeFlags_OpenOnArrow, ImGuiTreeNodeFlags_OpenOnDoubleClick,
-                    ImGuiTreeNodeFlags_Selected, ImGuiWindowFlags_AlwaysAutoResize,
-                    ImGuiWindowFlags_AlwaysHorizontalScrollbar,
-                    ImGuiWindowFlags_AlwaysUseWindowPadding,
-                    ImGuiWindowFlags_AlwaysVerticalScrollbar,
-                    ImGuiWindowFlags_HorizontalScrollbar, ImGuiWindowFlags_MenuBar,
-                    ImGuiWindowFlags_NoBringToFrontOnFocus, ImGuiWindowFlags_NoCollapse,
-                    ImGuiWindowFlags_NoFocusOnAppearing, ImGuiWindowFlags_NoInputs,
-                    ImGuiWindowFlags_NoMove, ImGuiWindowFlags_NoResize,
-                    ImGuiWindowFlags_NoSavedSettings, ImGuiWindowFlags_NoScrollWithMouse,
-                    ImGuiWindowFlags_NoScrollbar, ImGuiWindowFlags_NoTitleBar,
-                    ImGuiWindowFlags_ShowBorders};
+              ImGuiInputTextFlags_AutoSelectAll, ImGuiInputTextFlags_CallbackAlways,
+              ImGuiInputTextFlags_CallbackCharFilter, ImGuiInputTextFlags_CallbackCompletion,
+              ImGuiInputTextFlags_CallbackHistory, ImGuiInputTextFlags_CharsDecimal,
+              ImGuiInputTextFlags_CharsHexadecimal, ImGuiInputTextFlags_CharsNoBlank,
+              ImGuiInputTextFlags_CharsUppercase, ImGuiInputTextFlags_CtrlEnterForNewLine,
+              ImGuiInputTextFlags_EnterReturnsTrue, ImGuiInputTextFlags_NoHorizontalScroll,
+              ImGuiInputTextFlags_Password, ImGuiInputTextFlags_ReadOnly,
+              ImGuiSelectableFlags_DontClosePopups, ImGuiSelectableFlags_SpanAllColumns,
+              ImGuiSetCond_Always, ImGuiSetCond_Appearing, ImGuiSetCond_FirstUseEver,
+              ImGuiSetCond_Once, ImGuiTreeNodeFlags_AllowOverlapMode, ImGuiTreeNodeFlags_Bullet,
+              ImGuiTreeNodeFlags_CollapsingHeader, ImGuiTreeNodeFlags_DefaultOpen,
+              ImGuiTreeNodeFlags_Framed, ImGuiTreeNodeFlags_Leaf,
+              ImGuiTreeNodeFlags_NoAutoOpenOnLog, ImGuiTreeNodeFlags_NoTreePushOnOpen,
+              ImGuiTreeNodeFlags_OpenOnArrow, ImGuiTreeNodeFlags_OpenOnDoubleClick,
+              ImGuiTreeNodeFlags_Selected, ImGuiWindowFlags_AlwaysAutoResize,
+              ImGuiWindowFlags_AlwaysHorizontalScrollbar, ImGuiWindowFlags_AlwaysUseWindowPadding,
+              ImGuiWindowFlags_AlwaysVerticalScrollbar, ImGuiWindowFlags_HorizontalScrollbar,
+              ImGuiWindowFlags_MenuBar, ImGuiWindowFlags_NoBringToFrontOnFocus,
+              ImGuiWindowFlags_NoCollapse, ImGuiWindowFlags_NoFocusOnAppearing,
+              ImGuiWindowFlags_NoInputs, ImGuiWindowFlags_NoMove, ImGuiWindowFlags_NoResize,
+              ImGuiWindowFlags_NoSavedSettings, ImGuiWindowFlags_NoScrollWithMouse,
+              ImGuiWindowFlags_NoScrollbar, ImGuiWindowFlags_NoTitleBar,
+              ImGuiWindowFlags_ShowBorders};
 
 pub use sys::{ImDrawIdx, ImDrawVert, ImGuiColorEditFlags, ImGuiInputTextFlags, ImGuiKey,
-                    ImGuiSelectableFlags, ImGuiCond, ImGuiCol, ImGuiStyle, ImGuiTreeNodeFlags,
-                    ImGuiWindowFlags, ImVec2, ImVec4};
+              ImGuiSelectableFlags, ImGuiCond, ImGuiCol, ImGuiStyle, ImGuiTreeNodeFlags,
+              ImGuiWindowFlags, ImVec2, ImVec4};
 pub use child_frame::ChildFrame;
 pub use color_editors::{ColorEdit, ColorEditMode, ColorPicker, ColorPickerMode, EditableColor,
                         EditableColorFormat, EditableColorPreview};
@@ -364,9 +361,7 @@ impl<'ui> Ui<'ui> {
         Ok(())
     }
     pub fn show_user_guide(&self) { unsafe { sys::igShowUserGuide() }; }
-    pub fn show_default_style_editor(&self) {
-        unsafe { sys::igShowStyleEditor(ptr::null_mut()) };
-    }
+    pub fn show_default_style_editor(&self) { unsafe { sys::igShowStyleEditor(ptr::null_mut()) }; }
     pub fn show_style_editor<'p>(&self, style: &'p mut ImGuiStyle) {
         unsafe {
             sys::igShowStyleEditor(style as *mut ImGuiStyle);
