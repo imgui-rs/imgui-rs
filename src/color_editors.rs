@@ -3,7 +3,7 @@ use sys;
 use std::marker::PhantomData;
 use std::ptr;
 
-use {ImGuiColorEditFlags, ImStr, Ui};
+use {ImGuiColorEditFlags, ImStr, ImVec2, ImVec4, Ui};
 
 /// Mutable reference to an editable color value.
 #[derive(Debug)]
@@ -358,5 +358,84 @@ impl<'ui, 'p> ColorPicker<'ui, 'p> {
                 ref_color,
             )
         }
+    }
+}
+
+/// Builder for a color button widget.
+#[must_use]
+pub struct ColorButton<'ui, 'p> {
+    desc_id: &'p ImStr,
+    color: ImVec4,
+    flags: ImGuiColorEditFlags,
+    size: ImVec2,
+    _phantom: PhantomData<&'ui Ui<'ui>>,
+}
+
+impl<'ui, 'p> ColorButton<'ui, 'p> {
+    /// Constructs a new color button builder.
+    pub fn new(_: &Ui<'ui>, desc_id: &'p ImStr, color: ImVec4) -> Self {
+        ColorButton {
+            desc_id,
+            color,
+            flags: ImGuiColorEditFlags::empty(),
+            size: ImVec2::zero(),
+            _phantom: PhantomData,
+        }
+    }
+    /// Replaces all current settings with the given flags.
+    #[inline]
+    pub fn flags(mut self, flags: ImGuiColorEditFlags) -> Self {
+        self.flags = flags;
+        self
+    }
+    /// Enables/disables the use of the alpha component.
+    #[inline]
+    pub fn alpha(mut self, value: bool) -> Self {
+        self.flags.set(ImGuiColorEditFlags::NoAlpha, !value);
+        self
+    }
+    /// Enables/disables the tooltip that appears when hovering the preview.
+    #[inline]
+    pub fn tooltip(mut self, value: bool) -> Self {
+        self.flags.set(ImGuiColorEditFlags::NoTooltip, !value);
+        self
+    }
+    /// Sets the preview style.
+    #[inline]
+    pub fn preview(mut self, preview: EditableColorPreview) -> Self {
+        self.flags.set(
+            ImGuiColorEditFlags::AlphaPreviewHalf,
+            preview == EditableColorPreview::HalfAlpha,
+        );
+        self.flags.set(
+            ImGuiColorEditFlags::AlphaPreview,
+            preview == EditableColorPreview::Alpha,
+        );
+        self
+    }
+    /// Sets the formatting style of color components.
+    #[inline]
+    pub fn format(mut self, format: EditableColorFormat) -> Self {
+        self.flags.set(
+            ImGuiColorEditFlags::Uint8,
+            format == EditableColorFormat::U8,
+        );
+        self.flags.set(
+            ImGuiColorEditFlags::Float,
+            format == EditableColorFormat::Float,
+        );
+        self
+    }
+    /// Sets the button size.
+    ///
+    /// Use 0.0 for width and/or height to use the default size.
+    #[inline]
+    pub fn size<S: Into<ImVec2>>(mut self, size: S) -> Self {
+        self.size = size.into();
+        self
+    }
+    /// Builds the color button.
+    pub fn build(self) -> bool {
+        unsafe { sys::igColorButton(self.desc_id.as_ptr(), self.color, self.flags, self.size) }
     }
 }

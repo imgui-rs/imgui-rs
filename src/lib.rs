@@ -38,8 +38,8 @@ pub use sys::{ImDrawIdx, ImDrawVert, ImGuiColorEditFlags, ImGuiInputTextFlags, I
               ImGuiSelectableFlags, ImGuiCond, ImGuiCol, ImGuiStyle, ImGuiTreeNodeFlags,
               ImGuiWindowFlags, ImVec2, ImVec4};
 pub use child_frame::ChildFrame;
-pub use color_editors::{ColorEdit, ColorEditMode, ColorPicker, ColorPickerMode, EditableColor,
-                        EditableColorFormat, EditableColorPreview};
+pub use color_editors::{ColorButton, ColorEdit, ColorEditMode, ColorPicker, ColorPickerMode,
+                        EditableColor, EditableColorFormat, EditableColorPreview};
 pub use input::{InputFloat, InputFloat2, InputFloat3, InputFloat4, InputInt, InputInt2, InputInt3,
                 InputInt4, InputText};
 pub use menus::{Menu, MenuItem};
@@ -661,6 +661,14 @@ impl<'ui> Ui<'ui> {
         value: V,
     ) -> ColorPicker<'ui, 'p> {
         ColorPicker::new(self, label, value.into())
+    }
+    /// Constructs a new color button builder.
+    pub fn color_button<'p, C: Into<ImVec4>>(
+        &self,
+        desc_id: &'p ImStr,
+        color: C,
+    ) -> ColorButton<'ui, 'p> {
+        ColorButton::new(self, desc_id, color.into())
     }
 }
 
