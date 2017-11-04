@@ -2,11 +2,11 @@ use std::borrow::Borrow;
 use std::ffi::CStr;
 use std::fmt;
 use std::mem;
-use std::ops::Deref;
+use std::ops::{Deref, Index, RangeFull};
 use std::os::raw::c_char;
 use std::str;
 
-#[derive(Clone, Default, Hash, Ord, Eq, PartialOrd, PartialEq)]
+#[derive(Clone, Hash, Ord, Eq, PartialOrd, PartialEq)]
 pub struct ImString(Vec<u8>);
 
 impl ImString {
@@ -56,6 +56,18 @@ impl ImString {
     }
 }
 
+impl<'a> Default for ImString {
+    fn default() -> ImString { unsafe { ImString::from_utf8_with_nul_unchecked(vec![0]) } }
+}
+
+impl From<String> for ImString {
+    fn from(s: String) -> ImString { ImString::new(s) }
+}
+
+impl<'a, T: ?Sized + AsRef<ImStr>> From<&'a T> for ImString {
+    fn from(s: &'a T) -> ImString { s.as_ref().to_owned() }
+}
+
 impl AsRef<ImStr> for ImString {
     fn as_ref(&self) -> &ImStr { self }
 }
@@ -64,11 +76,21 @@ impl Borrow<ImStr> for ImString {
     fn borrow(&self) -> &ImStr { self }
 }
 
+impl AsRef<str> for ImString {
+    fn as_ref(&self) -> &str { self.to_str() }
+}
+
+impl Borrow<str> for ImString {
+    fn borrow(&self) -> &str { self.to_str() }
+}
+
+impl Index<RangeFull> for ImString {
+    type Output = ImStr;
+    fn index(&self, _index: RangeFull) -> &ImStr { self }
+}
+
 impl fmt::Debug for ImString {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        let s: &str = self;
-        fmt::Debug::fmt(s, f)
-    }
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result { fmt::Debug::fmt(self.to_str(), f) }
 }
 
 impl Deref for ImString {
@@ -80,11 +102,7 @@ impl Deref for ImString {
     }
 }
 
-impl<'a> From<&'a ImStr> for ImString {
-    fn from(value: &'a ImStr) -> ImString { value.to_owned() }
-}
-
-#[derive(Hash)]
+#[derive(Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub struct ImStr(CStr);
 
 impl<'a> Default for &'a ImStr {
@@ -99,13 +117,10 @@ impl fmt::Debug for ImStr {
 }
 
 impl ImStr {
+    pub fn new<S: AsRef<ImStr> + ?Sized>(s: &S) -> &ImStr { s.as_ref() }
     pub unsafe fn from_utf8_with_nul_unchecked(bytes: &[u8]) -> &ImStr { mem::transmute(bytes) }
     pub fn as_ptr(&self) -> *const c_char { self.0.as_ptr() }
     pub fn to_str(&self) -> &str { unsafe { str::from_utf8_unchecked(self.0.to_bytes()) } }
-}
-
-impl<'a> Into<&'a CStr> for &'a ImStr {
-    fn into(self) -> &'a CStr { &self.0 }
 }
 
 impl AsRef<CStr> for ImStr {
@@ -116,12 +131,11 @@ impl AsRef<ImStr> for ImStr {
     fn as_ref(&self) -> &ImStr { self }
 }
 
+impl AsRef<str> for ImStr {
+    fn as_ref(&self) -> &str { self.to_str() }
+}
+
 impl ToOwned for ImStr {
     type Owned = ImString;
     fn to_owned(&self) -> ImString { ImString(self.0.to_owned().into_bytes()) }
-}
-
-impl Deref for ImStr {
-    type Target = str;
-    fn deref(&self) -> &str { unsafe { str::from_utf8_unchecked(self.0.to_bytes()) } }
 }

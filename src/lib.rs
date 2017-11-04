@@ -468,7 +468,7 @@ impl<'ui> Ui<'ui> {
 
 // Widgets
 impl<'ui> Ui<'ui> {
-    pub fn text<P: AsRef<ImStr>>(&self, text: P) {
+    pub fn text<S: AsRef<str>>(&self, text: S) {
         let s = text.as_ref();
         unsafe {
             let start = s.as_ptr();

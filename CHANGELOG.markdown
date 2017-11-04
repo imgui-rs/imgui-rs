@@ -12,6 +12,12 @@
 - Adapt to latest cimgui API changes
 - Bump minimum Rust version to 1.20
 - Upgrade to bitflags 1.0
+- Various minor ImString/ImStr changes
+- `text` now accepts normal Rust strings. ImStr is still needed everywhere else
+
+### Fixed
+
+- Default impl for ImString was incorrect and could cause a crash
 
 ### Deprecated
 
@@ -20,6 +26,10 @@
 - `Window::bg_alpha`. Push a color change with `with_color_var` instead
 - `color_edit3`. Use `color_edit` instead
 - `color_edit4`. Use `color_edit` instead
+
+### Removed
+
+- ImStr -> str Deref. Use `to_str` instead.
 
 ## [0.0.16] - 2017-10-26
 
