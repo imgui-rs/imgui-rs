@@ -505,7 +505,7 @@ fn show_test_window<'a>(ui: &Ui<'a>, state: &mut State, opened: &mut bool) {
                     .rgb(true);
 
                   if s.ref_color {
-                    b = b.reference_color(s.ref_color_v)
+                    b = b.reference_color(&s.ref_color_v)
                   }
                   b.build();
                 });

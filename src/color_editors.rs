@@ -178,7 +178,7 @@ pub struct ColorPicker<'ui, 'p> {
     label: &'p ImStr,
     value: EditableColor<'p>,
     flags: ImGuiColorEditFlags,
-    ref_color: Option<[f32; 4]>,
+    ref_color: Option<&'p [f32; 4]>,
     _phantom: PhantomData<&'ui Ui<'ui>>,
 }
 
@@ -284,7 +284,7 @@ impl<'ui, 'p> ColorPicker<'ui, 'p> {
         self
     }
     #[inline]
-    pub fn reference_color(mut self, ref_color: [f32; 4]) -> Self {
+    pub fn reference_color(mut self, ref_color: &'p [f32; 4]) -> Self {
         self.ref_color = Some(ref_color);
         self
     }
@@ -292,7 +292,7 @@ impl<'ui, 'p> ColorPicker<'ui, 'p> {
         if let EditableColor::Float3(_) = self.value {
             self.flags.insert(ImGuiColorEditFlags::NoAlpha);
         }
-        let ref_color = self.ref_color.as_ref().map(|c| c.as_ptr()).unwrap_or(
+        let ref_color = self.ref_color.map(|c| c.as_ptr()).unwrap_or(
             ptr::null(),
         );
         unsafe {
