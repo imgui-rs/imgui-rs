@@ -6,6 +6,7 @@
 
 - Namespaced flags (e.g. `ImGuiWindowFlags`)
 - Color picker widget
+- `imgui_sys` is now re-exported as `sys` in the main create
 
 ### Changed
 
