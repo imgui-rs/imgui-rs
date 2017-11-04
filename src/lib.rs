@@ -670,6 +670,14 @@ impl<'ui> Ui<'ui> {
     ) -> ColorButton<'ui, 'p> {
         ColorButton::new(self, desc_id, color.into())
     }
+    /// Initialize current options (generally on application startup) if you want to select a
+    /// default format, picker type, etc. Users will be able to change many settings, unless you
+    /// use .options(false) in your widget builders.
+    pub fn set_color_edit_options(&self, flags: ImGuiColorEditFlags) {
+        unsafe {
+            sys::igSetColorEditOptions(flags);
+        }
+    }
 }
 
 // Widgets: Trees
