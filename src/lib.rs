@@ -38,7 +38,8 @@ pub use sys::{ImDrawIdx, ImDrawVert, ImGuiColorEditFlags, ImGuiInputTextFlags, I
               ImGuiSelectableFlags, ImGuiCond, ImGuiCol, ImGuiStyle, ImGuiTreeNodeFlags,
               ImGuiWindowFlags, ImVec2, ImVec4};
 pub use child_frame::ChildFrame;
-pub use color_editors::{ColorButton, ColorEdit, ColorEditMode, ColorFormat, ColorPicker, ColorPickerMode, ColorPreview, EditableColor};
+pub use color_editors::{ColorButton, ColorEdit, ColorEditMode, ColorFormat, ColorPicker,
+                        ColorPickerMode, ColorPreview, EditableColor};
 pub use input::{InputFloat, InputFloat2, InputFloat3, InputFloat4, InputInt, InputInt2, InputInt3,
                 InputInt4, InputText};
 pub use menus::{Menu, MenuItem};

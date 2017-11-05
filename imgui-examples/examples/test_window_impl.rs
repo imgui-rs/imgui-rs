@@ -458,7 +458,7 @@ fn show_test_window<'a>(ui: &Ui<'a>, state: &mut State, opened: &mut bool) {
                   show_help_marker(ui, im_str!("Click on the colored square to open a color picker.\nCTRL+click on individual component to input value.\n"));
                   ui.color_edit(im_str!("MyColor##1"), &mut s.color)
                     .flags(misc_flags)
-                    .alpha(false)                    
+                    .alpha(false)
                     .build();
 
                   ui.text(im_str!("Color widget HSV with Alpha:"));
