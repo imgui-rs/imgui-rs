@@ -13,9 +13,5 @@ travis-ci = { repository = "Gekkio/imgui-rs" }
 
 [dependencies]
 gfx = "0.16"
-glutin = "0.10"
 imgui = { version = "0.0.17-pre", path = "../" }
 imgui-sys = { version = "0.0.17-pre", path = "../imgui-sys", features = ["gfx"] }
-
-[dev-dependencies]
-gfx_window_glutin = "0.18"

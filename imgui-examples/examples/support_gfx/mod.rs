@@ -46,7 +46,6 @@ pub fn run<F: FnMut(&Ui) -> bool>(title: String, clear_color: [f32; 4], mut run_
     };
 
     let mut imgui = ImGui::init();
-    imgui.set_ini_filename(None);
     let mut renderer = Renderer::init(&mut imgui, &mut factory, shaders, main_color.clone())
         .expect("Failed to initialize renderer");
 
