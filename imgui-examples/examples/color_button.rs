@@ -65,18 +65,21 @@ fn example_1(state: &mut State, ui: &Ui) {
                 Try hovering over and clicking these buttons!"
             ));
             ui.text(state.notify_text);
+
             ui.text("This button is black:");
             if ui.color_button(im_str!("Black color"), (0.0, 0.0, 0.0, 1.0))
                 .build()
             {
                 state.notify_text = "*** Black button was clicked";
             }
+
             ui.text("This button is red:");
             if ui.color_button(im_str!("Red color"), (1.0, 0.0, 0.0, 1.0))
                 .build()
             {
                 state.notify_text = "*** Red button was clicked";
             }
+
             ui.text("This button is BIG because it has a custom size:");
             if ui.color_button(im_str!("Green color"), (0.0, 1.0, 0.0, 1.0))
                 .size((100.0, 50.0))
@@ -84,6 +87,7 @@ fn example_1(state: &mut State, ui: &Ui) {
             {
                 state.notify_text = "*** BIG button was clicked";
             }
+
             ui.text("This button doesn't use the tooltip at all:");
             if ui.color_button(im_str!("No tooltip"), (0.0, 0.0, 1.0, 1.0))
                 .tooltip(false)
@@ -104,10 +108,12 @@ fn example_2(ui: &Ui) {
                     0.0 - 1.0 (RGBA). If you don't care about the alpha component, it can be \
                     disabled and it won't show up in the tooltip"
             ));
+
             ui.text("This button ignores the alpha component:");
             ui.color_button(im_str!("Red color"), (1.0, 0.0, 0.0, 0.5))
                 .alpha(false)
                 .build();
+
             ui.spacing();
             ui.spacing();
             ui.spacing();
@@ -115,6 +121,7 @@ fn example_2(ui: &Ui) {
                 "If you *do* care about the alpha component, you can choose how it's \
                     displayed in the button and the tooltip"
             ));
+
             ui.separator();
             ui.text_wrapped(im_str!(
                 "ColorPreview::Opaque (default) doesn't show the alpha component at all"
@@ -122,6 +129,7 @@ fn example_2(ui: &Ui) {
             ui.color_button(im_str!("Red + ColorPreview::Opaque"), (1.0, 0.0, 0.0, 0.5))
                 .preview(ColorPreview::Opaque)
                 .build();
+
             ui.separator();
             ui.text_wrapped(im_str!(
                 "ColorPreview::HalfAlpha divides the color area into two halves and uses a \
@@ -132,6 +140,7 @@ fn example_2(ui: &Ui) {
                 (1.0, 0.0, 0.0, 0.5),
             ).preview(ColorPreview::HalfAlpha)
                 .build();
+
             ui.separator();
             ui.text_wrapped(im_str!(
                 "ColorPreview::Alpha uses a checkerboard pattern in the entire color area to \
