@@ -413,19 +413,6 @@ impl<'ui, 'p> ColorButton<'ui, 'p> {
         );
         self
     }
-    /// Sets the formatting style of color components.
-    #[inline]
-    pub fn format(mut self, format: ColorFormat) -> Self {
-        self.flags.set(
-            ImGuiColorEditFlags::Uint8,
-            format == ColorFormat::U8,
-        );
-        self.flags.set(
-            ImGuiColorEditFlags::Float,
-            format == ColorFormat::Float,
-        );
-        self
-    }
     /// Sets the button size.
     ///
     /// Use 0.0 for width and/or height to use the default size.
