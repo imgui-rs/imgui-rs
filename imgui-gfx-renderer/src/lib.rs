@@ -38,7 +38,10 @@ gfx_defines!{
         vertex_buffer: gfx::VertexBuffer<ImDrawVert> = (),
         matrix: gfx::Global<[[f32; 4]; 4]> = "matrix",
         tex: gfx::TextureSampler<[f32; 4]> = "tex",
-        out: gfx::BlendTarget<gfx::format::Rgba8> = ("Target0", gfx::state::MASK_ALL, gfx::preset::blend::ALPHA),
+        out: gfx::BlendTarget<gfx::format::Rgba8> = (
+            "Target0", gfx::state::MASK_ALL,
+            gfx::preset::blend::ALPHA
+        ),
         scissor: gfx::Scissor = (),
     }
 }
