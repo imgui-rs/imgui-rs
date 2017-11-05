@@ -21,6 +21,7 @@ pub fn run<F: FnMut(&Ui) -> bool>(title: String, clear_color: [f32; 4], mut run_
     let display = Display::new(window, context, &events_loop).unwrap();
 
     let mut imgui = ImGui::init();
+    imgui.set_ini_filename(None);
     let mut renderer = Renderer::init(&mut imgui, &display).expect("Failed to initialize renderer");
 
     configure_keys(&mut imgui);

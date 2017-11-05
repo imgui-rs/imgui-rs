@@ -54,7 +54,7 @@ pub enum ColorPickerMode {
 
 /// Color component formatting.
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
-pub enum EditableColorFormat {
+pub enum ColorFormat {
     /// Display values formatted as 0..255.
     U8,
     /// Display values formatted as 0.0..1.0.
@@ -63,7 +63,7 @@ pub enum EditableColorFormat {
 
 /// Color editor preview style.
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
-pub enum EditableColorPreview {
+pub enum ColorPreview {
     /// Don't show the alpha component.
     Opaque,
     /// Half of the preview area shows the alpha component using a checkerboard pattern.
@@ -149,20 +149,20 @@ impl<'ui, 'p> ColorEdit<'ui, 'p> {
     }
     /// Sets the preview style.
     #[inline]
-    pub fn preview(mut self, preview: EditableColorPreview) -> Self {
+    pub fn preview(mut self, preview: ColorPreview) -> Self {
         self.flags.set(
             ImGuiColorEditFlags::AlphaPreviewHalf,
-            preview == EditableColorPreview::HalfAlpha,
+            preview == ColorPreview::HalfAlpha,
         );
         self.flags.set(
             ImGuiColorEditFlags::AlphaPreview,
-            preview == EditableColorPreview::Alpha,
+            preview == ColorPreview::Alpha,
         );
         self
     }
     /// (WIP) Currently only disables 0.0..1.0 limits in RGBA edition.
     ///
-    /// Note: you probably want to use EditableColorFormat::Float as well.
+    /// Note: you probably want to use ColorFormat::Float as well.
     #[inline]
     pub fn hdr(mut self, value: bool) -> Self {
         self.flags.set(ImGuiColorEditFlags::HDR, value);
@@ -187,14 +187,14 @@ impl<'ui, 'p> ColorEdit<'ui, 'p> {
     }
     /// Sets the formatting style of color components.
     #[inline]
-    pub fn format(mut self, format: EditableColorFormat) -> Self {
+    pub fn format(mut self, format: ColorFormat) -> Self {
         self.flags.set(
             ImGuiColorEditFlags::Uint8,
-            format == EditableColorFormat::U8,
+            format == ColorFormat::U8,
         );
         self.flags.set(
             ImGuiColorEditFlags::Float,
-            format == EditableColorFormat::Float,
+            format == ColorFormat::Float,
         );
         self
     }
@@ -283,14 +283,14 @@ impl<'ui, 'p> ColorPicker<'ui, 'p> {
     }
     /// Sets the preview style.
     #[inline]
-    pub fn preview(mut self, preview: EditableColorPreview) -> Self {
+    pub fn preview(mut self, preview: ColorPreview) -> Self {
         self.flags.set(
             ImGuiColorEditFlags::AlphaPreviewHalf,
-            preview == EditableColorPreview::HalfAlpha,
+            preview == ColorPreview::HalfAlpha,
         );
         self.flags.set(
             ImGuiColorEditFlags::AlphaPreview,
-            preview == EditableColorPreview::Alpha,
+            preview == ColorPreview::Alpha,
         );
         self
     }
@@ -327,14 +327,14 @@ impl<'ui, 'p> ColorPicker<'ui, 'p> {
     }
     /// Sets the formatting style of color components.
     #[inline]
-    pub fn format(mut self, format: EditableColorFormat) -> Self {
+    pub fn format(mut self, format: ColorFormat) -> Self {
         self.flags.set(
             ImGuiColorEditFlags::Uint8,
-            format == EditableColorFormat::U8,
+            format == ColorFormat::U8,
         );
         self.flags.set(
             ImGuiColorEditFlags::Float,
-            format == EditableColorFormat::Float,
+            format == ColorFormat::Float,
         );
         self
     }
@@ -402,27 +402,27 @@ impl<'ui, 'p> ColorButton<'ui, 'p> {
     }
     /// Sets the preview style.
     #[inline]
-    pub fn preview(mut self, preview: EditableColorPreview) -> Self {
+    pub fn preview(mut self, preview: ColorPreview) -> Self {
         self.flags.set(
             ImGuiColorEditFlags::AlphaPreviewHalf,
-            preview == EditableColorPreview::HalfAlpha,
+            preview == ColorPreview::HalfAlpha,
         );
         self.flags.set(
             ImGuiColorEditFlags::AlphaPreview,
-            preview == EditableColorPreview::Alpha,
+            preview == ColorPreview::Alpha,
         );
         self
     }
     /// Sets the formatting style of color components.
     #[inline]
-    pub fn format(mut self, format: EditableColorFormat) -> Self {
+    pub fn format(mut self, format: ColorFormat) -> Self {
         self.flags.set(
             ImGuiColorEditFlags::Uint8,
-            format == EditableColorFormat::U8,
+            format == ColorFormat::U8,
         );
         self.flags.set(
             ImGuiColorEditFlags::Float,
-            format == EditableColorFormat::Float,
+            format == ColorFormat::Float,
         );
         self
     }

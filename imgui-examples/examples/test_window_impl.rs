@@ -470,7 +470,7 @@ fn show_test_window<'a>(ui: &Ui<'a>, state: &mut State, opened: &mut bool) {
                   ui.text(im_str!("Color widget with Float Display:"));
                   ui.color_edit(im_str!("MyColor##2f"), &mut s.color)
                     .flags(misc_flags)
-                    .format(EditableColorFormat::Float)
+                    .format(ColorFormat::Float)
                     .build();
 
                   ui.text(im_str!("Color button with Picker:"));
