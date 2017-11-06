@@ -94,6 +94,13 @@ pub struct TextureHandle<'a> {
     pub pixels: &'a [c_uchar],
 }
 
+pub fn get_style_color_name(color: ImGuiCol) -> &'static ImStr {
+    unsafe {
+        let bytes = CStr::from_ptr(sys::igGetStyleColorName(color)).to_bytes_with_nul();
+        ImStr::from_utf8_with_nul_unchecked(bytes)
+    }
+}
+
 pub fn get_version() -> &'static str {
     unsafe {
         let bytes = CStr::from_ptr(sys::igGetVersion()).to_bytes();

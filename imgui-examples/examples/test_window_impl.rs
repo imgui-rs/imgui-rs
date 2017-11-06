@@ -8,15 +8,19 @@ use imgui::*;
 mod support;
 
 struct State {
-    show_app_metrics: bool,
     show_app_main_menu_bar: bool,
     show_app_console: bool,
+    show_app_log: bool,
     show_app_layout: bool,
+    show_app_property_editor: bool,
     show_app_long_text: bool,
     show_app_auto_resize: bool,
+    show_app_constrained_resize: bool,
     show_app_fixed_overlay: bool,
-    show_app_custom_rendering: bool,
     show_app_manipulating_window_title: bool,
+    show_app_custom_rendering: bool,
+    show_app_style_editor: bool,
+    show_app_metrics: bool,
     show_app_about: bool,
     no_titlebar: bool,
     no_border: bool,
@@ -25,7 +29,6 @@ struct State {
     no_scrollbar: bool,
     no_collapse: bool,
     no_menu: bool,
-    bg_alpha: f32,
     wrap_width: f32,
     buf: ImString,
     item: i32,
@@ -44,6 +47,56 @@ struct State {
     file_menu: FileMenuState,
     radio_button: i32,
     color_edit: ColorEditState,
+}
+
+impl Default for State {
+    fn default() -> Self {
+        let mut buf = ImString::with_capacity(32);
+        buf.push_str("日本語");
+        let mut text = ImString::with_capacity(128);
+        text.push_str("Hello, world!");
+        State {
+            show_app_main_menu_bar: false,
+            show_app_console: false,
+            show_app_log: false,
+            show_app_layout: false,
+            show_app_property_editor: false,
+            show_app_long_text: false,
+            show_app_auto_resize: false,
+            show_app_fixed_overlay: false,
+            show_app_constrained_resize: false,
+            show_app_manipulating_window_title: false,
+            show_app_custom_rendering: false,
+            show_app_style_editor: false,
+            show_app_metrics: false,
+            show_app_about: false,
+            no_titlebar: false,
+            no_border: true,
+            no_resize: false,
+            no_move: false,
+            no_scrollbar: false,
+            no_collapse: false,
+            no_menu: false,
+            wrap_width: 200.0,
+            buf: buf,
+            item: 0,
+            item2: 0,
+            text: text,
+            i0: 123,
+            f0: 0.001,
+            vec2f: [0.10, 0.20],
+            vec3f: [0.10, 0.20, 0.30],
+            vec2i: [10, 20],
+            vec3i: [10, 20, 30],
+            col1: [1.0, 0.0, 0.2],
+            col2: [0.4, 0.7, 0.0, 0.5],
+            selected_fish: None,
+            auto_resize_state: Default::default(),
+            file_menu: Default::default(),
+            radio_button: 0,
+            color_edit: ColorEditState::default(),
+        }
+    }
 }
 
 struct ColorEditState {
@@ -76,59 +129,22 @@ impl Default for ColorEditState {
     }
 }
 
-impl Default for State {
-    fn default() -> Self {
-        let mut buf = ImString::with_capacity(32);
-        buf.push_str("日本語");
-        let mut text = ImString::with_capacity(128);
-        text.push_str("Hello, world!");
-        State {
-            show_app_metrics: false,
-            show_app_main_menu_bar: false,
-            show_app_console: false,
-            show_app_layout: false,
-            show_app_long_text: false,
-            show_app_auto_resize: false,
-            show_app_fixed_overlay: false,
-            show_app_custom_rendering: false,
-            show_app_manipulating_window_title: false,
-            show_app_about: false,
-            no_titlebar: false,
-            no_border: true,
-            no_resize: false,
-            no_move: false,
-            no_scrollbar: false,
-            no_collapse: false,
-            no_menu: false,
-            bg_alpha: 0.65,
-            wrap_width: 200.0,
-            buf: buf,
-            item: 0,
-            item2: 0,
-            text: text,
-            i0: 123,
-            f0: 0.001,
-            vec2f: [0.10, 0.20],
-            vec3f: [0.10, 0.20, 0.30],
-            vec2i: [10, 20],
-            vec3i: [10, 20, 30],
-            col1: [1.0, 0.0, 0.2],
-            col2: [0.4, 0.7, 0.0, 0.5],
-            selected_fish: None,
-            auto_resize_state: Default::default(),
-            file_menu: Default::default(),
-            radio_button: 0,
-            color_edit: ColorEditState::default(),
-        }
-    }
-}
-
 struct FileMenuState {
     enabled: bool,
+    f: f32,
+    n: i32,
+    b: bool,
 }
 
 impl Default for FileMenuState {
-    fn default() -> Self { FileMenuState { enabled: true } }
+    fn default() -> Self {
+        FileMenuState {
+            enabled: true,
+            f: 0.5,
+            n: 0,
+            b: true,
+        }
+    }
 }
 
 struct AutoResizeState {
@@ -156,13 +172,14 @@ fn show_help_marker(ui: &Ui, _: &ImStr) {
     // TODO
 }
 
-fn show_user_guide<'a>(ui: &Ui<'a>) {
+fn show_user_guide(ui: &Ui) {
     ui.bullet_text(im_str!("Double-click on title bar to collapse window."));
     ui.bullet_text(im_str!(
         "Click and drag on lower right corner to resize window."
     ));
     ui.bullet_text(im_str!("Click and drag on any empty space to move window."));
     ui.bullet_text(im_str!("Mouse Wheel to scroll."));
+    // TODO: check font_allow_user_scaling
     ui.bullet_text(im_str!(
         "TAB/SHIFT+TAB to cycle through keyboard editable fields."
     ));
@@ -170,24 +187,17 @@ fn show_user_guide<'a>(ui: &Ui<'a>) {
     ui.bullet_text(im_str!(
         "While editing text:
 - Hold SHIFT or use mouse to select text
-- \
-                            CTRL+Left/Right to word jump
+- CTRL+Left/Right to word jump
 - CTRL+A or double-click to select all
-\
-                            - CTRL+X,CTRL+C,CTRL+V clipboard
+- CTRL+X,CTRL+C,CTRL+V clipboard
 - CTRL+Z,CTRL+Y undo/redo
-- ESCAPE \
-                            to revert
-- You can apply arithmetic operators +,*,/ on numerical \
-                            values.
-  Use +- to subtract."
+- ESCAPE to revert
+- You can apply arithmetic operators +,*,/ on numerical values.
+  Use +- to subtract.\n"
     ));
 }
 
-fn show_test_window<'a>(ui: &Ui<'a>, state: &mut State, opened: &mut bool) {
-    if state.show_app_metrics {
-        ui.show_metrics_window(&mut state.show_app_metrics);
-    }
+fn show_test_window(ui: &Ui, state: &mut State, opened: &mut bool) {
     if state.show_app_main_menu_bar {
         show_example_app_main_menu_bar(ui, state)
     }
@@ -204,19 +214,27 @@ fn show_test_window<'a>(ui: &Ui<'a>, state: &mut State, opened: &mut bool) {
     if state.show_app_manipulating_window_title {
         show_example_app_manipulating_window_title(ui);
     }
+    if state.show_app_metrics {
+        ui.show_metrics_window(&mut state.show_app_metrics);
+    }
+    if state.show_app_style_editor {
+        ui.window(im_str!("Style Editor"))
+            .opened(&mut state.show_app_style_editor)
+            .build(|| ui.show_default_style_editor());
+    }
     if state.show_app_about {
         ui.window(im_str!("About ImGui"))
             .always_auto_resize(true)
             .opened(&mut state.show_app_about)
             .build(|| {
-                ui.text(im_str!("ImGui {}", imgui::get_version()));
+                ui.text(format!("dear imgui, {}", imgui::get_version()));
                 ui.separator();
-                ui.text(im_str!("By Omar Cornut and all github contributors."));
-                ui.text(im_str!(
+                ui.text("By Omar Cornut and all github contributors.");
+                ui.text(
                     "ImGui is licensed under the MIT License, see LICENSE for more \
-                                 information."
-                ));
-            })
+                        information.",
+                );
+            });
     }
 
     ui.window(im_str!("ImGui Demo"))
@@ -227,11 +245,11 @@ fn show_test_window<'a>(ui: &Ui<'a>, state: &mut State, opened: &mut bool) {
         .scroll_bar(!state.no_scrollbar)
         .collapsible(!state.no_collapse)
         .menu_bar(!state.no_menu)
-        .bg_alpha(state.bg_alpha)
         .size((550.0, 680.0), ImGuiCond::FirstUseEver)
         .opened(opened)
         .build(|| {
-            ui.text(im_str!("ImGui says hello."));
+            ui.push_item_width(-140.0);
+            ui.text(format!("dear imgui says hello. ({})", imgui::get_version()));
             ui.menu_bar(|| {
                 ui.menu(im_str!("Menu")).build(|| {
                     show_example_menu_file(ui, &mut state.file_menu);
@@ -243,14 +261,23 @@ fn show_test_window<'a>(ui: &Ui<'a>, state: &mut State, opened: &mut bool) {
                     ui.menu_item(im_str!("Console"))
                         .selected(&mut state.show_app_console)
                         .build();
+                    ui.menu_item(im_str!("Log"))
+                        .selected(&mut state.show_app_log)
+                        .build();
                     ui.menu_item(im_str!("Simple layout"))
                         .selected(&mut state.show_app_layout)
+                        .build();
+                    ui.menu_item(im_str!("Property editor"))
+                        .selected(&mut state.show_app_property_editor)
                         .build();
                     ui.menu_item(im_str!("Long text display"))
                         .selected(&mut state.show_app_long_text)
                         .build();
                     ui.menu_item(im_str!("Auto-resizing window"))
                         .selected(&mut state.show_app_auto_resize)
+                        .build();
+                    ui.menu_item(im_str!("Constrained-resizing window"))
+                        .selected(&mut state.show_app_constrained_resize)
                         .build();
                     ui.menu_item(im_str!("Simple overlay"))
                         .selected(&mut state.show_app_fixed_overlay)
@@ -266,6 +293,9 @@ fn show_test_window<'a>(ui: &Ui<'a>, state: &mut State, opened: &mut bool) {
                     ui.menu_item(im_str!("Metrics"))
                         .selected(&mut state.show_app_metrics)
                         .build();
+                    ui.menu_item(im_str!("Style Editor"))
+                        .selected(&mut state.show_app_style_editor)
+                        .build();
                     ui.menu_item(im_str!("About ImGui"))
                         .selected(&mut state.show_app_about)
                         .build();
@@ -275,42 +305,28 @@ fn show_test_window<'a>(ui: &Ui<'a>, state: &mut State, opened: &mut bool) {
             if ui.collapsing_header(im_str!("Help")).build() {
                 ui.text_wrapped(im_str!(
                     "This window is being created by the show_test_window() \
-                                         function. Please refer to the code for programming \
-                                         reference.\n\nUser Guide:"
+                    function. Please refer to the code for programming \
+                    reference.\n\nUser Guide:"
                 ));
                 show_user_guide(ui);
             }
 
             if ui.collapsing_header(im_str!("Window options")).build() {
-                ui.checkbox(im_str!("no titlebar"), &mut state.no_titlebar);
+                ui.checkbox(im_str!("No titlebar"), &mut state.no_titlebar);
                 ui.same_line(150.0);
-                ui.checkbox(im_str!("no border"), &mut state.no_border);
+                ui.checkbox(im_str!("No border"), &mut state.no_border);
                 ui.same_line(300.0);
-                ui.checkbox(im_str!("no resize"), &mut state.no_resize);
-                ui.checkbox(im_str!("no move"), &mut state.no_move);
+                ui.checkbox(im_str!("No resize"), &mut state.no_resize);
+                ui.checkbox(im_str!("No move"), &mut state.no_move);
                 ui.same_line(150.0);
-                ui.checkbox(im_str!("no scrollbar"), &mut state.no_scrollbar);
+                ui.checkbox(im_str!("No scrollbar"), &mut state.no_scrollbar);
                 ui.same_line(300.0);
-                ui.checkbox(im_str!("no collapse"), &mut state.no_collapse);
-                ui.checkbox(im_str!("no menu"), &mut state.no_menu);
-                ui.slider_float(im_str!("bg alpha"), &mut state.bg_alpha, 0.0, 1.0)
-                    .build();
+                ui.checkbox(im_str!("No collapse"), &mut state.no_collapse);
+                ui.checkbox(im_str!("No menu"), &mut state.no_menu);
 
                 ui.tree_node(im_str!("Style")).build(|| {
-                    // TODO: Reimplement style editor
-                    ui.show_default_style_editor();
+                    ui.show_default_style_editor()
                 });
-                ui.tree_node(im_str!("Fonts"))
-                    .label(im_str!("Fonts ({})", "TODO"))
-                    .build(|| {
-                        ui.text_wrapped(im_str!(
-                            "Tip: Load fonts with \
-                                                 io.Fonts->AddFontFromFileTTF()."
-                        ));
-                        ui.tree_node(im_str!("Atlas texture")).build(|| {
-                            // TODO
-                        });
-                    });
             }
             if ui.collapsing_header(im_str!("Widgets")).build() {
                 ui.tree_node(im_str!("Tree")).build(|| for i in 0..5 {
@@ -412,10 +428,8 @@ fn show_test_window<'a>(ui: &Ui<'a>, state: &mut State, opened: &mut bool) {
                     .build();
                 ui.input_float3(im_str!("input float3"), &mut state.vec3f)
                     .build();
-                ui.color_edit(im_str!("color 1"), &mut state.col1)
-                    .build();
-                ui.color_edit(im_str!("color 2"), &mut state.col2)
-                    .build();
+                ui.color_edit(im_str!("color 1"), &mut state.col1).build();
+                ui.color_edit(im_str!("color 2"), &mut state.col2).build();
 
                 ui.tree_node(im_str!("Multi-component Widgets")).build(|| {
                     ui.input_float2(im_str!("input float2"), &mut state.vec2f)
@@ -432,82 +446,111 @@ fn show_test_window<'a>(ui: &Ui<'a>, state: &mut State, opened: &mut bool) {
                 });
 
                 ui.tree_node(im_str!("Color/Picker Widgets")).build(|| {
-                  let s = &mut state.color_edit;
-                  ui.checkbox(im_str!("With HDR"), &mut s.hdr);
-                  ui.same_line(0.0);
-                  show_help_marker(ui, im_str!("Currently all this does is to lift the 0..1 limits on dragging widgets."));
-
-                  ui.checkbox(im_str!("With Alpha Preview"), &mut s.alpha_preview);
-                  ui.checkbox(im_str!("With Half Alpha Preview"), &mut s.alpha_half_preview);
-                  ui.checkbox(im_str!("With Options Menu"), &mut s.options_menu);
-                  ui.same_line(0.0);
-                  show_help_marker(ui, im_str!("Right-click on the individual color widget to show options."));
-                  let misc_flags = {
-                    let mut f = ImGuiColorEditFlags::empty();
-                    f.set(ImGuiColorEditFlags::HDR, s.hdr);
-                    f.set(ImGuiColorEditFlags::AlphaPreviewHalf, s.alpha_half_preview);
-                    if !s.alpha_half_preview {
-                      f.set(ImGuiColorEditFlags::AlphaPreview, s.alpha_preview);
-                    }
-                    f.set(ImGuiColorEditFlags::NoOptions, !s.options_menu);
-                    f
-                  };
-
-                  ui.text(im_str!("Color widget:"));
-                  ui.same_line(0.0);
-                  show_help_marker(ui, im_str!("Click on the colored square to open a color picker.\nCTRL+click on individual component to input value.\n"));
-                  ui.color_edit(im_str!("MyColor##1"), &mut s.color)
-                    .flags(misc_flags)
-                    .alpha(false)
-                    .build();
-
-                  ui.text(im_str!("Color widget HSV with Alpha:"));
-                  ui.color_edit(im_str!("MyColor##2"), &mut s.color)
-                    .flags(misc_flags)
-                    .mode(ColorEditMode::HSV)
-                    .build();
-
-                  ui.text(im_str!("Color widget with Float Display:"));
-                  ui.color_edit(im_str!("MyColor##2f"), &mut s.color)
-                    .flags(misc_flags)
-                    .format(ColorFormat::Float)
-                    .build();
-
-                  ui.text(im_str!("Color button with Picker:"));
-                  ui.same_line(0.0);
-                  show_help_marker(ui, im_str!("With the inputs(false) function you can hide all the slider/text inputs.\nWith the label(false) function you can pass a non-empty label which will only be used for the tooltip and picker popup."));
-                  ui.color_edit(im_str!("MyColor##3"), &mut s.color)
-                    .flags(misc_flags)
-                    .inputs(false)
-                    .label(false)
-                    .build();
-
-                  ui.text(im_str!("Color picker:"));
-                  ui.checkbox(im_str!("With Alpha"), &mut s.alpha);
-                  ui.checkbox(im_str!("With Alpha Bar"), &mut s.alpha_bar);
-                  ui.checkbox(im_str!("With Side Preview"), &mut s.side_preview);
-                  if s.side_preview {
+                    let s = &mut state.color_edit;
+                    ui.checkbox(im_str!("With HDR"), &mut s.hdr);
                     ui.same_line(0.0);
-                    ui.checkbox(im_str!("With Ref Color"), &mut s.ref_color);
-                    if s.ref_color {
-                      ui.same_line(0.0);
-                      ui.color_edit(im_str!("##RefColor"), &mut s.ref_color_v)
+                    show_help_marker(
+                        ui,
+                        im_str!(
+                            "Currently all this does is to lift the 0..1 \
+                                               limits on dragging widgets."
+                        ),
+                    );
+
+                    ui.checkbox(im_str!("With Alpha Preview"), &mut s.alpha_preview);
+                    ui.checkbox(
+                        im_str!("With Half Alpha Preview"),
+                        &mut s.alpha_half_preview,
+                    );
+                    ui.checkbox(im_str!("With Options Menu"), &mut s.options_menu);
+                    ui.same_line(0.0);
+                    show_help_marker(
+                        ui,
+                        im_str!(
+                            "Right-click on the individual color widget to \
+                                               show options."
+                        ),
+                    );
+                    let misc_flags = {
+                        let mut f = ImGuiColorEditFlags::empty();
+                        f.set(ImGuiColorEditFlags::HDR, s.hdr);
+                        f.set(ImGuiColorEditFlags::AlphaPreviewHalf, s.alpha_half_preview);
+                        if !s.alpha_half_preview {
+                            f.set(ImGuiColorEditFlags::AlphaPreview, s.alpha_preview);
+                        }
+                        f.set(ImGuiColorEditFlags::NoOptions, !s.options_menu);
+                        f
+                    };
+
+                    ui.text(im_str!("Color widget:"));
+                    ui.same_line(0.0);
+                    show_help_marker(
+                        ui,
+                        im_str!(
+                            "Click on the colored square to open a color picker.
+CTRL+click on individual component to input value.\n"
+                        ),
+                    );
+                    ui.color_edit(im_str!("MyColor##1"), &mut s.color)
+                        .flags(misc_flags)
+                        .alpha(false)
+                        .build();
+
+                    ui.text(im_str!("Color widget HSV with Alpha:"));
+                    ui.color_edit(im_str!("MyColor##2"), &mut s.color)
+                        .flags(misc_flags)
+                        .mode(ColorEditMode::HSV)
+                        .build();
+
+                    ui.text(im_str!("Color widget with Float Display:"));
+                    ui.color_edit(im_str!("MyColor##2f"), &mut s.color)
+                        .flags(misc_flags)
+                        .format(ColorFormat::Float)
+                        .build();
+
+                    ui.text(im_str!("Color button with Picker:"));
+                    ui.same_line(0.0);
+                    show_help_marker(
+                        ui,
+                        im_str!(
+                            "With the inputs(false) function you can hide all \
+                            the slider/text inputs.\n \
+                            With the label(false) function you can pass a non-empty label which \
+                            will only be used for the tooltip and picker popup."
+                        ),
+                    );
+                    ui.color_edit(im_str!("MyColor##3"), &mut s.color)
                         .flags(misc_flags)
                         .inputs(false)
+                        .label(false)
                         .build();
-                    }
-                  }
-                  let mut b = ui.color_picker(im_str!("MyColor##4"), &mut s.color)
-                    .flags(misc_flags)
-                    .alpha(s.alpha)
-                    .alpha_bar(s.alpha_bar)
-                    .side_preview(s.side_preview)
-                    .rgb(true);
 
-                  if s.ref_color {
-                    b = b.reference_color(&s.ref_color_v)
-                  }
-                  b.build();
+                    ui.text(im_str!("Color picker:"));
+                    ui.checkbox(im_str!("With Alpha"), &mut s.alpha);
+                    ui.checkbox(im_str!("With Alpha Bar"), &mut s.alpha_bar);
+                    ui.checkbox(im_str!("With Side Preview"), &mut s.side_preview);
+                    if s.side_preview {
+                        ui.same_line(0.0);
+                        ui.checkbox(im_str!("With Ref Color"), &mut s.ref_color);
+                        if s.ref_color {
+                            ui.same_line(0.0);
+                            ui.color_edit(im_str!("##RefColor"), &mut s.ref_color_v)
+                                .flags(misc_flags)
+                                .inputs(false)
+                                .build();
+                        }
+                    }
+                    let mut b = ui.color_picker(im_str!("MyColor##4"), &mut s.color)
+                        .flags(misc_flags)
+                        .alpha(s.alpha)
+                        .alpha_bar(s.alpha_bar)
+                        .side_preview(s.side_preview)
+                        .rgb(true);
+
+                    if s.ref_color {
+                        b = b.reference_color(&s.ref_color_v)
+                    }
+                    b.build();
                 });
             }
             if ui.collapsing_header(im_str!("Popups & Modal windows"))
@@ -608,56 +651,67 @@ fn show_example_menu_file<'a>(ui: &Ui<'a>, state: &mut FileMenuState) {
         ui.menu_item(im_str!("Enabled"))
             .selected(&mut state.enabled)
             .build();
-        // TODO
+        ui.child_frame(im_str!("child"), (0.0, 60.0))
+            .show_borders(true)
+            .build(|| for i in 0..10 {
+                ui.text(format!("Scrolling Text {}", i));
+            });
+        ui.slider_float(im_str!("Value"), &mut state.f, 0.0, 1.0)
+            .build();
+        ui.input_float(im_str!("Input"), &mut state.f)
+            .step(0.1)
+            .build();
+        let items = [im_str!("Yes"), im_str!("No"), im_str!("Maybe")];
+        ui.combo(im_str!("Combo"), &mut state.n, &items, -1);
+        ui.checkbox(im_str!("Check"), &mut state.b);
     });
-    ui.menu(im_str!("Colors")).build(|| {
-        // TODO
+    ui.menu(im_str!("Colors")).build(|| for &col in
+        ImGuiCol::values()
+    {
+        ui.menu_item(imgui::get_style_color_name(col)).build();
     });
     ui.menu(im_str!("Disabled")).enabled(false).build(|| {
         unreachable!();
     });
-    let mut checked = true;
-    ui.menu_item(im_str!("Checked"))
-        .selected(&mut checked)
-        .build();
+    ui.menu_item(im_str!("Checked")).selected(&mut true).build();
     ui.menu_item(im_str!("Quit"))
         .shortcut(im_str!("Alt+F4"))
         .build();
 }
 
-fn show_example_app_auto_resize<'a>(ui: &Ui<'a>, state: &mut AutoResizeState, opened: &mut bool) {
+fn show_example_app_auto_resize(ui: &Ui, state: &mut AutoResizeState, opened: &mut bool) {
     ui.window(im_str!("Example: Auto-resizing window"))
         .opened(opened)
         .always_auto_resize(true)
         .build(|| {
-            ui.text(im_str!(
+            ui.text(
                 "Window will resize every-ui to the size of its content.
 Note that you probably don't want to query the window size to
-output your content because that would create a feedback loop."
-            ));
+output your content because that would create a feedback loop.",
+            );
             ui.slider_int(im_str!("Number of lines"), &mut state.lines, 1, 20)
                 .build();
             for i in 0..state.lines {
-                ui.text(im_str!("{:2$}This is line {}", "", i, i as usize * 4));
+                ui.text(format!("{:2$}This is line {}", "", i, i as usize * 4));
             }
         })
 }
 
-fn show_example_app_fixed_overlay<'a>(ui: &Ui<'a>, opened: &mut bool) {
+#[allow(deprecated)]
+fn show_example_app_fixed_overlay(ui: &Ui, opened: &mut bool) {
     ui.window(im_str!("Example: Fixed Overlay"))
         .opened(opened)
+        .position((10.0, 10.0), ImGuiCond::Always)
         .bg_alpha(0.3)
         .title_bar(false)
         .resizable(false)
         .movable(false)
         .save_settings(false)
         .build(|| {
-            ui.text(im_str!(
-                "Simple overlay\non the top-left side of the screen."
-            ));
+            ui.text("Simple overlay\non the top-left side of the screen.");
             ui.separator();
             let mouse_pos = ui.imgui().mouse_pos();
-            ui.text(im_str!(
+            ui.text(format!(
                 "Mouse Position: ({:.1},{:.1})",
                 mouse_pos.0,
                 mouse_pos.1
@@ -665,22 +719,22 @@ fn show_example_app_fixed_overlay<'a>(ui: &Ui<'a>, opened: &mut bool) {
         })
 }
 
-fn show_example_app_manipulating_window_title<'a>(ui: &Ui<'a>) {
+fn show_example_app_manipulating_window_title(ui: &Ui) {
     ui.window(im_str!("Same title as another window##1"))
         .position((100.0, 100.0), ImGuiCond::FirstUseEver)
         .build(|| {
-            ui.text(im_str!(
+            ui.text(
                 "This is window 1.
-My title is the same as window 2, but my identifier is unique."
-            ));
+My title is the same as window 2, but my identifier is unique.",
+            );
         });
     ui.window(im_str!("Same title as another window##2"))
         .position((100.0, 200.0), ImGuiCond::FirstUseEver)
         .build(|| {
-            ui.text(im_str!(
+            ui.text(
                 "This is window 2.
-My title is the same as window 1, but my identifier is unique."
-            ));
+My title is the same as window 1, but my identifier is unique.",
+            );
         });
     let chars = ['|', '/', '-', '\\'];
     let ch_idx = (ui.imgui().get_time() / 0.25) as usize & 3;
@@ -688,5 +742,5 @@ My title is the same as window 1, but my identifier is unique."
     let title = im_str!("Animated title {} {}###AnimatedTitle", chars[ch_idx], num);
     ui.window(title)
         .position((100.0, 300.0), ImGuiCond::FirstUseEver)
-        .build(|| { ui.text(im_str!("This window has a changing title")); });
+        .build(|| ui.text("This window has a changing title"));
 }

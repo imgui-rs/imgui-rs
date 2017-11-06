@@ -91,6 +91,54 @@ impl ImGuiCol {
     pub const ColumnHovered: ImGuiCol = ImGuiCol::SeparatorHovered;
     #[deprecated(since = "0.0.17", note = "please use ImGuiCol::SeparatorActive instead")]
     pub const ColumnActive: ImGuiCol = ImGuiCol::SeparatorActive;
+    pub fn values() -> &'static [ImGuiCol] {
+        use ImGuiCol::*;
+        &[
+            Text,
+            TextDisabled,
+            WindowBg,
+            ChildWindowBg,
+            PopupBg,
+            Border,
+            BorderShadow,
+            FrameBg,
+            FrameBgHovered,
+            FrameBgActive,
+            TitleBg,
+            TitleBgCollapsed,
+            TitleBgActive,
+            MenuBarBg,
+            ScrollbarBg,
+            ScrollbarGrab,
+            ScrollbarGrabHovered,
+            ScrollbarGrabActive,
+            ComboBg,
+            CheckMark,
+            SliderGrab,
+            SliderGrabActive,
+            Button,
+            ButtonHovered,
+            ButtonActive,
+            Header,
+            HeaderHovered,
+            HeaderActive,
+            Separator,
+            SeparatorHovered,
+            SeparatorActive,
+            ResizeGrip,
+            ResizeGripHovered,
+            ResizeGripActive,
+            CloseButton,
+            CloseButtonHovered,
+            CloseButtonActive,
+            PlotLines,
+            PlotLinesHovered,
+            PlotHistogram,
+            PlotHistogramHovered,
+            TextSelectedBg,
+            ModalWindowDarkening,
+        ]
+    }
 }
 pub const ImGuiCol_COUNT: usize = 43;
 
@@ -1812,7 +1860,11 @@ extern "C" {
     pub fn ImGuiTextBuffer_clear(buffer: *mut ImGuiTextBuffer);
     pub fn ImGuiTextBuffer_c_str(buffer: *const ImGuiTextBuffer) -> *const c_char;
     pub fn ImGuiTextBuffer_append(buffer: *const ImGuiTextBuffer, fmt: *const c_char, ...);
-// pub fn ImGuiTextBuffer_appendv(buffer: *const ImGuiTextBuffer, fmt: *const c_char, args: va_list);
+// pub fn ImGuiTextBuffer_appendv(
+//     buffer: *const ImGuiTextBuffer,
+//     fmt: *const c_char,
+//     args: va_list
+// );
 }
 
 // ImGuiStorage

@@ -8,6 +8,7 @@
 - Color picker widget
 - Color button widget
 - `imgui_sys` is now re-exported as `sys` in the main create
+- `imgui::get_style_color_name`
 
 ### Changed
 
