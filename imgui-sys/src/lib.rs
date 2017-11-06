@@ -93,7 +93,7 @@ impl ImGuiCol {
     pub const ColumnActive: ImGuiCol = ImGuiCol::SeparatorActive;
     pub fn values() -> &'static [ImGuiCol] {
         use ImGuiCol::*;
-        &[
+        static values: &'static [ImGuiCol] = &[
             Text,
             TextDisabled,
             WindowBg,
@@ -137,7 +137,8 @@ impl ImGuiCol {
             PlotHistogramHovered,
             TextSelectedBg,
             ModalWindowDarkening,
-        ]
+        ];
+        values
     }
 }
 pub const ImGuiCol_COUNT: usize = 43;
