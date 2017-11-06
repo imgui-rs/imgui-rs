@@ -184,7 +184,7 @@ bitflags!(
     /// Window flags
     #[repr(C)]
     pub struct ImGuiWindowFlags: c_int {
-        const NoTitleBar                = 1 << 0;
+        const NoTitleBar                = 1;
         const NoResize                  = 1 << 1;
         const NoMove                    = 1 << 2;
         const NoScrollbar               = 1 << 3;
@@ -273,7 +273,7 @@ bitflags!(
     /// Condition flags
     #[repr(C)]
     pub struct ImGuiCond: c_int {
-        const Always       = 1 << 0;
+        const Always       = 1;
         const Once         = 1 << 1;
         const FirstUseEver = 1 << 2;
         const Appearing    = 1 << 3;
@@ -296,7 +296,7 @@ bitflags!(
     #[repr(C)]
     pub struct ImGuiColumnsFlags: c_int {
         /// Disable column dividers
-        const NoBorder            = 1 << 0;
+        const NoBorder            = 1;
         /// Disable resizing columns when clicking on the dividers
         const NoResize            = 1 << 1;
         /// Disable column width preservation when adjusting columns
@@ -310,7 +310,7 @@ bitflags!(
     /// Flags for text inputs
     #[repr(C)]
     pub struct ImGuiInputTextFlags: c_int {
-        const CharsDecimal        = 1 << 0;
+        const CharsDecimal        = 1;
         const CharsHexadecimal    = 1 << 1;
         const CharsUppercase      = 1 << 2;
         const CharsNoBlank        = 1 << 3;
@@ -383,7 +383,7 @@ bitflags!(
     /// Flags for selectables
     #[repr(C)]
     pub struct ImGuiSelectableFlags: c_int {
-        const DontClosePopups  = 1 << 0;
+        const DontClosePopups  = 1;
         const SpanAllColumns   = 1 << 1;
         const AllowDoubleClick = 1 << 2;
     }
@@ -403,7 +403,7 @@ bitflags!(
     /// Flags for trees and collapsing headers
     #[repr(C)]
     pub struct ImGuiTreeNodeFlags: c_int {
-        const Selected          = 1 << 0;
+        const Selected          = 1;
         const Framed            = 1 << 1;
         const AllowOverlapMode  = 1 << 2;
         const NoTreePushOnOpen  = 1 << 3;

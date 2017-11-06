@@ -432,7 +432,7 @@ fn show_test_window<'a>(ui: &Ui<'a>, state: &mut State, opened: &mut bool) {
                 });
 
                 ui.tree_node(im_str!("Color/Picker Widgets")).build(|| {
-                  let ref mut s = state.color_edit;
+                  let s = &mut state.color_edit;
                   ui.checkbox(im_str!("With HDR"), &mut s.hdr);
                   ui.same_line(0.0);
                   show_help_marker(ui, im_str!("Currently all this does is to lift the 0..1 limits on dragging widgets."));
@@ -531,7 +531,7 @@ fn show_test_window<'a>(ui: &Ui<'a>, state: &mut State, opened: &mut bool) {
                     }
                     ui.same_line(0.0);
                     ui.text(match state.selected_fish {
-                        Some(index) => names[index].clone(),
+                        Some(index) => names[index],
                         None => im_str!("<None>"),
                     });
                     ui.popup(im_str!("select"), || {
@@ -539,7 +539,7 @@ fn show_test_window<'a>(ui: &Ui<'a>, state: &mut State, opened: &mut bool) {
                         ui.separator();
                         for (index, name) in names.iter().enumerate() {
                             if ui.selectable(
-                                name.clone(),
+                                name,
                                 false,
                                 ImGuiSelectableFlags::empty(),
                                 ImVec2::new(0.0, 0.0),

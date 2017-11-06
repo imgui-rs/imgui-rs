@@ -173,7 +173,7 @@ impl<R: Resources> Renderer<R> {
         ];
 
         ui.render(|ui, draw_list| {
-            self.render_draw_list(ui, factory, encoder, draw_list)
+            self.render_draw_list(ui, factory, encoder, &draw_list)
         })
     }
     fn render_draw_list<'a, F: Factory<R>, C: CommandBuffer<R>>(
@@ -181,7 +181,7 @@ impl<R: Resources> Renderer<R> {
         ui: &'a Ui<'a>,
         factory: &mut F,
         encoder: &mut Encoder<R, C>,
-        draw_list: DrawList<'a>,
+        draw_list: &DrawList<'a>,
     ) -> RendererResult<()> {
         let (scale_width, scale_height) = ui.imgui().display_framebuffer_scale();
 

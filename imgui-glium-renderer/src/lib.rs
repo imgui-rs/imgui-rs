@@ -66,7 +66,7 @@ impl Renderer {
     pub fn init<F: Facade>(imgui: &mut ImGui, ctx: &F) -> RendererResult<Renderer> {
         let device_objects = try!(DeviceObjects::init(imgui, ctx));
         Ok(Renderer {
-            ctx: ctx.get_context().clone(),
+            ctx: Rc::clone(ctx.get_context()),
             device_objects: device_objects,
         })
     }
@@ -74,7 +74,7 @@ impl Renderer {
     pub fn render<'a, S: Surface>(&mut self, surface: &mut S, ui: Ui<'a>) -> RendererResult<()> {
         let _ = self.ctx.insert_debug_marker("imgui-rs: starting rendering");
         let result = ui.render(|ui, draw_list| {
-            self.render_draw_list(surface, ui, draw_list)
+            self.render_draw_list(surface, ui, &draw_list)
         });
         let _ = self.ctx.insert_debug_marker("imgui-rs: rendering finished");
         result
@@ -84,7 +84,7 @@ impl Renderer {
         &mut self,
         surface: &mut S,
         ui: &'a Ui<'a>,
-        draw_list: DrawList<'a>,
+        draw_list: &DrawList<'a>,
     ) -> RendererResult<()> {
         use glium::{Blend, DrawParameters, Rect};
         use glium::uniforms::{MinifySamplerFilter, MagnifySamplerFilter};

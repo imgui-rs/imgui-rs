@@ -34,14 +34,12 @@ pub fn run<F: FnMut(&Ui) -> bool>(title: String, clear_color: [f32; 4], mut run_
             } else {
                 Shaders::GlSlEs100
             }
+        } else if version.major >= 4 {
+            Shaders::GlSl400
+        } else if version.major >= 3 {
+            Shaders::GlSl130
         } else {
-            if version.major >= 4 {
-                Shaders::GlSl400
-            } else if version.major >= 3 {
-                Shaders::GlSl130
-            } else {
-                Shaders::GlSl110
-            }
+            Shaders::GlSl110
         }
     };
 
@@ -141,7 +139,7 @@ pub fn run<F: FnMut(&Ui) -> bool>(title: String, clear_color: [f32; 4], mut run_
             break;
         }
 
-        encoder.clear(&mut main_color, clear_color);
+        encoder.clear(&main_color, clear_color);
         renderer.render(ui, &mut factory, &mut encoder).expect(
             "Rendering failed",
         );
