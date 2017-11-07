@@ -167,9 +167,13 @@ fn main() {
     });
 }
 
-fn show_help_marker(ui: &Ui, _: &ImStr) {
+fn show_help_marker(ui: &Ui, desc: &str) {
     ui.text_disabled(im_str!("(?)"));
-    // TODO
+    if ui.is_item_hovered() {
+      ui.tooltip(|| {
+        ui.text(desc);
+      });
+    }
 }
 
 fn show_user_guide(ui: &Ui) {
@@ -451,10 +455,8 @@ fn show_test_window(ui: &Ui, state: &mut State, opened: &mut bool) {
                     ui.same_line(0.0);
                     show_help_marker(
                         ui,
-                        im_str!(
                             "Currently all this does is to lift the 0..1 \
-                                               limits on dragging widgets."
-                        ),
+                                               limits on dragging widgets.",
                     );
 
                     ui.checkbox(im_str!("With Alpha Preview"), &mut s.alpha_preview);
@@ -466,10 +468,8 @@ fn show_test_window(ui: &Ui, state: &mut State, opened: &mut bool) {
                     ui.same_line(0.0);
                     show_help_marker(
                         ui,
-                        im_str!(
                             "Right-click on the individual color widget to \
-                                               show options."
-                        ),
+                                               show options.",
                     );
                     let misc_flags = {
                         let mut f = ImGuiColorEditFlags::empty();
@@ -486,10 +486,8 @@ fn show_test_window(ui: &Ui, state: &mut State, opened: &mut bool) {
                     ui.same_line(0.0);
                     show_help_marker(
                         ui,
-                        im_str!(
                             "Click on the colored square to open a color picker.
 CTRL+click on individual component to input value.\n"
-                        ),
                     );
                     ui.color_edit(im_str!("MyColor##1"), &mut s.color)
                         .flags(misc_flags)
@@ -512,12 +510,10 @@ CTRL+click on individual component to input value.\n"
                     ui.same_line(0.0);
                     show_help_marker(
                         ui,
-                        im_str!(
                             "With the inputs(false) function you can hide all \
                             the slider/text inputs.\n \
                             With the label(false) function you can pass a non-empty label which \
                             will only be used for the tooltip and picker popup."
-                        ),
                     );
                     ui.color_edit(im_str!("MyColor##3"), &mut s.color)
                         .flags(misc_flags)
