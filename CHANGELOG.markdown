@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [0.0.17] - 2017-11-07
+
 ### Added
 
 - Namespaced flags (e.g. `ImGuiWindowFlags`)

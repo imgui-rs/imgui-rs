@@ -1,6 +1,6 @@
 [package]
 name = "imgui-examples"
-version = "0.0.17-pre"
+version = "0.0.17"
 authors = ["Joonas Javanainen <joonas.javanainen@gmail.com>", "imgui-rs contributors"]
 description = "imgui crate examples"
 homepage = "https://github.com/Gekkio/imgui-rs"
@@ -13,7 +13,7 @@ gfx = "0.16"
 gfx_window_glutin = "0.18"
 glium = { version = "0.18", default-features = true }
 glutin = "0.10"
-imgui = { version = "0.0.17-pre", path = "../" }
-imgui-gfx-renderer = { version = "0.0.17-pre", path = "../imgui-gfx-renderer" }
-imgui-glium-renderer = { version = "0.0.17-pre", path = "../imgui-glium-renderer" }
-imgui-sys = { version = "0.0.17-pre", path = "../imgui-sys", features = ["gfx", "glium"] }
+imgui = { version = "0.0.17", path = "../" }
+imgui-gfx-renderer = { version = "0.0.17", path = "../imgui-gfx-renderer" }
+imgui-glium-renderer = { version = "0.0.17", path = "../imgui-glium-renderer" }
+imgui-sys = { version = "0.0.17", path = "../imgui-sys", features = ["gfx", "glium"] }
