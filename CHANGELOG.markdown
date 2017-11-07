@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+### Added
+
+- `is_item_hovered`
+- `tooltip`
+- `tooltip_text`
+
 ### Removed
 
 - Non-namespaced flags

@@ -445,7 +445,7 @@ impl<'ui> Ui<'ui> {
 
 // Widgets
 impl<'ui> Ui<'ui> {
-    pub fn text<S: AsRef<str>>(&self, text: S) {
+    pub fn text<T: AsRef<str>>(&self, text: T) {
         let s = text.as_ref();
         unsafe {
             let start = s.as_ptr();
@@ -671,6 +671,54 @@ impl<'ui> Ui<'ui> {
     ) -> bool {
         unsafe { sys::igSelectable(label.as_ptr(), selected, flags, size.into()) }
     }
+}
+
+/// # Tooltips
+impl<'ui> Ui<'ui> {
+    /// Construct a tooltip window that can have any kind of content.
+    ///
+    /// Typically used with `Ui::is_item_hovered()` or some other conditional check.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # #[macro_use] extern crate imgui;
+    /// # use imgui::*;
+    /// fn user_interface(ui: &Ui) {
+    ///     ui.text("Hover over me");
+    ///     if ui.is_item_hovered() {
+    ///         ui.tooltip(|| {
+    ///             ui.text_colored((1.0, 0.0, 0.0, 1.0), im_str!("I'm red!"));
+    ///         });
+    ///     }
+    /// }
+    /// # fn main() {
+    /// # }
+    /// ```
+    pub fn tooltip<F: FnOnce()>(&self, f: F) {
+        unsafe { sys::igBeginTooltip() };
+        f();
+        unsafe { sys::igEndTooltip() };
+    }
+    /// Construct a tooltip window with simple text content.
+    ///
+    /// Typically used with `Ui::is_item_hovered()` or some other conditional check.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # #[macro_use] extern crate imgui;
+    /// # use imgui::*;
+    /// fn user_interface(ui: &Ui) {
+    ///     ui.text("Hover over me");
+    ///     if ui.is_item_hovered() {
+    ///         ui.tooltip_text("I'm a tooltip!");
+    ///     }
+    /// }
+    /// # fn main() {
+    /// # }
+    /// ```
+    pub fn tooltip_text<T: AsRef<str>>(&self, text: T) { self.tooltip(|| self.text(text)); }
 }
 
 // Widgets: Menus
@@ -1013,4 +1061,23 @@ impl<'ui> Ui<'ui> {
         f();
         unsafe { sys::igPopStyleColor(color_vars.len() as i32) };
     }
+}
+
+/// # Utilities
+impl<'ui> Ui<'ui> {
+    /// Returns `true` if the last item is being hovered by the mouse.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # #[macro_use] extern crate imgui;
+    /// # use imgui::*;
+    /// fn user_interface(ui: &Ui) {
+    ///     ui.text("Hover over me");
+    ///     let is_hover_over_me_text_hovered = ui.is_item_hovered();
+    /// }
+    /// # fn main() {
+    /// # }
+    /// ```
+    pub fn is_item_hovered(&self) -> bool { unsafe { sys::igIsItemHovered() } }
 }
