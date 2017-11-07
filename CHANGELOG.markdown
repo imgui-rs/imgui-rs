@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+### Removed
+
+- Non-namespaced flags
+- Various imgui-sys things that were deprecated in imgui/cimgui 1.51
+- `Window::bg_alpha`
+- `color_edit3`
+- `color_edit4`
+
 ## [0.0.17] - 2017-11-07
 
 ### Added

@@ -8,32 +8,6 @@ use std::slice;
 use std::str;
 use sys::ImGuiStyleVar;
 
-#[allow(deprecated)]
-pub use sys::{ImGuiInputTextFlags_AllowTabInput, ImGuiInputTextFlags_AlwaysInsertMode,
-              ImGuiInputTextFlags_AutoSelectAll, ImGuiInputTextFlags_CallbackAlways,
-              ImGuiInputTextFlags_CallbackCharFilter, ImGuiInputTextFlags_CallbackCompletion,
-              ImGuiInputTextFlags_CallbackHistory, ImGuiInputTextFlags_CharsDecimal,
-              ImGuiInputTextFlags_CharsHexadecimal, ImGuiInputTextFlags_CharsNoBlank,
-              ImGuiInputTextFlags_CharsUppercase, ImGuiInputTextFlags_CtrlEnterForNewLine,
-              ImGuiInputTextFlags_EnterReturnsTrue, ImGuiInputTextFlags_NoHorizontalScroll,
-              ImGuiInputTextFlags_Password, ImGuiInputTextFlags_ReadOnly,
-              ImGuiSelectableFlags_DontClosePopups, ImGuiSelectableFlags_SpanAllColumns,
-              ImGuiSetCond_Always, ImGuiSetCond_Appearing, ImGuiSetCond_FirstUseEver,
-              ImGuiSetCond_Once, ImGuiTreeNodeFlags_AllowOverlapMode, ImGuiTreeNodeFlags_Bullet,
-              ImGuiTreeNodeFlags_CollapsingHeader, ImGuiTreeNodeFlags_DefaultOpen,
-              ImGuiTreeNodeFlags_Framed, ImGuiTreeNodeFlags_Leaf,
-              ImGuiTreeNodeFlags_NoAutoOpenOnLog, ImGuiTreeNodeFlags_NoTreePushOnOpen,
-              ImGuiTreeNodeFlags_OpenOnArrow, ImGuiTreeNodeFlags_OpenOnDoubleClick,
-              ImGuiTreeNodeFlags_Selected, ImGuiWindowFlags_AlwaysAutoResize,
-              ImGuiWindowFlags_AlwaysHorizontalScrollbar, ImGuiWindowFlags_AlwaysUseWindowPadding,
-              ImGuiWindowFlags_AlwaysVerticalScrollbar, ImGuiWindowFlags_HorizontalScrollbar,
-              ImGuiWindowFlags_MenuBar, ImGuiWindowFlags_NoBringToFrontOnFocus,
-              ImGuiWindowFlags_NoCollapse, ImGuiWindowFlags_NoFocusOnAppearing,
-              ImGuiWindowFlags_NoInputs, ImGuiWindowFlags_NoMove, ImGuiWindowFlags_NoResize,
-              ImGuiWindowFlags_NoSavedSettings, ImGuiWindowFlags_NoScrollWithMouse,
-              ImGuiWindowFlags_NoScrollbar, ImGuiWindowFlags_NoTitleBar,
-              ImGuiWindowFlags_ShowBorders};
-
 pub use sys::{ImDrawIdx, ImDrawVert, ImGuiColorEditFlags, ImGuiInputTextFlags, ImGuiKey,
               ImGuiSelectableFlags, ImGuiCond, ImGuiCol, ImGuiStyle, ImGuiTreeNodeFlags,
               ImGuiWindowFlags, ImVec2, ImVec4};
@@ -651,15 +625,6 @@ impl<'ui> Ui<'ui> {
         value: V,
     ) -> ColorEdit<'ui, 'p> {
         ColorEdit::new(self, label, value.into())
-    }
-    #[deprecated(since = "0.0.17", note = "please use color_edit instead")]
-    pub fn color_edit3<'p>(&self, label: &'p ImStr, value: &'p mut [f32; 3]) -> ColorEdit<'ui, 'p> {
-
-        self.color_edit(label, value)
-    }
-    #[deprecated(since = "0.0.17", note = "please use color_edit instead")]
-    pub fn color_edit4<'p>(&self, label: &'p ImStr, value: &'p mut [f32; 4]) -> ColorEdit<'ui, 'p> {
-        self.color_edit(label, value)
     }
     /// Constructs a new color picker builder.
     pub fn color_picker<'p, V: Into<EditableColor<'p>>>(

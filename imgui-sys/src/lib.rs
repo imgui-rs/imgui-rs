@@ -85,12 +85,6 @@ pub enum ImGuiCol {
     ModalWindowDarkening,
 }
 impl ImGuiCol {
-    #[deprecated(since = "0.0.17", note = "please use ImGuiCol::Separator instead")]
-    pub const Column: ImGuiCol = ImGuiCol::Separator;
-    #[deprecated(since = "0.0.17", note = "please use ImGuiCol::SeparatorHovered instead")]
-    pub const ColumnHovered: ImGuiCol = ImGuiCol::SeparatorHovered;
-    #[deprecated(since = "0.0.17", note = "please use ImGuiCol::SeparatorActive instead")]
-    pub const ColumnActive: ImGuiCol = ImGuiCol::SeparatorActive;
     pub fn values() -> &'static [ImGuiCol] {
         use ImGuiCol::*;
         static values: &'static [ImGuiCol] = &[
@@ -260,64 +254,6 @@ bitflags!(
     }
 );
 
-#[deprecated(since = "0.0.17", note = "please use ImGuiWindowFlags::NoTitleBar instead")]
-pub const ImGuiWindowFlags_NoTitleBar: ImGuiWindowFlags = ImGuiWindowFlags::NoTitleBar;
-#[deprecated(since = "0.0.17", note = "please use ImGuiWindowFlags::NoResize instead")]
-pub const ImGuiWindowFlags_NoResize: ImGuiWindowFlags = ImGuiWindowFlags::NoResize;
-#[deprecated(since = "0.0.17", note = "please use ImGuiWindowFlags::NoMove instead")]
-pub const ImGuiWindowFlags_NoMove: ImGuiWindowFlags = ImGuiWindowFlags::NoMove;
-#[deprecated(since = "0.0.17", note = "please use ImGuiWindowFlags::NoScrollbar instead")]
-pub const ImGuiWindowFlags_NoScrollbar: ImGuiWindowFlags = ImGuiWindowFlags::NoScrollbar;
-#[deprecated(since = "0.0.17", note = "please use ImGuiWindowFlags::NoScrollWithMouse instead")]
-pub const ImGuiWindowFlags_NoScrollWithMouse: ImGuiWindowFlags =
-    ImGuiWindowFlags::NoScrollWithMouse;
-#[deprecated(since = "0.0.17", note = "please use ImGuiWindowFlags::NoCollapse instead")]
-pub const ImGuiWindowFlags_NoCollapse: ImGuiWindowFlags = ImGuiWindowFlags::NoCollapse;
-#[deprecated(since = "0.0.17", note = "please use ImGuiWindowFlags::AlwaysAutoResize instead")]
-pub const ImGuiWindowFlags_AlwaysAutoResize: ImGuiWindowFlags = ImGuiWindowFlags::AlwaysAutoResize;
-#[deprecated(since = "0.0.17", note = "please use ImGuiWindowFlags::ShowBorders instead")]
-pub const ImGuiWindowFlags_ShowBorders: ImGuiWindowFlags = ImGuiWindowFlags::ShowBorders;
-#[deprecated(since = "0.0.17", note = "please use ImGuiWindowFlags::NoSavedSettings instead")]
-pub const ImGuiWindowFlags_NoSavedSettings: ImGuiWindowFlags = ImGuiWindowFlags::NoSavedSettings;
-#[deprecated(since = "0.0.17", note = "please use ImGuiWindowFlags::NoInputs instead")]
-pub const ImGuiWindowFlags_NoInputs: ImGuiWindowFlags = ImGuiWindowFlags::NoInputs;
-#[deprecated(since = "0.0.17", note = "please use ImGuiWindowFlags::MenuBar instead")]
-pub const ImGuiWindowFlags_MenuBar: ImGuiWindowFlags = ImGuiWindowFlags::MenuBar;
-#[deprecated(since = "0.0.17", note = "please use ImGuiWindowFlags::HorizontalScrollbar instead")]
-pub const ImGuiWindowFlags_HorizontalScrollbar: ImGuiWindowFlags =
-    ImGuiWindowFlags::HorizontalScrollbar;
-#[deprecated(since = "0.0.17", note = "please use ImGuiWindowFlags::NoFocusOnAppearing instead")]
-pub const ImGuiWindowFlags_NoFocusOnAppearing: ImGuiWindowFlags =
-    ImGuiWindowFlags::NoFocusOnAppearing;
-#[deprecated(since = "0.0.17", note = "please use ImGuiWindowFlags::NoBringToFrontOnFocus instead")]
-pub const ImGuiWindowFlags_NoBringToFrontOnFocus: ImGuiWindowFlags =
-    ImGuiWindowFlags::NoBringToFrontOnFocus;
-#[deprecated(since = "0.0.17",
-             note = "please use ImGuiWindowFlags::AlwaysVerticalScrollbar instead")]
-pub const ImGuiWindowFlags_AlwaysVerticalScrollbar: ImGuiWindowFlags =
-    ImGuiWindowFlags::AlwaysVerticalScrollbar;
-#[deprecated(since = "0.0.17",
-             note = "please use ImGuiWindowFlags::AlwaysHorizontalScrollbar instead")]
-pub const ImGuiWindowFlags_AlwaysHorizontalScrollbar: ImGuiWindowFlags =
-    ImGuiWindowFlags::AlwaysHorizontalScrollbar;
-#[deprecated(since = "0.0.17",
-             note = "please use ImGuiWindowFlags::AlwaysUseWindowPadding instead")]
-pub const ImGuiWindowFlags_AlwaysUseWindowPadding: ImGuiWindowFlags =
-    ImGuiWindowFlags::AlwaysUseWindowPadding;
-
-#[deprecated(since = "0.0.17", note = "please use ImGuiWindowFlags::ChildWindow instead")]
-pub const ImGuiWindowFlags_ChildWindow: ImGuiWindowFlags = ImGuiWindowFlags::ChildWindow;
-#[deprecated(since = "0.0.17", note = "please use ImGuiWindowFlags::ComboBox instead")]
-pub const ImGuiWindowFlags_ComboBox: ImGuiWindowFlags = ImGuiWindowFlags::ComboBox;
-#[deprecated(since = "0.0.17", note = "please use ImGuiWindowFlags::Tooltip instead")]
-pub const ImGuiWindowFlags_Tooltip: ImGuiWindowFlags = ImGuiWindowFlags::Tooltip;
-#[deprecated(since = "0.0.17", note = "please use ImGuiWindowFlags::Popup instead")]
-pub const ImGuiWindowFlags_Popup: ImGuiWindowFlags = ImGuiWindowFlags::Popup;
-#[deprecated(since = "0.0.17", note = "please use ImGuiWindowFlags::Modal instead")]
-pub const ImGuiWindowFlags_Modal: ImGuiWindowFlags = ImGuiWindowFlags::Modal;
-#[deprecated(since = "0.0.17", note = "please use ImGuiWindowFlags::ChildMenu instead")]
-pub const ImGuiWindowFlags_ChildMenu: ImGuiWindowFlags = ImGuiWindowFlags::ChildMenu;
-
 bitflags!(
     /// Condition flags
     #[repr(C)]
@@ -328,17 +264,6 @@ bitflags!(
         const Appearing    = 1 << 3;
     }
 );
-
-#[deprecated(since = "0.0.17", note = "please use ImGuiCond instead")]
-pub type ImGuiSetCond = ImGuiCond;
-#[deprecated(since = "0.0.17", note = "please use ImGuiCond::Always instead")]
-pub const ImGuiSetCond_Always: ImGuiCond = ImGuiCond::Always;
-#[deprecated(since = "0.0.17", note = "please use ImGuiCond::Once instead")]
-pub const ImGuiSetCond_Once: ImGuiCond = ImGuiCond::Once;
-#[deprecated(since = "0.0.17", note = "please use ImGuiCond::FirstUseEver instead")]
-pub const ImGuiSetCond_FirstUseEver: ImGuiCond = ImGuiCond::FirstUseEver;
-#[deprecated(since = "0.0.17", note = "please use ImGuiCond::Appearing instead")]
-pub const ImGuiSetCond_Appearing: ImGuiCond = ImGuiCond::Appearing;
 
 bitflags!(
     /// Flags for column functions
@@ -380,54 +305,6 @@ bitflags!(
     }
 );
 
-#[deprecated(since = "0.0.17", note = "please use ImGuiInputTextFlags::CharsDecimal instead")]
-pub const ImGuiInputTextFlags_CharsDecimal: ImGuiInputTextFlags = ImGuiInputTextFlags::CharsDecimal;
-#[deprecated(since = "0.0.17", note = "please use ImGuiInputTextFlags::CharsHexadecimal instead")]
-pub const ImGuiInputTextFlags_CharsHexadecimal: ImGuiInputTextFlags =
-    ImGuiInputTextFlags::CharsHexadecimal;
-#[deprecated(since = "0.0.17", note = "please use ImGuiInputTextFlags::CharsUppercase instead")]
-pub const ImGuiInputTextFlags_CharsUppercase: ImGuiInputTextFlags =
-    ImGuiInputTextFlags::CharsUppercase;
-#[deprecated(since = "0.0.17", note = "please use ImGuiInputTextFlags::CharsNoBlank instead")]
-pub const ImGuiInputTextFlags_CharsNoBlank: ImGuiInputTextFlags = ImGuiInputTextFlags::CharsNoBlank;
-#[deprecated(since = "0.0.17", note = "please use ImGuiInputTextFlags::AutoSelectAll instead")]
-pub const ImGuiInputTextFlags_AutoSelectAll: ImGuiInputTextFlags =
-    ImGuiInputTextFlags::AutoSelectAll;
-#[deprecated(since = "0.0.17", note = "please use ImGuiInputTextFlags::EnterReturnsTrue instead")]
-pub const ImGuiInputTextFlags_EnterReturnsTrue: ImGuiInputTextFlags =
-    ImGuiInputTextFlags::EnterReturnsTrue;
-#[deprecated(since = "0.0.17", note = "please use ImGuiInputTextFlags::CallbackCompletion instead")]
-pub const ImGuiInputTextFlags_CallbackCompletion: ImGuiInputTextFlags =
-    ImGuiInputTextFlags::CallbackCompletion;
-#[deprecated(since = "0.0.17", note = "please use ImGuiInputTextFlags::CallbackHistory instead")]
-pub const ImGuiInputTextFlags_CallbackHistory: ImGuiInputTextFlags =
-    ImGuiInputTextFlags::CallbackHistory;
-#[deprecated(since = "0.0.17", note = "please use ImGuiInputTextFlags::CallbackAlways instead")]
-pub const ImGuiInputTextFlags_CallbackAlways: ImGuiInputTextFlags =
-    ImGuiInputTextFlags::CallbackAlways;
-#[deprecated(since = "0.0.17", note = "please use ImGuiInputTextFlags::CallbackCharFilter instead")]
-pub const ImGuiInputTextFlags_CallbackCharFilter: ImGuiInputTextFlags =
-    ImGuiInputTextFlags::CallbackCharFilter;
-#[deprecated(since = "0.0.17", note = "please use ImGuiInputTextFlags::AllowTabInput instead")]
-pub const ImGuiInputTextFlags_AllowTabInput: ImGuiInputTextFlags =
-    ImGuiInputTextFlags::AllowTabInput;
-#[deprecated(since = "0.0.17",
-             note = "please use ImGuiInputTextFlags::CtrlEnterForNewLine instead")]
-pub const ImGuiInputTextFlags_CtrlEnterForNewLine: ImGuiInputTextFlags =
-    ImGuiInputTextFlags::CtrlEnterForNewLine;
-#[deprecated(since = "0.0.17", note = "please use ImGuiInputTextFlags::NoHorizontalScroll instead")]
-pub const ImGuiInputTextFlags_NoHorizontalScroll: ImGuiInputTextFlags =
-    ImGuiInputTextFlags::NoHorizontalScroll;
-#[deprecated(since = "0.0.17", note = "please use ImGuiInputTextFlags::AlwaysInsertMode instead")]
-pub const ImGuiInputTextFlags_AlwaysInsertMode: ImGuiInputTextFlags =
-    ImGuiInputTextFlags::AlwaysInsertMode;
-#[deprecated(since = "0.0.17", note = "please use ImGuiInputTextFlags::ReadOnly instead")]
-pub const ImGuiInputTextFlags_ReadOnly: ImGuiInputTextFlags = ImGuiInputTextFlags::ReadOnly;
-#[deprecated(since = "0.0.17", note = "please use ImGuiInputTextFlags::Password instead")]
-pub const ImGuiInputTextFlags_Password: ImGuiInputTextFlags = ImGuiInputTextFlags::Password;
-#[deprecated(since = "0.0.17", note = "please use ImGuiInputTextFlags::Multiline instead")]
-pub const ImGuiInputTextFlags_Multiline: ImGuiInputTextFlags = ImGuiInputTextFlags::Multiline;
-
 bitflags!(
     /// Flags for selectables
     #[repr(C)]
@@ -437,16 +314,6 @@ bitflags!(
         const AllowDoubleClick = 1 << 2;
     }
 );
-
-#[deprecated(since = "0.0.17", note = "please use ImGuiSelectableFlags::DontClosePopups instead")]
-pub const ImGuiSelectableFlags_DontClosePopups: ImGuiSelectableFlags =
-    ImGuiSelectableFlags::DontClosePopups;
-#[deprecated(since = "0.0.17", note = "please use ImGuiSelectableFlags::SpanAllColumns instead")]
-pub const ImGuiSelectableFlags_SpanAllColumns: ImGuiSelectableFlags =
-    ImGuiSelectableFlags::SpanAllColumns;
-#[deprecated(since = "0.0.17", note = "please use ImGuiSelectableFlags::AllowDoubleClick instead")]
-pub const ImGuiSelectableFlags_AllowDoubleClick: ImGuiSelectableFlags =
-    ImGuiSelectableFlags::AllowDoubleClick;
 
 bitflags!(
     /// Flags for trees and collapsing headers
@@ -466,34 +333,6 @@ bitflags!(
             ImGuiTreeNodeFlags::Framed.bits | ImGuiTreeNodeFlags::NoAutoOpenOnLog.bits;
     }
 );
-
-#[deprecated(since = "0.0.17", note = "please use ImGuiTreeNodeFlags::Selected instead")]
-pub const ImGuiTreeNodeFlags_Selected: ImGuiTreeNodeFlags = ImGuiTreeNodeFlags::Selected;
-#[deprecated(since = "0.0.17", note = "please use ImGuiTreeNodeFlags::Framed instead")]
-pub const ImGuiTreeNodeFlags_Framed: ImGuiTreeNodeFlags = ImGuiTreeNodeFlags::Framed;
-#[deprecated(since = "0.0.17", note = "please use ImGuiTreeNodeFlags::AllowOverlapMode instead")]
-pub const ImGuiTreeNodeFlags_AllowOverlapMode: ImGuiTreeNodeFlags =
-    ImGuiTreeNodeFlags::AllowOverlapMode;
-#[deprecated(since = "0.0.17", note = "please use ImGuiTreeNodeFlags::NoTreePushOnOpen instead")]
-pub const ImGuiTreeNodeFlags_NoTreePushOnOpen: ImGuiTreeNodeFlags =
-    ImGuiTreeNodeFlags::NoTreePushOnOpen;
-#[deprecated(since = "0.0.17", note = "please use ImGuiTreeNodeFlags::NoAutoOpenOnLog instead")]
-pub const ImGuiTreeNodeFlags_NoAutoOpenOnLog: ImGuiTreeNodeFlags =
-    ImGuiTreeNodeFlags::NoAutoOpenOnLog;
-#[deprecated(since = "0.0.17", note = "please use ImGuiTreeNodeFlags::DefaultOpen instead")]
-pub const ImGuiTreeNodeFlags_DefaultOpen: ImGuiTreeNodeFlags = ImGuiTreeNodeFlags::DefaultOpen;
-#[deprecated(since = "0.0.17", note = "please use ImGuiTreeNodeFlags::OpenOnDoubleClick instead")]
-pub const ImGuiTreeNodeFlags_OpenOnDoubleClick: ImGuiTreeNodeFlags =
-    ImGuiTreeNodeFlags::OpenOnDoubleClick;
-#[deprecated(since = "0.0.17", note = "please use ImGuiTreeNodeFlags::OpenOnArrow instead")]
-pub const ImGuiTreeNodeFlags_OpenOnArrow: ImGuiTreeNodeFlags = ImGuiTreeNodeFlags::OpenOnArrow;
-#[deprecated(since = "0.0.17", note = "please use ImGuiTreeNodeFlags::Leaf instead")]
-pub const ImGuiTreeNodeFlags_Leaf: ImGuiTreeNodeFlags = ImGuiTreeNodeFlags::Leaf;
-#[deprecated(since = "0.0.17", note = "please use ImGuiTreeNodeFlags::Bullet instead")]
-pub const ImGuiTreeNodeFlags_Bullet: ImGuiTreeNodeFlags = ImGuiTreeNodeFlags::Bullet;
-#[deprecated(since = "0.0.17", note = "please use ImGuiTreeNodeFlags::CollapsingHeader instead")]
-pub const ImGuiTreeNodeFlags_CollapsingHeader: ImGuiTreeNodeFlags =
-    ImGuiTreeNodeFlags::CollapsingHeader;
 
 pub type ImGuiTextEditCallback = Option<
     extern "C" fn(data: *mut ImGuiTextEditCallbackData) -> c_int,
@@ -1126,35 +965,6 @@ extern "C" {
     pub fn igGetIDPtr(ptr_id: *const c_void) -> ImGuiID;
 }
 
-#[allow(non_snake_case)]
-#[deprecated(since = "0.0.17", note = "please use igPushIDStr instead")]
-pub unsafe fn igPushIdStr(str_id: *const c_char) { igPushIDStr(str_id) }
-#[allow(non_snake_case)]
-#[deprecated(since = "0.0.17", note = "please use igPushIDStrRange instead")]
-pub unsafe fn igPushIdStrRange(str_begin: *const c_char, str_end: *const c_char) {
-    igPushIDStrRange(str_begin, str_end)
-}
-#[allow(non_snake_case)]
-#[deprecated(since = "0.0.17", note = "please use igPushIDPtr instead")]
-pub unsafe fn igPushIdPtr(ptr_id: *const c_void) { igPushIDPtr(ptr_id) }
-#[allow(non_snake_case)]
-#[deprecated(since = "0.0.17", note = "please use igPushIDInt instead")]
-pub unsafe fn igPushIdInt(int_id: c_int) { igPushIDInt(int_id) }
-#[allow(non_snake_case)]
-#[deprecated(since = "0.0.17", note = "please use igPopID instead")]
-pub unsafe fn igPopId() { igPopID() }
-#[allow(non_snake_case)]
-#[deprecated(since = "0.0.17", note = "please use igGetIDStr instead")]
-pub unsafe fn igGetIdStr(str_id: *const c_char) -> ImGuiID { igGetIDStr(str_id) }
-#[allow(non_snake_case)]
-#[deprecated(since = "0.0.17", note = "please use igGetIDStrRange instead")]
-pub unsafe fn igGetIdstrRange(str_begin: *const c_char, str_end: *const c_char) -> ImGuiID {
-    igGetIDStrRange(str_begin, str_end)
-}
-#[allow(non_snake_case)]
-#[deprecated(since = "0.0.17", note = "please use igGetIDPtr instead")]
-pub unsafe fn igGetIdPtr(ptr_id: *const c_void) -> ImGuiID { igGetIDPtr(ptr_id) }
-
 // Widgets
 extern "C" {
     pub fn igText(fmt: *const c_char, ...);
@@ -1700,19 +1510,6 @@ extern "C" {
     );
     pub fn igPopClipRect();
 }
-
-#[allow(non_snake_case)]
-#[deprecated(since = "0.0.17", note = "please use igIsItemRectHovered instead")]
-pub unsafe fn igIsItemHoveredRect() -> bool { igIsItemRectHovered() }
-#[allow(non_snake_case)]
-#[deprecated(since = "0.0.17", note = "please use igIsWindowRectHovered instead")]
-pub unsafe fn igIsMouseHoveringWindow() -> bool { igIsWindowRectHovered() }
-#[allow(non_snake_case)]
-#[deprecated(since = "0.0.17", note = "please use igIsAnyWindowHovered instead")]
-pub unsafe fn igIsMouseHoveringAnyWindow() -> bool { igIsAnyWindowHovered() }
-#[allow(non_snake_case)]
-#[deprecated(since = "0.0.17", note = "please use igGetStyleColorName instead")]
-pub unsafe fn igGetStyleColName(idx: ImGuiCol) -> *const c_char { igGetStyleColorName(idx) }
 
 // Utilities
 extern "C" {
