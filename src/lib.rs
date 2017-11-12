@@ -8,8 +8,8 @@ use std::slice;
 use std::str;
 use sys::ImGuiStyleVar;
 
-pub use sys::{ImDrawIdx, ImDrawVert, ImGuiColorEditFlags, ImGuiInputTextFlags, ImGuiKey,
-              ImGuiSelectableFlags, ImGuiCond, ImGuiCol, ImGuiStyle, ImGuiTreeNodeFlags,
+pub use sys::{ImDrawIdx, ImDrawVert, ImGuiColorEditFlags, ImGuiHoveredFlags, ImGuiInputTextFlags,
+              ImGuiKey, ImGuiSelectableFlags, ImGuiCond, ImGuiCol, ImGuiStyle, ImGuiTreeNodeFlags,
               ImGuiWindowFlags, ImVec2, ImVec4};
 pub use child_frame::ChildFrame;
 pub use color_editors::{ColorButton, ColorEdit, ColorEditMode, ColorFormat, ColorPicker,
@@ -1079,5 +1079,7 @@ impl<'ui> Ui<'ui> {
     /// # fn main() {
     /// # }
     /// ```
-    pub fn is_item_hovered(&self) -> bool { unsafe { sys::igIsItemHovered() } }
+    pub fn is_item_hovered(&self) -> bool {
+        unsafe { sys::igIsItemHovered(ImGuiHoveredFlags::empty()) }
+    }
 }

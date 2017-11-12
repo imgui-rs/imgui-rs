@@ -8,10 +8,19 @@
 - `tooltip`
 - `tooltip_text`
 
+### Changed
+
+- Upgrade to imgui/cimgui 1.52
+
+### Deprecated
+
+- Various imgui-sys things that were deprecated in imgui/cimgui 1.52
+
 ### Removed
 
 - Non-namespaced flags
 - Various imgui-sys things that were deprecated in imgui/cimgui 1.51
+- `Window::bg_alpha`. Push a color change with `with_color_var` instead
 - `color_edit3`
 - `color_edit4`
 

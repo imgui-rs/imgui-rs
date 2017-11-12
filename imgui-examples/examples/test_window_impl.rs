@@ -170,9 +170,7 @@ fn main() {
 fn show_help_marker(ui: &Ui, desc: &str) {
     ui.text_disabled(im_str!("(?)"));
     if ui.is_item_hovered() {
-      ui.tooltip(|| {
-        ui.text(desc);
-      });
+        ui.tooltip(|| { ui.text(desc); });
     }
 }
 
@@ -455,7 +453,7 @@ fn show_test_window(ui: &Ui, state: &mut State, opened: &mut bool) {
                     ui.same_line(0.0);
                     show_help_marker(
                         ui,
-                            "Currently all this does is to lift the 0..1 \
+                        "Currently all this does is to lift the 0..1 \
                                                limits on dragging widgets.",
                     );
 
@@ -468,7 +466,7 @@ fn show_test_window(ui: &Ui, state: &mut State, opened: &mut bool) {
                     ui.same_line(0.0);
                     show_help_marker(
                         ui,
-                            "Right-click on the individual color widget to \
+                        "Right-click on the individual color widget to \
                                                show options.",
                     );
                     let misc_flags = {
@@ -486,8 +484,8 @@ fn show_test_window(ui: &Ui, state: &mut State, opened: &mut bool) {
                     ui.same_line(0.0);
                     show_help_marker(
                         ui,
-                            "Click on the colored square to open a color picker.
-CTRL+click on individual component to input value.\n"
+                        "Click on the colored square to open a color picker.
+CTRL+click on individual component to input value.\n",
                     );
                     ui.color_edit(im_str!("MyColor##1"), &mut s.color)
                         .flags(misc_flags)
@@ -510,10 +508,10 @@ CTRL+click on individual component to input value.\n"
                     ui.same_line(0.0);
                     show_help_marker(
                         ui,
-                            "With the inputs(false) function you can hide all \
+                        "With the inputs(false) function you can hide all \
                             the slider/text inputs.\n \
                             With the label(false) function you can pass a non-empty label which \
-                            will only be used for the tooltip and picker popup."
+                            will only be used for the tooltip and picker popup.",
                     );
                     ui.color_edit(im_str!("MyColor##3"), &mut s.color)
                         .flags(misc_flags)
@@ -695,24 +693,28 @@ output your content because that would create a feedback loop.",
 
 #[allow(deprecated)]
 fn show_example_app_fixed_overlay(ui: &Ui, opened: &mut bool) {
-    ui.window(im_str!("Example: Fixed Overlay"))
+    const DISTANCE: f32 = 10.0;
+    let window_pos = (DISTANCE, DISTANCE);
+    ui.with_color_var(ImGuiCol::WindowBg, (0.0, 0.0, 0.0, 0.3), || {
+        ui.window(im_str!("Example: Fixed Overlay"))
         .opened(opened)
-        .position((10.0, 10.0), ImGuiCond::Always)
-        .bg_alpha(0.3)
+        .position(window_pos, ImGuiCond::Always)
         .title_bar(false)
         .resizable(false)
+        .always_auto_resize(true)
         .movable(false)
         .save_settings(false)
         .build(|| {
-            ui.text("Simple overlay\non the top-left side of the screen.");
-            ui.separator();
-            let mouse_pos = ui.imgui().mouse_pos();
-            ui.text(format!(
-                "Mouse Position: ({:.1},{:.1})",
-                mouse_pos.0,
-                mouse_pos.1
-            ));
+          ui.text("Simple overlay\nin the corner of the screen.\n(right-click to change position)");
+          ui.separator();
+          let mouse_pos = ui.imgui().mouse_pos();
+          ui.text(format!(
+              "Mouse Position: ({:.1},{:.1})",
+              mouse_pos.0,
+              mouse_pos.1
+              ));
         })
+    })
 }
 
 fn show_example_app_manipulating_window_title(ui: &Ui) {

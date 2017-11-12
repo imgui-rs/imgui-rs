@@ -12,7 +12,6 @@ pub struct Window<'ui, 'p> {
     size_cond: ImGuiCond,
     name: &'p ImStr,
     opened: Option<&'p mut bool>,
-    bg_alpha: f32,
     flags: ImGuiWindowFlags,
     _phantom: PhantomData<&'ui Ui<'ui>>,
 }
@@ -26,7 +25,6 @@ impl<'ui, 'p> Window<'ui, 'p> {
             size_cond: ImGuiCond::empty(),
             name: name,
             opened: None,
-            bg_alpha: -1.0,
             flags: ImGuiWindowFlags::empty(),
             _phantom: PhantomData,
         }
@@ -46,13 +44,6 @@ impl<'ui, 'p> Window<'ui, 'p> {
     #[inline]
     pub fn opened(mut self, opened: &'p mut bool) -> Self {
         self.opened = Some(opened);
-        self
-    }
-    #[deprecated(since = "0.0.17",
-                 note = "please use with_color_var and ImGuiCol::WindowBg instead")]
-    #[inline]
-    pub fn bg_alpha(mut self, bg_alpha: f32) -> Self {
-        self.bg_alpha = bg_alpha;
         self
     }
     #[inline]
@@ -160,18 +151,16 @@ impl<'ui, 'p> Window<'ui, 'p> {
     pub fn build<F: FnOnce()>(self, f: F) {
         let render = unsafe {
             if !self.pos_cond.is_empty() {
-                sys::igSetNextWindowPos(self.pos.into(), self.pos_cond);
+                sys::igSetNextWindowPos(self.pos.into(), self.pos_cond, ImVec2::zero());
             }
             if !self.size_cond.is_empty() {
                 sys::igSetNextWindowSize(self.size.into(), self.size_cond);
             }
-            sys::igBegin2(
+            sys::igBegin(
                 self.name.as_ptr(),
                 self.opened.map(|x| x as *mut bool).unwrap_or(
                     ptr::null_mut(),
                 ),
-                ImVec2::new(0.0, 0.0),
-                self.bg_alpha,
                 self.flags,
             )
         };
