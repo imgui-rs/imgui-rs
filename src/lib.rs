@@ -284,7 +284,7 @@ pub struct DrawList<'a> {
 }
 
 pub struct Ui<'ui> {
-    imgui: &'ui ImGui,
+    pub imgui: &'ui ImGui,
 }
 
 static FMT: &'static [u8] = b"%s\0";
