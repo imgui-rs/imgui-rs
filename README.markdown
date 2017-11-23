@@ -6,7 +6,7 @@ Minimum Rust version: 1.20
 
 [![Build Status](https://travis-ci.org/Gekkio/imgui-rs.svg?branch=master)](https://travis-ci.org/Gekkio/imgui-rs)
 [![Latest release on crates.io](https://meritbadge.herokuapp.com/imgui)](https://crates.io/crates/imgui)
-[![Documentation on docs.rs](https://docs.rs/mio/badge.svg)](https://docs.rs/imgui-rs)
+[![Documentation on docs.rs](https://docs.rs/imgui/badge.svg)](https://docs.rs/imgui)
 
 ![Hello world](hello_world.png)
 
