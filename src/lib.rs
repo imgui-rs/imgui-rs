@@ -51,12 +51,12 @@ pub struct ImGui {
 macro_rules! im_str {
     ($e:tt) => ({
         unsafe {
-          ::imgui::ImStr::from_utf8_with_nul_unchecked(concat!($e, "\0").as_bytes())
+          $crate::ImStr::from_utf8_with_nul_unchecked(concat!($e, "\0").as_bytes())
         }
     });
     ($e:tt, $($arg:tt)*) => ({
         unsafe {
-          &::imgui::ImString::from_utf8_with_nul_unchecked(
+          &$crate::ImString::from_utf8_with_nul_unchecked(
             format!(concat!($e, "\0"), $($arg)*).into_bytes())
         }
     })
