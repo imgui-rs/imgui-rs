@@ -72,7 +72,7 @@ pub fn run<F: FnMut(&Ui) -> bool>(title: String, clear_color: [f32; 4], mut run_
                             _ => {}
                         }
                     }
-                    MouseMoved { position: (x, y), .. } => mouse_state.pos = (x as i32, y as i32),
+                    CursorMoved { position: (x, y), .. } => mouse_state.pos = (x as i32, y as i32),
                     MouseInput { state, button, .. } => {
                         match button {
                             MouseButton::Left => mouse_state.pressed.0 = state == Pressed,
