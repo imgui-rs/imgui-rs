@@ -1,8 +1,7 @@
+use super::Ui;
 use imgui_sys;
 use std::marker::PhantomData;
 use std::ptr;
-
-use super::Ui;
 
 #[must_use]
 pub struct Menu<'ui, 'p> {
@@ -25,8 +24,9 @@ impl<'ui, 'p> Menu<'ui, 'p> {
         self
     }
     pub fn build<F: FnOnce()>(self, f: F) {
-        let render =
-            unsafe { imgui_sys::igBeginMenu(imgui_sys::ImStr::from(self.label), self.enabled) };
+        let render = unsafe {
+            imgui_sys::igBeginMenu(imgui_sys::ImStr::from(self.label), self.enabled)
+        };
         if render {
             f();
             unsafe { imgui_sys::igEndMenu() };
@@ -70,14 +70,16 @@ impl<'ui, 'p> MenuItem<'ui, 'p> {
     }
     pub fn build(self) -> bool {
         unsafe {
-            imgui_sys::igMenuItemPtr(imgui_sys::ImStr::from(self.label),
-                                     self.shortcut
-                                         .map(|x| imgui_sys::ImStr::from(x))
-                                         .unwrap_or(imgui_sys::ImStr::null()),
-                                     self.selected
-                                         .map(|x| x as *mut bool)
-                                         .unwrap_or(ptr::null_mut()),
-                                     self.enabled)
+            imgui_sys::igMenuItemPtr(
+                imgui_sys::ImStr::from(self.label),
+                self.shortcut
+                    .map(|x| imgui_sys::ImStr::from(x))
+                    .unwrap_or(imgui_sys::ImStr::null()),
+                self.selected
+                    .map(|x| x as *mut bool)
+                    .unwrap_or(ptr::null_mut()),
+                self.enabled,
+            )
         }
     }
 }

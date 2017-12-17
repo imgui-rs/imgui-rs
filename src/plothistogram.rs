@@ -1,7 +1,7 @@
 use imgui_sys;
 use imgui_sys::ImVec2;
-use std::{f32, mem};
 use libc::c_float;
+use std::{mem, f32};
 #[must_use]
 pub struct PlotHistogram<'p> {
     label: &'p str,
@@ -58,17 +58,19 @@ impl<'p> PlotHistogram<'p> {
 
     pub fn build(self) {
         unsafe {
-            imgui_sys::igPlotHistogram(imgui_sys::ImStr::from(self.label),
-                                       self.values.as_ptr() as *const c_float,
-                                       self.values.len() as i32,
-                                       self.values_offset as i32,
-                                       self.overlay_text
-                                           .map(|x| imgui_sys::ImStr::from(x))
-                                           .unwrap_or(imgui_sys::ImStr::null()),
-                                       self.scale_min,
-                                       self.scale_max,
-                                       self.graph_size,
-                                       mem::size_of::<f32>() as i32);
+            imgui_sys::igPlotHistogram(
+                imgui_sys::ImStr::from(self.label),
+                self.values.as_ptr() as *const c_float,
+                self.values.len() as i32,
+                self.values_offset as i32,
+                self.overlay_text
+                    .map(|x| imgui_sys::ImStr::from(x))
+                    .unwrap_or(imgui_sys::ImStr::null()),
+                self.scale_min,
+                self.scale_max,
+                self.graph_size,
+                mem::size_of::<f32>() as i32,
+            );
         }
     }
 }

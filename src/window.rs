@@ -1,7 +1,3 @@
-use imgui_sys;
-use std::marker::PhantomData;
-use std::ptr;
-
 use super::{ImGuiSetCond, ImGuiWindowFlags, ImGuiWindowFlags_AlwaysAutoResize,
             ImGuiWindowFlags_AlwaysHorizontalScrollbar, ImGuiWindowFlags_AlwaysUseWindowPadding,
             ImGuiWindowFlags_AlwaysVerticalScrollbar, ImGuiWindowFlags_HorizontalScrollbar,
@@ -11,6 +7,9 @@ use super::{ImGuiSetCond, ImGuiWindowFlags, ImGuiWindowFlags_AlwaysAutoResize,
             ImGuiWindowFlags_NoSavedSettings, ImGuiWindowFlags_NoScrollWithMouse,
             ImGuiWindowFlags_NoScrollbar, ImGuiWindowFlags_NoTitleBar,
             ImGuiWindowFlags_ShowBorders, ImVec2, Ui};
+use imgui_sys;
+use std::marker::PhantomData;
+use std::ptr;
 
 #[must_use]
 pub struct Window<'ui, 'p> {
@@ -133,22 +132,26 @@ impl<'ui, 'p> Window<'ui, 'p> {
     }
     #[inline]
     pub fn no_bring_to_front_on_focus(mut self, value: bool) -> Self {
-        self.flags.set(ImGuiWindowFlags_NoBringToFrontOnFocus, value);
+        self.flags
+            .set(ImGuiWindowFlags_NoBringToFrontOnFocus, value);
         self
     }
     #[inline]
     pub fn always_vertical_scrollbar(mut self, value: bool) -> Self {
-        self.flags.set(ImGuiWindowFlags_AlwaysVerticalScrollbar, value);
+        self.flags
+            .set(ImGuiWindowFlags_AlwaysVerticalScrollbar, value);
         self
     }
     #[inline]
     pub fn always_horizontal_scrollbar(mut self, value: bool) -> Self {
-        self.flags.set(ImGuiWindowFlags_AlwaysHorizontalScrollbar, value);
+        self.flags
+            .set(ImGuiWindowFlags_AlwaysHorizontalScrollbar, value);
         self
     }
     #[inline]
     pub fn always_use_window_padding(mut self, value: bool) -> Self {
-        self.flags.set(ImGuiWindowFlags_AlwaysUseWindowPadding, value);
+        self.flags
+            .set(ImGuiWindowFlags_AlwaysUseWindowPadding, value);
         self
     }
     pub fn build<F: FnOnce()>(self, f: F) {
@@ -159,11 +162,15 @@ impl<'ui, 'p> Window<'ui, 'p> {
             if !self.size_cond.is_empty() {
                 imgui_sys::igSetNextWindowSize(self.size.into(), self.size_cond);
             }
-            imgui_sys::igBegin2(imgui_sys::ImStr::from(self.name),
-                                self.opened.map(|x| x as *mut bool).unwrap_or(ptr::null_mut()),
-                                ImVec2::new(0.0, 0.0),
-                                self.bg_alpha,
-                                self.flags)
+            imgui_sys::igBegin2(
+                imgui_sys::ImStr::from(self.name),
+                self.opened
+                    .map(|x| x as *mut bool)
+                    .unwrap_or(ptr::null_mut()),
+                ImVec2::new(0.0, 0.0),
+                self.bg_alpha,
+                self.flags,
+            )
         };
         if render {
             f();

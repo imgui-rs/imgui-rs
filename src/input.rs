@@ -1,8 +1,3 @@
-use imgui_sys;
-use libc::size_t;
-use std::marker::PhantomData;
-use std::ptr;
-
 use super::{ImGuiInputTextFlags,
             ImGuiInputTextFlags_AllowTabInput /* ImGuiInputTextFlags_CtrlEnterForNewLine, */,
             ImGuiInputTextFlags_AlwaysInsertMode, ImGuiInputTextFlags_AutoSelectAll,
@@ -11,6 +6,10 @@ use super::{ImGuiInputTextFlags,
             ImGuiInputTextFlags_CharsDecimal, ImGuiInputTextFlags_CharsHexadecimal,
             ImGuiInputTextFlags_CharsNoBlank, ImGuiInputTextFlags_CharsUppercase,
             ImGuiInputTextFlags_EnterReturnsTrue, ImGuiInputTextFlags_NoHorizontalScroll, Ui};
+use imgui_sys;
+use libc::size_t;
+use std::marker::PhantomData;
+use std::ptr;
 
 macro_rules! impl_text_flags {
     ($InputType:ident) => {
@@ -151,14 +150,16 @@ impl<'ui, 'p> InputText<'ui, 'p> {
 
     pub fn build(self) -> bool {
         unsafe {
-            imgui_sys::igInputText(imgui_sys::ImStr::from(self.label),
-                                   // TODO: this is evil.
-                                   // Perhaps something else than &mut str is better
-                                   self.buf.as_ptr() as *mut i8,
-                                   self.buf.len() as size_t,
-                                   self.flags,
-                                   None,
-                                   ptr::null_mut())
+            imgui_sys::igInputText(
+                imgui_sys::ImStr::from(self.label),
+                // TODO: this is evil.
+                // Perhaps something else than &mut str is better
+                self.buf.as_ptr() as *mut i8,
+                self.buf.len() as size_t,
+                self.flags,
+                None,
+                ptr::null_mut(),
+            )
         }
     }
 }
@@ -187,11 +188,13 @@ impl<'ui, 'p> InputInt<'ui, 'p> {
 
     pub fn build(self) -> bool {
         unsafe {
-            imgui_sys::igInputInt(imgui_sys::ImStr::from(self.label),
-                                  self.value as *mut i32,
-                                  self.step,
-                                  self.step_fast,
-                                  self.flags)
+            imgui_sys::igInputInt(
+                imgui_sys::ImStr::from(self.label),
+                self.value as *mut i32,
+                self.step,
+                self.step_fast,
+                self.flags,
+            )
         }
     }
 
@@ -225,12 +228,14 @@ impl<'ui, 'p> InputFloat<'ui, 'p> {
 
     pub fn build(self) -> bool {
         unsafe {
-            imgui_sys::igInputFloat(imgui_sys::ImStr::from(self.label),
-                                    self.value as *mut f32,
-                                    self.step,
-                                    self.step_fast,
-                                    self.decimal_precision,
-                                    self.flags)
+            imgui_sys::igInputFloat(
+                imgui_sys::ImStr::from(self.label),
+                self.value as *mut f32,
+                self.step,
+                self.step_fast,
+                self.decimal_precision,
+                self.flags,
+            )
         }
     }
 
@@ -362,9 +367,11 @@ impl<'ui, 'p> ColorEdit4<'ui, 'p> {
 
     pub fn build(self) -> bool {
         unsafe {
-            imgui_sys::igColorEdit4(imgui_sys::ImStr::from(self.label),
-                                    self.value.as_mut_ptr(),
-                                    self.show_alpha)
+            imgui_sys::igColorEdit4(
+                imgui_sys::ImStr::from(self.label),
+                self.value.as_mut_ptr(),
+                self.show_alpha,
+            )
         }
     }
 }

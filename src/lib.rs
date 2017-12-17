@@ -6,14 +6,6 @@ extern crate imgui_sys;
 
 extern crate libc;
 
-use libc::{c_float, c_int, c_uchar, c_void, uintptr_t};
-use std::convert::From;
-use std::ffi::{CStr, CString};
-use std::mem;
-use std::ptr;
-use std::slice;
-use std::str;
-
 pub use imgui_sys::{ImDrawIdx, ImDrawVert, ImGuiInputTextFlags, ImGuiInputTextFlags_AllowTabInput,
                     ImGuiInputTextFlags_AlwaysInsertMode, ImGuiInputTextFlags_AutoSelectAll,
                     ImGuiInputTextFlags_CallbackAlways, ImGuiInputTextFlags_CallbackCharFilter,
@@ -44,10 +36,17 @@ pub use imgui_sys::{ImDrawIdx, ImDrawVert, ImGuiInputTextFlags, ImGuiInputTextFl
                     ImGuiWindowFlags_ShowBorders, ImVec2, ImVec4};
 pub use input::{ColorEdit3, ColorEdit4, InputFloat, InputFloat2, InputFloat3, InputFloat4,
                 InputInt, InputInt2, InputInt3, InputInt4, InputText};
+use libc::{c_float, c_int, c_uchar, c_void, uintptr_t};
 pub use menus::{Menu, MenuItem};
 pub use plothistogram::PlotHistogram;
 pub use plotlines::PlotLines;
 pub use sliders::{SliderFloat, SliderInt};
+use std::convert::From;
+use std::ffi::{CStr, CString};
+use std::mem;
+use std::ptr;
+use std::slice;
+use std::str;
 pub use trees::{CollapsingHeader, TreeNode};
 pub use window::Window;
 
@@ -98,7 +97,8 @@ impl ImGui {
         unsafe { mem::transmute(imgui_sys::igGetStyle()) }
     }
     pub fn prepare_texture<'a, F, T>(&mut self, f: F) -> T
-        where F: FnOnce(TextureHandle<'a>) -> T
+    where
+        F: FnOnce(TextureHandle<'a>) -> T,
     {
         let io = self.io();
         let mut pixels: *mut c_uchar = ptr::null_mut();
@@ -106,11 +106,13 @@ impl ImGui {
         let mut height: c_int = 0;
         let mut bytes_per_pixel: c_int = 0;
         unsafe {
-            imgui_sys::ImFontAtlas_GetTexDataAsRGBA32(io.fonts,
-                                                      &mut pixels,
-                                                      &mut width,
-                                                      &mut height,
-                                                      &mut bytes_per_pixel);
+            imgui_sys::ImFontAtlas_GetTexDataAsRGBA32(
+                io.fonts,
+                &mut pixels,
+                &mut width,
+                &mut height,
+                &mut bytes_per_pixel,
+            );
             f(TextureHandle {
                 width: width as u32,
                 height: height as u32,
@@ -177,7 +179,10 @@ impl ImGui {
     }
     pub fn display_framebuffer_scale(&self) -> (f32, f32) {
         let io = self.io();
-        (io.display_framebuffer_scale.x, io.display_framebuffer_scale.y)
+        (
+            io.display_framebuffer_scale.x,
+            io.display_framebuffer_scale.y,
+        )
     }
     pub fn mouse_pos(&self) -> (f32, f32) {
         let io = self.io();
@@ -230,7 +235,7 @@ impl ImGui {
         // to bytes
         let mut string = String::new();
         string.push(character);
-        let s : &str = &string;
+        let s: &str = &string;
         unsafe {
             imgui_sys::ImGuiIO_AddInputCharactersUTF8(imgui_sys::ImStr::from(s));
         }
@@ -238,11 +243,12 @@ impl ImGui {
     pub fn get_time(&self) -> f32 { unsafe { imgui_sys::igGetTime() } }
     pub fn get_frame_count(&self) -> i32 { unsafe { imgui_sys::igGetFrameCount() } }
     pub fn get_frame_rate(&self) -> f32 { self.io().framerate }
-    pub fn frame<'ui, 'a: 'ui>(&'a mut self,
-                               size_points: (u32, u32),
-                               size_pixels: (u32, u32),
-                               delta_time: f32)
-                               -> Ui<'ui> {
+    pub fn frame<'ui, 'a: 'ui>(
+        &'a mut self,
+        size_points: (u32, u32),
+        size_pixels: (u32, u32),
+        delta_time: f32,
+    ) -> Ui<'ui> {
         {
             let io = self.io_mut();
             io.display_size.x = size_points.0 as c_float;
@@ -261,7 +267,9 @@ impl ImGui {
         }
         unsafe {
             imgui_sys::igNewFrame();
-            CURRENT_UI = Some(Ui { imgui: mem::transmute(self as &'a ImGui) });
+            CURRENT_UI = Some(Ui {
+                imgui: mem::transmute(self as &'a ImGui),
+            });
         }
         Ui { imgui: self }
     }
@@ -319,7 +327,8 @@ impl<'ui> Ui<'ui> {
         io.metrics_active_windows
     }
     pub fn render<F, E>(self, mut f: F) -> Result<(), E>
-        where F: FnMut(&Ui, DrawList) -> Result<(), E>
+    where
+        F: FnMut(&Ui, DrawList) -> Result<(), E>,
     {
         unsafe {
             imgui_sys::igRender();
@@ -408,7 +417,8 @@ impl<'ui> Ui<'ui> {
         }
     }
     pub fn text_colored<'p, A>(&self, col: A, text: &'p str)
-        where A: Into<ImVec4>
+    where
+        A: Into<ImVec4>,
     {
         unsafe {
             imgui_sys::igTextColored1(col.into(), imgui_sys::ImStr::from(text));
@@ -464,22 +474,25 @@ impl<'ui> Ui<'ui> {
     pub fn input_float<'p>(&self, label: &'p str, value: &'p mut f32) -> InputFloat<'ui, 'p> {
         InputFloat::new(label, value)
     }
-    pub fn input_float2<'p>(&self,
-                            label: &'p str,
-                            value: &'p mut [f32; 2])
-                            -> InputFloat2<'ui, 'p> {
+    pub fn input_float2<'p>(
+        &self,
+        label: &'p str,
+        value: &'p mut [f32; 2],
+    ) -> InputFloat2<'ui, 'p> {
         InputFloat2::new(label, value)
     }
-    pub fn input_float3<'p>(&self,
-                            label: &'p str,
-                            value: &'p mut [f32; 3])
-                            -> InputFloat3<'ui, 'p> {
+    pub fn input_float3<'p>(
+        &self,
+        label: &'p str,
+        value: &'p mut [f32; 3],
+    ) -> InputFloat3<'ui, 'p> {
         InputFloat3::new(label, value)
     }
-    pub fn input_float4<'p>(&self,
-                            label: &'p str,
-                            value: &'p mut [f32; 4])
-                            -> InputFloat4<'ui, 'p> {
+    pub fn input_float4<'p>(
+        &self,
+        label: &'p str,
+        value: &'p mut [f32; 4],
+    ) -> InputFloat4<'ui, 'p> {
         InputFloat4::new(label, value)
     }
     pub fn input_int<'p>(&self, label: &'p str, value: &'p mut i32) -> InputInt<'ui, 'p> {
@@ -498,20 +511,22 @@ impl<'ui> Ui<'ui> {
 
 // Widgets: Sliders
 impl<'ui> Ui<'ui> {
-    pub fn slider_float<'p>(&self,
-                            label: &'p str,
-                            value: &'p mut f32,
-                            min: f32,
-                            max: f32)
-                            -> SliderFloat<'ui, 'p> {
+    pub fn slider_float<'p>(
+        &self,
+        label: &'p str,
+        value: &'p mut f32,
+        min: f32,
+        max: f32,
+    ) -> SliderFloat<'ui, 'p> {
         SliderFloat::new(label, value, min, max)
     }
-    pub fn slider_int<'p>(&self,
-                          label: &'p str,
-                          value: &'p mut i32,
-                          min: i32,
-                          max: i32)
-                          -> SliderInt<'ui, 'p> {
+    pub fn slider_int<'p>(
+        &self,
+        label: &'p str,
+        value: &'p mut i32,
+        min: i32,
+        max: i32,
+    ) -> SliderInt<'ui, 'p> {
         SliderInt::new(label, value, min, max)
     }
 }
@@ -526,20 +541,24 @@ impl<'ui> Ui<'ui> {
 
 // Widgets: Selectable / Lists
 impl<'ui> Ui<'ui> {
-    pub fn selectable<'p>(&self,
-                          label: &'p str,
-                          selected: bool,
-                          flags: ImGuiSelectableFlags,
-                          size: ImVec2)
-                          -> bool {
-        unsafe { imgui_sys::igSelectable(imgui_sys::ImStr::from(label), selected, flags, size) }
+    pub fn selectable<'p>(
+        &self,
+        label: &'p str,
+        selected: bool,
+        flags: ImGuiSelectableFlags,
+        size: ImVec2,
+    ) -> bool {
+        unsafe {
+            imgui_sys::igSelectable(imgui_sys::ImStr::from(label), selected, flags, size)
+        }
     }
 }
 
 // Widgets: Menus
 impl<'ui> Ui<'ui> {
     pub fn main_menu_bar<F>(&self, f: F)
-        where F: FnOnce()
+    where
+        F: FnOnce(),
     {
         let render = unsafe { imgui_sys::igBeginMainMenuBar() };
         if render {
@@ -548,7 +567,8 @@ impl<'ui> Ui<'ui> {
         }
     }
     pub fn menu_bar<F>(&self, f: F)
-        where F: FnOnce()
+    where
+        F: FnOnce(),
     {
         let render = unsafe { imgui_sys::igBeginMenuBar() };
         if render {
@@ -566,7 +586,8 @@ impl<'ui> Ui<'ui> {
         unsafe { imgui_sys::igOpenPopup(imgui_sys::ImStr::from(str_id)) };
     }
     pub fn popup<'p, F>(&self, str_id: &'p str, f: F)
-        where F: FnOnce()
+    where
+        F: FnOnce(),
     {
         let render = unsafe { imgui_sys::igBeginPopup(imgui_sys::ImStr::from(str_id)) };
         if render {
@@ -574,49 +595,55 @@ impl<'ui> Ui<'ui> {
             unsafe { imgui_sys::igEndPopup() };
         }
     }
-    pub fn close_current_popup(&self) {
-        unsafe { imgui_sys::igCloseCurrentPopup() };
-    }
+    pub fn close_current_popup(&self) { unsafe { imgui_sys::igCloseCurrentPopup() }; }
 }
 
 // Widgets: Combos
 impl<'ui> Ui<'ui> {
-    pub fn combo<'p>(&self,
-                     label: &'p str,
-                     current_item: &mut i32,
-                     items: &'p [&'p str],
-                     height_in_items: i32)
-                     -> bool {
-        let items_inner: Vec<imgui_sys::ImStr> = items.into_iter()
+    pub fn combo<'p>(
+        &self,
+        label: &'p str,
+        current_item: &mut i32,
+        items: &'p [&'p str],
+        height_in_items: i32,
+    ) -> bool {
+        let items_inner: Vec<imgui_sys::ImStr> = items
+            .into_iter()
             .map(|item| imgui_sys::ImStr::from(*item))
             .collect();
         unsafe {
-            imgui_sys::igCombo(imgui_sys::ImStr::from(label),
-                               current_item,
-                               items_inner.as_ptr(),
-                               items_inner.len() as i32,
-                               height_in_items)
+            imgui_sys::igCombo(
+                imgui_sys::ImStr::from(label),
+                current_item,
+                items_inner.as_ptr(),
+                items_inner.len() as i32,
+                height_in_items,
+            )
         }
     }
 }
 
 // Widgets: ListBox
 impl<'ui> Ui<'ui> {
-    pub fn list_box<'p>(&self,
-                        label: &'p str,
-                        current_item: &mut i32,
-                        items: &'p [&'p str],
-                        height_in_items: i32)
-                        -> bool {
-        let items_inner: Vec<imgui_sys::ImStr> = items.into_iter()
+    pub fn list_box<'p>(
+        &self,
+        label: &'p str,
+        current_item: &mut i32,
+        items: &'p [&'p str],
+        height_in_items: i32,
+    ) -> bool {
+        let items_inner: Vec<imgui_sys::ImStr> = items
+            .into_iter()
             .map(|item| imgui_sys::ImStr::from(*item))
             .collect();
         unsafe {
-            imgui_sys::igListBox(imgui_sys::ImStr::from(label),
-                                 current_item,
-                                 items_inner.as_ptr(),
-                                 items_inner.len() as i32,
-                                 height_in_items)
+            imgui_sys::igListBox(
+                imgui_sys::ImStr::from(label),
+                current_item,
+                items_inner.as_ptr(),
+                items_inner.len() as i32,
+                height_in_items,
+            )
         }
     }
 }

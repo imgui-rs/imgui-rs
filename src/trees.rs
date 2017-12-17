@@ -1,10 +1,9 @@
-use imgui_sys;
-use std::marker::PhantomData;
-
 use super::{ImGuiSetCond, ImGuiTreeNodeFlags, ImGuiTreeNodeFlags_Bullet,
             ImGuiTreeNodeFlags_DefaultOpen, ImGuiTreeNodeFlags_Leaf,
             ImGuiTreeNodeFlags_OpenOnArrow, ImGuiTreeNodeFlags_OpenOnDoubleClick,
             ImGuiTreeNodeFlags_Selected, Ui};
+use imgui_sys;
+use std::marker::PhantomData;
 
 #[must_use]
 pub struct TreeNode<'ui, 'p> {
@@ -42,10 +41,10 @@ impl<'ui, 'p> TreeNode<'ui, 'p> {
                 imgui_sys::igSetNextTreeNodeOpen(self.opened, self.opened_cond);
             }
             match self.label {
-                Some(label) => {
-                    imgui_sys::igTreeNodeStr1(imgui_sys::ImStr::from(self.id),
-                                              imgui_sys::ImStr::from(label))
-                }
+                Some(label) => imgui_sys::igTreeNodeStr1(
+                    imgui_sys::ImStr::from(self.id),
+                    imgui_sys::ImStr::from(label),
+                ),
                 None => imgui_sys::igTreeNode(imgui_sys::ImStr::from(self.id)),
             }
         };
@@ -109,6 +108,8 @@ impl<'ui, 'p> CollapsingHeader<'ui, 'p> {
         self
     }
     pub fn build(self) -> bool {
-        unsafe { imgui_sys::igCollapsingHeader(imgui_sys::ImStr::from(self.label), self.flags) }
+        unsafe {
+            imgui_sys::igCollapsingHeader(imgui_sys::ImStr::from(self.label), self.flags)
+        }
     }
 }
