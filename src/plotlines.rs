@@ -1,9 +1,12 @@
-use imgui_sys;
-use imgui_sys::ImVec2;
-use libc::c_float;
-use std::{mem, f32};
+use sys;
+use std::{f32, mem};
+use std::marker::PhantomData;
+use std::os::raw::c_float;
+
+use super::{ImVec2, Ui};
+
 #[must_use]
-pub struct PlotLines<'p> {
+pub struct PlotLines<'ui, 'p> {
     label: &'p str,
     values: &'p [f32],
     values_offset: usize,
@@ -11,10 +14,11 @@ pub struct PlotLines<'p> {
     scale_min: f32,
     scale_max: f32,
     graph_size: ImVec2,
+    _phantom: PhantomData<&'ui Ui<'ui>>,
 }
 
-impl<'p> PlotLines<'p> {
-    pub fn new(label: &'p str, values: &'p [f32]) -> Self {
+impl<'ui, 'p> PlotLines<'ui, 'p> {
+    pub fn new(_: &Ui<'ui>, label: &'p str, values: &'p [f32]) -> Self {
         PlotLines {
             label: label,
             values: values,
@@ -23,6 +27,7 @@ impl<'p> PlotLines<'p> {
             scale_min: f32::MAX,
             scale_max: f32::MAX,
             graph_size: ImVec2::new(0.0f32, 0.0f32),
+            _phantom: PhantomData,
         }
     }
 
@@ -51,21 +56,19 @@ impl<'p> PlotLines<'p> {
     }
 
     #[inline]
-    pub fn graph_size(mut self, graph_size: ImVec2) -> Self {
-        self.graph_size = graph_size;
+    pub fn graph_size<S: Into<ImVec2>>(mut self, graph_size: S) -> Self {
+        self.graph_size = graph_size.into();
         self
     }
 
     pub fn build(self) {
         unsafe {
-            imgui_sys::igPlotLines(
-                imgui_sys::ImStr::from(self.label),
+            sys::igPlotLines(
+                sys::ImStr::from(self.label),
                 self.values.as_ptr() as *const c_float,
                 self.values.len() as i32,
                 self.values_offset as i32,
-                self.overlay_text
-                    .map(|x| imgui_sys::ImStr::from(x))
-                    .unwrap_or(imgui_sys::ImStr::null()),
+                self.overlay_text.map(|x| sys::ImStr::from(x)).unwrap_or(sys::ImStr::null()),
                 self.scale_min,
                 self.scale_max,
                 self.graph_size,

@@ -1,26 +1,24 @@
-use super::{ImGuiSetCond, ImGuiTreeNodeFlags, ImGuiTreeNodeFlags_Bullet,
-            ImGuiTreeNodeFlags_DefaultOpen, ImGuiTreeNodeFlags_Leaf,
-            ImGuiTreeNodeFlags_OpenOnArrow, ImGuiTreeNodeFlags_OpenOnDoubleClick,
-            ImGuiTreeNodeFlags_Selected, Ui};
-use imgui_sys;
+use sys;
 use std::marker::PhantomData;
+
+use super::{ImGuiCond, ImGuiTreeNodeFlags, Ui};
 
 #[must_use]
 pub struct TreeNode<'ui, 'p> {
     id: &'p str,
     label: Option<&'p str>,
     opened: bool,
-    opened_cond: ImGuiSetCond,
+    opened_cond: ImGuiCond,
     _phantom: PhantomData<&'ui Ui<'ui>>,
 }
 
 impl<'ui, 'p> TreeNode<'ui, 'p> {
-    pub fn new(id: &'p str) -> Self {
+    pub fn new(_: &Ui<'ui>, id: &'p str) -> Self {
         TreeNode {
             id: id,
             label: None,
             opened: false,
-            opened_cond: ImGuiSetCond::empty(),
+            opened_cond: ImGuiCond::empty(),
             _phantom: PhantomData,
         }
     }
@@ -30,7 +28,7 @@ impl<'ui, 'p> TreeNode<'ui, 'p> {
         self
     }
     #[inline]
-    pub fn opened(mut self, opened: bool, cond: ImGuiSetCond) -> Self {
+    pub fn opened(mut self, opened: bool, cond: ImGuiCond) -> Self {
         self.opened = opened;
         self.opened_cond = cond;
         self
@@ -38,19 +36,19 @@ impl<'ui, 'p> TreeNode<'ui, 'p> {
     pub fn build<F: FnOnce()>(self, f: F) {
         let render = unsafe {
             if !self.opened_cond.is_empty() {
-                imgui_sys::igSetNextTreeNodeOpen(self.opened, self.opened_cond);
+                sys::igSetNextTreeNodeOpen(self.opened, self.opened_cond);
             }
             match self.label {
-                Some(label) => imgui_sys::igTreeNodeStr1(
-                    imgui_sys::ImStr::from(self.id),
-                    imgui_sys::ImStr::from(label),
+                Some(label) => sys::igTreeNodeStr1(
+                    sys::ImStr::from(self.id),
+                    sys::ImStr::from(label),
                 ),
-                None => imgui_sys::igTreeNode(imgui_sys::ImStr::from(self.id)),
+                None => sys::igTreeNode(sys::ImStr::from(self.id)),
             }
         };
         if render {
             f();
-            unsafe { imgui_sys::igTreePop() };
+            unsafe { sys::igTreePop() };
         }
     }
 }
@@ -65,7 +63,7 @@ pub struct CollapsingHeader<'ui, 'p> {
 }
 
 impl<'ui, 'p> CollapsingHeader<'ui, 'p> {
-    pub fn new(label: &'p str) -> Self {
+    pub fn new(_: &Ui<'ui>, label: &'p str) -> Self {
         CollapsingHeader {
             label: label,
             flags: ImGuiTreeNodeFlags::empty(),
@@ -79,37 +77,35 @@ impl<'ui, 'p> CollapsingHeader<'ui, 'p> {
     }
     #[inline]
     pub fn selected(mut self, value: bool) -> Self {
-        self.flags.set(ImGuiTreeNodeFlags_Selected, value);
+        self.flags.set(ImGuiTreeNodeFlags::Selected, value);
         self
     }
     #[inline]
     pub fn default_open(mut self, value: bool) -> Self {
-        self.flags.set(ImGuiTreeNodeFlags_DefaultOpen, value);
+        self.flags.set(ImGuiTreeNodeFlags::DefaultOpen, value);
         self
     }
     #[inline]
     pub fn open_on_double_click(mut self, value: bool) -> Self {
-        self.flags.set(ImGuiTreeNodeFlags_OpenOnDoubleClick, value);
+        self.flags.set(ImGuiTreeNodeFlags::OpenOnDoubleClick, value);
         self
     }
     #[inline]
     pub fn open_on_arrow(mut self, value: bool) -> Self {
-        self.flags.set(ImGuiTreeNodeFlags_OpenOnArrow, value);
+        self.flags.set(ImGuiTreeNodeFlags::OpenOnArrow, value);
         self
     }
     #[inline]
     pub fn leaf(mut self, value: bool) -> Self {
-        self.flags.set(ImGuiTreeNodeFlags_Leaf, value);
+        self.flags.set(ImGuiTreeNodeFlags::Leaf, value);
         self
     }
     #[inline]
     pub fn bullet(mut self, value: bool) -> Self {
-        self.flags.set(ImGuiTreeNodeFlags_Bullet, value);
+        self.flags.set(ImGuiTreeNodeFlags::Bullet, value);
         self
     }
     pub fn build(self) -> bool {
-        unsafe {
-            imgui_sys::igCollapsingHeader(imgui_sys::ImStr::from(self.label), self.flags)
-        }
+        unsafe { sys::igCollapsingHeader(sys::ImStr::from(self.label), self.flags) }
     }
 }

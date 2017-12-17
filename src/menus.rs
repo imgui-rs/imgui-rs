@@ -1,7 +1,8 @@
-use super::Ui;
-use imgui_sys;
+use sys;
 use std::marker::PhantomData;
 use std::ptr;
+
+use super::Ui;
 
 #[must_use]
 pub struct Menu<'ui, 'p> {
@@ -11,7 +12,7 @@ pub struct Menu<'ui, 'p> {
 }
 
 impl<'ui, 'p> Menu<'ui, 'p> {
-    pub fn new(label: &'p str) -> Self {
+    pub fn new(_: &Ui<'ui>, label: &'p str) -> Self {
         Menu {
             label: label,
             enabled: true,
@@ -24,12 +25,10 @@ impl<'ui, 'p> Menu<'ui, 'p> {
         self
     }
     pub fn build<F: FnOnce()>(self, f: F) {
-        let render = unsafe {
-            imgui_sys::igBeginMenu(imgui_sys::ImStr::from(self.label), self.enabled)
-        };
+        let render = unsafe { sys::igBeginMenu(sys::ImStr::from(self.label), self.enabled) };
         if render {
             f();
-            unsafe { imgui_sys::igEndMenu() };
+            unsafe { sys::igEndMenu() };
         }
     }
 }
@@ -44,7 +43,7 @@ pub struct MenuItem<'ui, 'p> {
 }
 
 impl<'ui, 'p> MenuItem<'ui, 'p> {
-    pub fn new(label: &'p str) -> Self {
+    pub fn new(_: &Ui<'ui>, label: &'p str) -> Self {
         MenuItem {
             label: label,
             shortcut: None,
@@ -69,17 +68,12 @@ impl<'ui, 'p> MenuItem<'ui, 'p> {
         self
     }
     pub fn build(self) -> bool {
-        unsafe {
-            imgui_sys::igMenuItemPtr(
-                imgui_sys::ImStr::from(self.label),
-                self.shortcut
-                    .map(|x| imgui_sys::ImStr::from(x))
-                    .unwrap_or(imgui_sys::ImStr::null()),
-                self.selected
-                    .map(|x| x as *mut bool)
-                    .unwrap_or(ptr::null_mut()),
-                self.enabled,
-            )
-        }
+        let label = sys::ImStr::from(self.label);
+        let shortcut = self.shortcut.map(|x| sys::ImStr::from(x)).unwrap_or(sys::ImStr::null());
+        let selected = self.selected.map(|x| x as *mut bool).unwrap_or(
+            ptr::null_mut(),
+        );
+        let enabled = self.enabled;
+        unsafe { sys::igMenuItemPtr(label, shortcut, selected, enabled) }
     }
 }

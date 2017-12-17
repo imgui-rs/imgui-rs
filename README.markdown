@@ -1,15 +1,18 @@
 # imgui-rs: Rust bindings for ImGui
 
-**Ultra hyper turbo cyber mega extra über experimental!!!**
+**Still fairly experimental!**
+
+Minimum Rust version: 1.20
 
 [![Build Status](https://travis-ci.org/Gekkio/imgui-rs.svg?branch=master)](https://travis-ci.org/Gekkio/imgui-rs)
 [![Latest release on crates.io](https://meritbadge.herokuapp.com/imgui)](https://crates.io/crates/imgui)
+[![Documentation on docs.rs](https://docs.rs/imgui/badge.svg)](https://docs.rs/imgui)
 
 ![Hello world](hello_world.png)
 
 ```rust
 ui.window("Hello world")
-    .size((300.0, 100.0), ImGuiSetCond_FirstUseEver)
+    .size((300.0, 100.0), ImGuiCond::FirstUseEver)
     .build(|| {
         ui.text("Hello world!");
         ui.text("This...is...imgui-rs!");
@@ -45,17 +48,20 @@ ui.window("Hello world")
 
 ## Compiling and running the demos
 
+Examples are under the imgui-examples directory.
+
     git clone https://github.com/Gekkio/imgui-rs
     cd imgui-rs
     git submodule update --init --recursive
+    cd imgui-examples
     cargo test
 
     cargo run --example hello_world
     cargo run --example test_window
     cargo run --example test_window_impl
 
-Note to Windows users:  You will need to use the *MSVC ABI* version of the Rust compiler along 
-with its associated [dependencies](https://www.rust-lang.org/en-US/downloads.html#win-foot) to 
+Note to Windows users:  You will need to use the *MSVC ABI* version of the Rust compiler along
+with its associated [dependencies](https://www.rust-lang.org/en-US/downloads.html#win-foot) to
 build this libary and run the examples.
 
 ## How to contribute
@@ -63,7 +69,7 @@ build this libary and run the examples.
 1. Change or add something
 2. Run rustfmt to guarantee code style conformance
 
-        cargo install fmt
+        cargo install rustfmt
         cargo fmt -- --write-mode=overwrite
 
 3. Open a pull request in Github

@@ -1,31 +1,19 @@
 [package]
 name = "imgui"
-version = "0.1.0-pre"
-authors = ["Joonas Javanainen <joonas.javanainen@gmail.com>"]
-description = "Experimental bindings to ocornut/imgui"
+version = "0.0.18-pre"
+authors = ["Joonas Javanainen <joonas.javanainen@gmail.com>", "imgui-rs contributors"]
+description = "High-level Rust bindings to dear imgui"
+homepage = "https://github.com/Gekkio/imgui-rs"
+repository = "https://github.com/Gekkio/imgui-rs"
+license = "MIT/Apache-2.0"
+categories = ["gui", "api-bindings"]
 readme = "README.markdown"
-homepage = "https://github.com/gekkio/imgui-rs"
-repository = "https://github.com/gekkio/imgui-rs"
-license = "MIT OR Apache-2.0"
 
-[features]
-default = ["glium"]
+[badges]
+travis-ci = { repository = "Gekkio/imgui-rs" }
 
 [dependencies]
-libc = "0.2"
+imgui-sys = { version = "0.0.18-pre", path = "imgui-sys" }
 
-[dependencies.glium]
-version = "0.15"
-default-features = false
-optional = true
-
-[dependencies.imgui-sys]
-path = "imgui-sys"
-
-[build-dependencies]
-gcc = "0.3"
-
-[dev-dependencies.glium]
-version = "0.15"
-features = ["glutin"]
-default-features = false
+[workspace]
+members = ["imgui-examples", "imgui-sys", "imgui-gfx-renderer", "imgui-glium-renderer"]

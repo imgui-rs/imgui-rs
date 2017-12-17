@@ -5,6 +5,7 @@ rust:
   - stable
   - beta
   - nightly
+  - 1.20.0
 os:
   - linux
   - osx
@@ -12,5 +13,10 @@ cache: cargo
 matrix:
   allow_failures:
     - rust: nightly
+
 before_install:
   - git submodule update --init --recursive
+
+script:
+  - cargo build --all --verbose
+  - cargo test --all --verbose
