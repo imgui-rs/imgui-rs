@@ -11,6 +11,7 @@ extern crate gfx;
 extern crate glium;
 
 use std::convert::From;
+use std::marker::PhantomData;
 use std::mem;
 use std::os::raw::{c_char, c_float, c_int, c_short, c_uchar, c_uint, c_ushort, c_void};
 use std::ptr;
@@ -421,25 +422,28 @@ impl Into<(f32, f32, f32, f32)> for ImVec4 {
 #[repr(C)]
 #[derive(Copy, Clone, Debug)]
 /// String slice for use with ig* functions
-pub struct ImStr {
+pub struct ImStr<'p> {
     pub begin: *const c_char,
     pub end: *const c_char,
+    phantom: PhantomData<&'p str>
 }
 
-impl ImStr {
-    pub fn null() -> ImStr {
+impl<'p> ImStr<'p> {
+    pub fn null() -> ImStr<'p> {
         ImStr {
             begin: ptr::null(),
             end: ptr::null(),
+            phantom: PhantomData,
         }
     }
 }
 
-impl<'p> From<&'p str> for ImStr {
-    fn from(s: &'p str) -> ImStr {
+impl<'p> From<&'p str> for ImStr<'p> {
+    fn from(s: &'p str) -> ImStr<'p> {
         ImStr {
             begin: s.as_ptr() as *const c_char,
             end: unsafe { s.as_ptr().offset(s.len() as isize) as *const c_char },
+            phantom: PhantomData,
         }
     }
 }
