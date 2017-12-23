@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [0.0.18] - 2017-12-23
+
 ### Added
 
 - `is_item_hovered`
@@ -11,6 +13,7 @@
 ### Changed
 
 - Upgrade to imgui/cimgui 1.52
+- Upgrade to glium 0.19
 
 ### Deprecated
 
