@@ -26,6 +26,7 @@ pub use string::{ImStr, ImString};
 pub use style::StyleVar;
 pub use trees::{CollapsingHeader, TreeNode};
 pub use window::Window;
+pub use window_draw_list::WindowDrawList;
 
 mod child_frame;
 mod color_editors;
@@ -39,6 +40,7 @@ mod string;
 mod style;
 mod trees;
 mod window;
+mod window_draw_list;
 
 pub struct ImGui {
     // We need to keep ownership of the ImStr values to ensure the *const char pointer
@@ -1083,3 +1085,18 @@ impl<'ui> Ui<'ui> {
         unsafe { sys::igIsItemHovered(ImGuiHoveredFlags::empty()) }
     }
 }
+
+/// # Draw list
+impl<'ui> Ui<'ui> {
+    
+    pub fn with_window_draw_list<F: FnOnce(&mut window_draw_list::WindowDrawList)>(&self, f: F) {
+        let mut window_draw_list = window_draw_list::WindowDrawList {
+            window_draw_list: unsafe { sys::igGetWindowDrawList() },
+            _phantom: std::marker::PhantomData,
+        };
+
+        f(&mut window_draw_list);
+    }
+}
+
+
