@@ -6,7 +6,6 @@ use std::os::raw::{c_char, c_float, c_int};
 
 use Ui;
 
-#[must_use]
 pub struct WindowDrawList<'ui> {
     pub(super) window_draw_list: *mut sys::ImDrawList,
     pub(super) _phantom: PhantomData<&'ui Ui<'ui>>,
