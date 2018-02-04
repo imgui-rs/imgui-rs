@@ -244,7 +244,7 @@ impl<'ui> WindowDrawList<'ui> {
         anti_aliased: bool) {
 
         unsafe {
-            sys::ImDrawList_AddPolyLine(
+            sys::ImDrawList_AddPolyline(
                 self.window_draw_list,
                 points.as_ptr(),
                 points.len() as i32,
