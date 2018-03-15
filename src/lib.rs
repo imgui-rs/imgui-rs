@@ -202,13 +202,25 @@ impl ImGui {
         let io = self.io_mut();
         io.mouse_draw_cursor = value;
     }
+    pub fn key_ctrl(&self) -> bool {
+        let io = self.io();
+        io.key_ctrl
+    }
     pub fn set_key_ctrl(&mut self, value: bool) {
         let io = self.io_mut();
         io.key_ctrl = value;
     }
+    pub fn key_shift(&self) -> bool {
+        let io = self.io();
+        io.key_shift
+    }
     pub fn set_key_shift(&mut self, value: bool) {
         let io = self.io_mut();
         io.key_shift = value;
+    }
+    pub fn key_alt(&self) -> bool {
+        let io = self.io();
+        io.key_alt
     }
     pub fn set_key_alt(&mut self, value: bool) {
         let io = self.io_mut();
