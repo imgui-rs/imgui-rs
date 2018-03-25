@@ -384,6 +384,14 @@ impl<'a> Ui<'a> {
 // Window
 impl<'ui> Ui<'ui> {
     pub fn window<'p>(&self, name: &'p ImStr) -> Window<'ui, 'p> { Window::new(self, name) }
+    /// Get current window's size in pixels
+    pub fn get_window_size(&self) -> (f32, f32) {
+        let mut out = ImVec2::new(0.0, 0.0);
+        unsafe {
+            sys::igGetWindowSize(&mut out as *mut ImVec2);
+        }
+        (out.x, out.y)
+    }
 }
 
 // Layout
