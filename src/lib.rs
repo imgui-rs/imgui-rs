@@ -190,6 +190,11 @@ impl ImGui {
         io.mouse_pos.x = x;
         io.mouse_pos.y = y;
     }
+    /// Get mouse's position's delta between the current and the last frame.
+    pub fn mouse_delta(&self) -> (f32, f32) {
+        let io = self.io();
+        (io.mouse_delta.x, io.mouse_delta.y)
+    }
     pub fn set_mouse_down(&mut self, states: &[bool; 5]) {
         let io = self.io_mut();
         io.mouse_down = *states;
