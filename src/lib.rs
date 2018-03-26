@@ -9,8 +9,8 @@ use std::str;
 use sys::ImGuiStyleVar;
 
 pub use sys::{ImDrawIdx, ImDrawVert, ImGuiColorEditFlags, ImGuiHoveredFlags, ImGuiInputTextFlags,
-              ImGuiKey, ImGuiSelectableFlags, ImGuiCond, ImGuiCol, ImGuiStyle, ImGuiTreeNodeFlags,
-              ImGuiWindowFlags, ImVec2, ImVec4};
+              ImGuiKey, ImGuiMouseCursor, ImGuiSelectableFlags, ImGuiCond, ImGuiCol, ImGuiStyle,
+              ImGuiTreeNodeFlags, ImGuiWindowFlags, ImVec2, ImVec4};
 pub use child_frame::ChildFrame;
 pub use color_editors::{ColorButton, ColorEdit, ColorEditMode, ColorFormat, ColorPicker,
                         ColorPickerMode, ColorPreview, EditableColor};
@@ -198,9 +198,30 @@ impl ImGui {
         let io = self.io_mut();
         io.mouse_wheel = value;
     }
+    /// Set to `true` to have ImGui draw the cursor in software.
+    /// If `false`, the OS cursor is used (default to `false`).
     pub fn set_mouse_draw_cursor(&mut self, value: bool) {
         let io = self.io_mut();
         io.mouse_draw_cursor = value;
+    }
+    pub fn mouse_draw_cursor(&self) -> bool {
+        let io = self.io();
+        io.mouse_draw_cursor
+    }
+    /// Set currently displayed cursor.
+    /// Requires support in the windowing back-end if OS cursor is used.
+    /// OS cursor is used if `mouse_draw_cursor` is set to `false` with
+    /// [set_mouse_draw_cursor](#method.set_mouse_draw_cursor).
+    pub fn set_mouse_cursor(&self, cursor: ImGuiMouseCursor) {
+        unsafe {
+            sys::igSetMouseCursor(cursor);
+        }
+    }
+    /// Get currently displayed cursor.
+    pub fn mouse_cursor(&self) -> ImGuiMouseCursor {
+        unsafe {
+            sys::igGetMouseCursor()
+        }
     }
     pub fn key_ctrl(&self) -> bool {
         let io = self.io();
