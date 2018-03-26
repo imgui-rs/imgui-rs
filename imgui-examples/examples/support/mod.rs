@@ -1,4 +1,4 @@
-use imgui::{ImGui, Ui};
+use imgui::{ImGui, ImGuiMouseCursor, Ui};
 use std::time::Instant;
 
 #[derive(Copy, Clone, PartialEq, Debug, Default)]
@@ -105,6 +105,26 @@ pub fn run<F: FnMut(&Ui) -> bool>(title: String, clear_color: [f32; 4], mut run_
         update_mouse(&mut imgui, &mut mouse_state);
 
         let gl_window = display.gl_window();
+
+        let mouse_cursor = imgui.mouse_cursor();
+        if imgui.mouse_draw_cursor() || mouse_cursor == ImGuiMouseCursor::None {
+            // Hide OS cursor
+            gl_window.set_cursor_state(glutin::CursorState::Hide).unwrap();
+        } else {
+            // Set OS cursor
+            gl_window.set_cursor_state(glutin::CursorState::Normal).unwrap();
+            gl_window.set_cursor(match mouse_cursor {
+                ImGuiMouseCursor::None => unreachable!("mouse_cursor was None!"),
+                ImGuiMouseCursor::Arrow => glutin::MouseCursor::Arrow,
+                ImGuiMouseCursor::TextInput => glutin::MouseCursor::Text,
+                ImGuiMouseCursor::Move => glutin::MouseCursor::Move,
+                ImGuiMouseCursor::ResizeNS => glutin::MouseCursor::NsResize,
+                ImGuiMouseCursor::ResizeEW => glutin::MouseCursor::EwResize,
+                ImGuiMouseCursor::ResizeNESW => glutin::MouseCursor::NeswResize,
+                ImGuiMouseCursor::ResizeNWSE => glutin::MouseCursor::NwseResize,
+            });
+        }
+
         let size_pixels = gl_window.get_inner_size().unwrap();
         let hdipi = gl_window.hidpi_factor();
         let size_points = (
