@@ -86,6 +86,15 @@ pub fn get_version() -> &'static str {
     }
 }
 
+/// Represents one of the buttons of the mouse
+pub enum ImMouseButton {
+    Left = 0,
+    Right = 1,
+    Middle = 2,
+    Extra1 = 3,
+    Extra2 = 4,
+}
+
 impl ImGui {
     pub fn init() -> ImGui {
         ImGui {
@@ -229,6 +238,25 @@ impl ImGui {
     pub fn mouse_cursor(&self) -> ImGuiMouseCursor {
         unsafe {
             sys::igGetMouseCursor()
+        }
+    }
+    /// Returns `true` if mouse is currently dragging with the `button` provided
+    /// as argument.
+    pub fn is_mouse_dragging(&self, button: ImMouseButton) -> bool {
+        unsafe {
+            sys::igIsMouseDragging(button as c_int, -1.0)
+        }
+    }
+    /// Returns `true` if the `button` provided as argument is currently down.
+    pub fn is_mouse_down(&self, button: ImMouseButton) -> bool {
+        unsafe {
+            sys::igIsMouseDown(button as c_int)
+        }
+    }
+    /// Returns `true` if the `button` provided as argument is being clicked.
+    pub fn is_mouse_clicked(&self, button: ImMouseButton) -> bool {
+        unsafe {
+            sys::igIsMouseClicked(button as c_int, false)
         }
     }
     pub fn key_ctrl(&self) -> bool {
