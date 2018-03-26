@@ -392,6 +392,18 @@ impl<'ui> Ui<'ui> {
         }
         (out.x, out.y)
     }
+    /// Get current window's width in pixels
+    pub fn get_window_width(&self) -> f32 {
+        unsafe {
+            sys::igGetWindowWidth()
+        }
+    }
+    /// Get current window's height in pixels
+    pub fn get_window_height(&self) -> f32 {
+        unsafe {
+            sys::igGetWindowHeight()
+        }
+    }
 }
 
 // Layout
