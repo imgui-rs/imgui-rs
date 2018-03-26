@@ -1088,6 +1088,24 @@ impl<'ui> Ui<'ui> {
     }
 }
 
+impl<'ui> Ui<'ui> {
+    /// Runs a function after temporarily pushing an array of values to the
+    /// style and color stack.
+    pub fn with_style_and_color_vars<F, C>(
+        &self,
+        style_vars: &[StyleVar],
+        color_vars: &[(ImGuiCol, C)],
+        f: F,
+    ) where
+        F: FnOnce(),
+        C: Into<ImVec4> + Copy,
+    {
+        self.with_style_vars(style_vars, || {
+            self.with_color_vars(color_vars, f);
+        });
+    }
+}
+
 /// # Utilities
 impl<'ui> Ui<'ui> {
     /// Returns `true` if the last item is being hovered by the mouse.
