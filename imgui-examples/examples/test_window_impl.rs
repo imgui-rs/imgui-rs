@@ -47,6 +47,7 @@ struct State {
     file_menu: FileMenuState,
     radio_button: i32,
     color_edit: ColorEditState,
+    custom_rendering: CustomRenderingState,
 }
 
 impl Default for State {
@@ -95,6 +96,7 @@ impl Default for State {
             file_menu: Default::default(),
             radio_button: 0,
             color_edit: ColorEditState::default(),
+            custom_rendering: Default::default(),
         }
     }
 }
@@ -153,6 +155,20 @@ struct AutoResizeState {
 
 impl Default for AutoResizeState {
     fn default() -> Self { AutoResizeState { lines: 10 } }
+}
+
+struct CustomRenderingState {
+    sz: f32,
+    col: [f32; 3],
+}
+
+impl Default for CustomRenderingState {
+    fn default() -> Self {
+        CustomRenderingState {
+            sz: 36.0,
+            col: [1.0, 1.0, 0.4],
+        }
+    }
 }
 
 const CLEAR_COLOR: [f32; 4] = [114.0 / 255.0, 144.0 / 255.0, 154.0 / 255.0, 1.0];
@@ -237,6 +253,14 @@ fn show_test_window(ui: &Ui, state: &mut State, opened: &mut bool) {
                         information.",
                 );
             });
+    }
+
+    if state.show_app_custom_rendering {
+        show_example_app_custom_rendering(
+            ui,
+            &mut state.custom_rendering,
+            &mut state.show_app_custom_rendering,
+        );
     }
 
     ui.window(im_str!("ImGui Demo"))
@@ -741,4 +765,145 @@ My title is the same as window 1, but my identifier is unique.",
     ui.window(title)
         .position((100.0, 300.0), ImGuiCond::FirstUseEver)
         .build(|| ui.text("This window has a changing title"));
+}
+
+fn show_example_app_custom_rendering(ui: &Ui, state: &mut CustomRenderingState, opened: &mut bool) {
+    ui.window(im_str!("Example: Custom rendering"))
+        .size((350.0, 560.0), ImGuiCond::FirstUseEver)
+        .opened(opened)
+        .build(|| {
+            ui.text("Primitives");
+            // TODO: Add DragFloat to change value of sz
+            ui.color_edit(im_str!("Color"), &mut state.col).build();
+            let p = ui.get_cursor_screen_pos();
+            let spacing = 8.0;
+            let mut y = p.1 + 4.0;
+            for n in 0..2 {
+                let mut x = p.0 + 4.0;
+                let thickness = if n == 0 { 1.0 } else { 4.0 };
+                ui.with_window_draw_list(|draw_list| {
+                    draw_list
+                        .add_circle(
+                            (x + state.sz * 0.5, y + state.sz * 0.5),
+                            state.sz * 0.5,
+                            state.col,
+                        )
+                        .num_segments(20)
+                        .thickness(thickness)
+                        .build();
+                    x += state.sz + spacing;
+                    draw_list
+                        .add_rect((x, y), (x + state.sz, y + state.sz), state.col)
+                        .thickness(thickness)
+                        .build();
+                    x += state.sz + spacing;
+                    draw_list
+                        .add_rect((x, y), (x + state.sz, y + state.sz), state.col)
+                        .thickness(thickness)
+                        .rounding(10.0)
+                        .build();
+                    x += state.sz + spacing;
+                    draw_list
+                        .add_rect((x, y), (x + state.sz, y + state.sz), state.col)
+                        .thickness(thickness)
+                        .rounding(10.0)
+                        .round_top_right(false)
+                        .round_bot_left(false)
+                        .build();
+                    x += state.sz + spacing;
+                    draw_list
+                        .add_triangle(
+                            (x + state.sz * 0.5, y),
+                            (x + state.sz, y + state.sz - 0.5),
+                            (x, y + state.sz - 0.5),
+                            state.col,
+                        )
+                        .thickness(thickness)
+                        .build();
+                    x += state.sz + spacing;
+                    draw_list
+                        .add_line((x, y), (x + state.sz, y), state.col)
+                        .thickness(thickness)
+                        .build();
+                    x += state.sz + spacing;
+                    draw_list
+                        .add_line((x, y), (x + state.sz, y + state.sz), state.col)
+                        .thickness(thickness)
+                        .build();
+                    x += state.sz + spacing;
+                    draw_list
+                        .add_line((x, y), (x, y + state.sz), state.col)
+                        .thickness(thickness)
+                        .build();
+                    x += spacing;
+                    draw_list
+                        .add_bezier_curve(
+                            (x, y),
+                            (x + state.sz * 1.3, y + state.sz * 0.3),
+                            (x + state.sz - state.sz * 1.3, y + state.sz - state.sz * 0.3),
+                            (x + state.sz, y + state.sz),
+                            state.col,
+                        )
+                        .thickness(thickness)
+                        .build();
+                });
+                y += state.sz + spacing;
+            }
+            ui.with_window_draw_list(|draw_list| {
+                let mut x = p.0 + 4.0;
+                draw_list
+                    .add_circle(
+                        (x + state.sz * 0.5, y + state.sz * 0.5),
+                        state.sz * 0.5,
+                        state.col,
+                    )
+                    .num_segments(32)
+                    .filled(true)
+                    .build();
+                x += state.sz + spacing;
+                draw_list
+                    .add_rect((x, y), (x + state.sz, y + state.sz), state.col)
+                    .filled(true)
+                    .build();
+                x += state.sz + spacing;
+                draw_list
+                    .add_rect((x, y), (x + state.sz, y + state.sz), state.col)
+                    .filled(true)
+                    .rounding(10.0)
+                    .build();
+                x += state.sz + spacing;
+                draw_list
+                    .add_rect((x, y), (x + state.sz, y + state.sz), state.col)
+                    .filled(true)
+                    .rounding(10.0)
+                    .round_top_right(false)
+                    .round_bot_left(false)
+                    .build();
+                x += state.sz + spacing;
+                draw_list
+                    .add_triangle(
+                        (x + state.sz * 0.5, y),
+                        (x + state.sz, y + state.sz - 0.5),
+                        (x, y + state.sz - 0.5),
+                        state.col,
+                    )
+                    .filled(true)
+                    .build();
+                x += state.sz + spacing;
+                const MULTICOLOR_RECT_CORNER_COLOR1: [f32; 3] = [0.0, 0.0, 0.0];
+                const MULTICOLOR_RECT_CORNER_COLOR2: [f32; 3] = [1.0, 0.0, 0.0];
+                const MULTICOLOR_RECT_CORNER_COLOR3: [f32; 3] = [1.0, 1.0, 0.0];
+                const MULTICOLOR_RECT_CORNER_COLOR4: [f32; 3] = [0.0, 1.0, 0.0];
+                draw_list.add_rect_filled_multicolor(
+                    (x, y),
+                    (x + state.sz, y + state.sz),
+                    MULTICOLOR_RECT_CORNER_COLOR1,
+                    MULTICOLOR_RECT_CORNER_COLOR2,
+                    MULTICOLOR_RECT_CORNER_COLOR3,
+                    MULTICOLOR_RECT_CORNER_COLOR4,
+                );
+            });
+            ui.dummy(((state.sz + spacing) * 8.0, (state.sz + spacing) * 3.0));
+            ui.separator();
+        });
 }
