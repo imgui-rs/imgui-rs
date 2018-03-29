@@ -218,6 +218,41 @@ macro_rules! impl_draw_list_methods {
             {
                 BezierCurve::new(self, pos0, cp0, cp1, pos1, color)
             }
+
+            /// Push a clipping rectangle on the stack, run `f` and pop it.
+            ///
+            /// Clip all drawings done within the closure `f` in the given
+            /// rectangle.
+            pub fn with_clip_rect<P1, P2, F>(&self, min: P1, max: P2, f: F)
+            where
+                P1: Into<ImVec2>,
+                P2: Into<ImVec2>,
+                F: FnOnce(),
+            {
+                unsafe {
+                    sys::ImDrawList_PushClipRect(self.draw_list(), min.into(), max.into(), false)
+                }
+                f();
+                unsafe { sys::ImDrawList_PopClipRect(self.draw_list()) }
+            }
+
+            /// Push a clipping rectangle on the stack, run `f` and pop it.
+            ///
+            /// Clip all drawings done within the closure `f` in the given
+            /// rectangle. Intersect with all clipping rectangle previously on
+            /// the stack.
+            pub fn with_clip_rect_intersect<P1, P2, F>(&self, min: P1, max: P2, f: F)
+            where
+                P1: Into<ImVec2>,
+                P2: Into<ImVec2>,
+                F: FnOnce(),
+            {
+                unsafe {
+                    sys::ImDrawList_PushClipRect(self.draw_list(), min.into(), max.into(), true)
+                }
+                f();
+                unsafe { sys::ImDrawList_PopClipRect(self.draw_list()) }
+            }
         }
     };
 }
