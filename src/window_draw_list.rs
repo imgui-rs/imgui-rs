@@ -198,6 +198,26 @@ macro_rules! impl_draw_list_methods {
             {
                 Circle::new(self, center, radius, color)
             }
+
+            /// Returns a Bezier curve stretching from `pos0` to `pos1`, whose
+            /// curvature is defined by `cp0` and `cp1`.
+            pub fn add_bezier_curve<P1, P2, P3, P4, C>(
+                &self,
+                pos0: P1,
+                cp0: P2,
+                cp1: P3,
+                pos1: P4,
+                color: C,
+            ) -> BezierCurve<'ui, $T>
+            where
+                P1: Into<ImVec2>,
+                P2: Into<ImVec2>,
+                P3: Into<ImVec2>,
+                P4: Into<ImVec2>,
+                C: Into<ImColor>,
+            {
+                BezierCurve::new(self, pos0, cp0, cp1, pos1, color)
+            }
         }
     };
 }
@@ -492,6 +512,70 @@ impl<'ui, D: DrawAPI<'ui>> Circle<'ui, D> {
                     self.thickness,
                 )
             }
+        }
+    }
+}
+
+/// Represents a Bezier curve about to be drawn
+pub struct BezierCurve<'ui, D: 'ui> {
+    pos0: ImVec2,
+    cp0: ImVec2,
+    pos1: ImVec2,
+    cp1: ImVec2,
+    color: ImColor,
+    thickness: f32,
+    /// If num_segments is not set, the bezier curve is auto-tessalated.
+    num_segments: Option<u32>,
+    draw_list: &'ui D,
+}
+
+impl<'ui, D: DrawAPI<'ui>> BezierCurve<'ui, D> {
+    fn new<P1, P2, P3, P4, C>(draw_list: &'ui D, pos0: P1, cp0: P2, cp1: P3, pos1: P4, c: C) -> Self
+    where
+        P1: Into<ImVec2>,
+        P2: Into<ImVec2>,
+        P3: Into<ImVec2>,
+        P4: Into<ImVec2>,
+        C: Into<ImColor>,
+    {
+        Self {
+            pos0: pos0.into(),
+            cp0: cp0.into(),
+            pos1: pos1.into(),
+            cp1: cp1.into(),
+            color: c.into(),
+            thickness: 1.0,
+            num_segments: None,
+            draw_list,
+        }
+    }
+
+    /// Set curve's thickness (default to 1.0 pixel)
+    pub fn thickness(mut self, thickness: f32) -> Self {
+        self.thickness = thickness;
+        self
+    }
+
+    /// Set number of segments used to draw the Bezier curve. If not set, the
+    /// bezier curve is auto-tessalated.
+    pub fn num_segments(mut self, num_segments: u32) -> Self {
+        self.num_segments = Some(num_segments);
+        self
+    }
+
+    /// Draw the curve on the window.
+    pub fn build(self) {
+        unsafe {
+            sys::ImDrawList_AddBezierCurve(
+                self.draw_list.draw_list(),
+                self.pos0,
+                self.cp0,
+                self.cp1,
+                self.pos1,
+                self.color.into(),
+                self.thickness,
+                self.num_segments.unwrap_or(0) as i32,
+            )
         }
     }
 }
