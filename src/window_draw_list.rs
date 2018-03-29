@@ -172,6 +172,24 @@ macro_rules! impl_draw_list_methods {
                 }
             }
 
+            /// Returns a triangle with the given 3 vertices `p1`, `p2` and `p3`
+            /// and color `c`.
+            pub fn add_triangle<P1, P2, P3, C>(
+                &self,
+                p1: P1,
+                p2: P2,
+                p3: P3,
+                c: C,
+            ) -> Triangle<'ui, $T>
+            where
+                P1: Into<ImVec2>,
+                P2: Into<ImVec2>,
+                P3: Into<ImVec2>,
+                C: Into<ImColor>,
+            {
+                Triangle::new(self, p1, p2, p3, c)
+            }
+
             /// Returns a circle with the given `center`, `radius` and `color`.
             pub fn add_circle<P, C>(&self, center: P, radius: f32, color: C) -> Circle<'ui, $T>
             where
@@ -330,6 +348,75 @@ impl<'ui, D: DrawAPI<'ui>> Rect<'ui, D> {
                     self.flags,
                     self.thickness,
                 );
+            }
+        }
+    }
+}
+
+/// Represents a circle about to be drawn on the window
+pub struct Triangle<'ui, D: 'ui> {
+    p1: ImVec2,
+    p2: ImVec2,
+    p3: ImVec2,
+    color: ImColor,
+    thickness: f32,
+    filled: bool,
+    draw_list: &'ui D,
+}
+
+impl<'ui, D: DrawAPI<'ui>> Triangle<'ui, D> {
+    fn new<P1, P2, P3, C>(draw_list: &'ui D, p1: P1, p2: P2, p3: P3, c: C) -> Self
+    where
+        P1: Into<ImVec2>,
+        P2: Into<ImVec2>,
+        P3: Into<ImVec2>,
+        C: Into<ImColor>,
+    {
+        Self {
+            p1: p1.into(),
+            p2: p2.into(),
+            p3: p3.into(),
+            color: c.into(),
+            thickness: 1.0,
+            filled: false,
+            draw_list,
+        }
+    }
+
+    /// Set triangle's thickness (default to 1.0 pixel)
+    pub fn thickness(mut self, thickness: f32) -> Self {
+        self.thickness = thickness;
+        self
+    }
+
+    /// Set to `true` to make a filled triangle (default to `false`).
+    pub fn filled(mut self, filled: bool) -> Self {
+        self.filled = filled;
+        self
+    }
+
+    /// Draw the triangle on the window.
+    pub fn build(self) {
+        if self.filled {
+            unsafe {
+                sys::ImDrawList_AddTriangleFilled(
+                    self.draw_list.draw_list(),
+                    self.p1,
+                    self.p2,
+                    self.p3,
+                    self.color.into(),
+                )
+            }
+        } else {
+            unsafe {
+                sys::ImDrawList_AddTriangle(
+                    self.draw_list.draw_list(),
+                    self.p1,
+                    self.p2,
+                    self.p3,
+                    self.color.into(),
+                    self.thickness,
+                )
             }
         }
     }
