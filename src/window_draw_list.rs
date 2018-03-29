@@ -137,6 +137,40 @@ macro_rules! impl_draw_list_methods {
             {
                 Rect::new(self, p1, p2, c)
             }
+
+            /// Draw a rectangle whose upper-left corner is at point `p1`
+            /// and lower-right corner is at point `p2`.
+            /// The remains parameters are the respective color of the corners
+            /// in the counter-clockwise starting from the upper-left corner
+            /// first.
+            pub fn add_rect_filled_multicolor<P1, P2, C1, C2, C3, C4>(
+                &self,
+                p1: P1,
+                p2: P2,
+                col_upr_left: C1,
+                col_upr_right: C2,
+                col_bot_right: C3,
+                col_bot_left: C4,
+            ) where
+                P1: Into<ImVec2>,
+                P2: Into<ImVec2>,
+                C1: Into<ImColor>,
+                C2: Into<ImColor>,
+                C3: Into<ImColor>,
+                C4: Into<ImColor>,
+            {
+                unsafe {
+                    sys::ImDrawList_AddRectFilledMultiColor(
+                        self.draw_list(),
+                        p1.into(),
+                        p2.into(),
+                        col_upr_left.into().into(),
+                        col_upr_right.into().into(),
+                        col_bot_right.into().into(),
+                        col_bot_left.into().into(),
+                    );
+                }
+            }
         }
     };
 }
