@@ -27,6 +27,7 @@ pub use string::{ImStr, ImString};
 pub use style::StyleVar;
 pub use trees::{CollapsingHeader, TreeNode};
 pub use window::Window;
+pub use window_draw_list::{ImColor, WindowDrawList};
 
 mod child_frame;
 mod color_editors;
@@ -41,6 +42,7 @@ mod string;
 mod style;
 mod trees;
 mod window;
+mod window_draw_list;
 
 pub struct ImGui {
     // We need to keep ownership of the ImStr values to ensure the *const char pointer
@@ -1209,5 +1211,30 @@ impl<'ui> Ui<'ui> {
         unsafe { sys::igBeginGroup(); }
         f();
         unsafe { sys::igEndGroup(); }
+    }
+}
+
+/// # Draw list for custom drawing
+impl<'ui> Ui<'ui> {
+    /// Get access to drawing API
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// fn custom_draw(ui: &Ui) {
+    ///     ui.with_window_draw_list(|draw_list| {
+    ///         // Draw a line
+    ///         const WHITE: [f32; 3] = [1.0, 1.0, 1.0];
+    ///         draw_list.add_line([100.0, 100.0], [200.0, 200.0], WHITE).build();
+    ///         // Continue drawing ...
+    ///     });
+    /// }
+    /// ```
+    pub fn with_window_draw_list<F>(&self, f: F)
+    where
+        F: FnOnce(&WindowDrawList),
+    {
+        let window_draw_list = WindowDrawList::new(self);
+        f(&window_draw_list);
     }
 }
