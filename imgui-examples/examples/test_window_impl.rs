@@ -160,6 +160,8 @@ impl Default for AutoResizeState {
 struct CustomRenderingState {
     sz: f32,
     col: [f32; 3],
+    points: Vec<(f32, f32)>,
+    adding_line: bool,
 }
 
 impl Default for CustomRenderingState {
@@ -167,6 +169,8 @@ impl Default for CustomRenderingState {
         CustomRenderingState {
             sz: 36.0,
             col: [1.0, 1.0, 0.4],
+            points: vec![],
+            adding_line: false,
         }
     }
 }
@@ -905,5 +909,111 @@ fn show_example_app_custom_rendering(ui: &Ui, state: &mut CustomRenderingState, 
             });
             ui.dummy(((state.sz + spacing) * 8.0, (state.sz + spacing) * 3.0));
             ui.separator();
+
+            ui.text(im_str!("Canvas example"));
+            if ui.button(im_str!("Clear"), (0.0, 0.0)) {
+                state.points.clear();
+            }
+            if state.points.len() >= 2 {
+                ui.same_line(0.0);
+                if ui.button(im_str!("Undo"), (0.0, 0.0)) {
+                    state.points.pop();
+                    state.points.pop();
+                }
+            }
+            ui.text(im_str!(
+                "Left-click and drag to add lines,\nRight-click to undo"
+            ));
+            // Here we are using InvisibleButton() as a convenience to
+            //  1) advance the cursor, and
+            //  2) allows us to use IsItemHovered()
+            // However you can draw directly and poll mouse/keyboard by
+            // yourself. You can manipulate the cursor using GetCursorPos() and
+            // SetCursorPos(). If you only use the ImDrawList API, you can
+            // notify the owner window of its extends by using
+            // SetCursorPos(max).
+
+            // ImDrawList API uses screen coordinates!
+            let canvas_pos = ui.get_cursor_screen_pos();
+            // Resize canvas to what's available
+            let mut canvas_size = ui.get_content_region_avail();
+            if canvas_size.0 < 50.0 {
+                canvas_size.0 = 50.0;
+            }
+            if canvas_size.1 < 50.0 {
+                canvas_size.1 = 50.0;
+            }
+            ui.with_window_draw_list(|draw_list| {
+                const CANVAS_CORNER_COLOR1: [f32; 3] = [0.2, 0.2, 0.2];
+                const CANVAS_CORNER_COLOR2: [f32; 3] = [0.2, 0.2, 0.24];
+                const CANVAS_CORNER_COLOR3: [f32; 3] = [0.24, 0.24, 0.27];
+                const CANVAS_CORNER_COLOR4: [f32; 3] = [0.2, 0.2, 0.24];
+                draw_list.add_rect_filled_multicolor(
+                    canvas_pos,
+                    (canvas_pos.0 + canvas_size.0, canvas_pos.1 + canvas_size.1),
+                    CANVAS_CORNER_COLOR1,
+                    CANVAS_CORNER_COLOR2,
+                    CANVAS_CORNER_COLOR3,
+                    CANVAS_CORNER_COLOR4,
+                );
+                const CANVAS_BORDER_COLOR: [f32; 3] = [1.0, 1.0, 1.0];
+                draw_list
+                    .add_rect(
+                        canvas_pos,
+                        (canvas_pos.0 + canvas_size.0, canvas_pos.1 + canvas_size.1),
+                        CANVAS_BORDER_COLOR,
+                    )
+                    .build();
+
+                let mut adding_preview = false;
+                ui.invisible_button(im_str!("canvas"), canvas_size);
+                let mouse_pos = ui.imgui().mouse_pos();
+                let mouse_pos_in_canvas = (mouse_pos.0 - canvas_pos.0, mouse_pos.1 - canvas_pos.1);
+                if state.adding_line {
+                    adding_preview = true;
+                    state.points.push(mouse_pos_in_canvas);
+                    if !ui.imgui().is_mouse_down(ImMouseButton::Left) {
+                        state.adding_line = false;
+                        adding_preview = false;
+                    }
+                }
+                if ui.is_item_hovered() {
+                    if !state.adding_line && ui.imgui().is_mouse_clicked(ImMouseButton::Left) {
+                        state.points.push(mouse_pos_in_canvas);
+                        state.adding_line = true;
+                    }
+                    if ui.imgui().is_mouse_clicked(ImMouseButton::Right) && !state.points.is_empty()
+                    {
+                        state.adding_line = false;
+                        adding_preview = false;
+                        state.points.pop();
+                        state.points.pop();
+                    }
+                }
+                draw_list.with_clip_rect_intersect(
+                    canvas_pos,
+                    (canvas_pos.0 + canvas_size.0, canvas_pos.1 + canvas_size.1),
+                    || {
+                        const LINE_COLOR: [f32; 3] = [1.0, 1.0, 0.0];
+                        for line in state.points.chunks(2) {
+                            if line.len() < 2 {
+                                break;
+                            }
+                            let (p1, p2) = (line[0], line[1]);
+                            draw_list
+                                .add_line(
+                                    (canvas_pos.0 + p1.0, canvas_pos.1 + p1.1),
+                                    (canvas_pos.0 + p2.0, canvas_pos.1 + p2.1),
+                                    LINE_COLOR,
+                                )
+                                .thickness(2.0)
+                                .build();
+                        }
+                    },
+                );
+                if adding_preview {
+                    state.points.pop();
+                }
+            });
         });
 }
