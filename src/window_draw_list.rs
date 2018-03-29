@@ -1,5 +1,5 @@
 use sys;
-use sys::{ImDrawList, ImU32};
+use sys::{ImDrawCornerFlags, ImDrawList, ImU32};
 
 use super::{ImVec2, ImVec4, Ui};
 
@@ -126,6 +126,17 @@ macro_rules! impl_draw_list_methods {
             {
                 Line::new(self, p1, p2, c)
             }
+
+            /// Returns a rectangle whose upper-left corner is at point `p1`
+            /// and lower-right corner is at point `p2`, with color `c`.
+            pub fn add_rect<P1, P2, C>(&self, p1: P1, p2: P2, c: C) -> Rect<'ui, $T>
+            where
+                P1: Into<ImVec2>,
+                P2: Into<ImVec2>,
+                C: Into<ImColor>,
+            {
+                Rect::new(self, p1, p2, c)
+            }
         }
     };
 }
@@ -174,6 +185,109 @@ impl<'ui, D: DrawAPI<'ui>> Line<'ui, D> {
                 self.color.into(),
                 self.thickness,
             )
+        }
+    }
+}
+
+/// Represents a rectangle about to be drawn
+pub struct Rect<'ui, D: 'ui> {
+    p1: ImVec2,
+    p2: ImVec2,
+    color: ImColor,
+    rounding: f32,
+    flags: ImDrawCornerFlags,
+    thickness: f32,
+    filled: bool,
+    draw_list: &'ui D,
+}
+
+impl<'ui, D: DrawAPI<'ui>> Rect<'ui, D> {
+    fn new<P1, P2, C>(draw_list: &'ui D, p1: P1, p2: P2, c: C) -> Self
+    where
+        P1: Into<ImVec2>,
+        P2: Into<ImVec2>,
+        C: Into<ImColor>,
+    {
+        Self {
+            p1: p1.into(),
+            p2: p2.into(),
+            color: c.into(),
+            rounding: 0.0,
+            flags: ImDrawCornerFlags::All,
+            thickness: 1.0,
+            filled: false,
+            draw_list,
+        }
+    }
+
+    /// Set rectangle's corner rounding (default to 0.0: no rounding).
+    /// By default all corners are rounded if this value is set.
+    pub fn rounding(mut self, rounding: f32) -> Self {
+        self.rounding = rounding;
+        self
+    }
+
+    /// Set flag to indicate if rectangle's top-left corner will be rounded.
+    pub fn round_top_left(mut self, value: bool) -> Self {
+        self.flags.set(ImDrawCornerFlags::TopLeft, value);
+        self
+    }
+
+    /// Set flag to indicate if rectangle's top-right corner will be rounded.
+    pub fn round_top_right(mut self, value: bool) -> Self {
+        self.flags.set(ImDrawCornerFlags::TopRight, value);
+        self
+    }
+
+    /// Set flag to indicate if rectangle's bottom-left corner will be rounded.
+    pub fn round_bot_left(mut self, value: bool) -> Self {
+        self.flags.set(ImDrawCornerFlags::BotLeft, value);
+        self
+    }
+
+    /// Set flag to indicate if rectangle's bottom-right corner will be rounded.
+    pub fn round_bot_right(mut self, value: bool) -> Self {
+        self.flags.set(ImDrawCornerFlags::BotRight, value);
+        self
+    }
+
+    /// Set rectangle's thickness (default to 1.0 pixel).
+    pub fn thickness(mut self, thickness: f32) -> Self {
+        self.thickness = thickness;
+        self
+    }
+
+    /// Set to `true` to make a filled rectangle (default to `false`).
+    pub fn filled(mut self, filled: bool) -> Self {
+        self.filled = filled;
+        self
+    }
+
+    /// Draw the rectangle on the window.
+    pub fn build(self) {
+        if self.filled {
+            unsafe {
+                sys::ImDrawList_AddRectFilled(
+                    self.draw_list.draw_list(),
+                    self.p1,
+                    self.p2,
+                    self.color.into(),
+                    self.rounding,
+                    self.flags,
+                );
+            }
+        } else {
+            unsafe {
+                sys::ImDrawList_AddRect(
+                    self.draw_list.draw_list(),
+                    self.p1,
+                    self.p2,
+                    self.color.into(),
+                    self.rounding,
+                    self.flags,
+                    self.thickness,
+                );
+            }
         }
     }
 }

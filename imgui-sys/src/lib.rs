@@ -325,6 +325,26 @@ bitflags!(
     }
 );
 
+bitflags!(
+    /// Flags for indictating which corner of a rectangle should be rounded
+    #[repr(C)]
+    pub struct ImDrawCornerFlags: c_int {
+        const TopLeft  = 1 << 0;
+        const TopRight = 1 << 1;
+        const BotRight = 1 << 2;
+        const BotLeft  = 1 << 3;
+        const Top      = ImDrawCornerFlags::TopLeft.bits
+                       | ImDrawCornerFlags::TopRight.bits;
+        const Bot      = ImDrawCornerFlags::BotLeft.bits
+                       | ImDrawCornerFlags::BotRight.bits;
+        const Left     = ImDrawCornerFlags::TopLeft.bits
+                       | ImDrawCornerFlags::BotLeft.bits;
+        const Right    = ImDrawCornerFlags::TopRight.bits
+                       | ImDrawCornerFlags::BotRight.bits;
+        const All      = 0xF;
+    }
+);
+
 pub type ImGuiTextEditCallback = Option<
     extern "C" fn(data: *mut ImGuiTextEditCallbackData) -> c_int,
 >;
@@ -1840,7 +1860,7 @@ extern "C" {
         b: ImVec2,
         col: ImU32,
         rounding: c_float,
-        rounding_corners_flags: c_int,
+        rounding_corners_flags: ImDrawCornerFlags,
         thickness: c_float,
     );
     pub fn ImDrawList_AddRectFilled(
@@ -1849,7 +1869,7 @@ extern "C" {
         b: ImVec2,
         col: ImU32,
         rounding: c_float,
-        rounding_corners_flags: c_int,
+        rounding_corners_flags: ImDrawCornerFlags,
     );
     pub fn ImDrawList_AddRectFilledMultiColor(
         list: *mut ImDrawList,
