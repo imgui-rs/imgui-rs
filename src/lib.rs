@@ -469,6 +469,13 @@ impl<'ui> Ui<'ui> {
 
     pub fn get_columns_count(&self) -> i32 { unsafe { sys::igGetColumnsCount() } }
 
+    /// Fill a space of `size` in pixels with nothing on the current window.
+    /// Can be used to move the cursor on the window.
+    pub fn dummy<S: Into<ImVec2>>(&self, size: S) {
+        let size = size.into();
+        unsafe { sys::igDummy(&size) }
+    }
+
     /// Get cursor position on the screen, in screen coordinates.
     /// This sets the point on which the next widget will be drawn.
     ///
