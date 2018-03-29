@@ -1918,6 +1918,7 @@ extern "C" {
         radius: c_float,
         col: ImU32,
         num_segments: c_int,
+        thickness: c_float,
     );
     pub fn ImDrawList_AddCircleFilled(
         list: *mut ImDrawList,
