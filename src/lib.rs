@@ -537,6 +537,16 @@ impl<'ui> Ui<'ui> {
     pub fn set_cursor_pos<P: Into<ImVec2>>(&self, pos: P) {
         unsafe { sys::igSetCursorPos(pos.into()) }
     }
+
+    /// Get available space left between the cursor and the edges of the current
+    /// window.
+    pub fn get_content_region_avail(&self) -> (f32, f32) {
+        let mut out = ImVec2::new(0.0, 0.0);
+        unsafe {
+            sys::igGetContentRegionAvail(&mut out);
+        }
+        (out.x, out.y)
+    }
 }
 
 // ID scopes
