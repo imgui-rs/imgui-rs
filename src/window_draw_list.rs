@@ -79,6 +79,8 @@ impl<'ui> WindowDrawList<'ui> {
     /// # Example
     ///
     /// ```
+    /// # extern crate imgui;
+    /// # use imgui::*;
     /// fn custom_drawing(ui: &Ui) {
     ///     ui.with_window_draw_list(|draw_list| {
     ///         draw_list.channels_split(2, |draw_list| {

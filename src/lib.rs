@@ -1271,6 +1271,8 @@ impl<'ui> Ui<'ui> {
     /// # Examples
     ///
     /// ```
+    /// # extern crate imgui;
+    /// # use imgui::*;
     /// fn custom_draw(ui: &Ui) {
     ///     ui.with_window_draw_list(|draw_list| {
     ///         // Draw a line
