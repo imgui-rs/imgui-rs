@@ -610,6 +610,11 @@ impl<'ui> Ui<'ui> {
     pub fn small_button<'p>(&self, label: &'p ImStr) -> bool {
         unsafe { sys::igSmallButton(label.as_ptr()) }
     }
+    /// Make a invisible event. Can be used to conveniently catch events when
+    /// mouse hovers or click the area covered by this invisible button.
+    pub fn invisible_button<'p, S: Into<ImVec2>>(&self, label: &'p ImStr, size: S) -> bool {
+        unsafe { sys::igInvisibleButton(label.as_ptr(), size.into()) }
+    }
     pub fn checkbox<'p>(&self, label: &'p ImStr, value: &'p mut bool) -> bool {
         unsafe { sys::igCheckbox(label.as_ptr(), value) }
     }
