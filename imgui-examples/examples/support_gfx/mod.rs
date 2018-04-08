@@ -1,4 +1,4 @@
-use imgui::{ImGui, ImGuiMouseCursor, Ui};
+use imgui::{FontGlyphRange, ImFontConfig, ImGui, ImGuiMouseCursor, Ui};
 use imgui_gfx_renderer::{Renderer, Shaders};
 use std::time::Instant;
 
@@ -44,6 +44,11 @@ pub fn run<F: FnMut(&Ui) -> bool>(title: String, clear_color: [f32; 4], mut run_
     };
 
     let mut imgui = ImGui::init();
+    imgui.set_ini_filename(None);
+    let config = ImFontConfig::new().oversample_h(1).pixel_snap_h(true).size_pixels(13.0);
+    config.rasterizer_multiply(1.75).add_font(
+        &mut imgui.fonts(), include_bytes!("../mplus-1p-regular.ttf"), &FontGlyphRange::japanese());
+    config.merge_mode(true).add_default_font(&mut imgui.fonts());
     let mut renderer = Renderer::init(&mut imgui, &mut factory, shaders, main_color.clone())
         .expect("Failed to initialize renderer");
 

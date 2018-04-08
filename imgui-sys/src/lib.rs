@@ -13,6 +13,7 @@ extern crate glium;
 use std::convert::From;
 use std::mem;
 use std::os::raw::{c_char, c_float, c_int, c_short, c_uchar, c_uint, c_ushort, c_void};
+use std::ptr;
 use std::slice;
 
 #[cfg(feature = "gfx")]
@@ -734,6 +735,31 @@ pub struct ImFontConfig {
 
     name: [c_char; 32],
     dst_font: *mut ImFont,
+}
+impl ImFontConfig {
+    // This function only exists because cimgui does not provide a wrapper around
+    // `ImGuiConfig::ImGuiConfig()`. This code is based off that constructor.
+    pub fn new() -> ImFontConfig {
+        ImFontConfig {
+            font_data: ptr::null_mut(),
+            font_data_size: 0,
+            font_data_owned_by_atlas: true,
+            font_no: 0,
+            size_pixels: 0.0,
+            oversample_h: 3,
+            oversample_v: 1,
+            pixel_snap_h: false,
+            glyph_extra_spacing: ImVec2::zero(),
+            glyph_offset: ImVec2::zero(),
+            glyph_ranges: ptr::null(),
+            merge_mode: false,
+            rasterizer_flags: 0,
+            rasterizer_multiply: 1.0,
+
+            name: [0; 32],
+            dst_font: ptr::null_mut(),
+        }
+    }
 }
 
 #[repr(C)]

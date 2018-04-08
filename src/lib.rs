@@ -2,7 +2,7 @@ pub extern crate imgui_sys as sys;
 
 use std::ffi::CStr;
 use std::mem;
-use std::os::raw::{c_char, c_float, c_int, c_uchar, c_void};
+use std::os::raw::{c_char, c_float, c_int, c_uchar};
 use std::ptr;
 use std::slice;
 use std::str;
@@ -14,6 +14,7 @@ pub use sys::{ImDrawIdx, ImDrawVert, ImGuiColorEditFlags, ImGuiHoveredFlags, ImG
 pub use child_frame::ChildFrame;
 pub use color_editors::{ColorButton, ColorEdit, ColorEditMode, ColorFormat, ColorPicker,
                         ColorPickerMode, ColorPreview, EditableColor};
+pub use fonts::{FontGlyphRange, ImFontAtlas, ImFont, ImFontConfig};
 pub use input::{InputFloat, InputFloat2, InputFloat3, InputFloat4, InputInt, InputInt2, InputInt3,
                 InputInt4, InputText};
 pub use menus::{Menu, MenuItem};
@@ -29,6 +30,7 @@ pub use window::Window;
 
 mod child_frame;
 mod color_editors;
+mod fonts;
 mod input;
 mod menus;
 mod plothistogram;
@@ -93,6 +95,7 @@ impl ImGui {
     fn io_mut(&mut self) -> &mut sys::ImGuiIO { unsafe { &mut *sys::igGetIO() } }
     pub fn style(&self) -> &ImGuiStyle { unsafe { &*sys::igGetStyle() } }
     pub fn style_mut(&mut self) -> &mut ImGuiStyle { unsafe { &mut *sys::igGetStyle() } }
+    pub fn fonts(&mut self) -> ImFontAtlas { unsafe { ImFontAtlas::from_ptr(self.io_mut().fonts) } }
     pub fn prepare_texture<'a, F, T>(&mut self, f: F) -> T
     where
         F: FnOnce(TextureHandle<'a>) -> T,
@@ -118,9 +121,7 @@ impl ImGui {
         }
     }
     pub fn set_texture_id(&mut self, value: usize) {
-        unsafe {
-            (*self.io_mut().fonts).tex_id = value as *mut c_void;
-        }
+        self.fonts().set_texture_id(value);
     }
     pub fn set_ini_filename(&mut self, value: Option<ImString>) {
         {

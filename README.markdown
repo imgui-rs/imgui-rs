@@ -15,6 +15,7 @@ ui.window(im_str!("Hello world"))
     .size((300.0, 100.0), ImGuiCond::FirstUseEver)
     .build(|| {
         ui.text(im_str!("Hello world!"));
+        ui.text(im_str!("こんにちは世界！"));
         ui.text(im_str!("This...is...imgui-rs!"));
         ui.separator();
         let mouse_pos = ui.imgui().mouse_pos();
