@@ -78,8 +78,7 @@ impl<'ui> WindowDrawList<'ui> {
     ///
     /// # Example
     ///
-    /// ```
-    /// # extern crate imgui;
+    /// ```rust,no_run
     /// # use imgui::*;
     /// fn custom_drawing(ui: &Ui) {
     ///     ui.with_window_draw_list(|draw_list| {

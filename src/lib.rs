@@ -1270,8 +1270,7 @@ impl<'ui> Ui<'ui> {
     ///
     /// # Examples
     ///
-    /// ```
-    /// # extern crate imgui;
+    /// ```rust,no_run
     /// # use imgui::*;
     /// fn custom_draw(ui: &Ui) {
     ///     ui.with_window_draw_list(|draw_list| {
