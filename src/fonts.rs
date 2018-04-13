@@ -1,6 +1,6 @@
 use std::marker::PhantomData;
 use std::mem;
-use std::os::raw::{c_float, c_int, c_void};
+use std::os::raw::{c_int, c_void};
 use std::ptr;
 use sys;
 
@@ -138,12 +138,12 @@ impl ImFontConfig {
         self.pixel_snap_h = pixel_snap_h;
         self
     }
-    pub fn glyph_extra_spacing(mut self, glyph_extra_spacing: sys::ImVec2) -> ImFontConfig {
-        self.glyph_extra_spacing = glyph_extra_spacing;
+    pub fn glyph_extra_spacing<I: Into<sys::ImVec2>>(mut self, extra_spacing: I) -> ImFontConfig {
+        self.glyph_extra_spacing = extra_spacing.into();
         self
     }
-    pub fn glyph_offset(mut self, glyph_offset: sys::ImVec2) -> ImFontConfig {
-        self.glyph_offset = glyph_offset;
+    pub fn glyph_offset<I: Into<sys::ImVec2>>(mut self, glyph_offset: I) -> ImFontConfig {
+        self.glyph_offset = glyph_offset.into();
         self
     }
     pub fn merge_mode(mut self, merge_mode: bool) -> ImFontConfig {
@@ -220,10 +220,10 @@ impl <'a> ImFont<'a> {
         self.chain()
     }
 
-    pub fn display_offset(&self) -> sys::ImVec2 {
+    pub fn display_offset(&self) -> (f32, f32) {
         let mut display_offset = unsafe { mem::uninitialized() };
         unsafe { sys::ImFont_GetDisplayOffset(self.font, &mut display_offset) }
-        display_offset
+        display_offset.into()
     }
 }
 
