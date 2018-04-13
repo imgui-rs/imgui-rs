@@ -954,6 +954,19 @@ impl<'ui> Ui<'ui> {
 }
 
 impl<'ui> Ui<'ui> {
+    /// Get height of a line of previously drawn text item
+    pub fn get_text_line_height_with_spacing(&self) -> f32 {
+        unsafe { sys::igGetTextLineHeightWithSpacing() }
+    }
+    /// Get previously drawn item's size
+    pub fn get_item_rect_size(&self) -> (f32, f32) {
+        let mut out = ImVec2::new(0.0, 0.0);
+        unsafe { sys::igGetItemRectSize(&mut out); }
+        (out.x, out.y)
+    }
+}
+
+impl<'ui> Ui<'ui> {
     /// Creates a progress bar. Fraction is the progress level with 0.0 = 0% and 1.0 = 100%.
     ///
     /// # Example
