@@ -444,6 +444,40 @@ impl<'ui> Ui<'ui> {
     }
 
     pub fn get_columns_count(&self) -> i32 { unsafe { sys::igGetColumnsCount() } }
+
+    /// Get cursor position on the screen, in screen coordinates.
+    /// This sets the point on which the next widget will be drawn.
+    ///
+    /// This is especially useful for drawing, as the drawing API uses
+    /// screen coordiantes.
+    pub fn get_cursor_screen_pos(&self) -> (f32, f32) {
+        let mut out = ImVec2::new(0.0, 0.0);
+        unsafe {
+            sys::igGetCursorScreenPos(&mut out);
+        }
+        (out.x, out.y)
+    }
+
+    /// Set cursor position on the screen, in screen coordinates.
+    /// This sets the point on which the next widget will be drawn.
+    pub fn set_cursor_screen_pos<P: Into<ImVec2>>(&self, pos: P) {
+        unsafe { sys::igSetCursorScreenPos(pos.into()) }
+    }
+
+    /// Get cursor position on the screen, in window coordinates.
+    pub fn get_cursor_pos(&self) -> (f32, f32) {
+        let mut out = ImVec2::new(0.0, 0.0);
+        unsafe {
+            sys::igGetCursorPos(&mut out);
+        }
+        (out.x, out.y)
+    }
+
+    /// Set cursor position on the screen, in window coordinates.
+    /// This sets the point on which the next widget will be drawn.
+    pub fn set_cursor_pos<P: Into<ImVec2>>(&self, pos: P) {
+        unsafe { sys::igSetCursorPos(pos.into()) }
+    }
 }
 
 // ID scopes
