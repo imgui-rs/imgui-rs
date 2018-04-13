@@ -1166,4 +1166,13 @@ impl<'ui> Ui<'ui> {
             sys::igIsItemActive()
         }
     }
+
+    /// Group items together as a single item.
+    ///
+    /// May be useful to handle the same mouse event on a group of items, for example.
+    pub fn group<F: FnOnce()>(&self, f: F) {
+        unsafe { sys::igBeginGroup(); }
+        f();
+        unsafe { sys::igEndGroup(); }
+    }
 }
