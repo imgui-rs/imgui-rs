@@ -109,9 +109,9 @@ impl FontGlyphRange {
 /// A builder for the configuration for a font.
 #[derive(Copy, Clone, PartialEq, Debug)]
 pub struct ImFontConfig {
-    size_pixels: f64, oversample_h: u32, oversample_v: u32, pixel_snap_h: bool,
+    size_pixels: f32, oversample_h: u32, oversample_v: u32, pixel_snap_h: bool,
     glyph_extra_spacing: sys::ImVec2, glyph_offset: sys::ImVec2, merge_mode: bool,
-    rasterizer_multiply: f64,
+    rasterizer_multiply: f32,
 }
 impl ImFontConfig {
     pub fn new() -> ImFontConfig {
@@ -122,7 +122,7 @@ impl ImFontConfig {
         }
     }
 
-    pub fn size_pixels(mut self, size_pixels: f64) -> ImFontConfig {
+    pub fn size_pixels(mut self, size_pixels: f32) -> ImFontConfig {
         self.size_pixels = size_pixels;
         self
     }
@@ -150,21 +150,21 @@ impl ImFontConfig {
         self.merge_mode = merge_mode;
         self
     }
-    pub fn rasterizer_multiply(mut self, rasterizer_multiply: f64) -> ImFontConfig {
+    pub fn rasterizer_multiply(mut self, rasterizer_multiply: f32) -> ImFontConfig {
         self.rasterizer_multiply = rasterizer_multiply;
         self
     }
 
     fn make_config(self) -> sys::ImFontConfig {
         let mut config = sys::ImFontConfig::new();
-        config.size_pixels = self.size_pixels as c_float;
+        config.size_pixels = self.size_pixels;
         config.oversample_h = self.oversample_h as c_int;
         config.oversample_v = self.oversample_v as c_int;
         config.pixel_snap_h = self.pixel_snap_h;
         config.glyph_extra_spacing = self.glyph_extra_spacing;
         config.glyph_offset = self.glyph_offset;
         config.merge_mode = self.merge_mode;
-        config.rasterizer_multiply = self.rasterizer_multiply as c_float;
+        config.rasterizer_multiply = self.rasterizer_multiply;
         config
     }
 
@@ -204,19 +204,19 @@ impl <'a> ImFont<'a> {
         ImFont { font: self.font, _phantom: PhantomData }
     }
 
-    pub fn font_size(&self) -> f64 {
-        unsafe { sys::ImFont_GetFontSize(self.font) as f64 }
+    pub fn font_size(&self) -> f32 {
+        unsafe { sys::ImFont_GetFontSize(self.font) }
     }
-    pub fn set_font_size(&mut self, size: f64) -> ImFont {
-        unsafe { sys::ImFont_SetFontSize(self.font, size as c_float) }
+    pub fn set_font_size(&mut self, size: f32) -> ImFont {
+        unsafe { sys::ImFont_SetFontSize(self.font, size) }
         self.chain()
     }
 
-    pub fn scale(&self) -> f64 {
-        unsafe { sys::ImFont_GetScale(self.font) as f64 }
+    pub fn scale(&self) -> f32 {
+        unsafe { sys::ImFont_GetScale(self.font) }
     }
-    pub fn set_scale(&mut self, size: f64) -> ImFont {
-        unsafe { sys::ImFont_SetScale(self.font, size as c_float) }
+    pub fn set_scale(&mut self, size: f32) -> ImFont {
+        unsafe { sys::ImFont_SetScale(self.font, size) }
         self.chain()
     }
 
@@ -264,7 +264,7 @@ impl <'a> ImFontAtlas<'a> {
     }
 
     /// Adds a custom font to the font set.
-    pub fn add_font(&mut self, data: &[u8], size: f64, range: &FontGlyphRange) -> ImFont {
+    pub fn add_font(&mut self, data: &[u8], size: f32, range: &FontGlyphRange) -> ImFont {
         self.raw_add_font(data, ImFontConfig::new().size_pixels(size), range)
     }
 
