@@ -1281,6 +1281,21 @@ impl<'ui> Ui<'ui> {
     ///     // Continue drawing ...
     /// }
     /// ```
+    ///
+    /// This function will panic if several instances of [`WindowDrawList`]
+    /// coexist. Before a new instance is got, a previous instance should be
+    /// dropped.
+    ///
+    /// ```rust
+    /// # use imgui::*;
+    /// fn custom_draw(ui: &Ui) {
+    ///     let draw_list = ui.get_window_draw_list();
+    ///     // Draw something...
+    ///
+    ///     // This second call will panic!
+    ///     let draw_list = ui.get_window_draw_list();
+    /// }
+    /// ```
     pub fn get_window_draw_list(&'ui self) -> WindowDrawList<'ui> {
         WindowDrawList::new(self)
     }

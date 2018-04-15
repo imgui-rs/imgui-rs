@@ -54,6 +54,10 @@ pub trait DrawAPI {
 }
 
 /// Object implementing the custom draw API.
+///
+/// Called from [`Ui::get_window_draw_list`]. No more than one instance of this
+/// structure can live in a program at the same time.
+/// The program will panic on creating a second instance.
 pub struct WindowDrawList<'ui> {
     draw_list: *mut ImDrawList,
     _phantom: PhantomData<&'ui Ui<'ui>>,
@@ -63,8 +67,22 @@ impl<'ui> DrawAPI for WindowDrawList<'ui> {
     fn draw_list(&self) -> *mut ImDrawList { self.draw_list }
 }
 
+static mut WINDOW_DRAW_LIST_LOADED: bool = false;
+
+impl<'ui> Drop for WindowDrawList<'ui> {
+    fn drop(&mut self) {
+        unsafe { WINDOW_DRAW_LIST_LOADED = false; }
+    }
+}
+
 impl<'ui> WindowDrawList<'ui> {
     pub(crate) fn new(_: &Ui<'ui>) -> Self {
+        unsafe {
+            if WINDOW_DRAW_LIST_LOADED {
+                panic!("WindowDrawList is already loaded! You can only load one instance of it!")
+            }
+            WINDOW_DRAW_LIST_LOADED = true;
+        }
         Self {
             draw_list: unsafe { sys::igGetWindowDrawList() },
             _phantom: PhantomData,
