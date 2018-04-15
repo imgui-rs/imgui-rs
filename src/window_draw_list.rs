@@ -74,7 +74,7 @@ impl<'ui> WindowDrawList<'ui> {
     /// Split into *channels_count* drawing channels.
     /// At the end of the closure, the channels are merged. The objects
     /// are then drawn in the increasing order of their channel number, and not
-    /// in the all order they were called.
+    /// in the order they were called.
     ///
     /// # Example
     ///
@@ -100,7 +100,9 @@ impl<'ui> WindowDrawList<'ui> {
     }
 }
 
-/// Represent the drawing interface within a call to `channels_split`.
+/// Represent the drawing interface within a call to [`channels_split`].
+///
+/// [`channels_split`]: WindowDrawList::channels_split
 pub struct ChannelsSplit<'ui> {
     draw_list: &'ui WindowDrawList<'ui>,
     channels_count: u32,
@@ -111,7 +113,7 @@ impl<'ui> DrawAPI for ChannelsSplit<'ui> {
 }
 
 impl<'ui> ChannelsSplit<'ui> {
-    /// Change current channel
+    /// Change current channel.
     ///
     /// Panic if channel_index overflows the number of channels.
     pub fn channels_set_current(&self, channel_index: u32) {
