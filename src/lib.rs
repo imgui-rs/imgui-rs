@@ -87,6 +87,7 @@ pub fn get_version() -> &'static str {
 }
 
 /// Represents one of the buttons of the mouse
+#[derive(Copy, Clone, Eq, PartialEq, Debug)]
 pub enum ImMouseButton {
     Left = 0,
     Right = 1,
