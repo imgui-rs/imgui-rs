@@ -27,7 +27,7 @@ pub use string::{ImStr, ImString};
 pub use style::StyleVar;
 pub use trees::{CollapsingHeader, TreeNode};
 pub use window::Window;
-pub use window_draw_list::{ImColor, WindowDrawList};
+pub use window_draw_list::{ImColor, WindowDrawList, ChannelsSplit};
 
 mod child_frame;
 mod color_editors;
