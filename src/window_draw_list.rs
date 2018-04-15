@@ -92,21 +92,35 @@ impl<'ui> WindowDrawList<'ui> {
     /// ```
     pub fn channels_split<F: FnOnce(&ChannelsSplit)>(&self, channels_count: u32, f: F) {
         unsafe { sys::ImDrawList_ChannelsSplit(self.draw_list, channels_count as i32) };
-        f(&ChannelsSplit(self));
+        f(&ChannelsSplit {
+            draw_list: self,
+            channels_count,
+        });
         unsafe { sys::ImDrawList_ChannelsMerge(self.draw_list) };
     }
 }
 
 /// Represent the drawing interface within a call to `channels_split`.
-pub struct ChannelsSplit<'ui>(&'ui WindowDrawList<'ui>);
+pub struct ChannelsSplit<'ui> {
+    draw_list: &'ui WindowDrawList<'ui>,
+    channels_count: u32,
+}
 
 impl<'ui> DrawAPI for ChannelsSplit<'ui> {
-    fn draw_list(&self) -> *mut ImDrawList { self.0.draw_list }
+    fn draw_list(&self) -> *mut ImDrawList { self.draw_list.draw_list }
 }
 
 impl<'ui> ChannelsSplit<'ui> {
     /// Change current channel
+    ///
+    /// Panic if channel_index overflows the number of channels.
     pub fn channels_set_current(&self, channel_index: u32) {
+        assert!(
+            channel_index < self.channels_count,
+            "Channel cannot be set! Provided channel index ({}) is higher than channel count ({}).",
+            channel_index,
+            self.channels_count
+        );
         unsafe { sys::ImDrawList_ChannelsSetCurrent(self.draw_list(), channel_index as i32) };
     }
 }
