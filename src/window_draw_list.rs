@@ -409,7 +409,7 @@ impl<'ui, D: DrawAPI<'ui>> Rect<'ui, D> {
     }
 }
 
-/// Represents a circle about to be drawn on the window
+/// Represents a triangle about to be drawn on the window
 pub struct Triangle<'ui, D: 'ui> {
     p1: ImVec2,
     p2: ImVec2,
