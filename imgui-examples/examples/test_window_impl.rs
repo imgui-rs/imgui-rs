@@ -779,106 +779,37 @@ fn show_example_app_custom_rendering(ui: &Ui, state: &mut CustomRenderingState, 
             ui.text("Primitives");
             // TODO: Add DragFloat to change value of sz
             ui.color_edit(im_str!("Color"), &mut state.col).build();
+            let draw_list = ui.get_window_draw_list();
             let p = ui.get_cursor_screen_pos();
             let spacing = 8.0;
             let mut y = p.1 + 4.0;
             for n in 0..2 {
                 let mut x = p.0 + 4.0;
                 let thickness = if n == 0 { 1.0 } else { 4.0 };
-                ui.with_window_draw_list(|draw_list| {
-                    draw_list
-                        .add_circle(
-                            (x + state.sz * 0.5, y + state.sz * 0.5),
-                            state.sz * 0.5,
-                            state.col,
-                        )
-                        .num_segments(20)
-                        .thickness(thickness)
-                        .build();
-                    x += state.sz + spacing;
-                    draw_list
-                        .add_rect((x, y), (x + state.sz, y + state.sz), state.col)
-                        .thickness(thickness)
-                        .build();
-                    x += state.sz + spacing;
-                    draw_list
-                        .add_rect((x, y), (x + state.sz, y + state.sz), state.col)
-                        .thickness(thickness)
-                        .rounding(10.0)
-                        .build();
-                    x += state.sz + spacing;
-                    draw_list
-                        .add_rect((x, y), (x + state.sz, y + state.sz), state.col)
-                        .thickness(thickness)
-                        .rounding(10.0)
-                        .round_top_right(false)
-                        .round_bot_left(false)
-                        .build();
-                    x += state.sz + spacing;
-                    draw_list
-                        .add_triangle(
-                            (x + state.sz * 0.5, y),
-                            (x + state.sz, y + state.sz - 0.5),
-                            (x, y + state.sz - 0.5),
-                            state.col,
-                        )
-                        .thickness(thickness)
-                        .build();
-                    x += state.sz + spacing;
-                    draw_list
-                        .add_line((x, y), (x + state.sz, y), state.col)
-                        .thickness(thickness)
-                        .build();
-                    x += state.sz + spacing;
-                    draw_list
-                        .add_line((x, y), (x + state.sz, y + state.sz), state.col)
-                        .thickness(thickness)
-                        .build();
-                    x += state.sz + spacing;
-                    draw_list
-                        .add_line((x, y), (x, y + state.sz), state.col)
-                        .thickness(thickness)
-                        .build();
-                    x += spacing;
-                    draw_list
-                        .add_bezier_curve(
-                            (x, y),
-                            (x + state.sz * 1.3, y + state.sz * 0.3),
-                            (x + state.sz - state.sz * 1.3, y + state.sz - state.sz * 0.3),
-                            (x + state.sz, y + state.sz),
-                            state.col,
-                        )
-                        .thickness(thickness)
-                        .build();
-                });
-                y += state.sz + spacing;
-            }
-            ui.with_window_draw_list(|draw_list| {
-                let mut x = p.0 + 4.0;
                 draw_list
                     .add_circle(
                         (x + state.sz * 0.5, y + state.sz * 0.5),
                         state.sz * 0.5,
                         state.col,
                     )
-                    .num_segments(32)
-                    .filled(true)
+                    .num_segments(20)
+                    .thickness(thickness)
                     .build();
                 x += state.sz + spacing;
                 draw_list
                     .add_rect((x, y), (x + state.sz, y + state.sz), state.col)
-                    .filled(true)
+                    .thickness(thickness)
                     .build();
                 x += state.sz + spacing;
                 draw_list
                     .add_rect((x, y), (x + state.sz, y + state.sz), state.col)
-                    .filled(true)
+                    .thickness(thickness)
                     .rounding(10.0)
                     .build();
                 x += state.sz + spacing;
                 draw_list
                     .add_rect((x, y), (x + state.sz, y + state.sz), state.col)
-                    .filled(true)
+                    .thickness(thickness)
                     .rounding(10.0)
                     .round_top_right(false)
                     .round_bot_left(false)
@@ -891,22 +822,88 @@ fn show_example_app_custom_rendering(ui: &Ui, state: &mut CustomRenderingState, 
                         (x, y + state.sz - 0.5),
                         state.col,
                     )
-                    .filled(true)
+                    .thickness(thickness)
                     .build();
                 x += state.sz + spacing;
-                const MULTICOLOR_RECT_CORNER_COLOR1: [f32; 3] = [0.0, 0.0, 0.0];
-                const MULTICOLOR_RECT_CORNER_COLOR2: [f32; 3] = [1.0, 0.0, 0.0];
-                const MULTICOLOR_RECT_CORNER_COLOR3: [f32; 3] = [1.0, 1.0, 0.0];
-                const MULTICOLOR_RECT_CORNER_COLOR4: [f32; 3] = [0.0, 1.0, 0.0];
-                draw_list.add_rect_filled_multicolor(
-                    (x, y),
-                    (x + state.sz, y + state.sz),
-                    MULTICOLOR_RECT_CORNER_COLOR1,
-                    MULTICOLOR_RECT_CORNER_COLOR2,
-                    MULTICOLOR_RECT_CORNER_COLOR3,
-                    MULTICOLOR_RECT_CORNER_COLOR4,
-                );
-            });
+                draw_list
+                    .add_line((x, y), (x + state.sz, y), state.col)
+                    .thickness(thickness)
+                    .build();
+                x += state.sz + spacing;
+                draw_list
+                    .add_line((x, y), (x + state.sz, y + state.sz), state.col)
+                    .thickness(thickness)
+                    .build();
+                x += state.sz + spacing;
+                draw_list
+                    .add_line((x, y), (x, y + state.sz), state.col)
+                    .thickness(thickness)
+                    .build();
+                x += spacing;
+                draw_list
+                    .add_bezier_curve(
+                        (x, y),
+                        (x + state.sz * 1.3, y + state.sz * 0.3),
+                        (x + state.sz - state.sz * 1.3, y + state.sz - state.sz * 0.3),
+                        (x + state.sz, y + state.sz),
+                        state.col,
+                    )
+                    .thickness(thickness)
+                    .build();
+                y += state.sz + spacing;
+            }
+            let mut x = p.0 + 4.0;
+            draw_list
+                .add_circle(
+                    (x + state.sz * 0.5, y + state.sz * 0.5),
+                    state.sz * 0.5,
+                    state.col,
+                )
+                .num_segments(32)
+                .filled(true)
+                .build();
+            x += state.sz + spacing;
+            draw_list
+                .add_rect((x, y), (x + state.sz, y + state.sz), state.col)
+                .filled(true)
+                .build();
+            x += state.sz + spacing;
+            draw_list
+                .add_rect((x, y), (x + state.sz, y + state.sz), state.col)
+                .filled(true)
+                .rounding(10.0)
+                .build();
+            x += state.sz + spacing;
+            draw_list
+                .add_rect((x, y), (x + state.sz, y + state.sz), state.col)
+                .filled(true)
+                .rounding(10.0)
+                .round_top_right(false)
+                .round_bot_left(false)
+                .build();
+            x += state.sz + spacing;
+            draw_list
+                .add_triangle(
+                    (x + state.sz * 0.5, y),
+                    (x + state.sz, y + state.sz - 0.5),
+                    (x, y + state.sz - 0.5),
+                    state.col,
+                )
+                .filled(true)
+                .build();
+            x += state.sz + spacing;
+            const MULTICOLOR_RECT_CORNER_COLOR1: [f32; 3] = [0.0, 0.0, 0.0];
+            const MULTICOLOR_RECT_CORNER_COLOR2: [f32; 3] = [1.0, 0.0, 0.0];
+            const MULTICOLOR_RECT_CORNER_COLOR3: [f32; 3] = [1.0, 1.0, 0.0];
+            const MULTICOLOR_RECT_CORNER_COLOR4: [f32; 3] = [0.0, 1.0, 0.0];
+            draw_list.add_rect_filled_multicolor(
+                (x, y),
+                (x + state.sz, y + state.sz),
+                MULTICOLOR_RECT_CORNER_COLOR1,
+                MULTICOLOR_RECT_CORNER_COLOR2,
+                MULTICOLOR_RECT_CORNER_COLOR3,
+                MULTICOLOR_RECT_CORNER_COLOR4,
+            );
             ui.dummy(((state.sz + spacing) * 8.0, (state.sz + spacing) * 3.0));
             ui.separator();
 
@@ -943,77 +940,74 @@ fn show_example_app_custom_rendering(ui: &Ui, state: &mut CustomRenderingState, 
             if canvas_size.1 < 50.0 {
                 canvas_size.1 = 50.0;
             }
-            ui.with_window_draw_list(|draw_list| {
-                const CANVAS_CORNER_COLOR1: [f32; 3] = [0.2, 0.2, 0.2];
-                const CANVAS_CORNER_COLOR2: [f32; 3] = [0.2, 0.2, 0.24];
-                const CANVAS_CORNER_COLOR3: [f32; 3] = [0.24, 0.24, 0.27];
-                const CANVAS_CORNER_COLOR4: [f32; 3] = [0.2, 0.2, 0.24];
-                draw_list.add_rect_filled_multicolor(
+            const CANVAS_CORNER_COLOR1: [f32; 3] = [0.2, 0.2, 0.2];
+            const CANVAS_CORNER_COLOR2: [f32; 3] = [0.2, 0.2, 0.24];
+            const CANVAS_CORNER_COLOR3: [f32; 3] = [0.24, 0.24, 0.27];
+            const CANVAS_CORNER_COLOR4: [f32; 3] = [0.2, 0.2, 0.24];
+            draw_list.add_rect_filled_multicolor(
+                canvas_pos,
+                (canvas_pos.0 + canvas_size.0, canvas_pos.1 + canvas_size.1),
+                CANVAS_CORNER_COLOR1,
+                CANVAS_CORNER_COLOR2,
+                CANVAS_CORNER_COLOR3,
+                CANVAS_CORNER_COLOR4,
+            );
+            const CANVAS_BORDER_COLOR: [f32; 3] = [1.0, 1.0, 1.0];
+            draw_list
+                .add_rect(
                     canvas_pos,
                     (canvas_pos.0 + canvas_size.0, canvas_pos.1 + canvas_size.1),
-                    CANVAS_CORNER_COLOR1,
-                    CANVAS_CORNER_COLOR2,
-                    CANVAS_CORNER_COLOR3,
-                    CANVAS_CORNER_COLOR4,
-                );
-                const CANVAS_BORDER_COLOR: [f32; 3] = [1.0, 1.0, 1.0];
-                draw_list
-                    .add_rect(
-                        canvas_pos,
-                        (canvas_pos.0 + canvas_size.0, canvas_pos.1 + canvas_size.1),
-                        CANVAS_BORDER_COLOR,
-                    )
-                    .build();
+                    CANVAS_BORDER_COLOR,
+                )
+                .build();
 
-                let mut adding_preview = false;
-                ui.invisible_button(im_str!("canvas"), canvas_size);
-                let mouse_pos = ui.imgui().mouse_pos();
-                let mouse_pos_in_canvas = (mouse_pos.0 - canvas_pos.0, mouse_pos.1 - canvas_pos.1);
-                if state.adding_line {
-                    adding_preview = true;
+            let mut adding_preview = false;
+            ui.invisible_button(im_str!("canvas"), canvas_size);
+            let mouse_pos = ui.imgui().mouse_pos();
+            let mouse_pos_in_canvas = (mouse_pos.0 - canvas_pos.0, mouse_pos.1 - canvas_pos.1);
+            if state.adding_line {
+                adding_preview = true;
+                state.points.push(mouse_pos_in_canvas);
+                if !ui.imgui().is_mouse_down(ImMouseButton::Left) {
+                    state.adding_line = false;
+                    adding_preview = false;
+                }
+            }
+            if ui.is_item_hovered() {
+                if !state.adding_line && ui.imgui().is_mouse_clicked(ImMouseButton::Left) {
                     state.points.push(mouse_pos_in_canvas);
-                    if !ui.imgui().is_mouse_down(ImMouseButton::Left) {
-                        state.adding_line = false;
-                        adding_preview = false;
-                    }
+                    state.adding_line = true;
                 }
-                if ui.is_item_hovered() {
-                    if !state.adding_line && ui.imgui().is_mouse_clicked(ImMouseButton::Left) {
-                        state.points.push(mouse_pos_in_canvas);
-                        state.adding_line = true;
-                    }
-                    if ui.imgui().is_mouse_clicked(ImMouseButton::Right) && !state.points.is_empty()
-                    {
-                        state.adding_line = false;
-                        adding_preview = false;
-                        state.points.pop();
-                        state.points.pop();
-                    }
-                }
-                draw_list.with_clip_rect_intersect(
-                    canvas_pos,
-                    (canvas_pos.0 + canvas_size.0, canvas_pos.1 + canvas_size.1),
-                    || {
-                        const LINE_COLOR: [f32; 3] = [1.0, 1.0, 0.0];
-                        for line in state.points.chunks(2) {
-                            if line.len() < 2 {
-                                break;
-                            }
-                            let (p1, p2) = (line[0], line[1]);
-                            draw_list
-                                .add_line(
-                                    (canvas_pos.0 + p1.0, canvas_pos.1 + p1.1),
-                                    (canvas_pos.0 + p2.0, canvas_pos.1 + p2.1),
-                                    LINE_COLOR,
-                                )
-                                .thickness(2.0)
-                                .build();
-                        }
-                    },
-                );
-                if adding_preview {
+                if ui.imgui().is_mouse_clicked(ImMouseButton::Right) && !state.points.is_empty() {
+                    state.adding_line = false;
+                    adding_preview = false;
+                    state.points.pop();
                     state.points.pop();
                 }
-            });
+            }
+            draw_list.with_clip_rect_intersect(
+                canvas_pos,
+                (canvas_pos.0 + canvas_size.0, canvas_pos.1 + canvas_size.1),
+                || {
+                    const LINE_COLOR: [f32; 3] = [1.0, 1.0, 0.0];
+                    for line in state.points.chunks(2) {
+                        if line.len() < 2 {
+                            break;
+                        }
+                        let (p1, p2) = (line[0], line[1]);
+                        draw_list
+                            .add_line(
+                                (canvas_pos.0 + p1.0, canvas_pos.1 + p1.1),
+                                (canvas_pos.0 + p2.0, canvas_pos.1 + p2.1),
+                                LINE_COLOR,
+                            )
+                            .thickness(2.0)
+                            .build();
+                    }
+                },
+            );
+            if adding_preview {
+                state.points.pop();
+            }
         });
 }

@@ -81,13 +81,12 @@ impl<'ui> WindowDrawList<'ui> {
     /// ```rust,no_run
     /// # use imgui::*;
     /// fn custom_drawing(ui: &Ui) {
-    ///     ui.with_window_draw_list(|draw_list| {
-    ///         draw_list.channels_split(2, |draw_list| {
-    ///             draw_list.channels_set_current(1);
-    ///             // ... Draw channel 1
-    ///             draw_list.channels_set_current(0);
-    ///             // ... Draw channel 0
-    ///         });
+    ///     let draw_list = ui.get_window_draw_list();
+    ///     draw_list.channels_split(2, |draw_list| {
+    ///         draw_list.channels_set_current(1);
+    ///         // ... Draw channel 1
+    ///         draw_list.channels_set_current(0);
+    ///         // ... Draw channel 0
     ///     });
     /// }
     /// ```

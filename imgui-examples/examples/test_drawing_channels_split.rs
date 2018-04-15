@@ -9,8 +9,11 @@ const WHITE: [f32; 4] = [1.0, 1.0, 1.0, 1.0];
 const RED: [f32; 4] = [1.0, 0.0, 0.0, 1.0];
 
 fn main() {
-    support::run("test_drawing_channels_split".to_owned(), CLEAR_COLOR, |ui| {
-        ui.with_window_draw_list(|draw_list| {
+    support::run(
+        "test_drawing_channels_split".to_owned(),
+        CLEAR_COLOR,
+        |ui| {
+            let draw_list = ui.get_window_draw_list();
             // Will draw channel 0 first, then channel 1, whatever the order of
             // the calls in the code.
             //
@@ -38,7 +41,7 @@ fn main() {
                     .num_segments(50)
                     .build();
             });
-        });
-        true
-    });
+            true
+        },
+    );
 }

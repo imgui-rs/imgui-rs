@@ -1274,19 +1274,14 @@ impl<'ui> Ui<'ui> {
     /// ```rust,no_run
     /// # use imgui::*;
     /// fn custom_draw(ui: &Ui) {
-    ///     ui.with_window_draw_list(|draw_list| {
-    ///         // Draw a line
-    ///         const WHITE: [f32; 3] = [1.0, 1.0, 1.0];
-    ///         draw_list.add_line([100.0, 100.0], [200.0, 200.0], WHITE).build();
-    ///         // Continue drawing ...
-    ///     });
+    ///     let draw_list = ui.get_window_draw_list();
+    ///     // Draw a line
+    ///     const WHITE: [f32; 3] = [1.0, 1.0, 1.0];
+    ///     draw_list.add_line([100.0, 100.0], [200.0, 200.0], WHITE).build();
+    ///     // Continue drawing ...
     /// }
     /// ```
-    pub fn with_window_draw_list<F>(&self, f: F)
-    where
-        F: FnOnce(&WindowDrawList),
-    {
-        let window_draw_list = WindowDrawList::new(self);
-        f(&window_draw_list);
+    pub fn get_window_draw_list(&'ui self) -> WindowDrawList<'ui> {
+        WindowDrawList::new(self)
     }
 }
