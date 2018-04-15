@@ -12,7 +12,7 @@ use std::marker::PhantomData;
 /// The type implements `From<ImU32>`, `From<ImVec4>`, `From<[f32; 4]>`,
 /// `From<[f32; 3]>`, `From<(f32, f32, f32, f32)>` and `From<(f32, f32, f32)>`
 /// for convenience. If alpha is not provided, it is assumed to be 1.0 (255).
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Eq, PartialEq, Debug)]
 pub struct ImColor(ImU32);
 
 impl From<ImColor> for ImU32 {
