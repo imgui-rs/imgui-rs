@@ -64,7 +64,7 @@ impl<'ui> DrawAPI for WindowDrawList<'ui> {
 }
 
 impl<'ui> WindowDrawList<'ui> {
-    pub fn new(_: &Ui<'ui>) -> Self {
+    pub(crate) fn new(_: &Ui<'ui>) -> Self {
         Self {
             draw_list: unsafe { sys::igGetWindowDrawList() },
             _phantom: PhantomData,
