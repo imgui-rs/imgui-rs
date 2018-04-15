@@ -48,7 +48,7 @@ impl From<(f32, f32, f32)> for ImColor {
 /// All types from which ImGui's custom draw API can be used implement this
 /// trait. This trait is internal to this library and implemented by
 /// `WindowDrawList` and `ChannelsSplit`.
-pub trait DrawAPI<'ui> {
+pub trait DrawAPI {
     /// Get draw_list object
     fn draw_list(&self) -> *mut ImDrawList;
 }
@@ -59,7 +59,7 @@ pub struct WindowDrawList<'ui> {
     _phantom: PhantomData<&'ui Ui<'ui>>,
 }
 
-impl<'ui> DrawAPI<'ui> for WindowDrawList<'ui> {
+impl<'ui> DrawAPI for WindowDrawList<'ui> {
     fn draw_list(&self) -> *mut ImDrawList { self.draw_list }
 }
 
@@ -101,7 +101,7 @@ impl<'ui> WindowDrawList<'ui> {
 /// Represent the drawing interface within a call to `channels_split`.
 pub struct ChannelsSplit<'ui>(&'ui WindowDrawList<'ui>);
 
-impl<'ui> DrawAPI<'ui> for ChannelsSplit<'ui> {
+impl<'ui> DrawAPI for ChannelsSplit<'ui> {
     fn draw_list(&self) -> *mut ImDrawList { self.0.draw_list }
 }
 
@@ -116,7 +116,7 @@ macro_rules! impl_draw_list_methods {
     ($T: ident) => {
         impl<'ui> $T<'ui>
         where
-            $T<'ui>: DrawAPI<'ui>,
+            $T<'ui>: DrawAPI,
         {
             /// Returns a line from point `p1` to `p2` with color `c`.
             pub fn add_line<P1, P2, C>(&self, p1: P1, p2: P2, c: C) -> Line<'ui, $T>
@@ -270,7 +270,7 @@ pub struct Line<'ui, D: 'ui> {
     draw_list: &'ui D,
 }
 
-impl<'ui, D: DrawAPI<'ui>> Line<'ui, D> {
+impl<'ui, D: DrawAPI> Line<'ui, D> {
     fn new<P1, P2, C>(draw_list: &'ui D, p1: P1, p2: P2, c: C) -> Self
     where
         P1: Into<ImVec2>,
@@ -318,7 +318,7 @@ pub struct Rect<'ui, D: 'ui> {
     draw_list: &'ui D,
 }
 
-impl<'ui, D: DrawAPI<'ui>> Rect<'ui, D> {
+impl<'ui, D: DrawAPI> Rect<'ui, D> {
     fn new<P1, P2, C>(draw_list: &'ui D, p1: P1, p2: P2, c: C) -> Self
     where
         P1: Into<ImVec2>,
@@ -420,7 +420,7 @@ pub struct Triangle<'ui, D: 'ui> {
     draw_list: &'ui D,
 }
 
-impl<'ui, D: DrawAPI<'ui>> Triangle<'ui, D> {
+impl<'ui, D: DrawAPI> Triangle<'ui, D> {
     fn new<P1, P2, P3, C>(draw_list: &'ui D, p1: P1, p2: P2, p3: P3, c: C) -> Self
     where
         P1: Into<ImVec2>,
@@ -489,7 +489,7 @@ pub struct Circle<'ui, D: 'ui> {
     draw_list: &'ui D,
 }
 
-impl<'ui, D: DrawAPI<'ui>> Circle<'ui, D> {
+impl<'ui, D: DrawAPI> Circle<'ui, D> {
     pub fn new<P, C>(draw_list: &'ui D, center: P, radius: f32, color: C) -> Self
     where
         P: Into<ImVec2>,
@@ -565,7 +565,7 @@ pub struct BezierCurve<'ui, D: 'ui> {
     draw_list: &'ui D,
 }
 
-impl<'ui, D: DrawAPI<'ui>> BezierCurve<'ui, D> {
+impl<'ui, D: DrawAPI> BezierCurve<'ui, D> {
     fn new<P1, P2, P3, P4, C>(draw_list: &'ui D, pos0: P1, cp0: P2, cp1: P3, pos1: P4, c: C) -> Self
     where
         P1: Into<ImVec2>,
