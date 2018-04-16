@@ -190,6 +190,11 @@ impl ImGui {
         io.mouse_pos.x = x;
         io.mouse_pos.y = y;
     }
+    /// Get mouse's position's delta between the current and the last frame.
+    pub fn mouse_delta(&self) -> (f32, f32) {
+        let io = self.io();
+        (io.mouse_delta.x, io.mouse_delta.y)
+    }
     pub fn set_mouse_down(&mut self, states: &[bool; 5]) {
         let io = self.io_mut();
         io.mouse_down = *states;
@@ -400,6 +405,14 @@ impl<'a> Ui<'a> {
 // Window
 impl<'ui> Ui<'ui> {
     pub fn window<'p>(&self, name: &'p ImStr) -> Window<'ui, 'p> { Window::new(self, name) }
+    /// Get current window's size in pixels
+    pub fn get_window_size(&self) -> (f32, f32) {
+        let mut out = ImVec2::new(0.0, 0.0);
+        unsafe {
+            sys::igGetWindowSize(&mut out as *mut ImVec2);
+        }
+        (out.x, out.y)
+    }
 }
 
 // Layout
@@ -452,6 +465,40 @@ impl<'ui> Ui<'ui> {
     }
 
     pub fn get_columns_count(&self) -> i32 { unsafe { sys::igGetColumnsCount() } }
+
+    /// Get cursor position on the screen, in screen coordinates.
+    /// This sets the point on which the next widget will be drawn.
+    ///
+    /// This is especially useful for drawing, as the drawing API uses
+    /// screen coordiantes.
+    pub fn get_cursor_screen_pos(&self) -> (f32, f32) {
+        let mut out = ImVec2::new(0.0, 0.0);
+        unsafe {
+            sys::igGetCursorScreenPos(&mut out);
+        }
+        (out.x, out.y)
+    }
+
+    /// Set cursor position on the screen, in screen coordinates.
+    /// This sets the point on which the next widget will be drawn.
+    pub fn set_cursor_screen_pos<P: Into<ImVec2>>(&self, pos: P) {
+        unsafe { sys::igSetCursorScreenPos(pos.into()) }
+    }
+
+    /// Get cursor position on the screen, in window coordinates.
+    pub fn get_cursor_pos(&self) -> (f32, f32) {
+        let mut out = ImVec2::new(0.0, 0.0);
+        unsafe {
+            sys::igGetCursorPos(&mut out);
+        }
+        (out.x, out.y)
+    }
+
+    /// Set cursor position on the screen, in window coordinates.
+    /// This sets the point on which the next widget will be drawn.
+    pub fn set_cursor_pos<P: Into<ImVec2>>(&self, pos: P) {
+        unsafe { sys::igSetCursorPos(pos.into()) }
+    }
 }
 
 // ID scopes
@@ -928,6 +975,19 @@ impl<'ui> Ui<'ui> {
 }
 
 impl<'ui> Ui<'ui> {
+    /// Get height of a line of previously drawn text item
+    pub fn get_text_line_height_with_spacing(&self) -> f32 {
+        unsafe { sys::igGetTextLineHeightWithSpacing() }
+    }
+    /// Get previously drawn item's size
+    pub fn get_item_rect_size(&self) -> (f32, f32) {
+        let mut out = ImVec2::new(0.0, 0.0);
+        unsafe { sys::igGetItemRectSize(&mut out); }
+        (out.x, out.y)
+    }
+}
+
+impl<'ui> Ui<'ui> {
     /// Creates a progress bar. Fraction is the progress level with 0.0 = 0% and 1.0 = 100%.
     ///
     /// # Example
@@ -1096,6 +1156,24 @@ impl<'ui> Ui<'ui> {
     }
 }
 
+impl<'ui> Ui<'ui> {
+    /// Runs a function after temporarily pushing an array of values to the
+    /// style and color stack.
+    pub fn with_style_and_color_vars<F, C>(
+        &self,
+        style_vars: &[StyleVar],
+        color_vars: &[(ImGuiCol, C)],
+        f: F,
+    ) where
+        F: FnOnce(),
+        C: Into<ImVec4> + Copy,
+    {
+        self.with_style_vars(style_vars, || {
+            self.with_color_vars(color_vars, f);
+        });
+    }
+}
+
 /// # Utilities
 impl<'ui> Ui<'ui> {
     /// Returns `true` if the last item is being hovered by the mouse.
@@ -1114,5 +1192,21 @@ impl<'ui> Ui<'ui> {
     /// ```
     pub fn is_item_hovered(&self) -> bool {
         unsafe { sys::igIsItemHovered(ImGuiHoveredFlags::empty()) }
+    }
+
+    /// Returns `true` if the last item is being active.
+    pub fn is_item_active(&self) -> bool {
+        unsafe {
+            sys::igIsItemActive()
+        }
+    }
+
+    /// Group items together as a single item.
+    ///
+    /// May be useful to handle the same mouse event on a group of items, for example.
+    pub fn group<F: FnOnce()>(&self, f: F) {
+        unsafe { sys::igBeginGroup(); }
+        f();
+        unsafe { sys::igEndGroup(); }
     }
 }
