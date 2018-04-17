@@ -1,6 +1,6 @@
 pub extern crate imgui_sys as sys;
 
-use std::ffi::CStr;
+use std::ffi::{CStr, NulError};
 use std::mem;
 use std::os::raw::{c_char, c_float, c_int, c_uchar};
 use std::ptr;
@@ -302,6 +302,68 @@ impl ImGui {
             CURRENT_UI = Some(Ui { imgui: mem::transmute(self as &'a ImGui) });
         }
         Ui { imgui: self }
+    }
+    pub fn set_font(
+        &mut self,
+        filename: &str,
+        size: f32,
+        range: GlyphRange,
+    ) -> Result<(), SetFontError> {
+        let io = self.io_mut();
+        let range = match range {
+            GlyphRange::Default => unsafe {
+                sys::ImFontAtlas_GetGlyphRangesDefault(io.fonts)
+            },
+            GlyphRange::Korean => unsafe {
+                sys::ImFontAtlas_GetGlyphRangesKorean(io.fonts)
+            },
+            GlyphRange::Chinese => unsafe {
+                sys::ImFontAtlas_GetGlyphRangesChinese(io.fonts)
+            },
+            GlyphRange::Japanese => unsafe {
+                sys::ImFontAtlas_GetGlyphRangesJapanese(io.fonts)
+            },
+            GlyphRange::Cyrillic => unsafe {
+                sys::ImFontAtlas_GetGlyphRangesCyrillic(io.fonts)
+            },
+            GlyphRange::Thai => unsafe {
+                sys::ImFontAtlas_GetGlyphRangesThai(io.fonts)
+            },
+        };
+        let filename = std::ffi::CString::new(filename)?;
+        if unsafe {
+            sys::ImFontAtlas_AddFontFromFileTTF(
+                io.fonts,
+                filename.as_ptr(),
+                size,
+                0 as *const sys::ImFontConfig,
+                range,
+            )
+        }.is_null() {
+            Err(SetFontError::Null)
+        } else {
+            Ok(())
+        }
+    }
+}
+
+pub enum GlyphRange {
+    Default,
+    Korean,
+    Chinese,
+    Japanese,
+    Cyrillic,
+    Thai,
+}
+
+pub enum SetFontError {
+    NulError(NulError),
+    Null,
+}
+
+impl std::convert::From<NulError> for SetFontError {
+    fn from(error: NulError) -> SetFontError {
+        SetFontError::NulError(error)
     }
 }
 
