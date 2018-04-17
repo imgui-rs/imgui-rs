@@ -1946,7 +1946,7 @@ extern "C" {
         uv_d: ImVec2,
         col: ImU32,
     );
-    pub fn ImDrawList_AddPolyLine(
+    pub fn ImDrawList_AddPolyline(
         list: *mut ImDrawList,
         points: *const ImVec2,
         num_points: c_int,
