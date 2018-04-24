@@ -20,10 +20,10 @@ fn main() {
             // Here, we draw a red line on channel 1 then a white circle on
             // channel 0. As a result, the red line will always appear on top of
             // the white circle.
-            draw_list.channels_split(2, |draw_list| {
+            draw_list.channels_split(2, |channels| {
                 const RADIUS: f32 = 100.0;
                 let canvas_pos = ui.get_cursor_screen_pos();
-                draw_list.channels_set_current(1);
+                channels.set_current(1);
                 draw_list
                     .add_line(
                         canvas_pos,
@@ -33,7 +33,7 @@ fn main() {
                     .thickness(5.0)
                     .build();
 
-                draw_list.channels_set_current(0);
+                channels.set_current(0);
                 let center = (canvas_pos.0 + RADIUS, canvas_pos.1 + RADIUS);
                 draw_list
                     .add_circle(center, RADIUS, WHITE)

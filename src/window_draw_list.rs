@@ -100,10 +100,10 @@ impl<'ui> WindowDrawList<'ui> {
     /// # use imgui::*;
     /// fn custom_drawing(ui: &Ui) {
     ///     let draw_list = ui.get_window_draw_list();
-    ///     draw_list.channels_split(2, |draw_list| {
-    ///         draw_list.channels_set_current(1);
+    ///     draw_list.channels_split(2, |channels| {
+    ///         channels.set_current(1);
     ///         // ... Draw channel 1
-    ///         draw_list.channels_set_current(0);
+    ///         channels.set_current(0);
     ///         // ... Draw channel 0
     ///     });
     /// }
@@ -134,7 +134,7 @@ impl<'ui> ChannelsSplit<'ui> {
     /// Change current channel.
     ///
     /// Panic if channel_index overflows the number of channels.
-    pub fn channels_set_current(&self, channel_index: u32) {
+    pub fn set_current(&self, channel_index: u32) {
         assert!(
             channel_index < self.channels_count,
             "Channel cannot be set! Provided channel index ({}) is higher than channel count ({}).",
