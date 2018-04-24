@@ -45,14 +45,6 @@ impl From<(f32, f32, f32)> for ImColor {
     fn from(v: (f32, f32, f32)) -> Self { [v.0, v.1, v.2, 1.0].into() }
 }
 
-/// All types from which ImGui's custom draw API can be used implement this
-/// trait. This trait is internal to this library and implemented by
-/// `WindowDrawList` and `ChannelsSplit`.
-pub trait DrawAPI {
-    /// Get draw_list object
-    fn draw_list(&self) -> *mut ImDrawList;
-}
-
 /// Object implementing the custom draw API.
 ///
 /// Called from [`Ui::get_window_draw_list`]. No more than one instance of this
@@ -61,10 +53,6 @@ pub trait DrawAPI {
 pub struct WindowDrawList<'ui> {
     draw_list: *mut ImDrawList,
     _phantom: PhantomData<&'ui Ui<'ui>>,
-}
-
-impl<'ui> DrawAPI for WindowDrawList<'ui> {
-    fn draw_list(&self) -> *mut ImDrawList { self.draw_list }
 }
 
 static mut WINDOW_DRAW_LIST_LOADED: bool = false;
@@ -126,10 +114,6 @@ pub struct ChannelsSplit<'ui> {
     channels_count: u32,
 }
 
-impl<'ui> DrawAPI for ChannelsSplit<'ui> {
-    fn draw_list(&self) -> *mut ImDrawList { self.draw_list.draw_list }
-}
-
 impl<'ui> ChannelsSplit<'ui> {
     /// Change current channel.
     ///
@@ -141,170 +125,153 @@ impl<'ui> ChannelsSplit<'ui> {
             channel_index,
             self.channels_count
         );
-        unsafe { sys::ImDrawList_ChannelsSetCurrent(self.draw_list(), channel_index as i32) };
+        unsafe {
+            sys::ImDrawList_ChannelsSetCurrent(self.draw_list.draw_list, channel_index as i32)
+        };
     }
 }
 
-macro_rules! impl_draw_list_methods {
-    ($T: ident) => {
-        impl<'ui> $T<'ui>
-        where
-            $T<'ui>: DrawAPI,
-        {
-            /// Returns a line from point `p1` to `p2` with color `c`.
-            pub fn add_line<P1, P2, C>(&self, p1: P1, p2: P2, c: C) -> Line<'ui, $T>
-            where
-                P1: Into<ImVec2>,
-                P2: Into<ImVec2>,
-                C: Into<ImColor>,
-            {
-                Line::new(self, p1, p2, c)
-            }
+/// Drawing functions
+impl<'ui> WindowDrawList<'ui> {
+    /// Returns a line from point `p1` to `p2` with color `c`.
+    pub fn add_line<P1, P2, C>(&'ui self, p1: P1, p2: P2, c: C) -> Line<'ui>
+    where
+        P1: Into<ImVec2>,
+        P2: Into<ImVec2>,
+        C: Into<ImColor>,
+    {
+        Line::new(self, p1, p2, c)
+    }
 
-            /// Returns a rectangle whose upper-left corner is at point `p1`
-            /// and lower-right corner is at point `p2`, with color `c`.
-            pub fn add_rect<P1, P2, C>(&self, p1: P1, p2: P2, c: C) -> Rect<'ui, $T>
-            where
-                P1: Into<ImVec2>,
-                P2: Into<ImVec2>,
-                C: Into<ImColor>,
-            {
-                Rect::new(self, p1, p2, c)
-            }
+    /// Returns a rectangle whose upper-left corner is at point `p1`
+    /// and lower-right corner is at point `p2`, with color `c`.
+    pub fn add_rect<P1, P2, C>(&'ui self, p1: P1, p2: P2, c: C) -> Rect<'ui>
+    where
+        P1: Into<ImVec2>,
+        P2: Into<ImVec2>,
+        C: Into<ImColor>,
+    {
+        Rect::new(self, p1, p2, c)
+    }
 
-            /// Draw a rectangle whose upper-left corner is at point `p1`
-            /// and lower-right corner is at point `p2`.
-            /// The remains parameters are the respective color of the corners
-            /// in the counter-clockwise starting from the upper-left corner
-            /// first.
-            pub fn add_rect_filled_multicolor<P1, P2, C1, C2, C3, C4>(
-                &self,
-                p1: P1,
-                p2: P2,
-                col_upr_left: C1,
-                col_upr_right: C2,
-                col_bot_right: C3,
-                col_bot_left: C4,
-            ) where
-                P1: Into<ImVec2>,
-                P2: Into<ImVec2>,
-                C1: Into<ImColor>,
-                C2: Into<ImColor>,
-                C3: Into<ImColor>,
-                C4: Into<ImColor>,
-            {
-                unsafe {
-                    sys::ImDrawList_AddRectFilledMultiColor(
-                        self.draw_list(),
-                        p1.into(),
-                        p2.into(),
-                        col_upr_left.into().into(),
-                        col_upr_right.into().into(),
-                        col_bot_right.into().into(),
-                        col_bot_left.into().into(),
-                    );
-                }
-            }
-
-            /// Returns a triangle with the given 3 vertices `p1`, `p2` and `p3`
-            /// and color `c`.
-            pub fn add_triangle<P1, P2, P3, C>(
-                &self,
-                p1: P1,
-                p2: P2,
-                p3: P3,
-                c: C,
-            ) -> Triangle<'ui, $T>
-            where
-                P1: Into<ImVec2>,
-                P2: Into<ImVec2>,
-                P3: Into<ImVec2>,
-                C: Into<ImColor>,
-            {
-                Triangle::new(self, p1, p2, p3, c)
-            }
-
-            /// Returns a circle with the given `center`, `radius` and `color`.
-            pub fn add_circle<P, C>(&self, center: P, radius: f32, color: C) -> Circle<'ui, $T>
-            where
-                P: Into<ImVec2>,
-                C: Into<ImColor>,
-            {
-                Circle::new(self, center, radius, color)
-            }
-
-            /// Returns a Bezier curve stretching from `pos0` to `pos1`, whose
-            /// curvature is defined by `cp0` and `cp1`.
-            pub fn add_bezier_curve<P1, P2, P3, P4, C>(
-                &self,
-                pos0: P1,
-                cp0: P2,
-                cp1: P3,
-                pos1: P4,
-                color: C,
-            ) -> BezierCurve<'ui, $T>
-            where
-                P1: Into<ImVec2>,
-                P2: Into<ImVec2>,
-                P3: Into<ImVec2>,
-                P4: Into<ImVec2>,
-                C: Into<ImColor>,
-            {
-                BezierCurve::new(self, pos0, cp0, cp1, pos1, color)
-            }
-
-            /// Push a clipping rectangle on the stack, run `f` and pop it.
-            ///
-            /// Clip all drawings done within the closure `f` in the given
-            /// rectangle.
-            pub fn with_clip_rect<P1, P2, F>(&self, min: P1, max: P2, f: F)
-            where
-                P1: Into<ImVec2>,
-                P2: Into<ImVec2>,
-                F: FnOnce(),
-            {
-                unsafe {
-                    sys::ImDrawList_PushClipRect(self.draw_list(), min.into(), max.into(), false)
-                }
-                f();
-                unsafe { sys::ImDrawList_PopClipRect(self.draw_list()) }
-            }
-
-            /// Push a clipping rectangle on the stack, run `f` and pop it.
-            ///
-            /// Clip all drawings done within the closure `f` in the given
-            /// rectangle. Intersect with all clipping rectangle previously on
-            /// the stack.
-            pub fn with_clip_rect_intersect<P1, P2, F>(&self, min: P1, max: P2, f: F)
-            where
-                P1: Into<ImVec2>,
-                P2: Into<ImVec2>,
-                F: FnOnce(),
-            {
-                unsafe {
-                    sys::ImDrawList_PushClipRect(self.draw_list(), min.into(), max.into(), true)
-                }
-                f();
-                unsafe { sys::ImDrawList_PopClipRect(self.draw_list()) }
-            }
+    /// Draw a rectangle whose upper-left corner is at point `p1`
+    /// and lower-right corner is at point `p2`.
+    /// The remains parameters are the respective color of the corners
+    /// in the counter-clockwise starting from the upper-left corner
+    /// first.
+    pub fn add_rect_filled_multicolor<P1, P2, C1, C2, C3, C4>(
+        &self,
+        p1: P1,
+        p2: P2,
+        col_upr_left: C1,
+        col_upr_right: C2,
+        col_bot_right: C3,
+        col_bot_left: C4,
+    ) where
+        P1: Into<ImVec2>,
+        P2: Into<ImVec2>,
+        C1: Into<ImColor>,
+        C2: Into<ImColor>,
+        C3: Into<ImColor>,
+        C4: Into<ImColor>,
+    {
+        unsafe {
+            sys::ImDrawList_AddRectFilledMultiColor(
+                self.draw_list,
+                p1.into(),
+                p2.into(),
+                col_upr_left.into().into(),
+                col_upr_right.into().into(),
+                col_bot_right.into().into(),
+                col_bot_left.into().into(),
+            );
         }
-    };
+    }
+
+    /// Returns a triangle with the given 3 vertices `p1`, `p2` and `p3`
+    /// and color `c`.
+    pub fn add_triangle<P1, P2, P3, C>(&'ui self, p1: P1, p2: P2, p3: P3, c: C) -> Triangle<'ui>
+    where
+        P1: Into<ImVec2>,
+        P2: Into<ImVec2>,
+        P3: Into<ImVec2>,
+        C: Into<ImColor>,
+    {
+        Triangle::new(self, p1, p2, p3, c)
+    }
+
+    /// Returns a circle with the given `center`, `radius` and `color`.
+    pub fn add_circle<P, C>(&'ui self, center: P, radius: f32, color: C) -> Circle<'ui>
+    where
+        P: Into<ImVec2>,
+        C: Into<ImColor>,
+    {
+        Circle::new(self, center, radius, color)
+    }
+
+    /// Returns a Bezier curve stretching from `pos0` to `pos1`, whose
+    /// curvature is defined by `cp0` and `cp1`.
+    pub fn add_bezier_curve<P1, P2, P3, P4, C>(
+        &'ui self,
+        pos0: P1,
+        cp0: P2,
+        cp1: P3,
+        pos1: P4,
+        color: C,
+    ) -> BezierCurve<'ui>
+    where
+        P1: Into<ImVec2>,
+        P2: Into<ImVec2>,
+        P3: Into<ImVec2>,
+        P4: Into<ImVec2>,
+        C: Into<ImColor>,
+    {
+        BezierCurve::new(self, pos0, cp0, cp1, pos1, color)
+    }
+
+    /// Push a clipping rectangle on the stack, run `f` and pop it.
+    ///
+    /// Clip all drawings done within the closure `f` in the given
+    /// rectangle.
+    pub fn with_clip_rect<P1, P2, F>(&self, min: P1, max: P2, f: F)
+    where
+        P1: Into<ImVec2>,
+        P2: Into<ImVec2>,
+        F: FnOnce(),
+    {
+        unsafe { sys::ImDrawList_PushClipRect(self.draw_list, min.into(), max.into(), false) }
+        f();
+        unsafe { sys::ImDrawList_PopClipRect(self.draw_list) }
+    }
+
+    /// Push a clipping rectangle on the stack, run `f` and pop it.
+    ///
+    /// Clip all drawings done within the closure `f` in the given
+    /// rectangle. Intersect with all clipping rectangle previously on
+    /// the stack.
+    pub fn with_clip_rect_intersect<P1, P2, F>(&self, min: P1, max: P2, f: F)
+    where
+        P1: Into<ImVec2>,
+        P2: Into<ImVec2>,
+        F: FnOnce(),
+    {
+        unsafe { sys::ImDrawList_PushClipRect(self.draw_list, min.into(), max.into(), true) }
+        f();
+        unsafe { sys::ImDrawList_PopClipRect(self.draw_list) }
+    }
 }
 
-impl_draw_list_methods!(WindowDrawList);
-impl_draw_list_methods!(ChannelsSplit);
-
 /// Represents a line about to be drawn
-pub struct Line<'ui, D: 'ui> {
+pub struct Line<'ui> {
     p1: ImVec2,
     p2: ImVec2,
     color: ImColor,
     thickness: f32,
-    draw_list: &'ui D,
+    draw_list: &'ui WindowDrawList<'ui>,
 }
 
-impl<'ui, D: DrawAPI> Line<'ui, D> {
-    fn new<P1, P2, C>(draw_list: &'ui D, p1: P1, p2: P2, c: C) -> Self
+impl<'ui> Line<'ui> {
+    fn new<P1, P2, C>(draw_list: &'ui WindowDrawList, p1: P1, p2: P2, c: C) -> Self
     where
         P1: Into<ImVec2>,
         P2: Into<ImVec2>,
@@ -329,7 +296,7 @@ impl<'ui, D: DrawAPI> Line<'ui, D> {
     pub fn build(self) {
         unsafe {
             sys::ImDrawList_AddLine(
-                self.draw_list.draw_list(),
+                self.draw_list.draw_list,
                 self.p1,
                 self.p2,
                 self.color.into(),
@@ -340,7 +307,7 @@ impl<'ui, D: DrawAPI> Line<'ui, D> {
 }
 
 /// Represents a rectangle about to be drawn
-pub struct Rect<'ui, D: 'ui> {
+pub struct Rect<'ui> {
     p1: ImVec2,
     p2: ImVec2,
     color: ImColor,
@@ -348,11 +315,11 @@ pub struct Rect<'ui, D: 'ui> {
     flags: ImDrawCornerFlags,
     thickness: f32,
     filled: bool,
-    draw_list: &'ui D,
+    draw_list: &'ui WindowDrawList<'ui>,
 }
 
-impl<'ui, D: DrawAPI> Rect<'ui, D> {
-    fn new<P1, P2, C>(draw_list: &'ui D, p1: P1, p2: P2, c: C) -> Self
+impl<'ui> Rect<'ui> {
+    fn new<P1, P2, C>(draw_list: &'ui WindowDrawList, p1: P1, p2: P2, c: C) -> Self
     where
         P1: Into<ImVec2>,
         P2: Into<ImVec2>,
@@ -418,7 +385,7 @@ impl<'ui, D: DrawAPI> Rect<'ui, D> {
         if self.filled {
             unsafe {
                 sys::ImDrawList_AddRectFilled(
-                    self.draw_list.draw_list(),
+                    self.draw_list.draw_list,
                     self.p1,
                     self.p2,
                     self.color.into(),
@@ -429,7 +396,7 @@ impl<'ui, D: DrawAPI> Rect<'ui, D> {
         } else {
             unsafe {
                 sys::ImDrawList_AddRect(
-                    self.draw_list.draw_list(),
+                    self.draw_list.draw_list,
                     self.p1,
                     self.p2,
                     self.color.into(),
@@ -443,18 +410,18 @@ impl<'ui, D: DrawAPI> Rect<'ui, D> {
 }
 
 /// Represents a triangle about to be drawn on the window
-pub struct Triangle<'ui, D: 'ui> {
+pub struct Triangle<'ui> {
     p1: ImVec2,
     p2: ImVec2,
     p3: ImVec2,
     color: ImColor,
     thickness: f32,
     filled: bool,
-    draw_list: &'ui D,
+    draw_list: &'ui WindowDrawList<'ui>,
 }
 
-impl<'ui, D: DrawAPI> Triangle<'ui, D> {
-    fn new<P1, P2, P3, C>(draw_list: &'ui D, p1: P1, p2: P2, p3: P3, c: C) -> Self
+impl<'ui> Triangle<'ui> {
+    fn new<P1, P2, P3, C>(draw_list: &'ui WindowDrawList, p1: P1, p2: P2, p3: P3, c: C) -> Self
     where
         P1: Into<ImVec2>,
         P2: Into<ImVec2>,
@@ -489,7 +456,7 @@ impl<'ui, D: DrawAPI> Triangle<'ui, D> {
         if self.filled {
             unsafe {
                 sys::ImDrawList_AddTriangleFilled(
-                    self.draw_list.draw_list(),
+                    self.draw_list.draw_list,
                     self.p1,
                     self.p2,
                     self.p3,
@@ -499,7 +466,7 @@ impl<'ui, D: DrawAPI> Triangle<'ui, D> {
         } else {
             unsafe {
                 sys::ImDrawList_AddTriangle(
-                    self.draw_list.draw_list(),
+                    self.draw_list.draw_list,
                     self.p1,
                     self.p2,
                     self.p3,
@@ -512,18 +479,18 @@ impl<'ui, D: DrawAPI> Triangle<'ui, D> {
 }
 
 /// Represents a circle about to be drawn
-pub struct Circle<'ui, D: 'ui> {
+pub struct Circle<'ui> {
     center: ImVec2,
     radius: f32,
     color: ImColor,
     num_segments: u32,
     thickness: f32,
     filled: bool,
-    draw_list: &'ui D,
+    draw_list: &'ui WindowDrawList<'ui>,
 }
 
-impl<'ui, D: DrawAPI> Circle<'ui, D> {
-    pub fn new<P, C>(draw_list: &'ui D, center: P, radius: f32, color: C) -> Self
+impl<'ui> Circle<'ui> {
+    pub fn new<P, C>(draw_list: &'ui WindowDrawList, center: P, radius: f32, color: C) -> Self
     where
         P: Into<ImVec2>,
         C: Into<ImColor>,
@@ -563,7 +530,7 @@ impl<'ui, D: DrawAPI> Circle<'ui, D> {
         if self.filled {
             unsafe {
                 sys::ImDrawList_AddCircleFilled(
-                    self.draw_list.draw_list(),
+                    self.draw_list.draw_list,
                     self.center,
                     self.radius,
                     self.color.into(),
@@ -573,7 +540,7 @@ impl<'ui, D: DrawAPI> Circle<'ui, D> {
         } else {
             unsafe {
                 sys::ImDrawList_AddCircle(
-                    self.draw_list.draw_list(),
+                    self.draw_list.draw_list,
                     self.center,
                     self.radius,
                     self.color.into(),
@@ -586,7 +553,7 @@ impl<'ui, D: DrawAPI> Circle<'ui, D> {
 }
 
 /// Represents a Bezier curve about to be drawn
-pub struct BezierCurve<'ui, D: 'ui> {
+pub struct BezierCurve<'ui> {
     pos0: ImVec2,
     cp0: ImVec2,
     pos1: ImVec2,
@@ -595,11 +562,18 @@ pub struct BezierCurve<'ui, D: 'ui> {
     thickness: f32,
     /// If num_segments is not set, the bezier curve is auto-tessalated.
     num_segments: Option<u32>,
-    draw_list: &'ui D,
+    draw_list: &'ui WindowDrawList<'ui>,
 }
 
-impl<'ui, D: DrawAPI> BezierCurve<'ui, D> {
-    fn new<P1, P2, P3, P4, C>(draw_list: &'ui D, pos0: P1, cp0: P2, cp1: P3, pos1: P4, c: C) -> Self
+impl<'ui> BezierCurve<'ui> {
+    fn new<P1, P2, P3, P4, C>(
+        draw_list: &'ui WindowDrawList,
+        pos0: P1,
+        cp0: P2,
+        cp1: P3,
+        pos1: P4,
+        c: C,
+    ) -> Self
     where
         P1: Into<ImVec2>,
         P2: Into<ImVec2>,
@@ -636,7 +610,7 @@ impl<'ui, D: DrawAPI> BezierCurve<'ui, D> {
     pub fn build(self) {
         unsafe {
             sys::ImDrawList_AddBezierCurve(
-                self.draw_list.draw_list(),
+                self.draw_list.draw_list,
                 self.pos0,
                 self.cp0,
                 self.cp1,
