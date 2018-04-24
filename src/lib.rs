@@ -14,6 +14,8 @@ pub use sys::{ImDrawIdx, ImDrawVert, ImGuiColorEditFlags, ImGuiHoveredFlags, ImG
 pub use child_frame::ChildFrame;
 pub use color_editors::{ColorButton, ColorEdit, ColorEditMode, ColorFormat, ColorPicker,
                         ColorPickerMode, ColorPreview, EditableColor};
+pub use drag::{DragFloat, DragFloat2, DragFloat3, DragFloat4, DragInt, DragInt2, DragInt3,
+               DragInt4, DragFloatRange2, DragIntRange2};
 pub use fonts::{FontGlyphRange, ImFontAtlas, ImFont, ImFontConfig};
 pub use input::{InputFloat, InputFloat2, InputFloat3, InputFloat4, InputInt, InputInt2, InputInt3,
                 InputInt4, InputText};
@@ -30,6 +32,7 @@ pub use window::Window;
 
 mod child_frame;
 mod color_editors;
+mod drag;
 mod fonts;
 mod input;
 mod menus;
@@ -618,6 +621,62 @@ impl<'ui> Ui<'ui> {
     }
     pub fn input_int4<'p>(&self, label: &'p ImStr, value: &'p mut [i32; 4]) -> InputInt4<'ui, 'p> {
         InputInt4::new(self, label, value)
+    }
+}
+
+// Widgets: Drag
+impl<'ui> Ui<'ui> {
+    pub fn drag_float<'p>(&self, label: &'p ImStr, value: &'p mut f32) -> DragFloat<'ui, 'p> {
+        DragFloat::new(self, label, value)
+    }
+    pub fn drag_float2<'p>(
+        &self,
+        label: &'p ImStr,
+        value: &'p mut [f32; 2],
+    ) -> DragFloat2<'ui, 'p> {
+        DragFloat2::new(self, label, value)
+    }
+    pub fn drag_float3<'p>(
+        &self,
+        label: &'p ImStr,
+        value: &'p mut [f32; 3],
+    ) -> DragFloat3<'ui, 'p> {
+        DragFloat3::new(self, label, value)
+    }
+    pub fn drag_float4<'p>(
+        &self,
+        label: &'p ImStr,
+        value: &'p mut [f32; 4],
+    ) -> DragFloat4<'ui, 'p> {
+        DragFloat4::new(self, label, value)
+    }
+    pub fn drag_float_range2<'p>(
+        &self,
+        label: &'p ImStr,
+        current_min: &'p mut f32,
+        current_max: &'p mut f32,
+    ) -> DragFloatRange2<'ui, 'p> {
+        DragFloatRange2::new(self, label, current_min, current_max)
+    }
+    pub fn drag_int<'p>(&self, label: &'p ImStr, value: &'p mut i32) -> DragInt<'ui, 'p> {
+        DragInt::new(self, label, value)
+    }
+    pub fn drag_int2<'p>(&self, label: &'p ImStr, value: &'p mut [i32; 2]) -> DragInt2<'ui, 'p> {
+        DragInt2::new(self, label, value)
+    }
+    pub fn drag_int3<'p>(&self, label: &'p ImStr, value: &'p mut [i32; 3]) -> DragInt3<'ui, 'p> {
+        DragInt3::new(self, label, value)
+    }
+    pub fn drag_int4<'p>(&self, label: &'p ImStr, value: &'p mut [i32; 4]) -> DragInt4<'ui, 'p> {
+        DragInt4::new(self, label, value)
+    }
+    pub fn drag_int_range2<'p>(
+        &self,
+        label: &'p ImStr,
+        current_min: &'p mut i32,
+        current_max: &'p mut i32,
+    ) -> DragIntRange2<'ui, 'p> {
+        DragIntRange2::new(self, label, current_min, current_max)
     }
 }
 

@@ -424,9 +424,15 @@ fn show_test_window(ui: &Ui, state: &mut State, opened: &mut bool) {
                 ui.input_text(im_str!("input text"), &mut state.text)
                     .build();
                 ui.input_int(im_str!("input int"), &mut state.i0).build();
+                ui.drag_int(im_str!("drag int"), &mut state.i0).build();
                 ui.input_float(im_str!("input float"), &mut state.f0)
                     .step(0.01)
                     .step_fast(1.0)
+                    .build();
+                ui.drag_float(im_str!("drag float"), &mut state.f0)
+                    .speed(0.001)
+                    .min(-1.0)
+                    .max(1.0)
                     .build();
                 ui.input_float3(im_str!("input float3"), &mut state.vec3f)
                     .build();
