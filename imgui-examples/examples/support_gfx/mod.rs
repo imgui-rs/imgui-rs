@@ -17,7 +17,6 @@ pub fn run<F: FnMut(&Ui) -> bool>(title: String, clear_color: [f32; 4], mut run_
     type ColorFormat = gfx::format::Rgba8;
     type DepthFormat = gfx::format::DepthStencil;
 
-
     let mut events_loop = glutin::EventsLoop::new();
     let context = glutin::ContextBuilder::new().with_vsync(true);
     let window = glutin::WindowBuilder::new()
@@ -58,7 +57,7 @@ pub fn run<F: FnMut(&Ui) -> bool>(title: String, clear_color: [f32; 4], mut run_
     let mut mouse_state = MouseState::default();
     let mut quit = false;
 
-    loop {
+    'running: loop {
         events_loop.poll_events(|event| {
             use glutin::WindowEvent::*;
             use glutin::ElementState::Pressed;
@@ -128,6 +127,9 @@ pub fn run<F: FnMut(&Ui) -> bool>(title: String, clear_color: [f32; 4], mut run_
                 }
             }
         });
+        if quit {
+            break 'running;
+        }
 
         let now = Instant::now();
         let delta = now - last_frame;
@@ -174,10 +176,6 @@ pub fn run<F: FnMut(&Ui) -> bool>(title: String, clear_color: [f32; 4], mut run_
         encoder.flush(&mut device);
         window.context().swap_buffers().unwrap();
         device.cleanup();
-
-        if quit {
-            break;
-        }
     }
 }
 

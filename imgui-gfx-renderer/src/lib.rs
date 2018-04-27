@@ -2,8 +2,10 @@
 extern crate gfx;
 extern crate imgui;
 
-use gfx::{Bind, Bundle, CommandBuffer, Encoder, Factory, IntoIndexBuffer, Rect, Resources, Slice};
+use gfx::{Bundle, CommandBuffer, Encoder, Factory, IntoIndexBuffer, Rect, Resources, Slice};
+use gfx::memory::Bind;
 use gfx::handle::{Buffer, RenderTargetView};
+use gfx::texture::{FilterMethod, SamplerInfo, WrapMode};
 use gfx::traits::FactoryExt;
 use imgui::{DrawList, ImDrawIdx, ImDrawVert, ImGui, Ui};
 
@@ -38,7 +40,11 @@ gfx_defines!{
         vertex_buffer: gfx::VertexBuffer<ImDrawVert> = (),
         matrix: gfx::Global<[[f32; 4]; 4]> = "matrix",
         tex: gfx::TextureSampler<[f32; 4]> = "tex",
-        out: gfx::BlendTarget<gfx::format::Rgba8> = ("Target0", gfx::state::MASK_ALL, gfx::preset::blend::ALPHA),
+        out: gfx::BlendTarget<gfx::format::Rgba8> = (
+            "Target0",
+            gfx::state::ColorMask::all(),
+            gfx::preset::blend::ALPHA,
+        ),
         scissor: gfx::Scissor = (),
     }
 }
@@ -117,11 +123,13 @@ impl<R: Resources> Renderer<R> {
                     handle.height as u16,
                     gfx::texture::AaMode::Single,
                 ),
+                gfx::texture::Mipmap::Provided,
                 &[handle.pixels],
             )
         })?;
         // TODO: set texture id in imgui
-        let sampler = factory.create_sampler_linear();
+        let sampler =
+            factory.create_sampler(SamplerInfo::new(FilterMethod::Scale, WrapMode::Clamp));
         let data = pipe::Data {
             vertex_buffer: vertex_buffer,
             matrix: [
@@ -183,29 +191,22 @@ impl<R: Resources> Renderer<R> {
         encoder: &mut Encoder<R, C>,
         draw_list: &DrawList<'a>,
     ) -> RendererResult<()> {
+        let (width, height) = ui.imgui().display_size();
         let (scale_width, scale_height) = ui.imgui().display_framebuffer_scale();
+
+        self.upload_vertex_buffer(factory, encoder, draw_list.vtx_buffer)?;
+        self.upload_index_buffer(factory, encoder, draw_list.idx_buffer)?;
 
         self.bundle.slice.start = 0;
         for cmd in draw_list.cmd_buffer {
             // TODO: check cmd.texture_id
 
-            self.upload_vertex_buffer(
-                factory,
-                encoder,
-                draw_list.vtx_buffer,
-            )?;
-            self.upload_index_buffer(
-                factory,
-                encoder,
-                draw_list.idx_buffer,
-            )?;
-
             self.bundle.slice.end = self.bundle.slice.start + cmd.elem_count;
             self.bundle.data.scissor = Rect {
-                x: (cmd.clip_rect.x * scale_width) as u16,
-                y: (cmd.clip_rect.y * scale_height) as u16,
-                w: ((cmd.clip_rect.z - cmd.clip_rect.x).abs() * scale_width) as u16,
-                h: ((cmd.clip_rect.w - cmd.clip_rect.y).abs() * scale_height) as u16,
+                x: (cmd.clip_rect.x.max(0.0) * scale_width) as u16,
+                y: (cmd.clip_rect.y.max(0.0) * scale_height) as u16,
+                w: ((cmd.clip_rect.z - cmd.clip_rect.x).abs().min(width) * scale_width) as u16,
+                h: ((cmd.clip_rect.w - cmd.clip_rect.y).abs().min(height) * scale_height) as u16,
             };
             self.bundle.encode(encoder);
             self.bundle.slice.start = self.bundle.slice.end;
