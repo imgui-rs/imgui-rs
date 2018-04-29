@@ -1002,6 +1002,7 @@ extern "C" {
     pub fn igAlignTextToFramePadding();
     pub fn igGetTextLineHeight() -> c_float;
     pub fn igGetTextLineHeightWithSpacing() -> c_float;
+    pub fn igGetFrameHeight() -> c_float;
     pub fn igGetFrameHeightWithSpacing() -> c_float;
 }
 
