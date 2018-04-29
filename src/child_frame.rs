@@ -7,6 +7,7 @@ use super::{ImStr, ImVec2, ImGuiWindowFlags, Ui};
 pub struct ChildFrame<'ui, 'p> {
     name: &'p ImStr,
     size: ImVec2,
+    border: bool,
     flags: ImGuiWindowFlags,
     _phantom: PhantomData<&'ui Ui<'ui>>,
 }
@@ -16,6 +17,7 @@ impl<'ui, 'p> ChildFrame<'ui, 'p> {
         ChildFrame {
             name: name,
             size: size.into(),
+            border: false,
             flags: ImGuiWindowFlags::empty(),
             _phantom: PhantomData,
         }
@@ -47,7 +49,7 @@ impl<'ui, 'p> ChildFrame<'ui, 'p> {
     }
     #[inline]
     pub fn show_borders(mut self, value: bool) -> Self {
-        self.flags.set(ImGuiWindowFlags::ShowBorders, value);
+        self.border = value;
         self
     }
     #[inline]
@@ -103,12 +105,8 @@ impl<'ui, 'p> ChildFrame<'ui, 'p> {
         self
     }
     pub fn build<F: FnOnce()>(self, f: F) {
-        // See issue for history.
-        // https://github.com/Gekkio/imgui-rs/pull/58
-        let show_border = false;
-
         let render_child_frame =
-            unsafe { sys::igBeginChild(self.name.as_ptr(), self.size, show_border, self.flags) };
+            unsafe { sys::igBeginChild(self.name.as_ptr(), self.size, self.border, self.flags) };
         if render_child_frame {
             f();
         }

@@ -244,7 +244,6 @@ bitflags!(
         const NoScrollWithMouse         = 1 << 4;
         const NoCollapse                = 1 << 5;
         const AlwaysAutoResize          = 1 << 6;
-        const ShowBorders               = 1 << 7;
         const NoSavedSettings           = 1 << 8;
         const NoInputs                  = 1 << 9;
         const MenuBar                   = 1 << 10;

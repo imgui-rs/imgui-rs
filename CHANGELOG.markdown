@@ -19,6 +19,9 @@
   and `sys::ImDrawList_AddConvexPolyFilled`.
   - Rename `ImGuiStyleVar::ChildWindowRounding` to `ImGuiStyleVar::ChildRounding`.
   - Rename `StyleVar::ChildWindowRounding` to `StyleVar::ChildRounding`.
+  - Remove `ImGuiWindowFlags::ShowBorders` window flag. Borders are now fully
+  set up in the ImGuiStyle structure.
+  - Obsolete `Window::show_borders`. Use `StyleVar` instead.
 
   - Style: Add `PopupRounding`, `FrameBorderSize`, `WindowBorderSize`, `PopupBorderSize`.
 

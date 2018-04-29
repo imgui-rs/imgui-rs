@@ -23,7 +23,6 @@ struct State {
     show_app_metrics: bool,
     show_app_about: bool,
     no_titlebar: bool,
-    no_border: bool,
     no_resize: bool,
     no_move: bool,
     no_scrollbar: bool,
@@ -72,7 +71,6 @@ impl Default for State {
             show_app_metrics: false,
             show_app_about: false,
             no_titlebar: false,
-            no_border: true,
             no_resize: false,
             no_move: false,
             no_scrollbar: false,
@@ -269,7 +267,6 @@ fn show_test_window(ui: &Ui, state: &mut State, opened: &mut bool) {
 
     ui.window(im_str!("ImGui Demo"))
         .title_bar(!state.no_titlebar)
-        .show_borders(!state.no_border)
         .resizable(!state.no_resize)
         .movable(!state.no_move)
         .scroll_bar(!state.no_scrollbar)
@@ -344,15 +341,14 @@ fn show_test_window(ui: &Ui, state: &mut State, opened: &mut bool) {
             if ui.collapsing_header(im_str!("Window options")).build() {
                 ui.checkbox(im_str!("No titlebar"), &mut state.no_titlebar);
                 ui.same_line(150.0);
-                ui.checkbox(im_str!("No border"), &mut state.no_border);
-                ui.same_line(300.0);
-                ui.checkbox(im_str!("No resize"), &mut state.no_resize);
-                ui.checkbox(im_str!("No move"), &mut state.no_move);
-                ui.same_line(150.0);
                 ui.checkbox(im_str!("No scrollbar"), &mut state.no_scrollbar);
                 ui.same_line(300.0);
-                ui.checkbox(im_str!("No collapse"), &mut state.no_collapse);
                 ui.checkbox(im_str!("No menu"), &mut state.no_menu);
+                ui.checkbox(im_str!("No move"), &mut state.no_move);
+                ui.same_line(150.0);
+                ui.checkbox(im_str!("No resize"), &mut state.no_resize);
+                ui.same_line(300.0);
+                ui.checkbox(im_str!("No collapse"), &mut state.no_collapse);
 
                 ui.tree_node(im_str!("Style")).build(|| {
                     ui.show_default_style_editor()
