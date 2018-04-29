@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+- Upgrade to imgui/cimgui 1.53.1
+
+
 ## [0.0.18] - 2017-12-23
 
 ### Added
