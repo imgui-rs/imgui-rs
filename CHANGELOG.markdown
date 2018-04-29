@@ -12,6 +12,8 @@
   `sys::igIsWindowFocused(ImGuiFocusedFlags::RootAndChildWindows)`.
   - Obsolete `sys::igIsRootWindowOrAnyChildHovered()` in favor of using
   `sys::igIsWindowHovered(ImGuiHoveredFlags::RootAndChildWindows)`.
+  - Obsolete `sys::SetNextWindowContentWidth()` in favor of using
+  `sys::igSetNextWindowContentSize()`.
 
 
 ## [0.0.18] - 2017-12-23

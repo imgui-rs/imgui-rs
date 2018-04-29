@@ -930,7 +930,6 @@ extern "C" {
         custom_callback_data: *mut c_void,
     );
     pub fn igSetNextWindowContentSize(size: ImVec2);
-    pub fn igSetNextWindowContentWidth(width: c_float);
     pub fn igSetNextWindowCollapsed(collapsed: bool, cond: ImGuiCond);
     pub fn igSetNextWindowFocus();
     pub fn igSetWindowPos(pos: ImVec2, cond: ImGuiCond);
@@ -962,6 +961,15 @@ pub unsafe fn igSetNextWindowPosCenter(cond: ImGuiCond) {
     let pos = ImVec2::new((*io).display_size.x * 0.5, (*io).display_size.y * 0.5);
     let pivot = ImVec2::new(0.5, 0.5);
     igSetNextWindowPos(pos, cond, pivot);
+}
+/// Set next window content's width.
+///
+/// Original non-deprecated version preserved last Y value set by
+/// [`igSetNextWindowContentSize`].
+#[allow(non_snake_case)]
+#[deprecated(since = "0.0.19", note = "please use igSetNextWindowContentSize instead")]
+pub unsafe fn igSetNextWindowContentWidth(width: c_float) {
+    igSetNextWindowContentSize(ImVec2 { x: width, y: 0.0 })
 }
 
 // Parameter stack (shared)
