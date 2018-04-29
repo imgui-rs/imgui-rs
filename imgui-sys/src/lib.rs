@@ -329,12 +329,16 @@ bitflags!(
     /// Flags for hover checks
     #[repr(C)]
     pub struct ImGuiHoveredFlags: c_int {
-        const AllowWhenBlockedByPopup      = 1;
-        const AllowWhenBlockedByActiveItem = 1 << 2;
-        const AllowWhenOverlapped          = 1 << 3;
+        const ChildWindows                 = 1 << 0;
+        const RootWindow                   = 1 << 1;
+        const AllowWhenBlockedByPopup      = 1 << 2;
+        const AllowWhenBlockedByActiveItem = 1 << 4;
+        const AllowWhenOverlapped          = 1 << 5;
         const RectOnly = ImGuiHoveredFlags::AllowWhenBlockedByPopup.bits
             | ImGuiHoveredFlags::AllowWhenBlockedByActiveItem.bits
             | ImGuiHoveredFlags::AllowWhenOverlapped.bits;
+        const RootAndChildWindows = ImGuiFocusedFlags::RootWindow.bits
+            | ImGuiFocusedFlags::ChildWindows.bits;
     }
 );
 
@@ -1619,7 +1623,6 @@ extern "C" {
     pub fn igSetItemAllowOverlap();
     pub fn igIsWindowFocused(flags: ImGuiFocusedFlags) -> bool;
     pub fn igIsWindowHovered(flags: ImGuiHoveredFlags) -> bool;
-    pub fn igIsRootWindowOrAnyChildHovered(flags: ImGuiHoveredFlags) -> bool;
     pub fn igIsAnyWindowHovered() -> bool;
     pub fn igIsRectVisible(item_size: ImVec2) -> bool;
     pub fn igIsRectVisible2(rect_min: *const ImVec2, rect_max: *const ImVec2) -> bool;
@@ -1678,6 +1681,11 @@ pub unsafe fn igIsRootWindowFocused() -> bool {
 #[deprecated(since = "0.0.19", note = "please use igIsWindowFocused(ImGuiFocusedFlags::RootAndChildWindows) instead")]
 pub unsafe fn igIsRootWindowOrAnyChildFocused() -> bool {
     igIsWindowFocused(ImGuiFocusedFlags::RootAndChildWindows)
+}
+#[allow(non_snake_case)]
+#[deprecated(since = "0.0.19", note = "please use igIsWindowFocused(ImGuiFocusedFlags::RootAndChildWindows) instead")]
+pub unsafe fn igIsRootWindowOrAnyChildHovered(_flags: ImGuiHoveredFlags) -> bool {
+    igIsWindowHovered(ImGuiHoveredFlags::RootAndChildWindows)
 }
 
 // Inputs

@@ -10,6 +10,8 @@
   `sys::igIsWindowFocused(ImGuiFocusedFlags::RootWindow)`.
   - Obsolete `sys::igIsRootWindowOrAnyChildFocused()` in favor of using
   `sys::igIsWindowFocused(ImGuiFocusedFlags::RootAndChildWindows)`.
+  - Obsolete `sys::igIsRootWindowOrAnyChildHovered()` in favor of using
+  `sys::igIsWindowHovered(ImGuiHoveredFlags::RootAndChildWindows)`.
 
 
 ## [0.0.18] - 2017-12-23
