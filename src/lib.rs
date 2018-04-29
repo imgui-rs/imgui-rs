@@ -27,6 +27,7 @@ pub use string::{ImStr, ImString};
 pub use style::StyleVar;
 pub use trees::{CollapsingHeader, TreeNode};
 pub use window::Window;
+pub use window_draw_list::{ImColor, WindowDrawList, ChannelsSplit};
 
 mod child_frame;
 mod color_editors;
@@ -41,6 +42,7 @@ mod string;
 mod style;
 mod trees;
 mod window;
+mod window_draw_list;
 
 pub struct ImGui {
     // We need to keep ownership of the ImStr values to ensure the *const char pointer
@@ -82,6 +84,16 @@ pub fn get_version() -> &'static str {
         let bytes = CStr::from_ptr(sys::igGetVersion()).to_bytes();
         str::from_utf8_unchecked(bytes)
     }
+}
+
+/// Represents one of the buttons of the mouse
+#[derive(Copy, Clone, Eq, PartialEq, Debug)]
+pub enum ImMouseButton {
+    Left = 0,
+    Right = 1,
+    Middle = 2,
+    Extra1 = 3,
+    Extra2 = 4,
 }
 
 impl ImGui {
@@ -227,6 +239,25 @@ impl ImGui {
     pub fn mouse_cursor(&self) -> ImGuiMouseCursor {
         unsafe {
             sys::igGetMouseCursor()
+        }
+    }
+    /// Returns `true` if mouse is currently dragging with the `button` provided
+    /// as argument.
+    pub fn is_mouse_dragging(&self, button: ImMouseButton) -> bool {
+        unsafe {
+            sys::igIsMouseDragging(button as c_int, -1.0)
+        }
+    }
+    /// Returns `true` if the `button` provided as argument is currently down.
+    pub fn is_mouse_down(&self, button: ImMouseButton) -> bool {
+        unsafe {
+            sys::igIsMouseDown(button as c_int)
+        }
+    }
+    /// Returns `true` if the `button` provided as argument is being clicked.
+    pub fn is_mouse_clicked(&self, button: ImMouseButton) -> bool {
+        unsafe {
+            sys::igIsMouseClicked(button as c_int, false)
         }
     }
     pub fn key_ctrl(&self) -> bool {
@@ -467,6 +498,13 @@ impl<'ui> Ui<'ui> {
 
     pub fn get_columns_count(&self) -> i32 { unsafe { sys::igGetColumnsCount() } }
 
+    /// Fill a space of `size` in pixels with nothing on the current window.
+    /// Can be used to move the cursor on the window.
+    pub fn dummy<S: Into<ImVec2>>(&self, size: S) {
+        let size = size.into();
+        unsafe { sys::igDummy(&size) }
+    }
+
     /// Get cursor position on the screen, in screen coordinates.
     /// This sets the point on which the next widget will be drawn.
     ///
@@ -499,6 +537,16 @@ impl<'ui> Ui<'ui> {
     /// This sets the point on which the next widget will be drawn.
     pub fn set_cursor_pos<P: Into<ImVec2>>(&self, pos: P) {
         unsafe { sys::igSetCursorPos(pos.into()) }
+    }
+
+    /// Get available space left between the cursor and the edges of the current
+    /// window.
+    pub fn get_content_region_avail(&self) -> (f32, f32) {
+        let mut out = ImVec2::new(0.0, 0.0);
+        unsafe {
+            sys::igGetContentRegionAvail(&mut out);
+        }
+        (out.x, out.y)
     }
 }
 
@@ -572,6 +620,11 @@ impl<'ui> Ui<'ui> {
     }
     pub fn small_button<'p>(&self, label: &'p ImStr) -> bool {
         unsafe { sys::igSmallButton(label.as_ptr()) }
+    }
+    /// Make a invisible event. Can be used to conveniently catch events when
+    /// mouse hovers or click the area covered by this invisible button.
+    pub fn invisible_button<'p, S: Into<ImVec2>>(&self, label: &'p ImStr, size: S) -> bool {
+        unsafe { sys::igInvisibleButton(label.as_ptr(), size.into()) }
     }
     pub fn checkbox<'p>(&self, label: &'p ImStr, value: &'p mut bool) -> bool {
         unsafe { sys::igCheckbox(label.as_ptr(), value) }
@@ -1209,5 +1262,41 @@ impl<'ui> Ui<'ui> {
         unsafe { sys::igBeginGroup(); }
         f();
         unsafe { sys::igEndGroup(); }
+    }
+}
+
+/// # Draw list for custom drawing
+impl<'ui> Ui<'ui> {
+    /// Get access to drawing API
+    ///
+    /// # Examples
+    ///
+    /// ```rust,no_run
+    /// # use imgui::*;
+    /// fn custom_draw(ui: &Ui) {
+    ///     let draw_list = ui.get_window_draw_list();
+    ///     // Draw a line
+    ///     const WHITE: [f32; 3] = [1.0, 1.0, 1.0];
+    ///     draw_list.add_line([100.0, 100.0], [200.0, 200.0], WHITE).build();
+    ///     // Continue drawing ...
+    /// }
+    /// ```
+    ///
+    /// This function will panic if several instances of [`WindowDrawList`]
+    /// coexist. Before a new instance is got, a previous instance should be
+    /// dropped.
+    ///
+    /// ```rust
+    /// # use imgui::*;
+    /// fn custom_draw(ui: &Ui) {
+    ///     let draw_list = ui.get_window_draw_list();
+    ///     // Draw something...
+    ///
+    ///     // This second call will panic!
+    ///     let draw_list = ui.get_window_draw_list();
+    /// }
+    /// ```
+    pub fn get_window_draw_list(&'ui self) -> WindowDrawList<'ui> {
+        WindowDrawList::new(self)
     }
 }
