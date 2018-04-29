@@ -1619,7 +1619,6 @@ extern "C" {
     pub fn igSetItemAllowOverlap();
     pub fn igIsWindowFocused(flags: ImGuiFocusedFlags) -> bool;
     pub fn igIsWindowHovered(flags: ImGuiHoveredFlags) -> bool;
-    pub fn igIsRootWindowFocused() -> bool;
     pub fn igIsRootWindowOrAnyChildFocused() -> bool;
     pub fn igIsRootWindowOrAnyChildHovered(flags: ImGuiHoveredFlags) -> bool;
     pub fn igIsAnyWindowHovered() -> bool;
@@ -1669,6 +1668,12 @@ extern "C" {
         out_g: *mut c_float,
         out_b: *mut c_float,
     );
+}
+
+#[allow(non_snake_case)]
+#[deprecated(since = "0.0.19", note = "please use igIsWindowFocused(ImGuiFocusedFlags::RootWindow) instead")]
+pub unsafe fn igIsRootWindowFocused() -> bool {
+    igIsWindowFocused(ImGuiFocusedFlags::RootWindow)
 }
 
 // Inputs

@@ -6,6 +6,8 @@
   - Rename `Ui::show_test_window` to `Ui::show_demo_window`.
   - Rename `sys::igGetItemsLineHeightWithSpacing` to `sys::igGetFrameHeightWithSpacing`.
   - Rename `ImGuiTreeNodeFlags::AllowOverlapMode` to `ImGuiTreeNodeFlags::AllowItemOverlap`.
+  - Obsolete `sys::igIsRootWindowFocused()` in favor of using
+  `sys::igIsWindowFocused(ImGuiFocusedFlags::RootWindow)`.
 
 
 ## [0.0.18] - 2017-12-23
