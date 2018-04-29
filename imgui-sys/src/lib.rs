@@ -1002,12 +1002,18 @@ extern "C" {
     pub fn igAlignTextToFramePadding();
     pub fn igGetTextLineHeight() -> c_float;
     pub fn igGetTextLineHeightWithSpacing() -> c_float;
-    pub fn igGetItemsLineHeightWithSpacing() -> c_float;
+    pub fn igGetFrameHeightWithSpacing() -> c_float;
 }
 
 #[allow(non_snake_case)]
 #[deprecated(since = "0.0.18", note = "please use igAlignTextToFramePadding instead")]
 pub unsafe fn igAlignFirstTextHeightToWidgets() { igAlignTextToFramePadding(); }
+
+#[allow(non_snake_case)]
+#[deprecated(since = "0.0.19", note = "please use igGetFrameHeightWithSpacing instead")]
+pub unsafe fn igGetItemsLineHeightWithSpacing() -> c_float {
+    igGetFrameHeightWithSpacing()
+}
 
 // Columns
 extern "C" {

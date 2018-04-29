@@ -4,6 +4,7 @@
 
 - Upgrade to imgui/cimgui 1.53.1
   - Rename `Ui::show_test_window` to `Ui::show_demo_window`.
+  - Rename `sys::igGetItemsLineHeightWithSpacing` to `sys::igGetFrameHeightWithSpacing`.
 
 
 ## [0.0.18] - 2017-12-23
