@@ -2025,14 +2025,12 @@ extern "C" {
         col: ImU32,
         closed: bool,
         thickness: c_float,
-        anti_aliased: bool,
     );
     pub fn ImDrawList_AddConvexPolyFilled(
         list: *mut ImDrawList,
         points: *const ImVec2,
         num_points: c_int,
         col: ImU32,
-        anti_aliased: bool,
     );
     pub fn ImDrawList_AddBezierCurve(
         list: *mut ImDrawList,

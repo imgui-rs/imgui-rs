@@ -15,6 +15,8 @@
   - Obsolete `sys::SetNextWindowContentWidth()` in favor of using
   `sys::igSetNextWindowContentSize()`.
   - Rename `sys::ImGuiTextBuffer_append()` helper to `appendf()`.
+  - Remove `anti_aliased: bool` final parameter of `sys::ImDrawList_AddPolyline`
+  and `sys::ImDrawList_AddConvexPolyFilled`.
 
 
 ## [0.0.18] - 2017-12-23
