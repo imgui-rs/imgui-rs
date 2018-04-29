@@ -362,6 +362,14 @@ bitflags!(
     }
 );
 
+bitflags!(
+    #[repr(C)]
+    pub struct ImDrawListFlags: c_int {
+        const AntiAliasedLines = 1 << 0;
+        const AntiAliasedFill  = 1 << 1;
+    }
+);
+
 pub type ImGuiTextEditCallback = Option<
     extern "C" fn(data: *mut ImGuiTextEditCallbackData) -> c_int,
 >;
@@ -723,6 +731,8 @@ pub struct ImDrawList {
     pub idx_buffer: ImVector<ImDrawIdx>,
     pub vtx_buffer: ImVector<ImDrawVert>,
 
+    flags: ImDrawListFlags,
+    data: *const ImDrawListSharedData,
     owner_name: *const c_char,
     vtx_current_idx: c_uint,
     vtx_write_ptr: *mut ImDrawVert,
@@ -733,6 +743,20 @@ pub struct ImDrawList {
     channels_current: c_int,
     channels_count: c_int,
     channels: ImVector<ImDrawChannel>,
+}
+
+#[repr(C)]
+struct ImDrawListSharedData {
+    /// UV of white pixel in the atlas
+    tex_uv_white_pixel: ImVec2,
+    /// Current/default font (optional, for simplified AddText overload)
+    font: *mut ImFont,
+    /// Current/default font size (optional, for simplified AddText overload)
+    font_size: c_float,
+    curve_tessellation_tol: c_float,
+    /// Value for PushClipRectFullscreen()
+    clip_rect_fullscreen: ImVec4,
+    circle_vtx12: [ImVec2; 12],
 }
 
 /// All draw command lists required to render the frame
