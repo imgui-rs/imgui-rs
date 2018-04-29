@@ -315,6 +315,17 @@ bitflags!(
 );
 
 bitflags!(
+    /// Flags for window focus check
+    #[repr(C)]
+    pub struct ImGuiFocusedFlags: c_int {
+        const ChildWindows = 1 << 0;
+        const RootWindow = 1 << 1;
+        const RootAndChildWindows =
+            ImGuiFocusedFlags::RootWindow.bits | ImGuiFocusedFlags::ChildWindows.bits;
+    }
+);
+
+bitflags!(
     /// Flags for hover checks
     #[repr(C)]
     pub struct ImGuiHoveredFlags: c_int {
@@ -1606,7 +1617,7 @@ extern "C" {
     pub fn igGetItemRectMax(out: *mut ImVec2);
     pub fn igGetItemRectSize(out: *mut ImVec2);
     pub fn igSetItemAllowOverlap();
-    pub fn igIsWindowFocused() -> bool;
+    pub fn igIsWindowFocused(flags: ImGuiFocusedFlags) -> bool;
     pub fn igIsWindowHovered(flags: ImGuiHoveredFlags) -> bool;
     pub fn igIsRootWindowFocused() -> bool;
     pub fn igIsRootWindowOrAnyChildFocused() -> bool;
