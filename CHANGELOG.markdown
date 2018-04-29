@@ -14,6 +14,7 @@
   `sys::igIsWindowHovered(ImGuiHoveredFlags::RootAndChildWindows)`.
   - Obsolete `sys::SetNextWindowContentWidth()` in favor of using
   `sys::igSetNextWindowContentSize()`.
+  - Rename `sys::ImGuiTextBuffer_append()` helper to `appendf()`.
 
 
 ## [0.0.18] - 2017-12-23

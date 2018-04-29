@@ -1790,7 +1790,7 @@ extern "C" {
     pub fn ImGuiTextBuffer_empty(buffer: *mut ImGuiTextBuffer) -> bool;
     pub fn ImGuiTextBuffer_clear(buffer: *mut ImGuiTextBuffer);
     pub fn ImGuiTextBuffer_c_str(buffer: *const ImGuiTextBuffer) -> *const c_char;
-    pub fn ImGuiTextBuffer_append(buffer: *const ImGuiTextBuffer, fmt: *const c_char, ...);
+    pub fn ImGuiTextBuffer_appendf(buffer: *const ImGuiTextBuffer, fmt: *const c_char, ...);
 // pub fn ImGuiTextBuffer_appendv(
 //     buffer: *const ImGuiTextBuffer,
 //     fmt: *const c_char,
