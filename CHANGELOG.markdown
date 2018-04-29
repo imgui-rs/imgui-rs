@@ -8,6 +8,8 @@
   - Rename `ImGuiTreeNodeFlags::AllowOverlapMode` to `ImGuiTreeNodeFlags::AllowItemOverlap`.
   - Obsolete `sys::igIsRootWindowFocused()` in favor of using
   `sys::igIsWindowFocused(ImGuiFocusedFlags::RootWindow)`.
+  - Obsolete `sys::igIsRootWindowOrAnyChildFocused()` in favor of using
+  `sys::igIsWindowFocused(ImGuiFocusedFlags::RootAndChildWindows)`.
 
 
 ## [0.0.18] - 2017-12-23
