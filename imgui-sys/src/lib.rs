@@ -298,7 +298,9 @@ bitflags!(
     pub struct ImGuiTreeNodeFlags: c_int {
         const Selected          = 1;
         const Framed            = 1 << 1;
+        #[deprecated(since = "0.0.19", note = "please use AllowItemOverlap instead")]
         const AllowOverlapMode  = 1 << 2;
+        const AllowItemOverlap  = 1 << 2;
         const NoTreePushOnOpen  = 1 << 3;
         const NoAutoOpenOnLog   = 1 << 4;
         const DefaultOpen       = 1 << 5;
