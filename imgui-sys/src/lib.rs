@@ -860,10 +860,16 @@ extern "C" {
 
 // Demo/Debug/Info
 extern "C" {
-    pub fn igShowTestWindow(opened: *mut bool);
+    pub fn igShowDemoWindow(opened: *mut bool);
     pub fn igShowMetricsWindow(opened: *mut bool);
     pub fn igShowStyleEditor(style: *mut ImGuiStyle);
     pub fn igShowUserGuide();
+}
+
+#[allow(non_snake_case)]
+#[deprecated(since = "0.0.19", note = "please use igShowDemoWindow instead")]
+pub unsafe fn igShowTestWindow(opened: *mut bool) {
+   igShowDemoWindow(opened)
 }
 
 // Window
