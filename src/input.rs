@@ -89,6 +89,24 @@ macro_rules! impl_text_flags {
             self.flags.set(ImGuiInputTextFlags::AlwaysInsertMode, value);
             self
         }
+
+        #[inline]
+        pub fn read_only(mut self, value: bool) -> Self {
+            self.flags.set(ImGuiInputTextFlags::ReadOnly, value);
+            self
+        }
+
+        #[inline]
+        pub fn password(mut self, value: bool) -> Self {
+            self.flags.set(ImGuiInputTextFlags::Password, value);
+            self
+        }
+
+        #[inline]
+        pub fn no_undo_redo(mut self, value: bool) -> Self {
+            self.flags.set(ImGuiInputTextFlags::NoUndoRedo, value);
+            self
+        }
     }
 }
 
