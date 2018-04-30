@@ -23,6 +23,7 @@
   set up in the ImGuiStyle structure.
   - Obsolete `Window::show_borders`. Use `StyleVar` instead.
   - Obsolete `ImGuiCol::ComboBg`. Use `PopupBg` instead.
+  - Rename `ImGuiCol::ChildWindowBg` to `ImGuiCol::ChildBg`.
 
   - Style: Add `PopupRounding`, `FrameBorderSize`, `WindowBorderSize`, `PopupBorderSize`.
 

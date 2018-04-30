@@ -44,7 +44,7 @@ pub enum ImGuiCol {
     Text,
     TextDisabled,
     WindowBg,
-    ChildWindowBg,
+    ChildBg,
     PopupBg,
     Border,
     BorderShadow,
@@ -88,6 +88,8 @@ pub enum ImGuiCol {
 impl ImGuiCol {
     #[deprecated(since = "0.0.19", note = "ComboBg has been merged with PopupBg. Please use PopupBg instead")]
     pub const ComboBg: ImGuiCol = ImGuiCol::PopupBg;
+    #[deprecated(since = "0.0.19", note = "please use ChildBg instead")]
+    pub const ChildWindowBg: ImGuiCol = ImGuiCol::ChildBg;
 
     pub fn values() -> &'static [ImGuiCol] {
         use ImGuiCol::*;
@@ -95,7 +97,7 @@ impl ImGuiCol {
             Text,
             TextDisabled,
             WindowBg,
-            ChildWindowBg,
+            ChildBg,
             PopupBg,
             Border,
             BorderShadow,
