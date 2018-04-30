@@ -292,6 +292,7 @@ bitflags!(
         const AlwaysInsertMode    = 1 << 13;
         const ReadOnly            = 1 << 14;
         const Password            = 1 << 15;
+        const NoUndoRedo          = 1 << 16;
     }
 );
 
