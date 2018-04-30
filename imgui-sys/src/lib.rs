@@ -363,8 +363,8 @@ bitflags!(
     pub struct ImDrawCornerFlags: c_int {
         const TopLeft  = 1 << 0;
         const TopRight = 1 << 1;
-        const BotRight = 1 << 2;
-        const BotLeft  = 1 << 3;
+        const BotLeft  = 1 << 2;
+        const BotRight = 1 << 3;
         const Top      = ImDrawCornerFlags::TopLeft.bits
                        | ImDrawCornerFlags::TopRight.bits;
         const Bot      = ImDrawCornerFlags::BotLeft.bits
