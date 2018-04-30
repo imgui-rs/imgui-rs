@@ -483,19 +483,29 @@ pub struct ImGuiStyle {
     pub alpha: c_float,
     /// Padding within a window
     pub window_padding: ImVec2,
-    /// Minimum window size
-    pub window_min_size: ImVec2,
     /// Radius of window corners rounding. Set to 0.0f to have rectangular windows
     pub window_rounding: c_float,
+    /// Thickness of border around windows. Generally set to 0.0f or 1.0f. Other values not well tested.
+    pub window_border_size: c_float,
+    /// Minimum window size
+    pub window_min_size: ImVec2,
     /// Alignment for title bar text. Defaults to (0.0f, 0.5f) for left-aligned, vertically centered
     pub window_title_align: ImVec2,
     /// Radius of child window corners rounding. Set to 0.0f to have rectangular child windows
-    pub child_window_rounding: c_float,
+    pub child_rounding: c_float,
+    /// Thickness of border around child windows. Generally set to 0.0f or 1.0f. Other values not well tested.
+    pub child_border_size: c_float,
+    /// Radius of popup window corners rounding. Set to 0.0f to have rectangular child windows
+    pub popup_rounding: c_float,
+    /// Thickness of border around popup or tooltip windows. Generally set to 0.0f or 1.0f. Other values not well tested.
+    pub popup_border_size: c_float,
     /// Padding within a framed rectangle (used by most widgets)
     pub frame_padding: ImVec2,
     /// Radius of frame corners rounding. Set to 0.0f to have rectangular frames (used by most
     /// widgets).
     pub frame_rounding: c_float,
+    /// Thickness of border around frames. Generally set to 0.0f or 1.0f. Other values not well tested.
+    pub frame_border_size: c_float,
     /// Horizontal and vertical spacing between widgets/lines
     pub item_spacing: ImVec2,
     /// Horizontal and vertical spacing between within elements of a composed
@@ -530,7 +540,7 @@ pub struct ImGuiStyle {
     /// Enable anti-aliasing on lines/borders. Disable if you are really short on CPU/GPU.
     pub anti_aliased_lines: bool,
     /// Enable anti-aliasing on filled shapes (rounded rectangles, circles, etc.)
-    pub anti_aliased_shapes: bool,
+    pub anti_aliased_fill: bool,
     /// Tessellation tolerance. Decrease for highly tessellated curves (higher quality, more
     /// polygons), increase to reduce quality.
     pub curve_tessellation_tol: c_float,
@@ -2345,12 +2355,15 @@ fn test_default_style() {
     let style = unsafe { &*igGetStyle() };
     assert_eq!(style.alpha, 1.0);
     assert_eq!(style.window_padding, ImVec2::new(8.0, 8.0));
+    assert_eq!(style.window_rounding, 7.0);
+    assert_eq!(style.window_border_size, 0.0);
     assert_eq!(style.window_min_size, ImVec2::new(32.0, 32.0));
-    assert_eq!(style.window_rounding, 9.0);
     assert_eq!(style.window_title_align, ImVec2::new(0.0, 0.5));
-    assert_eq!(style.child_window_rounding, 0.0);
+    assert_eq!(style.popup_rounding, 0.0);
+    assert_eq!(style.popup_border_size, 1.0);
     assert_eq!(style.frame_padding, ImVec2::new(4.0, 3.0));
     assert_eq!(style.frame_rounding, 0.0);
+    assert_eq!(style.frame_border_size, 0.0);
     assert_eq!(style.item_spacing, ImVec2::new(8.0, 4.0));
     assert_eq!(style.item_inner_spacing, ImVec2::new(4.0, 4.0));
     assert_eq!(style.touch_extra_padding, ImVec2::new(0.0, 0.0));
@@ -2364,6 +2377,6 @@ fn test_default_style() {
     assert_eq!(style.display_window_padding, ImVec2::new(22.0, 22.0));
     assert_eq!(style.display_safe_area_padding, ImVec2::new(4.0, 4.0));
     assert_eq!(style.anti_aliased_lines, true);
-    assert_eq!(style.anti_aliased_shapes, true);
+    assert_eq!(style.anti_aliased_fill, true);
     assert_eq!(style.curve_tessellation_tol, 1.25);
 }
