@@ -20,6 +20,8 @@
   - Rename `ImGuiStyleVar::ChildWindowRounding` to `ImGuiStyleVar::ChildRounding`.
   - Rename `StyleVar::ChildWindowRounding` to `StyleVar::ChildRounding`.
 
+  - Style: Add `PopupRounding`, `FrameBorderSize`, `WindowBorderSize`, `PopupBorderSize`.
+
 
 ## [0.0.18] - 2017-12-23
 

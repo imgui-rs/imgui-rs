@@ -147,15 +147,19 @@ pub enum ImGuiStyleVar {
     WindowRounding,
     WindowMinSize,
     ChildRounding,
+    ChildBorderSize,
+    PopupRounding,
+    PopupBorderSize,
     FramePadding,
     FrameRounding,
+    FrameBorderSize,
     ItemSpacing,
     ItemInnerSpacing,
     IndentSpacing,
     GrabMinSize,
     ButtonTextAlign,
 }
-pub const ImGuiStyleVar_COUNT: usize = 12;
+pub const ImGuiStyleVar_COUNT: usize = 16;
 
 impl ImGuiStyleVar {
     #[deprecated(since = "0.0.19", note = "please use ChildRounding instead")]

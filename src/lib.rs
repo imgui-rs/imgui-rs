@@ -1206,8 +1206,20 @@ impl<'ui> Ui<'ui> {
             ChildRounding(v) => unsafe {
                 igPushStyleVar(ImGuiStyleVar::ChildRounding, v)
             },
+            ChildBorderSize(v) => unsafe {
+                igPushStyleVar(ImGuiStyleVar::ChildBorderSize, v)
+            },
+            PopupRounding(v) => unsafe {
+                igPushStyleVar(ImGuiStyleVar::PopupRounding, v)
+            },
+            PopupBorderSize(v) => unsafe {
+                igPushStyleVar(ImGuiStyleVar::PopupBorderSize, v)
+            },
             FramePadding(v) => unsafe { igPushStyleVarVec(ImGuiStyleVar::FramePadding, v) },
             FrameRounding(v) => unsafe { igPushStyleVar(ImGuiStyleVar::FrameRounding, v) },
+            FrameBorderSize(v) => unsafe {
+                igPushStyleVar(ImGuiStyleVar::FrameBorderSize, v)
+            },
             ItemSpacing(v) => unsafe { igPushStyleVarVec(ImGuiStyleVar::ItemSpacing, v) },
             ItemInnerSpacing(v) => unsafe { igPushStyleVarVec(ImGuiStyleVar::ItemInnerSpacing, v) },
             IndentSpacing(v) => unsafe { igPushStyleVar(ImGuiStyleVar::IndentSpacing, v) },
