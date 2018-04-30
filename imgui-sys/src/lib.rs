@@ -83,6 +83,7 @@ pub enum ImGuiCol {
     PlotHistogramHovered,
     TextSelectedBg,
     ModalWindowDarkening,
+    DragDropTarget,
 }
 impl ImGuiCol {
     #[deprecated(since = "0.0.19", note = "ComboBg has been merged with PopupBg. Please use PopupBg instead")]
@@ -133,11 +134,12 @@ impl ImGuiCol {
             PlotHistogramHovered,
             TextSelectedBg,
             ModalWindowDarkening,
+            DragDropTarget,
         ];
         values
     }
 }
-pub const ImGuiCol_COUNT: usize = 42;
+pub const ImGuiCol_COUNT: usize = 43;
 
 /// A variable identifier for styling
 #[repr(C)]
