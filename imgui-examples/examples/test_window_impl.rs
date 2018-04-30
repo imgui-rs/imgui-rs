@@ -28,6 +28,7 @@ struct State {
     no_scrollbar: bool,
     no_collapse: bool,
     no_menu: bool,
+    no_close: bool,
     wrap_width: f32,
     buf: ImString,
     item: i32,
@@ -76,6 +77,7 @@ impl Default for State {
             no_scrollbar: false,
             no_collapse: false,
             no_menu: false,
+            no_close: false,
             wrap_width: 200.0,
             buf: buf,
             item: 0,
@@ -265,16 +267,18 @@ fn show_test_window(ui: &Ui, state: &mut State, opened: &mut bool) {
         );
     }
 
-    ui.window(im_str!("ImGui Demo"))
+    let mut window = ui.window(im_str!("ImGui Demo"))
         .title_bar(!state.no_titlebar)
         .resizable(!state.no_resize)
         .movable(!state.no_move)
         .scroll_bar(!state.no_scrollbar)
         .collapsible(!state.no_collapse)
         .menu_bar(!state.no_menu)
-        .size((550.0, 680.0), ImGuiCond::FirstUseEver)
-        .opened(opened)
-        .build(|| {
+        .size((550.0, 680.0), ImGuiCond::FirstUseEver);
+    if !state.no_close {
+        window = window.opened(opened)
+    }
+    window.build(|| {
             ui.push_item_width(-140.0);
             ui.text(format!("dear imgui says hello. ({})", imgui::get_version()));
             ui.menu_bar(|| {
@@ -349,6 +353,7 @@ fn show_test_window(ui: &Ui, state: &mut State, opened: &mut bool) {
                 ui.checkbox(im_str!("No resize"), &mut state.no_resize);
                 ui.same_line(300.0);
                 ui.checkbox(im_str!("No collapse"), &mut state.no_collapse);
+                ui.checkbox(im_str!("No close"), &mut state.no_close);
 
                 ui.tree_node(im_str!("Style")).build(|| {
                     ui.show_default_style_editor()
