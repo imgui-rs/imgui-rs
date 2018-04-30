@@ -560,7 +560,7 @@ pub struct ImGuiIO {
     pub display_visible_min: ImVec2,
     pub display_visible_max: ImVec2,
 
-    pub osx_behaviors: bool,
+    pub opt_mac_osx_behaviors: bool,
     pub opt_cursor_blink: bool,
 
     pub render_draw_lists_fn: Option<extern "C" fn(data: *mut ImDrawData)>,
