@@ -22,6 +22,7 @@
   - Remove `ImGuiWindowFlags::ShowBorders` window flag. Borders are now fully
   set up in the ImGuiStyle structure.
   - Obsolete `Window::show_borders`. Use `StyleVar` instead.
+  - Obsolete `ImGuiCol::ComboBg`. Use `PopupBg` instead.
 
   - Style: Add `PopupRounding`, `FrameBorderSize`, `WindowBorderSize`, `PopupBorderSize`.
 

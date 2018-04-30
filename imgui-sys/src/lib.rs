@@ -59,7 +59,6 @@ pub enum ImGuiCol {
     ScrollbarGrab,
     ScrollbarGrabHovered,
     ScrollbarGrabActive,
-    ComboBg,
     CheckMark,
     SliderGrab,
     SliderGrabActive,
@@ -86,6 +85,9 @@ pub enum ImGuiCol {
     ModalWindowDarkening,
 }
 impl ImGuiCol {
+    #[deprecated(since = "0.0.19", note = "ComboBg has been merged with PopupBg. Please use PopupBg instead")]
+    pub const ComboBg: ImGuiCol = ImGuiCol::PopupBg;
+
     pub fn values() -> &'static [ImGuiCol] {
         use ImGuiCol::*;
         static values: &'static [ImGuiCol] = &[
@@ -107,7 +109,6 @@ impl ImGuiCol {
             ScrollbarGrab,
             ScrollbarGrabHovered,
             ScrollbarGrabActive,
-            ComboBg,
             CheckMark,
             SliderGrab,
             SliderGrabActive,
@@ -136,7 +137,7 @@ impl ImGuiCol {
         values
     }
 }
-pub const ImGuiCol_COUNT: usize = 43;
+pub const ImGuiCol_COUNT: usize = 42;
 
 /// A variable identifier for styling
 #[repr(C)]
