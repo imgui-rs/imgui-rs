@@ -146,7 +146,7 @@ pub enum ImGuiStyleVar {
     WindowPadding,
     WindowRounding,
     WindowMinSize,
-    ChildWindowRounding,
+    ChildRounding,
     FramePadding,
     FrameRounding,
     ItemSpacing,
@@ -156,6 +156,11 @@ pub enum ImGuiStyleVar {
     ButtonTextAlign,
 }
 pub const ImGuiStyleVar_COUNT: usize = 12;
+
+impl ImGuiStyleVar {
+    #[deprecated(since = "0.0.19", note = "please use ChildRounding instead")]
+    pub const ChildWindowRounding: ImGuiStyleVar = ImGuiStyleVar::ChildRounding;
+}
 
 /// A key identifier (ImGui-side enum)
 #[repr(C)]

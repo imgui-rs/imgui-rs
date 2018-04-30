@@ -17,6 +17,8 @@
   - Rename `sys::ImGuiTextBuffer_append()` helper to `appendf()`.
   - Remove `anti_aliased: bool` final parameter of `sys::ImDrawList_AddPolyline`
   and `sys::ImDrawList_AddConvexPolyFilled`.
+  - Rename `ImGuiStyleVar::ChildWindowRounding` to `ImGuiStyleVar::ChildRounding`.
+  - Rename `StyleVar::ChildWindowRounding` to `StyleVar::ChildRounding`.
 
 
 ## [0.0.18] - 2017-12-23

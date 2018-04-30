@@ -1203,8 +1203,8 @@ impl<'ui> Ui<'ui> {
             WindowPadding(v) => unsafe { igPushStyleVarVec(ImGuiStyleVar::WindowPadding, v) },
             WindowRounding(v) => unsafe { igPushStyleVar(ImGuiStyleVar::WindowRounding, v) },
             WindowMinSize(v) => unsafe { igPushStyleVarVec(ImGuiStyleVar::WindowMinSize, v) },
-            ChildWindowRounding(v) => unsafe {
-                igPushStyleVar(ImGuiStyleVar::ChildWindowRounding, v)
+            ChildRounding(v) => unsafe {
+                igPushStyleVar(ImGuiStyleVar::ChildRounding, v)
             },
             FramePadding(v) => unsafe { igPushStyleVarVec(ImGuiStyleVar::FramePadding, v) },
             FrameRounding(v) => unsafe { igPushStyleVar(ImGuiStyleVar::FrameRounding, v) },
