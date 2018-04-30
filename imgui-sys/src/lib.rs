@@ -258,6 +258,7 @@ bitflags!(
         const AlwaysVerticalScrollbar   = 1 << 14;
         const AlwaysHorizontalScrollbar = 1 << 15;
         const AlwaysUseWindowPadding    = 1 << 16;
+        const ResizeFromAnySide         = 1 << 17;
     }
 );
 
