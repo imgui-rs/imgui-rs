@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Added
+
+- `input_text_multiline`
+
 ## [0.0.18] - 2017-12-23
 
 ### Added

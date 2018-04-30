@@ -34,6 +34,7 @@ struct State {
     item: i32,
     item2: i32,
     text: ImString,
+    text_multiline: ImString,
     i0: i32,
     f0: f32,
     vec2f: [f32; 2],
@@ -56,6 +57,8 @@ impl Default for State {
         buf.push_str("日本語");
         let mut text = ImString::with_capacity(128);
         text.push_str("Hello, world!");
+        let mut text_mutiline = ImString::with_capacity(128);
+        text_mutiline.push_str("Hello, world!\nMultiline");
         State {
             show_app_main_menu_bar: false,
             show_app_console: false,
@@ -83,6 +86,7 @@ impl Default for State {
             item: 0,
             item2: 0,
             text: text,
+            text_multiline: text_mutiline,
             i0: 123,
             f0: 0.001,
             vec2f: [0.10, 0.20],
@@ -382,6 +386,11 @@ fn show_test_window(ui: &Ui, state: &mut State, opened: &mut bool) {
                     ui.text_colored((1.0, 1.0, 0.0, 1.0), im_str!("Yellow"));
                     ui.text_disabled(im_str!("Disabled"));
                 });
+
+                ui.tree_node(im_str!("Multi-line text")).build(|| {
+                    ui.input_text_multiline(im_str!("multiline"), &mut state.text_multiline, (300., 100.)).build();
+                });
+
                 ui.tree_node(im_str!("Word Wrapping")).build(|| {
                     ui.text_wrapped(im_str!(
                         "This text should automatically wrap on the edge of \
