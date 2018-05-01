@@ -946,6 +946,7 @@ extern "C" {
     pub fn igGetDrawData() -> *mut ImDrawData;
     pub fn igNewFrame();
     pub fn igRender();
+    pub fn igEndFrame();
     pub fn igShutdown();
 }
 
