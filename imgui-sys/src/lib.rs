@@ -954,6 +954,8 @@ extern "C" {
     pub fn igShowDemoWindow(opened: *mut bool);
     pub fn igShowMetricsWindow(opened: *mut bool);
     pub fn igShowStyleEditor(style: *mut ImGuiStyle);
+    pub fn igShowStyleSelector(label: *const c_char);
+    pub fn igShowFontSelector(label: *const c_char);
     pub fn igShowUserGuide();
 }
 
