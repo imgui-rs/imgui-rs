@@ -2121,6 +2121,17 @@ extern "C" {
         uv_d: ImVec2,
         col: ImU32,
     );
+    pub fn ImDrawList_AddImageRounded(
+        list: *mut ImDrawList,
+        user_texture_id: ImTextureID,
+        a: ImVec2,
+        b: ImVec2,
+        uv_a: ImVec2,
+        uv_b: ImVec2,
+        col: ImU32,
+        rounding: c_float,
+        rounding_corners: c_int,
+    );
     pub fn ImDrawList_AddPolyLine(
         list: *mut ImDrawList,
         points: *const ImVec2,
