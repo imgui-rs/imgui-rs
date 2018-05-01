@@ -1,6 +1,6 @@
 #[macro_use]
-extern crate glium;
-extern crate imgui;
+pub extern crate glium;
+pub extern crate imgui;
 
 use glium::{DrawError, GlObject, IndexBuffer, Program, Surface, Texture2d, VertexBuffer};
 use glium::backend::{Context, Facade};
