@@ -618,6 +618,7 @@ pub struct ImGuiIO {
     mouse_down_owned: [bool; 5],
     mouse_down_duration: [c_float; 5],
     mouse_down_duration_prev: [c_float; 5],
+    mouse_drag_max_distance_abs: [ImVec2; 5],
     mouse_drag_max_distance_sqr: [c_float; 5],
     keys_down_duration: [c_float; 512],
     keys_down_duration_prev: [c_float; 512],
