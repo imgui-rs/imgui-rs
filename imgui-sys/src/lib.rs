@@ -1023,7 +1023,6 @@ extern "C" {
     pub fn igSetScrollY(scroll_y: c_float);
     pub fn igSetScrollHere(center_y_ratio: c_float);
     pub fn igSetScrollFromPosY(pos_y: c_float, center_y_ratio: c_float);
-    pub fn igSetKeyboardFocusHere(offset: c_int);
     pub fn igSetStateStorage(tree: *mut ImGuiStorage);
     pub fn igGetStateStorage() -> *mut ImGuiStorage;
 }
@@ -1700,6 +1699,12 @@ extern "C" {
     pub fn igStyleColorsClassic(dst: *mut ImGuiStyle);
     pub fn igStyleColorsDark(dst: *mut ImGuiStyle);
     pub fn igStyleColorsLight(dst: *mut ImGuiStyle);
+}
+
+// Focus
+extern "C" {
+    pub fn igSetItemDefaultFocus();
+    pub fn igSetKeyboardFocusHere(offset: c_int);
 }
 
 // Utilities
