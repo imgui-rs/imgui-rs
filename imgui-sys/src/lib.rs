@@ -1851,6 +1851,10 @@ extern "C" {
     pub fn igSetCurrentContext(ctx: *mut ImGuiContext);
 }
 
+extern "C" {
+    pub fn ImFontConfig_DefaultConstructor(config: *mut ImFontConfig);
+}
+
 // ImGuiIO
 extern "C" {
     pub fn ImGuiIO_AddInputCharacter(c: c_ushort);
