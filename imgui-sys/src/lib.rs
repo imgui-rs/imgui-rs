@@ -796,7 +796,7 @@ pub struct ImDrawList {
 }
 
 #[repr(C)]
-struct ImDrawListSharedData {
+pub struct ImDrawListSharedData {
     /// UV of white pixel in the atlas
     tex_uv_white_pixel: ImVec2,
     /// Current/default font (optional, for simplified AddText overload)
@@ -1779,6 +1779,12 @@ pub unsafe fn igIsRootWindowOrAnyChildFocused() -> bool {
 #[deprecated(since = "0.0.19", note = "please use igIsWindowFocused(ImGuiFocusedFlags::RootAndChildWindows) instead")]
 pub unsafe fn igIsRootWindowOrAnyChildHovered(_flags: ImGuiHoveredFlags) -> bool {
     igIsWindowHovered(ImGuiHoveredFlags::RootAndChildWindows)
+}
+
+// DrawList
+extern "C" {
+    pub fn igGetOverlayDrawList() -> *mut ImDrawList;
+    pub fn igGetDrawListSharedData() -> *mut ImDrawListSharedData;
 }
 
 // Inputs
