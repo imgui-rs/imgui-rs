@@ -1666,6 +1666,8 @@ extern "C" {
 // Styles
 extern "C" {
     pub fn igStyleColorsClassic(dst: *mut ImGuiStyle);
+    pub fn igStyleColorsDark(dst: *mut ImGuiStyle);
+    pub fn igStyleColorsLight(dst: *mut ImGuiStyle);
 }
 
 // Utilities
