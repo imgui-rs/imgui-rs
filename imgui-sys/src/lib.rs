@@ -2428,6 +2428,7 @@ extern "C" {
     pub fn ImFont_SetFallbackChar(font: *mut ImFont, c: ImWchar);
     pub fn ImFont_GetCharAdvance(font: *const ImFont, c: ImWchar) -> c_float;
     pub fn ImFont_IsLoaded(font: *const ImFont) -> bool;
+    pub fn ImFont_GetDebugName(font: *const ImFont) -> *const c_char;
     pub fn ImFont_CalcTextSizeA(
         font: *const ImFont,
         out: *mut ImVec2,
