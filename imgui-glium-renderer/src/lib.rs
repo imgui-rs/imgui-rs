@@ -11,9 +11,10 @@ use glium::program;
 use glium::index::{self, PrimitiveType};
 use glium::texture;
 use glium::vertex;
-use imgui::{DrawList, ImDrawIdx, ImDrawVert, ImGui, Ui};
+use imgui::{DrawList, FromImTexture, ImDrawIdx, ImDrawVert, ImGui, Ui};
 use std::borrow::Cow;
 use std::fmt;
+use std::ops::Deref;
 use std::rc::Rc;
 
 pub type RendererResult<T> = Result<T, RendererError>;
@@ -118,10 +119,13 @@ impl Renderer {
 
         let mut idx_start = 0;
         for cmd in draw_list.cmd_buffer {
-            // We don't support custom textures...yet!
-            assert!(cmd.texture_id as usize == font_texture_id);
-
             let idx_end = idx_start + cmd.elem_count as usize;
+
+            let texture = if cmd.texture_id as usize == font_texture_id {
+                &self.device_objects.texture
+            } else {
+                <Texture as FromImTexture>::from_id(cmd.texture_id).deref()
+            };
 
             try!(
                 surface.draw(
@@ -133,7 +137,7 @@ impl Renderer {
                     &self.device_objects.program,
                     &uniform! {
                           matrix: matrix,
-                          tex: self.device_objects.texture.sampled()
+                          tex: texture.sampled()
                               .magnify_filter(MagnifySamplerFilter::Nearest)
                               .minify_filter(MinifySamplerFilter::Nearest),
                       },
