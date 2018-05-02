@@ -818,8 +818,8 @@ pub struct ImFontAtlas {
 
     tex_pixels_alpha8: *mut c_uchar,
     tex_pixels_rgba32: *mut c_uint,
-    tex_width: c_int,
-    tex_height: c_int,
+    pub tex_width: c_int,
+    pub tex_height: c_int,
     tex_uv_white_pixel: ImVec2,
     fonts: ImVector<*mut ImFont>,
     custom_rects: ImVector<CustomRect>,
