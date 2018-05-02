@@ -2,6 +2,9 @@
 extern crate glium;
 extern crate imgui;
 
+mod im_texture;
+pub use im_texture::Texture;
+
 use glium::{DrawError, GlObject, IndexBuffer, Program, Surface, Texture2d, VertexBuffer};
 use glium::backend::{Context, Facade};
 use glium::program;
