@@ -17,6 +17,7 @@ pub use color_editors::{ColorButton, ColorEdit, ColorEditMode, ColorFormat, Colo
 pub use drag::{DragFloat, DragFloat2, DragFloat3, DragFloat4, DragInt, DragInt2, DragInt3,
                DragInt4, DragFloatRange2, DragIntRange2};
 pub use fonts::{FontGlyphRange, ImFontAtlas, ImFont, ImFontConfig};
+pub use image::Image;
 pub use input::{InputFloat, InputFloat2, InputFloat3, InputFloat4, InputInt, InputInt2, InputInt3,
                 InputInt4, InputText};
 pub use menus::{Menu, MenuItem};
@@ -37,6 +38,7 @@ mod child_frame;
 mod color_editors;
 mod drag;
 mod fonts;
+mod image;
 mod input;
 mod menus;
 mod plothistogram;
@@ -1150,6 +1152,17 @@ impl<'ui> Ui<'ui> {
         size: S,
     ) -> ChildFrame<'ui, 'p> {
         ChildFrame::new(self, name, size.into())
+    }
+}
+
+/// Widgets: Images
+impl<'ui> Ui<'ui> {
+    pub fn image<T, S>(&self, texture: &T, size: S) -> Image
+    where
+        T: ImTexture,
+        S: Into<ImVec2>,
+    {
+        Image::new(texture, size)
     }
 }
 
