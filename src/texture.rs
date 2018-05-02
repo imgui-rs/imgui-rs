@@ -16,6 +16,15 @@ pub trait ImTexture {
     fn get_size(&self) -> (u32, u32);
 }
 
+/// We implement [`ImTexture`] for [`ImTextureID`] one only to be able to use
+/// it on the ID of the font texture (as is).
+impl ImTexture for ImTextureID {
+    fn get_id(&self) -> ImTextureID { *self }
+    fn get_size(&self) -> (u32, u32) {
+        panic!("Cannot get size of ImTextureID (it is a raw pointer)!")
+    }
+}
+
 /// A handle to a texture.
 ///
 /// Wraps a fat pointer to an trait object [`ImTexture`].
