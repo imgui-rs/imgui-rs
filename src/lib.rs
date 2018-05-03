@@ -1157,6 +1157,33 @@ impl<'ui> Ui<'ui> {
 
 /// Widgets: Images
 impl<'ui> Ui<'ui> {
+    /// Initiate the drawing of an image.
+    /// The image data should be an object implementing the [`ImTexture`] trait,
+    /// typically an [`AnyTexture`] object got from [`Ui::make_texture`].
+    ///
+    /// # Examples
+    ///
+    /// ## Example using glium as back-end
+    ///
+    /// ```rust,no_run
+    /// #[macro_use] extern crate imgui;
+    /// extern crate glium;
+    /// extern crate imgui_glium_renderer;
+    ///
+    /// use imgui::*;
+    /// use glium::Texture2d;
+    /// use glium::backend::Facade;
+    ///
+    /// fn make_a_texture<F: Facade>(ui: &Ui, facade: &F, data: Vec<Vec<(u8, u8, u8, u8)>>) {
+    ///     let texture_handle = ui.replace_texture(
+    ///         im_str!("#Texture Name ID"),
+    ///         Texture2d::new(facade, data).unwrap(),
+    ///     );
+    ///     ui.image(&texture_handle, [100.0, 100.0]).build();
+    /// }
+    ///
+    /// # fn main() {}
+    /// ```
     pub fn image<T, S>(&self, texture: &T, size: S) -> Image
     where
         T: ImTexture,
@@ -1380,6 +1407,34 @@ impl<'ui> Ui<'ui> {
 
 /// # Custom textures
 impl<'ui> Ui<'ui> {
+    /// Register a texture into ImGui the first time the function is called.
+    /// Just reuse the texture on subsequent uses.
+    ///
+    /// Returns a handle to the texture as an [`AnyTexture`] object. A back-end
+    /// (e.g. glium) is needed to create the texture.
+    ///
+    /// # Examples
+    ///
+    /// ## Example using glium as back-end
+    ///
+    /// ```rust,no_run
+    /// #[macro_use] extern crate imgui;
+    /// extern crate glium;
+    /// extern crate imgui_glium_renderer;
+    ///
+    /// use imgui::*;
+    /// use glium::Texture2d;
+    /// use glium::backend::Facade;
+    ///
+    /// fn make_a_texture<F: Facade>(ui: &Ui, facade: &F) {
+    ///     let texture_handle = ui.make_texture(im_str!("#Texture Name ID"), || {
+    ///         Texture2d::empty(facade, 100, 100).unwrap()
+    ///     });
+    ///     // ... Do something with `texture_handle`
+    /// }
+    ///
+    /// # fn main() {}
+    /// ```
     pub fn make_texture<F, T, U>(&self, name: &ImStr, f: F) -> AnyTexture
     where
         F: FnOnce() -> T,
@@ -1396,6 +1451,35 @@ impl<'ui> Ui<'ui> {
         }
     }
 
+    /// Swap and replace with the given new texture each time the function is
+    /// called.
+    ///
+    /// Returns a handle to the texture as an [`AnyTexture`] object. A back-end
+    /// (e.g. glium) is needed to create the texture.
+    ///
+    /// # Examples
+    ///
+    /// ## Example using glium as back-end
+    ///
+    /// ```rust,no_run
+    /// #[macro_use] extern crate imgui;
+    /// extern crate glium;
+    /// extern crate imgui_glium_renderer;
+    ///
+    /// use imgui::*;
+    /// use glium::Texture2d;
+    /// use glium::backend::Facade;
+    ///
+    /// fn make_a_texture<F: Facade>(ui: &Ui, facade: &F, data: Vec<Vec<(u8, u8, u8, u8)>>) {
+    ///     let texture_handle = ui.replace_texture(
+    ///         im_str!("#Texture Name ID"),
+    ///         Texture2d::new(facade, data).unwrap(),
+    ///     );
+    ///     // ... Do something with `texture_handle`
+    /// }
+    ///
+    /// # fn main() {}
+    /// ```
     pub fn replace_texture<T, U>(&self, name: &ImStr, t: T) -> AnyTexture
     where
         T: IntoImTexture<U>,

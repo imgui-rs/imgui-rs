@@ -2,6 +2,10 @@ use super::{ImTexture, ImTextureID, ImVec2, ImVec4};
 
 use sys;
 
+/// Represent an image about to be drawn
+/// See [`Ui::image`].
+///
+/// Crate your image using the builder pattern then [`Image::build`] it.
 pub struct Image {
     texture_id: ImTextureID,
     size: ImVec2,
@@ -41,26 +45,31 @@ impl Image {
         }
     }
 
+    /// Set uv0 (default `[0.0, 0.0]`)
     pub fn uv0<T: Into<ImVec2>>(mut self, uv0: T) -> Self {
         self.uv0 = uv0.into();
         self
     }
 
+    /// Set uv1 (default `[1.0, 1.0]`)
     pub fn uv1<T: Into<ImVec2>>(mut self, uv1: T) -> Self {
         self.uv1 = uv1.into();
         self
     }
 
+    /// Set tint color (default: no tint color)
     pub fn tint_col<T: Into<ImVec4>>(mut self, tint_col: T) -> Self {
         self.tint_col = tint_col.into();
         self
     }
 
+    /// Set border color (default: no border)
     pub fn border_col<T: Into<ImVec4>>(mut self, border_col: T) -> Self {
         self.border_col = border_col.into();
         self
     }
 
+    /// Draw image where the cursor currently is
     pub fn build(self) {
         unsafe {
             sys::igImage(
