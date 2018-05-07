@@ -142,6 +142,35 @@ impl ImGui {
             })
         }
     }
+    /// Register font texture returned by closure to [`ImGui`] instance.
+    pub fn register_font_texture<'a, F, T, U, E>(&mut self, f: F) -> Result<AnyTexture, E>
+    where
+        F: FnOnce(FontTextureHandle<'a>) -> Result<T, E>,
+        T: IntoImTexture<U>,
+        U: 'static + ImTexture,
+    {
+        let io = self.io();
+        let mut pixels: *mut c_uchar = ptr::null_mut();
+        let mut width: c_int = 0;
+        let mut height: c_int = 0;
+        let mut bytes_per_pixel: c_int = 0;
+        let texture = unsafe {
+            sys::ImFontAtlas_GetTexDataAsRGBA32(
+                io.fonts,
+                &mut pixels,
+                &mut width,
+                &mut height,
+                &mut bytes_per_pixel,
+            );
+            f(FontTextureHandle {
+                width: width as u32,
+                height: height as u32,
+                pixels: slice::from_raw_parts(pixels, (width * height * bytes_per_pixel) as usize),
+            })?.into_texture()
+        };
+        self.textures.register_texture(im_str!("#FONT"), texture);
+        Ok(self.textures.get_texture(im_str!("#FONT")).unwrap())
+    }
     pub fn set_texture_id(&mut self, value: usize) {
         self.fonts().set_texture_id(value);
     }
