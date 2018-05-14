@@ -5,6 +5,7 @@ pub enum StyleVar {
     Alpha(f32),
     WindowPadding(ImVec2),
     WindowRounding(f32),
+    WindowBorderSize(f32),
     WindowMinSize(ImVec2),
     ChildRounding(f32),
     ChildBorderSize(f32),

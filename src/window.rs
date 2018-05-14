@@ -161,7 +161,7 @@ impl<'ui, 'p> Window<'ui, 'p> {
                 sys::igSetNextWindowSize(self.size.into(), self.size_cond);
             }
             if self.border {
-                sys::igPushStyleVar(ImGuiStyleVar::FrameBorderSize, 1.0);
+                sys::igPushStyleVar(ImGuiStyleVar::WindowBorderSize, 1.0);
             }
             sys::igBegin(
                 self.name.as_ptr(),
