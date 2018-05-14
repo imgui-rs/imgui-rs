@@ -1069,14 +1069,6 @@ extern "C" {
     pub fn igGetStateStorage() -> *mut ImGuiStorage;
 }
 
-#[allow(non_snake_case)]
-#[deprecated(since = "0.0.18", note = "please use igSetNextWindowPos instead")]
-pub unsafe fn igSetNextWindowPosCenter(cond: ImGuiCond) {
-    let io = igGetIO();
-    let pos = ImVec2::new((*io).display_size.x * 0.5, (*io).display_size.y * 0.5);
-    let pivot = ImVec2::new(0.5, 0.5);
-    igSetNextWindowPos(pos, cond, pivot);
-}
 /// Set next window content's width.
 ///
 /// Original non-deprecated version preserved last Y value set by
@@ -1145,10 +1137,6 @@ extern "C" {
     pub fn igGetFrameHeight() -> c_float;
     pub fn igGetFrameHeightWithSpacing() -> c_float;
 }
-
-#[allow(non_snake_case)]
-#[deprecated(since = "0.0.18", note = "please use igAlignTextToFramePadding instead")]
-pub unsafe fn igAlignFirstTextHeightToWidgets() { igAlignTextToFramePadding(); }
 
 #[allow(non_snake_case)]
 #[deprecated(since = "0.0.19", note = "please use igGetFrameHeightWithSpacing instead")]
@@ -1876,18 +1864,6 @@ extern "C" {
     pub fn igCaptureMouseFromApp(capture: bool);
 }
 
-#[allow(non_snake_case)]
-#[deprecated(since = "0.0.18", note = "please use igIsItemHovered instead")]
-pub unsafe fn igIsItemRectHovered() -> bool { igIsItemHovered(ImGuiHoveredFlags::RectOnly) }
-#[allow(non_snake_case)]
-#[deprecated(since = "0.0.18", note = "please use igIsWindowHovered instead")]
-pub unsafe fn igIsWindowRectHovered() -> bool {
-    igIsWindowHovered(
-        ImGuiHoveredFlags::AllowWhenBlockedByPopup | ImGuiHoveredFlags::AllowWhenBlockedByActiveItem,
-    )
-}
-
-
 // Helpers functions to access functions pointers in ImGui::GetIO()
 extern "C" {
     pub fn igMemAlloc(sz: usize) -> *mut c_void;
@@ -2441,15 +2417,6 @@ extern "C" {
         wrap_width: c_float,
         cpu_fine_clip: bool,
     );
-}
-
-#[allow(non_snake_case)]
-#[deprecated(since = "0.0.18", note = "please use ImFont_ClearOutputData instead")]
-pub unsafe fn ImFont_Clear(font: *mut ImFont) { ImFont_ClearOutputData(font); }
-#[allow(non_snake_case)]
-#[deprecated(since = "0.0.18", note = "please use ImFont_GetFallbackChar instead")]
-pub unsafe fn ImFont_GetFallbackXAdvance(font: *const ImFont) -> c_float {
-    ImFont_GetFallbackAdvanceX(font)
 }
 
 // ImFont::Glyph

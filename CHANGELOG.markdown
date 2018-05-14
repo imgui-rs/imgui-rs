@@ -55,6 +55,7 @@
   and `sys::ImDrawList_AddConvexPolyFilled`.
   - Remove `ImGuiWindowFlags::ShowBorders` window flag. Borders are now fully
   set up in the ImGuiStyle structure.
+- Various imgui-sys things that were deprecated in imgui/cimgui 1.52
 
 ## [0.0.18] - 2017-12-23
 
