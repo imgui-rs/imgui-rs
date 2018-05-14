@@ -18,6 +18,12 @@
     - `ImFontConfig_DefaultConstructor`
     - `ImDrawList_AddImageRounded`
 - Input: Add `read_only` and `password` methods.
+- Various utility functions
+- Support for changing the mouse cursor
+- Custom font support
+- Support for item grouping (`group` function)
+- Custom drawing with draw list manipulation
+- Drag widgets
 
 ### Changed
 
