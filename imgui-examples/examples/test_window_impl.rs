@@ -23,12 +23,12 @@ struct State {
     show_app_metrics: bool,
     show_app_about: bool,
     no_titlebar: bool,
-    no_border: bool,
     no_resize: bool,
     no_move: bool,
     no_scrollbar: bool,
     no_collapse: bool,
     no_menu: bool,
+    no_close: bool,
     wrap_width: f32,
     buf: ImString,
     item: i32,
@@ -72,12 +72,12 @@ impl Default for State {
             show_app_metrics: false,
             show_app_about: false,
             no_titlebar: false,
-            no_border: true,
             no_resize: false,
             no_move: false,
             no_scrollbar: false,
             no_collapse: false,
             no_menu: false,
+            no_close: false,
             wrap_width: 200.0,
             buf: buf,
             item: 0,
@@ -267,17 +267,18 @@ fn show_test_window(ui: &Ui, state: &mut State, opened: &mut bool) {
         );
     }
 
-    ui.window(im_str!("ImGui Demo"))
+    let mut window = ui.window(im_str!("ImGui Demo"))
         .title_bar(!state.no_titlebar)
-        .show_borders(!state.no_border)
         .resizable(!state.no_resize)
         .movable(!state.no_move)
         .scroll_bar(!state.no_scrollbar)
         .collapsible(!state.no_collapse)
         .menu_bar(!state.no_menu)
-        .size((550.0, 680.0), ImGuiCond::FirstUseEver)
-        .opened(opened)
-        .build(|| {
+        .size((550.0, 680.0), ImGuiCond::FirstUseEver);
+    if !state.no_close {
+        window = window.opened(opened)
+    }
+    window.build(|| {
             ui.push_item_width(-140.0);
             ui.text(format!("dear imgui says hello. ({})", imgui::get_version()));
             ui.menu_bar(|| {
@@ -344,15 +345,15 @@ fn show_test_window(ui: &Ui, state: &mut State, opened: &mut bool) {
             if ui.collapsing_header(im_str!("Window options")).build() {
                 ui.checkbox(im_str!("No titlebar"), &mut state.no_titlebar);
                 ui.same_line(150.0);
-                ui.checkbox(im_str!("No border"), &mut state.no_border);
-                ui.same_line(300.0);
-                ui.checkbox(im_str!("No resize"), &mut state.no_resize);
-                ui.checkbox(im_str!("No move"), &mut state.no_move);
-                ui.same_line(150.0);
                 ui.checkbox(im_str!("No scrollbar"), &mut state.no_scrollbar);
                 ui.same_line(300.0);
-                ui.checkbox(im_str!("No collapse"), &mut state.no_collapse);
                 ui.checkbox(im_str!("No menu"), &mut state.no_menu);
+                ui.checkbox(im_str!("No move"), &mut state.no_move);
+                ui.same_line(150.0);
+                ui.checkbox(im_str!("No resize"), &mut state.no_resize);
+                ui.same_line(300.0);
+                ui.checkbox(im_str!("No collapse"), &mut state.no_collapse);
+                ui.checkbox(im_str!("No close"), &mut state.no_close);
 
                 ui.tree_node(im_str!("Style")).build(|| {
                     ui.show_default_style_editor()

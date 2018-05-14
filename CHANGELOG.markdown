@@ -2,6 +2,60 @@
 
 ## [Unreleased]
 
+### Added
+
+- New things in imgui/cimgui 1.53.1
+  - Style: Add `PopupRounding`, `FrameBorderSize`, `WindowBorderSize`, `PopupBorderSize`.
+  - DemoWindow: Add `no_close` state.
+  - Input: Add `no_undo_redo` method.
+  - *imgui-sys*:
+    - `igStyleColorsDark` and `igStyleColorsLight`
+    - DragDrop low level API
+    - `igGetFrameHeight`
+    - `igBeginCombo`, `igEndCombo`
+    - `igSetItemDefaultFocus`
+    - `igGetOverlayDrawList` and `igGetDrawListSharedData`
+    - `ImFontConfig_DefaultConstructor`
+    - `ImDrawList_AddImageRounded`
+- Input: Add `read_only` and `password` methods.
+
+### Changed
+
+- Upgrade to imgui/cimgui 1.53.1
+  - Rename `Ui::show_test_window` to `Ui::show_demo_window`. Keep redirection.
+  - Rename `sys::igGetItemsLineHeightWithSpacing` to `sys::igGetFrameHeightWithSpacing`.
+  Keep redirection.
+  - Rename `ImGuiTreeNodeFlags::AllowOverlapMode` to `ImGuiTreeNodeFlags::AllowItemOverlap`.
+  `sys::igSetNextWindowContentSize()`. Keep redirection.
+  - Rename `sys::ImGuiTextBuffer_append()` helper to `appendf()`.
+  - Rename `ImGuiStyleVar::ChildWindowRounding` to `ImGuiStyleVar::ChildRounding`.
+  Keep redirection.
+  - Rename `StyleVar::ChildWindowRounding` to `StyleVar::ChildRounding`.
+  Keep redirection.
+  - Rename `ImGuiCol::ChildWindowBg` to `ImGuiCol::ChildBg`.
+  Keep redirection.
+
+### Deprecated
+
+- Various imgui-sys things that were deprecated in imgui/cimgui 1.53.1
+  - Obsolete `sys::igIsRootWindowFocused()` in favor of using
+  `sys::igIsWindowFocused(ImGuiFocusedFlags::RootWindow)`.
+  - Obsolete `sys::igIsRootWindowOrAnyChildFocused()` in favor of using
+  `sys::igIsWindowFocused(ImGuiFocusedFlags::RootAndChildWindows)`.
+  - Obsolete `sys::igIsRootWindowOrAnyChildHovered()` in favor of using
+  `sys::igIsWindowHovered(ImGuiHoveredFlags::RootAndChildWindows)`.
+  - Obsolete `sys::SetNextWindowContentWidth()` in favor of using
+  - Obsolete `Window::show_borders`. Use `StyleVar` instead.
+  - Obsolete `ImGuiCol::ComboBg`. Use `PopupBg` instead.
+
+### Removed
+
+- Features that were removed in imgui/cimgui 1.53.1
+  - Remove `anti_aliased: bool` final parameter of `sys::ImDrawList_AddPolyline`
+  and `sys::ImDrawList_AddConvexPolyFilled`.
+  - Remove `ImGuiWindowFlags::ShowBorders` window flag. Borders are now fully
+  set up in the ImGuiStyle structure.
+
 ## [0.0.18] - 2017-12-23
 
 ### Added

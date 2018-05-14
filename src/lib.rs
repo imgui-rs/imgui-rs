@@ -421,9 +421,13 @@ impl<'ui> Ui<'ui> {
             sys::igShowStyleEditor(style as *mut ImGuiStyle);
         }
     }
+    #[deprecated(since = "0.0.19", note = "please use show_demo_window instead")]
     pub fn show_test_window(&self, opened: &mut bool) {
+        self.show_demo_window(opened)
+    }
+    pub fn show_demo_window(&self, opened: &mut bool) {
         unsafe {
-            sys::igShowTestWindow(opened);
+            sys::igShowDemoWindow(opened);
         }
     }
     pub fn show_metrics_window(&self, opened: &mut bool) {
@@ -1198,12 +1202,25 @@ impl<'ui> Ui<'ui> {
             Alpha(v) => unsafe { igPushStyleVar(ImGuiStyleVar::Alpha, v) },
             WindowPadding(v) => unsafe { igPushStyleVarVec(ImGuiStyleVar::WindowPadding, v) },
             WindowRounding(v) => unsafe { igPushStyleVar(ImGuiStyleVar::WindowRounding, v) },
+            WindowBorderSize(v) => unsafe { igPushStyleVar(ImGuiStyleVar::WindowBorderSize, v) },
             WindowMinSize(v) => unsafe { igPushStyleVarVec(ImGuiStyleVar::WindowMinSize, v) },
-            ChildWindowRounding(v) => unsafe {
-                igPushStyleVar(ImGuiStyleVar::ChildWindowRounding, v)
+            ChildRounding(v) => unsafe {
+                igPushStyleVar(ImGuiStyleVar::ChildRounding, v)
+            },
+            ChildBorderSize(v) => unsafe {
+                igPushStyleVar(ImGuiStyleVar::ChildBorderSize, v)
+            },
+            PopupRounding(v) => unsafe {
+                igPushStyleVar(ImGuiStyleVar::PopupRounding, v)
+            },
+            PopupBorderSize(v) => unsafe {
+                igPushStyleVar(ImGuiStyleVar::PopupBorderSize, v)
             },
             FramePadding(v) => unsafe { igPushStyleVarVec(ImGuiStyleVar::FramePadding, v) },
             FrameRounding(v) => unsafe { igPushStyleVar(ImGuiStyleVar::FrameRounding, v) },
+            FrameBorderSize(v) => unsafe {
+                igPushStyleVar(ImGuiStyleVar::FrameBorderSize, v)
+            },
             ItemSpacing(v) => unsafe { igPushStyleVarVec(ImGuiStyleVar::ItemSpacing, v) },
             ItemInnerSpacing(v) => unsafe { igPushStyleVarVec(ImGuiStyleVar::ItemInnerSpacing, v) },
             IndentSpacing(v) => unsafe { igPushStyleVar(ImGuiStyleVar::IndentSpacing, v) },

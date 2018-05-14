@@ -156,7 +156,11 @@ impl ImFontConfig {
     }
 
     fn make_config(self) -> sys::ImFontConfig {
-        let mut config = sys::ImFontConfig::new();
+        let mut config = unsafe {
+            let mut config = mem::uninitialized();
+            sys::ImFontConfig_DefaultConstructor(&mut config);
+            config
+        };
         config.size_pixels = self.size_pixels;
         config.oversample_h = self.oversample_h as c_int;
         config.oversample_v = self.oversample_v as c_int;
