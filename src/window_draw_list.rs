@@ -209,6 +209,19 @@ impl<'ui> WindowDrawList<'ui> {
         Circle::new(self, center, radius, color)
     }
 
+    /// Draw a text whose upper-left corner is at point `pos`.
+    pub fn add_text<P, C>(&self, pos: P, col: C, text: &str)
+    where
+        P: Into<ImVec2>,
+        C: Into<ImColor>,
+    {
+        unsafe {
+            let start = text.as_ptr() as *const i8;
+            let end = (start as usize + text.len()) as *const i8;
+            sys::ImDrawList_AddText(self.draw_list, pos.into(), col.into().into(), start, end)
+        }
+    }
+
     /// Returns a Bezier curve stretching from `pos0` to `pos1`, whose
     /// curvature is defined by `cp0` and `cp1`.
     pub fn add_bezier_curve<P1, P2, P3, P4, C>(
