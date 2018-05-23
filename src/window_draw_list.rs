@@ -262,6 +262,7 @@ impl<'ui> WindowDrawList<'ui> {
 }
 
 /// Represents a line about to be drawn
+#[must_use = "should call .build() to draw the object"]
 pub struct Line<'ui> {
     p1: ImVec2,
     p2: ImVec2,
@@ -307,6 +308,7 @@ impl<'ui> Line<'ui> {
 }
 
 /// Represents a rectangle about to be drawn
+#[must_use = "should call .build() to draw the object"]
 pub struct Rect<'ui> {
     p1: ImVec2,
     p2: ImVec2,
@@ -410,6 +412,7 @@ impl<'ui> Rect<'ui> {
 }
 
 /// Represents a triangle about to be drawn on the window
+#[must_use = "should call .build() to draw the object"]
 pub struct Triangle<'ui> {
     p1: ImVec2,
     p2: ImVec2,
@@ -479,6 +482,7 @@ impl<'ui> Triangle<'ui> {
 }
 
 /// Represents a circle about to be drawn
+#[must_use = "should call .build() to draw the object"]
 pub struct Circle<'ui> {
     center: ImVec2,
     radius: f32,
@@ -553,6 +557,7 @@ impl<'ui> Circle<'ui> {
 }
 
 /// Represents a Bezier curve about to be drawn
+#[must_use = "should call .build() to draw the object"]
 pub struct BezierCurve<'ui> {
     pos0: ImVec2,
     cp0: ImVec2,
