@@ -1,6 +1,14 @@
 #[macro_use]
+#[cfg(feature = "reexport-depts")]
 pub extern crate glium;
+#[cfg(feature = "reexport-depts")]
 pub extern crate imgui;
+
+#[macro_use]
+#[cfg(not(feature = "reexport-depts"))]
+extern crate glium;
+#[cfg(not(feature = "reexport-depts"))]
+extern crate imgui;
 
 use glium::{DrawError, GlObject, IndexBuffer, Program, Surface, Texture2d, VertexBuffer};
 use glium::backend::{Context, Facade};
