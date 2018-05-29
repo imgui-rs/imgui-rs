@@ -219,6 +219,11 @@ impl ImGui {
         let io = self.io_mut();
         io.mouse_wheel = value;
     }
+    /// Get mouse wheel delta
+    pub fn mouse_wheel(&self) -> f32 {
+        let io = self.io();
+        io.mouse_wheel
+    }
     /// Set to `true` to have ImGui draw the cursor in software.
     /// If `false`, the OS cursor is used (default to `false`).
     pub fn set_mouse_draw_cursor(&mut self, value: bool) {
