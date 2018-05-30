@@ -210,11 +210,13 @@ impl<'ui> WindowDrawList<'ui> {
     }
 
     /// Draw a text whose upper-left corner is at point `pos`.
-    pub fn add_text<P, C>(&self, pos: P, col: C, text: &str)
+    pub fn add_text<P, C, T>(&self, pos: P, col: C, text: T)
     where
         P: Into<ImVec2>,
         C: Into<ImColor>,
+        T: AsRef<str>,
     {
+        let text = text.as_ref();
         unsafe {
             let start = text.as_ptr() as *const i8;
             let end = (start as usize + text.len()) as *const i8;
