@@ -216,10 +216,12 @@ impl<'ui> WindowDrawList<'ui> {
         C: Into<ImColor>,
         T: AsRef<str>,
     {
+        use std::os::raw::c_char;
+
         let text = text.as_ref();
         unsafe {
-            let start = text.as_ptr() as *const i8;
-            let end = (start as usize + text.len()) as *const i8;
+            let start = text.as_ptr() as *const c_char;
+            let end = (start as usize + text.len()) as *const c_char;
             sys::ImDrawList_AddText(self.draw_list, pos.into(), col.into().into(), start, end)
         }
     }
