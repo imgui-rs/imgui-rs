@@ -314,6 +314,8 @@ impl ImGui {
     pub fn get_time(&self) -> f32 { unsafe { sys::igGetTime() } }
     pub fn get_frame_count(&self) -> i32 { unsafe { sys::igGetFrameCount() } }
     pub fn get_frame_rate(&self) -> f32 { self.io().framerate }
+    pub fn want_capture_mouse(&self) -> bool { self.io().want_capture_mouse }
+    pub fn want_capture_keyboard(&self) -> bool { self.io().want_capture_keyboard }
     pub fn frame<'ui, 'a: 'ui>(
         &'a mut self,
         size_points: (u32, u32),
@@ -372,12 +374,10 @@ fn fmt_ptr() -> *const c_char { FMT.as_ptr() as *const c_char }
 impl<'ui> Ui<'ui> {
     pub fn imgui(&self) -> &ImGui { self.imgui }
     pub fn want_capture_mouse(&self) -> bool {
-        let io = self.imgui.io();
-        io.want_capture_mouse
+        self.imgui().want_capture_mouse()
     }
     pub fn want_capture_keyboard(&self) -> bool {
-        let io = self.imgui.io();
-        io.want_capture_keyboard
+        self.imgui().want_capture_keyboard()
     }
     pub fn framerate(&self) -> f32 {
         let io = self.imgui.io();
