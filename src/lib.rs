@@ -304,6 +304,35 @@ impl ImGui {
         let io = self.io_mut();
         io.key_map[key as usize] = mapping as i32;
     }
+    /// Map [`ImGuiKey`] values into user's key index
+    pub fn get_key_index(&self, key: ImGuiKey) -> usize {
+        unsafe { sys::igGetKeyIndex(key) as usize }
+    }
+    /// Return whether specific key is being held
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// use imgui::{ImGuiKey, Ui};
+    ///
+    /// fn test(ui: &Ui) {
+    ///     let delete_key_index = ui.imgui().get_key_index(ImGuiKey::Delete);
+    ///     if ui.imgui().is_key_down(delete_key_index) {
+    ///         println!("Delete is being held!");
+    ///     }
+    /// }
+    /// ```
+    pub fn is_key_down(&self, user_key_index: usize) -> bool {
+        unsafe { sys::igIsKeyDown(user_key_index as c_int) }
+    }
+    /// Return whether specific key was pressed
+    pub fn is_key_pressed(&self, user_key_index: usize) -> bool {
+        unsafe { sys::igIsKeyPressed(user_key_index as c_int, true) }
+    }
+    /// Return whether specific key was released
+    pub fn is_key_released(&self, user_key_index: usize) -> bool {
+        unsafe { sys::igIsKeyReleased(user_key_index as c_int) }
+    }
     pub fn add_input_character(&mut self, character: char) {
         let mut buf = [0; 5];
         character.encode_utf8(&mut buf);
