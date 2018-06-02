@@ -268,6 +268,18 @@ impl ImGui {
             sys::igIsMouseClicked(button as c_int, false)
         }
     }
+    /// Returns `true` if the `button` provided as argument is being double-clicked.
+    pub fn is_mouse_double_clicked(&self, button: ImMouseButton) -> bool {
+        unsafe {
+            sys::igIsMouseDoubleClicked(button as c_int)
+        }
+    }
+    /// Returns `true` if the `button` provided as argument was released
+    pub fn is_mouse_released(&self, button: ImMouseButton) -> bool {
+        unsafe {
+            sys::igIsMouseReleased(button as c_int)
+        }
+    }
     pub fn key_ctrl(&self) -> bool {
         let io = self.io();
         io.key_ctrl
