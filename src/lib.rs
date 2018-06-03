@@ -502,9 +502,9 @@ impl<'ui> Ui<'ui> {
         let io = self.imgui.io();
         io.metrics_active_windows
     }
-    pub fn render<F, E>(self, mut f: F) -> Result<(), E>
+    pub fn render<F, E>(self, f: F) -> Result<(), E>
     where
-        F: FnMut(&Ui, DrawData) -> Result<(), E>,
+        F: FnOnce(&Ui, DrawData) -> Result<(), E>,
     {
         unsafe {
             sys::igRender();
