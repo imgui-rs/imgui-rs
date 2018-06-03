@@ -2,7 +2,7 @@ pub extern crate imgui_sys as sys;
 
 use std::ffi::CStr;
 use std::mem;
-use std::os::raw::{c_char, c_float, c_int, c_uchar};
+use std::os::raw::{c_char, c_float, c_int, c_uchar, c_void};
 use std::ptr;
 use std::slice;
 use std::str;
@@ -603,10 +603,50 @@ impl<'ui> Ui<'ui> {
     }
 }
 
+pub enum ImId<'a> {
+    Int(i32),
+    Str(&'a str),
+    Ptr(*const c_void),
+}
+
+impl From<i32> for ImId<'static> {
+    fn from(i: i32) -> Self { ImId::Int(i) }
+}
+
+impl<'a, T: ?Sized + AsRef<str>> From<&'a T> for ImId<'a> {
+    fn from(s: &'a T) -> Self { ImId::Str(s.as_ref()) }
+}
+
+impl<T> From<*const T> for ImId<'static> {
+    fn from(p: *const T) -> Self { ImId::Ptr(p as *const c_void) }
+}
+
+impl<T> From<*mut T> for ImId<'static> {
+    fn from(p: *mut T) -> Self { ImId::Ptr(p as *const T as *const c_void) }
+}
+
 // ID scopes
 impl<'ui> Ui<'ui> {
     /// Pushes an identifier to the ID stack.
-    pub fn push_id(&self, id: i32) { unsafe { sys::igPushIDInt(id) }; }
+    pub fn push_id<'a, I: Into<ImId<'a>>>(&self, id: I) {
+        let id = id.into();
+
+        unsafe {
+            match id {
+                ImId::Int(i) => {
+                    sys::igPushIDInt(i);
+                }
+                ImId::Str(s) => {
+                    let start = s.as_ptr() as *const c_char;
+                    let end = start.offset(s.len() as isize);
+                    sys::igPushIDStrRange(start, end);
+                }
+                ImId::Ptr(p) => {
+                    sys::igPushIDPtr(p as *const c_void);
+                }
+            }
+        }
+    }
 
     /// Pops an identifier from the ID stack.
     ///
@@ -615,9 +655,10 @@ impl<'ui> Ui<'ui> {
     pub fn pop_id(&self) { unsafe { sys::igPopID() }; }
 
     /// Runs a function after temporarily pushing a value to the ID stack.
-    pub fn with_id<F>(&self, id: i32, f: F)
+    pub fn with_id<'a, F, I>(&self, id: I, f: F)
     where
         F: FnOnce(),
+        I: Into<ImId<'a>>,
     {
         self.push_id(id);
         f();
