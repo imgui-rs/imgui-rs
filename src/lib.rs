@@ -597,7 +597,7 @@ impl<'ui> Ui<'ui> {
                 }
                 ImId::Str(s) => {
                     let start = s.as_ptr() as *const c_char;
-                    let end = start.add(s.len()) as *const c_char;
+                    let end = start.offset(s.len() as isize);
                     sys::igPushIDStrRange(start, end);
                 }
                 ImId::Ptr(p) => {
