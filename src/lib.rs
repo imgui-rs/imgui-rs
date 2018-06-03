@@ -396,6 +396,68 @@ impl Drop for ImGui {
 
 static mut CURRENT_UI: Option<Ui<'static>> = None;
 
+pub struct DrawData<'a> {
+    raw: &'a mut sys::ImDrawData,
+}
+
+impl<'a> DrawData<'a> {
+    pub fn is_valid(&self) -> bool {
+        self.raw.valid
+    }
+    pub fn draw_list_count(&self) -> usize {
+        self.raw.cmd_lists_count as usize
+    }
+    pub fn total_vtx_count(&self) -> usize {
+        self.raw.total_vtx_count as usize
+    }
+    pub fn total_idx_count(&self) -> usize {
+        self.raw.total_idx_count as usize
+    }
+    pub fn deindex_all_buffers(&mut self) {
+        unsafe {
+            sys::ImDrawData_DeIndexAllBuffers(self.raw);
+        }
+    }
+    pub fn scale_clip_rects<S: Into<ImVec2>>(&mut self, sc: S) {
+        unsafe {
+            sys::ImDrawData_ScaleClipRects(self.raw, sc.into());
+        }
+    }
+}
+
+impl<'a> IntoIterator for &'a DrawData<'a> {
+    type Item = DrawList<'a>;
+    type IntoIter = DrawListIterator<'a>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        unsafe {
+            DrawListIterator {
+                iter: self.raw.cmd_lists().iter(),
+            }
+        }
+    }
+}
+
+pub struct DrawListIterator<'a> {
+    iter: std::slice::Iter<'a, *const sys::ImDrawList>,
+}
+
+impl<'a> Iterator for DrawListIterator<'a> {
+    type Item = DrawList<'a>;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        self.iter.next().map(|&ptr| {
+            unsafe {
+                DrawList {
+                    cmd_buffer: (*ptr).cmd_buffer.as_slice(),
+                    idx_buffer: (*ptr).idx_buffer.as_slice(),
+                    vtx_buffer: (*ptr).vtx_buffer.as_slice(),
+                }
+            }
+        })
+    }
+}
+
 pub struct DrawList<'a> {
     pub cmd_buffer: &'a [sys::ImDrawCmd],
     pub idx_buffer: &'a [sys::ImDrawIdx],
@@ -442,20 +504,15 @@ impl<'ui> Ui<'ui> {
     }
     pub fn render<F, E>(self, mut f: F) -> Result<(), E>
     where
-        F: FnMut(&Ui, DrawList) -> Result<(), E>,
+        F: FnMut(&Ui, DrawData) -> Result<(), E>,
     {
         unsafe {
             sys::igRender();
 
-            let draw_data = sys::igGetDrawData();
-            for &cmd_list in (*draw_data).cmd_lists() {
-                let draw_list = DrawList {
-                    cmd_buffer: (*cmd_list).cmd_buffer.as_slice(),
-                    idx_buffer: (*cmd_list).idx_buffer.as_slice(),
-                    vtx_buffer: (*cmd_list).vtx_buffer.as_slice(),
-                };
-                try!(f(&self, draw_list));
-            }
+            let draw_data = DrawData {
+                raw: &mut *sys::igGetDrawData(),
+            };
+            f(&self, draw_data)?;
             CURRENT_UI = None;
         }
         Ok(())
