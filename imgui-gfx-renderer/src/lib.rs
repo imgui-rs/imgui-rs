@@ -180,8 +180,11 @@ impl<R: Resources> Renderer<R> {
             [-1.0, 1.0, 0.0, 1.0],
         ];
 
-        ui.render(|ui, draw_list| {
-            self.render_draw_list(ui, factory, encoder, &draw_list)
+        ui.render(|ui, draw_data| {
+            for draw_list in &draw_data {
+                self.render_draw_list(ui, factory, encoder, &draw_list)?;
+            }
+            Ok(())
         })
     }
     fn render_draw_list<'a, F: Factory<R>, C: CommandBuffer<R>>(
