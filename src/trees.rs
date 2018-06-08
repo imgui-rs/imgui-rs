@@ -9,6 +9,7 @@ pub struct TreeNode<'ui, 'p> {
     label: Option<&'p ImStr>,
     opened: bool,
     opened_cond: ImGuiCond,
+    flags: ImGuiTreeNodeFlags,
     _phantom: PhantomData<&'ui Ui<'ui>>,
 }
 
@@ -19,6 +20,7 @@ impl<'ui, 'p> TreeNode<'ui, 'p> {
             label: None,
             opened: false,
             opened_cond: ImGuiCond::empty(),
+            flags: ImGuiTreeNodeFlags::empty(),
             _phantom: PhantomData,
         }
     }
@@ -33,13 +35,74 @@ impl<'ui, 'p> TreeNode<'ui, 'p> {
         self.opened_cond = cond;
         self
     }
+    #[inline]
+    pub fn flags(mut self, flags: ImGuiTreeNodeFlags) -> Self {
+        self.flags = flags;
+        self
+    }
+    #[inline]
+    pub fn selected(mut self, value: bool) -> Self {
+        self.flags.set(ImGuiTreeNodeFlags::Selected, value);
+        self
+    }
+    #[inline]
+    pub fn framed(mut self, value: bool) -> Self {
+        self.flags.set(ImGuiTreeNodeFlags::Framed, value);
+        self
+    }
+    #[inline]
+    pub fn allow_item_overlap(mut self, value: bool) -> Self {
+        self.flags.set(ImGuiTreeNodeFlags::AllowItemOverlap, value);
+        self
+    }
+    #[inline]
+    pub fn no_tree_push_on_open(mut self, value: bool) -> Self {
+        self.flags.set(ImGuiTreeNodeFlags::NoTreePushOnOpen, value);
+        self
+    }
+    #[inline]
+    pub fn no_auto_open_on_log(mut self, value: bool) -> Self {
+        self.flags.set(ImGuiTreeNodeFlags::NoAutoOpenOnLog, value);
+        self
+    }
+    #[inline]
+    pub fn default_open(mut self, value: bool) -> Self {
+        self.flags.set(ImGuiTreeNodeFlags::DefaultOpen, value);
+        self
+    }
+    #[inline]
+    pub fn open_on_double_click(mut self, value: bool) -> Self {
+        self.flags.set(ImGuiTreeNodeFlags::OpenOnDoubleClick, value);
+        self
+    }
+    #[inline]
+    pub fn open_on_arrow(mut self, value: bool) -> Self {
+        self.flags.set(ImGuiTreeNodeFlags::OpenOnArrow, value);
+        self
+    }
+    #[inline]
+    pub fn leaf(mut self, value: bool) -> Self {
+        self.flags.set(ImGuiTreeNodeFlags::Leaf, value);
+        self
+    }
+    #[inline]
+    pub fn bullet(mut self, value: bool) -> Self {
+        self.flags.set(ImGuiTreeNodeFlags::Bullet, value);
+        self
+    }
+    #[inline]
+    pub fn frame_padding(mut self, value: bool) -> Self {
+        self.flags.set(ImGuiTreeNodeFlags::FramePadding, value);
+        self
+    }
     pub fn build<F: FnOnce()>(self, f: F) {
         let render = unsafe {
             if !self.opened_cond.is_empty() {
                 sys::igSetNextTreeNodeOpen(self.opened, self.opened_cond);
             }
-            sys::igTreeNodeStr(
+            sys::igTreeNodeExStr(
                 self.id.as_ptr(),
+                self.flags,
                 super::fmt_ptr(),
                 self.label.unwrap_or(self.id).as_ptr(),
             )
