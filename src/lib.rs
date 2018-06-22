@@ -2,7 +2,7 @@ pub extern crate imgui_sys as sys;
 
 use std::ffi::CStr;
 use std::mem;
-use std::os::raw::{c_char, c_float, c_int, c_uchar};
+use std::os::raw::{c_char, c_float, c_int, c_uchar, c_void};
 use std::ptr;
 use std::slice;
 use std::str;
@@ -219,6 +219,11 @@ impl ImGui {
         let io = self.io_mut();
         io.mouse_wheel = value;
     }
+    /// Get mouse wheel delta
+    pub fn mouse_wheel(&self) -> f32 {
+        let io = self.io();
+        io.mouse_wheel
+    }
     /// Set to `true` to have ImGui draw the cursor in software.
     /// If `false`, the OS cursor is used (default to `false`).
     pub fn set_mouse_draw_cursor(&mut self, value: bool) {
@@ -263,6 +268,18 @@ impl ImGui {
             sys::igIsMouseClicked(button as c_int, false)
         }
     }
+    /// Returns `true` if the `button` provided as argument is being double-clicked.
+    pub fn is_mouse_double_clicked(&self, button: ImMouseButton) -> bool {
+        unsafe {
+            sys::igIsMouseDoubleClicked(button as c_int)
+        }
+    }
+    /// Returns `true` if the `button` provided as argument was released
+    pub fn is_mouse_released(&self, button: ImMouseButton) -> bool {
+        unsafe {
+            sys::igIsMouseReleased(button as c_int)
+        }
+    }
     pub fn key_ctrl(&self) -> bool {
         let io = self.io();
         io.key_ctrl
@@ -298,6 +315,35 @@ impl ImGui {
     pub fn set_imgui_key(&mut self, key: ImGuiKey, mapping: u8) {
         let io = self.io_mut();
         io.key_map[key as usize] = mapping as i32;
+    }
+    /// Map [`ImGuiKey`] values into user's key index
+    pub fn get_key_index(&self, key: ImGuiKey) -> usize {
+        unsafe { sys::igGetKeyIndex(key) as usize }
+    }
+    /// Return whether specific key is being held
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// use imgui::{ImGuiKey, Ui};
+    ///
+    /// fn test(ui: &Ui) {
+    ///     let delete_key_index = ui.imgui().get_key_index(ImGuiKey::Delete);
+    ///     if ui.imgui().is_key_down(delete_key_index) {
+    ///         println!("Delete is being held!");
+    ///     }
+    /// }
+    /// ```
+    pub fn is_key_down(&self, user_key_index: usize) -> bool {
+        unsafe { sys::igIsKeyDown(user_key_index as c_int) }
+    }
+    /// Return whether specific key was pressed
+    pub fn is_key_pressed(&self, user_key_index: usize) -> bool {
+        unsafe { sys::igIsKeyPressed(user_key_index as c_int, true) }
+    }
+    /// Return whether specific key was released
+    pub fn is_key_released(&self, user_key_index: usize) -> bool {
+        unsafe { sys::igIsKeyReleased(user_key_index as c_int) }
     }
     pub fn add_input_character(&mut self, character: char) {
         let mut buf = [0; 5];
@@ -350,6 +396,68 @@ impl Drop for ImGui {
 
 static mut CURRENT_UI: Option<Ui<'static>> = None;
 
+pub struct DrawData<'a> {
+    raw: &'a mut sys::ImDrawData,
+}
+
+impl<'a> DrawData<'a> {
+    pub fn is_valid(&self) -> bool {
+        self.raw.valid
+    }
+    pub fn draw_list_count(&self) -> usize {
+        self.raw.cmd_lists_count as usize
+    }
+    pub fn total_vtx_count(&self) -> usize {
+        self.raw.total_vtx_count as usize
+    }
+    pub fn total_idx_count(&self) -> usize {
+        self.raw.total_idx_count as usize
+    }
+    pub fn deindex_all_buffers(&mut self) {
+        unsafe {
+            sys::ImDrawData_DeIndexAllBuffers(self.raw);
+        }
+    }
+    pub fn scale_clip_rects<S: Into<ImVec2>>(&mut self, sc: S) {
+        unsafe {
+            sys::ImDrawData_ScaleClipRects(self.raw, sc.into());
+        }
+    }
+}
+
+impl<'a> IntoIterator for &'a DrawData<'a> {
+    type Item = DrawList<'a>;
+    type IntoIter = DrawListIterator<'a>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        unsafe {
+            DrawListIterator {
+                iter: self.raw.cmd_lists().iter(),
+            }
+        }
+    }
+}
+
+pub struct DrawListIterator<'a> {
+    iter: std::slice::Iter<'a, *const sys::ImDrawList>,
+}
+
+impl<'a> Iterator for DrawListIterator<'a> {
+    type Item = DrawList<'a>;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        self.iter.next().map(|&ptr| {
+            unsafe {
+                DrawList {
+                    cmd_buffer: (*ptr).cmd_buffer.as_slice(),
+                    idx_buffer: (*ptr).idx_buffer.as_slice(),
+                    vtx_buffer: (*ptr).vtx_buffer.as_slice(),
+                }
+            }
+        })
+    }
+}
+
 pub struct DrawList<'a> {
     pub cmd_buffer: &'a [sys::ImDrawCmd],
     pub idx_buffer: &'a [sys::ImDrawIdx],
@@ -394,22 +502,17 @@ impl<'ui> Ui<'ui> {
         let io = self.imgui.io();
         io.metrics_active_windows
     }
-    pub fn render<F, E>(self, mut f: F) -> Result<(), E>
+    pub fn render<F, E>(self, f: F) -> Result<(), E>
     where
-        F: FnMut(&Ui, DrawList) -> Result<(), E>,
+        F: FnOnce(&Ui, DrawData) -> Result<(), E>,
     {
         unsafe {
             sys::igRender();
 
-            let draw_data = sys::igGetDrawData();
-            for &cmd_list in (*draw_data).cmd_lists() {
-                let draw_list = DrawList {
-                    cmd_buffer: (*cmd_list).cmd_buffer.as_slice(),
-                    idx_buffer: (*cmd_list).idx_buffer.as_slice(),
-                    vtx_buffer: (*cmd_list).vtx_buffer.as_slice(),
-                };
-                try!(f(&self, draw_list));
-            }
+            let draw_data = DrawData {
+                raw: &mut *sys::igGetDrawData(),
+            };
+            f(&self, draw_data)?;
             CURRENT_UI = None;
         }
         Ok(())
@@ -421,9 +524,13 @@ impl<'ui> Ui<'ui> {
             sys::igShowStyleEditor(style as *mut ImGuiStyle);
         }
     }
+    #[deprecated(since = "0.0.19", note = "please use show_demo_window instead")]
     pub fn show_test_window(&self, opened: &mut bool) {
+        self.show_demo_window(opened)
+    }
+    pub fn show_demo_window(&self, opened: &mut bool) {
         unsafe {
-            sys::igShowTestWindow(opened);
+            sys::igShowDemoWindow(opened);
         }
     }
     pub fn show_metrics_window(&self, opened: &mut bool) {
@@ -553,10 +660,50 @@ impl<'ui> Ui<'ui> {
     }
 }
 
+pub enum ImId<'a> {
+    Int(i32),
+    Str(&'a str),
+    Ptr(*const c_void),
+}
+
+impl From<i32> for ImId<'static> {
+    fn from(i: i32) -> Self { ImId::Int(i) }
+}
+
+impl<'a, T: ?Sized + AsRef<str>> From<&'a T> for ImId<'a> {
+    fn from(s: &'a T) -> Self { ImId::Str(s.as_ref()) }
+}
+
+impl<T> From<*const T> for ImId<'static> {
+    fn from(p: *const T) -> Self { ImId::Ptr(p as *const c_void) }
+}
+
+impl<T> From<*mut T> for ImId<'static> {
+    fn from(p: *mut T) -> Self { ImId::Ptr(p as *const T as *const c_void) }
+}
+
 // ID scopes
 impl<'ui> Ui<'ui> {
     /// Pushes an identifier to the ID stack.
-    pub fn push_id(&self, id: i32) { unsafe { sys::igPushIDInt(id) }; }
+    pub fn push_id<'a, I: Into<ImId<'a>>>(&self, id: I) {
+        let id = id.into();
+
+        unsafe {
+            match id {
+                ImId::Int(i) => {
+                    sys::igPushIDInt(i);
+                }
+                ImId::Str(s) => {
+                    let start = s.as_ptr() as *const c_char;
+                    let end = start.offset(s.len() as isize);
+                    sys::igPushIDStrRange(start, end);
+                }
+                ImId::Ptr(p) => {
+                    sys::igPushIDPtr(p as *const c_void);
+                }
+            }
+        }
+    }
 
     /// Pops an identifier from the ID stack.
     ///
@@ -565,9 +712,10 @@ impl<'ui> Ui<'ui> {
     pub fn pop_id(&self) { unsafe { sys::igPopID() }; }
 
     /// Runs a function after temporarily pushing a value to the ID stack.
-    pub fn with_id<F>(&self, id: i32, f: F)
+    pub fn with_id<'a, F, I>(&self, id: I, f: F)
     where
         F: FnOnce(),
+        I: Into<ImId<'a>>,
     {
         self.push_id(id);
         f();
@@ -1201,12 +1349,25 @@ impl<'ui> Ui<'ui> {
             Alpha(v) => unsafe { igPushStyleVar(ImGuiStyleVar::Alpha, v) },
             WindowPadding(v) => unsafe { igPushStyleVarVec(ImGuiStyleVar::WindowPadding, v) },
             WindowRounding(v) => unsafe { igPushStyleVar(ImGuiStyleVar::WindowRounding, v) },
+            WindowBorderSize(v) => unsafe { igPushStyleVar(ImGuiStyleVar::WindowBorderSize, v) },
             WindowMinSize(v) => unsafe { igPushStyleVarVec(ImGuiStyleVar::WindowMinSize, v) },
-            ChildWindowRounding(v) => unsafe {
-                igPushStyleVar(ImGuiStyleVar::ChildWindowRounding, v)
+            ChildRounding(v) => unsafe {
+                igPushStyleVar(ImGuiStyleVar::ChildRounding, v)
+            },
+            ChildBorderSize(v) => unsafe {
+                igPushStyleVar(ImGuiStyleVar::ChildBorderSize, v)
+            },
+            PopupRounding(v) => unsafe {
+                igPushStyleVar(ImGuiStyleVar::PopupRounding, v)
+            },
+            PopupBorderSize(v) => unsafe {
+                igPushStyleVar(ImGuiStyleVar::PopupBorderSize, v)
             },
             FramePadding(v) => unsafe { igPushStyleVarVec(ImGuiStyleVar::FramePadding, v) },
             FrameRounding(v) => unsafe { igPushStyleVar(ImGuiStyleVar::FrameRounding, v) },
+            FrameBorderSize(v) => unsafe {
+                igPushStyleVar(ImGuiStyleVar::FrameBorderSize, v)
+            },
             ItemSpacing(v) => unsafe { igPushStyleVarVec(ImGuiStyleVar::ItemSpacing, v) },
             ItemInnerSpacing(v) => unsafe { igPushStyleVarVec(ImGuiStyleVar::ItemInnerSpacing, v) },
             IndentSpacing(v) => unsafe { igPushStyleVar(ImGuiStyleVar::IndentSpacing, v) },
@@ -1308,6 +1469,11 @@ impl<'ui> Ui<'ui> {
     /// ```
     pub fn is_item_hovered(&self) -> bool {
         unsafe { sys::igIsItemHovered(ImGuiHoveredFlags::empty()) }
+    }
+
+    /// Return `true` if the current window is being hovered by the mouse.
+    pub fn is_window_hovered(&self) -> bool {
+        unsafe { sys::igIsWindowHovered(ImGuiHoveredFlags::empty()) }
     }
 
     /// Returns `true` if the last item is being active.

@@ -73,8 +73,11 @@ impl Renderer {
 
     pub fn render<'a, S: Surface>(&mut self, surface: &mut S, ui: Ui<'a>) -> RendererResult<()> {
         let _ = self.ctx.insert_debug_marker("imgui-rs: starting rendering");
-        let result = ui.render(|ui, draw_list| {
-            self.render_draw_list(surface, ui, &draw_list)
+        let result = ui.render(|ui, draw_data| {
+            for draw_list in draw_data.into_iter() {
+                self.render_draw_list(surface, ui, &draw_list)?;
+            }
+            Ok(())
         });
         let _ = self.ctx.insert_debug_marker("imgui-rs: rendering finished");
         result
