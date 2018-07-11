@@ -57,8 +57,8 @@ impl Default for State {
         buf.push_str("日本語");
         let mut text = ImString::with_capacity(128);
         text.push_str("Hello, world!");
-        let mut text_mutiline = ImString::with_capacity(128);
-        text_mutiline.push_str("Hello, world!\nMultiline");
+        let mut text_multiline = ImString::with_capacity(128);
+        text_multiline.push_str("Hello, world!\nMultiline");
         State {
             show_app_main_menu_bar: false,
             show_app_console: false,
@@ -86,7 +86,7 @@ impl Default for State {
             item: 0,
             item2: 0,
             text: text,
-            text_multiline: text_mutiline,
+            text_multiline: text_multiline,
             i0: 123,
             f0: 0.001,
             vec2f: [0.10, 0.20],
