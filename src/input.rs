@@ -174,6 +174,47 @@ impl<'ui, 'p> InputText<'ui, 'p> {
 }
 
 #[must_use]
+pub struct InputTextMultiline<'ui, 'p> {
+    label: &'p ImStr,
+    buf: &'p mut ImString,
+    flags: ImGuiInputTextFlags,
+    size: sys::ImVec2,
+    _phantom: PhantomData<&'ui Ui<'ui>>,
+}
+
+impl<'ui, 'p> InputTextMultiline<'ui, 'p> {
+    pub fn new(_: &Ui<'ui>, label: &'p ImStr, buf: &'p mut ImString, size: sys::ImVec2) -> Self {
+        InputTextMultiline {
+            label: label,
+            buf: buf,
+            flags: ImGuiInputTextFlags::empty(),
+            size: size,
+            _phantom: PhantomData,
+        }
+    }
+
+    impl_text_flags!(InputText);
+
+    // TODO: boxed closure...?
+    // pub fn callback(self) -> Self { }
+
+    pub fn build(self) -> bool {
+        unsafe {
+            sys::igInputTextMultiline(
+                self.label.as_ptr(),
+                self.buf.as_mut_ptr(),
+                self.buf.capacity_with_nul(),
+                self.size,
+                self.flags,
+                None,
+                ptr::null_mut(),
+            )
+        }
+    }
+}
+
+
+#[must_use]
 pub struct InputInt<'ui, 'p> {
     label: &'p ImStr,
     value: &'p mut i32,

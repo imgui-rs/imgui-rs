@@ -18,7 +18,7 @@ pub use drag::{DragFloat, DragFloat2, DragFloat3, DragFloat4, DragInt, DragInt2,
                DragInt4, DragFloatRange2, DragIntRange2};
 pub use fonts::{FontGlyphRange, ImFontAtlas, ImFont, ImFontConfig};
 pub use input::{InputFloat, InputFloat2, InputFloat3, InputFloat4, InputInt, InputInt2, InputInt3,
-                InputInt4, InputText};
+                InputInt4, InputText, InputTextMultiline};
 pub use menus::{Menu, MenuItem};
 pub use plothistogram::PlotHistogram;
 pub use plotlines::PlotLines;
@@ -786,6 +786,9 @@ impl<'ui> Ui<'ui> {
 impl<'ui> Ui<'ui> {
     pub fn input_text<'p>(&self, label: &'p ImStr, buf: &'p mut ImString) -> InputText<'ui, 'p> {
         InputText::new(self, label, buf)
+    }
+    pub fn input_text_multiline<'p, S: Into<ImVec2>>(&self, label: &'p ImStr, buf: &'p mut ImString, size: S) -> InputTextMultiline<'ui, 'p> {
+        InputTextMultiline::new(self, label, buf, size.into())
     }
     pub fn input_float<'p>(&self, label: &'p ImStr, value: &'p mut f32) -> InputFloat<'ui, 'p> {
         InputFloat::new(self, label, value)

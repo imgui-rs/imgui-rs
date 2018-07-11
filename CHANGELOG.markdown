@@ -24,6 +24,7 @@
 - Support for item grouping (`group` function)
 - Custom drawing with draw list manipulation
 - Drag widgets
+- Input: Add `input_text_multiline` method
 
 ### Changed
 
