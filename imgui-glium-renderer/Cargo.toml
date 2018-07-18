@@ -11,7 +11,11 @@ categories = ["gui", "rendering"]
 [badges]
 travis-ci = { repository = "Gekkio/imgui-rs" }
 
+[features]
+default = [ "glium-glutin" ]
+glium-glutin = [ "glium/glutin" ]
+
 [dependencies]
-glium = { version = "0.21", default-features = false }
+glium = { version = "0.22", default-features = false }
 imgui = { version = "0.0.19-pre", path = "../" }
 imgui-sys = { version = "0.0.19-pre", path = "../imgui-sys", features = ["glium"] }
