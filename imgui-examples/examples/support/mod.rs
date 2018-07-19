@@ -9,7 +9,7 @@ struct MouseState {
 }
 
 pub fn run<F: FnMut(&Ui) -> bool>(title: String, clear_color: [f32; 4], mut run_ui: F) {
-    use glium::glutin;
+    use glium::glutin::{self, dpi::{LogicalSize, LogicalPosition}};
     use glium::{Display, Surface};
     use imgui_glium_renderer::Renderer;
 
@@ -17,7 +17,7 @@ pub fn run<F: FnMut(&Ui) -> bool>(title: String, clear_color: [f32; 4], mut run_
     let context = glutin::ContextBuilder::new().with_vsync(true);
     let window = glutin::WindowBuilder::new()
         .with_title(title)
-        .with_dimensions(1024, 768);
+        .with_dimensions( LogicalSize::new(1024., 768.));
     let display = Display::new(window, context, &events_loop).unwrap();
 
     let mut imgui = ImGui::init();
@@ -42,7 +42,7 @@ pub fn run<F: FnMut(&Ui) -> bool>(title: String, clear_color: [f32; 4], mut run_
 
             if let Event::WindowEvent { event, .. } = event {
                 match event {
-                    Closed => quit = true,
+                    CloseRequested => quit = true,
                     KeyboardInput { input, .. } => {
                         use glium::glutin::VirtualKeyCode as Key;
 
@@ -76,7 +76,7 @@ pub fn run<F: FnMut(&Ui) -> bool>(title: String, clear_color: [f32; 4], mut run_
                             _ => {}
                         }
                     }
-                    CursorMoved { position: (x, y), .. } => mouse_state.pos = (x as i32, y as i32),
+                    CursorMoved { position: LogicalPosition { x, y }, .. } => mouse_state.pos = (x as i32, y as i32),
                     MouseInput { state, button, .. } => {
                         match button {
                             MouseButton::Left => mouse_state.pressed.0 = state == Pressed,
@@ -89,12 +89,12 @@ pub fn run<F: FnMut(&Ui) -> bool>(title: String, clear_color: [f32; 4], mut run_
                         delta: MouseScrollDelta::LineDelta(_, y),
                         phase: TouchPhase::Moved,
                         ..
-                    } |
+                    } => mouse_state.wheel = y,
                     MouseWheel {
-                        delta: MouseScrollDelta::PixelDelta(_, y),
+                        delta: MouseScrollDelta::PixelDelta(LogicalPosition { y, .. }),
                         phase: TouchPhase::Moved,
                         ..
-                    } => mouse_state.wheel = y,
+                    } => mouse_state.wheel = y as f32,
                     ReceivedCharacter(c) => imgui.add_input_character(c),
                     _ => (),
                 }
@@ -113,10 +113,10 @@ pub fn run<F: FnMut(&Ui) -> bool>(title: String, clear_color: [f32; 4], mut run_
         let mouse_cursor = imgui.mouse_cursor();
         if imgui.mouse_draw_cursor() || mouse_cursor == ImGuiMouseCursor::None {
             // Hide OS cursor
-            gl_window.set_cursor_state(glutin::CursorState::Hide).unwrap();
+            gl_window.hide_cursor(true);
         } else {
             // Set OS cursor
-            gl_window.set_cursor_state(glutin::CursorState::Normal).unwrap();
+            gl_window.hide_cursor(false);
             gl_window.set_cursor(match mouse_cursor {
                 ImGuiMouseCursor::None => unreachable!("mouse_cursor was None!"),
                 ImGuiMouseCursor::Arrow => glutin::MouseCursor::Arrow,
@@ -129,14 +129,9 @@ pub fn run<F: FnMut(&Ui) -> bool>(title: String, clear_color: [f32; 4], mut run_
             });
         }
 
-        let size_pixels = gl_window.get_inner_size().unwrap();
-        let hdipi = gl_window.hidpi_factor();
-        let size_points = (
-            (size_pixels.0 as f32 / hdipi) as u32,
-            (size_pixels.1 as f32 / hdipi) as u32,
-        );
-
-        let ui = imgui.frame(size_points, size_pixels, delta_s);
+        let size_points = gl_window.get_inner_size().unwrap();
+        let size_pixels = size_points.to_physical(gl_window.get_hidpi_factor());
+        let ui = imgui.frame(size_points.into(), size_pixels.into(), delta_s);
         if !run_ui(&ui) {
             break;
         }
@@ -182,11 +177,8 @@ fn configure_keys(imgui: &mut ImGui) {
 }
 
 fn update_mouse(imgui: &mut ImGui, mouse_state: &mut MouseState) {
-    let scale = imgui.display_framebuffer_scale();
-    imgui.set_mouse_pos(
-        mouse_state.pos.0 as f32 / scale.0,
-        mouse_state.pos.1 as f32 / scale.1,
-    );
+    // Both mouse position, and framebuffer dimensions are in logical scales, no rescaling necessary
+    imgui.set_mouse_pos(mouse_state.pos.0 as f32, mouse_state.pos.1 as f32);
     imgui.set_mouse_down(
         &[
             mouse_state.pressed.0,
@@ -196,6 +188,6 @@ fn update_mouse(imgui: &mut ImGui, mouse_state: &mut MouseState) {
             false,
         ],
     );
-    imgui.set_mouse_wheel(mouse_state.wheel / scale.1);
+    imgui.set_mouse_wheel(mouse_state.wheel);
     mouse_state.wheel = 0.0;
 }
