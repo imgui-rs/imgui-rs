@@ -109,11 +109,11 @@ impl {typ} {{
         .expect("Unable to generate bindings");
 
     let out_path = PathBuf::from(env::var("OUT_DIR").unwrap());
-
+    /*
     bindings
         .write_to_file("debug_ffi.rs")
         .expect("Couldn't write Debug bindings!");
-
+    */
     bindings
         .write_to_file(out_path.join("imgui_ffi.rs"))
         .expect("Couldn't write bindings!");

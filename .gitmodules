@@ -1,0 +1,6 @@
+[submodule "imgui-sys/third-party/freetype2"]
+	path = imgui-sys/third-party/freetype2
+	url = https://github.com/aseprite/freetype2
+[submodule "imgui-sys/third-party/imgui"]
+	path = imgui-sys/third-party/imgui
+	url = https://github.com/ocornut/imgui

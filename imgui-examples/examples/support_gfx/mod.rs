@@ -174,7 +174,7 @@ pub fn run<F: FnMut(&Ui) -> bool>(title: String, clear_color: [f32; 4], mut run_
                 ImGuiMouseCursor::None => unreachable!("mouse_cursor was None!"),
                 ImGuiMouseCursor::Arrow => glutin::MouseCursor::Arrow,
                 ImGuiMouseCursor::TextInput => glutin::MouseCursor::Text,
-                //ImGuiMouseCursor::Move => glutin::MouseCursor::Move,
+                ImGuiMouseCursor::ResizeAll => glutin::MouseCursor::Move,
                 ImGuiMouseCursor::ResizeNS => glutin::MouseCursor::NsResize,
                 ImGuiMouseCursor::ResizeEW => glutin::MouseCursor::EwResize,
                 ImGuiMouseCursor::ResizeNESW => glutin::MouseCursor::NeswResize,
