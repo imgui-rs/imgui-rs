@@ -3,3 +3,4 @@
 target
 Cargo.lock
 imgui.ini
+.idea

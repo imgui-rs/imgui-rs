@@ -61,27 +61,30 @@ fn example_1(state: &mut State, ui: &Ui) {
         .build(|| {
             ui.text_wrapped(im_str!(
                 "Color button is a widget that displays a color value as a clickable rectangle. \
-                It also supports a tooltip with detailed information about the color value. \
-                Try hovering over and clicking these buttons!"
+                 It also supports a tooltip with detailed information about the color value. \
+                 Try hovering over and clicking these buttons!"
             ));
             ui.text(state.notify_text);
 
             ui.text("This button is black:");
-            if ui.color_button(im_str!("Black color"), (0.0, 0.0, 0.0, 1.0))
+            if ui
+                .color_button(im_str!("Black color"), (0.0, 0.0, 0.0, 1.0))
                 .build()
             {
                 state.notify_text = "*** Black button was clicked";
             }
 
             ui.text("This button is red:");
-            if ui.color_button(im_str!("Red color"), (1.0, 0.0, 0.0, 1.0))
+            if ui
+                .color_button(im_str!("Red color"), (1.0, 0.0, 0.0, 1.0))
                 .build()
             {
                 state.notify_text = "*** Red button was clicked";
             }
 
             ui.text("This button is BIG because it has a custom size:");
-            if ui.color_button(im_str!("Green color"), (0.0, 1.0, 0.0, 1.0))
+            if ui
+                .color_button(im_str!("Green color"), (0.0, 1.0, 0.0, 1.0))
                 .size((100.0, 50.0))
                 .build()
             {
@@ -89,7 +92,8 @@ fn example_1(state: &mut State, ui: &Ui) {
             }
 
             ui.text("This button doesn't use the tooltip at all:");
-            if ui.color_button(im_str!("No tooltip"), (0.0, 0.0, 1.0, 1.0))
+            if ui
+                .color_button(im_str!("No tooltip"), (0.0, 0.0, 1.0, 1.0))
                 .tooltip(false)
                 .build()
             {
@@ -105,8 +109,8 @@ fn example_2(ui: &Ui) {
         .build(|| {
             ui.text_wrapped(im_str!(
                 "The displayed color is passed to the button as four float values between \
-                    0.0 - 1.0 (RGBA). If you don't care about the alpha component, it can be \
-                    disabled and it won't show up in the tooltip"
+                 0.0 - 1.0 (RGBA). If you don't care about the alpha component, it can be \
+                 disabled and it won't show up in the tooltip"
             ));
 
             ui.text("This button ignores the alpha component:");
@@ -119,7 +123,7 @@ fn example_2(ui: &Ui) {
             ui.spacing();
             ui.text_wrapped(im_str!(
                 "If you *do* care about the alpha component, you can choose how it's \
-                    displayed in the button and the tooltip"
+                 displayed in the button and the tooltip"
             ));
 
             ui.separator();
@@ -133,7 +137,7 @@ fn example_2(ui: &Ui) {
             ui.separator();
             ui.text_wrapped(im_str!(
                 "ColorPreview::HalfAlpha divides the color area into two halves and uses a \
-                    checkerboard pattern in one half to illustrate the alpha component"
+                 checkerboard pattern in one half to illustrate the alpha component"
             ));
             ui.color_button(
                 im_str!("Red + ColorPreview::HalfAlpha"),
@@ -144,7 +148,7 @@ fn example_2(ui: &Ui) {
             ui.separator();
             ui.text_wrapped(im_str!(
                 "ColorPreview::Alpha uses a checkerboard pattern in the entire color area to \
-                    illustrate the alpha component"
+                 illustrate the alpha component"
             ));
             ui.color_button(im_str!("Red + ColorPreview::Alpha"), (1.0, 0.0, 0.0, 0.5))
                 .preview(ColorPreview::Alpha)

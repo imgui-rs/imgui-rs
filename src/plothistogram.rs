@@ -1,7 +1,7 @@
-use sys;
-use std::{f32, mem, ptr};
 use std::marker::PhantomData;
 use std::os::raw::c_float;
+use std::{f32, mem, ptr};
+use sys;
 
 use super::{ImStr, ImVec2, Ui};
 
@@ -63,7 +63,7 @@ impl<'ui, 'p> PlotHistogram<'ui, 'p> {
 
     pub fn build(self) {
         unsafe {
-            sys::igPlotHistogram(
+            sys::PlotHistogram(
                 self.label.as_ptr(),
                 self.values.as_ptr() as *const c_float,
                 self.values.len() as i32,

@@ -1,9 +1,14 @@
 # Change Log
 
 ## [Unreleased]
-
+    
 ### Added
 
+- Moved to Bindgen generated bindings for ImGui from hand written bindings to cimgui
+  - ImGui updated to 1.62
+  - Added experimental FreeType2 font renderer support
+  
+  
 - New things in imgui/cimgui 1.53.1
   - Style: Add `PopupRounding`, `FrameBorderSize`, `WindowBorderSize`, `PopupBorderSize`.
   - DemoWindow: Add `no_close` state.

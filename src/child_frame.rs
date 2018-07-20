@@ -1,14 +1,14 @@
-use sys;
 use std::marker::PhantomData;
+use sys;
 
-use super::{ImStr, ImVec2, ImGuiWindowFlags, Ui};
+use super::{ImGuiWindowFlags, ImStr, ImVec2, Ui};
 
 #[must_use]
 pub struct ChildFrame<'ui, 'p> {
     name: &'p ImStr,
     size: ImVec2,
     border: bool,
-    flags: ImGuiWindowFlags,
+    flags: sys::ImGuiWindowFlags,
     _phantom: PhantomData<&'ui Ui<'ui>>,
 }
 
@@ -18,7 +18,7 @@ impl<'ui, 'p> ChildFrame<'ui, 'p> {
             name: name,
             size: size.into(),
             border: false,
-            flags: ImGuiWindowFlags::empty(),
+            flags: ImGuiWindowFlags::None,
             _phantom: PhantomData,
         }
     }
@@ -74,42 +74,40 @@ impl<'ui, 'p> ChildFrame<'ui, 'p> {
     }
     #[inline]
     pub fn bring_to_front_on_focus(mut self, value: bool) -> Self {
-        self.flags.set(
-            ImGuiWindowFlags::NoBringToFrontOnFocus,
-            !value,
-        );
+        self.flags
+            .set(ImGuiWindowFlags::NoBringToFrontOnFocus, !value);
         self
     }
     #[inline]
     pub fn always_show_vertical_scroll_bar(mut self, value: bool) -> Self {
-        self.flags.set(
-            ImGuiWindowFlags::AlwaysVerticalScrollbar,
-            value,
-        );
+        self.flags
+            .set(ImGuiWindowFlags::AlwaysVerticalScrollbar, value);
         self
     }
     #[inline]
     pub fn always_show_horizontal_scroll_bar(mut self, value: bool) -> Self {
-        self.flags.set(
-            ImGuiWindowFlags::AlwaysHorizontalScrollbar,
-            value,
-        );
+        self.flags
+            .set(ImGuiWindowFlags::AlwaysHorizontalScrollbar, value);
         self
     }
     #[inline]
     pub fn always_use_window_padding(mut self, value: bool) -> Self {
-        self.flags.set(
-            ImGuiWindowFlags::AlwaysUseWindowPadding,
-            value,
-        );
+        self.flags
+            .set(ImGuiWindowFlags::AlwaysUseWindowPadding, value);
         self
     }
     pub fn build<F: FnOnce()>(self, f: F) {
-        let render_child_frame =
-            unsafe { sys::igBeginChild(self.name.as_ptr(), self.size, self.border, self.flags) };
+        let render_child_frame = unsafe {
+            sys::BeginChild(
+                self.name.as_ptr(),
+                &self.size as *const _,
+                self.border,
+                self.flags,
+            )
+        };
         if render_child_frame {
             f();
         }
-        unsafe { sys::igEndChild() };
+        unsafe { sys::EndChild() };
     }
 }

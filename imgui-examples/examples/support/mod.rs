@@ -9,7 +9,10 @@ struct MouseState {
 }
 
 pub fn run<F: FnMut(&Ui) -> bool>(title: String, clear_color: [f32; 4], mut run_ui: F) {
-    use glium::glutin::{self, dpi::{LogicalSize, LogicalPosition}};
+    use glium::glutin::{
+        self,
+        dpi::{LogicalPosition, LogicalSize},
+    };
     use glium::{Display, Surface};
     use imgui_glium_renderer::Renderer;
 
@@ -17,14 +20,20 @@ pub fn run<F: FnMut(&Ui) -> bool>(title: String, clear_color: [f32; 4], mut run_
     let context = glutin::ContextBuilder::new().with_vsync(true);
     let window = glutin::WindowBuilder::new()
         .with_title(title)
-        .with_dimensions( LogicalSize::new(1024., 768.));
+        .with_dimensions(LogicalSize::new(1024., 768.));
     let display = Display::new(window, context, &events_loop).unwrap();
 
     let mut imgui = ImGui::init();
     imgui.set_ini_filename(None);
-    let config = ImFontConfig::new().oversample_h(1).pixel_snap_h(true).size_pixels(13.0);
+    let config = ImFontConfig::new()
+        .oversample_h(1)
+        .pixel_snap_h(true)
+        .size_pixels(13.0);
     config.rasterizer_multiply(1.75).add_font(
-        &mut imgui.fonts(), include_bytes!("../mplus-1p-regular.ttf"), &FontGlyphRange::japanese());
+        &mut imgui.fonts(),
+        include_bytes!("../mplus-1p-regular.ttf"),
+        &FontGlyphRange::japanese(),
+    );
     config.merge_mode(true).add_default_font(&mut imgui.fonts());
     let mut renderer = Renderer::init(&mut imgui, &display).expect("Failed to initialize renderer");
 
@@ -36,8 +45,8 @@ pub fn run<F: FnMut(&Ui) -> bool>(title: String, clear_color: [f32; 4], mut run_
 
     loop {
         events_loop.poll_events(|event| {
-            use glium::glutin::WindowEvent::*;
             use glium::glutin::ElementState::Pressed;
+            use glium::glutin::WindowEvent::*;
             use glium::glutin::{Event, MouseButton, MouseScrollDelta, TouchPhase};
 
             if let Event::WindowEvent { event, .. } = event {
@@ -67,24 +76,25 @@ pub fn run<F: FnMut(&Ui) -> bool>(title: String, clear_color: [f32; 4], mut run_
                             Some(Key::X) => imgui.set_key(16, pressed),
                             Some(Key::Y) => imgui.set_key(17, pressed),
                             Some(Key::Z) => imgui.set_key(18, pressed),
-                            Some(Key::LControl) |
-                            Some(Key::RControl) => imgui.set_key_ctrl(pressed),
-                            Some(Key::LShift) |
-                            Some(Key::RShift) => imgui.set_key_shift(pressed),
+                            Some(Key::LControl) | Some(Key::RControl) => {
+                                imgui.set_key_ctrl(pressed)
+                            }
+                            Some(Key::LShift) | Some(Key::RShift) => imgui.set_key_shift(pressed),
                             Some(Key::LAlt) | Some(Key::RAlt) => imgui.set_key_alt(pressed),
                             Some(Key::LWin) | Some(Key::RWin) => imgui.set_key_super(pressed),
                             _ => {}
                         }
                     }
-                    CursorMoved { position: LogicalPosition { x, y }, .. } => mouse_state.pos = (x as i32, y as i32),
-                    MouseInput { state, button, .. } => {
-                        match button {
-                            MouseButton::Left => mouse_state.pressed.0 = state == Pressed,
-                            MouseButton::Right => mouse_state.pressed.1 = state == Pressed,
-                            MouseButton::Middle => mouse_state.pressed.2 = state == Pressed,
-                            _ => {}
-                        }
-                    }
+                    CursorMoved {
+                        position: LogicalPosition { x, y },
+                        ..
+                    } => mouse_state.pos = (x as i32, y as i32),
+                    MouseInput { state, button, .. } => match button {
+                        MouseButton::Left => mouse_state.pressed.0 = state == Pressed,
+                        MouseButton::Right => mouse_state.pressed.1 = state == Pressed,
+                        MouseButton::Middle => mouse_state.pressed.2 = state == Pressed,
+                        _ => {}
+                    },
                     MouseWheel {
                         delta: MouseScrollDelta::LineDelta(_, y),
                         phase: TouchPhase::Moved,
@@ -121,11 +131,12 @@ pub fn run<F: FnMut(&Ui) -> bool>(title: String, clear_color: [f32; 4], mut run_
                 ImGuiMouseCursor::None => unreachable!("mouse_cursor was None!"),
                 ImGuiMouseCursor::Arrow => glutin::MouseCursor::Arrow,
                 ImGuiMouseCursor::TextInput => glutin::MouseCursor::Text,
-                ImGuiMouseCursor::Move => glutin::MouseCursor::Move,
+                //ImGuiMouseCursor::Hand => glutin::MouseCursor::Move,
                 ImGuiMouseCursor::ResizeNS => glutin::MouseCursor::NsResize,
                 ImGuiMouseCursor::ResizeEW => glutin::MouseCursor::EwResize,
                 ImGuiMouseCursor::ResizeNESW => glutin::MouseCursor::NeswResize,
                 ImGuiMouseCursor::ResizeNWSE => glutin::MouseCursor::NwseResize,
+                x @ _ => unreachable!("only count enum variants here :{:?}", x),
             });
         }
 
@@ -179,15 +190,13 @@ fn configure_keys(imgui: &mut ImGui) {
 fn update_mouse(imgui: &mut ImGui, mouse_state: &mut MouseState) {
     // Both mouse position, and framebuffer dimensions are in logical scales, no rescaling necessary
     imgui.set_mouse_pos(mouse_state.pos.0 as f32, mouse_state.pos.1 as f32);
-    imgui.set_mouse_down(
-        &[
-            mouse_state.pressed.0,
-            mouse_state.pressed.1,
-            mouse_state.pressed.2,
-            false,
-            false,
-        ],
-    );
+    imgui.set_mouse_down(&[
+        mouse_state.pressed.0,
+        mouse_state.pressed.1,
+        mouse_state.pressed.2,
+        false,
+        false,
+    ]);
     imgui.set_mouse_wheel(mouse_state.wheel);
     mouse_state.wheel = 0.0;
 }

@@ -12,8 +12,8 @@ struct MouseState {
 pub fn run<F: FnMut(&Ui) -> bool>(title: String, clear_color: [f32; 4], mut run_ui: F) {
     use gfx::{self, Device};
     use gfx_window_glutin;
+    use glutin::dpi::{LogicalPosition, LogicalSize};
     use glutin::{self, GlContext};
-    use glutin::dpi::{LogicalSize, LogicalPosition};
 
     type ColorFormat = gfx::format::Rgba8;
     type DepthFormat = gfx::format::DepthStencil;
@@ -57,14 +57,20 @@ pub fn run<F: FnMut(&Ui) -> bool>(title: String, clear_color: [f32; 4], mut run_
         }
 
         let style = imgui.style_mut();
-        for col in 0..style.colors.len() {
-            style.colors[col] = imgui_gamma_to_linear(style.colors[col]);
+        for col in 0..style.Colors.len() {
+            style.Colors[col] = imgui_gamma_to_linear(style.Colors[col]);
         }
     }
     imgui.set_ini_filename(None);
-    let config = ImFontConfig::new().oversample_h(1).pixel_snap_h(true).size_pixels(13.0);
+    let config = ImFontConfig::new()
+        .oversample_h(1)
+        .pixel_snap_h(true)
+        .size_pixels(13.0);
     config.rasterizer_multiply(1.75).add_font(
-        &mut imgui.fonts(), include_bytes!("../mplus-1p-regular.ttf"), &FontGlyphRange::japanese());
+        &mut imgui.fonts(),
+        include_bytes!("../mplus-1p-regular.ttf"),
+        &FontGlyphRange::japanese(),
+    );
     config.merge_mode(true).add_default_font(&mut imgui.fonts());
     let mut renderer = Renderer::init(&mut imgui, &mut factory, shaders, main_color.clone())
         .expect("Failed to initialize renderer");
@@ -77,8 +83,8 @@ pub fn run<F: FnMut(&Ui) -> bool>(title: String, clear_color: [f32; 4], mut run_
 
     'running: loop {
         events_loop.poll_events(|event| {
-            use glutin::WindowEvent::*;
             use glutin::ElementState::Pressed;
+            use glutin::WindowEvent::*;
             use glutin::{Event, MouseButton, MouseScrollDelta, TouchPhase};
 
             if let Event::WindowEvent { event, .. } = event {
@@ -112,24 +118,25 @@ pub fn run<F: FnMut(&Ui) -> bool>(title: String, clear_color: [f32; 4], mut run_
                             Some(Key::X) => imgui.set_key(16, pressed),
                             Some(Key::Y) => imgui.set_key(17, pressed),
                             Some(Key::Z) => imgui.set_key(18, pressed),
-                            Some(Key::LControl) |
-                            Some(Key::RControl) => imgui.set_key_ctrl(pressed),
-                            Some(Key::LShift) |
-                            Some(Key::RShift) => imgui.set_key_shift(pressed),
+                            Some(Key::LControl) | Some(Key::RControl) => {
+                                imgui.set_key_ctrl(pressed)
+                            }
+                            Some(Key::LShift) | Some(Key::RShift) => imgui.set_key_shift(pressed),
                             Some(Key::LAlt) | Some(Key::RAlt) => imgui.set_key_alt(pressed),
                             Some(Key::LWin) | Some(Key::RWin) => imgui.set_key_super(pressed),
                             _ => {}
                         }
                     }
-                    CursorMoved { position: LogicalPosition { x, y }, .. } => mouse_state.pos = (x as i32, y as i32),
-                    MouseInput { state, button, .. } => {
-                        match button {
-                            MouseButton::Left => mouse_state.pressed.0 = state == Pressed,
-                            MouseButton::Right => mouse_state.pressed.1 = state == Pressed,
-                            MouseButton::Middle => mouse_state.pressed.2 = state == Pressed,
-                            _ => {}
-                        }
-                    }
+                    CursorMoved {
+                        position: LogicalPosition { x, y },
+                        ..
+                    } => mouse_state.pos = (x as i32, y as i32),
+                    MouseInput { state, button, .. } => match button {
+                        MouseButton::Left => mouse_state.pressed.0 = state == Pressed,
+                        MouseButton::Right => mouse_state.pressed.1 = state == Pressed,
+                        MouseButton::Middle => mouse_state.pressed.2 = state == Pressed,
+                        _ => {}
+                    },
                     MouseWheel {
                         delta: MouseScrollDelta::LineDelta(_, y),
                         phase: TouchPhase::Moved,
@@ -167,11 +174,12 @@ pub fn run<F: FnMut(&Ui) -> bool>(title: String, clear_color: [f32; 4], mut run_
                 ImGuiMouseCursor::None => unreachable!("mouse_cursor was None!"),
                 ImGuiMouseCursor::Arrow => glutin::MouseCursor::Arrow,
                 ImGuiMouseCursor::TextInput => glutin::MouseCursor::Text,
-                ImGuiMouseCursor::Move => glutin::MouseCursor::Move,
+                //ImGuiMouseCursor::Move => glutin::MouseCursor::Move,
                 ImGuiMouseCursor::ResizeNS => glutin::MouseCursor::NsResize,
                 ImGuiMouseCursor::ResizeEW => glutin::MouseCursor::EwResize,
                 ImGuiMouseCursor::ResizeNESW => glutin::MouseCursor::NeswResize,
                 ImGuiMouseCursor::ResizeNWSE => glutin::MouseCursor::NwseResize,
+                _ => unreachable!("Only count should be here"),
             });
         }
 
@@ -184,9 +192,9 @@ pub fn run<F: FnMut(&Ui) -> bool>(title: String, clear_color: [f32; 4], mut run_
         }
 
         encoder.clear(&main_color, clear_color);
-        renderer.render(ui, &mut factory, &mut encoder).expect(
-            "Rendering failed",
-        );
+        renderer
+            .render(ui, &mut factory, &mut encoder)
+            .expect("Rendering failed");
         encoder.flush(&mut device);
         window.context().swap_buffers().unwrap();
         device.cleanup();
@@ -220,15 +228,13 @@ fn configure_keys(imgui: &mut ImGui) {
 fn update_mouse(imgui: &mut ImGui, mouse_state: &mut MouseState) {
     let scale = imgui.display_framebuffer_scale();
     imgui.set_mouse_pos(mouse_state.pos.0 as f32, mouse_state.pos.1 as f32);
-    imgui.set_mouse_down(
-        &[
-            mouse_state.pressed.0,
-            mouse_state.pressed.1,
-            mouse_state.pressed.2,
-            false,
-            false,
-        ],
-    );
+    imgui.set_mouse_down(&[
+        mouse_state.pressed.0,
+        mouse_state.pressed.1,
+        mouse_state.pressed.2,
+        false,
+        false,
+    ]);
     imgui.set_mouse_wheel(mouse_state.wheel);
     mouse_state.wheel = 0.0;
 }

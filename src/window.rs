@@ -1,6 +1,6 @@
-use sys;
 use std::marker::PhantomData;
 use std::ptr;
+use sys;
 
 use super::{ImGuiCond, ImGuiStyleVar, ImGuiWindowFlags, ImStr, ImVec2, Ui};
 
@@ -22,12 +22,12 @@ impl<'ui, 'p> Window<'ui, 'p> {
     pub fn new(_: &Ui<'ui>, name: &'p ImStr) -> Window<'ui, 'p> {
         Window {
             pos: (0.0, 0.0),
-            pos_cond: ImGuiCond::empty(),
+            pos_cond: ImGuiCond::None,
             size: (0.0, 0.0),
-            size_cond: ImGuiCond::empty(),
+            size_cond: ImGuiCond::None,
             name: name,
             opened: None,
-            flags: ImGuiWindowFlags::empty(),
+            flags: ImGuiWindowFlags::None,
             border: false,
             _phantom: PhantomData,
         }
@@ -122,52 +122,44 @@ impl<'ui, 'p> Window<'ui, 'p> {
     }
     #[inline]
     pub fn no_bring_to_front_on_focus(mut self, value: bool) -> Self {
-        self.flags.set(
-            ImGuiWindowFlags::NoBringToFrontOnFocus,
-            value,
-        );
+        self.flags
+            .set(ImGuiWindowFlags::NoBringToFrontOnFocus, value);
         self
     }
     #[inline]
     pub fn always_vertical_scrollbar(mut self, value: bool) -> Self {
-        self.flags.set(
-            ImGuiWindowFlags::AlwaysVerticalScrollbar,
-            value,
-        );
+        self.flags
+            .set(ImGuiWindowFlags::AlwaysVerticalScrollbar, value);
         self
     }
     #[inline]
     pub fn always_horizontal_scrollbar(mut self, value: bool) -> Self {
-        self.flags.set(
-            ImGuiWindowFlags::AlwaysHorizontalScrollbar,
-            value,
-        );
+        self.flags
+            .set(ImGuiWindowFlags::AlwaysHorizontalScrollbar, value);
         self
     }
     #[inline]
     pub fn always_use_window_padding(mut self, value: bool) -> Self {
-        self.flags.set(
-            ImGuiWindowFlags::AlwaysUseWindowPadding,
-            value,
-        );
+        self.flags
+            .set(ImGuiWindowFlags::AlwaysUseWindowPadding, value);
         self
     }
     pub fn build<F: FnOnce()>(self, f: F) {
         let render = unsafe {
-            if !self.pos_cond.is_empty() {
-                sys::igSetNextWindowPos(self.pos.into(), self.pos_cond, ImVec2::zero());
+            if self.pos_cond.0 != 0 {
+                sys::SetNextWindowPos(&self.pos.into() as _, self.pos_cond, &ImVec2::zero() as _);
             }
-            if !self.size_cond.is_empty() {
-                sys::igSetNextWindowSize(self.size.into(), self.size_cond);
+            if self.size_cond.0 != 0 {
+                sys::SetNextWindowSize(&self.size.into() as _, self.size_cond);
             }
             if self.border {
-                sys::igPushStyleVar(ImGuiStyleVar::WindowBorderSize, 1.0);
+                sys::PushStyleVar(ImGuiStyleVar::WindowBorderSize, 1.0);
             }
-            sys::igBegin(
+            sys::Begin(
                 self.name.as_ptr(),
-                self.opened.map(|x| x as *mut bool).unwrap_or(
-                    ptr::null_mut(),
-                ),
+                self.opened
+                    .map(|x| x as *mut bool)
+                    .unwrap_or(ptr::null_mut()),
                 self.flags,
             )
         };
@@ -175,9 +167,9 @@ impl<'ui, 'p> Window<'ui, 'p> {
             f();
         }
         unsafe {
-            sys::igEnd();
+            sys::End();
             if self.border {
-                sys::igPopStyleVar(1);
+                sys::PopStyleVar(1);
             }
         };
     }

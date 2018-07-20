@@ -1,5 +1,5 @@
-use sys;
 use std::marker::PhantomData;
+use sys;
 
 use super::{ImStr, Ui};
 
@@ -33,7 +33,7 @@ impl<'ui, 'p> SliderInt<'ui, 'p> {
     }
     pub fn build(self) -> bool {
         unsafe {
-            sys::igSliderInt(
+            sys::SliderInt(
                 self.label.as_ptr(),
                 self.value,
                 self.min,
@@ -57,7 +57,13 @@ macro_rules! impl_slider_intn {
         }
 
         impl<'ui, 'p> $SliderIntN<'ui, 'p> {
-            pub fn new(_: &Ui<'ui>, label: &'p ImStr, value: &'p mut [i32; $N], min: i32, max: i32) -> Self {
+            pub fn new(
+                _: &Ui<'ui>,
+                label: &'p ImStr,
+                value: &'p mut [i32; $N],
+                min: i32,
+                max: i32,
+            ) -> Self {
                 $SliderIntN {
                     label: label,
                     value: value,
@@ -79,16 +85,17 @@ macro_rules! impl_slider_intn {
                         self.value.as_mut_ptr(),
                         self.min,
                         self.max,
-                        self.display_format.as_ptr())
+                        self.display_format.as_ptr(),
+                    )
                 }
             }
         }
-    }
+    };
 }
 
-impl_slider_intn!(SliderInt2, 2, igSliderInt2);
-impl_slider_intn!(SliderInt3, 3, igSliderInt3);
-impl_slider_intn!(SliderInt4, 4, igSliderInt4);
+impl_slider_intn!(SliderInt2, 2, SliderInt2);
+impl_slider_intn!(SliderInt3, 3, SliderInt3);
+impl_slider_intn!(SliderInt4, 4, SliderInt4);
 
 #[must_use]
 pub struct SliderFloat<'ui, 'p> {
@@ -125,7 +132,7 @@ impl<'ui, 'p> SliderFloat<'ui, 'p> {
     }
     pub fn build(self) -> bool {
         unsafe {
-            sys::igSliderFloat(
+            sys::SliderFloat(
                 self.label.as_ptr(),
                 self.value,
                 self.min,
@@ -151,7 +158,13 @@ macro_rules! impl_slider_floatn {
         }
 
         impl<'ui, 'p> $SliderFloatN<'ui, 'p> {
-            pub fn new(_: &Ui<'ui>, label: &'p ImStr, value: &'p mut [f32; $N], min: f32, max: f32) -> Self {
+            pub fn new(
+                _: &Ui<'ui>,
+                label: &'p ImStr,
+                value: &'p mut [f32; $N],
+                min: f32,
+                max: f32,
+            ) -> Self {
                 $SliderFloatN {
                     label: label,
                     value: value,
@@ -180,13 +193,14 @@ macro_rules! impl_slider_floatn {
                         self.min,
                         self.max,
                         self.display_format.as_ptr(),
-                        self.power)
+                        self.power,
+                    )
                 }
             }
         }
-    }
+    };
 }
 
-impl_slider_floatn!(SliderFloat2, 2, igSliderFloat2);
-impl_slider_floatn!(SliderFloat3, 3, igSliderFloat3);
-impl_slider_floatn!(SliderFloat4, 4, igSliderFloat4);
+impl_slider_floatn!(SliderFloat2, 2, SliderFloat2);
+impl_slider_floatn!(SliderFloat3, 3, SliderFloat3);
+impl_slider_floatn!(SliderFloat4, 4, SliderFloat4);

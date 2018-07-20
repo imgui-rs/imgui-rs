@@ -1,6 +1,6 @@
-use sys;
 use std::marker::PhantomData;
 use std::ptr;
+use sys;
 
 use super::{ImStr, Ui};
 
@@ -25,10 +25,10 @@ impl<'ui, 'p> Menu<'ui, 'p> {
         self
     }
     pub fn build<F: FnOnce()>(self, f: F) {
-        let render = unsafe { sys::igBeginMenu(self.label.as_ptr(), self.enabled) };
+        let render = unsafe { sys::BeginMenu(self.label.as_ptr(), self.enabled) };
         if render {
             f();
-            unsafe { sys::igEndMenu() };
+            unsafe { sys::EndMenu() };
         }
     }
 }
@@ -70,10 +70,11 @@ impl<'ui, 'p> MenuItem<'ui, 'p> {
     pub fn build(self) -> bool {
         let label = self.label.as_ptr();
         let shortcut = self.shortcut.map(|x| x.as_ptr()).unwrap_or(ptr::null());
-        let selected = self.selected.map(|x| x as *mut bool).unwrap_or(
-            ptr::null_mut(),
-        );
+        let selected = self
+            .selected
+            .map(|x| x as *mut bool)
+            .unwrap_or(ptr::null_mut());
         let enabled = self.enabled;
-        unsafe { sys::igMenuItemPtr(label, shortcut, selected, enabled) }
+        unsafe { sys::MenuItem1(label, shortcut, selected, enabled) }
     }
 }

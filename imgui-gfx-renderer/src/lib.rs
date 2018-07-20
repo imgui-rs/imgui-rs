@@ -2,11 +2,11 @@
 extern crate gfx;
 extern crate imgui;
 
-use gfx::{Bundle, CommandBuffer, Encoder, Factory, IntoIndexBuffer, Rect, Resources, Slice};
-use gfx::memory::Bind;
 use gfx::handle::{Buffer, RenderTargetView};
+use gfx::memory::Bind;
 use gfx::texture::{FilterMethod, SamplerInfo, WrapMode};
 use gfx::traits::FactoryExt;
+use gfx::{Bundle, CommandBuffer, Encoder, Factory, IntoIndexBuffer, Rect, Resources, Slice};
 use imgui::{DrawList, ImDrawIdx, ImDrawVert, ImGui, Ui};
 
 pub type RendererResult<T> = Result<T, RendererError>;
@@ -51,9 +51,9 @@ gfx_defines!{
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
 pub enum Shaders {
-    GlSl400, // OpenGL 4.0+
-    GlSl130, // OpenGL 3.0+
-    GlSl110, // OpenGL 2.0+
+    GlSl400,   // OpenGL 4.0+
+    GlSl130,   // OpenGL 3.0+
+    GlSl110,   // OpenGL 2.0+
     GlSlEs300, // OpenGL ES 3.0+
     GlSlEs100, // OpenGL ES 2.0+
 }
@@ -99,11 +99,7 @@ impl<R: Resources> Renderer<R> {
         out: RenderTargetView<R, gfx::format::Rgba8>,
     ) -> RendererResult<Renderer<R>> {
         let (vs_code, ps_code) = shaders.get_program_code();
-        let pso = factory.create_pipeline_simple(
-            vs_code,
-            ps_code,
-            pipe::new(),
-        )?;
+        let pso = factory.create_pipeline_simple(vs_code, ps_code, pipe::new())?;
         let vertex_buffer = factory.create_buffer::<ImDrawVert>(
             256,
             gfx::buffer::Role::Vertex,
@@ -204,12 +200,12 @@ impl<R: Resources> Renderer<R> {
         for cmd in draw_list.cmd_buffer {
             // TODO: check cmd.texture_id
 
-            self.bundle.slice.end = self.bundle.slice.start + cmd.elem_count;
+            self.bundle.slice.end = self.bundle.slice.start + cmd.ElemCount;
             self.bundle.data.scissor = Rect {
-                x: (cmd.clip_rect.x.max(0.0) * scale_width) as u16,
-                y: (cmd.clip_rect.y.max(0.0) * scale_height) as u16,
-                w: ((cmd.clip_rect.z - cmd.clip_rect.x).abs().min(width) * scale_width) as u16,
-                h: ((cmd.clip_rect.w - cmd.clip_rect.y).abs().min(height) * scale_height) as u16,
+                x: (cmd.ClipRect.x.max(0.0) * scale_width) as u16,
+                y: (cmd.ClipRect.y.max(0.0) * scale_height) as u16,
+                w: ((cmd.ClipRect.z - cmd.ClipRect.x).abs().min(width) * scale_width) as u16,
+                h: ((cmd.ClipRect.w - cmd.ClipRect.y).abs().min(height) * scale_height) as u16,
             };
             self.bundle.encode(encoder);
             self.bundle.slice.start = self.bundle.slice.end;
@@ -230,11 +226,7 @@ impl<R: Resources> Renderer<R> {
                 Bind::empty(),
             )?;
         }
-        Ok(encoder.update_buffer(
-            &self.bundle.data.vertex_buffer,
-            vtx_buffer,
-            0,
-        )?)
+        Ok(encoder.update_buffer(&self.bundle.data.vertex_buffer, vtx_buffer, 0)?)
     }
     fn upload_index_buffer<F: Factory<R>, C: CommandBuffer<R>>(
         &mut self,

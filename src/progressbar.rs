@@ -1,7 +1,7 @@
 #![warn(missing_docs)]
-use sys;
 use std::marker::PhantomData;
 use std::ptr;
+use sys;
 
 use super::{ImStr, ImVec2, Ui};
 
@@ -49,7 +49,7 @@ impl<'ui, 'p> ProgressBar<'ui, 'p> {
     /// of the progress bar, otherwise the it will not be shown.
     pub fn build(self) {
         unsafe {
-            sys::igProgressBar(
+            sys::ProgressBar(
                 self.fraction,
                 &self.size,
                 self.overlay_text.map(|x| x.as_ptr()).unwrap_or(ptr::null()),

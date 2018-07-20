@@ -1,7 +1,7 @@
 #![warn(missing_docs)]
-use sys;
 use std::marker::PhantomData;
 use std::ptr;
+use sys;
 
 use {ImGuiColorEditFlags, ImStr, ImVec2, ImVec4, Ui};
 
@@ -77,7 +77,7 @@ pub enum ColorPreview {
 pub struct ColorEdit<'ui, 'p> {
     label: &'p ImStr,
     value: EditableColor<'p>,
-    flags: ImGuiColorEditFlags,
+    flags: sys::ImGuiColorEditFlags,
     _phantom: PhantomData<&'ui Ui<'ui>>,
 }
 
@@ -87,7 +87,7 @@ impl<'ui, 'p> ColorEdit<'ui, 'p> {
         ColorEdit {
             label,
             value,
-            flags: ImGuiColorEditFlags::empty(),
+            flags: ImGuiColorEditFlags::None,
             _phantom: PhantomData,
         }
     }
@@ -171,41 +171,31 @@ impl<'ui, 'p> ColorEdit<'ui, 'p> {
     /// Sets the color editor mode.
     #[inline]
     pub fn mode(mut self, mode: ColorEditMode) -> Self {
-        self.flags.set(
-            ImGuiColorEditFlags::RGB,
-            mode == ColorEditMode::RGB,
-        );
-        self.flags.set(
-            ImGuiColorEditFlags::HSV,
-            mode == ColorEditMode::HSV,
-        );
-        self.flags.set(
-            ImGuiColorEditFlags::HEX,
-            mode == ColorEditMode::HEX,
-        );
+        self.flags
+            .set(ImGuiColorEditFlags::RGB, mode == ColorEditMode::RGB);
+        self.flags
+            .set(ImGuiColorEditFlags::HSV, mode == ColorEditMode::HSV);
+        self.flags
+            .set(ImGuiColorEditFlags::HEX, mode == ColorEditMode::HEX);
         self
     }
     /// Sets the formatting style of color components.
     #[inline]
     pub fn format(mut self, format: ColorFormat) -> Self {
-        self.flags.set(
-            ImGuiColorEditFlags::Uint8,
-            format == ColorFormat::U8,
-        );
-        self.flags.set(
-            ImGuiColorEditFlags::Float,
-            format == ColorFormat::Float,
-        );
+        self.flags
+            .set(ImGuiColorEditFlags::Uint8, format == ColorFormat::U8);
+        self.flags
+            .set(ImGuiColorEditFlags::Float, format == ColorFormat::Float);
         self
     }
     /// Builds the color editor.
     pub fn build(self) -> bool {
         match self.value {
             EditableColor::Float3(value) => unsafe {
-                sys::igColorEdit3(self.label.as_ptr(), value.as_mut_ptr(), self.flags)
+                sys::ColorEdit3(self.label.as_ptr(), value.as_mut_ptr(), self.flags)
             },
             EditableColor::Float4(value) => unsafe {
-                sys::igColorEdit4(self.label.as_ptr(), value.as_mut_ptr(), self.flags)
+                sys::ColorEdit4(self.label.as_ptr(), value.as_mut_ptr(), self.flags)
             },
         }
     }
@@ -227,7 +217,7 @@ impl<'ui, 'p> ColorPicker<'ui, 'p> {
         ColorPicker {
             label,
             value,
-            flags: ImGuiColorEditFlags::empty(),
+            flags: ImGuiColorEditFlags::None,
             ref_color: None,
             _phantom: PhantomData,
         }
@@ -328,14 +318,10 @@ impl<'ui, 'p> ColorPicker<'ui, 'p> {
     /// Sets the formatting style of color components.
     #[inline]
     pub fn format(mut self, format: ColorFormat) -> Self {
-        self.flags.set(
-            ImGuiColorEditFlags::Uint8,
-            format == ColorFormat::U8,
-        );
-        self.flags.set(
-            ImGuiColorEditFlags::Float,
-            format == ColorFormat::Float,
-        );
+        self.flags
+            .set(ImGuiColorEditFlags::Uint8, format == ColorFormat::U8);
+        self.flags
+            .set(ImGuiColorEditFlags::Float, format == ColorFormat::Float);
         self
     }
     /// Sets the shown reference color.
@@ -347,11 +333,11 @@ impl<'ui, 'p> ColorPicker<'ui, 'p> {
     /// Builds the color picker.
     pub fn build(mut self) -> bool {
         if let EditableColor::Float3(_) = self.value {
-            self.flags.insert(ImGuiColorEditFlags::NoAlpha);
+            self.flags |= ImGuiColorEditFlags::NoAlpha;
         }
         let ref_color = self.ref_color.map(|c| c.as_ptr()).unwrap_or(ptr::null());
         unsafe {
-            sys::igColorPicker4(
+            sys::ColorPicker4(
                 self.label.as_ptr(),
                 self.value.as_mut_ptr(),
                 self.flags,
@@ -377,7 +363,7 @@ impl<'ui, 'p> ColorButton<'ui, 'p> {
         ColorButton {
             desc_id,
             color,
-            flags: ImGuiColorEditFlags::empty(),
+            flags: ImGuiColorEditFlags::None,
             size: ImVec2::zero(),
             _phantom: PhantomData,
         }
@@ -423,6 +409,13 @@ impl<'ui, 'p> ColorButton<'ui, 'p> {
     }
     /// Builds the color button.
     pub fn build(self) -> bool {
-        unsafe { sys::igColorButton(self.desc_id.as_ptr(), self.color, self.flags, self.size) }
+        unsafe {
+            sys::ColorButton(
+                self.desc_id.as_ptr(),
+                &self.color as *const _,
+                self.flags,
+                self.size,
+            )
+        }
     }
 }

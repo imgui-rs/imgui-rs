@@ -2,12 +2,12 @@
 extern crate glium;
 extern crate imgui;
 
-use glium::{DrawError, GlObject, IndexBuffer, Program, Surface, Texture2d, VertexBuffer};
 use glium::backend::{Context, Facade};
-use glium::program;
 use glium::index::{self, PrimitiveType};
+use glium::program;
 use glium::texture;
 use glium::vertex;
+use glium::{DrawError, GlObject, IndexBuffer, Program, Surface, Texture2d, VertexBuffer};
 use imgui::{DrawList, ImDrawIdx, ImDrawVert, ImGui, Ui};
 use std::borrow::Cow;
 use std::fmt;
@@ -89,17 +89,17 @@ impl Renderer {
         ui: &'a Ui<'a>,
         draw_list: &DrawList<'a>,
     ) -> RendererResult<()> {
+        use glium::uniforms::{MagnifySamplerFilter, MinifySamplerFilter};
         use glium::{Blend, DrawParameters, Rect};
-        use glium::uniforms::{MinifySamplerFilter, MagnifySamplerFilter};
 
-        try!(self.device_objects.upload_vertex_buffer(
-            &self.ctx,
-            draw_list.vtx_buffer,
-        ));
-        try!(self.device_objects.upload_index_buffer(
-            &self.ctx,
-            draw_list.idx_buffer,
-        ));
+        try!(
+            self.device_objects
+                .upload_vertex_buffer(&self.ctx, draw_list.vtx_buffer,)
+        );
+        try!(
+            self.device_objects
+                .upload_index_buffer(&self.ctx, draw_list.idx_buffer,)
+        );
 
         let (width, height) = ui.imgui().display_size();
         let (scale_width, scale_height) = ui.imgui().display_framebuffer_scale();
@@ -119,31 +119,32 @@ impl Renderer {
         let mut idx_start = 0;
         for cmd in draw_list.cmd_buffer {
             // We don't support custom textures...yet!
-            assert!(cmd.texture_id as usize == font_texture_id);
+            assert!(cmd.TextureId as usize == font_texture_id);
 
-            let idx_end = idx_start + cmd.elem_count as usize;
+            let idx_end = idx_start + cmd.ElemCount as usize;
 
             try!(
                 surface.draw(
                     &self.device_objects.vertex_buffer,
-                    &self.device_objects
+                    &self
+                        .device_objects
                         .index_buffer
                         .slice(idx_start..idx_end)
                         .expect("Invalid index buffer range"),
                     &self.device_objects.program,
                     &uniform! {
-                          matrix: matrix,
-                          tex: self.device_objects.texture.sampled()
-                              .magnify_filter(MagnifySamplerFilter::Nearest)
-                              .minify_filter(MinifySamplerFilter::Nearest),
-                      },
+                        matrix: matrix,
+                        tex: self.device_objects.texture.sampled()
+                            .magnify_filter(MagnifySamplerFilter::Nearest)
+                            .minify_filter(MinifySamplerFilter::Nearest),
+                    },
                     &DrawParameters {
                         blend: Blend::alpha_blending(),
                         scissor: Some(Rect {
-                            left: (cmd.clip_rect.x * scale_width) as u32,
-                            bottom: ((height - cmd.clip_rect.w) * scale_height) as u32,
-                            width: ((cmd.clip_rect.z - cmd.clip_rect.x) * scale_width) as u32,
-                            height: ((cmd.clip_rect.w - cmd.clip_rect.y) * scale_height) as u32,
+                            left: (cmd.ClipRect.x * scale_width) as u32,
+                            bottom: ((height - cmd.ClipRect.w) * scale_height) as u32,
+                            width: ((cmd.ClipRect.z - cmd.ClipRect.x) * scale_width) as u32,
+                            height: ((cmd.ClipRect.w - cmd.ClipRect.y) * scale_height) as u32,
                         }),
                         ..DrawParameters::default()
                     },

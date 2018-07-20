@@ -27,19 +27,19 @@ impl Vertex for ImDrawVert {
                     "pos".into(),
                     mem::transmute(&dummy.pos),
                     <ImVec2 as Attribute>::get_type(),
-                    false
+                    false,
                 ),
                 (
                     "uv".into(),
                     mem::transmute(&dummy.uv),
                     <ImVec2 as Attribute>::get_type(),
-                    false
+                    false,
                 ),
                 (
                     "col".into(),
                     mem::transmute(&dummy.col),
                     AttributeType::U8U8U8U8,
-                    false
+                    false,
                 ),
             ])
         }
