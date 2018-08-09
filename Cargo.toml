@@ -15,5 +15,9 @@ travis-ci = { repository = "Gekkio/imgui-rs" }
 [dependencies]
 imgui-sys = { version = "0.0.19-pre", path = "imgui-sys" }
 
+[dev-dependencies]
+glium = { version = "0.21", default-features = true }
+imgui-glium-renderer = { path = "imgui-glium-renderer" }
+
 [workspace]
 members = ["imgui-examples", "imgui-sys", "imgui-gfx-renderer", "imgui-glium-renderer"]

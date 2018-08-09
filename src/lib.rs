@@ -10,13 +10,14 @@ use sys::ImGuiStyleVar;
 
 pub use sys::{ImDrawIdx, ImDrawVert, ImGuiColorEditFlags, ImGuiHoveredFlags, ImGuiInputTextFlags,
               ImGuiKey, ImGuiMouseCursor, ImGuiSelectableFlags, ImGuiCond, ImGuiCol, ImGuiStyle,
-              ImGuiTreeNodeFlags, ImGuiWindowFlags, ImVec2, ImVec4};
+              ImTextureID, ImGuiTreeNodeFlags, ImGuiWindowFlags, ImVec2, ImVec4};
 pub use child_frame::ChildFrame;
 pub use color_editors::{ColorButton, ColorEdit, ColorEditMode, ColorFormat, ColorPicker,
                         ColorPickerMode, ColorPreview, EditableColor};
 pub use drag::{DragFloat, DragFloat2, DragFloat3, DragFloat4, DragInt, DragInt2, DragInt3,
                DragInt4, DragFloatRange2, DragIntRange2};
 pub use fonts::{FontGlyphRange, ImFontAtlas, ImFont, ImFontConfig};
+pub use image::Image;
 pub use input::{InputFloat, InputFloat2, InputFloat3, InputFloat4, InputInt, InputInt2, InputInt3,
                 InputInt4, InputText, InputTextMultiline};
 pub use menus::{Menu, MenuItem};
@@ -27,6 +28,8 @@ pub use sliders::{SliderFloat, SliderFloat2, SliderFloat3, SliderFloat4, SliderI
                   SliderInt3, SliderInt4};
 pub use string::{ImStr, ImString};
 pub use style::StyleVar;
+pub use texture::{AnyTexture, FromImTexture, ImTexture, IntoImTexture};
+use texture::TextureCache;
 pub use trees::{CollapsingHeader, TreeNode};
 pub use window::Window;
 pub use window_draw_list::{ImColor, WindowDrawList, ChannelsSplit};
@@ -35,6 +38,7 @@ mod child_frame;
 mod color_editors;
 mod drag;
 mod fonts;
+mod image;
 mod input;
 mod menus;
 mod plothistogram;
@@ -43,6 +47,7 @@ mod progressbar;
 mod sliders;
 mod string;
 mod style;
+mod texture;
 mod trees;
 mod window;
 mod window_draw_list;
@@ -52,6 +57,7 @@ pub struct ImGui {
     // lives long enough in case the ImStr contains a Cow::Owned
     ini_filename: Option<ImString>,
     log_filename: Option<ImString>,
+    textures: TextureCache,
 }
 
 #[macro_export]
@@ -69,7 +75,7 @@ macro_rules! im_str {
     })
 }
 
-pub struct TextureHandle<'a> {
+pub struct FontTextureHandle<'a> {
     pub width: u32,
     pub height: u32,
     pub pixels: &'a [c_uchar],
@@ -104,6 +110,7 @@ impl ImGui {
         ImGui {
             ini_filename: None,
             log_filename: None,
+            textures: TextureCache::new(),
         }
     }
     fn io(&self) -> &sys::ImGuiIO { unsafe { &*sys::igGetIO() } }
@@ -113,7 +120,7 @@ impl ImGui {
     pub fn fonts(&mut self) -> ImFontAtlas { unsafe { ImFontAtlas::from_ptr(self.io_mut().fonts) } }
     pub fn prepare_texture<'a, F, T>(&mut self, f: F) -> T
     where
-        F: FnOnce(TextureHandle<'a>) -> T,
+        F: FnOnce(FontTextureHandle<'a>) -> T,
     {
         let io = self.io();
         let mut pixels: *mut c_uchar = ptr::null_mut();
@@ -128,12 +135,41 @@ impl ImGui {
                 &mut height,
                 &mut bytes_per_pixel,
             );
-            f(TextureHandle {
+            f(FontTextureHandle {
                 width: width as u32,
                 height: height as u32,
                 pixels: slice::from_raw_parts(pixels, (width * height * bytes_per_pixel) as usize),
             })
         }
+    }
+    /// Register font texture returned by closure to [`ImGui`] instance.
+    pub fn register_font_texture<'a, F, T, U, E>(&mut self, f: F) -> Result<AnyTexture, E>
+    where
+        F: FnOnce(FontTextureHandle<'a>) -> Result<T, E>,
+        T: IntoImTexture<U>,
+        U: 'static + ImTexture,
+    {
+        let io = self.io();
+        let mut pixels: *mut c_uchar = ptr::null_mut();
+        let mut width: c_int = 0;
+        let mut height: c_int = 0;
+        let mut bytes_per_pixel: c_int = 0;
+        let texture = unsafe {
+            sys::ImFontAtlas_GetTexDataAsRGBA32(
+                io.fonts,
+                &mut pixels,
+                &mut width,
+                &mut height,
+                &mut bytes_per_pixel,
+            );
+            f(FontTextureHandle {
+                width: width as u32,
+                height: height as u32,
+                pixels: slice::from_raw_parts(pixels, (width * height * bytes_per_pixel) as usize),
+            })?.into_texture()
+        };
+        self.textures.register_texture(im_str!("#FONT"), texture);
+        Ok(self.textures.get_texture(im_str!("#FONT")).unwrap())
     }
     pub fn set_texture_id(&mut self, value: usize) {
         self.fonts().set_texture_id(value);
@@ -1299,6 +1335,44 @@ impl<'ui> Ui<'ui> {
     }
 }
 
+/// Widgets: Images
+impl<'ui> Ui<'ui> {
+    /// Initiate the drawing of an image.
+    /// The image data should be an object implementing the [`ImTexture`] trait,
+    /// typically an [`AnyTexture`] object got from [`Ui::make_texture`].
+    ///
+    /// # Examples
+    ///
+    /// ## Example using glium as back-end
+    ///
+    /// ```rust,no_run
+    /// #[macro_use] extern crate imgui;
+    /// extern crate glium;
+    /// extern crate imgui_glium_renderer;
+    ///
+    /// use imgui::*;
+    /// use glium::Texture2d;
+    /// use glium::backend::Facade;
+    ///
+    /// fn make_a_texture<F: Facade>(ui: &Ui, facade: &F, data: Vec<Vec<(u8, u8, u8, u8)>>) {
+    ///     let texture_handle = ui.replace_texture(
+    ///         im_str!("#Texture Name ID"),
+    ///         Texture2d::new(facade, data).unwrap(),
+    ///     );
+    ///     ui.image(&texture_handle, [100.0, 100.0]).build();
+    /// }
+    ///
+    /// # fn main() {}
+    /// ```
+    pub fn image<T, S>(&self, texture: &T, size: S) -> Image
+    where
+        T: ImTexture,
+        S: Into<ImVec2>,
+    {
+        Image::new(texture, size)
+    }
+}
+
 impl<'ui> Ui<'ui> {
     /// Runs a function after temporarily pushing a value to the style stack.
     ///
@@ -1526,5 +1600,92 @@ impl<'ui> Ui<'ui> {
     /// ```
     pub fn get_window_draw_list(&'ui self) -> WindowDrawList<'ui> {
         WindowDrawList::new(self)
+    }
+}
+
+/// # Custom textures
+impl<'ui> Ui<'ui> {
+    /// Register a texture into ImGui the first time the function is called.
+    /// Just reuse the texture on subsequent uses.
+    ///
+    /// Returns a handle to the texture as an [`AnyTexture`] object. A back-end
+    /// (e.g. glium) is needed to create the texture.
+    ///
+    /// # Examples
+    ///
+    /// ## Example using glium as back-end
+    ///
+    /// ```rust,no_run
+    /// #[macro_use] extern crate imgui;
+    /// extern crate glium;
+    /// extern crate imgui_glium_renderer;
+    ///
+    /// use imgui::*;
+    /// use glium::Texture2d;
+    /// use glium::backend::Facade;
+    ///
+    /// fn make_a_texture<F: Facade>(ui: &Ui, facade: &F) {
+    ///     let texture_handle = ui.make_texture(im_str!("#Texture Name ID"), || {
+    ///         Texture2d::empty(facade, 100, 100).unwrap()
+    ///     });
+    ///     // ... Do something with `texture_handle`
+    /// }
+    ///
+    /// # fn main() {}
+    /// ```
+    pub fn make_texture<F, T, U>(&self, name: &ImStr, f: F) -> AnyTexture
+    where
+        F: FnOnce() -> T,
+        T: IntoImTexture<U>,
+        U: 'static + ImTexture,
+    {
+        let imgui = self.imgui();
+        if let Some(texture) = imgui.textures.get_texture(name) {
+            texture
+        } else {
+            let texture = f().into_texture();
+            imgui.textures.register_texture(name, texture);
+            imgui.textures.get_texture(name).unwrap()
+        }
+    }
+
+    /// Swap and replace with the given new texture each time the function is
+    /// called.
+    ///
+    /// Returns a handle to the texture as an [`AnyTexture`] object. A back-end
+    /// (e.g. glium) is needed to create the texture.
+    ///
+    /// # Examples
+    ///
+    /// ## Example using glium as back-end
+    ///
+    /// ```rust,no_run
+    /// #[macro_use] extern crate imgui;
+    /// extern crate glium;
+    /// extern crate imgui_glium_renderer;
+    ///
+    /// use imgui::*;
+    /// use glium::Texture2d;
+    /// use glium::backend::Facade;
+    ///
+    /// fn make_a_texture<F: Facade>(ui: &Ui, facade: &F, data: Vec<Vec<(u8, u8, u8, u8)>>) {
+    ///     let texture_handle = ui.replace_texture(
+    ///         im_str!("#Texture Name ID"),
+    ///         Texture2d::new(facade, data).unwrap(),
+    ///     );
+    ///     // ... Do something with `texture_handle`
+    /// }
+    ///
+    /// # fn main() {}
+    /// ```
+    pub fn replace_texture<T, U>(&self, name: &ImStr, t: T) -> AnyTexture
+    where
+        T: IntoImTexture<U>,
+        U: 'static + ImTexture,
+    {
+        let imgui = self.imgui();
+        let texture = t.into_texture();
+        imgui.textures.register_texture(name, texture);
+        imgui.textures.get_texture(name).unwrap()
     }
 }

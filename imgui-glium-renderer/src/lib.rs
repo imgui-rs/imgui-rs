@@ -2,13 +2,16 @@
 extern crate glium;
 extern crate imgui;
 
-use glium::{DrawError, GlObject, IndexBuffer, Program, Surface, Texture2d, VertexBuffer};
+mod im_texture;
+pub use im_texture::Texture;
+
+use glium::{DrawError, IndexBuffer, Program, Surface, Texture2d, VertexBuffer};
 use glium::backend::{Context, Facade};
 use glium::program;
 use glium::index::{self, PrimitiveType};
 use glium::texture;
 use glium::vertex;
-use imgui::{DrawList, ImDrawIdx, ImDrawVert, ImGui, Ui};
+use imgui::{DrawList, FromImTexture, ImDrawIdx, ImDrawVert, ImGui, Ui};
 use std::borrow::Cow;
 use std::fmt;
 use std::rc::Rc;
@@ -114,14 +117,12 @@ impl Renderer {
             [0.0, 0.0, -1.0, 0.0],
             [-1.0, 1.0, 0.0, 1.0],
         ];
-        let font_texture_id = self.device_objects.texture.get_id() as usize;
 
         let mut idx_start = 0;
         for cmd in draw_list.cmd_buffer {
-            // We don't support custom textures...yet!
-            assert!(cmd.texture_id as usize == font_texture_id);
-
             let idx_end = idx_start + cmd.elem_count as usize;
+
+            let texture = <Texture as FromImTexture>::from_id(cmd.texture_id);
 
             try!(
                 surface.draw(
@@ -133,7 +134,7 @@ impl Renderer {
                     &self.device_objects.program,
                     &uniform! {
                           matrix: matrix,
-                          tex: self.device_objects.texture.sampled()
+                          tex: texture.sampled()
                               .magnify_filter(MagnifySamplerFilter::Nearest)
                               .minify_filter(MinifySamplerFilter::Nearest),
                       },
@@ -161,7 +162,6 @@ pub struct DeviceObjects {
     vertex_buffer: VertexBuffer<ImDrawVert>,
     index_buffer: IndexBuffer<ImDrawIdx>,
     program: Program,
-    texture: Texture2d,
 }
 
 fn compile_default_program<F: Facade>(
@@ -209,7 +209,7 @@ impl DeviceObjects {
         ));
 
         let program = try!(compile_default_program(ctx));
-        let texture = try!(im_gui.prepare_texture(|handle| {
+        let texture = try!(im_gui.register_font_texture(|handle| {
             let data = RawImage2d {
                 data: Cow::Borrowed(handle.pixels),
                 width: handle.width,
@@ -218,13 +218,13 @@ impl DeviceObjects {
             };
             Texture2d::new(ctx, data)
         }));
+
         im_gui.set_texture_id(texture.get_id() as usize);
 
         Ok(DeviceObjects {
             vertex_buffer: vertex_buffer,
             index_buffer: index_buffer,
             program: program,
-            texture: texture,
         })
     }
     pub fn upload_vertex_buffer<F: Facade>(
