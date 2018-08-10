@@ -129,14 +129,11 @@ pub fn run<F: FnMut(&Ui) -> bool>(title: String, clear_color: [f32; 4], mut run_
             });
         }
 
-        let size_pixels = gl_window.get_inner_size().unwrap();
+        let size_points = gl_window.get_inner_size().unwrap();
         let hdipi = gl_window.get_hidpi_factor();
-        let size_points = (
-            (size_pixels.width as f64 / hdipi) as u32,
-            (size_pixels.height as f64 / hdipi) as u32,
-        );
+        let size_pixels = size_points.to_physical(hdipi);
 
-        let ui = imgui.frame(size_points, size_pixels.into(), delta_s);
+        let ui = imgui.frame(size_points.into(), size_pixels.into(), delta_s);
         if !run_ui(&ui) {
             break;
         }
@@ -182,11 +179,7 @@ fn configure_keys(imgui: &mut ImGui) {
 }
 
 fn update_mouse(imgui: &mut ImGui, mouse_state: &mut MouseState) {
-    let scale = imgui.display_framebuffer_scale();
-    imgui.set_mouse_pos(
-        mouse_state.pos.0 as f32 / scale.0,
-        mouse_state.pos.1 as f32 / scale.1,
-    );
+    imgui.set_mouse_pos(mouse_state.pos.0 as f32, mouse_state.pos.1 as f32);
     imgui.set_mouse_down(
         &[
             mouse_state.pressed.0,
@@ -196,6 +189,6 @@ fn update_mouse(imgui: &mut ImGui, mouse_state: &mut MouseState) {
             false,
         ],
     );
-    imgui.set_mouse_wheel(mouse_state.wheel / scale.1);
+    imgui.set_mouse_wheel(mouse_state.wheel);
     mouse_state.wheel = 0.0;
 }
