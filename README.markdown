@@ -70,8 +70,8 @@ build this libary and run the examples.
 1. Change or add something
 2. Run rustfmt to guarantee code style conformance
 
-        cargo install rustfmt
-        cargo fmt -- --write-mode=overwrite
+        rustup component add rustfmt-preview
+        cargo fmt
 
 3. Open a pull request in Github
 
