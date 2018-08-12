@@ -8,7 +8,7 @@ use glium::program;
 use glium::index::{self, PrimitiveType};
 use glium::texture;
 use glium::vertex;
-use imgui::{DrawList, ImDrawIdx, ImDrawVert, ImGui, Ui};
+use imgui::{DrawList, FrameSize, ImDrawIdx, ImDrawVert, ImGui, Ui};
 use std::borrow::Cow;
 use std::fmt;
 use std::rc::Rc;
@@ -64,7 +64,7 @@ pub struct Renderer {
 
 impl Renderer {
     pub fn init<F: Facade>(imgui: &mut ImGui, ctx: &F) -> RendererResult<Renderer> {
-        let device_objects = try!(DeviceObjects::init(imgui, ctx));
+        let device_objects = DeviceObjects::init(imgui, ctx)?;
         Ok(Renderer {
             ctx: Rc::clone(ctx.get_context()),
             device_objects: device_objects,
@@ -73,9 +73,22 @@ impl Renderer {
 
     pub fn render<'a, S: Surface>(&mut self, surface: &mut S, ui: Ui<'a>) -> RendererResult<()> {
         let _ = self.ctx.insert_debug_marker("imgui-rs: starting rendering");
-        let result = ui.render(|ui, draw_data| {
+        let FrameSize { logical_size: (width, height), hidpi_factor } = ui.frame_size();
+        if !(width > 0.0 && height > 0.0) {
+            return Ok(());
+        }
+        let fb_size = ((width * hidpi_factor) as f32, (height * hidpi_factor) as f32);
+
+        let matrix = [
+            [(2.0 / width) as f32, 0.0, 0.0, 0.0],
+            [0.0, (2.0 / -height) as f32, 0.0, 0.0],
+            [0.0, 0.0, -1.0, 0.0],
+            [-1.0, 1.0, 0.0, 1.0],
+        ];
+        let result = ui.render(|ui, mut draw_data| {
+            draw_data.scale_clip_rects(ui.imgui().display_framebuffer_scale());
             for draw_list in draw_data.into_iter() {
-                self.render_draw_list(surface, ui, &draw_list)?;
+                self.render_draw_list(surface, &draw_list, fb_size, matrix)?;
             }
             Ok(())
         });
@@ -86,34 +99,24 @@ impl Renderer {
     fn render_draw_list<'a, S: Surface>(
         &mut self,
         surface: &mut S,
-        ui: &'a Ui<'a>,
         draw_list: &DrawList<'a>,
+        fb_size: (f32, f32),
+        matrix: [[f32; 4]; 4],
     ) -> RendererResult<()> {
         use glium::{Blend, DrawParameters, Rect};
         use glium::uniforms::{MinifySamplerFilter, MagnifySamplerFilter};
 
-        try!(self.device_objects.upload_vertex_buffer(
+        let (fb_width, fb_height) = fb_size;
+
+        self.device_objects.upload_vertex_buffer(
             &self.ctx,
             draw_list.vtx_buffer,
-        ));
-        try!(self.device_objects.upload_index_buffer(
+        )?;
+        self.device_objects.upload_index_buffer(
             &self.ctx,
             draw_list.idx_buffer,
-        ));
+        )?;
 
-        let (width, height) = ui.imgui().display_size();
-        let (scale_width, scale_height) = ui.imgui().display_framebuffer_scale();
-
-        if width == 0.0 || height == 0.0 {
-            return Ok(());
-        }
-
-        let matrix = [
-            [2.0 / width as f32, 0.0, 0.0, 0.0],
-            [0.0, 2.0 / -(height as f32), 0.0, 0.0],
-            [0.0, 0.0, -1.0, 0.0],
-            [-1.0, 1.0, 0.0, 1.0],
-        ];
         let font_texture_id = self.device_objects.texture.get_id() as usize;
 
         let mut idx_start = 0;
@@ -123,32 +126,30 @@ impl Renderer {
 
             let idx_end = idx_start + cmd.elem_count as usize;
 
-            try!(
-                surface.draw(
-                    &self.device_objects.vertex_buffer,
-                    &self.device_objects
-                        .index_buffer
-                        .slice(idx_start..idx_end)
-                        .expect("Invalid index buffer range"),
-                    &self.device_objects.program,
-                    &uniform! {
-                          matrix: matrix,
-                          tex: self.device_objects.texture.sampled()
-                              .magnify_filter(MagnifySamplerFilter::Nearest)
-                              .minify_filter(MinifySamplerFilter::Nearest),
-                      },
-                    &DrawParameters {
-                        blend: Blend::alpha_blending(),
-                        scissor: Some(Rect {
-                            left: (cmd.clip_rect.x * scale_width) as u32,
-                            bottom: ((height - cmd.clip_rect.w) * scale_height) as u32,
-                            width: ((cmd.clip_rect.z - cmd.clip_rect.x) * scale_width) as u32,
-                            height: ((cmd.clip_rect.w - cmd.clip_rect.y) * scale_height) as u32,
-                        }),
-                        ..DrawParameters::default()
-                    },
-                )
-            );
+            surface.draw(
+                &self.device_objects.vertex_buffer,
+                &self.device_objects
+                    .index_buffer
+                    .slice(idx_start..idx_end)
+                    .expect("Invalid index buffer range"),
+                &self.device_objects.program,
+                &uniform! {
+                      matrix: matrix,
+                      tex: self.device_objects.texture.sampled()
+                          .magnify_filter(MagnifySamplerFilter::Linear)
+                          .minify_filter(MinifySamplerFilter::Linear),
+                  },
+                &DrawParameters {
+                    blend: Blend::alpha_blending(),
+                    scissor: Some(Rect {
+                        left: cmd.clip_rect.x.max(0.0).round() as u32,
+                        bottom: (fb_height - cmd.clip_rect.w).max(0.0).round() as u32,
+                        width: (cmd.clip_rect.z - cmd.clip_rect.x).abs().max(fb_width).round() as u32,
+                        height: (cmd.clip_rect.w - cmd.clip_rect.y).abs().max(fb_height).round() as u32,
+                    }),
+                    ..DrawParameters::default()
+                },
+            )?;
 
             idx_start = idx_end;
         }
@@ -201,15 +202,15 @@ impl DeviceObjects {
     pub fn init<F: Facade>(im_gui: &mut ImGui, ctx: &F) -> RendererResult<DeviceObjects> {
         use glium::texture::{ClientFormat, RawImage2d};
 
-        let vertex_buffer = try!(VertexBuffer::empty_dynamic(ctx, 0));
-        let index_buffer = try!(IndexBuffer::empty_dynamic(
+        let vertex_buffer = VertexBuffer::empty_dynamic(ctx, 0)?;
+        let index_buffer = IndexBuffer::empty_dynamic(
             ctx,
             PrimitiveType::TrianglesList,
             0,
-        ));
+        )?;
 
-        let program = try!(compile_default_program(ctx));
-        let texture = try!(im_gui.prepare_texture(|handle| {
+        let program = compile_default_program(ctx)?;
+        let texture = im_gui.prepare_texture(|handle| {
             let data = RawImage2d {
                 data: Cow::Borrowed(handle.pixels),
                 width: handle.width,
@@ -217,7 +218,7 @@ impl DeviceObjects {
                 format: ClientFormat::U8U8U8U8,
             };
             Texture2d::new(ctx, data)
-        }));
+        })?;
         im_gui.set_texture_id(texture.get_id() as usize);
 
         Ok(DeviceObjects {
@@ -237,7 +238,7 @@ impl DeviceObjects {
             slice.write(vtx_buffer);
             return Ok(());
         }
-        self.vertex_buffer = try!(VertexBuffer::dynamic(ctx, vtx_buffer));
+        self.vertex_buffer = VertexBuffer::dynamic(ctx, vtx_buffer)?;
         let _ = ctx.get_context().insert_debug_marker(&format!(
             "imgui-rs: resized vertex buffer to {} bytes",
             self.vertex_buffer.get_size()
@@ -254,11 +255,11 @@ impl DeviceObjects {
             slice.write(idx_buffer);
             return Ok(());
         }
-        self.index_buffer = try!(IndexBuffer::dynamic(
+        self.index_buffer = IndexBuffer::dynamic(
             ctx,
             PrimitiveType::TrianglesList,
             idx_buffer,
-        ));
+        )?;
         let _ = ctx.get_context().insert_debug_marker(&format!(
             "imgui-rs: resized index buffer to {} bytes",
             self.index_buffer.get_size()

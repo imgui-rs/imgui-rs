@@ -1,4 +1,4 @@
-use imgui::{FontGlyphRange, ImFontConfig, ImGui, ImGuiMouseCursor, ImVec4, Ui};
+use imgui::{FontGlyphRange, FrameSize, ImFontConfig, ImGui, ImGuiMouseCursor, ImVec4, Ui};
 use imgui_gfx_renderer::{Renderer, Shaders};
 use std::time::Instant;
 
@@ -172,11 +172,14 @@ pub fn run<F: FnMut(&Ui) -> bool>(title: String, clear_color: [f32; 4], mut run_
             });
         }
 
-        let size_points = window.get_inner_size().unwrap();
-        let hdipi = window.get_hidpi_factor();
-        let size_pixels = size_points.to_physical(hdipi);
+        let logical_size = window.get_inner_size().unwrap();
 
-        let ui = imgui.frame(size_points.into(), size_pixels.into(), delta_s);
+        let frame_size = FrameSize {
+            logical_size: logical_size.into(),
+            hidpi_factor: window.get_hidpi_factor(),
+        };
+
+        let ui = imgui.frame(frame_size, delta_s);
         if !run_ui(&ui) {
             break;
         }

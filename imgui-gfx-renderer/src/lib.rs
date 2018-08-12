@@ -7,7 +7,7 @@ use gfx::memory::Bind;
 use gfx::handle::{Buffer, RenderTargetView};
 use gfx::texture::{FilterMethod, SamplerInfo, WrapMode};
 use gfx::traits::FactoryExt;
-use imgui::{DrawList, ImDrawIdx, ImDrawVert, ImGui, Ui};
+use imgui::{DrawList, FrameSize, ImDrawIdx, ImDrawVert, ImGui, Ui};
 
 pub type RendererResult<T> = Result<T, RendererError>;
 
@@ -129,7 +129,7 @@ impl<R: Resources> Renderer<R> {
         })?;
         // TODO: set texture id in imgui
         let sampler =
-            factory.create_sampler(SamplerInfo::new(FilterMethod::Scale, WrapMode::Clamp));
+            factory.create_sampler(SamplerInfo::new(FilterMethod::Trilinear, WrapMode::Clamp));
         let data = pipe::Data {
             vertex_buffer: vertex_buffer,
             matrix: [
@@ -168,34 +168,36 @@ impl<R: Resources> Renderer<R> {
         factory: &mut F,
         encoder: &mut Encoder<R, C>,
     ) -> RendererResult<()> {
-        let (width, height) = ui.imgui().display_size();
+        let FrameSize { logical_size: (width, height), hidpi_factor } = ui.frame_size();
 
-        if width == 0.0 || height == 0.0 {
+        if !(width > 0.0 && height > 0.0) {
             return Ok(());
         }
+        let fb_size = ((width * hidpi_factor) as f32, (height * hidpi_factor) as f32);
+
         self.bundle.data.matrix = [
-            [2.0 / width as f32, 0.0, 0.0, 0.0],
-            [0.0, -2.0 / height as f32, 0.0, 0.0],
+            [(2.0 / width) as f32, 0.0, 0.0, 0.0],
+            [0.0, (2.0 / -height) as f32, 0.0, 0.0],
             [0.0, 0.0, -1.0, 0.0],
             [-1.0, 1.0, 0.0, 1.0],
         ];
 
-        ui.render(|ui, draw_data| {
+        ui.render(|ui, mut draw_data| {
+            draw_data.scale_clip_rects(ui.imgui().display_framebuffer_scale());
             for draw_list in &draw_data {
-                self.render_draw_list(ui, factory, encoder, &draw_list)?;
+                self.render_draw_list(factory, encoder, &draw_list, fb_size)?;
             }
             Ok(())
         })
     }
     fn render_draw_list<'a, F: Factory<R>, C: CommandBuffer<R>>(
         &mut self,
-        ui: &'a Ui<'a>,
         factory: &mut F,
         encoder: &mut Encoder<R, C>,
         draw_list: &DrawList<'a>,
+        fb_size: (f32, f32)
     ) -> RendererResult<()> {
-        let (width, height) = ui.imgui().display_size();
-        let (scale_width, scale_height) = ui.imgui().display_framebuffer_scale();
+        let (fb_width, fb_height) = fb_size;
 
         self.upload_vertex_buffer(factory, encoder, draw_list.vtx_buffer)?;
         self.upload_index_buffer(factory, encoder, draw_list.idx_buffer)?;
@@ -206,10 +208,10 @@ impl<R: Resources> Renderer<R> {
 
             self.bundle.slice.end = self.bundle.slice.start + cmd.elem_count;
             self.bundle.data.scissor = Rect {
-                x: (cmd.clip_rect.x.max(0.0) * scale_width) as u16,
-                y: (cmd.clip_rect.y.max(0.0) * scale_height) as u16,
-                w: ((cmd.clip_rect.z - cmd.clip_rect.x).abs().min(width) * scale_width) as u16,
-                h: ((cmd.clip_rect.w - cmd.clip_rect.y).abs().min(height) * scale_height) as u16,
+                x: cmd.clip_rect.x.max(0.0).round() as u16,
+                y: cmd.clip_rect.y.max(0.0).round() as u16,
+                w: (cmd.clip_rect.z - cmd.clip_rect.x).abs().min(fb_width).round() as u16,
+                h: (cmd.clip_rect.w - cmd.clip_rect.y).abs().min(fb_height).round() as u16,
             };
             self.bundle.encode(encoder);
             self.bundle.slice.start = self.bundle.slice.end;

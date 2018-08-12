@@ -99,6 +99,12 @@ pub enum ImMouseButton {
     Extra2 = 4,
 }
 
+#[derive(Copy, Clone, Debug, PartialEq)]
+pub struct FrameSize {
+    pub logical_size: (f64, f64),
+    pub hidpi_factor: f64,
+}
+
 impl ImGui {
     pub fn init() -> ImGui {
         ImGui {
@@ -357,31 +363,22 @@ impl ImGui {
     pub fn get_frame_rate(&self) -> f32 { self.io().framerate }
     pub fn frame<'ui, 'a: 'ui>(
         &'a mut self,
-        size_points: (u32, u32),
-        size_pixels: (u32, u32),
+        frame_size: FrameSize,
         delta_time: f32,
     ) -> Ui<'ui> {
         {
             let io = self.io_mut();
-            io.display_size.x = size_points.0 as c_float;
-            io.display_size.y = size_points.1 as c_float;
-            io.display_framebuffer_scale.x = if size_points.0 > 0 {
-                size_pixels.0 as c_float / size_points.0 as c_float
-            } else {
-                0.0
-            };
-            io.display_framebuffer_scale.y = if size_points.1 > 0 {
-                size_pixels.1 as c_float / size_points.1 as c_float
-            } else {
-                0.0
-            };
+            io.display_size.x = frame_size.logical_size.0 as c_float;
+            io.display_size.y = frame_size.logical_size.1 as c_float;
+            io.display_framebuffer_scale.x = frame_size.hidpi_factor as c_float;
+            io.display_framebuffer_scale.y = frame_size.hidpi_factor as c_float;
             io.delta_time = delta_time;
         }
         unsafe {
             sys::igNewFrame();
-            CURRENT_UI = Some(Ui { imgui: mem::transmute(self as &'a ImGui) });
+            CURRENT_UI = Some(Ui { imgui: mem::transmute(self as &'a ImGui), frame_size });
         }
-        Ui { imgui: self }
+        Ui { imgui: self, frame_size }
     }
 }
 
@@ -466,6 +463,7 @@ pub struct DrawList<'a> {
 
 pub struct Ui<'ui> {
     imgui: &'ui ImGui,
+    frame_size: FrameSize,
 }
 
 static FMT: &'static [u8] = b"%s\0";
@@ -473,6 +471,9 @@ static FMT: &'static [u8] = b"%s\0";
 fn fmt_ptr() -> *const c_char { FMT.as_ptr() as *const c_char }
 
 impl<'ui> Ui<'ui> {
+    pub fn frame_size(&self) -> FrameSize {
+        self.frame_size
+    }
     pub fn imgui(&self) -> &ImGui { self.imgui }
     pub fn want_capture_mouse(&self) -> bool {
         let io = self.imgui.io();
