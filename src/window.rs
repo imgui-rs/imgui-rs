@@ -1,6 +1,6 @@
-use sys;
 use std::marker::PhantomData;
 use std::ptr;
+use sys;
 
 use super::{ImGuiCond, ImGuiStyleVar, ImGuiWindowFlags, ImStr, ImVec2, Ui};
 
@@ -122,34 +122,26 @@ impl<'ui, 'p> Window<'ui, 'p> {
     }
     #[inline]
     pub fn no_bring_to_front_on_focus(mut self, value: bool) -> Self {
-        self.flags.set(
-            ImGuiWindowFlags::NoBringToFrontOnFocus,
-            value,
-        );
+        self.flags
+            .set(ImGuiWindowFlags::NoBringToFrontOnFocus, value);
         self
     }
     #[inline]
     pub fn always_vertical_scrollbar(mut self, value: bool) -> Self {
-        self.flags.set(
-            ImGuiWindowFlags::AlwaysVerticalScrollbar,
-            value,
-        );
+        self.flags
+            .set(ImGuiWindowFlags::AlwaysVerticalScrollbar, value);
         self
     }
     #[inline]
     pub fn always_horizontal_scrollbar(mut self, value: bool) -> Self {
-        self.flags.set(
-            ImGuiWindowFlags::AlwaysHorizontalScrollbar,
-            value,
-        );
+        self.flags
+            .set(ImGuiWindowFlags::AlwaysHorizontalScrollbar, value);
         self
     }
     #[inline]
     pub fn always_use_window_padding(mut self, value: bool) -> Self {
-        self.flags.set(
-            ImGuiWindowFlags::AlwaysUseWindowPadding,
-            value,
-        );
+        self.flags
+            .set(ImGuiWindowFlags::AlwaysUseWindowPadding, value);
         self
     }
     pub fn build<F: FnOnce()>(self, f: F) {
@@ -165,9 +157,9 @@ impl<'ui, 'p> Window<'ui, 'p> {
             }
             sys::igBegin(
                 self.name.as_ptr(),
-                self.opened.map(|x| x as *mut bool).unwrap_or(
-                    ptr::null_mut(),
-                ),
+                self.opened
+                    .map(|x| x as *mut bool)
+                    .unwrap_or(ptr::null_mut()),
                 self.flags,
             )
         };

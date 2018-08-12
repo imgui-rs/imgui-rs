@@ -6,7 +6,13 @@ use sys;
 
 #[derive(Clone, Eq, PartialEq, Hash, Debug)]
 enum FontGlyphRangeData {
-    Chinese, Cyrillic, Default, Japanese, Korean, Thai, Custom(*const sys::ImWchar),
+    Chinese,
+    Cyrillic,
+    Default,
+    Japanese,
+    Korean,
+    Thai,
+    Custom(*const sys::ImWchar),
 }
 
 /// A set of 16-bit Unicode codepoints
@@ -51,27 +57,49 @@ impl FontGlyphRange {
     ///
     /// This function will panic if the given slice is not a valid font range.
     pub fn from_slice(slice: &'static [sys::ImWchar]) -> FontGlyphRange {
-        assert_eq!(slice.len() % 2, 1, "The length of a glyph range must be odd.");
-        assert_eq!(slice.last(), Some(&0), "A glyph range must be zero-terminated.");
+        assert_eq!(
+            slice.len() % 2,
+            1,
+            "The length of a glyph range must be odd."
+        );
+        assert_eq!(
+            slice.last(),
+            Some(&0),
+            "A glyph range must be zero-terminated."
+        );
 
-        for i in 0..slice.len()-1 {
-            assert_ne!(slice[i], 0, "A glyph in a range cannot be zero. \
-                                     (Glyph is zero at index {})", i)
+        for i in 0..slice.len() - 1 {
+            assert_ne!(
+                slice[i], 0,
+                "A glyph in a range cannot be zero. \
+                 (Glyph is zero at index {})",
+                i
+            )
         }
 
         let mut ranges = Vec::new();
-        for i in 0..slice.len()/2 {
+        for i in 0..slice.len() / 2 {
             let (start, end) = (slice[i * 2], slice[i * 2 + 1]);
-            assert!(start <= end, "The start of a range cannot be larger than its end. \
-                                   (At index {}, {} > {})", i * 2, start, end);
+            assert!(
+                start <= end,
+                "The start of a range cannot be larger than its end. \
+                 (At index {}, {} > {})",
+                i * 2,
+                start,
+                end
+            );
             ranges.push((start, end));
         }
         ranges.sort_unstable_by_key(|x| x.0);
-        for i in 0..ranges.len()-1 {
+        for i in 0..ranges.len() - 1 {
             let (range_a, range_b) = (ranges[i], ranges[i + 1]);
             if range_a.1 >= range_b.0 {
-                panic!("The glyph ranges {:?} and {:?} overlap between {:?}.",
-                       range_a, range_b, (range_a.1, range_b.0));
+                panic!(
+                    "The glyph ranges {:?} and {:?} overlap between {:?}.",
+                    range_a,
+                    range_b,
+                    (range_a.1, range_b.0)
+                );
             }
         }
 
@@ -94,12 +122,12 @@ impl FontGlyphRange {
 
     unsafe fn to_ptr(&self, atlas: *mut sys::ImFontAtlas) -> *const sys::ImWchar {
         match &self.0 {
-            &FontGlyphRangeData::Chinese  => sys::ImFontAtlas_GetGlyphRangesChinese(atlas),
+            &FontGlyphRangeData::Chinese => sys::ImFontAtlas_GetGlyphRangesChinese(atlas),
             &FontGlyphRangeData::Cyrillic => sys::ImFontAtlas_GetGlyphRangesCyrillic(atlas),
-            &FontGlyphRangeData::Default  => sys::ImFontAtlas_GetGlyphRangesDefault(atlas),
+            &FontGlyphRangeData::Default => sys::ImFontAtlas_GetGlyphRangesDefault(atlas),
             &FontGlyphRangeData::Japanese => sys::ImFontAtlas_GetGlyphRangesJapanese(atlas),
-            &FontGlyphRangeData::Korean   => sys::ImFontAtlas_GetGlyphRangesKorean(atlas),
-            &FontGlyphRangeData::Thai     => sys::ImFontAtlas_GetGlyphRangesThai(atlas),
+            &FontGlyphRangeData::Korean => sys::ImFontAtlas_GetGlyphRangesKorean(atlas),
+            &FontGlyphRangeData::Thai => sys::ImFontAtlas_GetGlyphRangesThai(atlas),
 
             &FontGlyphRangeData::Custom(ptr) => ptr,
         }
@@ -109,16 +137,26 @@ impl FontGlyphRange {
 /// A builder for the configuration for a font.
 #[derive(Copy, Clone, PartialEq, Debug)]
 pub struct ImFontConfig {
-    size_pixels: f32, oversample_h: u32, oversample_v: u32, pixel_snap_h: bool,
-    glyph_extra_spacing: sys::ImVec2, glyph_offset: sys::ImVec2, merge_mode: bool,
+    size_pixels: f32,
+    oversample_h: u32,
+    oversample_v: u32,
+    pixel_snap_h: bool,
+    glyph_extra_spacing: sys::ImVec2,
+    glyph_offset: sys::ImVec2,
+    merge_mode: bool,
     rasterizer_multiply: f32,
 }
 impl ImFontConfig {
     pub fn new() -> ImFontConfig {
         ImFontConfig {
-            size_pixels: 0.0, oversample_h: 3, oversample_v: 1, pixel_snap_h: false,
-            glyph_extra_spacing: sys::ImVec2::zero(), glyph_offset: sys::ImVec2::zero(),
-            merge_mode: false, rasterizer_multiply: 1.0,
+            size_pixels: 0.0,
+            oversample_h: 3,
+            oversample_v: 1,
+            pixel_snap_h: false,
+            glyph_extra_spacing: sys::ImVec2::zero(),
+            glyph_offset: sys::ImVec2::zero(),
+            merge_mode: false,
+            rasterizer_multiply: 1.0,
         }
     }
 
@@ -179,8 +217,12 @@ impl ImFontConfig {
     /// ======
     ///
     /// If no font size is set for the configuration.
-    pub fn add_font<'a>(self, atlas: &'a mut ImFontAtlas<'a>, data: &[u8],
-                        range: &FontGlyphRange) -> ImFont<'a> {
+    pub fn add_font<'a>(
+        self,
+        atlas: &'a mut ImFontAtlas<'a>,
+        data: &[u8],
+        range: &FontGlyphRange,
+    ) -> ImFont<'a> {
         atlas.add_font_with_config(data, self, range)
     }
 
@@ -197,15 +239,22 @@ impl Default for ImFontConfig {
 
 /// A handle to an imgui font.
 pub struct ImFont<'a> {
-    font: *mut sys::ImFont, _phantom: PhantomData<&'a mut sys::ImFont>,
+    font: *mut sys::ImFont,
+    _phantom: PhantomData<&'a mut sys::ImFont>,
 }
-impl <'a> ImFont<'a> {
+impl<'a> ImFont<'a> {
     unsafe fn from_ptr(font: *mut sys::ImFont) -> ImFont<'a> {
-        ImFont { font, _phantom: PhantomData }
+        ImFont {
+            font,
+            _phantom: PhantomData,
+        }
     }
 
     fn chain(&mut self) -> ImFont {
-        ImFont { font: self.font, _phantom: PhantomData }
+        ImFont {
+            font: self.font,
+            _phantom: PhantomData,
+        }
     }
 
     pub fn font_size(&self) -> f32 {
@@ -234,11 +283,15 @@ impl <'a> ImFont<'a> {
 /// A handle to imgui's font manager.
 #[repr(C)]
 pub struct ImFontAtlas<'a> {
-    atlas: *mut sys::ImFontAtlas, _phantom: PhantomData<&'a mut sys::ImFontAtlas>,
+    atlas: *mut sys::ImFontAtlas,
+    _phantom: PhantomData<&'a mut sys::ImFontAtlas>,
 }
-impl <'a> ImFontAtlas<'a> {
+impl<'a> ImFontAtlas<'a> {
     pub(crate) unsafe fn from_ptr(atlas: *mut sys::ImFontAtlas) -> ImFontAtlas<'a> {
-        ImFontAtlas { atlas, _phantom: PhantomData }
+        ImFontAtlas {
+            atlas,
+            _phantom: PhantomData,
+        }
     }
 
     /// Adds the default font to the font set.
@@ -252,9 +305,16 @@ impl <'a> ImFontAtlas<'a> {
         unsafe { ImFont::from_ptr(sys::ImFontAtlas_AddFontDefault(self.atlas, &config)) }
     }
 
-    fn raw_add_font(&mut self, data: &[u8], config: ImFontConfig,
-                    range: &FontGlyphRange) -> ImFont {
-        assert!((data.len() as u64) < (c_int::max_value() as u64), "Font data is too long.");
+    fn raw_add_font(
+        &mut self,
+        data: &[u8],
+        config: ImFontConfig,
+        range: &FontGlyphRange,
+    ) -> ImFont {
+        assert!(
+            (data.len() as u64) < (c_int::max_value() as u64),
+            "Font data is too long."
+        );
         unsafe {
             let mut config = config.make_config();
             assert!(config.size_pixels > 0.0, "Font size cannot be zero.");
@@ -279,8 +339,12 @@ impl <'a> ImFontAtlas<'a> {
     /// ======
     ///
     /// If no font size is set for the configuration.
-    pub fn add_font_with_config(&mut self, data: &[u8], config: ImFontConfig,
-                                range: &FontGlyphRange) -> ImFont {
+    pub fn add_font_with_config(
+        &mut self,
+        data: &[u8],
+        config: ImFontConfig,
+        range: &FontGlyphRange,
+    ) -> ImFont {
         self.raw_add_font(data, config, range)
     }
 
@@ -309,6 +373,8 @@ impl <'a> ImFontAtlas<'a> {
         unsafe { (*self.atlas).tex_id as usize }
     }
     pub fn set_texture_id(&mut self, value: usize) {
-        unsafe { (*self.atlas).tex_id = value as *mut c_void; }
+        unsafe {
+            (*self.atlas).tex_id = value as *mut c_void;
+        }
     }
 }

@@ -1,5 +1,5 @@
 use gfx::format::{Format, Formatted, U8Norm};
-use gfx::pso::buffer::{Element, ElemOffset, Structure};
+use gfx::pso::buffer::{ElemOffset, Element, Structure};
 use gfx::traits::Pod;
 use std::mem;
 
@@ -30,27 +30,20 @@ impl Structure<Format> for ImDrawVert {
         };
         let dummy: &ImDrawVert = unsafe { mem::transmute(0usize) };
         match sub_name {
-            "pos" => {
-                Some(Element {
-                    format: <ImVec2 as Formatted>::get_format(),
-                    offset: unsafe { mem::transmute::<_, usize>(&dummy.pos) } as ElemOffset +
-                        big_offset,
-                })
-            }
-            "uv" => {
-                Some(Element {
-                    format: <ImVec2 as Formatted>::get_format(),
-                    offset: unsafe { mem::transmute::<_, usize>(&dummy.uv) } as ElemOffset +
-                        big_offset,
-                })
-            }
-            "col" => {
-                Some(Element {
-                    format: <[U8Norm; 4] as Formatted>::get_format(),
-                    offset: unsafe { mem::transmute::<_, usize>(&dummy.col) } as ElemOffset +
-                        big_offset,
-                })
-            }
+            "pos" => Some(Element {
+                format: <ImVec2 as Formatted>::get_format(),
+                offset: unsafe { mem::transmute::<_, usize>(&dummy.pos) } as ElemOffset
+                    + big_offset,
+            }),
+            "uv" => Some(Element {
+                format: <ImVec2 as Formatted>::get_format(),
+                offset: unsafe { mem::transmute::<_, usize>(&dummy.uv) } as ElemOffset + big_offset,
+            }),
+            "col" => Some(Element {
+                format: <[U8Norm; 4] as Formatted>::get_format(),
+                offset: unsafe { mem::transmute::<_, usize>(&dummy.col) } as ElemOffset
+                    + big_offset,
+            }),
             _ => None,
         }
     }

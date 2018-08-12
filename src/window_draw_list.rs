@@ -16,19 +16,27 @@ use std::marker::PhantomData;
 pub struct ImColor(ImU32);
 
 impl From<ImColor> for ImU32 {
-    fn from(color: ImColor) -> Self { color.0 }
+    fn from(color: ImColor) -> Self {
+        color.0
+    }
 }
 
 impl From<ImU32> for ImColor {
-    fn from(color: ImU32) -> Self { ImColor(color) }
+    fn from(color: ImU32) -> Self {
+        ImColor(color)
+    }
 }
 
 impl From<ImVec4> for ImColor {
-    fn from(v: ImVec4) -> Self { ImColor(unsafe { sys::igColorConvertFloat4ToU32(v) }) }
+    fn from(v: ImVec4) -> Self {
+        ImColor(unsafe { sys::igColorConvertFloat4ToU32(v) })
+    }
 }
 
 impl From<[f32; 4]> for ImColor {
-    fn from(v: [f32; 4]) -> Self { ImColor(unsafe { sys::igColorConvertFloat4ToU32(v.into()) }) }
+    fn from(v: [f32; 4]) -> Self {
+        ImColor(unsafe { sys::igColorConvertFloat4ToU32(v.into()) })
+    }
 }
 
 impl From<(f32, f32, f32, f32)> for ImColor {
@@ -38,11 +46,15 @@ impl From<(f32, f32, f32, f32)> for ImColor {
 }
 
 impl From<[f32; 3]> for ImColor {
-    fn from(v: [f32; 3]) -> Self { [v[0], v[1], v[2], 1.0].into() }
+    fn from(v: [f32; 3]) -> Self {
+        [v[0], v[1], v[2], 1.0].into()
+    }
 }
 
 impl From<(f32, f32, f32)> for ImColor {
-    fn from(v: (f32, f32, f32)) -> Self { [v.0, v.1, v.2, 1.0].into() }
+    fn from(v: (f32, f32, f32)) -> Self {
+        [v.0, v.1, v.2, 1.0].into()
+    }
 }
 
 /// Object implementing the custom draw API.
@@ -59,7 +71,9 @@ static mut WINDOW_DRAW_LIST_LOADED: bool = false;
 
 impl<'ui> Drop for WindowDrawList<'ui> {
     fn drop(&mut self) {
-        unsafe { WINDOW_DRAW_LIST_LOADED = false; }
+        unsafe {
+            WINDOW_DRAW_LIST_LOADED = false;
+        }
     }
 }
 

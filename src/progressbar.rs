@@ -1,7 +1,7 @@
 #![warn(missing_docs)]
-use sys;
 use std::marker::PhantomData;
 use std::ptr;
+use sys;
 
 use super::{ImStr, ImVec2, Ui};
 

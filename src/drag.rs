@@ -1,9 +1,8 @@
-use sys;
 use std::marker::PhantomData;
 use std::ptr;
+use sys;
 
 use super::{ImStr, Ui};
-
 
 macro_rules! impl_display_format {
     ($InputType:ident) => {
@@ -51,7 +50,6 @@ macro_rules! impl_min_max {
     }
 }
 
-
 #[must_use]
 pub struct DragFloat<'ui, 'p> {
     label: &'p ImStr,
@@ -63,7 +61,6 @@ pub struct DragFloat<'ui, 'p> {
     power: f32,
     _phantom: PhantomData<&'ui Ui<'ui>>,
 }
-
 
 impl<'ui, 'p> DragFloat<'ui, 'p> {
     pub fn new(_: &Ui<'ui>, label: &'p ImStr, value: &'p mut f32) -> Self {
@@ -99,23 +96,22 @@ impl<'ui, 'p> DragFloat<'ui, 'p> {
     impl_power!(DragFloat);
 }
 
-
 macro_rules! impl_drag_floatn {
     ($DragFloatN:ident, $N:expr, $igDragFloatN:ident) => {
         #[must_use]
         pub struct $DragFloatN<'ui, 'p> {
             label: &'p ImStr,
-            value: &'p mut [f32;$N],
+            value: &'p mut [f32; $N],
             speed: f32,
             min: f32,
             max: f32,
             display_format: &'p ImStr,
             power: f32,
-            _phantom: PhantomData<&'ui Ui<'ui>>
+            _phantom: PhantomData<&'ui Ui<'ui>>,
         }
 
         impl<'ui, 'p> $DragFloatN<'ui, 'p> {
-            pub fn new(_: &Ui<'ui>, label: &'p ImStr, value: &'p mut [f32;$N]) -> Self {
+            pub fn new(_: &Ui<'ui>, label: &'p ImStr, value: &'p mut [f32; $N]) -> Self {
                 $DragFloatN {
                     label: label,
                     value: value,
@@ -124,7 +120,7 @@ macro_rules! impl_drag_floatn {
                     max: 0.0,
                     display_format: unsafe { ImStr::from_utf8_with_nul_unchecked(b"%.3f\0") },
                     power: 1.0,
-                    _phantom: PhantomData
+                    _phantom: PhantomData,
                 }
             }
 
@@ -147,7 +143,7 @@ macro_rules! impl_drag_floatn {
             impl_speed!(DragFloat);
             impl_power!(DragFloat);
         }
-    }
+    };
 }
 
 impl_drag_floatn!(DragFloat2, 2, igDragFloat2);
@@ -167,7 +163,6 @@ pub struct DragFloatRange2<'ui, 'p> {
     power: f32,
     _phantom: PhantomData<&'ui Ui<'ui>>,
 }
-
 
 impl<'ui, 'p> DragFloatRange2<'ui, 'p> {
     pub fn new(
@@ -218,7 +213,6 @@ impl<'ui, 'p> DragFloatRange2<'ui, 'p> {
     impl_power!(DragFloatRange2);
 }
 
-
 #[must_use]
 pub struct DragInt<'ui, 'p> {
     label: &'p ImStr,
@@ -229,7 +223,6 @@ pub struct DragInt<'ui, 'p> {
     display_format: &'p ImStr,
     _phantom: PhantomData<&'ui Ui<'ui>>,
 }
-
 
 impl<'ui, 'p> DragInt<'ui, 'p> {
     pub fn new(_: &Ui<'ui>, label: &'p ImStr, value: &'p mut i32) -> Self {
@@ -262,22 +255,21 @@ impl<'ui, 'p> DragInt<'ui, 'p> {
     impl_speed!(DragInt);
 }
 
-
 macro_rules! impl_drag_intn {
     ($DragIntN:ident, $N:expr, $igDragIntN:ident) => {
         #[must_use]
         pub struct $DragIntN<'ui, 'p> {
             label: &'p ImStr,
-            value: &'p mut [i32;$N],
+            value: &'p mut [i32; $N],
             speed: f32,
             min: i32,
             max: i32,
             display_format: &'p ImStr,
-            _phantom: PhantomData<&'ui Ui<'ui>>
+            _phantom: PhantomData<&'ui Ui<'ui>>,
         }
 
         impl<'ui, 'p> $DragIntN<'ui, 'p> {
-            pub fn new(_: &Ui<'ui>, label: &'p ImStr, value: &'p mut [i32;$N]) -> Self {
+            pub fn new(_: &Ui<'ui>, label: &'p ImStr, value: &'p mut [i32; $N]) -> Self {
                 $DragIntN {
                     label: label,
                     value: value,
@@ -285,7 +277,7 @@ macro_rules! impl_drag_intn {
                     min: 0,
                     max: 0,
                     display_format: unsafe { ImStr::from_utf8_with_nul_unchecked(b"%.0f\0") },
-                    _phantom: PhantomData
+                    _phantom: PhantomData,
                 }
             }
 
@@ -306,14 +298,12 @@ macro_rules! impl_drag_intn {
             impl_min_max!(DragInt, i32);
             impl_speed!(DragInt);
         }
-    }
+    };
 }
 
 impl_drag_intn!(DragInt2, 2, igDragInt2);
 impl_drag_intn!(DragInt3, 3, igDragInt3);
 impl_drag_intn!(DragInt4, 4, igDragInt4);
-
-
 
 #[must_use]
 pub struct DragIntRange2<'ui, 'p> {

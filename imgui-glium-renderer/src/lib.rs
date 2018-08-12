@@ -2,12 +2,12 @@
 extern crate glium;
 extern crate imgui;
 
-use glium::{DrawError, GlObject, IndexBuffer, Program, Surface, Texture2d, VertexBuffer};
 use glium::backend::{Context, Facade};
-use glium::program;
 use glium::index::{self, PrimitiveType};
+use glium::program;
 use glium::texture;
 use glium::vertex;
+use glium::{DrawError, GlObject, IndexBuffer, Program, Surface, Texture2d, VertexBuffer};
 use imgui::{DrawList, FrameSize, ImDrawIdx, ImDrawVert, ImGui, Ui};
 use std::borrow::Cow;
 use std::fmt;
@@ -38,23 +38,33 @@ impl fmt::Display for RendererError {
 }
 
 impl From<vertex::BufferCreationError> for RendererError {
-    fn from(e: vertex::BufferCreationError) -> RendererError { RendererError::Vertex(e) }
+    fn from(e: vertex::BufferCreationError) -> RendererError {
+        RendererError::Vertex(e)
+    }
 }
 
 impl From<index::BufferCreationError> for RendererError {
-    fn from(e: index::BufferCreationError) -> RendererError { RendererError::Index(e) }
+    fn from(e: index::BufferCreationError) -> RendererError {
+        RendererError::Index(e)
+    }
 }
 
 impl From<program::ProgramChooserCreationError> for RendererError {
-    fn from(e: program::ProgramChooserCreationError) -> RendererError { RendererError::Program(e) }
+    fn from(e: program::ProgramChooserCreationError) -> RendererError {
+        RendererError::Program(e)
+    }
 }
 
 impl From<texture::TextureCreationError> for RendererError {
-    fn from(e: texture::TextureCreationError) -> RendererError { RendererError::Texture(e) }
+    fn from(e: texture::TextureCreationError) -> RendererError {
+        RendererError::Texture(e)
+    }
 }
 
 impl From<DrawError> for RendererError {
-    fn from(e: DrawError) -> RendererError { RendererError::Draw(e) }
+    fn from(e: DrawError) -> RendererError {
+        RendererError::Draw(e)
+    }
 }
 
 pub struct Renderer {
@@ -73,11 +83,17 @@ impl Renderer {
 
     pub fn render<'a, S: Surface>(&mut self, surface: &mut S, ui: Ui<'a>) -> RendererResult<()> {
         let _ = self.ctx.insert_debug_marker("imgui-rs: starting rendering");
-        let FrameSize { logical_size: (width, height), hidpi_factor } = ui.frame_size();
+        let FrameSize {
+            logical_size: (width, height),
+            hidpi_factor,
+        } = ui.frame_size();
         if !(width > 0.0 && height > 0.0) {
             return Ok(());
         }
-        let fb_size = ((width * hidpi_factor) as f32, (height * hidpi_factor) as f32);
+        let fb_size = (
+            (width * hidpi_factor) as f32,
+            (height * hidpi_factor) as f32,
+        );
 
         let matrix = [
             [(2.0 / width) as f32, 0.0, 0.0, 0.0],
@@ -103,19 +119,15 @@ impl Renderer {
         fb_size: (f32, f32),
         matrix: [[f32; 4]; 4],
     ) -> RendererResult<()> {
+        use glium::uniforms::{MagnifySamplerFilter, MinifySamplerFilter};
         use glium::{Blend, DrawParameters, Rect};
-        use glium::uniforms::{MinifySamplerFilter, MagnifySamplerFilter};
 
         let (fb_width, fb_height) = fb_size;
 
-        self.device_objects.upload_vertex_buffer(
-            &self.ctx,
-            draw_list.vtx_buffer,
-        )?;
-        self.device_objects.upload_index_buffer(
-            &self.ctx,
-            draw_list.idx_buffer,
-        )?;
+        self.device_objects
+            .upload_vertex_buffer(&self.ctx, draw_list.vtx_buffer)?;
+        self.device_objects
+            .upload_index_buffer(&self.ctx, draw_list.idx_buffer)?;
 
         let font_texture_id = self.device_objects.texture.get_id() as usize;
 
@@ -128,24 +140,31 @@ impl Renderer {
 
             surface.draw(
                 &self.device_objects.vertex_buffer,
-                &self.device_objects
+                &self
+                    .device_objects
                     .index_buffer
                     .slice(idx_start..idx_end)
                     .expect("Invalid index buffer range"),
                 &self.device_objects.program,
                 &uniform! {
-                      matrix: matrix,
-                      tex: self.device_objects.texture.sampled()
-                          .magnify_filter(MagnifySamplerFilter::Linear)
-                          .minify_filter(MinifySamplerFilter::Linear),
-                  },
+                    matrix: matrix,
+                    tex: self.device_objects.texture.sampled()
+                        .magnify_filter(MagnifySamplerFilter::Linear)
+                        .minify_filter(MinifySamplerFilter::Linear),
+                },
                 &DrawParameters {
                     blend: Blend::alpha_blending(),
                     scissor: Some(Rect {
                         left: cmd.clip_rect.x.max(0.0).round() as u32,
                         bottom: (fb_height - cmd.clip_rect.w).max(0.0).round() as u32,
-                        width: (cmd.clip_rect.z - cmd.clip_rect.x).abs().max(fb_width).round() as u32,
-                        height: (cmd.clip_rect.w - cmd.clip_rect.y).abs().max(fb_height).round() as u32,
+                        width: (cmd.clip_rect.z - cmd.clip_rect.x)
+                            .abs()
+                            .max(fb_width)
+                            .round() as u32,
+                        height: (cmd.clip_rect.w - cmd.clip_rect.y)
+                            .abs()
+                            .max(fb_height)
+                            .round() as u32,
                     }),
                     ..DrawParameters::default()
                 },
@@ -203,11 +222,7 @@ impl DeviceObjects {
         use glium::texture::{ClientFormat, RawImage2d};
 
         let vertex_buffer = VertexBuffer::empty_dynamic(ctx, 0)?;
-        let index_buffer = IndexBuffer::empty_dynamic(
-            ctx,
-            PrimitiveType::TrianglesList,
-            0,
-        )?;
+        let index_buffer = IndexBuffer::empty_dynamic(ctx, PrimitiveType::TrianglesList, 0)?;
 
         let program = compile_default_program(ctx)?;
         let texture = im_gui.prepare_texture(|handle| {
@@ -255,11 +270,7 @@ impl DeviceObjects {
             slice.write(idx_buffer);
             return Ok(());
         }
-        self.index_buffer = IndexBuffer::dynamic(
-            ctx,
-            PrimitiveType::TrianglesList,
-            idx_buffer,
-        )?;
+        self.index_buffer = IndexBuffer::dynamic(ctx, PrimitiveType::TrianglesList, idx_buffer)?;
         let _ = ctx.get_context().insert_debug_marker(&format!(
             "imgui-rs: resized index buffer to {} bytes",
             self.index_buffer.get_size()

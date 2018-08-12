@@ -1,7 +1,7 @@
 #![warn(missing_docs)]
-use sys;
 use std::marker::PhantomData;
 use std::ptr;
+use sys;
 
 use {ImGuiColorEditFlags, ImStr, ImVec2, ImVec4, Ui};
 
@@ -25,11 +25,15 @@ impl<'p> EditableColor<'p> {
 }
 
 impl<'p> From<&'p mut [f32; 3]> for EditableColor<'p> {
-    fn from(value: &'p mut [f32; 3]) -> EditableColor<'p> { EditableColor::Float3(value) }
+    fn from(value: &'p mut [f32; 3]) -> EditableColor<'p> {
+        EditableColor::Float3(value)
+    }
 }
 
 impl<'p> From<&'p mut [f32; 4]> for EditableColor<'p> {
-    fn from(value: &'p mut [f32; 4]) -> EditableColor<'p> { EditableColor::Float4(value) }
+    fn from(value: &'p mut [f32; 4]) -> EditableColor<'p> {
+        EditableColor::Float4(value)
+    }
 }
 
 /// Color editor mode.
@@ -171,31 +175,21 @@ impl<'ui, 'p> ColorEdit<'ui, 'p> {
     /// Sets the color editor mode.
     #[inline]
     pub fn mode(mut self, mode: ColorEditMode) -> Self {
-        self.flags.set(
-            ImGuiColorEditFlags::RGB,
-            mode == ColorEditMode::RGB,
-        );
-        self.flags.set(
-            ImGuiColorEditFlags::HSV,
-            mode == ColorEditMode::HSV,
-        );
-        self.flags.set(
-            ImGuiColorEditFlags::HEX,
-            mode == ColorEditMode::HEX,
-        );
+        self.flags
+            .set(ImGuiColorEditFlags::RGB, mode == ColorEditMode::RGB);
+        self.flags
+            .set(ImGuiColorEditFlags::HSV, mode == ColorEditMode::HSV);
+        self.flags
+            .set(ImGuiColorEditFlags::HEX, mode == ColorEditMode::HEX);
         self
     }
     /// Sets the formatting style of color components.
     #[inline]
     pub fn format(mut self, format: ColorFormat) -> Self {
-        self.flags.set(
-            ImGuiColorEditFlags::Uint8,
-            format == ColorFormat::U8,
-        );
-        self.flags.set(
-            ImGuiColorEditFlags::Float,
-            format == ColorFormat::Float,
-        );
+        self.flags
+            .set(ImGuiColorEditFlags::Uint8, format == ColorFormat::U8);
+        self.flags
+            .set(ImGuiColorEditFlags::Float, format == ColorFormat::Float);
         self
     }
     /// Builds the color editor.
@@ -328,14 +322,10 @@ impl<'ui, 'p> ColorPicker<'ui, 'p> {
     /// Sets the formatting style of color components.
     #[inline]
     pub fn format(mut self, format: ColorFormat) -> Self {
-        self.flags.set(
-            ImGuiColorEditFlags::Uint8,
-            format == ColorFormat::U8,
-        );
-        self.flags.set(
-            ImGuiColorEditFlags::Float,
-            format == ColorFormat::Float,
-        );
+        self.flags
+            .set(ImGuiColorEditFlags::Uint8, format == ColorFormat::U8);
+        self.flags
+            .set(ImGuiColorEditFlags::Float, format == ColorFormat::Float);
         self
     }
     /// Sets the shown reference color.

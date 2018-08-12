@@ -1,5 +1,5 @@
-use sys;
 use std::marker::PhantomData;
+use sys;
 
 use super::{ImGuiCond, ImGuiTreeNodeFlags, ImStr, Ui};
 

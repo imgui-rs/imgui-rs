@@ -22,7 +22,9 @@ impl ImString {
         v.push(b'\0');
         ImString(v)
     }
-    pub unsafe fn from_utf8_with_nul_unchecked(v: Vec<u8>) -> ImString { ImString(v) }
+    pub unsafe fn from_utf8_with_nul_unchecked(v: Vec<u8>) -> ImString {
+        ImString(v)
+    }
     pub fn clear(&mut self) {
         self.0.clear();
         self.0.push(b'\0');
@@ -36,12 +38,24 @@ impl ImString {
         self.0.extend_from_slice(string.as_bytes());
         self.0.push(b'\0');
     }
-    pub fn capacity(&self) -> usize { self.0.capacity() - 1 }
-    pub fn capacity_with_nul(&self) -> usize { self.0.capacity() }
-    pub fn reserve(&mut self, additional: usize) { self.0.reserve(additional); }
-    pub fn reserve_exact(&mut self, additional: usize) { self.0.reserve_exact(additional); }
-    pub fn as_ptr(&self) -> *const c_char { self.0.as_ptr() as *const _ }
-    pub fn as_mut_ptr(&mut self) -> *mut c_char { self.0.as_mut_ptr() as *mut _ }
+    pub fn capacity(&self) -> usize {
+        self.0.capacity() - 1
+    }
+    pub fn capacity_with_nul(&self) -> usize {
+        self.0.capacity()
+    }
+    pub fn reserve(&mut self, additional: usize) {
+        self.0.reserve(additional);
+    }
+    pub fn reserve_exact(&mut self, additional: usize) {
+        self.0.reserve_exact(additional);
+    }
+    pub fn as_ptr(&self) -> *const c_char {
+        self.0.as_ptr() as *const _
+    }
+    pub fn as_mut_ptr(&mut self) -> *mut c_char {
+        self.0.as_mut_ptr() as *mut _
+    }
 
     /// Updates the buffer length based on the current contents.
     ///
@@ -57,40 +71,58 @@ impl ImString {
 }
 
 impl<'a> Default for ImString {
-    fn default() -> ImString { unsafe { ImString::from_utf8_with_nul_unchecked(vec![0]) } }
+    fn default() -> ImString {
+        unsafe { ImString::from_utf8_with_nul_unchecked(vec![0]) }
+    }
 }
 
 impl From<String> for ImString {
-    fn from(s: String) -> ImString { ImString::new(s) }
+    fn from(s: String) -> ImString {
+        ImString::new(s)
+    }
 }
 
 impl<'a, T: ?Sized + AsRef<ImStr>> From<&'a T> for ImString {
-    fn from(s: &'a T) -> ImString { s.as_ref().to_owned() }
+    fn from(s: &'a T) -> ImString {
+        s.as_ref().to_owned()
+    }
 }
 
 impl AsRef<ImStr> for ImString {
-    fn as_ref(&self) -> &ImStr { self }
+    fn as_ref(&self) -> &ImStr {
+        self
+    }
 }
 
 impl Borrow<ImStr> for ImString {
-    fn borrow(&self) -> &ImStr { self }
+    fn borrow(&self) -> &ImStr {
+        self
+    }
 }
 
 impl AsRef<str> for ImString {
-    fn as_ref(&self) -> &str { self.to_str() }
+    fn as_ref(&self) -> &str {
+        self.to_str()
+    }
 }
 
 impl Borrow<str> for ImString {
-    fn borrow(&self) -> &str { self.to_str() }
+    fn borrow(&self) -> &str {
+        self.to_str()
+    }
 }
 
 impl Index<RangeFull> for ImString {
     type Output = ImStr;
-    fn index(&self, _index: RangeFull) -> &ImStr { self }
+    fn index(&self, _index: RangeFull) -> &ImStr {
+        self
+    }
 }
 
 impl fmt::Debug for ImString {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result { fmt::Debug::fmt(self.to_str(), f) }
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        fmt::Debug::fmt(self.to_str(), f)
+    }
 }
 
 impl Deref for ImString {
@@ -113,29 +145,47 @@ impl<'a> Default for &'a ImStr {
 }
 
 impl fmt::Debug for ImStr {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result { fmt::Debug::fmt(&self.0, f) }
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        fmt::Debug::fmt(&self.0, f)
+    }
 }
 
 impl ImStr {
-    pub fn new<S: AsRef<ImStr> + ?Sized>(s: &S) -> &ImStr { s.as_ref() }
-    pub unsafe fn from_utf8_with_nul_unchecked(bytes: &[u8]) -> &ImStr { mem::transmute(bytes) }
-    pub fn as_ptr(&self) -> *const c_char { self.0.as_ptr() }
-    pub fn to_str(&self) -> &str { unsafe { str::from_utf8_unchecked(self.0.to_bytes()) } }
+    pub fn new<S: AsRef<ImStr> + ?Sized>(s: &S) -> &ImStr {
+        s.as_ref()
+    }
+    pub unsafe fn from_utf8_with_nul_unchecked(bytes: &[u8]) -> &ImStr {
+        mem::transmute(bytes)
+    }
+    pub fn as_ptr(&self) -> *const c_char {
+        self.0.as_ptr()
+    }
+    pub fn to_str(&self) -> &str {
+        unsafe { str::from_utf8_unchecked(self.0.to_bytes()) }
+    }
 }
 
 impl AsRef<CStr> for ImStr {
-    fn as_ref(&self) -> &CStr { &self.0 }
+    fn as_ref(&self) -> &CStr {
+        &self.0
+    }
 }
 
 impl AsRef<ImStr> for ImStr {
-    fn as_ref(&self) -> &ImStr { self }
+    fn as_ref(&self) -> &ImStr {
+        self
+    }
 }
 
 impl AsRef<str> for ImStr {
-    fn as_ref(&self) -> &str { self.to_str() }
+    fn as_ref(&self) -> &str {
+        self.to_str()
+    }
 }
 
 impl ToOwned for ImStr {
     type Owned = ImString;
-    fn to_owned(&self) -> ImString { ImString(self.0.to_owned().into_bytes()) }
+    fn to_owned(&self) -> ImString {
+        ImString(self.0.to_owned().into_bytes())
+    }
 }

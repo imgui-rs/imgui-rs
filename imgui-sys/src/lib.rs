@@ -24,7 +24,7 @@ mod gfx_support;
 mod glium_support;
 
 /// ImGui context (opaque)
-pub enum ImGuiContext { }
+pub enum ImGuiContext {}
 
 /// 32-bit unsigned integer (typically used to store packed colors)
 pub type ImU32 = c_uint;
@@ -87,7 +87,9 @@ pub enum ImGuiCol {
     DragDropTarget,
 }
 impl ImGuiCol {
-    #[deprecated(since = "0.0.19", note = "ComboBg has been merged with PopupBg. Please use PopupBg instead")]
+    #[deprecated(
+        since = "0.0.19", note = "ComboBg has been merged with PopupBg. Please use PopupBg instead"
+    )]
     pub const ComboBg: ImGuiCol = ImGuiCol::PopupBg;
     #[deprecated(since = "0.0.19", note = "please use ChildBg instead")]
     pub const ChildWindowBg: ImGuiCol = ImGuiCol::ChildBg;
@@ -450,9 +452,8 @@ bitflags!(
     }
 );
 
-pub type ImGuiTextEditCallback = Option<
-    extern "C" fn(data: *mut ImGuiTextEditCallbackData) -> c_int,
->;
+pub type ImGuiTextEditCallback =
+    Option<extern "C" fn(data: *mut ImGuiTextEditCallbackData) -> c_int>;
 
 pub type ImGuiSizeConstraintCallback =
     Option<extern "C" fn(data: *mut ImGuiSizeConstraintCallbackData)>;
@@ -481,19 +482,27 @@ impl ImVec2 {
 }
 
 impl From<[f32; 2]> for ImVec2 {
-    fn from(array: [f32; 2]) -> ImVec2 { ImVec2::new(array[0], array[1]) }
+    fn from(array: [f32; 2]) -> ImVec2 {
+        ImVec2::new(array[0], array[1])
+    }
 }
 
 impl From<(f32, f32)> for ImVec2 {
-    fn from((x, y): (f32, f32)) -> ImVec2 { ImVec2::new(x, y) }
+    fn from((x, y): (f32, f32)) -> ImVec2 {
+        ImVec2::new(x, y)
+    }
 }
 
 impl Into<[f32; 2]> for ImVec2 {
-    fn into(self) -> [f32; 2] { [self.x, self.y] }
+    fn into(self) -> [f32; 2] {
+        [self.x, self.y]
+    }
 }
 
 impl Into<(f32, f32)> for ImVec2 {
-    fn into(self) -> (f32, f32) { (self.x, self.y) }
+    fn into(self) -> (f32, f32) {
+        (self.x, self.y)
+    }
 }
 
 /// A tuple of 4 floating-point values
@@ -526,19 +535,27 @@ impl ImVec4 {
 }
 
 impl From<[f32; 4]> for ImVec4 {
-    fn from(array: [f32; 4]) -> ImVec4 { ImVec4::new(array[0], array[1], array[2], array[3]) }
+    fn from(array: [f32; 4]) -> ImVec4 {
+        ImVec4::new(array[0], array[1], array[2], array[3])
+    }
 }
 
 impl From<(f32, f32, f32, f32)> for ImVec4 {
-    fn from((x, y, z, w): (f32, f32, f32, f32)) -> ImVec4 { ImVec4::new(x, y, z, w) }
+    fn from((x, y, z, w): (f32, f32, f32, f32)) -> ImVec4 {
+        ImVec4::new(x, y, z, w)
+    }
 }
 
 impl Into<[f32; 4]> for ImVec4 {
-    fn into(self) -> [f32; 4] { [self.x, self.y, self.z, self.w] }
+    fn into(self) -> [f32; 4] {
+        [self.x, self.y, self.z, self.w]
+    }
 }
 
 impl Into<(f32, f32, f32, f32)> for ImVec4 {
-    fn into(self) -> (f32, f32, f32, f32) { (self.x, self.y, self.z, self.w) }
+    fn into(self) -> (f32, f32, f32, f32) {
+        (self.x, self.y, self.z, self.w)
+    }
 }
 
 /// Runtime data for styling/colors
@@ -698,7 +715,9 @@ pub struct ImVector<T> {
 }
 
 impl<T> ImVector<T> {
-    pub unsafe fn as_slice(&self) -> &[T] { slice::from_raw_parts(self.data, self.size as usize) }
+    pub unsafe fn as_slice(&self) -> &[T] {
+        slice::from_raw_parts(self.data, self.size as usize)
+    }
 }
 
 #[repr(C)]
@@ -804,10 +823,8 @@ pub struct ImGuiListClipper {
     pub display_end: c_int,
 }
 
-pub type ImDrawCallback = Option<
-    extern "C" fn(parent_list: *const ImDrawList,
-                  cmd: *const ImDrawCmd),
->;
+pub type ImDrawCallback =
+    Option<extern "C" fn(parent_list: *const ImDrawList, cmd: *const ImDrawCmd)>;
 
 /// A single draw command within a parent ImDrawList (generally maps to 1 GPU draw call)
 #[repr(C)]
@@ -1002,7 +1019,7 @@ extern "C" {
 #[allow(non_snake_case)]
 #[deprecated(since = "0.0.19", note = "please use igShowDemoWindow instead")]
 pub unsafe fn igShowTestWindow(opened: *mut bool) {
-   igShowDemoWindow(opened)
+    igShowDemoWindow(opened)
 }
 
 // Window
@@ -1279,7 +1296,8 @@ extern "C" {
     pub fn igCombo3(
         label: *const c_char,
         current_item: *mut c_int,
-        items_getter: extern "C" fn(data: *mut c_void, idx: c_int, out_text: *mut *const c_char) -> bool,
+        items_getter: extern "C" fn(data: *mut c_void, idx: c_int, out_text: *mut *const c_char)
+            -> bool,
         data: *mut c_void,
         items_count: c_int,
         height_in_items: c_int,
@@ -1630,7 +1648,7 @@ extern "C" {
         label: *const c_char,
         current_item: *mut c_int,
         items_getter: extern "C" fn(data: *mut c_void, idx: c_int, out_text: *mut *const c_char)
-                                    -> bool,
+            -> bool,
         data: *mut c_void,
         items_count: c_int,
         height_in_items: c_int,
@@ -1725,10 +1743,18 @@ extern "C" {
     /// 3. pcall [`igEndDragDropSource`]
     pub fn igBeginDragDropSource(flags: ImGuiDragDropFlags, mouse_button: c_int) -> bool;
     /// Use 'cond' to choose to submit payload on drag start or every frame
-    pub fn igSetDragDropPayload(type_: *const c_char, data: *const c_void, size: libc::size_t, cond: ImGuiCond) -> bool;
+    pub fn igSetDragDropPayload(
+        type_: *const c_char,
+        data: *const c_void,
+        size: libc::size_t,
+        cond: ImGuiCond,
+    ) -> bool;
     pub fn igEndDragDropSource();
     pub fn igBeginDragDropTarget() -> bool;
-    pub fn igAcceptDragDropPayload(type_: *const c_char, flags: ImGuiDragDropFlags) -> *const ImGuiPayload;
+    pub fn igAcceptDragDropPayload(
+        type_: *const c_char,
+        flags: ImGuiDragDropFlags,
+    ) -> *const ImGuiPayload;
     pub fn igEndDragDropTarget();
 }
 
@@ -1819,17 +1845,25 @@ extern "C" {
 }
 
 #[allow(non_snake_case)]
-#[deprecated(since = "0.0.19", note = "please use igIsWindowFocused(ImGuiFocusedFlags::RootWindow) instead")]
+#[deprecated(
+    since = "0.0.19", note = "please use igIsWindowFocused(ImGuiFocusedFlags::RootWindow) instead"
+)]
 pub unsafe fn igIsRootWindowFocused() -> bool {
     igIsWindowFocused(ImGuiFocusedFlags::RootWindow)
 }
 #[allow(non_snake_case)]
-#[deprecated(since = "0.0.19", note = "please use igIsWindowFocused(ImGuiFocusedFlags::RootAndChildWindows) instead")]
+#[deprecated(
+    since = "0.0.19",
+    note = "please use igIsWindowFocused(ImGuiFocusedFlags::RootAndChildWindows) instead"
+)]
 pub unsafe fn igIsRootWindowOrAnyChildFocused() -> bool {
     igIsWindowFocused(ImGuiFocusedFlags::RootAndChildWindows)
 }
 #[allow(non_snake_case)]
-#[deprecated(since = "0.0.19", note = "please use igIsWindowFocused(ImGuiFocusedFlags::RootAndChildWindows) instead")]
+#[deprecated(
+    since = "0.0.19",
+    note = "please use igIsWindowFocused(ImGuiFocusedFlags::RootAndChildWindows) instead"
+)]
 pub unsafe fn igIsRootWindowOrAnyChildHovered(_flags: ImGuiHoveredFlags) -> bool {
     igIsWindowHovered(ImGuiHoveredFlags::RootAndChildWindows)
 }

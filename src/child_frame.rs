@@ -1,7 +1,7 @@
-use sys;
 use std::marker::PhantomData;
+use sys;
 
-use super::{ImStr, ImVec2, ImGuiWindowFlags, Ui};
+use super::{ImGuiWindowFlags, ImStr, ImVec2, Ui};
 
 #[must_use]
 pub struct ChildFrame<'ui, 'p> {
@@ -74,34 +74,26 @@ impl<'ui, 'p> ChildFrame<'ui, 'p> {
     }
     #[inline]
     pub fn bring_to_front_on_focus(mut self, value: bool) -> Self {
-        self.flags.set(
-            ImGuiWindowFlags::NoBringToFrontOnFocus,
-            !value,
-        );
+        self.flags
+            .set(ImGuiWindowFlags::NoBringToFrontOnFocus, !value);
         self
     }
     #[inline]
     pub fn always_show_vertical_scroll_bar(mut self, value: bool) -> Self {
-        self.flags.set(
-            ImGuiWindowFlags::AlwaysVerticalScrollbar,
-            value,
-        );
+        self.flags
+            .set(ImGuiWindowFlags::AlwaysVerticalScrollbar, value);
         self
     }
     #[inline]
     pub fn always_show_horizontal_scroll_bar(mut self, value: bool) -> Self {
-        self.flags.set(
-            ImGuiWindowFlags::AlwaysHorizontalScrollbar,
-            value,
-        );
+        self.flags
+            .set(ImGuiWindowFlags::AlwaysHorizontalScrollbar, value);
         self
     }
     #[inline]
     pub fn always_use_window_padding(mut self, value: bool) -> Self {
-        self.flags.set(
-            ImGuiWindowFlags::AlwaysUseWindowPadding,
-            value,
-        );
+        self.flags
+            .set(ImGuiWindowFlags::AlwaysUseWindowPadding, value);
         self
     }
     pub fn build<F: FnOnce()>(self, f: F) {

@@ -1,6 +1,6 @@
-use sys;
 use std::marker::PhantomData;
 use std::ptr;
+use sys;
 
 use super::{ImGuiInputTextFlags, ImStr, ImString, Ui};
 
@@ -213,7 +213,6 @@ impl<'ui, 'p> InputTextMultiline<'ui, 'p> {
     }
 }
 
-
 #[must_use]
 pub struct InputInt<'ui, 'p> {
     label: &'p ImStr,
@@ -299,20 +298,20 @@ macro_rules! impl_input_floatn {
         #[must_use]
         pub struct $InputFloatN<'ui, 'p> {
             label: &'p ImStr,
-            value: &'p mut [f32;$N],
+            value: &'p mut [f32; $N],
             decimal_precision: i32,
             flags: ImGuiInputTextFlags,
-            _phantom: PhantomData<&'ui Ui<'ui>>
+            _phantom: PhantomData<&'ui Ui<'ui>>,
         }
 
         impl<'ui, 'p> $InputFloatN<'ui, 'p> {
-            pub fn new(_: &Ui<'ui>, label: &'p ImStr, value: &'p mut [f32;$N]) -> Self {
+            pub fn new(_: &Ui<'ui>, label: &'p ImStr, value: &'p mut [f32; $N]) -> Self {
                 $InputFloatN {
                     label: label,
                     value: value,
                     decimal_precision: -1,
                     flags: ImGuiInputTextFlags::empty(),
-                    _phantom: PhantomData
+                    _phantom: PhantomData,
                 }
             }
 
@@ -322,14 +321,15 @@ macro_rules! impl_input_floatn {
                         self.label.as_ptr(),
                         self.value.as_mut_ptr(),
                         self.decimal_precision,
-                        self.flags)
+                        self.flags,
+                    )
                 }
             }
 
             impl_precision_params!($InputFloatN);
             impl_text_flags!($InputFloatN);
         }
-    }
+    };
 }
 
 impl_input_floatn!(InputFloat2, 2, igInputFloat2);
@@ -341,33 +341,30 @@ macro_rules! impl_input_intn {
         #[must_use]
         pub struct $InputIntN<'ui, 'p> {
             label: &'p ImStr,
-            value: &'p mut [i32;$N],
+            value: &'p mut [i32; $N],
             flags: ImGuiInputTextFlags,
-            _phantom: PhantomData<&'ui Ui<'ui>>
+            _phantom: PhantomData<&'ui Ui<'ui>>,
         }
 
         impl<'ui, 'p> $InputIntN<'ui, 'p> {
-            pub fn new(_: &Ui<'ui>, label: &'p ImStr, value: &'p mut [i32;$N]) -> Self {
+            pub fn new(_: &Ui<'ui>, label: &'p ImStr, value: &'p mut [i32; $N]) -> Self {
                 $InputIntN {
                     label: label,
                     value: value,
                     flags: ImGuiInputTextFlags::empty(),
-                    _phantom: PhantomData
+                    _phantom: PhantomData,
                 }
             }
 
             pub fn build(self) -> bool {
                 unsafe {
-                    sys::$igInputIntN(
-                        self.label.as_ptr(),
-                        self.value.as_mut_ptr(),
-                        self.flags)
+                    sys::$igInputIntN(self.label.as_ptr(), self.value.as_mut_ptr(), self.flags)
                 }
             }
 
             impl_text_flags!($InputIntN);
         }
-    }
+    };
 }
 
 impl_input_intn!(InputInt2, 2, igInputInt2);

@@ -2,11 +2,11 @@
 extern crate gfx;
 extern crate imgui;
 
-use gfx::{Bundle, CommandBuffer, Encoder, Factory, IntoIndexBuffer, Rect, Resources, Slice};
-use gfx::memory::Bind;
 use gfx::handle::{Buffer, RenderTargetView};
+use gfx::memory::Bind;
 use gfx::texture::{FilterMethod, SamplerInfo, WrapMode};
 use gfx::traits::FactoryExt;
+use gfx::{Bundle, CommandBuffer, Encoder, Factory, IntoIndexBuffer, Rect, Resources, Slice};
 use imgui::{DrawList, FrameSize, ImDrawIdx, ImDrawVert, ImGui, Ui};
 
 pub type RendererResult<T> = Result<T, RendererError>;
@@ -20,19 +20,27 @@ pub enum RendererError {
 }
 
 impl From<gfx::UpdateError<usize>> for RendererError {
-    fn from(e: gfx::UpdateError<usize>) -> RendererError { RendererError::Update(e) }
+    fn from(e: gfx::UpdateError<usize>) -> RendererError {
+        RendererError::Update(e)
+    }
 }
 
 impl From<gfx::buffer::CreationError> for RendererError {
-    fn from(e: gfx::buffer::CreationError) -> RendererError { RendererError::Buffer(e) }
+    fn from(e: gfx::buffer::CreationError) -> RendererError {
+        RendererError::Buffer(e)
+    }
 }
 
 impl From<gfx::PipelineStateError<String>> for RendererError {
-    fn from(e: gfx::PipelineStateError<String>) -> RendererError { RendererError::Pipeline(e) }
+    fn from(e: gfx::PipelineStateError<String>) -> RendererError {
+        RendererError::Pipeline(e)
+    }
 }
 
 impl From<gfx::CombinedError> for RendererError {
-    fn from(e: gfx::CombinedError) -> RendererError { RendererError::Combined(e) }
+    fn from(e: gfx::CombinedError) -> RendererError {
+        RendererError::Combined(e)
+    }
 }
 
 gfx_defines!{
@@ -51,9 +59,9 @@ gfx_defines!{
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
 pub enum Shaders {
-    GlSl400, // OpenGL 4.0+
-    GlSl130, // OpenGL 3.0+
-    GlSl110, // OpenGL 2.0+
+    GlSl400,   // OpenGL 4.0+
+    GlSl130,   // OpenGL 3.0+
+    GlSl110,   // OpenGL 2.0+
     GlSlEs300, // OpenGL ES 3.0+
     GlSlEs100, // OpenGL ES 2.0+
 }
@@ -99,11 +107,7 @@ impl<R: Resources> Renderer<R> {
         out: RenderTargetView<R, gfx::format::Rgba8>,
     ) -> RendererResult<Renderer<R>> {
         let (vs_code, ps_code) = shaders.get_program_code();
-        let pso = factory.create_pipeline_simple(
-            vs_code,
-            ps_code,
-            pipe::new(),
-        )?;
+        let pso = factory.create_pipeline_simple(vs_code, ps_code, pipe::new())?;
         let vertex_buffer = factory.create_buffer::<ImDrawVert>(
             256,
             gfx::buffer::Role::Vertex,
@@ -168,12 +172,18 @@ impl<R: Resources> Renderer<R> {
         factory: &mut F,
         encoder: &mut Encoder<R, C>,
     ) -> RendererResult<()> {
-        let FrameSize { logical_size: (width, height), hidpi_factor } = ui.frame_size();
+        let FrameSize {
+            logical_size: (width, height),
+            hidpi_factor,
+        } = ui.frame_size();
 
         if !(width > 0.0 && height > 0.0) {
             return Ok(());
         }
-        let fb_size = ((width * hidpi_factor) as f32, (height * hidpi_factor) as f32);
+        let fb_size = (
+            (width * hidpi_factor) as f32,
+            (height * hidpi_factor) as f32,
+        );
 
         self.bundle.data.matrix = [
             [(2.0 / width) as f32, 0.0, 0.0, 0.0],
@@ -195,7 +205,7 @@ impl<R: Resources> Renderer<R> {
         factory: &mut F,
         encoder: &mut Encoder<R, C>,
         draw_list: &DrawList<'a>,
-        fb_size: (f32, f32)
+        fb_size: (f32, f32),
     ) -> RendererResult<()> {
         let (fb_width, fb_height) = fb_size;
 
@@ -210,8 +220,14 @@ impl<R: Resources> Renderer<R> {
             self.bundle.data.scissor = Rect {
                 x: cmd.clip_rect.x.max(0.0).round() as u16,
                 y: cmd.clip_rect.y.max(0.0).round() as u16,
-                w: (cmd.clip_rect.z - cmd.clip_rect.x).abs().min(fb_width).round() as u16,
-                h: (cmd.clip_rect.w - cmd.clip_rect.y).abs().min(fb_height).round() as u16,
+                w: (cmd.clip_rect.z - cmd.clip_rect.x)
+                    .abs()
+                    .min(fb_width)
+                    .round() as u16,
+                h: (cmd.clip_rect.w - cmd.clip_rect.y)
+                    .abs()
+                    .min(fb_height)
+                    .round() as u16,
             };
             self.bundle.encode(encoder);
             self.bundle.slice.start = self.bundle.slice.end;
@@ -232,11 +248,7 @@ impl<R: Resources> Renderer<R> {
                 Bind::empty(),
             )?;
         }
-        Ok(encoder.update_buffer(
-            &self.bundle.data.vertex_buffer,
-            vtx_buffer,
-            0,
-        )?)
+        Ok(encoder.update_buffer(&self.bundle.data.vertex_buffer, vtx_buffer, 0)?)
     }
     fn upload_index_buffer<F: Factory<R>, C: CommandBuffer<R>>(
         &mut self,

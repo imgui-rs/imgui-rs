@@ -7,7 +7,9 @@ use super::{ImDrawVert, ImVec2, ImVec4};
 
 #[cfg(feature = "glium")]
 unsafe impl Attribute for ImVec2 {
-    fn get_type() -> AttributeType { <(c_float, c_float) as Attribute>::get_type() }
+    fn get_type() -> AttributeType {
+        <(c_float, c_float) as Attribute>::get_type()
+    }
 }
 
 #[cfg(feature = "glium")]
@@ -27,19 +29,19 @@ impl Vertex for ImDrawVert {
                     "pos".into(),
                     mem::transmute(&dummy.pos),
                     <ImVec2 as Attribute>::get_type(),
-                    false
+                    false,
                 ),
                 (
                     "uv".into(),
                     mem::transmute(&dummy.uv),
                     <ImVec2 as Attribute>::get_type(),
-                    false
+                    false,
                 ),
                 (
                     "col".into(),
                     mem::transmute(&dummy.col),
                     AttributeType::U8U8U8U8,
-                    false
+                    false,
                 ),
             ])
         }
