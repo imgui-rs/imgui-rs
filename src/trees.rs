@@ -16,7 +16,7 @@ pub struct TreeNode<'ui, 'p> {
 impl<'ui, 'p> TreeNode<'ui, 'p> {
     pub fn new(_: &Ui<'ui>, id: &'p ImStr) -> Self {
         TreeNode {
-            id: id,
+            id,
             label: None,
             opened: false,
             opened_cond: ImGuiCond::empty(),
@@ -126,7 +126,7 @@ pub struct CollapsingHeader<'ui, 'p> {
 impl<'ui, 'p> CollapsingHeader<'ui, 'p> {
     pub fn new(_: &Ui<'ui>, label: &'p ImStr) -> Self {
         CollapsingHeader {
-            label: label,
+            label,
             flags: ImGuiTreeNodeFlags::empty(),
             _phantom: PhantomData,
         }

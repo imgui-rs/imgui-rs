@@ -18,10 +18,10 @@ pub struct SliderInt<'ui, 'p> {
 impl<'ui, 'p> SliderInt<'ui, 'p> {
     pub fn new(_: &Ui<'ui>, label: &'p ImStr, value: &'p mut i32, min: i32, max: i32) -> Self {
         SliderInt {
-            label: label,
-            value: value,
-            min: min,
-            max: max,
+            label,
+            value,
+            min,
+            max,
             display_format: unsafe { ImStr::from_utf8_with_nul_unchecked(b"%.0f\0") },
             _phantom: PhantomData,
         }
@@ -65,10 +65,10 @@ macro_rules! impl_slider_intn {
                 max: i32,
             ) -> Self {
                 $SliderIntN {
-                    label: label,
-                    value: value,
-                    min: min,
-                    max: max,
+                    label,
+                    value,
+                    min,
+                    max,
                     display_format: unsafe { ImStr::from_utf8_with_nul_unchecked(b"%.0f\0") },
                     _phantom: PhantomData,
                 }
@@ -111,10 +111,10 @@ pub struct SliderFloat<'ui, 'p> {
 impl<'ui, 'p> SliderFloat<'ui, 'p> {
     pub fn new(_: &Ui<'ui>, label: &'p ImStr, value: &'p mut f32, min: f32, max: f32) -> Self {
         SliderFloat {
-            label: label,
-            value: value,
-            min: min,
-            max: max,
+            label,
+            value,
+            min,
+            max,
             display_format: unsafe { ImStr::from_utf8_with_nul_unchecked(b"%.3f\0") },
             power: 1.0,
             _phantom: PhantomData,
@@ -166,10 +166,10 @@ macro_rules! impl_slider_floatn {
                 max: f32,
             ) -> Self {
                 $SliderFloatN {
-                    label: label,
-                    value: value,
-                    min: min,
-                    max: max,
+                    label,
+                    value,
+                    min,
+                    max,
                     display_format: unsafe { ImStr::from_utf8_with_nul_unchecked(b"%.3f\0") },
                     power: 1.0,
                     _phantom: PhantomData,

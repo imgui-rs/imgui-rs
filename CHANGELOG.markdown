@@ -46,6 +46,7 @@ HIDPI are calculated. Depending on your needs, you may want to set HIDPI to 1
 by setting the environment variable `WINIT_HIDPI_FACTOR=1` if you use X11.
 - `frame()` now takes a single `FrameSize` argument
 - Bump minimum Rust version to 1.24
+- `set_mouse_down` takes button states by value, not by reference
 
 ### Deprecated
 

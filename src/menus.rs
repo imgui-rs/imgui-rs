@@ -14,7 +14,7 @@ pub struct Menu<'ui, 'p> {
 impl<'ui, 'p> Menu<'ui, 'p> {
     pub fn new(_: &Ui<'ui>, label: &'p ImStr) -> Self {
         Menu {
-            label: label,
+            label,
             enabled: true,
             _phantom: PhantomData,
         }
@@ -45,7 +45,7 @@ pub struct MenuItem<'ui, 'p> {
 impl<'ui, 'p> MenuItem<'ui, 'p> {
     pub fn new(_: &Ui<'ui>, label: &'p ImStr) -> Self {
         MenuItem {
-            label: label,
+            label,
             shortcut: None,
             selected: None,
             enabled: true,

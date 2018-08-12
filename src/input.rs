@@ -147,8 +147,8 @@ pub struct InputText<'ui, 'p> {
 impl<'ui, 'p> InputText<'ui, 'p> {
     pub fn new(_: &Ui<'ui>, label: &'p ImStr, buf: &'p mut ImString) -> Self {
         InputText {
-            label: label,
-            buf: buf,
+            label,
+            buf,
             flags: ImGuiInputTextFlags::empty(),
             _phantom: PhantomData,
         }
@@ -185,10 +185,10 @@ pub struct InputTextMultiline<'ui, 'p> {
 impl<'ui, 'p> InputTextMultiline<'ui, 'p> {
     pub fn new(_: &Ui<'ui>, label: &'p ImStr, buf: &'p mut ImString, size: sys::ImVec2) -> Self {
         InputTextMultiline {
-            label: label,
-            buf: buf,
+            label,
+            buf,
             flags: ImGuiInputTextFlags::empty(),
-            size: size,
+            size,
             _phantom: PhantomData,
         }
     }
@@ -226,8 +226,8 @@ pub struct InputInt<'ui, 'p> {
 impl<'ui, 'p> InputInt<'ui, 'p> {
     pub fn new(_: &Ui<'ui>, label: &'p ImStr, value: &'p mut i32) -> Self {
         InputInt {
-            label: label,
-            value: value,
+            label,
+            value,
             step: 1,
             step_fast: 100,
             flags: ImGuiInputTextFlags::empty(),
@@ -265,8 +265,8 @@ pub struct InputFloat<'ui, 'p> {
 impl<'ui, 'p> InputFloat<'ui, 'p> {
     pub fn new(_: &Ui<'ui>, label: &'p ImStr, value: &'p mut f32) -> Self {
         InputFloat {
-            label: label,
-            value: value,
+            label,
+            value,
             step: 0.0,
             step_fast: 0.0,
             decimal_precision: -1,
@@ -307,8 +307,8 @@ macro_rules! impl_input_floatn {
         impl<'ui, 'p> $InputFloatN<'ui, 'p> {
             pub fn new(_: &Ui<'ui>, label: &'p ImStr, value: &'p mut [f32; $N]) -> Self {
                 $InputFloatN {
-                    label: label,
-                    value: value,
+                    label,
+                    value,
                     decimal_precision: -1,
                     flags: ImGuiInputTextFlags::empty(),
                     _phantom: PhantomData,
@@ -349,8 +349,8 @@ macro_rules! impl_input_intn {
         impl<'ui, 'p> $InputIntN<'ui, 'p> {
             pub fn new(_: &Ui<'ui>, label: &'p ImStr, value: &'p mut [i32; $N]) -> Self {
                 $InputIntN {
-                    label: label,
-                    value: value,
+                    label,
+                    value,
                     flags: ImGuiInputTextFlags::empty(),
                     _phantom: PhantomData,
                 }

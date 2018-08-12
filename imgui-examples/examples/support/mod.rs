@@ -204,7 +204,7 @@ fn configure_keys(imgui: &mut ImGui) {
 
 fn update_mouse(imgui: &mut ImGui, mouse_state: &mut MouseState) {
     imgui.set_mouse_pos(mouse_state.pos.0 as f32, mouse_state.pos.1 as f32);
-    imgui.set_mouse_down(&[
+    imgui.set_mouse_down([
         mouse_state.pressed.0,
         mouse_state.pressed.1,
         mouse_state.pressed.2,

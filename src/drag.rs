@@ -65,8 +65,8 @@ pub struct DragFloat<'ui, 'p> {
 impl<'ui, 'p> DragFloat<'ui, 'p> {
     pub fn new(_: &Ui<'ui>, label: &'p ImStr, value: &'p mut f32) -> Self {
         DragFloat {
-            label: label,
-            value: value,
+            label,
+            value,
             speed: 1.0,
             min: 0.0,
             max: 0.0,
@@ -113,8 +113,8 @@ macro_rules! impl_drag_floatn {
         impl<'ui, 'p> $DragFloatN<'ui, 'p> {
             pub fn new(_: &Ui<'ui>, label: &'p ImStr, value: &'p mut [f32; $N]) -> Self {
                 $DragFloatN {
-                    label: label,
-                    value: value,
+                    label,
+                    value,
                     speed: 1.0,
                     min: 0.0,
                     max: 0.0,
@@ -172,9 +172,9 @@ impl<'ui, 'p> DragFloatRange2<'ui, 'p> {
         current_max: &'p mut f32,
     ) -> Self {
         DragFloatRange2 {
-            label: label,
-            current_min: current_min,
-            current_max: current_max,
+            label,
+            current_min,
+            current_max,
             speed: 1.0,
             min: 0.0,
             max: 0.0,
@@ -227,8 +227,8 @@ pub struct DragInt<'ui, 'p> {
 impl<'ui, 'p> DragInt<'ui, 'p> {
     pub fn new(_: &Ui<'ui>, label: &'p ImStr, value: &'p mut i32) -> Self {
         DragInt {
-            label: label,
-            value: value,
+            label,
+            value,
             speed: 1.0,
             min: 0,
             max: 0,
@@ -271,8 +271,8 @@ macro_rules! impl_drag_intn {
         impl<'ui, 'p> $DragIntN<'ui, 'p> {
             pub fn new(_: &Ui<'ui>, label: &'p ImStr, value: &'p mut [i32; $N]) -> Self {
                 $DragIntN {
-                    label: label,
-                    value: value,
+                    label,
+                    value,
                     speed: 1.0,
                     min: 0,
                     max: 0,
@@ -326,9 +326,9 @@ impl<'ui, 'p> DragIntRange2<'ui, 'p> {
         current_max: &'p mut i32,
     ) -> Self {
         DragIntRange2 {
-            label: label,
-            current_min: current_min,
-            current_max: current_max,
+            label,
+            current_min,
+            current_max,
             speed: 1.0,
             min: 0,
             max: 0,

@@ -1,7 +1,6 @@
 use std::borrow::Borrow;
 use std::ffi::CStr;
 use std::fmt;
-use std::mem;
 use std::ops::{Deref, Index, RangeFull};
 use std::os::raw::c_char;
 use std::str;
@@ -130,7 +129,9 @@ impl Deref for ImString {
     fn deref(&self) -> &ImStr {
         // as_ptr() is used, because we need to look at the bytes to figure out the length
         // self.0.len() is incorrect, because there might be more than one nul byte in the end
-        unsafe { mem::transmute(CStr::from_ptr(self.0.as_ptr() as *const c_char)) }
+        unsafe {
+            &*(CStr::from_ptr(self.0.as_ptr() as *const c_char) as *const CStr as *const ImStr)
+        }
     }
 }
 
@@ -155,7 +156,7 @@ impl ImStr {
         s.as_ref()
     }
     pub unsafe fn from_utf8_with_nul_unchecked(bytes: &[u8]) -> &ImStr {
-        mem::transmute(bytes)
+        &*(bytes as *const [u8] as *const ImStr)
     }
     pub fn as_ptr(&self) -> *const c_char {
         self.0.as_ptr()

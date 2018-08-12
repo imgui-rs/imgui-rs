@@ -246,9 +246,9 @@ impl ImGui {
         let io = self.io();
         (io.mouse_delta.x, io.mouse_delta.y)
     }
-    pub fn set_mouse_down(&mut self, states: &[bool; 5]) {
+    pub fn set_mouse_down(&mut self, states: [bool; 5]) {
         let io = self.io_mut();
-        io.mouse_down = *states;
+        io.mouse_down = states;
     }
     pub fn set_mouse_wheel(&mut self, value: f32) {
         let io = self.io_mut();
@@ -337,7 +337,7 @@ impl ImGui {
     }
     pub fn set_imgui_key(&mut self, key: ImGuiKey, mapping: u8) {
         let io = self.io_mut();
-        io.key_map[key as usize] = mapping as i32;
+        io.key_map[key as usize] = i32::from(mapping);
     }
     /// Map [`ImGuiKey`] values into user's key index
     pub fn get_key_index(&self, key: ImGuiKey) -> usize {

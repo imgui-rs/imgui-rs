@@ -68,9 +68,9 @@ impl FontGlyphRange {
             "A glyph range must be zero-terminated."
         );
 
-        for i in 0..slice.len() - 1 {
+        for (i, &glyph) in slice.iter().enumerate().take(slice.len() - 1) {
             assert_ne!(
-                slice[i], 0,
+                glyph, 0,
                 "A glyph in a range cannot be zero. \
                  (Glyph is zero at index {})",
                 i
@@ -122,14 +122,14 @@ impl FontGlyphRange {
 
     unsafe fn to_ptr(&self, atlas: *mut sys::ImFontAtlas) -> *const sys::ImWchar {
         match &self.0 {
-            &FontGlyphRangeData::Chinese => sys::ImFontAtlas_GetGlyphRangesChinese(atlas),
-            &FontGlyphRangeData::Cyrillic => sys::ImFontAtlas_GetGlyphRangesCyrillic(atlas),
-            &FontGlyphRangeData::Default => sys::ImFontAtlas_GetGlyphRangesDefault(atlas),
-            &FontGlyphRangeData::Japanese => sys::ImFontAtlas_GetGlyphRangesJapanese(atlas),
-            &FontGlyphRangeData::Korean => sys::ImFontAtlas_GetGlyphRangesKorean(atlas),
-            &FontGlyphRangeData::Thai => sys::ImFontAtlas_GetGlyphRangesThai(atlas),
+            FontGlyphRangeData::Chinese => sys::ImFontAtlas_GetGlyphRangesChinese(atlas),
+            FontGlyphRangeData::Cyrillic => sys::ImFontAtlas_GetGlyphRangesCyrillic(atlas),
+            FontGlyphRangeData::Default => sys::ImFontAtlas_GetGlyphRangesDefault(atlas),
+            FontGlyphRangeData::Japanese => sys::ImFontAtlas_GetGlyphRangesJapanese(atlas),
+            FontGlyphRangeData::Korean => sys::ImFontAtlas_GetGlyphRangesKorean(atlas),
+            FontGlyphRangeData::Thai => sys::ImFontAtlas_GetGlyphRangesThai(atlas),
 
-            &FontGlyphRangeData::Custom(ptr) => ptr,
+            FontGlyphRangeData::Custom(ptr) => *ptr,
         }
     }
 }

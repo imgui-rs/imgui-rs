@@ -13,7 +13,6 @@ extern crate gfx;
 extern crate glium;
 
 use std::convert::From;
-use std::mem;
 use std::os::raw::{c_char, c_float, c_int, c_short, c_uchar, c_uint, c_ushort, c_void};
 use std::slice;
 
@@ -902,7 +901,7 @@ pub struct ImDrawData {
 
 impl ImDrawData {
     pub unsafe fn cmd_lists(&self) -> &[*const ImDrawList] {
-        let cmd_lists: *const *const ImDrawList = mem::transmute(self.cmd_lists);
+        let cmd_lists = self.cmd_lists as *const *const ImDrawList;
         slice::from_raw_parts(cmd_lists, self.cmd_lists_count as usize)
     }
 }

@@ -20,8 +20,8 @@ pub struct PlotHistogram<'ui, 'p> {
 impl<'ui, 'p> PlotHistogram<'ui, 'p> {
     pub fn new(_: &Ui<'ui>, label: &'p ImStr, values: &'p [f32]) -> Self {
         PlotHistogram {
-            label: label,
-            values: values,
+            label,
+            values,
             values_offset: 0usize,
             overlay_text: None,
             scale_min: f32::MAX,

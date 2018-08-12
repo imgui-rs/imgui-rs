@@ -20,8 +20,8 @@ pub struct PlotLines<'ui, 'p> {
 impl<'ui, 'p> PlotLines<'ui, 'p> {
     pub fn new(_: &Ui<'ui>, label: &'p ImStr, values: &'p [f32]) -> Self {
         PlotLines {
-            label: label,
-            values: values,
+            label,
+            values,
             values_offset: 0usize,
             overlay_text: None,
             scale_min: f32::MAX,

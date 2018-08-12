@@ -25,7 +25,7 @@ impl<'ui, 'p> Window<'ui, 'p> {
             pos_cond: ImGuiCond::empty(),
             size: (0.0, 0.0),
             size_cond: ImGuiCond::empty(),
-            name: name,
+            name,
             opened: None,
             flags: ImGuiWindowFlags::empty(),
             border: false,
