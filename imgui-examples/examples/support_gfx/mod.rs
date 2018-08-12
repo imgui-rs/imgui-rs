@@ -1,4 +1,4 @@
-use imgui::{FontGlyphRange, ImFontConfig, ImGui, ImGuiMouseCursor, Ui};
+use imgui::{FontGlyphRange, ImFontConfig, ImGui, ImGuiMouseCursor, ImVec4, Ui};
 use imgui_gfx_renderer::{Renderer, Shaders};
 use std::time::Instant;
 
@@ -45,8 +45,6 @@ pub fn run<F: FnMut(&Ui) -> bool>(title: String, clear_color: [f32; 4], mut run_
     let mut imgui = ImGui::init();
     {
         // Fix incorrect colors with sRGB framebuffer
-        use imgui_sys::ImVec4;
-
         fn imgui_gamma_to_linear(col: ImVec4) -> ImVec4 {
             let x = col.x.powf(2.2);
             let y = col.y.powf(2.2);
