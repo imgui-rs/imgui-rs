@@ -15,17 +15,32 @@ pub fn run<F: FnMut(&Ui) -> bool>(title: String, clear_color: [f32; 4], mut run_
 
     let mut events_loop = glutin::EventsLoop::new();
     let context = glutin::ContextBuilder::new().with_vsync(true);
-    let window = glutin::WindowBuilder::new()
+    let builder = glutin::WindowBuilder::new()
         .with_title(title)
         .with_dimensions(glutin::dpi::LogicalSize::new(1024f64, 768f64));
-    let display = Display::new(window, context, &events_loop).unwrap();
+    let display = Display::new(builder, context, &events_loop).unwrap();
+    let window = display.gl_window();
 
     let mut imgui = ImGui::init();
     imgui.set_ini_filename(None);
-    let config = ImFontConfig::new().oversample_h(1).pixel_snap_h(true).size_pixels(13.0);
-    config.rasterizer_multiply(1.75).add_font(
-        &mut imgui.fonts(), include_bytes!("../mplus-1p-regular.ttf"), &FontGlyphRange::japanese());
-    config.merge_mode(true).add_default_font(&mut imgui.fonts());
+
+    let font_oversample = window.get_hidpi_factor().ceil() as u32;
+
+    imgui.fonts().add_font_with_config(
+        include_bytes!("../mplus-1p-regular.ttf"),
+        ImFontConfig::new()
+            .oversample_h(font_oversample)
+            .oversample_v(font_oversample)
+            .pixel_snap_h(true)
+            .size_pixels(13.0)
+            .rasterizer_multiply(1.75),
+        &FontGlyphRange::japanese());
+
+    imgui.fonts().add_default_font_with_config(ImFontConfig::new()
+        .merge_mode(true)
+        .oversample_h(font_oversample)
+        .oversample_v(font_oversample));
+
     let mut renderer = Renderer::init(&mut imgui, &display).expect("Failed to initialize renderer");
 
     configure_keys(&mut imgui);
@@ -108,16 +123,14 @@ pub fn run<F: FnMut(&Ui) -> bool>(title: String, clear_color: [f32; 4], mut run_
 
         update_mouse(&mut imgui, &mut mouse_state);
 
-        let gl_window = display.gl_window();
-
         let mouse_cursor = imgui.mouse_cursor();
         if imgui.mouse_draw_cursor() || mouse_cursor == ImGuiMouseCursor::None {
             // Hide OS cursor
-            gl_window.hide_cursor(true);
+            window.hide_cursor(true);
         } else {
             // Set OS cursor
-            gl_window.hide_cursor(false);
-            gl_window.set_cursor(match mouse_cursor {
+            window.hide_cursor(false);
+            window.set_cursor(match mouse_cursor {
                 ImGuiMouseCursor::None => unreachable!("mouse_cursor was None!"),
                 ImGuiMouseCursor::Arrow => glutin::MouseCursor::Arrow,
                 ImGuiMouseCursor::TextInput => glutin::MouseCursor::Text,
@@ -129,11 +142,11 @@ pub fn run<F: FnMut(&Ui) -> bool>(title: String, clear_color: [f32; 4], mut run_
             });
         }
 
-        let logical_size = gl_window.get_inner_size().unwrap();
+        let logical_size = window.get_inner_size().unwrap();
 
         let frame_size = FrameSize {
             logical_size: logical_size.into(),
-            hidpi_factor: gl_window.get_hidpi_factor(),
+            hidpi_factor: window.get_hidpi_factor(),
         };
 
         let ui = imgui.frame(frame_size, delta_s);

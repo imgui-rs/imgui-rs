@@ -59,10 +59,24 @@ pub fn run<F: FnMut(&Ui) -> bool>(title: String, clear_color: [f32; 4], mut run_
         }
     }
     imgui.set_ini_filename(None);
-    let config = ImFontConfig::new().oversample_h(1).pixel_snap_h(true).size_pixels(13.0);
-    config.rasterizer_multiply(1.75).add_font(
-        &mut imgui.fonts(), include_bytes!("../mplus-1p-regular.ttf"), &FontGlyphRange::japanese());
-    config.merge_mode(true).add_default_font(&mut imgui.fonts());
+
+    let font_oversample = window.get_hidpi_factor().ceil() as u32;
+
+    imgui.fonts().add_font_with_config(
+        include_bytes!("../mplus-1p-regular.ttf"),
+        ImFontConfig::new()
+            .oversample_h(font_oversample)
+            .oversample_v(font_oversample)
+            .pixel_snap_h(true)
+            .size_pixels(13.0)
+            .rasterizer_multiply(1.75),
+        &FontGlyphRange::japanese());
+
+    imgui.fonts().add_default_font_with_config(ImFontConfig::new()
+        .merge_mode(true)
+        .oversample_h(font_oversample)
+        .oversample_v(font_oversample));
+
     let mut renderer = Renderer::init(&mut imgui, &mut factory, shaders, main_color.clone())
         .expect("Failed to initialize renderer");
 
