@@ -119,7 +119,6 @@ impl Renderer {
         fb_size: (f32, f32),
         matrix: [[f32; 4]; 4],
     ) -> RendererResult<()> {
-        use glium::uniforms::{MagnifySamplerFilter, MinifySamplerFilter};
         use glium::{Blend, DrawParameters, Rect};
 
         let (fb_width, fb_height) = fb_size;
@@ -149,8 +148,6 @@ impl Renderer {
                 &uniform! {
                     matrix: matrix,
                     tex: self.device_objects.texture.sampled()
-                        .magnify_filter(MagnifySamplerFilter::Linear)
-                        .minify_filter(MinifySamplerFilter::Linear),
                 },
                 &DrawParameters {
                     blend: Blend::alpha_blending(),
