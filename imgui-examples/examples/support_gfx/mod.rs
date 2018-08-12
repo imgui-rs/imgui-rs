@@ -74,7 +74,7 @@ pub fn run<F: FnMut(&Ui) -> bool>(title: String, clear_color: [f32; 4], mut run_
     let mut mouse_state = MouseState::default();
     let mut quit = false;
 
-    'running: loop {
+    loop {
         events_loop.poll_events(|event| {
             use glutin::WindowEvent::*;
             use glutin::ElementState::Pressed;
@@ -145,7 +145,7 @@ pub fn run<F: FnMut(&Ui) -> bool>(title: String, clear_color: [f32; 4], mut run_
             }
         });
         if quit {
-            break 'running;
+            break;
         }
 
         let now = Instant::now();
