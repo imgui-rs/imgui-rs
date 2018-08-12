@@ -44,6 +44,8 @@
 - Upgrade glium to 0.22.0. This updates winit to 0.16. This changes the way
 HIDPI are calculated. Depending on your needs, you may want to set HIDPI to 1
 by setting the environment variable `WINIT_HIDPI_FACTOR=1` if you use X11.
+- `frame()` now takes a single `FrameSize` argument
+- Bump minimum Rust version to 1.24
 
 ### Deprecated
 
