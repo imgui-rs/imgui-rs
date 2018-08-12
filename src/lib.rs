@@ -115,6 +115,15 @@ pub struct FrameSize {
     pub hidpi_factor: f64,
 }
 
+impl FrameSize {
+    pub fn new(width: f64, height: f64, hidpi_factor: f64) -> FrameSize {
+        FrameSize {
+            logical_size: (width, height),
+            hidpi_factor,
+        }
+    }
+}
+
 impl ImGui {
     pub fn init() -> ImGui {
         ImGui {
@@ -1232,7 +1241,7 @@ impl<'ui> Ui<'ui> {
     /// ```rust,no_run
     /// # use imgui::*;
     /// # let mut imgui = ImGui::init();
-    /// # let ui = imgui.frame((0, 0), (0, 0), 0.1);
+    /// # let ui = imgui.frame(FrameSize::new(100.0, 100.0, 1.0), 0.1);
     /// # let mut selected_radio_value = 2;
     /// ui.radio_button(im_str!("Item 1"), &mut selected_radio_value, 1);
     /// ui.radio_button(im_str!("Item 2"), &mut selected_radio_value, 2);
@@ -1249,7 +1258,7 @@ impl<'ui> Ui<'ui> {
     /// ```rust,no_run
     /// # use imgui::*;
     /// # let mut imgui = ImGui::init();
-    /// # let ui = imgui.frame((0, 0), (0, 0), 0.1);
+    /// # let ui = imgui.frame(FrameSize::new(100.0, 100.0, 1.0), 0.1);
     /// # let mut radio_button_test = "cats".to_string();
     /// if ui.radio_button_bool(im_str!("Cats"), radio_button_test == "cats") {
     ///     radio_button_test = "cats".to_string();
@@ -1328,7 +1337,7 @@ impl<'ui> Ui<'ui> {
     /// ```rust,no_run
     /// # use imgui::*;
     /// # let mut imgui = ImGui::init();
-    /// # let ui = imgui.frame((0, 0), (0, 0), 0.1);
+    /// # let ui = imgui.frame(FrameSize::new(100.0, 100.0, 1.0), 0.1);
     /// ui.progress_bar(0.6)
     ///     .size((100.0, 12.0))
     ///     .overlay_text(im_str!("Progress!"))
@@ -1346,7 +1355,7 @@ impl<'ui> Ui<'ui> {
     /// ```rust,no_run
     /// # use imgui::*;
     /// # let mut imgui = ImGui::init();
-    /// # let ui = imgui.frame((0, 0), (0, 0), 0.1);
+    /// # let ui = imgui.frame(FrameSize::new(100.0, 100.0, 1.0), 0.1);
     /// ui.window(im_str!("ChatWindow"))
     ///     .title_bar(true)
     ///     .scrollable(false)
@@ -1376,7 +1385,7 @@ impl<'ui> Ui<'ui> {
     /// ```rust,no_run
     /// # use imgui::*;
     /// # let mut imgui = ImGui::init();
-    /// # let ui = imgui.frame((0, 0), (0, 0), 0.1);
+    /// # let ui = imgui.frame(FrameSize::new(100.0, 100.0, 1.0), 0.1);
     /// ui.with_style_var(StyleVar::Alpha(0.2), || {
     ///     ui.text(im_str!("AB"));
     /// });
@@ -1394,7 +1403,7 @@ impl<'ui> Ui<'ui> {
     /// ```rust,no_run
     /// # use imgui::*;
     /// # let mut imgui = ImGui::init();
-    /// # let ui = imgui.frame((0, 0), (0, 0), 0.1);
+    /// # let ui = imgui.frame(FrameSize::new(100.0, 100.0, 1.0), 0.1);
     /// # let styles = [StyleVar::Alpha(0.2), StyleVar::WindowPadding(ImVec2::new(1.0, 1.0))];
     /// ui.with_style_vars(&styles, || {
     ///     ui.text(im_str!("A"));
@@ -1444,7 +1453,7 @@ impl<'ui> Ui<'ui> {
     /// ```rust,no_run
     /// # use imgui::*;
     /// # let mut imgui = ImGui::init();
-    /// # let ui = imgui.frame((0, 0), (0, 0), 0.1);
+    /// # let ui = imgui.frame(FrameSize::new(100.0, 100.0, 1.0), 0.1);
     /// ui.with_color_var(ImGuiCol::Text, (1.0, 0.0, 0.0, 1.0), || {
     ///     ui.text_wrapped(im_str!("AB"));
     /// });
@@ -1470,7 +1479,7 @@ impl<'ui> Ui<'ui> {
     /// ```rust,no_run
     /// # use imgui::*;
     /// # let mut imgui = ImGui::init();
-    /// # let ui = imgui.frame((0, 0), (0, 0), 0.1);
+    /// # let ui = imgui.frame(FrameSize::new(100.0, 100.0, 1.0), 0.1);
     /// let red = (1.0, 0.0, 0.0, 1.0);
     /// let green = (0.0, 1.0, 0.0, 1.0);
     /// # let vars = [(ImGuiCol::Text, red), (ImGuiCol::TextDisabled, green)];
