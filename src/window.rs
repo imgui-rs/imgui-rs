@@ -2,7 +2,7 @@ use std::marker::PhantomData;
 use std::ptr;
 use sys;
 
-use super::{ImGuiCond, ImGuiStyleVar, ImGuiWindowFlags, ImStr, ImVec2, Ui};
+use super::{ImGuiCond, ImGuiWindowFlags, ImStr, ImVec2, Ui};
 
 #[must_use]
 pub struct Window<'ui, 'p> {
@@ -13,8 +13,6 @@ pub struct Window<'ui, 'p> {
     name: &'p ImStr,
     opened: Option<&'p mut bool>,
     flags: ImGuiWindowFlags,
-    // Deprecated. Should be removed along with Window::show_borders
-    border: bool,
     _phantom: PhantomData<&'ui Ui<'ui>>,
 }
 
@@ -28,7 +26,6 @@ impl<'ui, 'p> Window<'ui, 'p> {
             name,
             opened: None,
             flags: ImGuiWindowFlags::empty(),
-            border: false,
             _phantom: PhantomData,
         }
     }
@@ -90,12 +87,6 @@ impl<'ui, 'p> Window<'ui, 'p> {
         self
     }
     #[inline]
-    #[deprecated(since = "0.0.19", note = "please use StyleVar instead")]
-    pub fn show_borders(mut self, value: bool) -> Self {
-        self.border = value;
-        self
-    }
-    #[inline]
     pub fn save_settings(mut self, value: bool) -> Self {
         self.flags.set(ImGuiWindowFlags::NoSavedSettings, !value);
         self
@@ -152,9 +143,6 @@ impl<'ui, 'p> Window<'ui, 'p> {
             if !self.size_cond.is_empty() {
                 sys::igSetNextWindowSize(self.size.into(), self.size_cond);
             }
-            if self.border {
-                sys::igPushStyleVar(ImGuiStyleVar::WindowBorderSize, 1.0);
-            }
             sys::igBegin(
                 self.name.as_ptr(),
                 self.opened
@@ -168,9 +156,6 @@ impl<'ui, 'p> Window<'ui, 'p> {
         }
         unsafe {
             sys::igEnd();
-            if self.border {
-                sys::igPopStyleVar(1);
-            }
         };
     }
 }

@@ -748,7 +748,6 @@ output your content because that would create a feedback loop.",
         })
 }
 
-#[allow(deprecated)]
 fn show_example_app_fixed_overlay(ui: &Ui, opened: &mut bool) {
     const DISTANCE: f32 = 10.0;
     let window_pos = (DISTANCE, DISTANCE);

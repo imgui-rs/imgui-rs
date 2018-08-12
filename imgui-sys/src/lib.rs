@@ -86,13 +86,6 @@ pub enum ImGuiCol {
     DragDropTarget,
 }
 impl ImGuiCol {
-    #[deprecated(
-        since = "0.0.19", note = "ComboBg has been merged with PopupBg. Please use PopupBg instead"
-    )]
-    pub const ComboBg: ImGuiCol = ImGuiCol::PopupBg;
-    #[deprecated(since = "0.0.19", note = "please use ChildBg instead")]
-    pub const ChildWindowBg: ImGuiCol = ImGuiCol::ChildBg;
-
     pub fn values() -> &'static [ImGuiCol] {
         use ImGuiCol::*;
         static values: &'static [ImGuiCol] = &[
@@ -168,11 +161,6 @@ pub enum ImGuiStyleVar {
     ButtonTextAlign,
 }
 pub const ImGuiStyleVar_COUNT: usize = 17;
-
-impl ImGuiStyleVar {
-    #[deprecated(since = "0.0.19", note = "please use ChildRounding instead")]
-    pub const ChildWindowRounding: ImGuiStyleVar = ImGuiStyleVar::ChildRounding;
-}
 
 /// A key identifier (ImGui-side enum)
 #[repr(C)]
@@ -316,8 +304,6 @@ bitflags!(
     pub struct ImGuiTreeNodeFlags: c_int {
         const Selected          = 1;
         const Framed            = 1 << 1;
-        #[deprecated(since = "0.0.19", note = "please use AllowItemOverlap instead")]
-        const AllowOverlapMode  = 1 << 2;
         const AllowItemOverlap  = 1 << 2;
         const NoTreePushOnOpen  = 1 << 3;
         const NoAutoOpenOnLog   = 1 << 4;
@@ -1015,12 +1001,6 @@ extern "C" {
     pub fn igShowUserGuide();
 }
 
-#[allow(non_snake_case)]
-#[deprecated(since = "0.0.19", note = "please use igShowDemoWindow instead")]
-pub unsafe fn igShowTestWindow(opened: *mut bool) {
-    igShowDemoWindow(opened)
-}
-
 // Window
 extern "C" {
     pub fn igBegin(name: *const c_char, open: *mut bool, flags: ImGuiWindowFlags) -> bool;
@@ -1085,16 +1065,6 @@ extern "C" {
     pub fn igGetStateStorage() -> *mut ImGuiStorage;
 }
 
-/// Set next window content's width.
-///
-/// Original non-deprecated version preserved last Y value set by
-/// [`igSetNextWindowContentSize`].
-#[allow(non_snake_case)]
-#[deprecated(since = "0.0.19", note = "please use igSetNextWindowContentSize instead")]
-pub unsafe fn igSetNextWindowContentWidth(width: c_float) {
-    igSetNextWindowContentSize(ImVec2 { x: width, y: 0.0 })
-}
-
 // Parameter stack (shared)
 extern "C" {
     pub fn igPushFont(font: *mut ImFont);
@@ -1152,12 +1122,6 @@ extern "C" {
     pub fn igGetTextLineHeightWithSpacing() -> c_float;
     pub fn igGetFrameHeight() -> c_float;
     pub fn igGetFrameHeightWithSpacing() -> c_float;
-}
-
-#[allow(non_snake_case)]
-#[deprecated(since = "0.0.19", note = "please use igGetFrameHeightWithSpacing instead")]
-pub unsafe fn igGetItemsLineHeightWithSpacing() -> c_float {
-    igGetFrameHeightWithSpacing()
 }
 
 // Columns
@@ -1841,30 +1805,6 @@ extern "C" {
         out_g: *mut c_float,
         out_b: *mut c_float,
     );
-}
-
-#[allow(non_snake_case)]
-#[deprecated(
-    since = "0.0.19", note = "please use igIsWindowFocused(ImGuiFocusedFlags::RootWindow) instead"
-)]
-pub unsafe fn igIsRootWindowFocused() -> bool {
-    igIsWindowFocused(ImGuiFocusedFlags::RootWindow)
-}
-#[allow(non_snake_case)]
-#[deprecated(
-    since = "0.0.19",
-    note = "please use igIsWindowFocused(ImGuiFocusedFlags::RootAndChildWindows) instead"
-)]
-pub unsafe fn igIsRootWindowOrAnyChildFocused() -> bool {
-    igIsWindowFocused(ImGuiFocusedFlags::RootAndChildWindows)
-}
-#[allow(non_snake_case)]
-#[deprecated(
-    since = "0.0.19",
-    note = "please use igIsWindowFocused(ImGuiFocusedFlags::RootAndChildWindows) instead"
-)]
-pub unsafe fn igIsRootWindowOrAnyChildHovered(_flags: ImGuiHoveredFlags) -> bool {
-    igIsWindowHovered(ImGuiHoveredFlags::RootAndChildWindows)
 }
 
 // DrawList

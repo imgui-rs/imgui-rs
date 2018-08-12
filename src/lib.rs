@@ -556,10 +556,6 @@ impl<'ui> Ui<'ui> {
             sys::igShowStyleEditor(style as *mut ImGuiStyle);
         }
     }
-    #[deprecated(since = "0.0.19", note = "please use show_demo_window instead")]
-    pub fn show_test_window(&self, opened: &mut bool) {
-        self.show_demo_window(opened)
-    }
     pub fn show_demo_window(&self, opened: &mut bool) {
         unsafe {
             sys::igShowDemoWindow(opened);

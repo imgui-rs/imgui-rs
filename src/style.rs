@@ -20,11 +20,3 @@ pub enum StyleVar {
     GrabMinSize(f32),
     ButtonTextAlign(ImVec2),
 }
-
-impl StyleVar {
-    #[allow(non_snake_case)]
-    #[deprecated(since = "0.0.19", note = "please use ChildRounding instead")]
-    pub fn ChildWindowRounding(value: f32) -> Self {
-        StyleVar::ChildRounding(value)
-    }
-}
