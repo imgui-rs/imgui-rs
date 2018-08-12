@@ -24,7 +24,10 @@ pub fn run<F: FnMut(&Ui) -> bool>(title: String, clear_color: [f32; 4], mut run_
     let mut imgui = ImGui::init();
     imgui.set_ini_filename(None);
 
-    let font_oversample = window.get_hidpi_factor().ceil() as u32;
+    let hidpi_factor = window.get_hidpi_factor();
+
+    let font_oversample = hidpi_factor.ceil() as u32;
+    let font_size = (13.0 * hidpi_factor) as f32;
 
     imgui.fonts().add_font_with_config(
         include_bytes!("../mplus-1p-regular.ttf"),
@@ -32,7 +35,7 @@ pub fn run<F: FnMut(&Ui) -> bool>(title: String, clear_color: [f32; 4], mut run_
             .oversample_h(font_oversample)
             .oversample_v(font_oversample)
             .pixel_snap_h(true)
-            .size_pixels(13.0)
+            .size_pixels(font_size)
             .rasterizer_multiply(1.75),
         &FontGlyphRange::japanese(),
     );
@@ -41,8 +44,12 @@ pub fn run<F: FnMut(&Ui) -> bool>(title: String, clear_color: [f32; 4], mut run_
         ImFontConfig::new()
             .merge_mode(true)
             .oversample_h(font_oversample)
-            .oversample_v(font_oversample),
+            .oversample_v(font_oversample)
+            .pixel_snap_h(true)
+            .size_pixels(font_size),
     );
+
+    imgui.set_font_global_scale((1.0 / hidpi_factor) as f32);
 
     let mut renderer = Renderer::init(&mut imgui, &display).expect("Failed to initialize renderer");
 
