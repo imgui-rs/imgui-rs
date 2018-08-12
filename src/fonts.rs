@@ -122,14 +122,14 @@ impl FontGlyphRange {
 
     unsafe fn to_ptr(&self, atlas: *mut sys::ImFontAtlas) -> *const sys::ImWchar {
         match &self.0 {
-            FontGlyphRangeData::Chinese => sys::ImFontAtlas_GetGlyphRangesChinese(atlas),
-            FontGlyphRangeData::Cyrillic => sys::ImFontAtlas_GetGlyphRangesCyrillic(atlas),
-            FontGlyphRangeData::Default => sys::ImFontAtlas_GetGlyphRangesDefault(atlas),
-            FontGlyphRangeData::Japanese => sys::ImFontAtlas_GetGlyphRangesJapanese(atlas),
-            FontGlyphRangeData::Korean => sys::ImFontAtlas_GetGlyphRangesKorean(atlas),
-            FontGlyphRangeData::Thai => sys::ImFontAtlas_GetGlyphRangesThai(atlas),
+            &FontGlyphRangeData::Chinese => sys::ImFontAtlas_GetGlyphRangesChinese(atlas),
+            &FontGlyphRangeData::Cyrillic => sys::ImFontAtlas_GetGlyphRangesCyrillic(atlas),
+            &FontGlyphRangeData::Default => sys::ImFontAtlas_GetGlyphRangesDefault(atlas),
+            &FontGlyphRangeData::Japanese => sys::ImFontAtlas_GetGlyphRangesJapanese(atlas),
+            &FontGlyphRangeData::Korean => sys::ImFontAtlas_GetGlyphRangesKorean(atlas),
+            &FontGlyphRangeData::Thai => sys::ImFontAtlas_GetGlyphRangesThai(atlas),
 
-            FontGlyphRangeData::Custom(ptr) => *ptr,
+            &FontGlyphRangeData::Custom(ptr) => ptr,
         }
     }
 }
