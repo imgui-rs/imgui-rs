@@ -16,4 +16,3 @@ glutin = "0.17"
 imgui = { version = "0.0.19-pre", path = "../" }
 imgui-gfx-renderer = { version = "0.0.19-pre", path = "../imgui-gfx-renderer" }
 imgui-glium-renderer = { version = "0.0.19-pre", path = "../imgui-glium-renderer" }
-imgui-sys = { version = "0.0.19-pre", path = "../imgui-sys", features = ["gfx", "glium"] }
