@@ -1,6 +1,6 @@
 [package]
 name = "imgui"
-version = "0.0.19-pre"
+version = "0.0.19"
 authors = ["Joonas Javanainen <joonas.javanainen@gmail.com>", "imgui-rs contributors"]
 description = "High-level Rust bindings to dear imgui"
 homepage = "https://github.com/Gekkio/imgui-rs"
@@ -13,7 +13,7 @@ readme = "README.markdown"
 travis-ci = { repository = "Gekkio/imgui-rs" }
 
 [dependencies]
-imgui-sys = { version = "0.0.19-pre", path = "imgui-sys" }
+imgui-sys = { version = "0.0.19", path = "imgui-sys" }
 
 [workspace]
 members = ["imgui-examples", "imgui-sys", "imgui-gfx-renderer", "imgui-glium-renderer"]
