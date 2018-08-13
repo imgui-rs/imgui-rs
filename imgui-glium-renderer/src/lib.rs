@@ -152,15 +152,15 @@ impl Renderer {
                 &DrawParameters {
                     blend: Blend::alpha_blending(),
                     scissor: Some(Rect {
-                        left: cmd.clip_rect.x.max(0.0).round() as u32,
-                        bottom: (fb_height - cmd.clip_rect.w).max(0.0).round() as u32,
+                        left: cmd.clip_rect.x.max(0.0).min(fb_width).round() as u32,
+                        bottom: (fb_height - cmd.clip_rect.w).max(0.0).min(fb_width).round() as u32,
                         width: (cmd.clip_rect.z - cmd.clip_rect.x)
                             .abs()
-                            .max(fb_width)
+                            .min(fb_width)
                             .round() as u32,
                         height: (cmd.clip_rect.w - cmd.clip_rect.y)
                             .abs()
-                            .max(fb_height)
+                            .min(fb_height)
                             .round() as u32,
                     }),
                     ..DrawParameters::default()

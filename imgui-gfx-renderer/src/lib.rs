@@ -218,8 +218,8 @@ impl<R: Resources> Renderer<R> {
 
             self.bundle.slice.end = self.bundle.slice.start + cmd.elem_count;
             self.bundle.data.scissor = Rect {
-                x: cmd.clip_rect.x.max(0.0).round() as u16,
-                y: cmd.clip_rect.y.max(0.0).round() as u16,
+                x: cmd.clip_rect.x.max(0.0).min(fb_width).round() as u16,
+                y: cmd.clip_rect.y.max(0.0).min(fb_height).round() as u16,
                 w: (cmd.clip_rect.z - cmd.clip_rect.x)
                     .abs()
                     .min(fb_width)
