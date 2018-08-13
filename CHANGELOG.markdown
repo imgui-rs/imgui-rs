@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Added
+
+- `ImGui::mouse_down`
+
 ## [0.0.20] - 2018-08-13
 
 ### Fixed

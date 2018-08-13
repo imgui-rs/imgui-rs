@@ -246,6 +246,10 @@ impl ImGui {
         let io = self.io();
         (io.mouse_delta.x, io.mouse_delta.y)
     }
+    pub fn mouse_down(&self) -> [bool; 5] {
+        let io = self.io();
+        io.mouse_down
+    }
     pub fn set_mouse_down(&mut self, states: [bool; 5]) {
         let io = self.io_mut();
         io.mouse_down = states;
