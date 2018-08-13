@@ -4,7 +4,7 @@
 //!
 //! In your initialization code call `configure_keys`:
 //!
-//! ```
+//! ```rust, no_run
 //! # extern crate imgui;
 //! # extern crate imgui_glutin_support;
 //! use imgui::ImGui;
@@ -16,7 +16,7 @@
 //! In your main loop you should already be retrieving events from glutin and handling them. All
 //! you need to do is pass each event to `imgui_glutin_support` as well:
 //!
-//! ```
+//! ```rust, no_run
 //! # extern crate glutin;
 //! # extern crate imgui;
 //! # extern crate imgui_glutin_support;
@@ -38,7 +38,7 @@
 //!
 //! For example, you might want to customize mouse wheel line scrolling amount:
 //!
-//! ```
+//! ```rust, no_run
 //! # extern crate glutin;
 //! # extern crate imgui;
 //! # extern crate imgui_glutin_support;
