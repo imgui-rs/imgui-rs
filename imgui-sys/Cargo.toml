@@ -1,6 +1,6 @@
 [package]
 name = "imgui-sys"
-version = "0.0.20-pre"
+version = "0.0.20"
 authors = ["Joonas Javanainen <joonas.javanainen@gmail.com>", "imgui-rs contributors"]
 description = "Raw FFI bindings to dear imgui"
 homepage = "https://github.com/Gekkio/imgui-rs"
