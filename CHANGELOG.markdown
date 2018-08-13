@@ -5,6 +5,7 @@
 ### Added
 
 - `ImGui::mouse_down`
+- `imgui-glutin-support` crate
 
 ## [0.0.20] - 2018-08-13
 

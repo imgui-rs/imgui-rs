@@ -1,19 +1,16 @@
 [package]
-name = "imgui"
+name = "imgui-glutin-support"
 version = "0.0.21-pre"
 authors = ["Joonas Javanainen <joonas.javanainen@gmail.com>", "imgui-rs contributors"]
-description = "High-level Rust bindings to dear imgui"
+description = "glutin support code for the imgui crate"
 homepage = "https://github.com/Gekkio/imgui-rs"
 repository = "https://github.com/Gekkio/imgui-rs"
 license = "MIT/Apache-2.0"
-categories = ["gui", "api-bindings"]
-readme = "README.markdown"
+categories = ["gui"]
 
 [badges]
 travis-ci = { repository = "Gekkio/imgui-rs" }
 
 [dependencies]
-imgui-sys = { version = "0.0.21-pre", path = "imgui-sys" }
-
-[workspace]
-members = ["imgui-examples", "imgui-sys", "imgui-gfx-renderer", "imgui-glium-renderer", "imgui-glutin-support"]
+glutin = "0.18"
+imgui = { version = "0.0.21-pre", path = "../" }
