@@ -2,9 +2,13 @@
 
 ## [Unreleased]
 
+### Fixed
+
+- Clip rect regression in the glium renderer
+
 ### Removed
 
-- Various things that were deprecated in imgui-rs 0.0.18
+- Various things that were deprecated in imgui-rs 0.0.19
 
 ## [0.0.19] - 2018-08-12
 
