@@ -9,8 +9,10 @@
 //! # extern crate imgui_glutin_support;
 //! use imgui::ImGui;
 //!
+//! # fn main() {
 //! let mut imgui = ImGui::init();
 //! imgui_glutin_support::configure_keys(&mut imgui);
+//! # }
 //! ```
 //!
 //! In your main loop you should already be retrieving events from glutin and handling them. All
@@ -22,6 +24,7 @@
 //! # extern crate imgui_glutin_support;
 //! # use glutin::EventsLoop;
 //! # use imgui::ImGui;
+//! # fn main() {
 //! # let mut events_loop = EventsLoop::new();
 //! # let mut imgui = ImGui::init();
 //! events_loop.poll_events(|event| {
@@ -29,6 +32,7 @@
 //!
 //!     imgui_glutin_support::handle_event(&mut imgui, &event);
 //! });
+//! # }
 //! ```
 //!
 //! # Advanced use cases
@@ -44,6 +48,7 @@
 //! # extern crate imgui_glutin_support;
 //! # use glutin::{EventsLoop, Event, WindowEvent, MouseScrollDelta, TouchPhase};
 //! # use imgui::ImGui;
+//! # fn main() {
 //! # let mut events_loop = EventsLoop::new();
 //! # let mut imgui = ImGui::init();
 //! events_loop.poll_events(|event| {
@@ -67,6 +72,7 @@
 //!         }
 //!     }
 //! });
+//! # }
 //! ```
 
 extern crate glutin;
