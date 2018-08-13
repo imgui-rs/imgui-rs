@@ -60,16 +60,16 @@ pub fn run<F: FnMut(&Ui) -> bool>(title: String, clear_color: [f32; 4], mut run_
     }
     imgui.set_ini_filename(None);
 
-    let hidpi_factor = window.get_hidpi_factor();
+    // In the examples we only use integer DPI factors, because the UI can get very blurry
+    // otherwise. This might or might not be what you want in a real application.
+    let hidpi_factor = window.get_hidpi_factor().round();
 
-    let font_oversample = hidpi_factor.ceil() as u32;
     let font_size = (13.0 * hidpi_factor) as f32;
 
     imgui.fonts().add_font_with_config(
         include_bytes!("../mplus-1p-regular.ttf"),
         ImFontConfig::new()
-            .oversample_h(font_oversample)
-            .oversample_v(font_oversample)
+            .oversample_h(1)
             .pixel_snap_h(true)
             .size_pixels(font_size)
             .rasterizer_multiply(1.75),
@@ -79,8 +79,7 @@ pub fn run<F: FnMut(&Ui) -> bool>(title: String, clear_color: [f32; 4], mut run_
     imgui.fonts().add_default_font_with_config(
         ImFontConfig::new()
             .merge_mode(true)
-            .oversample_h(font_oversample)
-            .oversample_v(font_oversample)
+            .oversample_h(1)
             .pixel_snap_h(true)
             .size_pixels(font_size),
     );
@@ -142,7 +141,14 @@ pub fn run<F: FnMut(&Ui) -> bool>(title: String, clear_color: [f32; 4], mut run_
                             _ => {}
                         }
                     }
-                    CursorMoved { position: pos, .. } => mouse_state.pos = pos.into(),
+                    CursorMoved { position: pos, .. } => {
+                        // Rescale position from glutin logical coordinates to our logical
+                        // coordinates
+                        mouse_state.pos = pos
+                            .to_physical(window.get_hidpi_factor())
+                            .to_logical(hidpi_factor)
+                            .into();
+                    }
                     MouseInput { state, button, .. } => match button {
                         MouseButton::Left => mouse_state.pressed.0 = state == Pressed,
                         MouseButton::Right => mouse_state.pressed.1 = state == Pressed,
@@ -158,7 +164,14 @@ pub fn run<F: FnMut(&Ui) -> bool>(title: String, clear_color: [f32; 4], mut run_
                         delta: MouseScrollDelta::PixelDelta(pos),
                         phase: TouchPhase::Moved,
                         ..
-                    } => mouse_state.wheel = pos.y as f32,
+                    } => {
+                        // Rescale pixel delta from glutin logical coordinates to our logical
+                        // coordinates
+                        mouse_state.wheel = pos
+                            .to_physical(window.get_hidpi_factor())
+                            .to_logical(hidpi_factor)
+                            .y as f32;
+                    }
                     ReceivedCharacter(c) => imgui.add_input_character(c),
                     _ => (),
                 }
@@ -194,11 +207,16 @@ pub fn run<F: FnMut(&Ui) -> bool>(title: String, clear_color: [f32; 4], mut run_
             });
         }
 
-        let logical_size = window.get_inner_size().unwrap();
+        // Rescale window size from glutin logical size to our logical size
+        let physical_size = window
+            .get_inner_size()
+            .unwrap()
+            .to_physical(window.get_hidpi_factor());
+        let logical_size = physical_size.to_logical(hidpi_factor);
 
         let frame_size = FrameSize {
             logical_size: logical_size.into(),
-            hidpi_factor: window.get_hidpi_factor(),
+            hidpi_factor,
         };
 
         let ui = imgui.frame(frame_size, delta_s);
