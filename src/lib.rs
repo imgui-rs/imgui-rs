@@ -402,11 +402,13 @@ impl ImGui {
             CURRENT_UI = Some(Ui {
                 imgui: mem::transmute(self as &'a ImGui),
                 frame_size,
+                needs_cleanup: false,
             });
         }
         Ui {
             imgui: self,
             frame_size,
+            needs_cleanup: true,
         }
     }
 }
@@ -491,6 +493,7 @@ pub struct DrawList<'a> {
 pub struct Ui<'ui> {
     imgui: &'ui ImGui,
     frame_size: FrameSize,
+    needs_cleanup: bool,
 }
 
 static FMT: &'static [u8] = b"%s\0";
@@ -545,7 +548,6 @@ impl<'ui> Ui<'ui> {
                 raw: &mut *sys::igGetDrawData(),
             };
             f(&self, draw_data)?;
-            CURRENT_UI = None;
         }
         Ok(())
     }
@@ -568,6 +570,17 @@ impl<'ui> Ui<'ui> {
     pub fn show_metrics_window(&self, opened: &mut bool) {
         unsafe {
             sys::igShowMetricsWindow(opened);
+        }
+    }
+}
+
+impl<'a> Drop for Ui<'a> {
+    fn drop(&mut self) {
+        if self.needs_cleanup {
+            unsafe {
+                sys::igEndFrame();
+                CURRENT_UI = None;
+            }
         }
     }
 }
