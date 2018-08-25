@@ -16,3 +16,4 @@ glutin = "0.18"
 imgui = { version = "0.0.21-pre", path = "../" }
 imgui-gfx-renderer = { version = "0.0.21-pre", path = "../imgui-gfx-renderer" }
 imgui-glium-renderer = { version = "0.0.21-pre", path = "../imgui-glium-renderer" }
+imgui-glium-textured-renderer = { version = "0.0.21-pre", path = "../imgui-glium-textured-renderer" }
