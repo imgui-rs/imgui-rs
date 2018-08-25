@@ -1,7 +1,5 @@
 pub extern crate imgui_sys as sys;
 
-use std::any::Any;
-use std::cell::RefCell;
 use std::ffi::CStr;
 use std::mem;
 use std::os::raw::{c_char, c_float, c_int, c_uchar, c_void};
