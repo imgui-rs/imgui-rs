@@ -125,7 +125,7 @@ impl Renderer {
         let result = ui.render(|ui, mut draw_data| {
             draw_data.scale_clip_rects(ui.imgui().display_framebuffer_scale());
             for draw_list in draw_data.into_iter() {
-                self.render_draw_list(surface, &draw_list, fb_size, matrix, ui)?;
+                self.render_draw_list(surface, &draw_list, fb_size, matrix)?;
             }
             Ok(())
         });
@@ -139,7 +139,6 @@ impl Renderer {
         draw_list: &DrawList<'a>,
         fb_size: (f32, f32),
         matrix: [[f32; 4]; 4],
-        ui: &Ui<'a>,
     ) -> RendererResult<()> {
         use glium::{Blend, DrawParameters, Rect};
 
@@ -151,13 +150,12 @@ impl Renderer {
             .upload_index_buffer(&self.ctx, draw_list.idx_buffer)?;
         let texture = &self.device_objects.texture;
 
-        // let texture = self.bundle.data.texture = imgui.retrieve_texture(cmd.texture_id)?;
 
         let font_texture_id = self.device_objects.texture.get_id() as usize;
 
         let mut idx_start = 0;
         for cmd in draw_list.cmd_buffer {
-            // We don't support custom textures...yet!
+            // We do support custom textures now!
             let sampled = if cmd.texture_id as usize != font_texture_id {
                 let texture = self
                     .texture_cache
