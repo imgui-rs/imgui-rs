@@ -545,6 +545,7 @@ impl Into<(f32, f32, f32, f32)> for ImVec4 {
 
 /// Runtime data for styling/colors
 #[repr(C)]
+#[derive(Clone)]
 pub struct ImGuiStyle {
     /// Global alpha applies to everything in ImGui
     pub alpha: c_float,
