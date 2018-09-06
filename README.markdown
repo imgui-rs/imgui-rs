@@ -2,7 +2,7 @@
 
 **Still fairly experimental!**
 
-Minimum Rust version: 1.24
+Minimum Rust version: 1.26
 
 [![Build Status](https://travis-ci.org/Gekkio/imgui-rs.svg?branch=master)](https://travis-ci.org/Gekkio/imgui-rs)
 [![Latest release on crates.io](https://meritbadge.herokuapp.com/imgui)](https://crates.io/crates/imgui)
