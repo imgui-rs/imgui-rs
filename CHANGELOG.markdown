@@ -7,6 +7,10 @@
 - `ImGui::mouse_down`
 - `imgui-glutin-support` crate
 
+### Changed
+
+- Bump minimum Rust version to 1.26 (required by the parking_lot_core crate)
+
 ## [0.0.20] - 2018-08-13
 
 ### Fixed
