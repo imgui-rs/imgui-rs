@@ -18,6 +18,7 @@ pub use drag::{
     DragInt4, DragIntRange2,
 };
 pub use fonts::{FontGlyphRange, ImFont, ImFontAtlas, ImFontConfig};
+pub use image::Image;
 pub use input::{
     InputFloat, InputFloat2, InputFloat3, InputFloat4, InputInt, InputInt2, InputInt3, InputInt4,
     InputText, InputTextMultiline,
@@ -35,8 +36,10 @@ pub use style::StyleVar;
 pub use sys::{
     ImDrawIdx, ImDrawVert, ImGuiCol, ImGuiColorEditFlags, ImGuiCond, ImGuiHoveredFlags,
     ImGuiInputTextFlags, ImGuiKey, ImGuiMouseCursor, ImGuiSelectableFlags, ImGuiStyle,
-    ImGuiTreeNodeFlags, ImGuiWindowFlags, ImVec2, ImVec4,
+    ImGuiTreeNodeFlags, ImGuiWindowFlags, ImTextureID, ImVec2, ImVec4,
 };
+pub use texture_cache::{TextureCache, TextureCacheError};
+pub use texture_ui::TexturedUi;
 pub use trees::{CollapsingHeader, TreeNode};
 pub use window::Window;
 pub use window_draw_list::{ChannelsSplit, ImColor, WindowDrawList};
@@ -45,6 +48,7 @@ mod child_frame;
 mod color_editors;
 mod drag;
 mod fonts;
+mod image;
 mod input;
 mod menus;
 mod plothistogram;
@@ -53,6 +57,8 @@ mod progressbar;
 mod sliders;
 mod string;
 mod style;
+mod texture_cache;
+mod texture_ui;
 mod trees;
 mod window;
 mod window_draw_list;
@@ -146,7 +152,7 @@ impl ImGui {
     pub fn fonts(&mut self) -> ImFontAtlas {
         unsafe { ImFontAtlas::from_ptr(self.io_mut().fonts) }
     }
-    pub fn prepare_texture<'a, F, T>(&mut self, f: F) -> T
+    pub fn prepare_font_texture<'a, F, T>(&mut self, f: F) -> T
     where
         F: FnOnce(TextureHandle<'a>) -> T,
     {
@@ -170,7 +176,7 @@ impl ImGui {
             })
         }
     }
-    pub fn set_texture_id(&mut self, value: usize) {
+    pub fn set_font_texture_id(&mut self, value: usize) {
         self.fonts().set_texture_id(value);
     }
     pub fn set_ini_filename(&mut self, value: Option<ImString>) {

@@ -120,7 +120,7 @@ impl<R: Resources> Renderer<R> {
             gfx::memory::Usage::Dynamic,
             Bind::empty(),
         )?;
-        let (_, texture) = imgui.prepare_texture(|handle| {
+        let (_, texture) = imgui.prepare_font_texture(|handle| {
             factory.create_texture_immutable_u8::<gfx::format::Rgba8>(
                 gfx::texture::Kind::D2(
                     handle.width as u16,
@@ -215,6 +215,8 @@ impl<R: Resources> Renderer<R> {
         self.bundle.slice.start = 0;
         for cmd in draw_list.cmd_buffer {
             // TODO: check cmd.texture_id
+            // TODOK: here we can change the texture based on
+            // self.bundle.data.texture = imgui.retrieve_texture(cmd.texture_id)?;
 
             self.bundle.slice.end = self.bundle.slice.start + cmd.elem_count;
             self.bundle.data.scissor = Rect {

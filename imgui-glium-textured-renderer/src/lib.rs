@@ -8,7 +8,10 @@ use glium::program;
 use glium::texture;
 use glium::vertex;
 use glium::{DrawError, GlObject, IndexBuffer, Program, Surface, Texture2d, VertexBuffer};
-use imgui::{DrawList, FrameSize, ImDrawIdx, ImDrawVert, ImGui, Ui};
+use imgui::{
+    DrawList, FrameSize, ImDrawIdx, ImDrawVert, ImGui, TextureCache, TextureCacheError, TexturedUi,
+    Ui,
+};
 use std::borrow::Cow;
 use std::fmt;
 use std::rc::Rc;
@@ -22,6 +25,13 @@ pub enum RendererError {
     Program(program::ProgramChooserCreationError),
     Texture(texture::TextureCreationError),
     Draw(DrawError),
+    UiTexture(TextureCacheError),
+}
+
+impl From<TextureCacheError> for RendererError {
+    fn from(item: TextureCacheError) -> RendererError {
+        RendererError::UiTexture(item)
+    }
 }
 
 impl fmt::Display for RendererError {
@@ -33,6 +43,7 @@ impl fmt::Display for RendererError {
             Program(ref e) => write!(f, "Program creation failed: {}", e),
             Texture(_) => write!(f, "Texture creation failed"),
             Draw(ref e) => write!(f, "Drawing failed: {}", e),
+            UiTexture(ref e) => write!(f, "Invalid texture found: {}", e),
         }
     }
 }
@@ -70,15 +81,25 @@ impl From<DrawError> for RendererError {
 pub struct Renderer {
     ctx: Rc<Context>,
     device_objects: DeviceObjects,
+    texture_cache: TextureCache<Rc<Texture2d>>,
 }
 
 impl Renderer {
     pub fn init<F: Facade>(imgui: &mut ImGui, ctx: &F) -> RendererResult<Renderer> {
         let device_objects = DeviceObjects::init(imgui, ctx)?;
+        let mut texture_cache = TextureCache::default();
+        let font_texture_id = device_objects.texture.get_id() as usize;
+        texture_cache.set_font_texture_id(font_texture_id);
+
         Ok(Renderer {
             ctx: Rc::clone(ctx.get_context()),
-            device_objects: device_objects,
+            device_objects,
+            texture_cache,
         })
+    }
+
+    pub fn textured_ui<'a, 'b>(&'b mut self, ui: &'a Ui<'a>) -> TexturedUi<'a, 'b, Rc<Texture2d>> {
+        TexturedUi::init(&ui, &mut self.texture_cache)
     }
 
     pub fn render<'a, S: Surface>(&mut self, surface: &mut S, ui: Ui<'a>) -> RendererResult<()> {
@@ -134,7 +155,15 @@ impl Renderer {
 
         let mut idx_start = 0;
         for cmd in draw_list.cmd_buffer {
-            assert!(cmd.texture_id as usize == font_texture_id);
+            // We do support custom textures now!
+            let sampled = if cmd.texture_id as usize != font_texture_id {
+                let texture = self
+                    .texture_cache
+                    .retrieve_texture(&(cmd.texture_id as usize))?;
+                texture.sampled()
+            } else {
+                texture.sampled()
+            };
 
             let idx_end = idx_start + cmd.elem_count as usize;
 
@@ -148,7 +177,7 @@ impl Renderer {
                 &self.device_objects.program,
                 &uniform! {
                     matrix: matrix,
-                    tex: texture.sampled()
+                    tex: sampled
                 },
                 &DrawParameters {
                     blend: Blend::alpha_blending(),
