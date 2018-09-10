@@ -29,7 +29,7 @@ pub struct TextureCache<T> {
     name_map: HashMap<String, TextureID>,
     /// maps between usizes and the underlying texture objects
     texture_map: HashMap<TextureID, T>,
-    /// holds the id of the font_texture - used to avoid colissions
+    /// holds the id of the font_texture - used to avoid collisions
     font_texture_id: Option<TextureID>,
 }
 
@@ -67,7 +67,7 @@ impl<T> TextureCache<T> {
     pub fn set_font_texture_id(&mut self, font_texture_id: TextureID) {
         self.font_texture_id = Some(font_texture_id);
 
-        // avoid the colission
+        // avoid the collision
         if self.last_id == font_texture_id {
             self.last_id += 1;
         }
@@ -86,7 +86,7 @@ impl<T> TextureCache<T> {
         name: String,
         texture: T,
     ) -> Result<TextureID, TextureCacheError> {
-        // we need to know what ids fonts will be using to avoid colissions.
+        // we need to know what ids fonts will be using to avoid collisions.
         let font_id = match self.font_texture_id.as_ref() {
             Some(font_id) => *font_id,
             None => return Err(TextureCacheError::FontTextureNotSet),
@@ -102,7 +102,7 @@ impl<T> TextureCache<T> {
                 self.texture_map.insert(new_id, texture);
 
                 self.last_id += 1;
-                // avoid colission with the font texture
+                // avoid collision with the font texture
                 if self.last_id == font_id {
                     self.last_id += 1;
                 }
@@ -121,7 +121,7 @@ impl<T> TextureCache<T> {
         name: &str,
         texture: T,
     ) -> Result<(TextureID, T), TextureCacheError> {
-        // we need to know what ids fonts will be using to avoid colissions.
+        // we need to know what ids fonts will be using to avoid collisions.
         if self.font_texture_id.is_none() {
             return Err(TextureCacheError::FontTextureNotSet);
         }
@@ -145,7 +145,7 @@ impl<T> TextureCache<T> {
 
     /// Removes a named texture from the texture cache, also invalidating the texture's id
     pub fn remove_texture(&mut self, name: &str) -> Result<(TextureID, T), TextureCacheError> {
-        // we need to know what ids fonts will be using to avoid colissions.
+        // we need to know what ids fonts will be using to avoid collisions.
         if self.font_texture_id.is_none() {
             return Err(TextureCacheError::FontTextureNotSet);
         }
@@ -180,7 +180,7 @@ impl<T> TextureCache<T> {
     /// Retrieves the texture object given an id
     /// Used within the render_draw_list functions - `imgui.texture_cache.retrieve_texture(cmd.texture_id)?`
     pub fn retrieve_texture(&self, id: &TextureID) -> Result<&T, TextureCacheError> {
-        // we need to know what ids fonts will be using to avoid colissions.
+        // we need to know what ids fonts will be using to avoid collisions.
         if self.font_texture_id.is_none() {
             return Err(TextureCacheError::FontTextureNotSet);
         }
@@ -220,7 +220,7 @@ mod test {
     }
 
     #[test]
-    fn name_colissions_return_err() {
+    fn name_collisions_return_err() {
         let mut cache = construct_texture_cache();
         let insert_result = cache.add_texture("example_name".into(), 10);
         let insert_result = cache.add_texture("example_name".into(), 10);
