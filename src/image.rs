@@ -1,4 +1,4 @@
-use super::{ImTextureID, ImVec2, ImVec4};
+use super::{ImVec2, ImVec4};
 use std::os::raw::c_void;
 use texture_cache::TextureID;
 
