@@ -1,5 +1,4 @@
 use std::collections::hash_map::{Entry, HashMap};
-use std::error::Error;
 use std::fmt;
 use std::fmt::{Display, Formatter};
 pub type TextureID = usize;
@@ -54,14 +53,13 @@ pub enum TextureCacheError {
 impl Display for TextureCacheError {
     fn fmt(&self, f: &mut Formatter) -> Result<(), fmt::Error> {
         match self {
-            TextureCacheError::IDNotFound => write!(f, "Provided TextureID not found"),
-            TextureCacheError::NameExists => write!(f, "Attempted rebinding of existing name"),
-            TextureCacheError::NameNotFound => write!(f, "Provided name not found"),
-            TextureCacheError::FontTextureNotSet => write!(f, "Font Texture has not set"),
+            &TextureCacheError::IDNotFound => write!(f, "Provided TextureID not found"),
+            &TextureCacheError::NameExists => write!(f, "Attempted rebinding of existing name"),
+            &TextureCacheError::NameNotFound => write!(f, "Provided name not found"),
+            &TextureCacheError::FontTextureNotSet => write!(f, "Font Texture has not set"),
         }
     }
 }
-impl Error for TextureCacheError {}
 
 impl<T> TextureCache<T> {
     pub fn set_font_texture_id(&mut self, font_texture_id: TextureID) {
