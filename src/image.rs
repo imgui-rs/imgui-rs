@@ -29,6 +29,7 @@ impl From<*mut c_void> for ImTexture {
 /// See [`Ui::image`].
 ///
 /// Create your image using the builder pattern then [`Image::build`] it.
+#[must_use]
 pub struct Image<'ui> {
     /// we use Result to allow postponing any construction errors to the build call
     texture_id: ImTexture,
