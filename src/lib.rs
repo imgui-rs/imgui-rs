@@ -18,7 +18,7 @@ pub use drag::{
     DragInt4, DragIntRange2,
 };
 pub use fonts::{FontGlyphRange, ImFont, ImFontAtlas, ImFontConfig};
-pub use image::{ImTexture, Image};
+pub use image::{ImTexture, Image, Textures};
 pub use input::{
     InputFloat, InputFloat2, InputFloat3, InputFloat4, InputInt, InputInt2, InputInt3, InputInt4,
     InputText, InputTextMultiline,

@@ -1,5 +1,6 @@
 use super::{ImVec2, ImVec4, Ui};
 use std::marker::PhantomData;
+use std::collections::HashMap;
 use std::os::raw::c_void;
 use sys;
 
@@ -86,5 +87,40 @@ impl<'ui> Image<'ui> {
                 self.border_col,
             );
         }
+    }
+}
+
+/// Generic texture mapping for use by renderers.
+pub struct Textures<T> {
+    textures: HashMap<usize, T>,
+    next: usize,
+}
+
+impl<T> Textures<T> {
+    pub fn new() -> Self {
+        Textures {
+            textures: HashMap::new(),
+            next: 0,
+        }
+    }
+
+    pub fn insert(&mut self, texture: T) -> ImTexture {
+        let id = self.next;
+        self.textures.insert(id, texture);
+        self.next += 1;
+        id
+    }
+
+    pub fn replace(&mut self, id: ImTexture, texture: T) {
+        assert!(self.textures.contains_key(&id));
+        self.textures.insert(id, texture);
+    }
+
+    pub fn remove(&mut self, id: ImTexture) {
+        self.textures.remove(&id);
+    }
+
+    pub fn get(&self, id: ImTexture) -> Option<&T> {
+        self.textures.get(&id)
     }
 }
