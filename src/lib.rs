@@ -18,6 +18,7 @@ pub use drag::{
     DragInt4, DragIntRange2,
 };
 pub use fonts::{FontGlyphRange, ImFont, ImFontAtlas, ImFontConfig};
+pub use image::{ImTexture, Image};
 pub use input::{
     InputFloat, InputFloat2, InputFloat3, InputFloat4, InputInt, InputInt2, InputInt3, InputInt4,
     InputText, InputTextMultiline,
@@ -45,6 +46,7 @@ mod child_frame;
 mod color_editors;
 mod drag;
 mod fonts;
+mod image;
 mod input;
 mod menus;
 mod plothistogram;
@@ -1298,6 +1300,16 @@ impl<'ui> Ui<'ui> {
         values: &'p [f32],
     ) -> PlotHistogram<'ui, 'p> {
         PlotHistogram::new(self, label, values)
+    }
+}
+
+// Image
+impl<'ui> Ui<'ui> {
+    pub fn image<S>(&self, texture: ImTexture, size: S) -> Image
+    where
+        S: Into<ImVec2>,
+    {
+        Image::new(self, texture, size)
     }
 }
 

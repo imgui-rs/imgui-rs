@@ -7,7 +7,9 @@ use gfx::memory::Bind;
 use gfx::texture::{FilterMethod, SamplerInfo, WrapMode};
 use gfx::traits::FactoryExt;
 use gfx::{Bundle, CommandBuffer, Encoder, Factory, IntoIndexBuffer, Rect, Resources, Slice};
-use imgui::{DrawList, FrameSize, ImDrawIdx, ImDrawVert, ImGui, Ui};
+use imgui::{DrawList, FrameSize, ImDrawIdx, ImDrawVert, ImGui, Ui, ImTexture};
+
+use std::collections::HashMap;
 
 pub type RendererResult<T> = Result<T, RendererError>;
 
@@ -94,9 +96,13 @@ impl Shaders {
     }
 }
 
+pub type Texture<R> = (gfx::handle::ShaderResourceView<R, [f32; 4]>, gfx::handle::Sampler<R>);
+
 pub struct Renderer<R: Resources> {
     bundle: Bundle<R, pipe::Data<R>>,
     index_buffer: Buffer<R, u16>,
+    textures: HashMap<usize, Texture<R>>,
+    next_texture: usize,
 }
 
 impl<R: Resources> Renderer<R> {
@@ -131,9 +137,13 @@ impl<R: Resources> Renderer<R> {
                 &[handle.pixels],
             )
         })?;
-        // TODO: set texture id in imgui
         let sampler =
             factory.create_sampler(SamplerInfo::new(FilterMethod::Trilinear, WrapMode::Clamp));
+        let pair = (texture, sampler);
+        let mut textures = HashMap::new();
+        textures.insert(0, pair.clone());
+        imgui.set_texture_id(0);
+
         let data = pipe::Data {
             vertex_buffer: vertex_buffer,
             matrix: [
@@ -142,7 +152,7 @@ impl<R: Resources> Renderer<R> {
                 [0.0, 0.0, -1.0, 0.0],
                 [-1.0, 1.0, 0.0, 1.0],
             ],
-            tex: (texture, sampler),
+            tex: pair,
             out: out,
             scissor: Rect {
                 x: 0,
@@ -161,11 +171,22 @@ impl<R: Resources> Renderer<R> {
         Ok(Renderer {
             bundle: Bundle::new(slice, pso, data),
             index_buffer: index_buffer,
+            textures,
+            next_texture: 1,
         })
     }
+
     pub fn update_render_target(&mut self, out: RenderTargetView<R, gfx::format::Rgba8>) {
         self.bundle.data.out = out;
     }
+
+    pub fn add_texture(&mut self, texture: Texture<R>) -> ImTexture {
+        let id = self.next_texture;
+        self.textures.insert(id, texture);
+        self.next_texture += 1;
+        id
+    }
+
     pub fn render<'a, F: Factory<R>, C: CommandBuffer<R>>(
         &mut self,
         ui: Ui<'a>,
@@ -214,7 +235,10 @@ impl<R: Resources> Renderer<R> {
 
         self.bundle.slice.start = 0;
         for cmd in draw_list.cmd_buffer {
-            // TODO: check cmd.texture_id
+            if let Some(tex) = self.textures.get(&(cmd.texture_id as usize)) {
+                // cloning handles is okay, since they're Arcs internally
+                self.bundle.data.tex = tex.clone();
+            }
 
             self.bundle.slice.end = self.bundle.slice.start + cmd.elem_count;
             self.bundle.data.scissor = Rect {
