@@ -7,8 +7,8 @@ use glium::index::{self, PrimitiveType};
 use glium::program;
 use glium::texture;
 use glium::vertex;
-use glium::{DrawError, GlObject, IndexBuffer, Program, Surface, Texture2d, VertexBuffer};
-use imgui::{DrawList, FrameSize, ImDrawIdx, ImDrawVert, ImGui, Ui};
+use glium::{DrawError, IndexBuffer, Program, Surface, Texture2d, VertexBuffer};
+use imgui::{DrawList, FrameSize, ImDrawIdx, ImDrawVert, ImGui, Ui, Textures};
 use std::borrow::Cow;
 use std::fmt;
 use std::rc::Rc;
@@ -81,6 +81,10 @@ impl Renderer {
         })
     }
 
+    pub fn textures(&mut self) -> &mut Textures<Texture2d> {
+        &mut self.device_objects.textures
+    }
+
     pub fn render<'a, S: Surface>(&mut self, surface: &mut S, ui: Ui<'a>) -> RendererResult<()> {
         let _ = self.ctx.insert_debug_marker("imgui-rs: starting rendering");
         let FrameSize {
@@ -128,12 +132,17 @@ impl Renderer {
         self.device_objects
             .upload_index_buffer(&self.ctx, draw_list.idx_buffer)?;
 
-        let font_texture_id = self.device_objects.texture.get_id() as usize;
-
         let mut idx_start = 0;
         for cmd in draw_list.cmd_buffer {
-            // We don't support custom textures...yet!
-            assert!(cmd.texture_id as usize == font_texture_id);
+            let texture = match self.device_objects.textures.get(cmd.texture_id.into()) {
+                Some(tex) => tex,
+                // if an invalid ID is supplied, fall back to the font
+                None => match self.device_objects.textures.get(0.into()) {
+                    Some(tex) => tex,
+                    // if the font is missing, which should never happen, skip
+                    None => continue,
+                }
+            };
 
             let idx_end = idx_start + cmd.elem_count as usize;
 
@@ -147,7 +156,7 @@ impl Renderer {
                 &self.device_objects.program,
                 &uniform! {
                     matrix: matrix,
-                    tex: self.device_objects.texture.sampled()
+                    tex: texture.sampled()
                 },
                 &DrawParameters {
                     blend: Blend::alpha_blending(),
@@ -178,7 +187,7 @@ pub struct DeviceObjects {
     vertex_buffer: VertexBuffer<ImDrawVert>,
     index_buffer: IndexBuffer<ImDrawIdx>,
     program: Program,
-    texture: Texture2d,
+    textures: Textures<Texture2d>,
 }
 
 fn compile_default_program<F: Facade>(
@@ -231,13 +240,14 @@ impl DeviceObjects {
             };
             Texture2d::new(ctx, data)
         })?;
-        im_gui.set_texture_id(texture.get_id() as usize);
+        let mut textures = Textures::new();
+        im_gui.set_texture_id(textures.insert(texture));
 
         Ok(DeviceObjects {
             vertex_buffer: vertex_buffer,
             index_buffer: index_buffer,
             program: program,
-            texture: texture,
+            textures: textures,
         })
     }
     pub fn upload_vertex_buffer<F: Facade>(

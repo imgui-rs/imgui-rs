@@ -4,7 +4,26 @@ use std::collections::HashMap;
 use std::os::raw::c_void;
 use sys;
 
-pub type ImTexture = usize;
+#[derive(Copy, Clone, Debug, Eq, PartialEq, Ord, PartialOrd, Hash)]
+pub struct ImTexture(usize);
+
+impl ImTexture {
+    pub fn id(&self) -> usize {
+        self.0
+    }
+}
+
+impl From<usize> for ImTexture {
+    fn from(id: usize) -> Self {
+        ImTexture(id)
+    }
+}
+
+impl From<*mut c_void> for ImTexture {
+    fn from(ptr: *mut c_void) -> Self {
+        ImTexture(ptr as usize)
+    }
+}
 
 /// Represent an image about to be drawn.
 /// See [`Ui::image`].
@@ -22,7 +41,7 @@ pub struct Image<'ui> {
 }
 
 impl<'ui> Image<'ui> {
-    pub fn new<S>(_: &Ui<'ui>, texture_id: usize, size: S) -> Self
+    pub fn new<S>(_: &Ui<'ui>, texture_id: ImTexture, size: S) -> Self
     where
         S: Into<ImVec2>,
     {
@@ -79,7 +98,7 @@ impl<'ui> Image<'ui> {
     pub fn build(self) {
         unsafe {
             sys::igImage(
-                self.texture_id as *mut c_void,
+                self.texture_id.0 as *mut c_void,
                 self.size,
                 self.uv0,
                 self.uv1,
@@ -108,19 +127,19 @@ impl<T> Textures<T> {
         let id = self.next;
         self.textures.insert(id, texture);
         self.next += 1;
-        id
+        ImTexture(id)
     }
 
     pub fn replace(&mut self, id: ImTexture, texture: T) {
-        assert!(self.textures.contains_key(&id));
-        self.textures.insert(id, texture);
+        assert!(self.textures.contains_key(&id.0));
+        self.textures.insert(id.0, texture);
     }
 
     pub fn remove(&mut self, id: ImTexture) {
-        self.textures.remove(&id);
+        self.textures.remove(&id.0);
     }
 
     pub fn get(&self, id: ImTexture) -> Option<&T> {
-        self.textures.get(&id)
+        self.textures.get(&id.0)
     }
 }

@@ -172,8 +172,8 @@ impl ImGui {
             })
         }
     }
-    pub fn set_texture_id(&mut self, value: usize) {
-        self.fonts().set_texture_id(value);
+    pub fn set_texture_id(&mut self, value: ImTexture) {
+        self.fonts().set_texture_id(value.id());
     }
     pub fn set_ini_filename(&mut self, value: Option<ImString>) {
         {

@@ -227,7 +227,7 @@ impl<R: Resources> Renderer<R> {
 
         self.bundle.slice.start = 0;
         for cmd in draw_list.cmd_buffer {
-            if let Some(tex) = self.textures.get(cmd.texture_id as usize) {
+            if let Some(tex) = self.textures.get(cmd.texture_id.into()) {
                 // cloning handles is okay, since they're Arcs internally
                 self.bundle.data.tex = tex.clone();
             }
