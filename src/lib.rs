@@ -604,6 +604,14 @@ impl<'ui> Ui<'ui> {
         }
         (out.x, out.y)
     }
+    /// Get current window's position in pixels
+    pub fn get_window_pos(&self) -> (f32, f32) {
+        let mut out = ImVec2::new(0.0, 0.0);
+        unsafe {
+            sys::igGetWindowPos(&mut out);
+        }
+        (out.x, out.y)
+    }
 }
 
 // Layout
