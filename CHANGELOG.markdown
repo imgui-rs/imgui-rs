@@ -5,6 +5,10 @@
 ### Added
 
 - `ImGui::mouse_down`
+- `Ui::get_window_pos`
+- `Ui::is_window_focused`
+- `Ui::is_root_window_focused`
+- `Ui::is_child_window_focused`
 - `imgui-glutin-support` crate
 
 ### Changed
