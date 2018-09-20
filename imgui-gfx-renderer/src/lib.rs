@@ -8,7 +8,7 @@ use gfx::texture::{FilterMethod, SamplerInfo, WrapMode};
 use gfx::traits::FactoryExt;
 use gfx::{CommandBuffer, Encoder, Factory, IntoIndexBuffer, Rect, Resources, Slice};
 use gfx::pso::{PipelineData, PipelineState};
-use imgui::{DrawList, FrameSize, ImDrawIdx, ImDrawVert, ImGui, Ui, Textures};
+use imgui::{DrawList, FrameSize, ImDrawIdx, ImDrawVert, ImGui, Ui, Textures, ImTexture};
 
 pub type RendererResult<T> = Result<T, RendererError>;
 
@@ -18,6 +18,7 @@ pub enum RendererError {
     Buffer(gfx::buffer::CreationError),
     Pipeline(gfx::PipelineStateError<String>),
     Combined(gfx::CombinedError),
+    BadTexture(ImTexture),
 }
 
 impl From<gfx::UpdateError<usize>> for RendererError {
@@ -136,7 +137,6 @@ pub struct Renderer<R: Resources> {
     bundle: Bundle<R, pipe::Data<R>>,
     index_buffer: Buffer<R, u16>,
     textures: Textures<Texture<R>>,
-    backup_texture: Texture<R>,
 }
 
 impl<R: Resources> Renderer<R> {
@@ -175,7 +175,7 @@ impl<R: Resources> Renderer<R> {
             factory.create_sampler(SamplerInfo::new(FilterMethod::Trilinear, WrapMode::Clamp));
         let pair = (texture, sampler);
         let mut textures = Textures::new();
-        imgui.set_font_texture_id(textures.insert(pair.clone()));
+        imgui.set_font_texture_id(textures.insert(pair));
 
         let slice = Slice {
             start: 0,
@@ -193,7 +193,6 @@ impl<R: Resources> Renderer<R> {
             },
             index_buffer: index_buffer,
             textures: textures,
-            backup_texture: pair,
         })
     }
 
@@ -254,7 +253,9 @@ impl<R: Resources> Renderer<R> {
 
         self.bundle.slice.start = 0;
         for cmd in draw_list.cmd_buffer {
-            let tex = self.textures.get(cmd.texture_id.into()).unwrap_or(&self.backup_texture);
+            let texture_id = cmd.texture_id.into();
+            let tex = self.textures.get(texture_id)
+                .ok_or_else(|| RendererError::BadTexture(texture_id))?;
 
             self.bundle.slice.end = self.bundle.slice.start + cmd.elem_count;
             let scissor = Rect {

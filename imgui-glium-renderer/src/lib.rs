@@ -8,7 +8,7 @@ use glium::program;
 use glium::texture;
 use glium::vertex;
 use glium::{DrawError, IndexBuffer, Program, Surface, Texture2d, VertexBuffer};
-use imgui::{DrawList, FrameSize, ImDrawIdx, ImDrawVert, ImGui, Ui, Textures};
+use imgui::{DrawList, FrameSize, ImDrawIdx, ImDrawVert, ImGui, Ui, Textures, ImTexture};
 use std::borrow::Cow;
 use std::fmt;
 use std::rc::Rc;
@@ -22,6 +22,7 @@ pub enum RendererError {
     Program(program::ProgramChooserCreationError),
     Texture(texture::TextureCreationError),
     Draw(DrawError),
+    BadTexture(ImTexture),
 }
 
 impl fmt::Display for RendererError {
@@ -33,6 +34,7 @@ impl fmt::Display for RendererError {
             Program(ref e) => write!(f, "Program creation failed: {}", e),
             Texture(_) => write!(f, "Texture creation failed"),
             Draw(ref e) => write!(f, "Drawing failed: {}", e),
+            BadTexture(ref t) => write!(f, "Bad texture ID: {}", t.id()),
         }
     }
 }
@@ -134,15 +136,9 @@ impl Renderer {
 
         let mut idx_start = 0;
         for cmd in draw_list.cmd_buffer {
-            let texture = match self.device_objects.textures.get(cmd.texture_id.into()) {
-                Some(tex) => tex,
-                // if an invalid ID is supplied, fall back to the font
-                None => match self.device_objects.textures.get(0.into()) {
-                    Some(tex) => tex,
-                    // if the font is missing, which should never happen, skip
-                    None => continue,
-                }
-            };
+            let texture_id = cmd.texture_id.into();
+            let texture = self.device_objects.textures.get(texture_id)
+                .ok_or_else(|| RendererError::BadTexture(texture_id))?;
 
             let idx_end = idx_start + cmd.elem_count as usize;
 
