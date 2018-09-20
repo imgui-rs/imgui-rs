@@ -241,7 +241,7 @@ impl DeviceObjects {
             Texture2d::new(ctx, data)
         })?;
         let mut textures = Textures::new();
-        im_gui.set_texture_id(textures.insert(texture));
+        im_gui.set_font_texture_id(textures.insert(texture));
 
         Ok(DeviceObjects {
             vertex_buffer: vertex_buffer,

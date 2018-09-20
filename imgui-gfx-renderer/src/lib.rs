@@ -175,7 +175,7 @@ impl<R: Resources> Renderer<R> {
             factory.create_sampler(SamplerInfo::new(FilterMethod::Trilinear, WrapMode::Clamp));
         let pair = (texture, sampler);
         let mut textures = Textures::new();
-        imgui.set_texture_id(textures.insert(pair.clone()));
+        imgui.set_font_texture_id(textures.insert(pair.clone()));
 
         let slice = Slice {
             start: 0,
