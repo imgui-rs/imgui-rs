@@ -9,6 +9,7 @@
 - `Ui::is_window_focused`
 - `Ui::is_root_window_focused`
 - `Ui::is_child_window_focused`
+- `Ui::popup_modal`
 - `imgui-glutin-support` crate
 
 ### Changed
