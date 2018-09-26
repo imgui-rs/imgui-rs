@@ -5,6 +5,7 @@ use super::{ImGuiWindowFlags, ImStr, Ui};
 
 use sys;
 
+/// Created by call to [`Ui::popup_modal`].
 #[must_use]
 pub struct PopupModal<'ui, 'p> {
     label: &'p ImStr,
@@ -22,6 +23,8 @@ impl<'ui, 'p> PopupModal<'ui, 'p> {
             _phantom: PhantomData,
         }
     }
+    /// Pass a mutable boolean which will be updated to refer to the current
+    /// "open" state of the modal.
     pub fn opened(mut self, opened: &'p mut bool) -> Self {
         self.opened = Some(opened);
         self
@@ -98,6 +101,7 @@ impl<'ui, 'p> PopupModal<'ui, 'p> {
             .set(ImGuiWindowFlags::AlwaysUseWindowPadding, value);
         self
     }
+    /// Consume and draw the PopupModal.
     pub fn build<F: FnOnce()>(self, f: F) {
         let render = unsafe {
             sys::igBeginPopupModal(

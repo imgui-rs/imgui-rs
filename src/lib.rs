@@ -1206,6 +1206,23 @@ impl<'ui> Ui<'ui> {
             unsafe { sys::igEndPopup() };
         }
     }
+    /// Create a modal pop-up.
+    ///
+    /// # Example
+    /// ```rust,no_run
+    /// # use imgui::*;
+    /// # let mut imgui = ImGui::init();
+    /// # let ui = imgui.frame(FrameSize::new(100.0, 100.0, 1.0), 0.1);
+    /// if ui.button(im_str!("Show modal"), (0.0, 0.0)) {
+    ///     ui.open_popup(im_str!("modal"));
+    /// }
+    /// ui.popup_modal(im_str!("modal")).build(|| {
+    ///     ui.text("Content of my modal");
+    ///     if ui.button(im_str!("OK"), (0.0, 0.0)) {
+    ///         ui.close_current_popup();
+    ///     }
+    /// });
+    /// ```
     pub fn popup_modal<'p>(&self, str_id: &'p ImStr) -> PopupModal<'ui, 'p> {
         PopupModal::new(self, str_id)
     }
