@@ -642,6 +642,22 @@ CTRL+click on individual component to input value.\n",
                     }
                 });
             });
+
+            ui.tree_node(im_str!("Modals")).build(|| {
+                ui.text_wrapped(im_str!(
+                    "Modal windows are like popups but the user cannot close \
+                     them by clicking outside the window."
+                ));
+
+                if ui.button(im_str!("Delete.."), (0.0, 0.0)) {
+                    ui.open_popup(im_str!("Delete?"));
+                }
+                ui.popup_modal(im_str!("Delete?")).always_auto_resize(true).build(|| {
+                    ui.text("All those beautiful files will be deleted.\nThis operation cannot be undone!\n\n");
+                    ui.separator();
+
+                });
+            });
         }
     })
 }
