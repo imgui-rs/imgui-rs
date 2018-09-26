@@ -1226,6 +1226,8 @@ impl<'ui> Ui<'ui> {
     pub fn popup_modal<'p>(&self, str_id: &'p ImStr) -> PopupModal<'ui, 'p> {
         PopupModal::new(self, str_id)
     }
+    /// Close a popup. Should be called within the closure given as argument to
+    /// [`Ui::popup`] or [`Ui::popup_modal`].
     pub fn close_current_popup(&self) {
         unsafe { sys::igCloseCurrentPopup() };
     }
