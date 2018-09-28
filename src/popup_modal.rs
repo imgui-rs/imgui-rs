@@ -114,7 +114,7 @@ impl<'ui, 'p> PopupModal<'ui, 'p> {
         };
         if render {
             f();
-            unsafe { sys::igEndMenu() };
+            unsafe { sys::igEndPopup() };
         }
     }
 }
