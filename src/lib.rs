@@ -25,6 +25,7 @@ pub use input::{
 pub use menus::{Menu, MenuItem};
 pub use plothistogram::PlotHistogram;
 pub use plotlines::PlotLines;
+pub use popup_modal::PopupModal;
 pub use progressbar::ProgressBar;
 pub use sliders::{
     SliderFloat, SliderFloat2, SliderFloat3, SliderFloat4, SliderInt, SliderInt2, SliderInt3,
@@ -49,6 +50,7 @@ mod input;
 mod menus;
 mod plothistogram;
 mod plotlines;
+mod popup_modal;
 mod progressbar;
 mod sliders;
 mod string;
@@ -1204,6 +1206,28 @@ impl<'ui> Ui<'ui> {
             unsafe { sys::igEndPopup() };
         }
     }
+    /// Create a modal pop-up.
+    ///
+    /// # Example
+    /// ```rust,no_run
+    /// # use imgui::*;
+    /// # let mut imgui = ImGui::init();
+    /// # let ui = imgui.frame(FrameSize::new(100.0, 100.0, 1.0), 0.1);
+    /// if ui.button(im_str!("Show modal"), (0.0, 0.0)) {
+    ///     ui.open_popup(im_str!("modal"));
+    /// }
+    /// ui.popup_modal(im_str!("modal")).build(|| {
+    ///     ui.text("Content of my modal");
+    ///     if ui.button(im_str!("OK"), (0.0, 0.0)) {
+    ///         ui.close_current_popup();
+    ///     }
+    /// });
+    /// ```
+    pub fn popup_modal<'p>(&self, str_id: &'p ImStr) -> PopupModal<'ui, 'p> {
+        PopupModal::new(self, str_id)
+    }
+    /// Close a popup. Should be called within the closure given as argument to
+    /// [`Ui::popup`] or [`Ui::popup_modal`].
     pub fn close_current_popup(&self) {
         unsafe { sys::igCloseCurrentPopup() };
     }

@@ -49,6 +49,9 @@ struct State {
     radio_button: i32,
     color_edit: ColorEditState,
     custom_rendering: CustomRenderingState,
+    dont_ask_me_next_time: bool,
+    stacked_modals_item: i32,
+    stacked_modals_color: [f32; 4],
 }
 
 impl Default for State {
@@ -101,6 +104,9 @@ impl Default for State {
             radio_button: 0,
             color_edit: ColorEditState::default(),
             custom_rendering: Default::default(),
+            dont_ask_me_next_time: false,
+            stacked_modals_item: 0,
+            stacked_modals_color: [0.4, 0.7, 0.0, 0.5],
         }
     }
 }
@@ -639,6 +645,61 @@ CTRL+click on individual component to input value.\n",
                         ) {
                             state.selected_fish = Some(index);
                         }
+                    }
+                });
+            });
+
+            ui.tree_node(im_str!("Modals")).build(|| {
+                ui.text_wrapped(im_str!(
+                    "Modal windows are like popups but the user cannot close \
+                     them by clicking outside the window."
+                ));
+
+                if ui.button(im_str!("Delete.."), (0.0, 0.0)) {
+                    ui.open_popup(im_str!("Delete?"));
+                }
+                ui.popup_modal(im_str!("Delete?")).always_auto_resize(true).build(|| {
+                    ui.text("All those beautiful files will be deleted.\nThis operation cannot be undone!\n\n");
+                    ui.separator();
+                    ui.with_style_var(StyleVar::FramePadding(ImVec2::new(0.0, 0.0)), || {
+                        ui.checkbox(im_str!("Don't ask me next time"), &mut state.dont_ask_me_next_time);
+
+                        if ui.button(im_str!("OK"), (120.0, 0.0)) {
+                            ui.close_current_popup();
+                        }
+                        ui.same_line(0.0);
+                        if ui.button(im_str!("Cancel"), (120.0, 0.0)) {
+                            ui.close_current_popup();
+                        }
+                    });
+                });
+
+                if ui.button(im_str!("Stacked modals.."), (0.0, 0.0)) {
+                    ui.open_popup(im_str!("Stacked 1"));
+                }
+                ui.popup_modal(im_str!("Stacked 1")).build(|| {
+                    ui.text(
+                       "Hello from Stacked The First\n\
+                        Using style.Colors[ImGuiCol_ModalWindowDarkening] for darkening."
+                    );
+
+                    let items = &[im_str!("aaaa"), im_str!("bbbb"), im_str!("cccc"), im_str!("dddd"), im_str!("eeee")];
+                    ui.combo(im_str!("Combo"), &mut state.stacked_modals_item, items, -1);
+
+                    ui.color_edit(im_str!("color"), &mut state.stacked_modals_color).build();
+
+                    if ui.button(im_str!("Add another modal.."), (0.0, 0.0)) {
+                        ui.open_popup(im_str!("Stacked 2"))   ;
+                    }
+                    ui.popup_modal(im_str!("Stacked 2")).build(|| {
+                        ui.text("Hello from Stacked The Second");
+                        if ui.button(im_str!("Close"), (0.0, 0.0)) {
+                            ui.close_current_popup();
+                        }
+                    });
+
+                    if ui.button(im_str!("Close"), (0.0, 0.0)) {
+                        ui.close_current_popup();
                     }
                 });
             });
