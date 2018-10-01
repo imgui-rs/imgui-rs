@@ -333,6 +333,10 @@ impl ImGui {
         let io = self.io_mut();
         io.key_alt = value;
     }
+    pub fn key_super(&self) -> bool {
+        let io = self.io();
+        io.key_super
+    }
     pub fn set_key_super(&mut self, value: bool) {
         let io = self.io_mut();
         io.key_super = value;
