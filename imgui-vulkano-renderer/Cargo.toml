@@ -1,0 +1,19 @@
+[package]
+name = "imgui-vulkano-renderer"
+version = "0.0.1"
+authors = ["Walter Pearce <jaynus@gmail.com>", "imgui-rs contributors"]
+description = "Vulkano renderer for the imgui crate"
+homepage = "https://github.com/Gekkio/imgui-rs"
+repository = "https://github.com/Gekkio/imgui-rs"
+license = "MIT/Apache-2.0"
+categories = ["gui", "rendering"]
+
+[badges]
+travis-ci = { repository = "Gekkio/imgui-rs" }
+
+[dependencies]
+vulkano = "*"
+vulkano-shader-derive = "*"
+image = "*"
+imgui = { version = "0.0.21-pre", path = "../" }
+imgui-sys = { version = "0.0.21-pre", path = "../imgui-sys", features = ["vulkano"] }

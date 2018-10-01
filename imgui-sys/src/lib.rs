@@ -12,6 +12,9 @@ extern crate gfx;
 #[cfg(feature = "glium")]
 extern crate glium;
 
+#[cfg(feature = "vulkano")]
+extern crate vulkano;
+
 use std::convert::From;
 use std::os::raw::{c_char, c_float, c_int, c_short, c_uchar, c_uint, c_ushort, c_void};
 use std::slice;
@@ -21,6 +24,9 @@ mod gfx_support;
 
 #[cfg(feature = "glium")]
 mod glium_support;
+
+#[cfg(feature = "vulkano")]
+mod vulkano_support;
 
 /// ImGui context (opaque)
 pub enum ImGuiContext {}
