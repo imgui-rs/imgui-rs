@@ -23,6 +23,8 @@ mod feature {
     use std::sync::Arc;
     use std::path::Path;
 
+    use support::MouseState;
+
     use winit;
     use vulkano;
     use vulkano::{
@@ -51,13 +53,6 @@ mod feature {
     const WIN_W: u32 = 1024;
     const WIN_H: u32 =  768;
     const CLEAR_COLOR: [f32; 4] = [0.2, 0.2, 0.2, 1.0];
-
-    #[derive(Copy, Clone, PartialEq, Debug, Default)]
-    struct MouseState {
-        pos: (i32, i32),
-        pressed: (bool, bool, bool),
-        wheel: f32,
-    }
 
     pub fn main() {
         let mut window = support::vulkano_window::Window::new(WIN_W, WIN_H, "Conrod with vulkano");
@@ -159,7 +154,7 @@ mod feature {
                             winit::MouseButton::Left => mouse_state.pressed.0 = state == winit::ElementState::Pressed,
                             winit::MouseButton::Right => mouse_state.pressed.1 = state == winit::ElementState::Pressed,
                             winit::MouseButton::Middle => mouse_state.pressed.2 = state == winit::ElementState::Pressed,
-                            _ => {}
+                            _ => { }
                         },
                         MouseWheel {
                             delta: winit::MouseScrollDelta::LineDelta(_, y),
@@ -183,6 +178,8 @@ mod feature {
                     }
                 }
             });
+
+            support::update_mouse(&mut imgui, &mut mouse_state);
 
             // If the window is closed, this will be None for one tick, so to avoid panicking with
             // unwrap, instead break the loop
@@ -212,7 +209,7 @@ mod feature {
 
             let ui = imgui.frame(FrameSize {
                                     logical_size: (logical_size.width, logical_size.height),
-                                    hidpi_factor: 1.0,
+                                    hidpi_factor: window.get_hidpi_factor(),
                                 }, 1.0);
 
             ui.window(im_str!("Hello world"))

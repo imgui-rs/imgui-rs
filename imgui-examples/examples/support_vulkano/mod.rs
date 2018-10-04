@@ -3,6 +3,13 @@ pub mod vulkano_window;
 use imgui::*;
 use winit::VirtualKeyCode;
 
+#[derive(Copy, Clone, PartialEq, Debug, Default)]
+pub struct MouseState {
+    pub pos: (i32, i32),
+    pub pressed: (bool, bool, bool),
+    pub wheel: f32,
+}
+
 pub fn configure_keys(imgui: &mut ImGui) {
     use imgui::ImGuiKey;
 
@@ -25,4 +32,17 @@ pub fn configure_keys(imgui: &mut ImGui) {
     imgui.set_imgui_key(ImGuiKey::X, 16);
     imgui.set_imgui_key(ImGuiKey::Y, 17);
     imgui.set_imgui_key(ImGuiKey::Z, 18);
+}
+
+pub fn update_mouse(imgui: &mut ImGui, mouse_state: &mut MouseState) {
+    imgui.set_mouse_pos(mouse_state.pos.0 as f32, mouse_state.pos.1 as f32);
+    imgui.set_mouse_down([
+        mouse_state.pressed.0,
+        mouse_state.pressed.1,
+        mouse_state.pressed.2,
+        false,
+        false,
+    ]);
+    imgui.set_mouse_wheel(mouse_state.wheel);
+    mouse_state.wheel = 0.0;
 }
