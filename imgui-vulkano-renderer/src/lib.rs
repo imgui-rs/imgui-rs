@@ -50,17 +50,6 @@ pub struct Vertex {
     color: [f32; 4],
 }
 
-#[inline(always)]
-pub fn normalize(src: u32) -> [f32; 4] {
-    [
-        (src & 0xff000000 >> 16) as f32 / 255.0,
-        (src & 0x00ff0000 >> 16) as f32 / 255.0,
-        (src & 0x0000ff00 >>  8) as f32 / 255.0,
-        (src & 0x000000ff >>  0) as f32 / 255.0,
-
-    ]
-}
-
 impl From<ImDrawVert> for Vertex {
     fn from(v: ImDrawVert) -> Self {
         Vertex {
@@ -69,6 +58,17 @@ impl From<ImDrawVert> for Vertex {
             color: normalize(v.col),
         }
     }
+}
+
+#[inline(always)]
+pub fn normalize(src: u32) -> [f32; 4] {
+    [
+        (src & 0x000000ff >> 0) as f32 / 255.0,
+        (src & 0x0000ff00 >> 8) as f32 / 255.0,
+        (src & 0x00ff0000 >> 16) as f32 / 255.0,
+        (src & 0xff000000 >> 24) as f32 / 255.0,
+
+    ]
 }
 
 pub struct Renderer {
@@ -99,13 +99,6 @@ impl Renderer {
         let mut textures = Vec::new();
 
         let (texture, texture_future) = imgui.prepare_texture(|handle| {
-            /*let data = RawImage2d {
-                data: Cow::Borrowed(handle.pixels),
-                width: handle.width,
-                height: handle.height,
-                format: ClientFormat::U8U8U8U8,
-            };
-            Texture2d::new(ctx, data)*/
             let r = vulkano::image::immutable::ImmutableImage::from_iter(
                 handle.pixels.iter().cloned(),
                 vulkano::image::Dimensions::Dim2d { width: handle.width, height: handle.height },
@@ -131,7 +124,7 @@ impl Renderer {
         let pipeline = Arc::new(GraphicsPipeline::start()
             .vertex_input_single_buffer::<Vertex>()
             .vertex_shader(vertex_shader.main_entry_point(), ())
-            .depth_stencil_disabled()
+            //.depth_stencil_simple_depth()
             .triangle_list()
             .front_face_clockwise()
             //.cull_mode_back()
@@ -192,14 +185,8 @@ impl Renderer {
             translate: [-1.0, -1.0],
         };
 
-        //pushConstBlock.scale = glm::vec2(2.0f / io.DisplaySize.x, 2.0f / io.DisplaySize.y);
-        //pushConstBlock.translate = glm::vec2(-1.0f);
-        //vkCmdPushConstants(commandBuffer, pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(PushConstBlock), &pushConstBlock);
-
         let render_result: RendererResult<()> = ui.render(|ui, mut draw_data| {
             draw_data.scale_clip_rects(ui.imgui().display_framebuffer_scale());
-
-            //self.update_buffers(&draw_data, &device, draw_data.total_vtx_count(), draw_data.total_idx_count());
 
             struct DrawCall {
                 vbuf: Arc<CpuAccessibleBuffer<[Vertex]>>,
@@ -210,8 +197,6 @@ impl Renderer {
             // draw shit
             for draw_list in draw_data.into_iter() {
                 let mut dc = Arc::get_mut(&mut draw_call_collection).unwrap();
-                // scisssor our shit
-
                 let vert: Vec<Vertex> = draw_list.vtx_buffer.iter().map(|s| Vertex::from(*s)).collect();
                 let vbuf = CpuAccessibleBuffer::from_iter(
                     device.clone(),
@@ -252,12 +237,12 @@ impl Renderer {
 
         for call in draw_call_collection.iter() {
             command_buffer = command_buffer.draw_indexed(self.pipeline.clone(),
-                                          &call.state,
-                                          vec![call.vbuf.clone()],
-                                          call.ibuf.clone(),
-                                            imgui_desc.clone(),
+                                                         &call.state,
+                                                         vec![call.vbuf.clone()],
+                                                         call.ibuf.clone(),
+                                                         imgui_desc.clone(),
                                                          push_constants)
-                                    .unwrap();
+                .unwrap();
 
         }
 
