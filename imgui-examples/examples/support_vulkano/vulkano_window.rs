@@ -145,6 +145,10 @@ impl Window {
         Some(r)
     }
 
+    pub fn get_hidpi_factor(&self) -> f64 {
+        self.surface.window().get_hidpi_factor()
+    }
+
     pub fn handle_resize(&mut self) -> () {
         // Get the new dimensions for the viewport/framebuffers.
         let new_dimensions = self.surface.capabilities(self.device.physical_device())

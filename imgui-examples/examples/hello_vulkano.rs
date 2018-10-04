@@ -52,6 +52,13 @@ mod feature {
     const WIN_H: u32 =  768;
     const CLEAR_COLOR: [f32; 4] = [0.2, 0.2, 0.2, 1.0];
 
+    #[derive(Copy, Clone, PartialEq, Debug, Default)]
+    struct MouseState {
+        pos: (i32, i32),
+        pressed: (bool, bool, bool),
+        wheel: f32,
+    }
+
     pub fn main() {
         let mut window = support::vulkano_window::Window::new(WIN_W, WIN_H, "Conrod with vulkano");
 
@@ -63,6 +70,8 @@ mod feature {
         // IMGUI //
         let mut imgui = ImGui::init();
         imgui.set_ini_filename(None);
+
+        support::configure_keys(&mut imgui);
 
         let font_size = 13.0 as f32;
 
@@ -94,8 +103,87 @@ mod feature {
                                                                              1.0).unwrap();
 
         let mut previous_frame_end = futures;
+        let mut mouse_state = MouseState::default();
 
+        let window_dpi = window.get_hidpi_factor();
         'main: loop {
+            let mut should_quit = false;
+            window.events_loop.poll_events(|event| {
+                use winit::WindowEvent::*;
+
+                if let winit::Event::WindowEvent { event, .. } = event {
+                    match event {
+                        CloseRequested => should_quit = true,
+                        KeyboardInput { input, .. } => {
+                            use winit::VirtualKeyCode as Key;
+
+                            let pressed = input.state == winit::ElementState::Pressed;
+                            match input.virtual_keycode {
+                                Some(Key::Tab) => imgui.set_key(0, pressed),
+                                Some(Key::Left) => imgui.set_key(1, pressed),
+                                Some(Key::Right) => imgui.set_key(2, pressed),
+                                Some(Key::Up) => imgui.set_key(3, pressed),
+                                Some(Key::Down) => imgui.set_key(4, pressed),
+                                Some(Key::PageUp) => imgui.set_key(5, pressed),
+                                Some(Key::PageDown) => imgui.set_key(6, pressed),
+                                Some(Key::Home) => imgui.set_key(7, pressed),
+                                Some(Key::End) => imgui.set_key(8, pressed),
+                                Some(Key::Delete) => imgui.set_key(9, pressed),
+                                Some(Key::Back) => imgui.set_key(10, pressed),
+                                Some(Key::Return) => imgui.set_key(11, pressed),
+                                Some(Key::Escape) => imgui.set_key(12, pressed),
+                                Some(Key::A) => imgui.set_key(13, pressed),
+                                Some(Key::C) => imgui.set_key(14, pressed),
+                                Some(Key::V) => imgui.set_key(15, pressed),
+                                Some(Key::X) => imgui.set_key(16, pressed),
+                                Some(Key::Y) => imgui.set_key(17, pressed),
+                                Some(Key::Z) => imgui.set_key(18, pressed),
+                                Some(Key::LControl) | Some(Key::RControl) => {
+                                    imgui.set_key_ctrl(pressed)
+                                }
+                                Some(Key::LShift) | Some(Key::RShift) => imgui.set_key_shift(pressed),
+                                Some(Key::LAlt) | Some(Key::RAlt) => imgui.set_key_alt(pressed),
+                                Some(Key::LWin) | Some(Key::RWin) => imgui.set_key_super(pressed),
+                                _ => {}
+                            }
+                        },
+                        CursorMoved { position: pos, .. } => {
+                            // Rescale position from glutin logical coordinates to our logical
+                            // coordinates
+                            mouse_state.pos = pos
+                                .to_physical(window_dpi)
+                                .to_logical(1.0)
+                                .into();
+                        }
+                        MouseInput { state, button, .. } => match button {
+                            winit::MouseButton::Left => mouse_state.pressed.0 = state == winit::ElementState::Pressed,
+                            winit::MouseButton::Right => mouse_state.pressed.1 = state == winit::ElementState::Pressed,
+                            winit::MouseButton::Middle => mouse_state.pressed.2 = state == winit::ElementState::Pressed,
+                            _ => {}
+                        },
+                        MouseWheel {
+                            delta: winit::MouseScrollDelta::LineDelta(_, y),
+                            phase: winit::TouchPhase::Moved,
+                            ..
+                        } => mouse_state.wheel = y,
+                        MouseWheel {
+                            delta: winit::MouseScrollDelta::PixelDelta(pos),
+                            phase: winit::TouchPhase::Moved,
+                            ..
+                        } => {
+                            // Rescale pixel delta from glutin logical coordinates to our logical
+                            // coordinates
+                            mouse_state.wheel = pos
+                                .to_physical(window_dpi)
+                                .to_logical(1.0)
+                                .y as f32;
+                        }
+                        ReceivedCharacter(c) => imgui.add_input_character(c),
+                        _ => (),
+                    }
+                }
+            });
+
             // If the window is closed, this will be None for one tick, so to avoid panicking with
             // unwrap, instead break the loop
             let logical_size = match window.get_dimensions() {
@@ -161,28 +249,9 @@ mod feature {
                 }
             }
 
-
-            let mut should_quit = false;
-
             let winit_window_handle = window.surface.clone();
             let winit_window_handle = winit_window_handle.window();
 
-            window.events_loop.poll_events(|event| {
-                //let dpi_factor = dpi_factor as conrod::Scalar;
-
-                // Convert winit event to conrod event, requires conrod to be built with the `winit` feature
-                //if let Some(event) = conrod::backend::winit::convert_event(event.clone(), winit_window_handle) {
-                //
-                //}
-
-                // Close window if the escape key or the exit button is pressed
-                match event {
-                    winit::Event::WindowEvent { event: winit::WindowEvent::KeyboardInput { input: winit::KeyboardInput { virtual_keycode: Some(winit::VirtualKeyCode::Escape), .. }, .. }, .. } |
-                    winit::Event::WindowEvent { event: winit::WindowEvent::CloseRequested, .. } =>
-                        should_quit = true,
-                    _ => {}
-                }
-            });
             if should_quit {
                 break 'main;
             }
