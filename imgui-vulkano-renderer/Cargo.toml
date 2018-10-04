@@ -12,8 +12,8 @@ categories = ["gui", "rendering"]
 travis-ci = { repository = "Gekkio/imgui-rs" }
 
 [dependencies]
-vulkano = "*"
-vulkano-shader-derive = "*"
-image = "*"
+image = "0.20"
+vulkano = "0.10"
+vulkano-shader-derive = "0.10"
 imgui = { version = "0.0.21-pre", path = "../" }
 imgui-sys = { version = "0.0.21-pre", path = "../imgui-sys", features = ["vulkano"] }

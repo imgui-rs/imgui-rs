@@ -49,6 +49,7 @@ pub struct Vertex {
     uv: [f32; 2],
     color: [f32; 4],
 }
+impl_vertex!(Vertex, position, uv, color);
 
 impl From<ImDrawVert> for Vertex {
     fn from(v: ImDrawVert) -> Self {
@@ -63,10 +64,10 @@ impl From<ImDrawVert> for Vertex {
 #[inline(always)]
 pub fn normalize(src: u32) -> [f32; 4] {
     [
-        (src & 0x000000ff >> 0) as f32 / 255.0,
-        (src & 0x0000ff00 >> 8) as f32 / 255.0,
-        (src & 0x00ff0000 >> 16) as f32 / 255.0,
-        (src & 0xff000000 >> 24) as f32 / 255.0,
+        ((src >> 0) & 0xff) as f32 / 255.0,
+        ((src >> 8) & 0xff) as f32 / 255.0,
+        ((src >> 16) & 0xff) as f32 / 255.0,
+        ((src >> 24) & 0xff) as f32 / 255.0,
 
     ]
 }
@@ -80,7 +81,7 @@ pub struct Renderer {
     tex_descs: FixedSizeDescriptorSetsPool<Arc<GraphicsPipelineAbstract+Send+Sync>>,
 }
 
-impl_vertex!(Vertex, position, uv, color);
+
 
 impl Renderer {
     pub fn init<'a, L>(imgui: &mut ImGui,

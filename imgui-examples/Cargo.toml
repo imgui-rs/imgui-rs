@@ -13,13 +13,14 @@ gfx = "0.17"
 gfx_window_glutin = "0.26"
 glium = { version = "0.22", default-features = true }
 glutin = "0.18"
-image = "*"
+
 imgui = { version = "0.0.21-pre", path = "../" }
 imgui-gfx-renderer = { version = "0.0.21-pre", path = "../imgui-gfx-renderer" }
 imgui-glium-renderer = { version = "0.0.21-pre", path = "../imgui-glium-renderer" }
 imgui-vulkano-renderer = { version = "*", path = "../imgui-vulkano-renderer" }
 
-winit = "*"
-vulkano = "*"
-vulkano-win = "*"
-vulkano-shader-derive = "*"
+image = "0.20"
+winit = "0.17"
+vulkano = "0.10"
+vulkano-win = "0.10"
+vulkano-shader-derive = "0.10"
