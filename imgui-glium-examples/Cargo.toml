@@ -12,3 +12,4 @@ publish = false
 glium = { version = "0.22", default-features = true }
 imgui = { version = "0.0.22-pre", path = "../" }
 imgui-glium-renderer = { version = "0.0.22-pre", path = "../imgui-glium-renderer" }
+imgui-glutin-support = { version = "0.0.22-pre", path = "../imgui-glutin-support" }
