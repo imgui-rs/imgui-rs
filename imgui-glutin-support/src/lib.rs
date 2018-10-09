@@ -27,10 +27,17 @@
 //! # fn main() {
 //! # let mut events_loop = EventsLoop::new();
 //! # let mut imgui = ImGui::init();
+//! # let window_hidpi_factor = 1.0;
+//! # let app_hidpi_factor = 1.0;
 //! events_loop.poll_events(|event| {
 //!     // do application-specific stuff with event
 //!
-//!     imgui_glutin_support::handle_event(&mut imgui, &event);
+//!     imgui_glutin_support::handle_event(
+//!         &mut imgui,
+//!         &event,
+//!         window_hidpi_factor,
+//!         app_hidpi_factor
+//!     );
 //! });
 //! # }
 //! ```
@@ -51,11 +58,18 @@
 //! # fn main() {
 //! # let mut events_loop = EventsLoop::new();
 //! # let mut imgui = ImGui::init();
+//! # let window_hidpi_factor = 1.0;
+//! # let app_hidpi_factor = 1.0;
 //! events_loop.poll_events(|event| {
 //!     // do application-specific stuff with event
 //!
 //!     // default handling for events
-//!     imgui_glutin_support::handle_event(&mut imgui, &event);
+//!     imgui_glutin_support::handle_event(
+//!         &mut imgui,
+//!         &event,
+//!         window_hidpi_factor,
+//!         app_hidpi_factor
+//!     );
 //!
 //!     // Scroll 10 times the pixels per line by handling LineDelta events again and
 //!     // overriding the mouse wheel value
@@ -132,10 +146,20 @@ pub fn handle_modifiers(imgui: &mut ImGui, modifiers: ModifiersState) {
 }
 
 /// Update imgui mouse wheel position
-pub fn handle_mouse_scroll_delta(imgui: &mut ImGui, delta: MouseScrollDelta) {
+pub fn handle_mouse_scroll_delta(
+    imgui: &mut ImGui,
+    delta: MouseScrollDelta,
+    window_hidpi_factor: f64,
+    app_hidpi_factor: f64,
+) {
     match delta {
         MouseScrollDelta::LineDelta(_, y) => imgui.set_mouse_wheel(y),
-        MouseScrollDelta::PixelDelta(pos) => imgui.set_mouse_wheel(pos.y as f32),
+        MouseScrollDelta::PixelDelta(pos) => {
+            let pos = pos
+                .to_physical(window_hidpi_factor)
+                .to_logical(app_hidpi_factor);
+            imgui.set_mouse_wheel(pos.y as f32)
+        }
     }
 }
 
@@ -154,15 +178,27 @@ pub fn handle_mouse_button_state(imgui: &mut ImGui, button: MouseButton, state: 
 }
 
 /// Update imgui state from glutin event
-pub fn handle_event(imgui: &mut ImGui, event: &Event) {
+pub fn handle_event(
+    imgui: &mut ImGui,
+    event: &Event,
+    window_hidpi_factor: f64,
+    app_hidpi_factor: f64,
+) {
     match event {
-        &Event::WindowEvent { ref event, .. } => handle_window_event(imgui, event),
+        &Event::WindowEvent { ref event, .. } => {
+            handle_window_event(imgui, event, window_hidpi_factor, app_hidpi_factor)
+        }
         _ => (),
     }
 }
 
 /// Update imgui state from glutin window event
-pub fn handle_window_event(imgui: &mut ImGui, event: &WindowEvent) {
+pub fn handle_window_event(
+    imgui: &mut ImGui,
+    event: &WindowEvent,
+    window_hidpi_factor: f64,
+    app_hidpi_factor: f64,
+) {
     use WindowEvent::*;
     match event {
         &KeyboardInput { input, .. } => handle_keyboard_input(imgui, input),
@@ -172,6 +208,9 @@ pub fn handle_window_event(imgui: &mut ImGui, event: &WindowEvent) {
             modifiers,
             ..
         } => {
+            let position = position
+                .to_physical(window_hidpi_factor)
+                .to_logical(app_hidpi_factor);
             imgui.set_mouse_pos(position.x as f32, position.y as f32);
             handle_modifiers(imgui, modifiers);
         }
@@ -181,7 +220,7 @@ pub fn handle_window_event(imgui: &mut ImGui, event: &WindowEvent) {
             phase: TouchPhase::Moved,
             ..
         } => {
-            handle_mouse_scroll_delta(imgui, delta);
+            handle_mouse_scroll_delta(imgui, delta, window_hidpi_factor, app_hidpi_factor);
             handle_modifiers(imgui, modifiers);
         }
         &MouseInput {
@@ -222,9 +261,12 @@ pub fn update_mouse_cursor(imgui: &ImGui, window: &Window) {
 /// Get the current frame size for imgui frame rendering.
 ///
 /// Returns `None` if the window no longer exists
-pub fn get_frame_size(window: &Window) -> Option<FrameSize> {
+pub fn get_frame_size(window: &Window, app_hidpi_factor: f64) -> Option<FrameSize> {
     window.get_inner_size().map(|logical_size| FrameSize {
-        logical_size: logical_size.into(),
-        hidpi_factor: window.get_hidpi_factor(),
+        logical_size: logical_size
+            .to_physical(window.get_hidpi_factor())
+            .to_logical(app_hidpi_factor)
+            .into(),
+        hidpi_factor: app_hidpi_factor,
     })
 }
