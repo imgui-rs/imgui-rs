@@ -222,7 +222,7 @@ pub fn update_mouse_cursor(imgui: &ImGui, window: &Window) {
 /// Get the current frame size for imgui frame rendering.
 ///
 /// Returns `None` if the window no longer exists
-pub fn get_frame_size(window: &mut Window) -> Option<FrameSize> {
+pub fn get_frame_size(window: &Window) -> Option<FrameSize> {
     window.get_inner_size().map(|logical_size| FrameSize {
         logical_size: logical_size.into(),
         hidpi_factor: window.get_hidpi_factor(),
