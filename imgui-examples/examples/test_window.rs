@@ -1,6 +1,7 @@
 extern crate glium;
 extern crate imgui;
 extern crate imgui_glium_renderer;
+extern crate imgui_glutin_support;
 
 mod support;
 
