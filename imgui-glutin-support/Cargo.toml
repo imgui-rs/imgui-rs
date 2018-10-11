@@ -1,6 +1,6 @@
 [package]
 name = "imgui-glutin-support"
-version = "0.0.21-pre"
+version = "0.0.21"
 authors = ["Joonas Javanainen <joonas.javanainen@gmail.com>", "imgui-rs contributors"]
 description = "glutin support code for the imgui crate"
 homepage = "https://github.com/Gekkio/imgui-rs"
@@ -13,4 +13,4 @@ travis-ci = { repository = "Gekkio/imgui-rs" }
 
 [dependencies]
 glutin = ">= 0.17, <= 0.18"
-imgui = { version = "0.0.21-pre", path = "../" }
+imgui = { version = "0.0.21", path = "../" }

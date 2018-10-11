@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [0.0.21] - 2018-10-11
+
 ### Added
 
 - `ImGui::mouse_down`
@@ -393,7 +395,8 @@ by setting the environment variable `WINIT_HIDPI_FACTOR=1` if you use X11.
 
 - Initial release with cimgui/imgui 1.44, glium 0.9
 
-[Unreleased]: https://github.com/Gekkio/imgui-rs/compare/v0.0.20...HEAD
+[Unreleased]: https://github.com/Gekkio/imgui-rs/compare/v0.0.21...HEAD
+[0.0.21]: https://github.com/Gekkio/imgui-rs/compare/v0.0.20...v0.0.21
 [0.0.20]: https://github.com/Gekkio/imgui-rs/compare/v0.0.19...v0.0.20
 [0.0.19]: https://github.com/Gekkio/imgui-rs/compare/v0.0.18...v0.0.19
 [0.0.18]: https://github.com/Gekkio/imgui-rs/compare/v0.0.17...v0.0.18
