@@ -5,12 +5,18 @@
 ### Added
 
 - `ImGui::mouse_down`
+- `ImGui::key_super`
 - `Ui::get_window_pos`
 - `Ui::is_window_focused`
 - `Ui::is_root_window_focused`
 - `Ui::is_child_window_focused`
 - `Ui::popup_modal`
 - `imgui-glutin-support` crate
+- Support for custom textures
+
+### Fixed
+
+- Possible crash if rendering was skipped during a frame
 
 ### Changed
 
