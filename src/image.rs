@@ -8,7 +8,7 @@ use sys;
 pub struct ImTexture(usize);
 
 impl ImTexture {
-    pub fn id(&self) -> usize {
+    pub fn id(self) -> usize {
         self.0
     }
 }
@@ -60,7 +60,7 @@ impl<'ui> Image<'ui> {
             w: 0.0,
         };
         Image {
-            texture_id: texture_id,
+            texture_id,
             size: size.into(),
             uv0: DEFAULT_UV0,
             uv1: DEFAULT_UV1,

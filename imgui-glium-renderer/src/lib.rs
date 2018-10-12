@@ -8,7 +8,7 @@ use glium::program;
 use glium::texture;
 use glium::vertex;
 use glium::{DrawError, IndexBuffer, Program, Surface, Texture2d, VertexBuffer};
-use imgui::{DrawList, FrameSize, ImDrawIdx, ImDrawVert, ImGui, ImTexture, Textures, Ui};
+use imgui::{DrawList, FrameSize, ImGui, ImTexture, Textures, Ui};
 use std::borrow::Cow;
 use std::fmt;
 use std::rc::Rc;
@@ -79,7 +79,7 @@ impl Renderer {
         let device_objects = DeviceObjects::init(imgui, ctx)?;
         Ok(Renderer {
             ctx: Rc::clone(ctx.get_context()),
-            device_objects: device_objects,
+            device_objects,
         })
     }
 
@@ -109,7 +109,7 @@ impl Renderer {
         ];
         let result = ui.render(|ui, mut draw_data| {
             draw_data.scale_clip_rects(ui.imgui().display_framebuffer_scale());
-            for draw_list in draw_data.into_iter() {
+            for draw_list in &draw_data {
                 self.render_draw_list(surface, &draw_list, fb_size, matrix)?;
             }
             Ok(())
@@ -237,9 +237,6 @@ impl DeviceObjects {
         let mut textures = Textures::new();
         im_gui.set_font_texture_id(textures.insert(texture));
 
-        Ok(DeviceObjects {
-            program: program,
-            textures: textures,
-        })
+        Ok(DeviceObjects { program, textures })
     }
 }

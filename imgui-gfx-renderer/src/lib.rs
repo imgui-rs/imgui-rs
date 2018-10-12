@@ -189,13 +189,13 @@ impl<R: Resources> Renderer<R> {
         };
         Ok(Renderer {
             bundle: Bundle {
-                slice: slice,
-                pso: pso,
-                vertex_buffer: vertex_buffer,
-                out: out,
+                slice,
+                pso,
+                vertex_buffer,
+                out,
             },
-            index_buffer: index_buffer,
-            textures: textures,
+            index_buffer,
+            textures,
         })
     }
 
@@ -277,8 +277,8 @@ impl<R: Resources> Renderer<R> {
             };
             let data = pipe::BorrowedData {
                 vertex_buffer: &self.bundle.vertex_buffer,
-                matrix: matrix,
-                tex: tex,
+                matrix,
+                tex,
                 out: &self.bundle.out,
                 scissor: &scissor,
             };
@@ -301,7 +301,8 @@ impl<R: Resources> Renderer<R> {
                 Bind::empty(),
             )?;
         }
-        Ok(encoder.update_buffer(&self.bundle.vertex_buffer, vtx_buffer, 0)?)
+        encoder.update_buffer(&self.bundle.vertex_buffer, vtx_buffer, 0)?;
+        Ok(())
     }
     fn upload_index_buffer<F: Factory<R>, C: CommandBuffer<R>>(
         &mut self,
@@ -318,7 +319,8 @@ impl<R: Resources> Renderer<R> {
             )?;
             self.bundle.slice.buffer = self.index_buffer.clone().into_index_buffer(factory);
         }
-        Ok(encoder.update_buffer(&self.index_buffer, idx_buffer, 0)?)
+        encoder.update_buffer(&self.index_buffer, idx_buffer, 0)?;
+        Ok(())
     }
 }
 
