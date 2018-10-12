@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+### Changed
+
+- Upgrade to cimgui 1.65.2 / imgui 1.65. **This is a very big update, so there
+  are a lot of breaking changes**
+
 ## [0.0.21] - 2018-10-11
 
 ### Added

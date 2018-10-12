@@ -130,6 +130,9 @@ impl FrameSize {
 
 impl ImGui {
     pub fn init() -> ImGui {
+        unsafe {
+            sys::igCreateContext(ptr::null_mut());
+        }
         ImGui {
             ini_filename: None,
             log_filename: None,
@@ -384,7 +387,7 @@ impl ImGui {
         let mut buf = [0; 5];
         character.encode_utf8(&mut buf);
         unsafe {
-            sys::ImGuiIO_AddInputCharactersUTF8(buf.as_ptr() as *const _);
+            sys::ImGuiIO_AddInputCharactersUTF8(self.io_mut(), buf.as_ptr() as *const _);
         }
     }
     pub fn get_time(&self) -> f32 {
@@ -425,7 +428,7 @@ impl Drop for ImGui {
     fn drop(&mut self) {
         unsafe {
             CURRENT_UI = None;
-            sys::igShutdown();
+            sys::igDestroyContext(ptr::null_mut());
         }
     }
 }
@@ -529,10 +532,6 @@ impl<'ui> Ui<'ui> {
         let io = self.imgui.io();
         io.framerate
     }
-    pub fn metrics_allocs(&self) -> i32 {
-        let io = self.imgui.io();
-        io.metrics_allocs
-    }
     pub fn metrics_render_vertices(&self) -> i32 {
         let io = self.imgui.io();
         io.metrics_render_vertices
@@ -606,19 +605,13 @@ impl<'ui> Ui<'ui> {
     }
     /// Get current window's size in pixels
     pub fn get_window_size(&self) -> (f32, f32) {
-        let mut out = ImVec2::new(0.0, 0.0);
-        unsafe {
-            sys::igGetWindowSize(&mut out as *mut ImVec2);
-        }
-        (out.x, out.y)
+        let size = unsafe { sys::igGetWindowSize() };
+        size.into()
     }
     /// Get current window's position in pixels
     pub fn get_window_pos(&self) -> (f32, f32) {
-        let mut out = ImVec2::new(0.0, 0.0);
-        unsafe {
-            sys::igGetWindowPos(&mut out);
-        }
-        (out.x, out.y)
+        let size = unsafe { sys::igGetWindowPos() };
+        size.into()
     }
 }
 
@@ -694,8 +687,7 @@ impl<'ui> Ui<'ui> {
     /// Fill a space of `size` in pixels with nothing on the current window.
     /// Can be used to move the cursor on the window.
     pub fn dummy<S: Into<ImVec2>>(&self, size: S) {
-        let size = size.into();
-        unsafe { sys::igDummy(&size) }
+        unsafe { sys::igDummy(size.into()) }
     }
 
     /// Get cursor position on the screen, in screen coordinates.
@@ -704,11 +696,8 @@ impl<'ui> Ui<'ui> {
     /// This is especially useful for drawing, as the drawing API uses
     /// screen coordiantes.
     pub fn get_cursor_screen_pos(&self) -> (f32, f32) {
-        let mut out = ImVec2::new(0.0, 0.0);
-        unsafe {
-            sys::igGetCursorScreenPos(&mut out);
-        }
-        (out.x, out.y)
+        let size = unsafe { sys::igGetCursorScreenPos() };
+        size.into()
     }
 
     /// Set cursor position on the screen, in screen coordinates.
@@ -719,11 +708,8 @@ impl<'ui> Ui<'ui> {
 
     /// Get cursor position on the screen, in window coordinates.
     pub fn get_cursor_pos(&self) -> (f32, f32) {
-        let mut out = ImVec2::new(0.0, 0.0);
-        unsafe {
-            sys::igGetCursorPos(&mut out);
-        }
-        (out.x, out.y)
+        let size = unsafe { sys::igGetCursorPos() };
+        size.into()
     }
 
     /// Set cursor position on the screen, in window coordinates.
@@ -735,11 +721,8 @@ impl<'ui> Ui<'ui> {
     /// Get available space left between the cursor and the edges of the current
     /// window.
     pub fn get_content_region_avail(&self) -> (f32, f32) {
-        let mut out = ImVec2::new(0.0, 0.0);
-        unsafe {
-            sys::igGetContentRegionAvail(&mut out);
-        }
-        (out.x, out.y)
+        let size = unsafe { sys::igGetContentRegionAvail() };
+        size.into()
     }
 }
 
@@ -787,7 +770,7 @@ impl<'ui> Ui<'ui> {
                 ImId::Str(s) => {
                     let start = s.as_ptr() as *const c_char;
                     let end = start.offset(s.len() as isize);
-                    sys::igPushIDStrRange(start, end);
+                    sys::igPushIDRange(start, end);
                 }
                 ImId::Ptr(p) => {
                     sys::igPushIDPtr(p as *const c_void);
@@ -1206,7 +1189,7 @@ impl<'ui> Ui<'ui> {
     where
         F: FnOnce(),
     {
-        let render = unsafe { sys::igBeginPopup(str_id.as_ptr()) };
+        let render = unsafe { sys::igBeginPopup(str_id.as_ptr(), ImGuiWindowFlags::empty()) };
         if render {
             f();
             unsafe { sys::igEndPopup() };
@@ -1272,7 +1255,7 @@ impl<'ui> Ui<'ui> {
     ) -> bool {
         let items_inner: Vec<*const c_char> = items.into_iter().map(|item| item.as_ptr()).collect();
         unsafe {
-            sys::igListBox(
+            sys::igListBoxStr_arr(
                 label.as_ptr(),
                 current_item,
                 items_inner.as_ptr() as *mut *const c_char,
@@ -1299,7 +1282,7 @@ impl<'ui> Ui<'ui> {
     /// ui.radio_button(im_str!("Item 3"), &mut selected_radio_value, 3);
     /// ```
     pub fn radio_button<'p>(&self, label: &'p ImStr, value: &'p mut i32, wanted: i32) -> bool {
-        unsafe { sys::igRadioButton(label.as_ptr(), value, wanted) }
+        unsafe { sys::igRadioButtonIntPtr(label.as_ptr(), value, wanted) }
     }
 
     /// Creates a radio button that shows as selected if the given value is true.
@@ -1362,17 +1345,14 @@ impl<'ui> Ui<'ui> {
         hide_text_after_double_hash: bool,
         wrap_width: f32,
     ) -> ImVec2 {
-        let mut buffer = ImVec2::new(0.0, 0.0);
         unsafe {
             sys::igCalcTextSize(
-                &mut buffer as *mut ImVec2,
                 text.as_ptr(),
                 std::ptr::null(),
                 hide_text_after_double_hash,
                 wrap_width,
-            );
+            )
         }
-        buffer
     }
 }
 
@@ -1383,11 +1363,8 @@ impl<'ui> Ui<'ui> {
     }
     /// Get previously drawn item's size
     pub fn get_item_rect_size(&self) -> (f32, f32) {
-        let mut out = ImVec2::new(0.0, 0.0);
-        unsafe {
-            sys::igGetItemRectSize(&mut out);
-        }
-        (out.x, out.y)
+        let size = unsafe { sys::igGetItemRectSize() };
+        size.into()
     }
 }
 
@@ -1483,26 +1460,30 @@ impl<'ui> Ui<'ui> {
 
     #[inline]
     fn push_style_var(&self, style_var: StyleVar) {
-        use sys::{igPushStyleVar, igPushStyleVarVec};
+        use sys::{igPushStyleVarFloat, igPushStyleVarVec2};
         use StyleVar::*;
         match style_var {
-            Alpha(v) => unsafe { igPushStyleVar(ImGuiStyleVar::Alpha, v) },
-            WindowPadding(v) => unsafe { igPushStyleVarVec(ImGuiStyleVar::WindowPadding, v) },
-            WindowRounding(v) => unsafe { igPushStyleVar(ImGuiStyleVar::WindowRounding, v) },
-            WindowBorderSize(v) => unsafe { igPushStyleVar(ImGuiStyleVar::WindowBorderSize, v) },
-            WindowMinSize(v) => unsafe { igPushStyleVarVec(ImGuiStyleVar::WindowMinSize, v) },
-            ChildRounding(v) => unsafe { igPushStyleVar(ImGuiStyleVar::ChildRounding, v) },
-            ChildBorderSize(v) => unsafe { igPushStyleVar(ImGuiStyleVar::ChildBorderSize, v) },
-            PopupRounding(v) => unsafe { igPushStyleVar(ImGuiStyleVar::PopupRounding, v) },
-            PopupBorderSize(v) => unsafe { igPushStyleVar(ImGuiStyleVar::PopupBorderSize, v) },
-            FramePadding(v) => unsafe { igPushStyleVarVec(ImGuiStyleVar::FramePadding, v) },
-            FrameRounding(v) => unsafe { igPushStyleVar(ImGuiStyleVar::FrameRounding, v) },
-            FrameBorderSize(v) => unsafe { igPushStyleVar(ImGuiStyleVar::FrameBorderSize, v) },
-            ItemSpacing(v) => unsafe { igPushStyleVarVec(ImGuiStyleVar::ItemSpacing, v) },
-            ItemInnerSpacing(v) => unsafe { igPushStyleVarVec(ImGuiStyleVar::ItemInnerSpacing, v) },
-            IndentSpacing(v) => unsafe { igPushStyleVar(ImGuiStyleVar::IndentSpacing, v) },
-            GrabMinSize(v) => unsafe { igPushStyleVar(ImGuiStyleVar::GrabMinSize, v) },
-            ButtonTextAlign(v) => unsafe { igPushStyleVarVec(ImGuiStyleVar::ButtonTextAlign, v) },
+            Alpha(v) => unsafe { igPushStyleVarFloat(ImGuiStyleVar::Alpha, v) },
+            WindowPadding(v) => unsafe { igPushStyleVarVec2(ImGuiStyleVar::WindowPadding, v) },
+            WindowRounding(v) => unsafe { igPushStyleVarFloat(ImGuiStyleVar::WindowRounding, v) },
+            WindowBorderSize(v) => unsafe {
+                igPushStyleVarFloat(ImGuiStyleVar::WindowBorderSize, v)
+            },
+            WindowMinSize(v) => unsafe { igPushStyleVarVec2(ImGuiStyleVar::WindowMinSize, v) },
+            ChildRounding(v) => unsafe { igPushStyleVarFloat(ImGuiStyleVar::ChildRounding, v) },
+            ChildBorderSize(v) => unsafe { igPushStyleVarFloat(ImGuiStyleVar::ChildBorderSize, v) },
+            PopupRounding(v) => unsafe { igPushStyleVarFloat(ImGuiStyleVar::PopupRounding, v) },
+            PopupBorderSize(v) => unsafe { igPushStyleVarFloat(ImGuiStyleVar::PopupBorderSize, v) },
+            FramePadding(v) => unsafe { igPushStyleVarVec2(ImGuiStyleVar::FramePadding, v) },
+            FrameRounding(v) => unsafe { igPushStyleVarFloat(ImGuiStyleVar::FrameRounding, v) },
+            FrameBorderSize(v) => unsafe { igPushStyleVarFloat(ImGuiStyleVar::FrameBorderSize, v) },
+            ItemSpacing(v) => unsafe { igPushStyleVarVec2(ImGuiStyleVar::ItemSpacing, v) },
+            ItemInnerSpacing(v) => unsafe {
+                igPushStyleVarVec2(ImGuiStyleVar::ItemInnerSpacing, v)
+            },
+            IndentSpacing(v) => unsafe { igPushStyleVarFloat(ImGuiStyleVar::IndentSpacing, v) },
+            GrabMinSize(v) => unsafe { igPushStyleVarFloat(ImGuiStyleVar::GrabMinSize, v) },
+            ButtonTextAlign(v) => unsafe { igPushStyleVarVec2(ImGuiStyleVar::ButtonTextAlign, v) },
         }
     }
 }

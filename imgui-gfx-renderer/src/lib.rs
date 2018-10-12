@@ -4,11 +4,11 @@ extern crate imgui;
 
 use gfx::handle::{Buffer, RenderTargetView};
 use gfx::memory::Bind;
+use gfx::pso::{PipelineData, PipelineState};
 use gfx::texture::{FilterMethod, SamplerInfo, WrapMode};
 use gfx::traits::FactoryExt;
 use gfx::{CommandBuffer, Encoder, Factory, IntoIndexBuffer, Rect, Resources, Slice};
-use gfx::pso::{PipelineData, PipelineState};
-use imgui::{DrawList, FrameSize, ImDrawIdx, ImDrawVert, ImGui, Ui, Textures, ImTexture};
+use imgui::{DrawList, FrameSize, ImDrawIdx, ImDrawVert, ImGui, ImTexture, Textures, Ui};
 
 pub type RendererResult<T> = Result<T, RendererError>;
 
@@ -131,7 +131,10 @@ impl Shaders {
     }
 }
 
-pub type Texture<R> = (gfx::handle::ShaderResourceView<R, [f32; 4]>, gfx::handle::Sampler<R>);
+pub type Texture<R> = (
+    gfx::handle::ShaderResourceView<R, [f32; 4]>,
+    gfx::handle::Sampler<R>,
+);
 
 pub struct Renderer<R: Resources> {
     bundle: Bundle<R, pipe::Data<R>>,
@@ -254,7 +257,9 @@ impl<R: Resources> Renderer<R> {
         self.bundle.slice.start = 0;
         for cmd in draw_list.cmd_buffer {
             let texture_id = cmd.texture_id.into();
-            let tex = self.textures.get(texture_id)
+            let tex = self
+                .textures
+                .get(texture_id)
                 .ok_or_else(|| RendererError::BadTexture(texture_id))?;
 
             self.bundle.slice.end = self.bundle.slice.start + cmd.elem_count;

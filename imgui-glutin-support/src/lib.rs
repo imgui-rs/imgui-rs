@@ -210,11 +210,12 @@ pub fn update_mouse_cursor(imgui: &ImGui, window: &Window) {
             ImGuiMouseCursor::None => unreachable!("mouse_cursor was None!"),
             ImGuiMouseCursor::Arrow => MouseCursor::Arrow,
             ImGuiMouseCursor::TextInput => MouseCursor::Text,
-            ImGuiMouseCursor::Move => MouseCursor::Move,
+            ImGuiMouseCursor::ResizeAll => MouseCursor::Move,
             ImGuiMouseCursor::ResizeNS => MouseCursor::NsResize,
             ImGuiMouseCursor::ResizeEW => MouseCursor::EwResize,
             ImGuiMouseCursor::ResizeNESW => MouseCursor::NeswResize,
             ImGuiMouseCursor::ResizeNWSE => MouseCursor::NwseResize,
+            ImGuiMouseCursor::Hand => MouseCursor::Hand,
         });
     }
 }

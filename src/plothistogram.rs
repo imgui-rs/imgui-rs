@@ -63,7 +63,7 @@ impl<'ui, 'p> PlotHistogram<'ui, 'p> {
 
     pub fn build(self) {
         unsafe {
-            sys::igPlotHistogram(
+            sys::igPlotHistogramFloatPtr(
                 self.label.as_ptr(),
                 self.values.as_ptr() as *const c_float,
                 self.values.len() as i32,

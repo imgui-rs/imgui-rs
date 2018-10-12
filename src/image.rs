@@ -1,6 +1,6 @@
 use super::{ImVec2, ImVec4, Ui};
-use std::marker::PhantomData;
 use std::collections::HashMap;
+use std::marker::PhantomData;
 use std::os::raw::c_void;
 use sys;
 

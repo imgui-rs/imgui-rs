@@ -75,6 +75,6 @@ impl<'ui, 'p> MenuItem<'ui, 'p> {
             .map(|x| x as *mut bool)
             .unwrap_or(ptr::null_mut());
         let enabled = self.enabled;
-        unsafe { sys::igMenuItemPtr(label, shortcut, selected, enabled) }
+        unsafe { sys::igMenuItemBoolPtr(label, shortcut, selected, enabled) }
     }
 }

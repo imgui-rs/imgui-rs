@@ -4,6 +4,8 @@
 
 Minimum Rust version: 1.26
 
+Wrapped Dear ImGui version: 1.65
+
 [![Build Status](https://travis-ci.org/Gekkio/imgui-rs.svg?branch=master)](https://travis-ci.org/Gekkio/imgui-rs)
 [![Latest release on crates.io](https://meritbadge.herokuapp.com/imgui)](https://crates.io/crates/imgui)
 [![Documentation on docs.rs](https://docs.rs/imgui/badge.svg)](https://docs.rs/imgui)
@@ -84,7 +86,7 @@ Licensed under either of
 
 at your option.
 
-Uses [ImGui](https://github.com/ocornut/imgui) and [cimgui](https://github.com/Extrawurst/cimgui).
+Uses [ImGui](https://github.com/ocornut/imgui) and [cimgui](https://github.com/cimgui/cimgui).
 
 ### Contribution
 
