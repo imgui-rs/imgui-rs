@@ -14,13 +14,14 @@ extern crate glium;
 
 use std::convert::From;
 use std::os::raw::{c_char, c_float, c_int, c_short, c_uchar, c_uint, c_ushort, c_void};
-use std::slice;
 
 pub use self::enums::*;
 pub use self::flags::*;
+pub use self::structs::*;
 
 mod enums;
 mod flags;
+mod structs;
 
 #[cfg(feature = "gfx")]
 mod gfx_support;
@@ -28,8 +29,17 @@ mod gfx_support;
 #[cfg(feature = "glium")]
 mod glium_support;
 
+/// Vertex index
+pub type ImDrawIdx = c_ushort;
+
 /// ImGui context (opaque)
 pub enum ImGuiContext {}
+
+/// Unique ID used by widgets (typically hashed from a stack of string)
+pub type ImGuiID = ImU32;
+
+/// User data to identify a texture
+pub type ImTextureID = *mut c_void;
 
 /// 32-bit unsigned integer (typically used to store packed colors)
 pub type ImU32 = c_uint;
@@ -37,17 +47,16 @@ pub type ImU32 = c_uint;
 /// Character for keyboard input/display
 pub type ImWchar = c_ushort;
 
-/// User data to identify a texture
-pub type ImTextureID = *mut c_void;
+/// Draw callback for advanced use
+pub type ImDrawCallback =
+    Option<extern "C" fn(parent_list: *const ImDrawList, cmd: *const ImDrawCmd)>;
 
-/// Unique ID used by widgets (typically hashed from a stack of string)
-pub type ImGuiID = ImU32;
+/// Input text callback for advanced use
+pub type ImGuiInputTextCallback =
+    Option<extern "C" fn(data: *mut ImGuiInputTextCallbackData) -> c_int>;
 
-pub type ImGuiTextEditCallback =
-    Option<extern "C" fn(data: *mut ImGuiTextEditCallbackData) -> c_int>;
-
-pub type ImGuiSizeConstraintCallback =
-    Option<extern "C" fn(data: *mut ImGuiSizeConstraintCallbackData)>;
+/// Size constraint callback for advanced use
+pub type ImGuiSizeCallback = Option<extern "C" fn(data: *mut ImGuiSizeCallbackData)>;
 
 /// A tuple of 2 floating-point values
 #[repr(C)]
@@ -149,442 +158,10 @@ impl Into<(f32, f32, f32, f32)> for ImVec4 {
     }
 }
 
-/// Runtime data for styling/colors
-#[repr(C)]
-#[derive(Clone)]
-pub struct ImGuiStyle {
-    /// Global alpha applies to everything in ImGui
-    pub alpha: c_float,
-    /// Padding within a window
-    pub window_padding: ImVec2,
-    /// Radius of window corners rounding. Set to 0.0f to have rectangular windows
-    pub window_rounding: c_float,
-    /// Thickness of border around windows. Generally set to 0.0f or 1.0f. Other values not well tested.
-    pub window_border_size: c_float,
-    /// Minimum window size
-    pub window_min_size: ImVec2,
-    /// Alignment for title bar text. Defaults to (0.0f, 0.5f) for left-aligned, vertically centered
-    pub window_title_align: ImVec2,
-    /// Radius of child window corners rounding. Set to 0.0f to have rectangular child windows
-    pub child_rounding: c_float,
-    /// Thickness of border around child windows. Generally set to 0.0f or 1.0f. Other values not well tested.
-    pub child_border_size: c_float,
-    /// Radius of popup window corners rounding. Set to 0.0f to have rectangular child windows
-    pub popup_rounding: c_float,
-    /// Thickness of border around popup or tooltip windows. Generally set to 0.0f or 1.0f. Other values not well tested.
-    pub popup_border_size: c_float,
-    /// Padding within a framed rectangle (used by most widgets)
-    pub frame_padding: ImVec2,
-    /// Radius of frame corners rounding. Set to 0.0f to have rectangular frames (used by most
-    /// widgets).
-    pub frame_rounding: c_float,
-    /// Thickness of border around frames. Generally set to 0.0f or 1.0f. Other values not well tested.
-    pub frame_border_size: c_float,
-    /// Horizontal and vertical spacing between widgets/lines
-    pub item_spacing: ImVec2,
-    /// Horizontal and vertical spacing between within elements of a composed
-    /// widget (e.g. a slider and its label)
-    pub item_inner_spacing: ImVec2,
-    /// Expand reactive bounding box for touch-based system where touch position is not accurate
-    /// enough. Unfortunately we don't sort widgets so priority on overlap will always be given
-    /// to the first widget. So don't grow this too much!
-    pub touch_extra_padding: ImVec2,
-    /// Horizontal spacing when e.g. entering a tree node.
-    /// Generally == (FontSize + FramePadding.x*2).
-    pub indent_spacing: c_float,
-    /// Minimum horizontal spacing between two columns
-    pub columns_min_spacing: c_float,
-    /// Width of the vertical scrollbar, Height of the horizontal scrollbar
-    pub scrollbar_size: c_float,
-    /// Width of the vertical scrollbar, Height of the horizontal scrollbar
-    pub scrollbar_rounding: c_float,
-    /// Minimum width/height of a grab box for slider/scrollbar
-    pub grab_min_size: c_float,
-    /// Radius of grabs corners rounding. Set to 0.0f to have rectangular slider grabs.
-    pub grab_rounding: c_float,
-    /// Alignment of button text when button is larger than text. Defaults to (0.5f, 0.5f)
-    /// for horizontally + vertically centered
-    pub button_text_align: ImVec2,
-    /// Window positions are clamped to be visible within the display area by at least this
-    /// amount. Only covers regular windows.
-    pub display_window_padding: ImVec2,
-    /// If you cannot see the edge of your screen (e.g. on a TV) increase the safe area padding.
-    /// Covers popups/tooltips as well regular windows.
-    pub display_safe_area_padding: ImVec2,
-    /// Enable anti-aliasing on lines/borders. Disable if you are really short on CPU/GPU.
-    pub anti_aliased_lines: bool,
-    /// Enable anti-aliasing on filled shapes (rounded rectangles, circles, etc.)
-    pub anti_aliased_fill: bool,
-    /// Tessellation tolerance. Decrease for highly tessellated curves (higher quality, more
-    /// polygons), increase to reduce quality.
-    pub curve_tessellation_tol: c_float,
-    /// Colors for the user interface
-    pub colors: [ImVec4; ImGuiCol_COUNT],
-}
-
-/// Main configuration and I/O between your application and ImGui
-#[repr(C)]
-pub struct ImGuiIO {
-    pub display_size: ImVec2,
-    pub delta_time: c_float,
-    pub ini_saving_rate: c_float,
-    pub ini_filename: *const c_char,
-    pub log_filename: *const c_char,
-    pub mouse_double_click_time: c_float,
-    pub mouse_double_click_max_dist: c_float,
-    pub mouse_drag_threshold: c_float,
-    pub key_map: [c_int; ImGuiKey_COUNT],
-    pub key_repeat_delay: c_float,
-    pub key_repeat_rate: c_float,
-    pub user_data: *mut c_void,
-
-    pub fonts: *mut ImFontAtlas,
-    pub font_global_scale: c_float,
-    pub font_allow_user_scaling: bool,
-    pub font_default: *mut ImFont,
-    pub display_framebuffer_scale: ImVec2,
-    pub display_visible_min: ImVec2,
-    pub display_visible_max: ImVec2,
-
-    pub opt_mac_osx_behaviors: bool,
-    pub opt_cursor_blink: bool,
-
-    pub render_draw_lists_fn: Option<extern "C" fn(data: *mut ImDrawData)>,
-
-    pub get_clipboard_text_fn: Option<extern "C" fn(user_data: *mut c_void) -> *const c_char>,
-    pub set_clipboard_text_fn: Option<extern "C" fn(user_data: *mut c_void, text: *const c_char)>,
-    pub clipboard_user_data: *mut c_void,
-
-    pub mem_alloc_fn: Option<extern "C" fn(sz: usize) -> *mut c_void>,
-    pub mem_free_fn: Option<extern "C" fn(ptr: *mut c_void)>,
-
-    pub ime_set_input_screen_pos_fn: Option<extern "C" fn(x: c_int, y: c_int)>,
-    pub ime_window_handle: *mut c_void,
-
-    pub mouse_pos: ImVec2,
-    pub mouse_down: [bool; 5],
-    pub mouse_wheel: c_float,
-    pub mouse_draw_cursor: bool,
-    pub key_ctrl: bool,
-    pub key_shift: bool,
-    pub key_alt: bool,
-    pub key_super: bool,
-    pub keys_down: [bool; 512],
-    pub input_characters: [ImWchar; 16 + 1],
-
-    pub want_capture_mouse: bool,
-    pub want_capture_keyboard: bool,
-    pub want_text_input: bool,
-    pub want_move_mouse: bool,
-    pub framerate: c_float,
-    pub metrics_allocs: c_int,
-    pub metrics_render_vertices: c_int,
-    pub metrics_render_indices: c_int,
-    pub metrics_active_windows: c_int,
-    pub mouse_delta: ImVec2,
-
-    mouse_pos_prev: ImVec2,
-    mouse_clicked_pos: [ImVec2; 5],
-    mouse_clicked_time: [c_float; 5],
-    mouse_clicked: [bool; 5],
-    mouse_double_clicked: [bool; 5],
-    mouse_released: [bool; 5],
-    mouse_down_owned: [bool; 5],
-    mouse_down_duration: [c_float; 5],
-    mouse_down_duration_prev: [c_float; 5],
-    mouse_drag_max_distance_abs: [ImVec2; 5],
-    mouse_drag_max_distance_sqr: [c_float; 5],
-    keys_down_duration: [c_float; 512],
-    keys_down_duration_prev: [c_float; 512],
-}
-
-/// Lightweight vector struct
-#[repr(C)]
-pub struct ImVector<T> {
-    pub size: c_int,
-    pub capacity: c_int,
-    pub data: *mut T,
-}
-
-impl<T> ImVector<T> {
-    pub unsafe fn as_slice(&self) -> &[T] {
-        slice::from_raw_parts(self.data, self.size as usize)
-    }
-}
-
-#[repr(C)]
-pub struct TextRange {
-    pub begin: *const c_char,
-    pub end: *const c_char,
-}
-
-#[repr(C)]
-pub struct ImGuiTextFilter {
-    pub input_buf: [c_char; 256],
-    pub filters: ImVector<TextRange>,
-    pub count_grep: c_int,
-}
-
-/// Data payload for Drag and Drop operations
-#[repr(C)]
-pub struct ImGuiPayload {
-    /// Data (copied and owned by dear imgui)
-    pub data: *const c_void,
-    /// Data size
-    pub data_size: c_int,
-
-    /// Source item id
-    source_id: ImGuiID,
-    /// Source parent id (if available)
-    source_parent_id: ImGuiID,
-    /// Data timestamp
-    data_frame_count: c_int,
-    /// Data type tag (short user-supplied string)
-    data_type: [c_char; 8 + 1],
-    /// Set when AcceptDragDropPayload() was called and mouse has been hovering the target item (nb: handle overlapping drag targets)
-    preview: bool,
-    /// Set when AcceptDragDropPayload() was called and mouse button is released over the target item.
-    delivery: bool,
-}
-
-#[repr(C)]
-pub struct ImGuiTextBuffer {
-    pub buf: ImVector<c_char>,
-}
-
-#[repr(C)]
-pub struct Pair {
-    pub key: ImGuiID,
-    pub value: PairValue,
-}
-
-#[repr(C)]
-pub union PairValue {
-    val_i: c_int,
-    val_f: c_float,
-    val_p: *mut c_void,
-}
-
-#[repr(C)]
-pub struct ImGuiStorage {
-    pub data: ImVector<Pair>,
-}
-
-#[repr(C)]
-pub struct ImGuiTextEditCallbackData {
-    pub event_flag: ImGuiInputTextFlags,
-    pub flags: ImGuiInputTextFlags,
-    pub user_data: *mut c_void,
-    pub read_only: bool,
-
-    pub event_char: ImWchar,
-
-    pub event_key: ImGuiKey,
-    pub buf: *mut c_char,
-    pub buf_text_len: c_int,
-    pub buf_size: c_int,
-    pub buf_dirty: bool,
-    pub cursor_pos: c_int,
-    pub selection_start: c_int,
-    pub selection_end: c_int,
-}
-
-#[repr(C)]
-pub struct ImGuiSizeConstraintCallbackData {
-    pub user_data: *mut c_void,
-    pub pos: ImVec2,
-    pub current_size: ImVec2,
-    pub desired_size: ImVec2,
-}
-
-#[repr(C)]
-#[derive(Copy, Clone, Debug, Default)]
-pub struct ImColor {
-    pub value: ImVec4,
-}
-
-/// Helper to manually clip large list of items
-#[repr(C)]
-#[derive(Copy, Clone, Debug)]
-pub struct ImGuiListClipper {
-    pub start_pos_y: c_float,
-    pub items_height: c_float,
-    pub items_count: c_int,
-    pub step_no: c_int,
-    pub display_start: c_int,
-    pub display_end: c_int,
-}
-
-pub type ImDrawCallback =
-    Option<extern "C" fn(parent_list: *const ImDrawList, cmd: *const ImDrawCmd)>;
-
-/// A single draw command within a parent ImDrawList (generally maps to 1 GPU draw call)
-#[repr(C)]
-pub struct ImDrawCmd {
-    pub elem_count: c_uint,
-    pub clip_rect: ImVec4,
-    pub texture_id: ImTextureID,
-    pub user_callback: ImDrawCallback,
-    pub user_callback_data: *mut c_void,
-}
-
-/// Vertex index
-pub type ImDrawIdx = c_ushort;
-
-/// A single vertex
-#[repr(C)]
-#[derive(Copy, Clone, Debug, Default)]
-pub struct ImDrawVert {
-    pub pos: ImVec2,
-    pub uv: ImVec2,
-    pub col: ImU32,
-}
-
-/// Temporary storage for outputting drawing commands out of order
-#[repr(C)]
-pub struct ImDrawChannel {
-    pub cmd_buffer: ImVector<ImDrawCmd>,
-    pub idx_buffer: ImVector<ImDrawIdx>,
-}
-
-/// A single draw command list (generally one per window)
-#[repr(C)]
-pub struct ImDrawList {
-    pub cmd_buffer: ImVector<ImDrawCmd>,
-    pub idx_buffer: ImVector<ImDrawIdx>,
-    pub vtx_buffer: ImVector<ImDrawVert>,
-
-    flags: ImDrawListFlags,
-    data: *const ImDrawListSharedData,
-    owner_name: *const c_char,
-    vtx_current_idx: c_uint,
-    vtx_write_ptr: *mut ImDrawVert,
-    idx_write_ptr: *mut ImDrawIdx,
-    clip_rect_stack: ImVector<ImVec4>,
-    texture_id_stack: ImVector<ImTextureID>,
-    path: ImVector<ImVec2>,
-    channels_current: c_int,
-    channels_count: c_int,
-    channels: ImVector<ImDrawChannel>,
-}
-
-#[repr(C)]
-pub struct ImDrawListSharedData {
-    /// UV of white pixel in the atlas
-    tex_uv_white_pixel: ImVec2,
-    /// Current/default font (optional, for simplified AddText overload)
-    font: *mut ImFont,
-    /// Current/default font size (optional, for simplified AddText overload)
-    font_size: c_float,
-    curve_tessellation_tol: c_float,
-    /// Value for PushClipRectFullscreen()
-    clip_rect_fullscreen: ImVec4,
-    circle_vtx12: [ImVec2; 12],
-}
-
-/// All draw command lists required to render the frame
-#[repr(C)]
-pub struct ImDrawData {
-    pub valid: bool,
-    pub cmd_lists: *mut *mut ImDrawList,
-    pub cmd_lists_count: c_int,
-    pub total_vtx_count: c_int,
-    pub total_idx_count: c_int,
-}
-
-impl ImDrawData {
-    pub unsafe fn cmd_lists(&self) -> &[*const ImDrawList] {
-        let cmd_lists = self.cmd_lists as *const *const ImDrawList;
-        slice::from_raw_parts(cmd_lists, self.cmd_lists_count as usize)
-    }
-}
-
-/// Configuration data when adding a font or merging fonts
-#[repr(C)]
-pub struct ImFontConfig {
-    pub font_data: *mut c_void,
-    pub font_data_size: c_int,
-    pub font_data_owned_by_atlas: bool,
-    pub font_no: c_int,
-    pub size_pixels: c_float,
-    pub oversample_h: c_int,
-    pub oversample_v: c_int,
-    pub pixel_snap_h: bool,
-    pub glyph_extra_spacing: ImVec2,
-    pub glyph_offset: ImVec2,
-    pub glyph_ranges: *const ImWchar,
-    pub merge_mode: bool,
-    pub rasterizer_flags: c_uint,
-    pub rasterizer_multiply: c_float,
-
-    name: [c_char; 32],
-    dst_font: *mut ImFont,
-}
-
-#[repr(C)]
-#[derive(Copy, Clone, Debug, Default)]
-pub struct ImFontGlyph {
-    codepoint: ImWchar,
-    advance_x: c_float,
-    x0: c_float,
-    y0: c_float,
-    x1: c_float,
-    y1: c_float,
-    u0: c_float,
-    v0: c_float,
-    u1: c_float,
-    v1: c_float,
-}
-
-#[repr(C)]
-pub struct CustomRect {
-    pub id: c_uint,
-    pub width: c_ushort,
-    pub height: c_ushort,
-    pub x: c_ushort,
-    pub y: c_ushort,
-    pub glyph_advance_x: c_float,
-    pub glyph_offset: ImVec2,
-    pub font: *mut ImFont,
-}
-
-/// Runtime data for multiple fonts, bake multiple fonts into a single texture, TTF/OTF font loader
-#[repr(C)]
-pub struct ImFontAtlas {
-    pub tex_id: *mut c_void,
-    pub tex_desired_width: c_int,
-    pub tex_glyph_padding: c_int,
-
-    tex_pixels_alpha8: *mut c_uchar,
-    tex_pixels_rgba32: *mut c_uint,
-    tex_width: c_int,
-    tex_height: c_int,
-    tex_uv_white_pixel: ImVec2,
-    fonts: ImVector<*mut ImFont>,
-    custom_rects: ImVector<CustomRect>,
-    config_data: ImVector<ImFontConfig>,
-    custom_rect_ids: [c_int; 1],
-}
-
-/// Runtime data for a single font within a parent ImFontAtlas
-#[repr(C)]
-pub struct ImFont {
-    font_size: c_float,
-    scale: c_float,
-    display_offset: ImVec2,
-    glyphs: ImVector<ImFontGlyph>,
-    index_advance_x: ImVector<c_float>,
-    index_lookup: ImVector<c_ushort>,
-    fallback_glyph: *const ImFontGlyph,
-    fallback_advance_x: c_float,
-    fallback_char: ImWchar,
-
-    config_data_count: c_short,
-    config_data: *mut ImFontConfig,
-    container_atlas: *mut ImFontAtlas,
-    ascent: c_float,
-    descent: c_float,
-    metrics_total_surface: c_int,
+extern "C" {
+    pub fn igStyleColorsDark(dst: *mut ImGuiStyle);
+    pub fn igStyleColorsClassic(dst: *mut ImGuiStyle);
+    pub fn igStyleColorsLight(dst: *mut ImGuiStyle);
 }
 
 // Main
@@ -645,7 +222,7 @@ extern "C" {
     pub fn igSetNextWindowConstraints(
         size_min: ImVec2,
         size_max: ImVec2,
-        custom_callback: ImGuiSizeConstraintCallback,
+        custom_callback: ImGuiSizeCallback,
         custom_callback_data: *mut c_void,
     );
     pub fn igSetNextWindowContentSize(size: ImVec2);
@@ -1006,7 +583,7 @@ extern "C" {
         buf: *mut c_char,
         buf_size: usize,
         flags: ImGuiInputTextFlags,
-        callback: ImGuiTextEditCallback,
+        callback: ImGuiInputTextCallback,
         user_data: *mut c_void,
     ) -> bool;
     pub fn igInputTextMultiline(
@@ -1015,7 +592,7 @@ extern "C" {
         buf_size: usize,
         size: ImVec2,
         flags: ImGuiInputTextFlags,
-        callback: ImGuiTextEditCallback,
+        callback: ImGuiInputTextCallback,
         user_data: *mut c_void,
     ) -> bool;
     pub fn igInputFloat(
@@ -1338,13 +915,6 @@ extern "C" {
     pub fn igPopClipRect();
 }
 
-// Styles
-extern "C" {
-    pub fn igStyleColorsClassic(dst: *mut ImGuiStyle);
-    pub fn igStyleColorsDark(dst: *mut ImGuiStyle);
-    pub fn igStyleColorsLight(dst: *mut ImGuiStyle);
-}
-
 // Focus
 extern "C" {
     pub fn igSetItemDefaultFocus();
@@ -1564,17 +1134,17 @@ extern "C" {
 // ImGuiTextEditCallbackData
 extern "C" {
     pub fn ImGuiTextEditCallbackData_DeleteChars(
-        data: *mut ImGuiTextEditCallbackData,
+        data: *mut ImGuiInputTextCallbackData,
         pos: c_int,
         bytes_count: c_int,
     );
     pub fn ImGuiTextEditCallbackData_InsertChars(
-        data: *mut ImGuiTextEditCallbackData,
+        data: *mut ImGuiInputTextCallbackData,
         pos: c_int,
         text: *const c_char,
         text_end: *const c_char,
     );
-    pub fn ImGuiTextEditCallbackData_HasSelection(data: *mut ImGuiTextEditCallbackData) -> bool;
+    pub fn ImGuiTextEditCallbackData_HasSelection(data: *mut ImGuiInputTextCallbackData) -> bool;
 }
 
 // ImGuiListClipper
@@ -2015,37 +1585,4 @@ extern "C" {
 extern "C" {
     pub fn ImFont_IndexLookup_size(ofnt: *const ImFont) -> c_int;
     pub fn ImFont_IndexLookup_index(font: *const ImFont, index: c_int) -> c_ushort;
-}
-
-// Although this test is sensitive to ImGui updates, it's useful to reveal potential
-// alignment errors
-#[test]
-fn test_default_style() {
-    let style = unsafe { &*igGetStyle() };
-    assert_eq!(style.alpha, 1.0);
-    assert_eq!(style.window_padding, ImVec2::new(8.0, 8.0));
-    assert_eq!(style.window_rounding, 7.0);
-    assert_eq!(style.window_border_size, 0.0);
-    assert_eq!(style.window_min_size, ImVec2::new(32.0, 32.0));
-    assert_eq!(style.window_title_align, ImVec2::new(0.0, 0.5));
-    assert_eq!(style.popup_rounding, 0.0);
-    assert_eq!(style.popup_border_size, 1.0);
-    assert_eq!(style.frame_padding, ImVec2::new(4.0, 3.0));
-    assert_eq!(style.frame_rounding, 0.0);
-    assert_eq!(style.frame_border_size, 0.0);
-    assert_eq!(style.item_spacing, ImVec2::new(8.0, 4.0));
-    assert_eq!(style.item_inner_spacing, ImVec2::new(4.0, 4.0));
-    assert_eq!(style.touch_extra_padding, ImVec2::new(0.0, 0.0));
-    assert_eq!(style.indent_spacing, 21.0);
-    assert_eq!(style.columns_min_spacing, 6.0);
-    assert_eq!(style.scrollbar_size, 16.0);
-    assert_eq!(style.scrollbar_rounding, 9.0);
-    assert_eq!(style.grab_min_size, 10.0);
-    assert_eq!(style.grab_rounding, 0.0);
-    assert_eq!(style.button_text_align, ImVec2::new(0.5, 0.5));
-    assert_eq!(style.display_window_padding, ImVec2::new(22.0, 22.0));
-    assert_eq!(style.display_safe_area_padding, ImVec2::new(4.0, 4.0));
-    assert_eq!(style.anti_aliased_lines, true);
-    assert_eq!(style.anti_aliased_fill, true);
-    assert_eq!(style.curve_tessellation_tol, 1.25);
 }
