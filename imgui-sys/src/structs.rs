@@ -1,9 +1,10 @@
 use std::os::raw::{c_char, c_float, c_int, c_short, c_uchar, c_uint, c_ushort, c_void};
 use std::slice;
 
-use super::enums::{ImGuiCol, ImGuiKey, ImGuiNavInput};
+use super::enums::{ImGuiCol, ImGuiKey, ImGuiMouseCursor, ImGuiNavInput};
 use super::flags::{
-    ImDrawListFlags, ImFontAtlasFlags, ImGuiBackendFlags, ImGuiConfigFlags, ImGuiInputTextFlags,
+    ImDrawCornerFlags, ImDrawListFlags, ImFontAtlasFlags, ImGuiBackendFlags, ImGuiConfigFlags,
+    ImGuiInputTextFlags,
 };
 use super::{ImDrawCallback, ImDrawIdx, ImGuiID, ImTextureID, ImU32, ImVec2, ImVec4, ImWchar};
 
@@ -122,7 +123,7 @@ pub struct ImFont {
 
     config_data_count: c_short,
     config_data: *mut ImFontConfig,
-    container_atlas: *mut ImFontAtlas,
+    container_font_atlas: *mut ImFontAtlas,
     ascent: c_float,
     descent: c_float,
     dirty_lookup_tables: bool,
@@ -470,4 +471,584 @@ pub union PairValue {
 pub struct TextRange {
     pub begin: *const c_char,
     pub end: *const c_char,
+}
+
+// ImGuiStyle
+extern "C" {
+    pub fn ImGuiStyle_ScaleAllSizes(this: *mut ImGuiStyle, scale_factor: c_float);
+}
+
+// ImGuiIO
+extern "C" {
+    pub fn ImGuiIO_AddInputCharacter(this: *mut ImGuiIO, c: c_ushort);
+    pub fn ImGuiIO_AddInputCharactersUTF8(this: *mut ImGuiIO, utf8_chars: *const c_char);
+    pub fn ImGuiIO_ClearInputCharacters(this: *mut ImGuiIO);
+}
+
+// ImGuiTextFilter
+extern "C" {
+    pub fn ImGuiTextFilter_Draw(
+        this: *mut ImGuiTextFilter,
+        label: *const c_char,
+        width: c_float,
+    ) -> bool;
+    pub fn ImGuiTextFilter_PassFilter(
+        this: *mut ImGuiTextFilter,
+        text: *const c_char,
+        text_end: *const c_char,
+    ) -> bool;
+    pub fn ImGuiTextFilter_Build(this: *mut ImGuiTextFilter);
+    pub fn ImGuiTextFilter_Clear(this: *mut ImGuiTextFilter);
+    pub fn ImGuiTextFilter_IsActive(this: *mut ImGuiTextFilter) -> bool;
+}
+
+// TextRange
+extern "C" {
+    pub fn TextRange_begin(this: *mut TextRange) -> *const c_char;
+    pub fn TextRange_end(this: *mut TextRange) -> *const c_char;
+    pub fn TextRange_empty(this: *mut TextRange) -> bool;
+    pub fn TextRange_split(this: *mut TextRange, separator: c_char, out: *mut ImVector<TextRange>);
+}
+
+// ImGuiTextBuffer
+extern "C" {
+    pub fn ImGuiTextBuffer_begin(this: *mut ImGuiTextBuffer) -> *const c_char;
+    pub fn ImGuiTextBuffer_end(this: *mut ImGuiTextBuffer) -> *const c_char;
+    pub fn ImGuiTextBuffer_size(this: *mut ImGuiTextBuffer) -> c_int;
+    pub fn ImGuiTextBuffer_empty(this: *mut ImGuiTextBuffer) -> bool;
+    pub fn ImGuiTextBuffer_clear(this: *mut ImGuiTextBuffer);
+    pub fn ImGuiTextBuffer_reserve(this: *mut ImGuiTextBuffer, capacity: c_int);
+    pub fn ImGuiTextBuffer_c_str(this: *mut ImGuiTextBuffer) -> *const c_char;
+    pub fn ImGuiTextBuffer_appendf(this: *mut ImGuiTextBuffer, fmt: *const c_char, ...);
+}
+
+// ImGuiStorage
+extern "C" {
+    pub fn ImGuiStorage_Clear(this: *mut ImGuiStorage);
+    pub fn ImGuiStorage_GetInt(this: *mut ImGuiStorage, key: ImGuiID, default_val: c_int) -> c_int;
+    pub fn ImGuiStorage_SetInt(this: *mut ImGuiStorage, key: ImGuiID, val: c_int);
+    pub fn ImGuiStorage_GetBool(this: *mut ImGuiStorage, key: ImGuiID, default_val: bool) -> bool;
+    pub fn ImGuiStorage_SetBool(this: *mut ImGuiStorage, key: ImGuiID, val: bool);
+    pub fn ImGuiStorage_GetFloat(
+        this: *mut ImGuiStorage,
+        key: ImGuiID,
+        default_val: c_float,
+    ) -> c_float;
+    pub fn ImGuiStorage_SetFloat(this: *mut ImGuiStorage, key: ImGuiID, val: c_float);
+    pub fn ImGuiStorage_GetVoidPtr(this: *mut ImGuiStorage, key: ImGuiID);
+    pub fn ImGuiStorage_SetVoidPtr(this: *mut ImGuiStorage, key: ImGuiID, val: *mut c_void);
+    pub fn ImGuiStorage_GetIntRef(
+        this: *mut ImGuiStorage,
+        key: ImGuiID,
+        default_val: c_int,
+    ) -> *mut c_int;
+    pub fn ImGuiStorage_GetBoolRef(
+        this: *mut ImGuiStorage,
+        key: ImGuiID,
+        default_val: bool,
+    ) -> *mut bool;
+    pub fn ImGuiStorage_GetFloatRef(
+        this: *mut ImGuiStorage,
+        key: ImGuiID,
+        default_val: c_float,
+    ) -> *mut c_float;
+    pub fn ImGuiStorage_GetVoidPtrRef(
+        this: *mut ImGuiStorage,
+        key: ImGuiID,
+        default_val: *mut c_void,
+    ) -> *mut *mut c_void;
+    pub fn ImGuiStorage_SetAllInt(this: *mut ImGuiStorage, val: c_int);
+    pub fn ImGuiStorage_BuildSortByKey(this: *mut ImGuiStorage);
+}
+
+// ImGuiInputTextCallbackData
+extern "C" {
+    pub fn ImGuiInputTextCallbackData_DeleteChars(
+        this: *mut ImGuiInputTextCallbackData,
+        pos: c_int,
+        bytes_count: c_int,
+    );
+    pub fn ImGuiInputTextCallbackData_InsertChars(
+        this: *mut ImGuiInputTextCallbackData,
+        pos: c_int,
+        text: *const c_char,
+        text_end: *const c_char,
+    );
+    pub fn ImGuiInputTextCallbackData_HasSelection(this: *mut ImGuiInputTextCallbackData) -> bool;
+}
+
+// ImGuiPayload
+extern "C" {
+    pub fn ImGuiPayload_Clear(this: *mut ImGuiPayload);
+    pub fn ImGuiPayload_IsDataType(this: *mut ImGuiPayload, type_: *const c_char) -> bool;
+    pub fn ImGuiPayload_IsPreview(this: *mut ImGuiPayload) -> bool;
+    pub fn ImGuiPayload_IsDelivery(this: *mut ImGuiPayload) -> bool;
+}
+
+// ImGuiListClipper
+extern "C" {
+    pub fn ImGuiListClipper_Step(this: *mut ImGuiListClipper) -> bool;
+    pub fn ImGuiListClipper_Begin(
+        this: *mut ImGuiListClipper,
+        items_count: c_int,
+        items_height: c_float,
+    );
+    pub fn ImGuiListClipper_End(this: *mut ImGuiListClipper);
+}
+
+// ImDrawList
+extern "C" {
+    pub fn ImDrawList_PushClipRect(
+        this: *mut ImDrawList,
+        clip_rect_min: ImVec2,
+        clip_rect_max: ImVec2,
+        intersect_with_current_clip_rect: bool,
+    );
+    pub fn ImDrawList_PushClipRectFullScreen(this: *mut ImDrawList);
+    pub fn ImDrawList_PopClipRect(this: *mut ImDrawList);
+    pub fn ImDrawList_PushTextureID(this: *mut ImDrawList, texture_id: ImTextureID);
+    pub fn ImDrawList_PopTextureID(this: *mut ImDrawList);
+    pub fn ImDrawList_GetClipRectMin(this: *mut ImDrawList) -> ImVec2;
+    pub fn ImDrawList_GetClipRectMax(this: *mut ImDrawList) -> ImVec2;
+
+    pub fn ImDrawList_AddLine(
+        this: *mut ImDrawList,
+        a: ImVec2,
+        b: ImVec2,
+        col: ImU32,
+        thickness: c_float,
+    );
+    pub fn ImDrawList_AddRect(
+        this: *mut ImDrawList,
+        a: ImVec2,
+        b: ImVec2,
+        col: ImU32,
+        rounding: c_float,
+        rounding_corners_flags: ImDrawCornerFlags,
+        thickness: c_float,
+    );
+    pub fn ImDrawList_AddRectFilled(
+        this: *mut ImDrawList,
+        a: ImVec2,
+        b: ImVec2,
+        col: ImU32,
+        rounding: c_float,
+        rounding_corners_flags: ImDrawCornerFlags,
+    );
+    pub fn ImDrawList_AddRectFilledMultiColor(
+        this: *mut ImDrawList,
+        a: ImVec2,
+        b: ImVec2,
+        col_upr_left: ImU32,
+        col_upr_right: ImU32,
+        col_bot_right: ImU32,
+        col_bot_left: ImU32,
+    );
+    pub fn ImDrawList_AddQuad(
+        this: *mut ImDrawList,
+        a: ImVec2,
+        b: ImVec2,
+        c: ImVec2,
+        d: ImVec2,
+        col: ImU32,
+        thickness: c_float,
+    );
+    pub fn ImDrawList_AddQuadFilled(
+        this: *mut ImDrawList,
+        a: ImVec2,
+        b: ImVec2,
+        c: ImVec2,
+        d: ImVec2,
+        col: ImU32,
+    );
+    pub fn ImDrawList_AddTriangle(
+        this: *mut ImDrawList,
+        a: ImVec2,
+        b: ImVec2,
+        c: ImVec2,
+        col: ImU32,
+        thickness: c_float,
+    );
+    pub fn ImDrawList_AddTriangleFilled(
+        this: *mut ImDrawList,
+        a: ImVec2,
+        b: ImVec2,
+        c: ImVec2,
+        col: ImU32,
+    );
+    pub fn ImDrawList_AddCircle(
+        this: *mut ImDrawList,
+        centre: ImVec2,
+        radius: c_float,
+        col: ImU32,
+        num_segments: c_int,
+        thickness: c_float,
+    );
+    pub fn ImDrawList_AddCircleFilled(
+        this: *mut ImDrawList,
+        centre: ImVec2,
+        radius: c_float,
+        col: ImU32,
+        num_segments: c_int,
+    );
+    pub fn ImDrawList_AddText(
+        this: *mut ImDrawList,
+        pos: ImVec2,
+        col: ImU32,
+        text_begin: *const c_char,
+        text_end: *const c_char,
+    );
+    pub fn ImDrawList_AddTextFontPtr(
+        this: *mut ImDrawList,
+        font: *const ImFont,
+        font_size: c_float,
+        pos: ImVec2,
+        col: ImU32,
+        text_begin: *const c_char,
+        text_end: *const c_char,
+        wrap_width: c_float,
+        cpu_fine_clip_rect: *const ImVec4,
+    );
+    pub fn ImDrawList_AddImage(
+        this: *mut ImDrawList,
+        user_texture_id: ImTextureID,
+        a: ImVec2,
+        b: ImVec2,
+        uv_a: ImVec2,
+        uv_b: ImVec2,
+        col: ImU32,
+    );
+    pub fn ImDrawList_AddImageQuad(
+        this: *mut ImDrawList,
+        user_texture_id: ImTextureID,
+        a: ImVec2,
+        b: ImVec2,
+        c: ImVec2,
+        d: ImVec2,
+        uv_a: ImVec2,
+        uv_b: ImVec2,
+        uv_c: ImVec2,
+        uv_d: ImVec2,
+        col: ImU32,
+    );
+    pub fn ImDrawList_AddImageRounded(
+        this: *mut ImDrawList,
+        user_texture_id: ImTextureID,
+        a: ImVec2,
+        b: ImVec2,
+        uv_a: ImVec2,
+        uv_b: ImVec2,
+        col: ImU32,
+        rounding: c_float,
+        rounding_corners: ImDrawCornerFlags,
+    );
+    pub fn ImDrawList_AddPolyLine(
+        this: *mut ImDrawList,
+        points: *const ImVec2,
+        num_points: c_int,
+        col: ImU32,
+        closed: bool,
+        thickness: c_float,
+    );
+    pub fn ImDrawList_AddConvexPolyFilled(
+        this: *mut ImDrawList,
+        points: *const ImVec2,
+        num_points: c_int,
+        col: ImU32,
+    );
+    pub fn ImDrawList_AddBezierCurve(
+        this: *mut ImDrawList,
+        pos0: ImVec2,
+        cp0: ImVec2,
+        cp1: ImVec2,
+        pos1: ImVec2,
+        col: ImU32,
+        thickness: c_float,
+        num_segments: c_int,
+    );
+
+    pub fn ImDrawList_PathClear(this: *mut ImDrawList);
+    pub fn ImDrawList_PathLineTo(this: *mut ImDrawList, pos: ImVec2);
+    pub fn ImDrawList_PathLineToMergeDuplicate(this: *mut ImDrawList, pos: ImVec2);
+    pub fn ImDrawList_PathFillConvex(this: *mut ImDrawList, col: ImU32);
+    pub fn ImDrawList_PathStroke(
+        this: *mut ImDrawList,
+        col: ImU32,
+        closed: bool,
+        thickness: c_float,
+    );
+    pub fn ImDrawList_PathArcTo(
+        this: *mut ImDrawList,
+        centre: ImVec2,
+        radius: c_float,
+        a_min: c_float,
+        a_max: c_float,
+        num_segments: c_int,
+    );
+    pub fn ImDrawList_PathArcToFast(
+        this: *mut ImDrawList,
+        centre: ImVec2,
+        radius: c_float,
+        a_min_of_12: c_int,
+        a_max_of_12: c_int,
+    );
+    pub fn ImDrawList_PathBezierCurveTo(
+        this: *mut ImDrawList,
+        p1: ImVec2,
+        p2: ImVec2,
+        p3: ImVec2,
+        num_segments: c_int,
+    );
+    pub fn ImDrawList_PathRect(
+        this: *mut ImDrawList,
+        rect_min: ImVec2,
+        rect_max: ImVec2,
+        rounding: c_float,
+        rounding_corners_flags: c_int,
+    );
+
+    pub fn ImDrawList_ChannelsSplit(this: *mut ImDrawList, channels_count: c_int);
+    pub fn ImDrawList_ChannelsMerge(this: *mut ImDrawList);
+    pub fn ImDrawList_ChannelsSetCurrent(this: *mut ImDrawList, channel_index: c_int);
+
+    pub fn ImDrawList_AddCallback(
+        this: *mut ImDrawList,
+        callback: ImDrawCallback,
+        callback_data: *mut c_void,
+    );
+    pub fn ImDrawList_AddDrawCmd(this: *mut ImDrawList);
+
+    pub fn ImDrawList_CloneOutput(this: *mut ImDrawList) -> *mut ImDrawList;
+    pub fn ImDrawList_Clear(this: *mut ImDrawList);
+    pub fn ImDrawList_ClearFreeMemory(this: *mut ImDrawList);
+
+    pub fn ImDrawList_PrimReserve(this: *mut ImDrawList, idx_count: c_int, vtx_count: c_int);
+    pub fn ImDrawList_PrimRect(this: *mut ImDrawList, a: ImVec2, b: ImVec2, col: ImU32);
+    pub fn ImDrawList_PrimRectUV(
+        this: *mut ImDrawList,
+        a: ImVec2,
+        b: ImVec2,
+        uv_a: ImVec2,
+        uv_b: ImVec2,
+        col: ImU32,
+    );
+    pub fn ImDrawList_PrimQuadUV(
+        this: *mut ImDrawList,
+        a: ImVec2,
+        b: ImVec2,
+        c: ImVec2,
+        d: ImVec2,
+        uv_a: ImVec2,
+        uv_b: ImVec2,
+        uv_c: ImVec2,
+        uv_d: ImVec2,
+        col: ImU32,
+    );
+    pub fn ImDrawList_PrimWriteVtx(this: *mut ImDrawList, pos: ImVec2, uv: ImVec2, col: ImU32);
+    pub fn ImDrawList_PrimWriteIdx(this: *mut ImDrawList, idx: ImDrawIdx);
+    pub fn ImDrawList_PrimVtx(this: *mut ImDrawList, pos: ImVec2, uv: ImVec2, col: ImU32);
+    pub fn ImDrawList_UpdateClipRect(this: *mut ImDrawList);
+    pub fn ImDrawList_UpdateTextureID(this: *mut ImDrawList);
+}
+
+// ImDrawData
+extern "C" {
+    pub fn ImDrawData_Clear(this: *mut ImDrawData);
+    pub fn ImDrawData_DeIndexAllBuffers(this: *mut ImDrawData);
+    pub fn ImDrawData_ScaleClipRects(this: *mut ImDrawData, sc: ImVec2);
+}
+
+// ImFontConfig
+extern "C" {
+    pub fn ImFontConfig_DefaultConstructor(config: *mut ImFontConfig);
+}
+
+// ImFontAtlas
+extern "C" {
+    pub fn ImFontAtlas_AddFont(
+        this: *mut ImFontAtlas,
+        font_cfg: *const ImFontConfig,
+    ) -> *mut ImFont;
+    pub fn ImFontAtlas_AddFontDefault(
+        this: *mut ImFontAtlas,
+        font_cfg: *const ImFontConfig,
+    ) -> *mut ImFont;
+    pub fn ImFontAtlas_AddFontFromFileTTF(
+        this: *mut ImFontAtlas,
+        filename: *const c_char,
+        size_pixels: c_float,
+        font_cfg: *const ImFontConfig,
+        glyph_ranges: *const ImWchar,
+    ) -> *mut ImFont;
+    pub fn ImFontAtlas_AddFontFromMemoryTTF(
+        this: *mut ImFontAtlas,
+        font_data: *mut c_void,
+        font_size: c_int,
+        size_pixels: c_float,
+        font_cfg: *const ImFontConfig,
+        glyph_ranges: *const ImWchar,
+    ) -> *mut ImFont;
+    pub fn ImFontAtlas_AddFontFromMemoryCompressedTTF(
+        this: *mut ImFontAtlas,
+        compressed_font_data: *const c_void,
+        compressed_font_size: c_int,
+        size_pixels: c_float,
+        font_cfg: *const ImFontConfig,
+        glyph_ranges: *const ImWchar,
+    ) -> *mut ImFont;
+    pub fn ImFontAtlas_AddFontFromMemoryCompressedBase85TTF(
+        this: *mut ImFontAtlas,
+        compressed_font_data_base85: *const c_char,
+        size_pixels: c_float,
+        font_cfg: *const ImFontConfig,
+        glyph_ranges: *const ImWchar,
+    ) -> *mut ImFont;
+    pub fn ImFontAtlas_ClearInputData(this: *mut ImFontAtlas);
+    pub fn ImFontAtlas_ClearTexData(this: *mut ImFontAtlas);
+    pub fn ImFontAtlas_ClearFonts(this: *mut ImFontAtlas);
+    pub fn ImFontAtlas_Clear(this: *mut ImFontAtlas);
+    pub fn ImFontAtlas_Build(this: *mut ImFontAtlas) -> bool;
+    pub fn ImFontAtlas_IsBuilt(this: *mut ImFontAtlas) -> bool;
+    pub fn ImFontAtlas_GetTexDataAsAlpha8(
+        this: *mut ImFontAtlas,
+        out_pixels: *mut *mut c_uchar,
+        out_width: *mut c_int,
+        out_height: *mut c_int,
+        out_bytes_per_pixel: *mut c_int,
+    );
+    pub fn ImFontAtlas_GetTexDataAsRGBA32(
+        this: *mut ImFontAtlas,
+        out_pixels: *mut *mut c_uchar,
+        out_width: *mut c_int,
+        out_height: *mut c_int,
+        out_bytes_per_pixel: *mut c_int,
+    );
+    pub fn ImFontAtlas_SetTexID(this: *mut ImFontAtlas, id: ImTextureID);
+    pub fn ImFontAtlas_GetGlyphRangesDefault(this: *mut ImFontAtlas) -> *const ImWchar;
+    pub fn ImFontAtlas_GetGlyphRangesKorean(this: *mut ImFontAtlas) -> *const ImWchar;
+    pub fn ImFontAtlas_GetGlyphRangesJapanese(this: *mut ImFontAtlas) -> *const ImWchar;
+    pub fn ImFontAtlas_GetGlyphRangesChineseFull(this: *mut ImFontAtlas) -> *const ImWchar;
+    pub fn ImFontAtlas_GetGlyphRangesChineseSimplifiedCommon(
+        this: *mut ImFontAtlas,
+    ) -> *const ImWchar;
+    pub fn ImFontAtlas_GetGlyphRangesCyrillic(this: *mut ImFontAtlas) -> *const ImWchar;
+    pub fn ImFontAtlas_GetGlyphRangesThai(this: *mut ImFontAtlas) -> *const ImWchar;
+    pub fn ImFontAtlas_AddCustomRectRegular(
+        this: *mut ImFontAtlas,
+        id: c_uint,
+        width: c_int,
+        height: c_int,
+    ) -> c_int;
+    pub fn ImFontAtlas_AddCustomRectFontGlyph(
+        this: *mut ImFontAtlas,
+        font: *mut ImFont,
+        id: ImWchar,
+        width: c_int,
+        height: c_int,
+        advance_x: c_float,
+        offset: ImVec2,
+    ) -> c_int;
+    pub fn ImFontAtlas_GetCustomRectByIndex(
+        this: *mut ImFontAtlas,
+        index: c_int,
+    ) -> *const CustomRect;
+    pub fn ImFontAtlas_CalcCustomRectUV(
+        this: *mut ImFontAtlas,
+        rect: *const CustomRect,
+        out_uv_min: *mut ImVec2,
+        out_uv_max: *mut ImVec2,
+    );
+    pub fn ImFontAtlas_GetMouseCursorTexData(
+        this: *mut ImFontAtlas,
+        cursor: ImGuiMouseCursor,
+        out_offset: *mut ImVec2,
+        out_size: *mut ImVec2,
+        out_uv_border: *mut ImVec2,
+        out_uv_fill: *mut ImVec2,
+    ) -> bool;
+}
+
+// GlyphRangesBuilder
+extern "C" {
+    pub fn GlyphRangesBuilder_GetBit(this: *mut GlyphRangesBuilder, n: c_int) -> bool;
+    pub fn GlyphRangesBuilder_SetBit(this: *mut GlyphRangesBuilder, n: c_int);
+    pub fn GlyphRangesBuilder_AddChar(this: *mut GlyphRangesBuilder, c: ImWchar);
+    pub fn GlyphRangesBuilder_AddText(
+        this: *mut GlyphRangesBuilder,
+        text: *const c_char,
+        text_end: *const c_char,
+    );
+    pub fn GlyphRangesBuilder_AddRanges(this: *mut GlyphRangesBuilder, ranges: *const ImWchar);
+    pub fn GlyphRangesBuilder_BuildRanges(
+        this: *mut GlyphRangesBuilder,
+        out_ranges: *mut ImVector<ImWchar>,
+    );
+}
+
+// CustomRect
+extern "C" {
+    pub fn CustomRect_IsPacked(this: *mut CustomRect) -> bool;
+}
+
+// ImFont
+extern "C" {
+    pub fn ImFont_ClearOutputData(this: *mut ImFont);
+    pub fn ImFont_BuildLookupTable(this: *mut ImFont);
+    pub fn ImFont_FindGlyph(this: *mut ImFont, c: ImWchar) -> *const ImFontGlyph;
+    pub fn ImFont_FindGlyphNoFallback(this: *mut ImFont, c: ImWchar) -> *const ImFontGlyph;
+    pub fn ImFont_SetFallbackChar(this: *mut ImFont, c: ImWchar);
+    pub fn ImFont_GetCharAdvance(this: *mut ImFont, c: ImWchar) -> c_float;
+    pub fn ImFont_IsLoaded(this: *mut ImFont) -> bool;
+    pub fn ImFont_GetDebugName(this: *mut ImFont) -> *const c_char;
+    pub fn ImFont_CalcTextSizeA(
+        this: *mut ImFont,
+        size: c_float,
+        max_width: c_float,
+        wrap_width: c_float,
+        text_begin: *const c_char,
+        text_end: *const c_char,
+        remaining: *mut *const c_char,
+    ) -> ImVec2;
+    pub fn ImFont_CalcWordWrapPositionA(
+        this: *mut ImFont,
+        scale: c_float,
+        text: *const c_char,
+        text_end: *const c_char,
+        wrap_width: c_float,
+    ) -> *const c_char;
+    pub fn ImFont_RenderChar(
+        this: *mut ImFont,
+        draw_list: *mut ImDrawList,
+        size: c_float,
+        pos: ImVec2,
+        col: ImU32,
+        c: c_ushort,
+    );
+    pub fn ImFont_RenderText(
+        this: *mut ImFont,
+        draw_list: *mut ImDrawList,
+        size: c_float,
+        pos: ImVec2,
+        col: ImU32,
+        clip_rect: ImVec4,
+        text_begin: *const c_char,
+        text_end: *const c_char,
+        wrap_width: c_float,
+        cpu_fine_clip: bool,
+    );
+    pub fn ImFont_GrowIndex(this: *mut ImFont, new_size: c_int);
+    pub fn ImFont_AddGlyph(
+        this: *mut ImFont,
+        c: ImWchar,
+        x0: c_float,
+        y0: c_float,
+        x1: c_float,
+        y1: c_float,
+        u0: c_float,
+        v0: c_float,
+        u1: c_float,
+        v1: c_float,
+        advance_x: c_float,
+    );
+    pub fn ImFont_AddRemapChar(this: *mut ImFont, dst: ImWchar, src: ImWchar, overwrite_dst: bool);
 }
