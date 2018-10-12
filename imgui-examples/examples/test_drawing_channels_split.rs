@@ -29,8 +29,7 @@ fn main() {
                         canvas_pos,
                         [canvas_pos.0 + RADIUS, canvas_pos.1 + RADIUS],
                         RED,
-                    )
-                    .thickness(5.0)
+                    ).thickness(5.0)
                     .build();
 
                 channels.set_current(0);

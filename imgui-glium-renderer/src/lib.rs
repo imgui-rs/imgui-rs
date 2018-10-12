@@ -8,7 +8,7 @@ use glium::program;
 use glium::texture;
 use glium::vertex;
 use glium::{DrawError, IndexBuffer, Program, Surface, Texture2d, VertexBuffer};
-use imgui::{DrawList, FrameSize, ImDrawIdx, ImDrawVert, ImGui, Ui, Textures, ImTexture};
+use imgui::{DrawList, FrameSize, ImDrawIdx, ImDrawVert, ImGui, ImTexture, Textures, Ui};
 use std::borrow::Cow;
 use std::fmt;
 use std::rc::Rc;
@@ -137,7 +137,10 @@ impl Renderer {
         let mut idx_start = 0;
         for cmd in draw_list.cmd_buffer {
             let texture_id = cmd.texture_id.into();
-            let texture = self.device_objects.textures.get(texture_id)
+            let texture = self
+                .device_objects
+                .textures
+                .get(texture_id)
                 .ok_or_else(|| RendererError::BadTexture(texture_id))?;
 
             let idx_end = idx_start + cmd.elem_count as usize;

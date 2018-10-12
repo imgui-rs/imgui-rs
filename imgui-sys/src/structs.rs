@@ -111,23 +111,23 @@ pub struct ImDrawVert {
 /// Runtime data for a single font within a parent ImFontAtlas
 #[repr(C)]
 pub struct ImFont {
-    font_size: c_float,
-    scale: c_float,
-    display_offset: ImVec2,
-    glyphs: ImVector<ImFontGlyph>,
-    index_advance_x: ImVector<c_float>,
-    index_lookup: ImVector<c_ushort>,
-    fallback_glyph: *const ImFontGlyph,
-    fallback_advance_x: c_float,
-    fallback_char: ImWchar,
+    pub font_size: c_float,
+    pub scale: c_float,
+    pub display_offset: ImVec2,
+    pub glyphs: ImVector<ImFontGlyph>,
+    pub index_advance_x: ImVector<c_float>,
+    pub index_lookup: ImVector<c_ushort>,
+    pub fallback_glyph: *const ImFontGlyph,
+    pub fallback_advance_x: c_float,
+    pub fallback_char: ImWchar,
 
-    config_data_count: c_short,
-    config_data: *mut ImFontConfig,
-    container_font_atlas: *mut ImFontAtlas,
-    ascent: c_float,
-    descent: c_float,
-    dirty_lookup_tables: bool,
-    metrics_total_surface: c_int,
+    pub config_data_count: c_short,
+    pub config_data: *mut ImFontConfig,
+    pub container_font_atlas: *mut ImFontAtlas,
+    pub ascent: c_float,
+    pub descent: c_float,
+    pub dirty_lookup_tables: bool,
+    pub metrics_total_surface: c_int,
 }
 
 /// Runtime data for multiple fonts, bake multiple fonts into a single texture, TTF/OTF font loader
@@ -139,16 +139,16 @@ pub struct ImFontAtlas {
     pub tex_desired_width: c_int,
     pub tex_glyph_padding: c_int,
 
-    tex_pixels_alpha8: *mut c_uchar,
-    tex_pixels_rgba32: *mut c_uint,
-    tex_width: c_int,
-    tex_height: c_int,
-    tex_uv_scale: ImVec2,
-    tex_uv_white_pixel: ImVec2,
-    fonts: ImVector<*mut ImFont>,
-    custom_rects: ImVector<CustomRect>,
-    config_data: ImVector<ImFontConfig>,
-    custom_rect_ids: [c_int; 1],
+    pub tex_pixels_alpha8: *mut c_uchar,
+    pub tex_pixels_rgba32: *mut c_uint,
+    pub tex_width: c_int,
+    pub tex_height: c_int,
+    pub tex_uv_scale: ImVec2,
+    pub tex_uv_white_pixel: ImVec2,
+    pub fonts: ImVector<*mut ImFont>,
+    pub custom_rects: ImVector<CustomRect>,
+    pub config_data: ImVector<ImFontConfig>,
+    pub custom_rect_ids: [c_int; 1],
 }
 
 /// Configuration data when adding a font or merging fonts

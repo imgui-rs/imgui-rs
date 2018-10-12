@@ -145,7 +145,7 @@ fn example_2(ui: &Ui) {
                 im_str!("Red + ColorPreview::HalfAlpha"),
                 (1.0, 0.0, 0.0, 0.5),
             ).preview(ColorPreview::HalfAlpha)
-                .build();
+            .build();
 
             ui.separator();
             ui.text_wrapped(im_str!(

@@ -778,7 +778,7 @@ fn show_example_menu_file<'a>(ui: &Ui<'a>, state: &mut FileMenuState) {
         ui.checkbox(im_str!("Check"), &mut state.b);
     });
     ui.menu(im_str!("Colors")).build(|| {
-        for &col in ImGuiCol::values() {
+        for &col in ImGuiCol::VARIANTS.iter() {
             ui.menu_item(imgui::get_style_color_name(col)).build();
         }
     });
@@ -879,8 +879,7 @@ fn show_example_app_custom_rendering(ui: &Ui, state: &mut CustomRenderingState, 
                         (x + state.sz * 0.5, y + state.sz * 0.5),
                         state.sz * 0.5,
                         state.col,
-                    )
-                    .num_segments(20)
+                    ).num_segments(20)
                     .thickness(thickness)
                     .build();
                 x += state.sz + spacing;
@@ -909,8 +908,7 @@ fn show_example_app_custom_rendering(ui: &Ui, state: &mut CustomRenderingState, 
                         (x + state.sz, y + state.sz - 0.5),
                         (x, y + state.sz - 0.5),
                         state.col,
-                    )
-                    .thickness(thickness)
+                    ).thickness(thickness)
                     .build();
                 x += state.sz + spacing;
                 draw_list
@@ -935,8 +933,7 @@ fn show_example_app_custom_rendering(ui: &Ui, state: &mut CustomRenderingState, 
                         (x + state.sz - state.sz * 1.3, y + state.sz - state.sz * 0.3),
                         (x + state.sz, y + state.sz),
                         state.col,
-                    )
-                    .thickness(thickness)
+                    ).thickness(thickness)
                     .build();
                 y += state.sz + spacing;
             }
@@ -946,8 +943,7 @@ fn show_example_app_custom_rendering(ui: &Ui, state: &mut CustomRenderingState, 
                     (x + state.sz * 0.5, y + state.sz * 0.5),
                     state.sz * 0.5,
                     state.col,
-                )
-                .num_segments(32)
+                ).num_segments(32)
                 .filled(true)
                 .build();
             x += state.sz + spacing;
@@ -976,8 +972,7 @@ fn show_example_app_custom_rendering(ui: &Ui, state: &mut CustomRenderingState, 
                     (x + state.sz, y + state.sz - 0.5),
                     (x, y + state.sz - 0.5),
                     state.col,
-                )
-                .filled(true)
+                ).filled(true)
                 .build();
             x += state.sz + spacing;
             const MULTICOLOR_RECT_CORNER_COLOR1: [f32; 3] = [0.0, 0.0, 0.0];
@@ -1046,8 +1041,7 @@ fn show_example_app_custom_rendering(ui: &Ui, state: &mut CustomRenderingState, 
                     canvas_pos,
                     (canvas_pos.0 + canvas_size.0, canvas_pos.1 + canvas_size.1),
                     CANVAS_BORDER_COLOR,
-                )
-                .build();
+                ).build();
 
             let mut adding_preview = false;
             ui.invisible_button(im_str!("canvas"), canvas_size);
@@ -1088,8 +1082,7 @@ fn show_example_app_custom_rendering(ui: &Ui, state: &mut CustomRenderingState, 
                                 (canvas_pos.0 + p1.0, canvas_pos.1 + p1.1),
                                 (canvas_pos.0 + p2.0, canvas_pos.1 + p2.1),
                                 LINE_COLOR,
-                            )
-                            .thickness(2.0)
+                            ).thickness(2.0)
                             .build();
                     }
                 },

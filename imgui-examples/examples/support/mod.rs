@@ -30,22 +30,22 @@ pub fn run<F: FnMut(&Ui) -> bool>(title: String, clear_color: [f32; 4], mut run_
 
     let font_size = (13.0 * hidpi_factor) as f32;
 
+    imgui.fonts().add_default_font_with_config(
+        ImFontConfig::new()
+            .oversample_h(1)
+            .pixel_snap_h(true)
+            .size_pixels(font_size),
+    );
+
     imgui.fonts().add_font_with_config(
         include_bytes!("../mplus-1p-regular.ttf"),
         ImFontConfig::new()
+            .merge_mode(true)
             .oversample_h(1)
             .pixel_snap_h(true)
             .size_pixels(font_size)
             .rasterizer_multiply(1.75),
         &FontGlyphRange::japanese(),
-    );
-
-    imgui.fonts().add_default_font_with_config(
-        ImFontConfig::new()
-            .merge_mode(true)
-            .oversample_h(1)
-            .pixel_snap_h(true)
-            .size_pixels(font_size),
     );
 
     imgui.set_font_global_scale((1.0 / hidpi_factor) as f32);
@@ -155,11 +155,12 @@ pub fn run<F: FnMut(&Ui) -> bool>(title: String, clear_color: [f32; 4], mut run_
                 ImGuiMouseCursor::None => unreachable!("mouse_cursor was None!"),
                 ImGuiMouseCursor::Arrow => glutin::MouseCursor::Arrow,
                 ImGuiMouseCursor::TextInput => glutin::MouseCursor::Text,
-                ImGuiMouseCursor::Move => glutin::MouseCursor::Move,
+                ImGuiMouseCursor::ResizeAll => glutin::MouseCursor::Move,
                 ImGuiMouseCursor::ResizeNS => glutin::MouseCursor::NsResize,
                 ImGuiMouseCursor::ResizeEW => glutin::MouseCursor::EwResize,
                 ImGuiMouseCursor::ResizeNESW => glutin::MouseCursor::NeswResize,
                 ImGuiMouseCursor::ResizeNWSE => glutin::MouseCursor::NwseResize,
+                ImGuiMouseCursor::Hand => glutin::MouseCursor::Hand,
             });
         }
 
