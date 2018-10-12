@@ -129,10 +129,12 @@ impl Renderer {
 
         let (fb_width, fb_height) = fb_size;
 
-        self.device_objects
-            .upload_vertex_buffer(&self.ctx, draw_list.vtx_buffer)?;
-        self.device_objects
-            .upload_index_buffer(&self.ctx, draw_list.idx_buffer)?;
+        let vtx_buffer = VertexBuffer::immutable(&self.ctx, draw_list.vtx_buffer)?;
+        let idx_buffer = IndexBuffer::immutable(
+            &self.ctx,
+            PrimitiveType::TrianglesList,
+            draw_list.idx_buffer,
+        )?;
 
         let mut idx_start = 0;
         for cmd in draw_list.cmd_buffer {
@@ -146,10 +148,8 @@ impl Renderer {
             let idx_end = idx_start + cmd.elem_count as usize;
 
             surface.draw(
-                &self.device_objects.vertex_buffer,
-                &self
-                    .device_objects
-                    .index_buffer
+                &vtx_buffer,
+                &idx_buffer
                     .slice(idx_start..idx_end)
                     .expect("Invalid index buffer range"),
                 &self.device_objects.program,
@@ -183,8 +183,6 @@ impl Renderer {
 }
 
 pub struct DeviceObjects {
-    vertex_buffer: VertexBuffer<ImDrawVert>,
-    index_buffer: IndexBuffer<ImDrawIdx>,
     program: Program,
     textures: Textures<Texture2d>,
 }
@@ -226,9 +224,6 @@ impl DeviceObjects {
     pub fn init<F: Facade>(im_gui: &mut ImGui, ctx: &F) -> RendererResult<DeviceObjects> {
         use glium::texture::{ClientFormat, RawImage2d};
 
-        let vertex_buffer = VertexBuffer::empty_dynamic(ctx, 0)?;
-        let index_buffer = IndexBuffer::empty_dynamic(ctx, PrimitiveType::TrianglesList, 0)?;
-
         let program = compile_default_program(ctx)?;
         let texture = im_gui.prepare_texture(|handle| {
             let data = RawImage2d {
@@ -243,44 +238,8 @@ impl DeviceObjects {
         im_gui.set_font_texture_id(textures.insert(texture));
 
         Ok(DeviceObjects {
-            vertex_buffer: vertex_buffer,
-            index_buffer: index_buffer,
             program: program,
             textures: textures,
         })
-    }
-    pub fn upload_vertex_buffer<F: Facade>(
-        &mut self,
-        ctx: &F,
-        vtx_buffer: &[ImDrawVert],
-    ) -> RendererResult<()> {
-        self.vertex_buffer.invalidate();
-        if let Some(slice) = self.vertex_buffer.slice_mut(0..vtx_buffer.len()) {
-            slice.write(vtx_buffer);
-            return Ok(());
-        }
-        self.vertex_buffer = VertexBuffer::dynamic(ctx, vtx_buffer)?;
-        let _ = ctx.get_context().insert_debug_marker(&format!(
-            "imgui-rs: resized vertex buffer to {} bytes",
-            self.vertex_buffer.get_size()
-        ));
-        Ok(())
-    }
-    pub fn upload_index_buffer<F: Facade>(
-        &mut self,
-        ctx: &F,
-        idx_buffer: &[ImDrawIdx],
-    ) -> RendererResult<()> {
-        self.index_buffer.invalidate();
-        if let Some(slice) = self.index_buffer.slice_mut(0..idx_buffer.len()) {
-            slice.write(idx_buffer);
-            return Ok(());
-        }
-        self.index_buffer = IndexBuffer::dynamic(ctx, PrimitiveType::TrianglesList, idx_buffer)?;
-        let _ = ctx.get_context().insert_debug_marker(&format!(
-            "imgui-rs: resized index buffer to {} bytes",
-            self.index_buffer.get_size()
-        ));
-        Ok(())
     }
 }
