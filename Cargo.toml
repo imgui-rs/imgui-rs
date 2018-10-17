@@ -17,6 +17,8 @@ travis-ci = { repository = "Gekkio/imgui-rs" }
 glium = { version = "0.23", default-features = false, optional = true }
 gfx = { version = "0.17", optional = true }
 imgui-sys = { version = "0.0.23-pre", path = "imgui-sys" }
+lazy_static = "1.1"
+parking_lot = "0.7"
 
 [workspace]
 members = [

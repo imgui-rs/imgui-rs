@@ -5,10 +5,27 @@ use std::ops::{Deref, Index, RangeFull};
 use std::os::raw::c_char;
 use std::str;
 
+#[macro_export]
+macro_rules! im_str {
+    ($e:tt) => ({
+        unsafe {
+          $crate::ImStr::from_utf8_with_nul_unchecked(concat!($e, "\0").as_bytes())
+        }
+    });
+    ($e:tt, $($arg:tt)*) => ({
+        unsafe {
+          &$crate::ImString::from_utf8_with_nul_unchecked(
+            format!(concat!($e, "\0"), $($arg)*).into_bytes())
+        }
+    })
+}
+
+/// A UTF-8 encoded, growable, implicitly null-terminated string.
 #[derive(Clone, Hash, Ord, Eq, PartialOrd, PartialEq)]
 pub struct ImString(Vec<u8>);
 
 impl ImString {
+    /// Creates a new ImString from an existing string.
     pub fn new<T: Into<String>>(value: T) -> ImString {
         unsafe { ImString::from_utf8_unchecked(value.into().into_bytes()) }
     }
@@ -135,6 +152,7 @@ impl Deref for ImString {
     }
 }
 
+/// A UTF-8 encoded, implicitly null-terminated string slice.
 #[derive(Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub struct ImStr(CStr);
 
@@ -155,13 +173,18 @@ impl ImStr {
     pub fn new<S: AsRef<ImStr> + ?Sized>(s: &S) -> &ImStr {
         s.as_ref()
     }
+    /// Converts a slice of bytes to an ImGui string slice without checking for valid UTF-8 or null
+    /// termination.
     pub unsafe fn from_utf8_with_nul_unchecked(bytes: &[u8]) -> &ImStr {
         &*(bytes as *const [u8] as *const ImStr)
     }
+    /// Converts an ImGui string slice to a raw pointer
     pub fn as_ptr(&self) -> *const c_char {
         self.0.as_ptr()
     }
+    /// Converts an ImGui string slice to a normal string slice
     pub fn to_str(&self) -> &str {
+        // CStr::to_bytes does *not* include the null terminator
         unsafe { str::from_utf8_unchecked(self.0.to_bytes()) }
     }
 }
