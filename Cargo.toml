@@ -14,6 +14,8 @@ readme = "README.markdown"
 travis-ci = { repository = "Gekkio/imgui-rs" }
 
 [dependencies]
+glium = { version = "0.23", default-features = false, optional = true }
+gfx = { version = "0.17", optional = true }
 imgui-sys = { version = "0.0.23-pre", path = "imgui-sys" }
 
 [workspace]
@@ -26,4 +28,5 @@ members = [
 exclude = [
     "imgui-examples",
     "imgui-glium-examples",
+    "imgui-sys-bindgen"
 ]
