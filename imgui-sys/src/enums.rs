@@ -370,6 +370,7 @@ impl ImGuiNavInput {
         ImGuiNavInput::TweakFast,
     ];
     pub const COUNT: usize = 16;
+    pub(crate) const COUNT_INTERNAL: usize = 21;
 }
 
 /// A variable identifier for styling

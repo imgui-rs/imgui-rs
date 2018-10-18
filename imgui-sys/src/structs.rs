@@ -257,12 +257,12 @@ pub struct ImGuiIO {
     pub key_super: bool,
     pub keys_down: [bool; 512],
     pub input_characters: [ImWchar; 16 + 1],
-    pub nav_inputs: [c_float; ImGuiNavInput::COUNT],
+    pub nav_inputs: [c_float; ImGuiNavInput::COUNT_INTERNAL],
 
     pub want_capture_mouse: bool,
     pub want_capture_keyboard: bool,
     pub want_text_input: bool,
-    pub want_move_mouse: bool,
+    pub want_set_mouse_pos: bool,
     pub want_save_ini_settings: bool,
     pub nav_active: bool,
     pub nav_visible: bool,
@@ -287,8 +287,8 @@ pub struct ImGuiIO {
     mouse_drag_max_distance_sqr: [c_float; 5],
     keys_down_duration: [c_float; 512],
     keys_down_duration_prev: [c_float; 512],
-    nav_inputs_down_duration: [c_float; ImGuiNavInput::COUNT],
-    nav_inputs_down_duration_prev: [c_float; ImGuiNavInput::COUNT],
+    nav_inputs_down_duration: [c_float; ImGuiNavInput::COUNT_INTERNAL],
+    nav_inputs_down_duration_prev: [c_float; ImGuiNavInput::COUNT_INTERNAL],
 }
 
 /// Helper to manually clip large list of items
