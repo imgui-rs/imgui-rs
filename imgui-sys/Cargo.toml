@@ -13,5 +13,8 @@ build = "build.rs"
 [badges]
 travis-ci = { repository = "Gekkio/imgui-rs" }
 
+[target.'cfg(windows)'.dependencies]
+winapi = { version = "0.3", features = ["imm"] }
+
 [build-dependencies]
 cc = "1.0"
