@@ -36,7 +36,11 @@ pub fn run<F: FnMut(&Ui) -> bool>(title: String, clear_color: [f32; 4], mut run_
         } else if version.major >= 4 {
             Shaders::GlSl400
         } else if version.major >= 3 {
-            Shaders::GlSl130
+            if version.minor >= 2 {
+                Shaders::GlSl150
+            } else {
+                Shaders::GlSl130
+            }
         } else {
             Shaders::GlSl110
         }

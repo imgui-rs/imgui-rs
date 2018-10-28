@@ -197,6 +197,11 @@ fn compile_default_program<F: Facade>(
             fragment: include_str!("shader/glsl_400.frag"),
             outputs_srgb: true,
         },
+        150 => {
+            vertex: include_str!("shader/glsl_150.vert"),
+            fragment: include_str!("shader/glsl_150.frag"),
+            outputs_srgb: true,
+        },
         130 => {
             vertex: include_str!("shader/glsl_130.vert"),
             fragment: include_str!("shader/glsl_130.frag"),

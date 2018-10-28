@@ -97,6 +97,7 @@ extended_defines! {
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
 pub enum Shaders {
     GlSl400,   // OpenGL 4.0+
+    GlSl150,   // OpenGL 3.2+
     GlSl130,   // OpenGL 3.0+
     GlSl110,   // OpenGL 2.0+
     GlSlEs300, // OpenGL ES 3.0+
@@ -110,6 +111,10 @@ impl Shaders {
             GlSl400 => (
                 include_bytes!("shader/glsl_400.vert"),
                 include_bytes!("shader/glsl_400.frag"),
+            ),
+            GlSl150 => (
+                include_bytes!("shader/glsl_150.vert"),
+                include_bytes!("shader/glsl_150.frag"),
             ),
             GlSl130 => (
                 include_bytes!("shader/glsl_130.vert"),
