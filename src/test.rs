@@ -8,5 +8,5 @@ lazy_static! {
 
 pub fn test_ctx() -> (ReentrantMutexGuard<'static, ()>, Context) {
     let guard = TEST_MUTEX.lock();
-    (guard, Context::new())
+    (guard, Context::create())
 }

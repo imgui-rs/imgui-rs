@@ -6,6 +6,7 @@ use crate::sys;
 pub struct Style(pub sys::ImGuiStyle);
 
 impl Style {
+    /// Scales all sizes in the style
     pub fn scale_all_sizes(&mut self, scale_factor: f32) {
         unsafe {
             sys::ImGuiStyle_ScaleAllSizes(&mut self.0, scale_factor);
@@ -33,6 +34,9 @@ impl Style {
         }
         self
     }
+}
+
+impl Style {
     pub fn alpha(&self) -> f32 {
         self.0.Alpha
     }
@@ -256,6 +260,17 @@ impl Style {
     pub fn set_color(&mut self, col: StyleColor, value: (f32, f32, f32, f32)) -> &mut Self {
         self.0.Colors[col as usize] = value.into();
         self
+    }
+}
+
+impl Style {
+    /// Returns an immutable reference to the underlying raw Dear ImGui style
+    pub fn raw(&self) -> &sys::ImGuiStyle {
+        &self.0
+    }
+    /// Returns a mutable reference to the underlying raw Dear ImGui style
+    pub fn raw_mut(&mut self) -> &mut sys::ImGuiStyle {
+        &mut self.0
     }
 }
 

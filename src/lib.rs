@@ -5,6 +5,7 @@ extern crate parking_lot;
 pub extern crate imgui_sys as sys;
 
 mod context;
+mod font_atlas;
 mod string;
 mod style;
 #[cfg(test)]
@@ -14,6 +15,7 @@ use std::ffi::CStr;
 use std::str;
 
 pub use context::*;
+pub use font_atlas::*;
 pub use string::*;
 pub use style::*;
 
