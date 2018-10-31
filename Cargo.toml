@@ -17,10 +17,12 @@ imgui-sys = { version = "0.0.22-pre", path = "imgui-sys" }
 
 [workspace]
 members = [
-    "imgui-examples",
-    "imgui-glium-examples",
     "imgui-sys",
     "imgui-gfx-renderer",
     "imgui-glium-renderer",
     "imgui-glutin-support"
+]
+exclude = [
+    "imgui-examples",
+    "imgui-glium-examples",
 ]
