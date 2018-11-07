@@ -28,3 +28,5 @@ before_install:
 script:
   - cargo build --all --verbose
   - cargo test --all --verbose
+  - cargo build --all --verbose --manifest-path imgui-examples/Cargo.toml
+  - cargo build --all --verbose --manifest-path imgui-glium-examples/Cargo.toml

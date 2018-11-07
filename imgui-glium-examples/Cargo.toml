@@ -1,17 +1,15 @@
 [package]
-name = "imgui-examples"
+name = "imgui-glium-examples"
 version = "0.0.22-pre"
 authors = ["Joonas Javanainen <joonas.javanainen@gmail.com>", "imgui-rs contributors"]
-description = "imgui crate examples"
+description = "imgui crate examples using Glium backend"
 homepage = "https://github.com/Gekkio/imgui-rs"
 repository = "https://github.com/Gekkio/imgui-rs"
 license = "MIT/Apache-2.0"
 publish = false
 
 [dev-dependencies]
-gfx = "0.17"
-gfx_window_glutin = "0.26"
-glutin = "0.18"
+glium = { version = "0.22", default-features = true }
 imgui = { version = "0.0.22-pre", path = "../" }
-imgui-gfx-renderer = { version = "0.0.22-pre", path = "../imgui-gfx-renderer" }
+imgui-glium-renderer = { version = "0.0.22-pre", path = "../imgui-glium-renderer" }
 imgui-glutin-support = { version = "0.0.22-pre", path = "../imgui-glutin-support" }
