@@ -77,14 +77,16 @@ impl CustomTexturesApp {
 
     fn show_textures(&self, ui: &Ui) {
         ui.window(im_str!("Hello textures"))
-            .size((300.0, 400.0), ImGuiCond::FirstUseEver)
+            .size((400.0, 600.0), ImGuiCond::FirstUseEver)
             .build(|| {
                 ui.text(im_str!("Hello textures!"));
                 if let Some(my_texture_id) = self.my_texture_id {
+                    ui.text("Some generated texture");
                     ui.image(my_texture_id, (100.0, 100.0)).build();
                 }
 
                 if let Some(lenna) = &self.lenna {
+                    ui.text("Say hello to Lenna.jpg");
                     lenna.show(ui);
                 }
             });
