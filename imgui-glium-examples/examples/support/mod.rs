@@ -32,7 +32,7 @@ pub fn run<F: FnMut(&Ui) -> bool>(title: String, clear_color: [f32; 4], mut run_
     );
 
     imgui.fonts().add_font_with_config(
-        include_bytes!("../mplus-1p-regular.ttf"),
+        include_bytes!("../../../resources/mplus-1p-regular.ttf"),
         ImFontConfig::new()
             .merge_mode(true)
             .oversample_h(1)
