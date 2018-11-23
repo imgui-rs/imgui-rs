@@ -1,15 +1,18 @@
 extern crate glium;
+extern crate image;
 extern crate imgui;
 extern crate imgui_glium_renderer;
 extern crate imgui_glutin_support;
 
 use std::borrow::Cow;
+use std::io::Cursor;
 
 use glium::{
     backend::Facade,
     texture::{ClientFormat, RawImage2d},
     Texture2d,
 };
+use image::{jpeg::JPEGDecoder, DecodingResult, ImageDecoder};
 use imgui::*;
 
 mod support;
@@ -20,6 +23,12 @@ const CLEAR_COLOR: [f32; 4] = [1.0, 1.0, 1.0, 1.0];
 #[derive(Default)]
 struct CustomTexturesApp {
     my_texture_id: Option<ImTexture>,
+    lenna: Option<Lenna>,
+}
+
+struct Lenna {
+    texture_id: ImTexture,
+    size: (f32, f32),
 }
 
 impl CustomTexturesApp {
@@ -53,6 +62,10 @@ impl CustomTexturesApp {
 
             self.my_texture_id = Some(texture_id);
         }
+
+        if self.lenna.is_none() {
+            self.lenna = Some(Lenna::new(gl_ctx, textures));
+        }
     }
 
     fn show_textures(&self, ui: &Ui) {
@@ -63,7 +76,45 @@ impl CustomTexturesApp {
                 if let Some(my_texture_id) = self.my_texture_id {
                     ui.image(my_texture_id, (100.0, 100.0)).build();
                 }
+
+                if let Some(lenna) = &self.lenna {
+                    lenna.show(ui);
+                }
             });
+    }
+}
+
+impl Lenna {
+    fn new<F>(gl_ctx: &F, textures: &mut Textures) -> Self
+    where
+        F: Facade,
+    {
+        let lenna_bytes = include_bytes!("../../resources/Lenna.jpg");
+        let byte_stream = Cursor::new(lenna_bytes.as_ref());
+        let mut decoder = JPEGDecoder::new(byte_stream);
+
+        let (width, height) = decoder.dimensions().expect("Could not read dimensions");
+        let image = decoder.read_image().expect("Could not read image");
+        let raw = if let DecodingResult::U8(data) = &image {
+            RawImage2d {
+                data: Cow::Borrowed(data),
+                width,
+                height,
+                format: ClientFormat::U8U8U8,
+            }
+        } else {
+            unimplemented!("I only know how to deal with U8 data")
+        };
+        let gl_texture = Texture2d::new(gl_ctx, raw).expect("Could not create texture");
+        let texture_id = textures.insert(gl_texture);
+        Lenna {
+            texture_id,
+            size: (width as f32, height as f32),
+        }
+    }
+
+    fn show(&self, ui: &Ui) {
+        ui.image(self.texture_id, self.size).build();
     }
 }
 
