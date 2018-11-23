@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Added
+
+- `Ui::with_test_wrap_pos`
+
 ### Changed
 
 - Upgrade to cimgui 1.65.2 / imgui 1.65. **This is a very big update, so there
