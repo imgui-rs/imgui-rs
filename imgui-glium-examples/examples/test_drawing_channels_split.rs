@@ -13,7 +13,7 @@ fn main() {
     support::run(
         "test_drawing_channels_split".to_owned(),
         CLEAR_COLOR,
-        |ui| {
+        |ui, _, _| {
             let draw_list = ui.get_window_draw_list();
             // Will draw channel 0 first, then channel 1, whatever the order of
             // the calls in the code.
