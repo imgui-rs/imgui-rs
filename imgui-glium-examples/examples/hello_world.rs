@@ -11,7 +11,9 @@ mod support;
 const CLEAR_COLOR: [f32; 4] = [1.0, 1.0, 1.0, 1.0];
 
 fn main() {
-    support::run("hello_world.rs".to_owned(), CLEAR_COLOR, hello_world);
+    support::run("hello_world.rs".to_owned(), CLEAR_COLOR, |ui, _, _| {
+        hello_world(ui)
+    });
 }
 
 fn hello_world<'a>(ui: &Ui<'a>) -> bool {

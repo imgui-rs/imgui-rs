@@ -1,8 +1,18 @@
+use glium::{
+    backend::{Context, Facade},
+    Texture2d,
+};
 use imgui::{FontGlyphRange, ImFontConfig, ImGui, Ui};
 use imgui_glutin_support;
+use std::rc::Rc;
 use std::time::Instant;
 
-pub fn run<F: FnMut(&Ui) -> bool>(title: String, clear_color: [f32; 4], mut run_ui: F) {
+pub type Textures = imgui::Textures<Texture2d>;
+
+pub fn run<F>(title: String, clear_color: [f32; 4], mut run_ui: F)
+where
+    F: FnMut(&Ui, &Rc<Context>, &mut Textures) -> bool,
+{
     use glium::glutin;
     use glium::{Display, Surface};
     use imgui_glium_renderer::Renderer;
@@ -32,7 +42,7 @@ pub fn run<F: FnMut(&Ui) -> bool>(title: String, clear_color: [f32; 4], mut run_
     );
 
     imgui.fonts().add_font_with_config(
-        include_bytes!("../mplus-1p-regular.ttf"),
+        include_bytes!("../../../resources/mplus-1p-regular.ttf"),
         ImFontConfig::new()
             .merge_mode(true)
             .oversample_h(1)
@@ -80,7 +90,7 @@ pub fn run<F: FnMut(&Ui) -> bool>(title: String, clear_color: [f32; 4], mut run_
         let frame_size = imgui_glutin_support::get_frame_size(&window, hidpi_factor).unwrap();
 
         let ui = imgui.frame(frame_size, delta_s);
-        if !run_ui(&ui) {
+        if !run_ui(&ui, display.get_context(), renderer.textures()) {
             break;
         }
 

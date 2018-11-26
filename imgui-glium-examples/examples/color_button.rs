@@ -32,7 +32,7 @@ impl Default for State {
 
 fn main() {
     let mut state = State::default();
-    support::run("color_button.rs".to_owned(), CLEAR_COLOR, |ui| {
+    support::run("color_button.rs".to_owned(), CLEAR_COLOR, |ui, _, _| {
         example_selector(&mut state, ui);
         match state.example {
             1 => example_1(&mut state, ui),
