@@ -827,6 +827,19 @@ impl<'ui> Ui<'ui> {
             sys::igTextWrapped(fmt_ptr(), text.as_ptr());
         }
     }
+    /// Set word-wrapping for `text_*()` commands.
+    /// - `< 0.0`: no wrapping;
+    /// - `= 0.0`: wrap to end of window (or column);
+    /// - `> 0.0`: wrap at `wrap_pos_x` position in window local space
+    pub fn with_text_wrap_pos<F: FnOnce()>(&self, wrap_pos_x: f32, f: F) {
+        unsafe {
+            sys::igPushTextWrapPos(wrap_pos_x);
+        }
+        f();
+        unsafe {
+            sys::igPopTextWrapPos();
+        }
+    }
     pub fn label_text<'p>(&self, label: &'p ImStr, text: &'p ImStr) {
         unsafe {
             sys::igLabelText(label.as_ptr(), fmt_ptr(), text.as_ptr());
