@@ -316,8 +316,17 @@ extern "C" {
     pub fn igGetScrollMaxY() -> c_float;
     pub fn igSetScrollX(scroll_x: c_float);
     pub fn igSetScrollY(scroll_y: c_float);
-    pub fn igSetScrollHere(center_y_ratio: c_float);
+    pub fn igSetScrollHereY(center_y_ratio: c_float);
     pub fn igSetScrollFromPosY(pos_y: c_float, center_y_ratio: c_float);
+}
+
+#[deprecated(
+    since = "0.0.22",
+    note = "please use igSetScrollHereY instead"
+)]
+#[allow(non_snake_case)]
+pub unsafe fn igSetScrollHere(center_y_ratio: c_float) {
+    igSetScrollHereY(center_y_ratio)
 }
 
 // Parameter stacks (shared)
@@ -652,6 +661,7 @@ extern "C" {
         v_rad: *mut c_float,
         v_degrees_min: c_float,
         v_degrees_max: c_float,
+        format: *const c_char,
     ) -> bool;
     pub fn igSliderInt(
         label: *const c_char,
@@ -1082,6 +1092,7 @@ extern "C" {
         flags: ImGuiDragDropFlags,
     ) -> *const ImGuiPayload;
     pub fn igEndDragDropTarget();
+    pub fn igGetDragDropPayload() -> *const ImGuiPayload;
 }
 
 // Clipping

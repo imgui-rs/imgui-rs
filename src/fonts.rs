@@ -1,6 +1,7 @@
+use std::f32;
 use std::marker::PhantomData;
 use std::mem;
-use std::os::raw::{c_int, c_void};
+use std::os::raw::{c_float, c_int, c_void};
 use std::ptr;
 use sys;
 
@@ -203,8 +204,9 @@ impl ImFontConfig {
 
     fn make_config(self) -> sys::ImFontConfig {
         let mut config = unsafe {
-            let mut config = mem::uninitialized();
-            sys::ImFontConfig_DefaultConstructor(&mut config);
+            let mut config = mem::zeroed::<sys::ImFontConfig>();
+            config.font_data_owned_by_atlas = true;
+            config.glyph_max_advance_x = f32::MAX as c_float;
             config
         };
         config.size_pixels = self.size_pixels;

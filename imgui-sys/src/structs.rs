@@ -116,7 +116,7 @@ pub struct ImFont {
     pub display_offset: ImVec2,
     pub glyphs: ImVector<ImFontGlyph>,
     pub index_advance_x: ImVector<c_float>,
-    pub index_lookup: ImVector<c_ushort>,
+    pub index_lookup: ImVector<ImWchar>,
     pub fallback_glyph: *const ImFontGlyph,
     pub fallback_advance_x: c_float,
     pub fallback_char: ImWchar,
@@ -875,11 +875,6 @@ extern "C" {
     pub fn ImDrawData_ScaleClipRects(this: *mut ImDrawData, sc: ImVec2);
 }
 
-// ImFontConfig
-extern "C" {
-    pub fn ImFontConfig_DefaultConstructor(config: *mut ImFontConfig);
-}
-
 // ImFontAtlas
 extern "C" {
     pub fn ImFontAtlas_AddFont(
@@ -1039,7 +1034,7 @@ extern "C" {
         size: c_float,
         pos: ImVec2,
         col: ImU32,
-        c: c_ushort,
+        c: ImWchar,
     );
     pub fn ImFont_RenderText(
         this: *mut ImFont,

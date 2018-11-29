@@ -378,10 +378,12 @@ bitflags!(
         const NoCollapse = 1 << 5;
         /// Resize every window to its content every frame.
         const AlwaysAutoResize = 1 << 6;
+        /// Disable drawing background color (WindowBg, etc.) and outside border
+        const NoBackground = 1 << 7;
         /// Never load/save settings in .ini file.
         const NoSavedSettings = 1 << 8;
-        /// Disable catching mouse or keyboard inputs;hovering test with pass through.
-        const NoInputs = 1 << 9;
+        /// Disable catching mouse, hovering test with pass through.
+        const NoMouseInputs = 1 << 9;
         /// Has a menu-bar.
         const MenuBar = 1 << 10;
         /// Allow horizontal scrollbar to appear (off by default).
@@ -405,5 +407,9 @@ bitflags!(
         const NoNavFocus = 1 << 19;
 
         const NoNav = ImGuiWindowFlags::NoNavInputs.bits | ImGuiWindowFlags::NoNavFocus.bits;
+        const NoDecoration = ImGuiWindowFlags::NoTitleBar.bits | ImGuiWindowFlags::NoResize.bits
+            | ImGuiWindowFlags::NoScrollbar.bits | ImGuiWindowFlags::NoCollapse.bits;
+        const NoInputs = ImGuiWindowFlags::NoMouseInputs.bits | ImGuiWindowFlags::NoNavInputs.bits
+            | ImGuiWindowFlags::NoNavFocus.bits;
     }
 );
