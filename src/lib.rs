@@ -605,12 +605,12 @@ impl<'ui> Ui<'ui> {
     }
     /// Get current window's size in pixels
     pub fn get_window_size(&self) -> (f32, f32) {
-        let size = unsafe { sys::igGetWindowSize() };
+        let size = unsafe { sys::igGetWindowSize_nonUDT2() };
         size.into()
     }
     /// Get current window's position in pixels
     pub fn get_window_pos(&self) -> (f32, f32) {
-        let size = unsafe { sys::igGetWindowPos() };
+        let size = unsafe { sys::igGetWindowPos_nonUDT2() };
         size.into()
     }
 }
@@ -696,7 +696,7 @@ impl<'ui> Ui<'ui> {
     /// This is especially useful for drawing, as the drawing API uses
     /// screen coordiantes.
     pub fn get_cursor_screen_pos(&self) -> (f32, f32) {
-        let size = unsafe { sys::igGetCursorScreenPos() };
+        let size = unsafe { sys::igGetCursorScreenPos_nonUDT2() };
         size.into()
     }
 
@@ -708,7 +708,7 @@ impl<'ui> Ui<'ui> {
 
     /// Get cursor position on the screen, in window coordinates.
     pub fn get_cursor_pos(&self) -> (f32, f32) {
-        let size = unsafe { sys::igGetCursorPos() };
+        let size = unsafe { sys::igGetCursorPos_nonUDT2() };
         size.into()
     }
 
@@ -721,7 +721,7 @@ impl<'ui> Ui<'ui> {
     /// Get available space left between the cursor and the edges of the current
     /// window.
     pub fn get_content_region_avail(&self) -> (f32, f32) {
-        let size = unsafe { sys::igGetContentRegionAvail() };
+        let size = unsafe { sys::igGetContentRegionAvail_nonUDT2() };
         size.into()
     }
 }
@@ -1359,7 +1359,7 @@ impl<'ui> Ui<'ui> {
         wrap_width: f32,
     ) -> ImVec2 {
         unsafe {
-            sys::igCalcTextSize(
+            sys::igCalcTextSize_nonUDT2(
                 text.as_ptr(),
                 std::ptr::null(),
                 hide_text_after_double_hash,
@@ -1376,7 +1376,7 @@ impl<'ui> Ui<'ui> {
     }
     /// Get previously drawn item's size
     pub fn get_item_rect_size(&self) -> (f32, f32) {
-        let size = unsafe { sys::igGetItemRectSize() };
+        let size = unsafe { sys::igGetItemRectSize_nonUDT2() };
         size.into()
     }
 }

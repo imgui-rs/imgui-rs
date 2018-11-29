@@ -225,15 +225,15 @@ extern "C" {
     pub fn igIsWindowFocused(flags: ImGuiFocusedFlags) -> bool;
     pub fn igIsWindowHovered(flags: ImGuiHoveredFlags) -> bool;
     pub fn igGetWindowDrawList() -> *mut ImDrawList;
-    pub fn igGetWindowPos() -> ImVec2;
-    pub fn igGetWindowSize() -> ImVec2;
+    pub fn igGetWindowPos_nonUDT2() -> ImVec2;
+    pub fn igGetWindowSize_nonUDT2() -> ImVec2;
     pub fn igGetWindowWidth() -> c_float;
     pub fn igGetWindowHeight() -> c_float;
-    pub fn igGetContentRegionMax() -> ImVec2;
-    pub fn igGetContentRegionAvail() -> ImVec2;
+    pub fn igGetContentRegionMax_nonUDT2() -> ImVec2;
+    pub fn igGetContentRegionAvail_nonUDT2() -> ImVec2;
     pub fn igGetContentRegionAvailWidth() -> c_float;
-    pub fn igGetWindowContentRegionMin() -> ImVec2;
-    pub fn igGetWindowContentRegionMax() -> ImVec2;
+    pub fn igGetWindowContentRegionMin_nonUDT2() -> ImVec2;
+    pub fn igGetWindowContentRegionMax_nonUDT2() -> ImVec2;
     pub fn igGetWindowContentRegionWidth() -> c_float;
 
     pub fn igSetNextWindowPos(pos: ImVec2, cond: ImGuiCond, pivot: ImVec2);
@@ -257,6 +257,55 @@ extern "C" {
     pub fn igSetWindowSizeStr(name: *const c_char, size: ImVec2, cond: ImGuiCond);
     pub fn igSetWindowCollapsedStr(name: *const c_char, collapsed: bool, cond: ImGuiCond);
     pub fn igSetWindowFocusStr(name: *const c_char);
+}
+
+#[deprecated(
+    since = "0.0.22",
+    note = "please use the _nonUDT2 suffixed version of this function"
+)]
+#[allow(non_snake_case)]
+pub unsafe fn igGetWindowPos() -> ImVec2 {
+    igGetWindowPos_nonUDT2()
+}
+#[deprecated(
+    since = "0.0.22",
+    note = "please use the _nonUDT2 suffixed version of this function"
+)]
+#[allow(non_snake_case)]
+pub unsafe fn igGetWindowSize() -> ImVec2 {
+    igGetWindowSize_nonUDT2()
+}
+#[deprecated(
+    since = "0.0.22",
+    note = "please use the _nonUDT2 suffixed version of this function"
+)]
+#[allow(non_snake_case)]
+pub unsafe fn igGetContentRegionMax() -> ImVec2 {
+    igGetContentRegionMax_nonUDT2()
+}
+#[deprecated(
+    since = "0.0.22",
+    note = "please use the _nonUDT2 suffixed version of this function"
+)]
+#[allow(non_snake_case)]
+pub unsafe fn igGetContentRegionAvail() -> ImVec2 {
+    igGetContentRegionAvail_nonUDT2()
+}
+#[deprecated(
+    since = "0.0.22",
+    note = "please use the _nonUDT2 suffixed version of this function"
+)]
+#[allow(non_snake_case)]
+pub unsafe fn igGetWindowContentRegionMin() -> ImVec2 {
+    igGetWindowContentRegionMin_nonUDT2()
+}
+#[deprecated(
+    since = "0.0.22",
+    note = "please use the _nonUDT2 suffixed version of this function"
+)]
+#[allow(non_snake_case)]
+pub unsafe fn igGetWindowContentRegionMax() -> ImVec2 {
+    igGetWindowContentRegionMax_nonUDT2()
 }
 
 // Windows scrolling
@@ -284,10 +333,19 @@ extern "C" {
     pub fn igGetStyleColorVec4(idx: ImGuiCol) -> *const ImVec4;
     pub fn igGetFont() -> *mut ImFont;
     pub fn igGetFontSize() -> c_float;
-    pub fn igGetFontTexUvWhitePixel() -> ImVec2;
+    pub fn igGetFontTexUvWhitePixel_nonUDT2() -> ImVec2;
     pub fn igGetColorU32(idx: ImGuiCol, alpha_mul: c_float) -> ImU32;
     pub fn igGetColorU32Vec(col: ImVec4) -> ImU32;
     pub fn igGetColorU32U32(col: ImU32) -> ImU32;
+}
+
+#[deprecated(
+    since = "0.0.22",
+    note = "please use the _nonUDT2 suffixed version of this function"
+)]
+#[allow(non_snake_case)]
+pub unsafe fn igGetFontTexUvWhitePixel() -> ImVec2 {
+    igGetFontTexUvWhitePixel_nonUDT2()
 }
 
 // Parameter stack (current window)
@@ -314,20 +372,45 @@ extern "C" {
     pub fn igUnindent(indent_w: c_float);
     pub fn igBeginGroup();
     pub fn igEndGroup();
-    pub fn igGetCursorPos() -> ImVec2;
+    pub fn igGetCursorPos_nonUDT2() -> ImVec2;
     pub fn igGetCursorPosX() -> c_float;
     pub fn igGetCursorPosY() -> c_float;
     pub fn igSetCursorPos(local_pos: ImVec2);
     pub fn igSetCursorPosX(x: c_float);
     pub fn igSetCursorPosY(y: c_float);
-    pub fn igGetCursorStartPos() -> ImVec2;
-    pub fn igGetCursorScreenPos() -> ImVec2;
+    pub fn igGetCursorStartPos_nonUDT2() -> ImVec2;
+    pub fn igGetCursorScreenPos_nonUDT2() -> ImVec2;
     pub fn igSetCursorScreenPos(screen_pos: ImVec2);
     pub fn igAlignTextToFramePadding();
     pub fn igGetTextLineHeight() -> c_float;
     pub fn igGetTextLineHeightWithSpacing() -> c_float;
     pub fn igGetFrameHeight() -> c_float;
     pub fn igGetFrameHeightWithSpacing() -> c_float;
+}
+
+#[deprecated(
+    since = "0.0.22",
+    note = "please use the _nonUDT2 suffixed version of this function"
+)]
+#[allow(non_snake_case)]
+pub unsafe fn igGetCursorPos() -> ImVec2 {
+    igGetCursorPos_nonUDT2()
+}
+#[deprecated(
+    since = "0.0.22",
+    note = "please use the _nonUDT2 suffixed version of this function"
+)]
+#[allow(non_snake_case)]
+pub unsafe fn igGetCursorStartPos() -> ImVec2 {
+    igGetCursorStartPos_nonUDT2()
+}
+#[deprecated(
+    since = "0.0.22",
+    note = "please use the _nonUDT2 suffixed version of this function"
+)]
+#[allow(non_snake_case)]
+pub unsafe fn igGetCursorScreenPos() -> ImVec2 {
+    igGetCursorScreenPos_nonUDT2()
 }
 
 // ID stack/scopes
@@ -1030,9 +1113,9 @@ extern "C" {
     pub fn igIsAnyItemHovered() -> bool;
     pub fn igIsAnyItemActive() -> bool;
     pub fn igIsAnyItemFocused() -> bool;
-    pub fn igGetItemRectMin() -> ImVec2;
-    pub fn igGetItemRectMax() -> ImVec2;
-    pub fn igGetItemRectSize() -> ImVec2;
+    pub fn igGetItemRectMin_nonUDT2() -> ImVec2;
+    pub fn igGetItemRectMax_nonUDT2() -> ImVec2;
+    pub fn igGetItemRectSize_nonUDT2() -> ImVec2;
     pub fn igSetItemAllowOverlap();
     pub fn igIsRectVisible(size: ImVec2) -> bool;
     pub fn igIsRectVisibleVec2(rect_min: ImVec2, rect_max: ImVec2) -> bool;
@@ -1043,7 +1126,7 @@ extern "C" {
     pub fn igGetStyleColorName(idx: ImGuiCol) -> *const c_char;
     pub fn igSetStateStorage(storage: *mut ImGuiStorage);
     pub fn igGetStateStorage() -> *mut ImGuiStorage;
-    pub fn igCalcTextSize(
+    pub fn igCalcTextSize_nonUDT2(
         text: *const c_char,
         text_end: *const c_char,
         hide_text_after_double_hash: bool,
@@ -1059,7 +1142,7 @@ extern "C" {
     pub fn igBeginChildFrame(id: ImGuiID, size: ImVec2, flags: ImGuiWindowFlags) -> bool;
     pub fn igEndChildFrame();
 
-    pub fn igColorConvertU32ToFloat4(color: ImU32) -> ImVec4;
+    pub fn igColorConvertU32ToFloat4_nonUDT2(color: ImU32) -> ImVec4;
     pub fn igColorConvertFloat4ToU32(color: ImVec4) -> ImU32;
     pub fn igColorConvertRGBtoHSV(
         r: c_float,
@@ -1079,6 +1162,52 @@ extern "C" {
     );
 }
 
+#[deprecated(
+    since = "0.0.22",
+    note = "please use the _nonUDT2 suffixed version of this function"
+)]
+#[allow(non_snake_case)]
+pub unsafe fn igGetItemRectMin() -> ImVec2 {
+    igGetItemRectMin_nonUDT2()
+}
+#[deprecated(
+    since = "0.0.22",
+    note = "please use the _nonUDT2 suffixed version of this function"
+)]
+#[allow(non_snake_case)]
+pub unsafe fn igGetItemRectMax() -> ImVec2 {
+    igGetItemRectMax_nonUDT2()
+}
+#[deprecated(
+    since = "0.0.22",
+    note = "please use the _nonUDT2 suffixed version of this function"
+)]
+#[allow(non_snake_case)]
+pub unsafe fn igGetItemRectSize() -> ImVec2 {
+    igGetItemRectSize_nonUDT2()
+}
+#[deprecated(
+    since = "0.0.22",
+    note = "please use the _nonUDT2 suffixed version of this function"
+)]
+#[allow(non_snake_case)]
+pub unsafe fn igCalcTextSize(
+    text: *const c_char,
+    text_end: *const c_char,
+    hide_text_after_double_hash: bool,
+    wrap_width: c_float,
+) -> ImVec2 {
+    igCalcTextSize_nonUDT2(text, text_end, hide_text_after_double_hash, wrap_width)
+}
+#[deprecated(
+    since = "0.0.22",
+    note = "please use the _nonUDT2 suffixed version of this function"
+)]
+#[allow(non_snake_case)]
+pub unsafe fn igColorConvertU32ToFloat4(color: ImU32) -> ImVec4 {
+    igColorConvertU32ToFloat4_nonUDT2(color)
+}
+
 // Inputs
 extern "C" {
     pub fn igGetKeyIndex(imgui_key: ImGuiKey) -> c_int;
@@ -1094,14 +1223,39 @@ extern "C" {
     pub fn igIsMouseDragging(button: c_int, lock_threshold: c_float) -> bool;
     pub fn igIsMouseHoveringRect(r_min: ImVec2, r_max: ImVec2, clip: bool) -> bool;
     pub fn igIsMousePosValid(mouse_pos: *const ImVec2) -> bool;
-    pub fn igGetMousePos() -> ImVec2;
-    pub fn igGetMousePosOnOpeningCurrentPopup() -> ImVec2;
-    pub fn igGetMouseDragDelta(button: c_int, lock_threshold: c_float) -> ImVec2;
+    pub fn igGetMousePos_nonUDT2() -> ImVec2;
+    pub fn igGetMousePosOnOpeningCurrentPopup_nonUDT2() -> ImVec2;
+    pub fn igGetMouseDragDelta_nonUDT2(button: c_int, lock_threshold: c_float) -> ImVec2;
     pub fn igResetMouseDragDelta(button: c_int);
     pub fn igGetMouseCursor() -> ImGuiMouseCursor;
     pub fn igSetMouseCursor(cursor: ImGuiMouseCursor);
     pub fn igCaptureKeyboardFromApp(capture: bool);
     pub fn igCaptureMouseFromApp(capture: bool);
+}
+
+#[deprecated(
+    since = "0.0.22",
+    note = "please use the _nonUDT2 suffixed version of this function"
+)]
+#[allow(non_snake_case)]
+pub unsafe fn igGetMousePos() -> ImVec2 {
+    igGetMousePos_nonUDT2()
+}
+#[deprecated(
+    since = "0.0.22",
+    note = "please use the _nonUDT2 suffixed version of this function"
+)]
+#[allow(non_snake_case)]
+pub unsafe fn igGetMousePosOnOpeningCurrentPopup() -> ImVec2 {
+    igGetMousePosOnOpeningCurrentPopup_nonUDT2()
+}
+#[deprecated(
+    since = "0.0.22",
+    note = "please use the _nonUDT2 suffixed version of this function"
+)]
+#[allow(non_snake_case)]
+pub unsafe fn igGetMouseDragDelta(button: c_int, lock_threshold: c_float) -> ImVec2 {
+    igGetMouseDragDelta_nonUDT2(button, lock_threshold)
 }
 
 // Clipboard utilities

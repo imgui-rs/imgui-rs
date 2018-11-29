@@ -608,8 +608,8 @@ extern "C" {
     pub fn ImDrawList_PopClipRect(this: *mut ImDrawList);
     pub fn ImDrawList_PushTextureID(this: *mut ImDrawList, texture_id: ImTextureID);
     pub fn ImDrawList_PopTextureID(this: *mut ImDrawList);
-    pub fn ImDrawList_GetClipRectMin(this: *mut ImDrawList) -> ImVec2;
-    pub fn ImDrawList_GetClipRectMax(this: *mut ImDrawList) -> ImVec2;
+    pub fn ImDrawList_GetClipRectMin_nonUDT2(this: *mut ImDrawList) -> ImVec2;
+    pub fn ImDrawList_GetClipRectMax_nonUDT2(this: *mut ImDrawList) -> ImVec2;
 
     pub fn ImDrawList_AddLine(
         this: *mut ImDrawList,
@@ -851,6 +851,23 @@ extern "C" {
     pub fn ImDrawList_UpdateTextureID(this: *mut ImDrawList);
 }
 
+#[deprecated(
+    since = "0.0.22",
+    note = "please use the _nonUDT2 suffixed version of this function"
+)]
+#[allow(non_snake_case)]
+pub unsafe fn ImDrawList_GetClipRectMin(this: *mut ImDrawList) -> ImVec2 {
+    ImDrawList_GetClipRectMin_nonUDT2(this)
+}
+#[deprecated(
+    since = "0.0.22",
+    note = "please use the _nonUDT2 suffixed version of this function"
+)]
+#[allow(non_snake_case)]
+pub unsafe fn ImDrawList_GetClipRectMax(this: *mut ImDrawList) -> ImVec2 {
+    ImDrawList_GetClipRectMax_nonUDT2(this)
+}
+
 // ImDrawData
 extern "C" {
     pub fn ImDrawData_Clear(this: *mut ImDrawData);
@@ -1000,7 +1017,7 @@ extern "C" {
     pub fn ImFont_GetCharAdvance(this: *mut ImFont, c: ImWchar) -> c_float;
     pub fn ImFont_IsLoaded(this: *mut ImFont) -> bool;
     pub fn ImFont_GetDebugName(this: *mut ImFont) -> *const c_char;
-    pub fn ImFont_CalcTextSizeA(
+    pub fn ImFont_CalcTextSizeA_nonUDT2(
         this: *mut ImFont,
         size: c_float,
         max_width: c_float,
@@ -1051,4 +1068,23 @@ extern "C" {
         advance_x: c_float,
     );
     pub fn ImFont_AddRemapChar(this: *mut ImFont, dst: ImWchar, src: ImWchar, overwrite_dst: bool);
+}
+
+#[deprecated(
+    since = "0.0.22",
+    note = "please use the _nonUDT2 suffixed version of this function"
+)]
+#[allow(non_snake_case)]
+pub unsafe fn ImFont_CalcTextSizeA(
+    this: *mut ImFont,
+    size: c_float,
+    max_width: c_float,
+    wrap_width: c_float,
+    text_begin: *const c_char,
+    text_end: *const c_char,
+    remaining: *mut *const c_char,
+) -> ImVec2 {
+    ImFont_CalcTextSizeA_nonUDT2(
+        this, size, max_width, wrap_width, text_begin, text_end, remaining,
+    )
 }
