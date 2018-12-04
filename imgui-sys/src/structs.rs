@@ -237,6 +237,8 @@ pub struct ImGuiIO {
     pub config_mac_osx_behaviors: bool,
     pub config_input_text_cursor_blink: bool,
     pub config_resize_windows_from_edges: bool,
+    pub backend_platform_name: *const c_char,
+    pub backend_renderer_name: *const c_char,
 
     pub get_clipboard_text_fn: Option<extern "C" fn(user_data: *mut c_void) -> *const c_char>,
     pub set_clipboard_text_fn: Option<extern "C" fn(user_data: *mut c_void, text: *const c_char)>,

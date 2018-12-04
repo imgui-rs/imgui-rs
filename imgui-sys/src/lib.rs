@@ -187,6 +187,7 @@ extern "C" {
 
 // Demo, Debug, Information
 extern "C" {
+    pub fn igShowAboutWindow(opened: *mut bool);
     pub fn igShowDemoWindow(opened: *mut bool);
     pub fn igShowMetricsWindow(opened: *mut bool);
     pub fn igShowStyleEditor(style: *mut ImGuiStyle);
