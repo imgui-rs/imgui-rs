@@ -6,7 +6,7 @@ use std::time::Instant;
 pub fn run<F: FnMut(&Ui) -> bool>(title: String, clear_color: [f32; 4], mut run_ui: F) {
     use gfx::{self, Device};
     use gfx_window_glutin;
-    use glutin::{self, GlContext};
+    use glutin;
 
     type ColorFormat = gfx::format::Rgba8;
     type DepthFormat = gfx::format::DepthStencil;
@@ -140,7 +140,7 @@ pub fn run<F: FnMut(&Ui) -> bool>(title: String, clear_color: [f32; 4], mut run_
             .render(ui, &mut factory, &mut encoder)
             .expect("Rendering failed");
         encoder.flush(&mut device);
-        window.context().swap_buffers().unwrap();
+        window.swap_buffers().unwrap();
         device.cleanup();
     }
 }
