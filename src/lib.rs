@@ -613,6 +613,16 @@ impl<'ui> Ui<'ui> {
         let size = unsafe { sys::igGetWindowPos_nonUDT2() };
         size.into()
     }
+
+    pub fn get_window_content_region_min(&self) -> (f32, f32) {
+        let size = unsafe { sys::igGetWindowContentRegionMin_nonUDT2() };
+        size.into()
+    }
+
+    pub fn get_window_content_region_max(&self) -> (f32, f32) {
+        let size = unsafe { sys::igGetWindowContentRegionMax_nonUDT2() };
+        size.into()
+    }
 }
 
 // Layout
@@ -716,6 +726,11 @@ impl<'ui> Ui<'ui> {
     /// This sets the point on which the next widget will be drawn.
     pub fn set_cursor_pos<P: Into<ImVec2>>(&self, pos: P) {
         unsafe { sys::igSetCursorPos(pos.into()) }
+    }
+
+    pub fn get_content_region_max(&self) -> (f32, f32) {
+        let size = unsafe { sys::igGetContentRegionMax_nonUDT2() };
+        size.into()
     }
 
     /// Get available space left between the cursor and the edges of the current
