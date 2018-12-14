@@ -1595,6 +1595,10 @@ impl<'ui> Ui<'ui> {
         unsafe { sys::igIsItemHovered(ImGuiHoveredFlags::empty()) }
     }
 
+    pub fn is_item_hovered_with_flags(&self, flags: ImGuiHoveredFlags) -> bool {
+        unsafe { sys::igIsItemHovered(flags) }
+    }
+
     /// Return `true` if the current window is being hovered by the mouse.
     pub fn is_window_hovered(&self) -> bool {
         unsafe { sys::igIsWindowHovered(ImGuiHoveredFlags::empty()) }
