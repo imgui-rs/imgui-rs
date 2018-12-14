@@ -1604,6 +1604,10 @@ impl<'ui> Ui<'ui> {
         unsafe { sys::igIsWindowHovered(ImGuiHoveredFlags::empty()) }
     }
 
+    pub fn is_window_hovered_with_flags(&self, flags: ImGuiHoveredFlags) -> bool {
+        unsafe { sys::igIsWindowHovered(flags) }
+    }
+
     /// Return `true` if the current window is currently focused.
     pub fn is_window_focused(&self) -> bool {
         unsafe { sys::igIsWindowFocused(ImGuiFocusedFlags::RootAndChildWindows) }
