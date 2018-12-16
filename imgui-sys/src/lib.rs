@@ -239,7 +239,7 @@ extern "C" {
 
     pub fn igSetNextWindowPos(pos: ImVec2, cond: ImGuiCond, pivot: ImVec2);
     pub fn igSetNextWindowSize(size: ImVec2, cond: ImGuiCond);
-    pub fn igSetNextWindowConstraints(
+    pub fn igSetNextWindowSizeConstraints(
         size_min: ImVec2,
         size_max: ImVec2,
         custom_callback: ImGuiSizeCallback,
