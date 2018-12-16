@@ -20,7 +20,7 @@ members = [
     "imgui-sys",
     "imgui-gfx-renderer",
     "imgui-glium-renderer",
-    "imgui-glutin-support"
+    "imgui-winit-support"
 ]
 exclude = [
     "imgui-examples",

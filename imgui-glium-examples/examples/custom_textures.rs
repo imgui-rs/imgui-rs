@@ -2,7 +2,7 @@ extern crate glium;
 extern crate image;
 extern crate imgui;
 extern crate imgui_glium_renderer;
-extern crate imgui_glutin_support;
+extern crate imgui_winit_support;
 
 use std::borrow::Cow;
 use std::error::Error;

@@ -1,6 +1,6 @@
 use imgui::{FontGlyphRange, ImFontConfig, ImGui, ImVec4, Ui};
 use imgui_gfx_renderer::{Renderer, Shaders};
-use imgui_glutin_support;
+use imgui_winit_support;
 use std::time::Instant;
 
 pub fn run<F: FnMut(&Ui) -> bool>(title: String, clear_color: [f32; 4], mut run_ui: F) {
@@ -87,7 +87,7 @@ pub fn run<F: FnMut(&Ui) -> bool>(title: String, clear_color: [f32; 4], mut run_
     let mut renderer = Renderer::init(&mut imgui, &mut factory, shaders, main_color.clone())
         .expect("Failed to initialize renderer");
 
-    imgui_glutin_support::configure_keys(&mut imgui);
+    imgui_winit_support::configure_keys(&mut imgui);
 
     let mut last_frame = Instant::now();
     let mut quit = false;
@@ -99,7 +99,7 @@ pub fn run<F: FnMut(&Ui) -> bool>(title: String, clear_color: [f32; 4], mut run_
                 WindowEvent::{CloseRequested, Resized},
             };
 
-            imgui_glutin_support::handle_event(
+            imgui_winit_support::handle_event(
                 &mut imgui,
                 &event,
                 window.get_hidpi_factor(),
@@ -126,9 +126,9 @@ pub fn run<F: FnMut(&Ui) -> bool>(title: String, clear_color: [f32; 4], mut run_
         let delta_s = delta.as_secs() as f32 + delta.subsec_nanos() as f32 / 1_000_000_000.0;
         last_frame = now;
 
-        imgui_glutin_support::update_mouse_cursor(&imgui, &window);
+        imgui_winit_support::update_mouse_cursor(&imgui, &window);
 
-        let frame_size = imgui_glutin_support::get_frame_size(&window, hidpi_factor).unwrap();
+        let frame_size = imgui_winit_support::get_frame_size(&window, hidpi_factor).unwrap();
 
         let ui = imgui.frame(frame_size, delta_s);
         if !run_ui(&ui) {

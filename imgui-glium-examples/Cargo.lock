@@ -305,7 +305,7 @@ dependencies = [
  "image 0.20.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "imgui 0.0.22-pre",
  "imgui-glium-renderer 0.0.22-pre",
- "imgui-glutin-support 0.0.22-pre",
+ "imgui-winit-support 0.0.22-pre",
 ]
 
 [[package]]
@@ -318,14 +318,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "imgui-glutin-support"
-version = "0.0.22-pre"
-dependencies = [
- "glutin 0.17.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "imgui 0.0.22-pre",
-]
-
-[[package]]
 name = "imgui-sys"
 version = "0.0.22-pre"
 dependencies = [
@@ -333,6 +325,14 @@ dependencies = [
  "cc 1.0.25 (registry+https://github.com/rust-lang/crates.io-index)",
  "glium 0.22.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "libc 0.2.43 (registry+https://github.com/rust-lang/crates.io-index)",
+]
+
+[[package]]
+name = "imgui-winit-support"
+version = "0.0.22-pre"
+dependencies = [
+ "imgui 0.0.22-pre",
+ "winit 0.16.2 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]

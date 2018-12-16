@@ -1,4 +1,4 @@
-//! This crate provides support functions to simplify integrating imgui-rs with glutin.
+//! This crate provides support functions to simplify integrating imgui-rs with winit.
 //!
 //! # Using the library
 //!
@@ -6,24 +6,24 @@
 //!
 //! ```rust,no_run
 //! # extern crate imgui;
-//! # extern crate imgui_glutin_support;
+//! # extern crate imgui_winit_support;
 //! use imgui::ImGui;
 //!
 //! # fn main() {
 //! let mut imgui = ImGui::init();
-//! imgui_glutin_support::configure_keys(&mut imgui);
+//! imgui_winit_support::configure_keys(&mut imgui);
 //! # }
 //! ```
 //!
-//! In your main loop you should already be retrieving events from glutin and handling them. All
-//! you need to do is pass each event to `imgui_glutin_support` as well:
+//! In your main loop you should already be retrieving events from winit and handling them. All
+//! you need to do is pass each event to `imgui_winit_support` as well:
 //!
 //! ```rust,no_run
-//! # extern crate glutin;
 //! # extern crate imgui;
-//! # extern crate imgui_glutin_support;
-//! # use glutin::EventsLoop;
+//! # extern crate imgui_winit_support;
+//! # extern crate winit;
 //! # use imgui::ImGui;
+//! # use winit::EventsLoop;
 //! # fn main() {
 //! # let mut events_loop = EventsLoop::new();
 //! # let mut imgui = ImGui::init();
@@ -32,7 +32,7 @@
 //! events_loop.poll_events(|event| {
 //!     // do application-specific stuff with event
 //!
-//!     imgui_glutin_support::handle_event(
+//!     imgui_winit_support::handle_event(
 //!         &mut imgui,
 //!         &event,
 //!         window_hidpi_factor,
@@ -50,11 +50,11 @@
 //! For example, you might want to customize mouse wheel line scrolling amount:
 //!
 //! ```rust,no_run
-//! # extern crate glutin;
 //! # extern crate imgui;
-//! # extern crate imgui_glutin_support;
-//! # use glutin::{EventsLoop, Event, WindowEvent, MouseScrollDelta, TouchPhase};
+//! # extern crate imgui_winit_support;
+//! # extern crate winit;
 //! # use imgui::ImGui;
+//! # use winit::{EventsLoop, Event, WindowEvent, MouseScrollDelta, TouchPhase};
 //! # fn main() {
 //! # let mut events_loop = EventsLoop::new();
 //! # let mut imgui = ImGui::init();
@@ -64,7 +64,7 @@
 //!     // do application-specific stuff with event
 //!
 //!     // default handling for events
-//!     imgui_glutin_support::handle_event(
+//!     imgui_winit_support::handle_event(
 //!         &mut imgui,
 //!         &event,
 //!         window_hidpi_factor,
@@ -89,16 +89,16 @@
 //! # }
 //! ```
 
-extern crate glutin;
 extern crate imgui;
+extern crate winit;
 
-use glutin::{
+use imgui::{FrameSize, ImGui, ImGuiKey, ImGuiMouseCursor};
+use winit::{
     ElementState, Event, KeyboardInput, ModifiersState, MouseButton, MouseCursor, MouseScrollDelta,
     TouchPhase, VirtualKeyCode, Window, WindowEvent,
 };
-use imgui::{FrameSize, ImGui, ImGuiKey, ImGuiMouseCursor};
 
-/// Configure imgui key map with glutin `VirtualKeyCode` values
+/// Configure imgui key map with winit `VirtualKeyCode` values
 pub fn configure_keys(imgui: &mut ImGui) {
     imgui.set_imgui_key(ImGuiKey::Tab, VirtualKeyCode::Tab as _);
     imgui.set_imgui_key(ImGuiKey::LeftArrow, VirtualKeyCode::Left as _);
@@ -177,7 +177,7 @@ pub fn handle_mouse_button_state(imgui: &mut ImGui, button: MouseButton, state: 
     imgui.set_mouse_down(states);
 }
 
-/// Update imgui state from glutin event
+/// Update imgui state from winit event
 pub fn handle_event(
     imgui: &mut ImGui,
     event: &Event,
@@ -192,7 +192,7 @@ pub fn handle_event(
     }
 }
 
-/// Update imgui state from glutin window event
+/// Update imgui state from winit window event
 pub fn handle_window_event(
     imgui: &mut ImGui,
     event: &WindowEvent,
@@ -236,7 +236,7 @@ pub fn handle_window_event(
     }
 }
 
-/// Update glutin window mouse cursor state
+/// Update winit window mouse cursor state
 pub fn update_mouse_cursor(imgui: &ImGui, window: &Window) {
     let mouse_cursor = imgui.mouse_cursor();
     if imgui.mouse_draw_cursor() || mouse_cursor == ImGuiMouseCursor::None {

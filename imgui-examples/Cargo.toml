@@ -14,4 +14,4 @@ gfx_window_glutin = "0.27"
 glutin = "0.19"
 imgui = { version = "0.0.22-pre", path = "../" }
 imgui-gfx-renderer = { version = "0.0.22-pre", path = "../imgui-gfx-renderer" }
-imgui-glutin-support = { version = "0.0.22-pre", path = "../imgui-glutin-support" }
+imgui-winit-support = { version = "0.0.22-pre", path = "../imgui-winit-support" }

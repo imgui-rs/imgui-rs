@@ -2,7 +2,7 @@ extern crate glium;
 #[macro_use]
 extern crate imgui;
 extern crate imgui_glium_renderer;
-extern crate imgui_glutin_support;
+extern crate imgui_winit_support;
 
 use imgui::*;
 

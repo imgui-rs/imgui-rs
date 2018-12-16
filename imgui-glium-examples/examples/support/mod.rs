@@ -3,7 +3,7 @@ use glium::{
     Texture2d,
 };
 use imgui::{FontGlyphRange, ImFontConfig, ImGui, Ui};
-use imgui_glutin_support;
+use imgui_winit_support;
 use std::rc::Rc;
 use std::time::Instant;
 
@@ -56,7 +56,7 @@ where
 
     let mut renderer = Renderer::init(&mut imgui, &display).expect("Failed to initialize renderer");
 
-    imgui_glutin_support::configure_keys(&mut imgui);
+    imgui_winit_support::configure_keys(&mut imgui);
 
     let mut last_frame = Instant::now();
     let mut quit = false;
@@ -65,7 +65,7 @@ where
         events_loop.poll_events(|event| {
             use glium::glutin::{Event, WindowEvent::CloseRequested};
 
-            imgui_glutin_support::handle_event(
+            imgui_winit_support::handle_event(
                 &mut imgui,
                 &event,
                 window.get_hidpi_factor(),
@@ -85,9 +85,9 @@ where
         let delta_s = delta.as_secs() as f32 + delta.subsec_nanos() as f32 / 1_000_000_000.0;
         last_frame = now;
 
-        imgui_glutin_support::update_mouse_cursor(&imgui, &window);
+        imgui_winit_support::update_mouse_cursor(&imgui, &window);
 
-        let frame_size = imgui_glutin_support::get_frame_size(&window, hidpi_factor).unwrap();
+        let frame_size = imgui_winit_support::get_frame_size(&window, hidpi_factor).unwrap();
 
         let ui = imgui.frame(frame_size, delta_s);
         if !run_ui(&ui, display.get_context(), renderer.textures()) {
