@@ -8,40 +8,40 @@ use std::slice;
 use std::str;
 use sys::ImGuiStyleVar;
 
-pub use child_frame::ChildFrame;
-pub use color_editors::{
+pub use self::child_frame::ChildFrame;
+pub use self::color_editors::{
     ColorButton, ColorEdit, ColorEditMode, ColorFormat, ColorPicker, ColorPickerMode, ColorPreview,
     EditableColor,
 };
-pub use drag::{
+pub use self::drag::{
     DragFloat, DragFloat2, DragFloat3, DragFloat4, DragFloatRange2, DragInt, DragInt2, DragInt3,
     DragInt4, DragIntRange2,
 };
-pub use fonts::{FontGlyphRange, ImFont, ImFontAtlas, ImFontConfig};
-pub use image::{ImTexture, Image, Textures};
-pub use input::{
+pub use self::fonts::{FontGlyphRange, ImFont, ImFontAtlas, ImFontConfig};
+pub use self::image::{ImTexture, Image, Textures};
+pub use self::input::{
     InputFloat, InputFloat2, InputFloat3, InputFloat4, InputInt, InputInt2, InputInt3, InputInt4,
     InputText, InputTextMultiline,
 };
-pub use menus::{Menu, MenuItem};
-pub use plothistogram::PlotHistogram;
-pub use plotlines::PlotLines;
-pub use popup_modal::PopupModal;
-pub use progressbar::ProgressBar;
-pub use sliders::{
+pub use self::menus::{Menu, MenuItem};
+pub use self::plothistogram::PlotHistogram;
+pub use self::plotlines::PlotLines;
+pub use self::popup_modal::PopupModal;
+pub use self::progressbar::ProgressBar;
+pub use self::sliders::{
     SliderFloat, SliderFloat2, SliderFloat3, SliderFloat4, SliderInt, SliderInt2, SliderInt3,
     SliderInt4,
 };
-pub use string::{ImStr, ImString};
-pub use style::StyleVar;
-pub use sys::{
+pub use self::string::{ImStr, ImString};
+pub use self::style::StyleVar;
+pub use self::sys::{
     ImDrawIdx, ImDrawVert, ImGuiCol, ImGuiColorEditFlags, ImGuiCond, ImGuiFocusedFlags,
     ImGuiHoveredFlags, ImGuiInputTextFlags, ImGuiKey, ImGuiMouseCursor, ImGuiSelectableFlags,
     ImGuiStyle, ImGuiTreeNodeFlags, ImGuiWindowFlags, ImVec2, ImVec4,
 };
-pub use trees::{CollapsingHeader, TreeNode};
-pub use window::Window;
-pub use window_draw_list::{ChannelsSplit, ImColor, WindowDrawList};
+pub use self::trees::{CollapsingHeader, TreeNode};
+pub use self::window::Window;
+pub use self::window_draw_list::{ChannelsSplit, ImColor, WindowDrawList};
 
 mod child_frame;
 mod color_editors;
@@ -1488,8 +1488,8 @@ impl<'ui> Ui<'ui> {
 
     #[inline]
     fn push_style_var(&self, style_var: StyleVar) {
+        use self::StyleVar::*;
         use sys::{igPushStyleVarFloat, igPushStyleVarVec2};
-        use StyleVar::*;
         match style_var {
             Alpha(v) => unsafe { igPushStyleVarFloat(ImGuiStyleVar::Alpha, v) },
             WindowPadding(v) => unsafe { igPushStyleVarVec2(ImGuiStyleVar::WindowPadding, v) },

@@ -199,7 +199,7 @@ pub fn handle_window_event(
     window_hidpi_factor: f64,
     app_hidpi_factor: f64,
 ) {
-    use WindowEvent::*;
+    use self::WindowEvent::*;
     match event {
         &KeyboardInput { input, .. } => handle_keyboard_input(imgui, input),
         &ReceivedCharacter(ch) => imgui.add_input_character(ch),

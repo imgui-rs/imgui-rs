@@ -106,7 +106,7 @@ pub enum Shaders {
 
 impl Shaders {
     fn get_program_code(self) -> (&'static [u8], &'static [u8]) {
-        use Shaders::*;
+        use self::Shaders::*;
         match self {
             GlSl400 => (
                 include_bytes!("shader/glsl_400.vert"),

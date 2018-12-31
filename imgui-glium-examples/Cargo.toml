@@ -1,6 +1,7 @@
 [package]
 name = "imgui-glium-examples"
 version = "0.0.22-pre"
+edition = "2018"
 authors = ["Joonas Javanainen <joonas.javanainen@gmail.com>", "imgui-rs contributors"]
 description = "imgui crate examples using Glium backend"
 homepage = "https://github.com/Gekkio/imgui-rs"

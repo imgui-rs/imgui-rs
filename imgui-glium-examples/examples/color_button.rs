@@ -145,7 +145,8 @@ fn example_2(ui: &Ui) {
             ui.color_button(
                 im_str!("Red + ColorPreview::HalfAlpha"),
                 (1.0, 0.0, 0.0, 0.5),
-            ).preview(ColorPreview::HalfAlpha)
+            )
+            .preview(ColorPreview::HalfAlpha)
             .build();
 
             ui.separator();

@@ -1,4 +1,4 @@
-use ImVec2;
+use crate::ImVec2;
 
 #[derive(Copy, Clone, Debug, PartialEq)]
 pub enum StyleVar {

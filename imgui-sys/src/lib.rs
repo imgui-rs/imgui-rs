@@ -321,10 +321,7 @@ extern "C" {
     pub fn igSetScrollFromPosY(pos_y: c_float, center_y_ratio: c_float);
 }
 
-#[deprecated(
-    since = "0.0.22",
-    note = "please use igSetScrollHereY instead"
-)]
+#[deprecated(since = "0.0.22", note = "please use igSetScrollHereY instead")]
 #[allow(non_snake_case)]
 pub unsafe fn igSetScrollHere(center_y_ratio: c_float) {
     igSetScrollHereY(center_y_ratio)
@@ -501,8 +498,11 @@ extern "C" {
     pub fn igComboFnPtr(
         label: *const c_char,
         current_item: *mut c_int,
-        items_getter: extern "C" fn(data: *mut c_void, idx: c_int, out_text: *mut *const c_char)
-            -> bool,
+        items_getter: extern "C" fn(
+            data: *mut c_void,
+            idx: c_int,
+            out_text: *mut *const c_char,
+        ) -> bool,
         data: *mut c_void,
         items_count: c_int,
         popup_max_height_in_items: c_int,
@@ -928,8 +928,11 @@ extern "C" {
     pub fn igListBoxFnPtr(
         label: *const c_char,
         current_item: *mut c_int,
-        items_getter: extern "C" fn(data: *mut c_void, idx: c_int, out_text: *mut *const c_char)
-            -> bool,
+        items_getter: extern "C" fn(
+            data: *mut c_void,
+            idx: c_int,
+            out_text: *mut *const c_char,
+        ) -> bool,
         data: *mut c_void,
         items_count: c_int,
         height_in_items: c_int,

@@ -107,18 +107,12 @@ impl ImGuiCol {
         note = "please use ImGuiCol::ModalWindowDimBg instead"
     )]
     pub const ModalWindowDarkening: ImGuiCol = ImGuiCol::ModalWindowDimBg;
-    #[deprecated(
-        since = "0.0.21",
-        note = "please use ImGuiCol::VARIANTS instead"
-    )]
+    #[deprecated(since = "0.0.21", note = "please use ImGuiCol::VARIANTS instead")]
     pub fn values() -> &'static [ImGuiCol] {
         &ImGuiCol::VARIANTS
     }
 }
-#[deprecated(
-    since = "0.0.21",
-    note = "please use ImGuiCol::COUNT instead"
-)]
+#[deprecated(since = "0.0.21", note = "please use ImGuiCol::COUNT instead")]
 pub const ImGuiCol_COUNT: usize = 43;
 
 /// A primary data type
@@ -230,10 +224,7 @@ impl ImGuiKey {
     ];
     pub const COUNT: usize = 21;
 }
-#[deprecated(
-    since = "0.0.21",
-    note = "please use ImGuiKey::COUNT instead"
-)]
+#[deprecated(since = "0.0.21", note = "please use ImGuiKey::COUNT instead")]
 pub const ImGuiKey_COUNT: usize = 21;
 
 /// A mouse cursor identifier

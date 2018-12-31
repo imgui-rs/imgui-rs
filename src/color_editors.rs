@@ -3,7 +3,7 @@ use std::marker::PhantomData;
 use std::ptr;
 use sys;
 
-use {ImGuiColorEditFlags, ImStr, ImVec2, ImVec4, Ui};
+use crate::{ImGuiColorEditFlags, ImStr, ImVec2, ImVec4, Ui};
 
 /// Mutable reference to an editable color value.
 #[derive(Debug)]

@@ -17,7 +17,7 @@ use image::{jpeg::JPEGDecoder, DecodingResult, ImageDecoder};
 use imgui::*;
 
 mod support;
-use support::Textures;
+use self::support::Textures;
 
 const CLEAR_COLOR: [f32; 4] = [1.0, 1.0, 1.0, 1.0];
 
