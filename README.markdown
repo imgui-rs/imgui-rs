@@ -51,12 +51,12 @@ ui.window(im_str!("Hello world"))
 
 ## Compiling and running the demos
 
-Examples are under the imgui-examples directory.
+Some examples for glium backend are under the imgui-glium-examples directory.
 
     git clone https://github.com/Gekkio/imgui-rs
     cd imgui-rs
     git submodule update --init --recursive
-    cd imgui-examples
+    cd imgui-glium-examples
     cargo test
 
     cargo run --example hello_world
