@@ -1,3 +1,4 @@
+use bitflags::bitflags;
 use std::os::raw::c_int;
 
 bitflags!(

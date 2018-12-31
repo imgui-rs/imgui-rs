@@ -1,8 +1,3 @@
-extern crate glium;
-extern crate imgui;
-extern crate imgui_glium_renderer;
-extern crate imgui_winit_support;
-
 mod support;
 
 const CLEAR_COLOR: [f32; 4] = [0.2, 0.2, 0.2, 1.0];

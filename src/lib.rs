@@ -784,7 +784,7 @@ impl<'ui> Ui<'ui> {
                 }
                 ImId::Str(s) => {
                     let start = s.as_ptr() as *const c_char;
-                    let end = start.offset(s.len() as isize);
+                    let end = start.add(s.len());
                     sys::igPushIDRange(start, end);
                 }
                 ImId::Ptr(p) => {
@@ -820,7 +820,7 @@ impl<'ui> Ui<'ui> {
         let s = text.as_ref();
         unsafe {
             let start = s.as_ptr();
-            let end = start.offset(s.len() as isize);
+            let end = start.add(s.len());
             sys::igTextUnformatted(start as *const c_char, end as *const c_char);
         }
     }
@@ -1137,7 +1137,6 @@ impl<'ui> Ui<'ui> {
     /// # Examples
     ///
     /// ```
-    /// # #[macro_use] extern crate imgui;
     /// # use imgui::*;
     /// fn user_interface(ui: &Ui) {
     ///     ui.text("Hover over me");
@@ -1162,7 +1161,6 @@ impl<'ui> Ui<'ui> {
     /// # Examples
     ///
     /// ```
-    /// # #[macro_use] extern crate imgui;
     /// # use imgui::*;
     /// fn user_interface(ui: &Ui) {
     ///     ui.text("Hover over me");
@@ -1597,7 +1595,6 @@ impl<'ui> Ui<'ui> {
     /// # Examples
     ///
     /// ```
-    /// # #[macro_use] extern crate imgui;
     /// # use imgui::*;
     /// fn user_interface(ui: &Ui) {
     ///     ui.text("Hover over me");

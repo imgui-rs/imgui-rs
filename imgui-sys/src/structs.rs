@@ -1,12 +1,12 @@
 use std::os::raw::{c_char, c_float, c_int, c_short, c_uchar, c_uint, c_ushort, c_void};
 use std::slice;
 
-use super::enums::{ImGuiCol, ImGuiKey, ImGuiMouseCursor, ImGuiNavInput};
-use super::flags::{
+use crate::enums::{ImGuiCol, ImGuiKey, ImGuiMouseCursor, ImGuiNavInput};
+use crate::flags::{
     ImDrawCornerFlags, ImDrawListFlags, ImFontAtlasFlags, ImGuiBackendFlags, ImGuiConfigFlags,
     ImGuiInputTextFlags,
 };
-use super::{ImDrawCallback, ImDrawIdx, ImGuiID, ImTextureID, ImU32, ImVec2, ImVec4, ImWchar};
+use crate::{ImDrawCallback, ImDrawIdx, ImGuiID, ImTextureID, ImU32, ImVec2, ImVec4, ImWchar};
 
 /// Font atlas glyph range builder
 #[repr(C)]

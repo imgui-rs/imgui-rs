@@ -1,7 +1,3 @@
-#[macro_use]
-extern crate gfx;
-extern crate imgui;
-
 use gfx::handle::{Buffer, RenderTargetView};
 use gfx::memory::Bind;
 use gfx::pso::{PipelineData, PipelineState};
@@ -52,9 +48,9 @@ macro_rules! extended_defines {
         #[allow(missing_docs)]
         mod $module {
             #[allow(unused_imports)]
-            use super::*;
+            use crate::*;
             #[allow(unused_imports)]
-            use super::gfx;
+            use gfx::gfx_pipeline_inner;
             gfx_pipeline_inner!{ $(
                 $field: $ty,
             )*}

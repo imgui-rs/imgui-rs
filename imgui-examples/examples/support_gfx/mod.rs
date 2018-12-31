@@ -18,7 +18,7 @@ pub fn run<F: FnMut(&Ui) -> bool>(title: String, clear_color: [f32; 4], mut run_
         .with_dimensions(glutin::dpi::LogicalSize::new(1024f64, 768f64));
     let (window, mut device, mut factory, mut main_color, mut main_depth) =
         gfx_window_glutin::init::<ColorFormat, DepthFormat>(window, context, &events_loop)
-        .expect("Failed to initalize graphics");
+            .expect("Failed to initalize graphics");
     let mut encoder: gfx::Encoder<_, _> = factory.create_command_buffer().into();
     let shaders = {
         let version = device.get_info().shading_language;

@@ -1,11 +1,3 @@
-extern crate gfx;
-extern crate gfx_window_glutin;
-extern crate glutin;
-#[macro_use]
-extern crate imgui;
-extern crate imgui_gfx_renderer;
-extern crate imgui_winit_support;
-
 use imgui::*;
 
 mod support_gfx;

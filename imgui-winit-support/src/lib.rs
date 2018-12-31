@@ -5,8 +5,6 @@
 //! In your initialization code call `configure_keys`:
 //!
 //! ```rust,no_run
-//! # extern crate imgui;
-//! # extern crate imgui_winit_support;
 //! use imgui::ImGui;
 //!
 //! # fn main() {
@@ -19,9 +17,6 @@
 //! you need to do is pass each event to `imgui_winit_support` as well:
 //!
 //! ```rust,no_run
-//! # extern crate imgui;
-//! # extern crate imgui_winit_support;
-//! # extern crate winit;
 //! # use imgui::ImGui;
 //! # use winit::EventsLoop;
 //! # fn main() {
@@ -50,9 +45,6 @@
 //! For example, you might want to customize mouse wheel line scrolling amount:
 //!
 //! ```rust,no_run
-//! # extern crate imgui;
-//! # extern crate imgui_winit_support;
-//! # extern crate winit;
 //! # use imgui::ImGui;
 //! # use winit::{EventsLoop, Event, WindowEvent, MouseScrollDelta, TouchPhase};
 //! # fn main() {
@@ -88,9 +80,6 @@
 //! });
 //! # }
 //! ```
-
-extern crate imgui;
-extern crate winit;
 
 use imgui::{FrameSize, ImGui, ImGuiKey, ImGuiMouseCursor};
 use winit::{
@@ -184,11 +173,8 @@ pub fn handle_event(
     window_hidpi_factor: f64,
     app_hidpi_factor: f64,
 ) {
-    match event {
-        &Event::WindowEvent { ref event, .. } => {
-            handle_window_event(imgui, event, window_hidpi_factor, app_hidpi_factor)
-        }
-        _ => (),
+    if let Event::WindowEvent { ref event, .. } = event {
+        handle_window_event(imgui, event, window_hidpi_factor, app_hidpi_factor)
     }
 }
 
@@ -201,9 +187,9 @@ pub fn handle_window_event(
 ) {
     use self::WindowEvent::*;
     match event {
-        &KeyboardInput { input, .. } => handle_keyboard_input(imgui, input),
-        &ReceivedCharacter(ch) => imgui.add_input_character(ch),
-        &CursorMoved {
+        KeyboardInput { input, .. } => handle_keyboard_input(imgui, *input),
+        ReceivedCharacter(ch) => imgui.add_input_character(*ch),
+        CursorMoved {
             position,
             modifiers,
             ..
@@ -212,25 +198,25 @@ pub fn handle_window_event(
                 .to_physical(window_hidpi_factor)
                 .to_logical(app_hidpi_factor);
             imgui.set_mouse_pos(position.x as f32, position.y as f32);
-            handle_modifiers(imgui, modifiers);
+            handle_modifiers(imgui, *modifiers);
         }
-        &MouseWheel {
+        MouseWheel {
             delta,
             modifiers,
             phase: TouchPhase::Moved,
             ..
         } => {
-            handle_mouse_scroll_delta(imgui, delta, window_hidpi_factor, app_hidpi_factor);
-            handle_modifiers(imgui, modifiers);
+            handle_mouse_scroll_delta(imgui, *delta, window_hidpi_factor, app_hidpi_factor);
+            handle_modifiers(imgui, *modifiers);
         }
-        &MouseInput {
+        MouseInput {
             state,
             button,
             modifiers,
             ..
         } => {
-            handle_mouse_button_state(imgui, button, state);
-            handle_modifiers(imgui, modifiers);
+            handle_mouse_button_state(imgui, *button, *state);
+            handle_modifiers(imgui, *modifiers);
         }
         _ => (),
     }

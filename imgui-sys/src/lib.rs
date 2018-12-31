@@ -1,17 +1,5 @@
 #![allow(non_upper_case_globals)]
 
-#[macro_use]
-extern crate bitflags;
-
-extern crate libc;
-
-#[cfg(feature = "gfx")]
-#[macro_use]
-extern crate gfx;
-
-#[cfg(feature = "glium")]
-extern crate glium;
-
 use libc::size_t;
 use std::convert::From;
 use std::os::raw::{c_char, c_double, c_float, c_int, c_uint, c_ushort, c_void};

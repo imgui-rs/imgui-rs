@@ -110,6 +110,7 @@ impl<'ui> Image<'ui> {
 }
 
 /// Generic texture mapping for use by renderers.
+#[derive(Debug, Default)]
 pub struct Textures<T> {
     textures: HashMap<usize, T>,
     next: usize,

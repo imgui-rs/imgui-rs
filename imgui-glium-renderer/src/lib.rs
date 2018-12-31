@@ -1,13 +1,9 @@
-#[macro_use]
-extern crate glium;
-extern crate imgui;
-
 use glium::backend::{Context, Facade};
 use glium::index::{self, PrimitiveType};
 use glium::program;
 use glium::texture;
 use glium::vertex;
-use glium::{DrawError, IndexBuffer, Program, Surface, Texture2d, VertexBuffer};
+use glium::{uniform, DrawError, IndexBuffer, Program, Surface, Texture2d, VertexBuffer};
 use imgui::{DrawList, FrameSize, ImGui, ImTexture, Textures, Ui};
 use std::borrow::Cow;
 use std::fmt;
