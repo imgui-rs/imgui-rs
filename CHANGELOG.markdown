@@ -10,7 +10,8 @@
 
 - Upgrade to cimgui 1.66.2+ / imgui 1.66b. **This is a very big update, so there
   are a lot of breaking changes**
-- Bump minimum Rust version to 1.28 (required by the glutin crate)
+- Bump minimum Rust version to 1.31 (1.28 required by the glutin crate, and
+  1.31 requires by the stb_truetype crate)
 - Replaced `imgui-glutin-support` with `imgui-winit-support`
 
 ## [0.0.21] - 2018-10-11
