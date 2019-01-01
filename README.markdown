@@ -51,17 +51,29 @@ ui.window(im_str!("Hello world"))
 
 ## Compiling and running the demos
 
-Examples are under the imgui-examples directory.
 
     git clone https://github.com/Gekkio/imgui-rs
     cd imgui-rs
     git submodule update --init --recursive
+
+Examples for gfx backend are under the imgui-examples directory.
+
     cd imgui-examples
+    cargo test
+
+    cargo run --example hello_gfx
+
+Examples for glium backend are located into the imgui-glium-examples directory.
+
+    # At the reposity root
+    cd imgui-glium-examples
     cargo test
 
     cargo run --example hello_world
     cargo run --example test_window
     cargo run --example test_window_impl
+
+
 
 Note to Windows users:  You will need to use the *MSVC ABI* version of the Rust compiler along
 with its associated [dependencies](https://www.rust-lang.org/en-US/downloads.html#win-foot) to
