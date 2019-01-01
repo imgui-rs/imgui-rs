@@ -73,8 +73,6 @@ Examples for glium backend are located into the imgui-glium-examples directory.
     cargo run --example test_window
     cargo run --example test_window_impl
 
-
-
 Note to Windows users:  You will need to use the *MSVC ABI* version of the Rust compiler along
 with its associated [dependencies](https://www.rust-lang.org/en-US/downloads.html#win-foot) to
 build this libary and run the examples.
