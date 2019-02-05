@@ -102,18 +102,7 @@ impl ImGuiCol {
         ImGuiCol::ModalWindowDimBg,
     ];
     pub const COUNT: usize = 43;
-    #[deprecated(
-        since = "0.0.21",
-        note = "please use ImGuiCol::ModalWindowDimBg instead"
-    )]
-    pub const ModalWindowDarkening: ImGuiCol = ImGuiCol::ModalWindowDimBg;
-    #[deprecated(since = "0.0.21", note = "please use ImGuiCol::VARIANTS instead")]
-    pub fn values() -> &'static [ImGuiCol] {
-        &ImGuiCol::VARIANTS
-    }
 }
-#[deprecated(since = "0.0.21", note = "please use ImGuiCol::COUNT instead")]
-pub const ImGuiCol_COUNT: usize = 43;
 
 /// A primary data type
 #[repr(C)]
@@ -224,8 +213,6 @@ impl ImGuiKey {
     ];
     pub const COUNT: usize = 21;
 }
-#[deprecated(since = "0.0.21", note = "please use ImGuiKey::COUNT instead")]
-pub const ImGuiKey_COUNT: usize = 21;
 
 /// A mouse cursor identifier
 ///
@@ -265,11 +252,6 @@ impl ImGuiMouseCursor {
         ImGuiMouseCursor::Hand,
     ];
 }
-#[deprecated(
-    since = "0.0.21",
-    note = "please use ImGuiMouseCursor::VARIANTS.len() instead"
-)]
-pub const ImGuiMouseCursor_COUNT: usize = 8;
 
 /// An input identifier for navigation
 #[repr(C)]
@@ -415,8 +397,3 @@ impl ImGuiStyleVar {
         ImGuiStyleVar::ButtonTextAlign,
     ];
 }
-#[deprecated(
-    since = "0.0.21",
-    note = "please use ImGuiStyleVar::VARIANTS.len() instead"
-)]
-pub const ImGuiStyleVar_COUNT: usize = 21;
