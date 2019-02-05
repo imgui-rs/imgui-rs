@@ -5,13 +5,17 @@
 ### Added
 
 - `Ui::with_test_wrap_pos`
+- `Ui::get_content_region_max`
+- `Ui::get_window_content_region_min`
+- `Ui::get_window_content_region_max`
 
 ### Changed
 
 - Upgrade to cimgui 1.66.2+ / imgui 1.66b. **This is a very big update, so there
   are a lot of breaking changes**
 - Bump minimum Rust version to 1.31 (1.28 required by the glutin crate, and
-  1.31 requires by the stb_truetype crate)
+  1.31 required by the stb_truetype crate)
+- Upgrade to glium 0.23
 - Replaced `imgui-glutin-support` with `imgui-winit-support`
 
 ## [0.0.21] - 2018-10-11
