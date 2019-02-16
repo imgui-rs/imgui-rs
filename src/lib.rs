@@ -14,10 +14,10 @@ mod test;
 use std::ffi::CStr;
 use std::str;
 
-pub use context::*;
-pub use font_atlas::*;
-pub use string::*;
-pub use style::*;
+pub use self::context::*;
+pub use self::font_atlas::*;
+pub use self::string::*;
+pub use self::style::*;
 
 /// Returns the underlying Dear ImGui library version
 pub fn get_dear_imgui_version() -> &'static str {

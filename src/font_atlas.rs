@@ -4,7 +4,7 @@ use std::os::raw::{c_int, c_uchar, c_void};
 use std::ptr;
 use std::slice;
 
-use sys;
+use crate::sys;
 
 #[repr(transparent)]
 #[derive(Debug)]
@@ -151,7 +151,7 @@ pub enum FontAtlasRef<'a> {
 impl<'a> Deref for FontAtlasRef<'a> {
     type Target = FontAtlas;
     fn deref(&self) -> &FontAtlas {
-        use FontAtlasRef::*;
+        use self::FontAtlasRef::*;
         match self {
             Unique(atlas) => atlas,
             Shared(cell) => cell,
@@ -169,7 +169,7 @@ pub enum FontAtlasRefMut<'a> {
 impl<'a> Deref for FontAtlasRefMut<'a> {
     type Target = FontAtlas;
     fn deref(&self) -> &FontAtlas {
-        use FontAtlasRefMut::*;
+        use self::FontAtlasRefMut::*;
         match self {
             Unique(atlas) => atlas,
             Shared(cell) => cell,
@@ -179,7 +179,7 @@ impl<'a> Deref for FontAtlasRefMut<'a> {
 
 impl<'a> DerefMut for FontAtlasRefMut<'a> {
     fn deref_mut(&mut self) -> &mut FontAtlas {
-        use FontAtlasRefMut::*;
+        use self::FontAtlasRefMut::*;
         match self {
             Unique(atlas) => atlas,
             Shared(cell) => cell,
