@@ -1,28 +1,132 @@
+use std::ops::{Index, IndexMut};
+
 use crate::sys;
 
 /// User interface style/colors
-#[repr(transparent)]
-#[derive(Debug)]
-pub struct Style(pub sys::ImGuiStyle);
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct Style {
+    /// Global alpha applies to everything
+    pub alpha: f32,
+    /// Padding within a window
+    pub window_padding: [f32; 2],
+    /// Rounding radius of window corners.
+    ///
+    /// Set to 0.0 to have rectangular windows.
+    pub window_rounding: f32,
+    /// Thickness of border around windows.
+    ///
+    /// Generally set to 0.0 or 1.0 (other values are not well tested and cost more CPU/GPU).
+    pub window_border_size: f32,
+    /// Minimum window size
+    pub window_min_size: [f32; 2],
+    /// Alignment for title bar text.
+    ///
+    /// Defaults to [0.5, 0.5] for left-aligned, vertically centered.
+    pub window_title_align: [f32; 2],
+    /// Rounding radius of child window corners.
+    ///
+    /// Set to 0.0 to have rectangular child windows.
+    pub child_rounding: f32,
+    /// Thickness of border around child windows.
+    ///
+    /// Generally set to 0.0 or 1.0 (other values are not well tested and cost more CPU/GPU).
+    pub child_border_size: f32,
+    /// Rounding radius of popup window corners.
+    ///
+    /// Note that tooltip windows use `window_rounding` instead.
+    pub popup_rounding: f32,
+    /// Thickness of border around popup/tooltip windows.
+    ///
+    /// Generally set to 0.0 or 1.0 (other values are not well tested and cost more CPU/GPU).
+    pub popup_border_size: f32,
+    /// Padding within a framed rectangle (used by most widgets)
+    pub frame_padding: [f32; 2],
+    /// Rounding radius of frame corners (used by most widgets).
+    ///
+    /// Set to 0.0 to have rectangular frames.
+    pub frame_rounding: f32,
+    /// Thickness of border around frames.
+    ///
+    /// Generally set to 0.0 or 1.0 (other values are not well tested and cost more CPU/GPU).
+    pub frame_border_size: f32,
+    /// Horizontal and vertical spacing between widgets/lines
+    pub item_spacing: [f32; 2],
+    /// Horizontal and vertical spacing between elements of a composed widget (e.g. a slider and
+    /// its label)
+    pub item_inner_spacing: [f32; 2],
+    /// Expand reactive bounding box for touch-based system where touch position is not accurate
+    /// enough.
+    ///
+    /// Unfortunately we don't sort widgets so priority on overlap will always be given to the
+    /// first widget, so don't grow this too much.
+    pub touch_extra_padding: [f32; 2],
+    /// Horizontal indentation when e.g. entering a tree node.
+    ///
+    /// Generally equal to (font size + horizontal frame padding * 2).
+    pub indent_spacing: f32,
+    /// Minimum horizontal spacing between two columns
+    pub columns_min_spacing: f32,
+    /// Width of the vertical scrollbar, height of the horizontal scrollbar
+    pub scrollbar_size: f32,
+    /// Rounding radius of scrollbar grab corners
+    pub scrollbar_rounding: f32,
+    /// Minimum width/height of a grab box for slider/scrollbar
+    pub grab_min_size: f32,
+    /// Rounding radius of grab corners.
+    ///
+    /// Set to 0.0 to have rectangular slider grabs.
+    pub grab_rounding: f32,
+    /// Rounding radius of upper corners of tabs.
+    ///
+    /// Set to 0.0 to have rectangular tabs.
+    pub tab_rounding: f32,
+    /// Thichkness of border around tabs
+    pub tab_border_size: f32,
+    /// Alignment of button text when button is larger than text.
+    ///
+    /// Defaults to [0.5, 0.5] for horizontally and vertically centered.
+    pub button_text_align: [f32; 2],
+    /// Window positions are clamped to be visible within the display area by at least this amount.
+    ///
+    /// Only applies to regular windows.
+    pub display_window_padding: [f32; 2],
+    /// If you cannot see the edges of your screen (e.g. on a TV), increase the safe area padding.
+    ///
+    /// Also applies to popups/tooltips in addition to regular windows.
+    pub display_safe_area_padding: [f32; 2],
+    /// Scale software-rendered mouse cursor.
+    ///
+    /// May be removed later.
+    pub mouse_cursor_scale: f32,
+    /// Enable anti-aliasing on lines/borders.
+    ///
+    /// Disable if you are really tight on CPU/GPU.
+    pub anti_aliased_lines: bool,
+    /// Enable anti-aliasing on filled shapes (rounded rectangles, circles, etc.)
+    pub anti_aliased_fill: bool,
+    pub curve_tessellation_tol: f32,
+    pub colors: [[f32; 4]; 48],
+}
 
 impl Style {
     /// Scales all sizes in the style
     pub fn scale_all_sizes(&mut self, scale_factor: f32) {
         unsafe {
-            sys::ImGuiStyle_ScaleAllSizes(&mut self.0, scale_factor);
+            sys::ImGuiStyle_ScaleAllSizes(self.raw_mut(), scale_factor);
         }
     }
     /// Replaces current colors with classic Dear ImGui style
     pub fn use_classic_colors(&mut self) -> &mut Self {
         unsafe {
-            sys::igStyleColorsClassic(&mut self.0);
+            sys::igStyleColorsClassic(self.raw_mut());
         }
         self
     }
     /// Replaces current colors with a new, recommended style
     pub fn use_dark_colors(&mut self) -> &mut Self {
         unsafe {
-            sys::igStyleColorsDark(&mut self.0);
+            sys::igStyleColorsDark(self.raw_mut());
         }
         self
     }
@@ -30,247 +134,39 @@ impl Style {
     /// font
     pub fn use_light_colors(&mut self) -> &mut Self {
         unsafe {
-            sys::igStyleColorsLight(&mut self.0);
+            sys::igStyleColorsLight(self.raw_mut());
         }
         self
     }
 }
 
 impl Style {
-    pub fn alpha(&self) -> f32 {
-        self.0.Alpha
+    pub fn from_raw(raw: &sys::ImGuiStyle) -> &Self {
+        unsafe { &*(raw as *const _ as *const Style) }
     }
-    pub fn set_alpha(&mut self, value: f32) -> &mut Self {
-        self.0.Alpha = value;
-        self
+    pub fn from_raw_mut(raw: &mut sys::ImGuiStyle) -> &mut Self {
+        unsafe { &mut *(raw as *mut _ as *mut Style) }
     }
-    pub fn window_padding(&self) -> (f32, f32) {
-        self.0.WindowPadding.into()
-    }
-    pub fn set_window_padding(&mut self, value: (f32, f32)) -> &mut Self {
-        self.0.WindowPadding = value.into();
-        self
-    }
-    pub fn window_rounding(&self) -> f32 {
-        self.0.WindowRounding
-    }
-    pub fn set_window_rounding(&mut self, value: f32) -> &mut Self {
-        self.0.WindowRounding = value;
-        self
-    }
-    pub fn window_border_size(&self) -> f32 {
-        self.0.WindowBorderSize
-    }
-    pub fn set_window_border_size(&mut self, value: f32) -> &mut Self {
-        self.0.WindowBorderSize = value;
-        self
-    }
-    pub fn window_min_size(&self) -> (f32, f32) {
-        self.0.WindowMinSize.into()
-    }
-    pub fn set_window_min_size(&mut self, value: (f32, f32)) -> &mut Self {
-        self.0.WindowMinSize = value.into();
-        self
-    }
-    pub fn window_title_align(&self) -> (f32, f32) {
-        self.0.WindowTitleAlign.into()
-    }
-    pub fn set_window_title_align(&mut self, value: (f32, f32)) -> &mut Self {
-        self.0.WindowTitleAlign = value.into();
-        self
-    }
-    pub fn child_rounding(&self) -> f32 {
-        self.0.ChildRounding
-    }
-    pub fn set_child_rounding(&mut self, value: f32) -> &mut Self {
-        self.0.ChildRounding = value;
-        self
-    }
-    pub fn child_border_size(&self) -> f32 {
-        self.0.ChildBorderSize
-    }
-    pub fn set_child_border_size(&mut self, value: f32) -> &mut Self {
-        self.0.ChildBorderSize = value;
-        self
-    }
-    pub fn popup_rounding(&self) -> f32 {
-        self.0.PopupRounding
-    }
-    pub fn set_popup_rounding(&mut self, value: f32) -> &mut Self {
-        self.0.PopupRounding = value;
-        self
-    }
-    pub fn popup_border_size(&self) -> f32 {
-        self.0.PopupBorderSize
-    }
-    pub fn set_popup_border_size(&mut self, value: f32) -> &mut Self {
-        self.0.PopupBorderSize = value;
-        self
-    }
-    pub fn frame_padding(&self) -> (f32, f32) {
-        self.0.FramePadding.into()
-    }
-    pub fn set_frame_padding(&mut self, value: (f32, f32)) -> &mut Self {
-        self.0.FramePadding = value.into();
-        self
-    }
-    pub fn frame_rounding(&self) -> f32 {
-        self.0.FrameRounding
-    }
-    pub fn set_frame_rounding(&mut self, value: f32) -> &mut Self {
-        self.0.FrameRounding = value;
-        self
-    }
-    pub fn frame_border_size(&self) -> f32 {
-        self.0.FrameBorderSize
-    }
-    pub fn set_frame_border_size(&mut self, value: f32) -> &mut Self {
-        self.0.FrameBorderSize = value;
-        self
-    }
-    pub fn item_spacing(&self) -> (f32, f32) {
-        self.0.ItemSpacing.into()
-    }
-    pub fn set_item_spacing(&mut self, value: (f32, f32)) -> &mut Self {
-        self.0.ItemSpacing = value.into();
-        self
-    }
-    pub fn item_inner_spacing(&self) -> (f32, f32) {
-        self.0.ItemInnerSpacing.into()
-    }
-    pub fn set_item_inner_spacing(&mut self, value: (f32, f32)) -> &mut Self {
-        self.0.ItemInnerSpacing = value.into();
-        self
-    }
-    pub fn touch_extra_padding(&self) -> (f32, f32) {
-        self.0.TouchExtraPadding.into()
-    }
-    pub fn set_touch_extra_padding(&mut self, value: (f32, f32)) -> &mut Self {
-        self.0.TouchExtraPadding = value.into();
-        self
-    }
-    pub fn indent_spacing(&self) -> f32 {
-        self.0.IndentSpacing
-    }
-    pub fn set_indent_spacing(&mut self, value: f32) -> &mut Self {
-        self.0.IndentSpacing = value;
-        self
-    }
-    pub fn columns_min_spacing(&self) -> f32 {
-        self.0.ColumnsMinSpacing
-    }
-    pub fn set_columns_min_spacing(&mut self, value: f32) -> &mut Self {
-        self.0.ColumnsMinSpacing = value;
-        self
-    }
-    pub fn scrollbar_size(&self) -> f32 {
-        self.0.ScrollbarSize
-    }
-    pub fn set_scrollbar_size(&mut self, value: f32) -> &mut Self {
-        self.0.ScrollbarSize = value;
-        self
-    }
-    pub fn scrollbar_rounding(&self) -> f32 {
-        self.0.ScrollbarRounding
-    }
-    pub fn set_scrollbar_rounding(&mut self, value: f32) -> &mut Self {
-        self.0.ScrollbarRounding = value;
-        self
-    }
-    pub fn grab_min_size(&self) -> f32 {
-        self.0.GrabMinSize
-    }
-    pub fn set_grab_min_size(&mut self, value: f32) -> &mut Self {
-        self.0.GrabMinSize = value;
-        self
-    }
-    pub fn grab_rounding(&self) -> f32 {
-        self.0.GrabRounding
-    }
-    pub fn set_grab_rounding(&mut self, value: f32) -> &mut Self {
-        self.0.GrabRounding = value;
-        self
-    }
-    pub fn tab_rounding(&self) -> f32 {
-        self.0.TabRounding
-    }
-    pub fn set_tab_rounding(&mut self, value: f32) -> &mut Self {
-        self.0.TabRounding = value;
-        self
-    }
-    pub fn tab_border_size(&self) -> f32 {
-        self.0.TabBorderSize
-    }
-    pub fn set_tab_border_size(&mut self, value: f32) -> &mut Self {
-        self.0.TabBorderSize = value;
-        self
-    }
-    pub fn button_text_align(&self) -> (f32, f32) {
-        self.0.ButtonTextAlign.into()
-    }
-    pub fn set_button_text_align(&mut self, value: (f32, f32)) -> &mut Self {
-        self.0.ButtonTextAlign = value.into();
-        self
-    }
-    pub fn display_window_padding(&self) -> (f32, f32) {
-        self.0.DisplayWindowPadding.into()
-    }
-    pub fn set_display_window_padding(&mut self, value: (f32, f32)) -> &mut Self {
-        self.0.DisplayWindowPadding = value.into();
-        self
-    }
-    pub fn display_safe_area_padding(&self) -> (f32, f32) {
-        self.0.DisplaySafeAreaPadding.into()
-    }
-    pub fn set_display_safe_area_padding(&mut self, value: (f32, f32)) -> &mut Self {
-        self.0.DisplaySafeAreaPadding = value.into();
-        self
-    }
-    pub fn mouse_cursor_scale(&self) -> f32 {
-        self.0.MouseCursorScale
-    }
-    pub fn set_mouse_cursor_scale(&mut self, value: f32) -> &mut Self {
-        self.0.MouseCursorScale = value;
-        self
-    }
-    pub fn anti_aliased_lines(&self) -> bool {
-        self.0.AntiAliasedLines
-    }
-    pub fn set_anti_aliased_lines(&mut self, value: bool) -> &mut Self {
-        self.0.AntiAliasedLines = value;
-        self
-    }
-    pub fn anti_aliased_fill(&self) -> bool {
-        self.0.AntiAliasedFill
-    }
-    pub fn set_anti_aliased_fill(&mut self, value: bool) -> &mut Self {
-        self.0.AntiAliasedFill = value;
-        self
-    }
-    pub fn curve_tessellation_tol(&self) -> f32 {
-        self.0.CurveTessellationTol
-    }
-    pub fn set_curve_tessellation_tol(&mut self, value: f32) -> &mut Self {
-        self.0.CurveTessellationTol = value;
-        self
-    }
-    pub fn color(&self, col: StyleColor) -> (f32, f32, f32, f32) {
-        self.0.Colors[col as usize].into()
-    }
-    pub fn set_color(&mut self, col: StyleColor, value: (f32, f32, f32, f32)) -> &mut Self {
-        self.0.Colors[col as usize] = value.into();
-        self
-    }
-}
-
-impl Style {
     /// Returns an immutable reference to the underlying raw Dear ImGui style
     pub fn raw(&self) -> &sys::ImGuiStyle {
-        &self.0
+        unsafe { &*(self as *const _ as *const sys::ImGuiStyle) }
     }
     /// Returns a mutable reference to the underlying raw Dear ImGui style
     pub fn raw_mut(&mut self) -> &mut sys::ImGuiStyle {
-        &mut self.0
+        unsafe { &mut *(self as *mut _ as *mut sys::ImGuiStyle) }
+    }
+}
+
+impl Index<StyleColor> for Style {
+    type Output = [f32; 4];
+    fn index(&self, index: StyleColor) -> &[f32; 4] {
+        &self.colors[index as usize]
+    }
+}
+
+impl IndexMut<StyleColor> for Style {
+    fn index_mut(&mut self, index: StyleColor) -> &mut [f32; 4] {
+        &mut self.colors[index as usize]
     }
 }
 
@@ -388,81 +284,115 @@ impl StyleColor {
         StyleColor::NavWindowingDimBg,
         StyleColor::ModalWindowDimBg,
     ];
+    /// Total count of `StyleColor` variants
     pub const COUNT: usize = sys::ImGuiCol_COUNT as usize;
 }
 
+/// A temporary change in user interface style
 #[derive(Copy, Clone, Debug, PartialEq)]
 pub enum StyleVar {
+    /// Global alpha applies to everything
     Alpha(f32),
-    WindowPadding((f32, f32)),
+    /// Padding within a window
+    WindowPadding([f32; 2]),
+    /// Rounding radius of window corners
     WindowRounding(f32),
+    /// Thickness of border around windows
     WindowBorderSize(f32),
-    WindowMinSize((f32, f32)),
-    WindowTitleAlign((f32, f32)),
+    /// Minimum window size
+    WindowMinSize([f32; 2]),
+    /// Alignment for title bar text
+    WindowTitleAlign([f32; 2]),
+    /// Rounding radius of child window corners
     ChildRounding(f32),
+    /// Thickness of border around child windows
     ChildBorderSize(f32),
+    /// Rounding radius of popup window corners
     PopupRounding(f32),
+    /// Thickness of border around popup/tooltip windows
     PopupBorderSize(f32),
-    FramePadding((f32, f32)),
+    /// Padding within a framed rectangle (used by most widgets)
+    FramePadding([f32; 2]),
+    /// Rounding radius of frame corners (used by most widgets)
     FrameRounding(f32),
+    /// Thickness of border around frames
     FrameBorderSize(f32),
-    ItemSpacing((f32, f32)),
-    ItemInnerSpacing((f32, f32)),
+    /// Horizontal and vertical spacing between widgets/lines
+    ItemSpacing([f32; 2]),
+    /// Horizontal and vertical spacing between elements of a composed widget (e.g. a slider and
+    /// its label)
+    ItemInnerSpacing([f32; 2]),
+    /// Horizontal indentation when e.g. entering a tree node
     IndentSpacing(f32),
+    /// Width of the vertical scrollbar, height of the horizontal scrollbar
     ScrollbarSize(f32),
+    /// Rounding radius of scrollbar grab corners
     ScrollbarRounding(f32),
+    /// Minimum width/height of a grab box for slider/scrollbar
     GrabMinSize(f32),
+    /// Rounding radius of grab corners
     GrabRounding(f32),
+    /// Rounding radius of upper corners of tabs
     TabRounding(f32),
-    ButtonTextAlign((f32, f32)),
+    /// Alignment of button text when button is larger than text
+    ButtonTextAlign([f32; 2]),
 }
 
 #[test]
 fn test_style_scaling() {
     let (_guard, mut ctx) = crate::test::test_ctx();
     let style = ctx.style_mut();
-    style
-        .set_window_padding((1.0, 2.0))
-        .set_window_rounding(3.0)
-        .set_window_min_size((4.0, 5.0))
-        .set_child_rounding(6.0)
-        .set_popup_rounding(7.0)
-        .set_frame_padding((8.0, 9.0))
-        .set_frame_rounding(10.0)
-        .set_item_spacing((11.0, 12.0))
-        .set_item_inner_spacing((13.0, 14.0))
-        .set_touch_extra_padding((15.0, 16.0))
-        .set_indent_spacing(17.0)
-        .set_columns_min_spacing(18.0)
-        .set_scrollbar_size(19.0)
-        .set_scrollbar_rounding(20.0)
-        .set_grab_min_size(21.0)
-        .set_grab_rounding(22.0)
-        .set_tab_rounding(23.0)
-        .set_display_window_padding((24.0, 25.0))
-        .set_display_safe_area_padding((26.0, 27.0))
-        .set_mouse_cursor_scale(28.0)
-        .scale_all_sizes(2.0);
-    assert_eq!(style.window_padding(), (2.0, 4.0));
-    assert_eq!(style.window_rounding(), 6.0);
-    assert_eq!(style.window_min_size(), (8.0, 10.0));
-    assert_eq!(style.child_rounding(), 12.0);
-    assert_eq!(style.popup_rounding(), 14.0);
-    assert_eq!(style.frame_padding(), (16.0, 18.0));
-    assert_eq!(style.frame_rounding(), 20.0);
-    assert_eq!(style.item_spacing(), (22.0, 24.0));
-    assert_eq!(style.item_inner_spacing(), (26.0, 28.0));
-    assert_eq!(style.touch_extra_padding(), (30.0, 32.0));
-    assert_eq!(style.indent_spacing(), 34.0);
-    assert_eq!(style.columns_min_spacing(), 36.0);
-    assert_eq!(style.scrollbar_size(), 38.0);
-    assert_eq!(style.scrollbar_rounding(), 40.0);
-    assert_eq!(style.grab_min_size(), 42.0);
-    assert_eq!(style.grab_rounding(), 44.0);
-    assert_eq!(style.tab_rounding(), 46.0);
-    assert_eq!(style.display_window_padding(), (48.0, 50.0));
-    assert_eq!(style.display_safe_area_padding(), (52.0, 54.0));
-    assert_eq!(style.mouse_cursor_scale(), 56.0);
+    style.window_padding = [1.0, 2.0];
+    style.window_rounding = 3.0;
+    style.window_min_size = [4.0, 5.0];
+    style.child_rounding = 6.0;
+    style.popup_rounding = 7.0;
+    style.frame_padding = [8.0, 9.0];
+    style.frame_rounding = 10.0;
+    style.item_spacing = [11.0, 12.0];
+    style.item_inner_spacing = [13.0, 14.0];
+    style.touch_extra_padding = [15.0, 16.0];
+    style.indent_spacing = 17.0;
+    style.columns_min_spacing = 18.0;
+    style.scrollbar_size = 19.0;
+    style.scrollbar_rounding = 20.0;
+    style.grab_min_size = 21.0;
+    style.grab_rounding = 22.0;
+    style.tab_rounding = 23.0;
+    style.display_window_padding = [24.0, 25.0];
+    style.display_safe_area_padding = [26.0, 27.0];
+    style.mouse_cursor_scale = 28.0;
+    style.scale_all_sizes(2.0);
+    assert_eq!(style.window_padding, [2.0, 4.0]);
+    assert_eq!(style.window_rounding, 6.0);
+    assert_eq!(style.window_min_size, [8.0, 10.0]);
+    assert_eq!(style.child_rounding, 12.0);
+    assert_eq!(style.popup_rounding, 14.0);
+    assert_eq!(style.frame_padding, [16.0, 18.0]);
+    assert_eq!(style.frame_rounding, 20.0);
+    assert_eq!(style.item_spacing, [22.0, 24.0]);
+    assert_eq!(style.item_inner_spacing, [26.0, 28.0]);
+    assert_eq!(style.touch_extra_padding, [30.0, 32.0]);
+    assert_eq!(style.indent_spacing, 34.0);
+    assert_eq!(style.columns_min_spacing, 36.0);
+    assert_eq!(style.scrollbar_size, 38.0);
+    assert_eq!(style.scrollbar_rounding, 40.0);
+    assert_eq!(style.grab_min_size, 42.0);
+    assert_eq!(style.grab_rounding, 44.0);
+    assert_eq!(style.tab_rounding, 46.0);
+    assert_eq!(style.display_window_padding, [48.0, 50.0]);
+    assert_eq!(style.display_safe_area_padding, [52.0, 54.0]);
+    assert_eq!(style.mouse_cursor_scale, 56.0);
+}
+
+#[test]
+fn test_style_color_indexing() {
+    let (_guard, mut ctx) = crate::test::test_ctx();
+    let style = ctx.style_mut();
+    let value = [0.1, 0.2, 0.3, 1.0];
+    style[StyleColor::Tab] = value;
+    assert_eq!(style[StyleColor::Tab], value);
+    assert_eq!(style.colors[StyleColor::Tab as usize], value);
 }
 
 #[test]
@@ -470,6 +400,44 @@ fn test_style_memory_layout() {
     use std::mem;
     assert_eq!(mem::size_of::<Style>(), mem::size_of::<sys::ImGuiStyle>());
     assert_eq!(mem::align_of::<Style>(), mem::align_of::<sys::ImGuiStyle>());
+    use memoffset::offset_of;
+    macro_rules! assert_field_offset {
+        ($l:ident, $r:ident) => {
+            assert_eq!(offset_of!(Style, $l), offset_of!(sys::ImGuiStyle, $r));
+        };
+    };
+    assert_field_offset!(alpha, Alpha);
+    assert_field_offset!(window_padding, WindowPadding);
+    assert_field_offset!(window_rounding, WindowRounding);
+    assert_field_offset!(window_border_size, WindowBorderSize);
+    assert_field_offset!(window_min_size, WindowMinSize);
+    assert_field_offset!(window_title_align, WindowTitleAlign);
+    assert_field_offset!(child_rounding, ChildRounding);
+    assert_field_offset!(child_border_size, ChildBorderSize);
+    assert_field_offset!(popup_rounding, PopupRounding);
+    assert_field_offset!(popup_border_size, PopupBorderSize);
+    assert_field_offset!(frame_padding, FramePadding);
+    assert_field_offset!(frame_rounding, FrameRounding);
+    assert_field_offset!(frame_border_size, FrameBorderSize);
+    assert_field_offset!(item_spacing, ItemSpacing);
+    assert_field_offset!(item_inner_spacing, ItemInnerSpacing);
+    assert_field_offset!(touch_extra_padding, TouchExtraPadding);
+    assert_field_offset!(indent_spacing, IndentSpacing);
+    assert_field_offset!(columns_min_spacing, ColumnsMinSpacing);
+    assert_field_offset!(scrollbar_size, ScrollbarSize);
+    assert_field_offset!(scrollbar_rounding, ScrollbarRounding);
+    assert_field_offset!(grab_min_size, GrabMinSize);
+    assert_field_offset!(grab_rounding, GrabRounding);
+    assert_field_offset!(tab_rounding, TabRounding);
+    assert_field_offset!(tab_border_size, TabBorderSize);
+    assert_field_offset!(button_text_align, ButtonTextAlign);
+    assert_field_offset!(display_window_padding, DisplayWindowPadding);
+    assert_field_offset!(display_safe_area_padding, DisplaySafeAreaPadding);
+    assert_field_offset!(mouse_cursor_scale, MouseCursorScale);
+    assert_field_offset!(anti_aliased_lines, AntiAliasedLines);
+    assert_field_offset!(anti_aliased_fill, AntiAliasedFill);
+    assert_field_offset!(curve_tessellation_tol, CurveTessellationTol);
+    assert_field_offset!(colors, Colors);
 }
 
 #[test]
