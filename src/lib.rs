@@ -6,6 +6,7 @@ pub extern crate imgui_sys as sys;
 
 mod context;
 mod font_atlas;
+mod io;
 mod string;
 mod style;
 #[cfg(test)]
@@ -16,6 +17,7 @@ use std::str;
 
 pub use self::context::*;
 pub use self::font_atlas::*;
+pub use self::io::*;
 pub use self::string::*;
 pub use self::style::*;
 

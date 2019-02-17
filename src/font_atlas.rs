@@ -116,7 +116,7 @@ pub struct FontAtlasTexture<'a> {
 pub struct SharedFontAtlas(*mut sys::ImFontAtlas);
 
 impl SharedFontAtlas {
-    pub fn new() -> SharedFontAtlas {
+    pub fn create() -> SharedFontAtlas {
         SharedFontAtlas(unsafe { sys::ImFontAtlas_ImFontAtlas() })
     }
 }

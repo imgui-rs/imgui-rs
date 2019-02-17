@@ -1,14 +1,18 @@
 use parking_lot::ReentrantMutex;
+use std::borrow::Cow;
 use std::cell::RefCell;
+use std::ffi::CStr;
 use std::ops::Drop;
 use std::ptr;
 use std::rc::Rc;
 
 use crate::font_atlas::{FontAtlas, FontAtlasRefMut, SharedFontAtlas};
+use crate::io::Io;
+use crate::string::ImStr;
 use crate::style::Style;
 use crate::sys;
 
-/// An ImGui context.
+/// An imgui-rs context.
 ///
 /// A context needs to be created to access most library functions. Due to current Dear ImGui
 /// design choices, at most one active Context can exist at any time. This limitation will likely
@@ -45,6 +49,8 @@ use crate::sys;
 pub struct Context {
     raw: *mut sys::ImGuiContext,
     shared_font_atlas: Option<Rc<RefCell<SharedFontAtlas>>>,
+    ini_filename: Option<Cow<'static, ImStr>>,
+    log_filename: Option<Cow<'static, ImStr>>,
 }
 
 lazy_static! {
@@ -64,7 +70,7 @@ fn no_current_context() -> bool {
 }
 
 impl Context {
-    /// Creates a new active ImGui context.
+    /// Creates a new active imgui-rs context.
     ///
     /// # Panics
     ///
@@ -72,7 +78,7 @@ impl Context {
     pub fn create() -> Self {
         Self::create_internal(None)
     }
-    /// Creates a new active ImGui context with a shared font atlas.
+    /// Creates a new active imgui-rs context with a shared font atlas.
     ///
     /// # Panics
     ///
@@ -90,6 +96,44 @@ impl Context {
         clear_current_context();
         SuspendedContext(self)
     }
+    pub fn ini_filename(&self) -> Option<&ImStr> {
+        let io = self.io();
+        if io.ini_filename.is_null() {
+            None
+        } else {
+            unsafe { Some(ImStr::from_cstr_unchecked(CStr::from_ptr(io.ini_filename))) }
+        }
+    }
+    pub fn set_ini_filename<T: Into<Option<Cow<'static, ImStr>>>>(&mut self, ini_filename: T) {
+        let value = ini_filename.into();
+        {
+            let io = self.io_mut();
+            io.ini_filename = match value {
+                Some(ref x) => x.as_ptr(),
+                None => ptr::null(),
+            }
+        }
+        self.ini_filename = value;
+    }
+    pub fn log_filename(&self) -> Option<&ImStr> {
+        let io = self.io();
+        if io.log_filename.is_null() {
+            None
+        } else {
+            unsafe { Some(ImStr::from_cstr_unchecked(CStr::from_ptr(io.log_filename))) }
+        }
+    }
+    pub fn set_log_filename<T: Into<Option<Cow<'static, ImStr>>>>(&mut self, log_filename: T) {
+        let value = log_filename.into();
+        {
+            let io = self.io_mut();
+            io.log_filename = match value {
+                Some(ref x) => x.as_ptr(),
+                None => ptr::null(),
+            }
+        }
+        self.log_filename = value;
+    }
     fn create_internal(shared_font_atlas: Option<Rc<RefCell<SharedFontAtlas>>>) -> Self {
         let _guard = CTX_MUTEX.lock();
         assert!(
@@ -102,6 +146,8 @@ impl Context {
         Context {
             raw,
             shared_font_atlas,
+            ini_filename: None,
+            log_filename: None,
         }
     }
     fn is_current_context(&self) -> bool {
@@ -121,7 +167,7 @@ impl Drop for Context {
     }
 }
 
-/// A suspended ImGui context.
+/// A suspended imgui-rs context.
 ///
 /// A suspended context retains its state, but is not usable without activating it first.
 ///
@@ -144,11 +190,11 @@ impl Drop for Context {
 pub struct SuspendedContext(Context);
 
 impl SuspendedContext {
-    /// Creates a new suspended ImGui context.
+    /// Creates a new suspended imgui-rs context.
     pub fn create() -> Self {
         Self::create_internal(None)
     }
-    /// Creates a new suspended ImGui context with a shared font atlas.
+    /// Creates a new suspended imgui-rs context with a shared font atlas.
     pub fn create_with_shared_font_atlas(shared_font_atlas: Rc<RefCell<SharedFontAtlas>>) -> Self {
         Self::create_internal(Some(shared_font_atlas))
     }
@@ -175,6 +221,8 @@ impl SuspendedContext {
         let ctx = Context {
             raw,
             shared_font_atlas,
+            ini_filename: None,
+            log_filename: None,
         };
         if ctx.is_current_context() {
             // Oops, the context was activated -> deactivate
@@ -256,7 +304,7 @@ fn test_suspend_failure() {
 #[test]
 fn test_shared_font_atlas() {
     let _guard = crate::test::TEST_MUTEX.lock();
-    let atlas = Rc::new(RefCell::new(SharedFontAtlas::new()));
+    let atlas = Rc::new(RefCell::new(SharedFontAtlas::create()));
     let suspended1 = SuspendedContext::create_with_shared_font_atlas(atlas.clone());
     let mut ctx2 = Context::create_with_shared_font_atlas(atlas.clone());
     {
@@ -271,7 +319,7 @@ fn test_shared_font_atlas() {
 #[should_panic]
 fn test_shared_font_atlas_borrow_panic() {
     let _guard = crate::test::TEST_MUTEX.lock();
-    let atlas = Rc::new(RefCell::new(SharedFontAtlas::new()));
+    let atlas = Rc::new(RefCell::new(SharedFontAtlas::create()));
     let _suspended = SuspendedContext::create_with_shared_font_atlas(atlas.clone());
     let mut ctx = Context::create_with_shared_font_atlas(atlas.clone());
     let _borrow1 = atlas.borrow();
@@ -279,6 +327,20 @@ fn test_shared_font_atlas_borrow_panic() {
 }
 
 impl Context {
+    /// Returns an immutable reference to the inputs/outputs object
+    pub fn io(&self) -> &Io {
+        unsafe {
+            // safe because Io is a transparent wrapper around sys::ImGuiIO
+            &*(sys::igGetIO() as *const Io)
+        }
+    }
+    /// Returns a mutable reference to the inputs/outputs object
+    pub fn io_mut(&mut self) -> &mut Io {
+        unsafe {
+            // safe because Io is a transparent wrapper around sys::ImGuiIO
+            &mut *(sys::igGetIO() as *mut Io)
+        }
+    }
     /// Returns an immutable reference to the user interface style
     pub fn style(&self) -> &Style {
         unsafe {

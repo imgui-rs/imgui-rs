@@ -14,6 +14,7 @@ readme = "README.markdown"
 travis-ci = { repository = "Gekkio/imgui-rs" }
 
 [dependencies]
+bitflags = "1.0"
 glium = { version = "0.23", default-features = false, optional = true }
 gfx = { version = "0.17", optional = true }
 imgui-sys = { version = "0.0.23-pre", path = "imgui-sys" }

@@ -173,16 +173,20 @@ impl ImStr {
     pub fn new<S: AsRef<ImStr> + ?Sized>(s: &S) -> &ImStr {
         s.as_ref()
     }
-    /// Converts a slice of bytes to an ImGui string slice without checking for valid UTF-8 or null
-    /// termination.
+    /// Converts a slice of bytes to an imgui-rs string slice without checking for valid UTF-8 or
+    /// null termination.
     pub unsafe fn from_utf8_with_nul_unchecked(bytes: &[u8]) -> &ImStr {
         &*(bytes as *const [u8] as *const ImStr)
     }
-    /// Converts an ImGui string slice to a raw pointer
+    /// Converts a CStr reference to an imgui-rs string slice without checking for valid UTF-8.
+    pub unsafe fn from_cstr_unchecked(value: &CStr) -> &ImStr {
+        &*(value as *const CStr as *const ImStr)
+    }
+    /// Converts an imgui-rs string slice to a raw pointer
     pub fn as_ptr(&self) -> *const c_char {
         self.0.as_ptr()
     }
-    /// Converts an ImGui string slice to a normal string slice
+    /// Converts an imgui-rs string slice to a normal string slice
     pub fn to_str(&self) -> &str {
         // CStr::to_bytes does *not* include the null terminator
         unsafe { str::from_utf8_unchecked(self.0.to_bytes()) }
