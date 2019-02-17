@@ -297,6 +297,10 @@ pub struct Io {
     ///
     /// Set only when `ConfigFlags::NavEnableSetMousePos` is enabled.
     pub want_set_mouse_pos: bool,
+    /// When manual .ini load/save is active (`ini_filename` is `None`), this will be set to notify
+    /// your application that you can call `save_ini_settings` and save the settings yourself.
+    ///
+    /// *Important*: You need to clear this flag yourself
     pub want_save_ini_settings: bool,
     /// Directional navigation is currently allowed
     pub nav_active: bool,

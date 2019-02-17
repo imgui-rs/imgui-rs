@@ -134,6 +134,15 @@ impl Context {
         }
         self.log_filename = value;
     }
+    pub fn load_ini_settings(&mut self, data: &str) {
+        unsafe {
+            sys::igLoadIniSettingsFromMemory(data.as_ptr() as *const _, data.len())
+        }
+    }
+    pub fn save_ini_settings(&mut self, buf: &mut String) {
+        let data = unsafe { CStr::from_ptr(sys::igSaveIniSettingsToMemory(ptr::null_mut())) };
+        buf.push_str(&data.to_string_lossy());
+    }
     fn create_internal(shared_font_atlas: Option<Rc<RefCell<SharedFontAtlas>>>) -> Self {
         let _guard = CTX_MUTEX.lock();
         assert!(
@@ -324,6 +333,19 @@ fn test_shared_font_atlas_borrow_panic() {
     let mut ctx = Context::create_with_shared_font_atlas(atlas.clone());
     let _borrow1 = atlas.borrow();
     let _borrow2 = ctx.fonts();
+}
+
+#[test]
+fn test_ini_load_save() {
+    let (_guard, mut ctx) = crate::test::test_ctx();
+    let data = "[Window][Debug##Default]
+Pos=60,60
+Size=400,400
+Collapsed=0";
+    ctx.load_ini_settings(&data);
+    let mut buf = String::new();
+    ctx.save_ini_settings(&mut buf);
+    assert_eq!(data.trim(), buf.trim());
 }
 
 impl Context {
