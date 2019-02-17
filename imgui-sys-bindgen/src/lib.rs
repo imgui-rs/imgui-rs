@@ -77,7 +77,7 @@ pub fn generate_bindings<P: AsRef<Path>>(cimgui_path: &P) -> Result<Bindings, Er
         .raw_line("#![allow(non_camel_case_types)]")
         .raw_line("#![allow(non_snake_case)]")
         .header_contents("cimgui.h", &header)
-        .rust_target(RustTarget::Stable_1_26)
+        .rust_target(RustTarget::Stable_1_28)
         .default_enum_style(EnumVariation::Consts)
         .prepend_enum_name(false)
         .generate_comments(false)
