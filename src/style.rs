@@ -141,19 +141,19 @@ impl Style {
 }
 
 impl Style {
-    pub fn from_raw(raw: &sys::ImGuiStyle) -> &Self {
-        unsafe { &*(raw as *const _ as *const Style) }
+    pub unsafe fn from_raw(raw: &sys::ImGuiStyle) -> &Self {
+        &*(raw as *const _ as *const Style)
     }
-    pub fn from_raw_mut(raw: &mut sys::ImGuiStyle) -> &mut Self {
-        unsafe { &mut *(raw as *mut _ as *mut Style) }
+    pub unsafe fn from_raw_mut(raw: &mut sys::ImGuiStyle) -> &mut Self {
+        &mut *(raw as *mut _ as *mut Style)
     }
     /// Returns an immutable reference to the underlying raw Dear ImGui style
-    pub fn raw(&self) -> &sys::ImGuiStyle {
-        unsafe { &*(self as *const _ as *const sys::ImGuiStyle) }
+    pub unsafe fn raw(&self) -> &sys::ImGuiStyle {
+        &*(self as *const _ as *const sys::ImGuiStyle)
     }
     /// Returns a mutable reference to the underlying raw Dear ImGui style
-    pub fn raw_mut(&mut self) -> &mut sys::ImGuiStyle {
-        unsafe { &mut *(self as *mut _ as *mut sys::ImGuiStyle) }
+    pub unsafe fn raw_mut(&mut self) -> &mut sys::ImGuiStyle {
+        &mut *(self as *mut _ as *mut sys::ImGuiStyle)
     }
 }
 

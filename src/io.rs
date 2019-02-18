@@ -373,19 +373,19 @@ impl Io {
 }
 
 impl Io {
-    pub fn from_raw(raw: &sys::ImGuiIO) -> &Self {
-        unsafe { &*(raw as *const _ as *const Io) }
+    pub unsafe fn from_raw(raw: &sys::ImGuiIO) -> &Self {
+        &*(raw as *const _ as *const Io)
     }
-    pub fn from_raw_mut(raw: &mut sys::ImGuiIO) -> &mut Self {
-        unsafe { &mut *(raw as *mut _ as *mut Io) }
+    pub unsafe fn from_raw_mut(raw: &mut sys::ImGuiIO) -> &mut Self {
+        &mut *(raw as *mut _ as *mut Io)
     }
     /// Returns an immutable reference to the underlying raw Dear ImGui IO object
-    pub fn raw(&self) -> &sys::ImGuiIO {
-        unsafe { &*(self as *const _ as *const sys::ImGuiIO) }
+    pub unsafe fn raw(&self) -> &sys::ImGuiIO {
+        &*(self as *const _ as *const sys::ImGuiIO)
     }
     /// Returns a mutable reference to the underlying raw Dear ImGui IO object
-    pub fn raw_mut(&mut self) -> &mut sys::ImGuiIO {
-        unsafe { &mut *(self as *mut _ as *mut sys::ImGuiIO) }
+    pub unsafe fn raw_mut(&mut self) -> &mut sys::ImGuiIO {
+        &mut *(self as *mut _ as *mut sys::ImGuiIO)
     }
 }
 
