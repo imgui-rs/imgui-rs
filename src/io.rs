@@ -222,9 +222,6 @@ pub struct Io {
     /// framebuffer coordinates
     pub display_framebuffer_scale: [f32; 2],
 
-    display_visible_min: [f32; 2],
-    display_visible_max: [f32; 2],
-
     /// Request imgui-rs to draw a mouse cursor for you
     pub mouse_draw_cursor: bool,
     /// macOS-style input behavior.
@@ -458,8 +455,6 @@ fn test_io_memory_layout() {
     assert_field_offset!(font_allow_user_scaling, FontAllowUserScaling);
     assert_field_offset!(font_default, FontDefault);
     assert_field_offset!(display_framebuffer_scale, DisplayFramebufferScale);
-    assert_field_offset!(display_visible_min, DisplayVisibleMin);
-    assert_field_offset!(display_visible_max, DisplayVisibleMax);
     assert_field_offset!(mouse_draw_cursor, MouseDrawCursor);
     assert_field_offset!(config_mac_os_behaviors, ConfigMacOSXBehaviors);
     assert_field_offset!(config_input_text_cursor_blink, ConfigInputTextCursorBlink);

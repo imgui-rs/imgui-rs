@@ -85,8 +85,12 @@ pub struct Style {
     pub tab_border_size: f32,
     /// Alignment of button text when button is larger than text.
     ///
-    /// Defaults to [0.5, 0.5] for horizontally and vertically centered.
+    /// Defaults to [0.5, 0.5] (centered).
     pub button_text_align: [f32; 2],
+    /// Alignment of selectable text when selectable is larger than text.
+    ///
+    /// Defaults to [0.5, 0.5] (top-left aligned).
+    pub selectable_text_align: [f32; 2],
     /// Window positions are clamped to be visible within the display area by at least this amount.
     ///
     /// Only applies to regular windows.
@@ -336,6 +340,8 @@ pub enum StyleVar {
     TabRounding(f32),
     /// Alignment of button text when button is larger than text
     ButtonTextAlign([f32; 2]),
+    /// Alignment of selectable text when selectable is larger than text
+    SelectableTextAlign([f32; 2]),
 }
 
 #[test]
@@ -431,6 +437,7 @@ fn test_style_memory_layout() {
     assert_field_offset!(tab_rounding, TabRounding);
     assert_field_offset!(tab_border_size, TabBorderSize);
     assert_field_offset!(button_text_align, ButtonTextAlign);
+    assert_field_offset!(selectable_text_align, SelectableTextAlign);
     assert_field_offset!(display_window_padding, DisplayWindowPadding);
     assert_field_offset!(display_safe_area_padding, DisplaySafeAreaPadding);
     assert_field_offset!(mouse_cursor_scale, MouseCursorScale);

@@ -31,5 +31,5 @@ pub fn get_dear_imgui_version() -> &'static str {
 
 #[test]
 fn test_get_version() {
-    assert_eq!(get_dear_imgui_version(), "1.67");
+    assert_eq!(get_dear_imgui_version(), "1.68");
 }
