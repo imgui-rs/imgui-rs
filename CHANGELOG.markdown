@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Added
+
+- Support for image buttons: `Ui::image_button`
+
 ### Removed
 
 - Various things that were deprecated in imgui-rs 0.0.21 and 0.0.22

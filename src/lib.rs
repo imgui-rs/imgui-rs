@@ -18,7 +18,7 @@ pub use self::drag::{
     DragInt4, DragIntRange2,
 };
 pub use self::fonts::{FontGlyphRange, ImFont, ImFontAtlas, ImFontConfig};
-pub use self::image::{ImTexture, Image, Textures};
+pub use self::image::{ImTexture, Image, ImageButton, Textures};
 pub use self::input::{
     InputFloat, InputFloat2, InputFloat3, InputFloat4, InputInt, InputInt2, InputInt3, InputInt4,
     InputText, InputTextMultiline,
@@ -1355,6 +1355,16 @@ impl<'ui> Ui<'ui> {
         S: Into<ImVec2>,
     {
         Image::new(self, texture, size)
+    }
+}
+
+// ImageButton
+impl<'ui> Ui<'ui> {
+    pub fn image_button<S>(&self, texture: ImTexture, size: S) -> ImageButton
+    where
+        S: Into<ImVec2>,
+    {
+        ImageButton::new(self, texture, size)
     }
 }
 
