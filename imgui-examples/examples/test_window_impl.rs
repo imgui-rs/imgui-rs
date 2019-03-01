@@ -399,7 +399,8 @@ fn show_test_window(ui: &Ui, state: &mut State, opened: &mut bool) {
                     im_str!("multiline"),
                     &mut state.text_multiline,
                     (300., 100.),
-                ).build();
+                )
+                .build();
             });
 
             ui.tree_node(im_str!("Word Wrapping")).build(|| {
@@ -804,7 +805,11 @@ fn show_example_app_custom_rendering(ui: &Ui, state: &mut CustomRenderingState, 
         .opened(opened)
         .build(|| {
             ui.text("Primitives");
-            // TODO: Add DragFloat to change value of sz
+            ui.drag_float(im_str!("Size"), &mut state.sz)
+                .min(2.0)
+                .max(72.0)
+                .display_format(im_str!("%.0f"))
+                .build();
             ui.color_edit(im_str!("Color"), &mut state.col).build();
             let draw_list = ui.get_window_draw_list();
             let p = ui.get_cursor_screen_pos();
