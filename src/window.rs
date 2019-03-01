@@ -2,12 +2,13 @@ use std::marker::PhantomData;
 use std::ptr;
 use sys;
 
-use super::{ImGuiCond, ImGuiWindowFlags, ImStr, ImVec2, Ui};
+use super::{ImGuiCond, ImGuiWindowFlags, ImStr, Ui};
 
 #[must_use]
 pub struct Window<'ui, 'p> {
     pos: (f32, f32),
     pos_cond: ImGuiCond,
+    pos_pivot: (f32, f32),
     size: (f32, f32),
     size_cond: ImGuiCond,
     name: &'p ImStr,
@@ -21,6 +22,7 @@ impl<'ui, 'p> Window<'ui, 'p> {
         Window {
             pos: (0.0, 0.0),
             pos_cond: ImGuiCond::empty(),
+            pos_pivot: (0.0, 0.0),
             size: (0.0, 0.0),
             size_cond: ImGuiCond::empty(),
             name,
@@ -33,6 +35,11 @@ impl<'ui, 'p> Window<'ui, 'p> {
     pub fn position(mut self, pos: (f32, f32), cond: ImGuiCond) -> Self {
         self.pos = pos;
         self.pos_cond = cond;
+        self
+    }
+    #[inline]
+    pub fn position_pivot(mut self, pivot: (f32, f32)) -> Self {
+        self.pos_pivot = pivot;
         self
     }
     #[inline]
@@ -138,7 +145,7 @@ impl<'ui, 'p> Window<'ui, 'p> {
     pub fn build<F: FnOnce()>(self, f: F) {
         let render = unsafe {
             if !self.pos_cond.is_empty() {
-                sys::igSetNextWindowPos(self.pos.into(), self.pos_cond, ImVec2::zero());
+                sys::igSetNextWindowPos(self.pos.into(), self.pos_cond, self.pos_pivot.into());
             }
             if !self.size_cond.is_empty() {
                 sys::igSetNextWindowSize(self.size.into(), self.size_cond);
