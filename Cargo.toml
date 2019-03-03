@@ -26,13 +26,13 @@ memoffset = "0.2"
 
 [workspace]
 members = [
-    "imgui-sys"
+    "imgui-glium-renderer",
+    "imgui-sys",
+    "imgui-winit-support"
 ]
 exclude = [
     "imgui-examples",
     "imgui-glium-examples",
     "imgui-sys-bindgen",
     "imgui-gfx-renderer",
-    "imgui-glium-renderer",
-    "imgui-winit-support"
 ]

@@ -1,6 +1,8 @@
 use bitflags::bitflags;
-use std::os::raw::{c_char, c_int, c_void};
+use std::f32;
 use std::ops::{Index, IndexMut};
+use std::os::raw::{c_char, c_int, c_void};
+use std::time::Instant;
 
 use crate::sys;
 
@@ -21,40 +23,40 @@ bitflags! {
         /// Master keyboard navigation enable flag.
         ///
         /// `frame()` will automatically fill `io.nav_inputs` based on `io.keys_down`.
-        const NavEnableKeyboard = sys::ImGuiConfigFlags_NavEnableKeyboard;
+        const NAV_ENABLE_KEYBOARD = sys::ImGuiConfigFlags_NavEnableKeyboard;
         /// Master gamepad navigation enable flag.
         ///
         /// This is mostly to instruct the backend to fill `io.nav_inputs`. The backend
         /// also needs to set `BackendFlags::HasGamepad`.
-        const NavEnableGamepad = sys::ImGuiConfigFlags_NavEnableGamepad;
+        const NAV_ENABLE_GAMEPAD = sys::ImGuiConfigFlags_NavEnableGamepad;
         /// Instruction navigation to move the mouse cursor.
         ///
         /// May be useful on TV/console systems where moving a virtual mouse is awkward.
         /// Will update `io.mouse_pos` and set `io.want_set_mouse_pos = true`. If enabled,
         /// you *must* honor `io.want_set_mouse_pos`, or imgui-rs will react as if the mouse is
         /// jumping around back and forth.
-        const NavEnableSetMousePos = sys::ImGuiConfigFlags_NavEnableSetMousePos;
+        const NAV_ENABLE_SET_MOUSE_POS = sys::ImGuiConfigFlags_NavEnableSetMousePos;
         /// Instruction navigation to not set the `io.want_capture_keyboard` flag when
         /// `io.nav_active` is set.
-        const NavNoCaptureKeyboard = sys::ImGuiConfigFlags_NavNoCaptureKeyboard;
+        const NAV_NO_CAPTURE_KEYBOARD = sys::ImGuiConfigFlags_NavNoCaptureKeyboard;
         /// Instruction imgui-rs to clear mouse position/buttons in `frame()`.
         ///
         /// This allows ignoring the mouse information set by the backend.
-        const NoMouse = sys::ImGuiConfigFlags_NoMouse;
+        const NO_MOUSE = sys::ImGuiConfigFlags_NoMouse;
         /// Instruction backend to not alter mouse cursor shape and visibility.
         ///
         /// Use if the backend cursor changes are interfering with yours and you don't want to use
         /// `set_mouse_cursor` to change the mouse cursor. You may want to honor requests from
         /// imgui-rs by reading `get_mouse_cursor` yourself instead.
-        const NoMouseCursorChange = sys::ImGuiConfigFlags_NoMouseCursorChange;
+        const NO_MOUSE_CURSOR_CHANGE = sys::ImGuiConfigFlags_NoMouseCursorChange;
         /// Application is SRGB-aware.
         ///
         /// Not used by core imgui-rs.
-        const IsSrgb = sys::ImGuiConfigFlags_IsSRGB;
+        const IS_SRGB = sys::ImGuiConfigFlags_IsSRGB;
         /// Application is using a touch screen instead of a mouse.
         ///
         /// Not used by core imgui-rs.
-        const IsTouchScreen = sys::ImGuiConfigFlags_IsTouchScreen;
+        const IS_TOUCH_SCREEN = sys::ImGuiConfigFlags_IsTouchScreen;
     }
 }
 
@@ -63,13 +65,13 @@ bitflags! {
     #[repr(transparent)]
     pub struct BackendFlags: u32 {
         /// Backend supports gamepad and currently has one connected
-        const HasGamepad = sys::ImGuiBackendFlags_HasGamepad;
+        const HAS_GAMEPAD = sys::ImGuiBackendFlags_HasGamepad;
         /// Backend supports honoring `get_mouse_cursor` value to change the OS cursor shape
-        const HasMouseCursors = sys::ImGuiBackendFlags_HasMouseCursors;
+        const HAS_MOUSE_CURSORS = sys::ImGuiBackendFlags_HasMouseCursors;
         /// Backend supports `io.want_set_mouse_pos` requests to reposition the OS mouse position.
         ///
         /// Only used if `ConfigFlags::NavEnableSetMousePos` is set.
-        const HasSetMousePos = sys::ImGuiBackendFlags_HasSetMousePos;
+        const HAS_SET_MOUSE_POS = sys::ImGuiBackendFlags_HasSetMousePos;
     }
 }
 
@@ -245,8 +247,8 @@ pub struct Io {
     /// Windows without a title bar are not affected.
     pub config_windows_move_from_title_bar_only: bool,
 
-    backend_platform_name: *const c_char,
-    backend_renderer_name: *const c_char,
+    pub(crate) backend_platform_name: *const c_char,
+    pub(crate) backend_renderer_name: *const c_char,
     backend_platform_user_data: *mut c_void,
     backend_renderer_user_data: *mut c_void,
     backend_language_user_data: *mut c_void,
@@ -366,6 +368,18 @@ impl Io {
         unsafe {
             sys::ImGuiIO_ClearInputCharacters(self.raw_mut());
         }
+    }
+    pub fn update_delta_time(&mut self, previous: Instant) -> Instant {
+        let now = Instant::now();
+        let delta = now - previous;
+        let delta_s = delta.as_secs() as f32 + delta.subsec_nanos() as f32 / 1_000_000_000.0;
+        if delta_s > 0.0 {
+            self.delta_time = delta_s;
+        } else {
+            self.delta_time = f32::MIN_POSITIVE;
+        }
+        self.delta_time = delta_s;
+        now
     }
 }
 

@@ -1,5 +1,4 @@
 use parking_lot::ReentrantMutex;
-use std::borrow::Cow;
 use std::cell::RefCell;
 use std::ffi::CStr;
 use std::ops::Drop;
@@ -8,9 +7,10 @@ use std::rc::Rc;
 
 use crate::font_atlas::{FontAtlas, FontAtlasRefMut, SharedFontAtlas};
 use crate::io::Io;
-use crate::string::ImStr;
+use crate::string::{ImStr, ImString};
 use crate::style::Style;
 use crate::sys;
+use crate::Ui;
 
 /// An imgui-rs context.
 ///
@@ -45,12 +45,15 @@ use crate::sys;
 /// let suspended1 = ctx1.suspend();
 /// let ctx2 = imgui::Context::create(); // this is now OK
 /// ```
+
 #[derive(Debug)]
 pub struct Context {
     raw: *mut sys::ImGuiContext,
     shared_font_atlas: Option<Rc<RefCell<SharedFontAtlas>>>,
-    ini_filename: Option<Cow<'static, ImStr>>,
-    log_filename: Option<Cow<'static, ImStr>>,
+    ini_filename: Option<ImString>,
+    log_filename: Option<ImString>,
+    platform_name: Option<ImString>,
+    renderer_name: Option<ImString>,
 }
 
 lazy_static! {
@@ -104,16 +107,13 @@ impl Context {
             unsafe { Some(ImStr::from_cstr_unchecked(CStr::from_ptr(io.ini_filename))) }
         }
     }
-    pub fn set_ini_filename<T: Into<Option<Cow<'static, ImStr>>>>(&mut self, ini_filename: T) {
-        let value = ini_filename.into();
-        {
-            let io = self.io_mut();
-            io.ini_filename = match value {
-                Some(ref x) => x.as_ptr(),
-                None => ptr::null(),
-            }
-        }
-        self.ini_filename = value;
+    pub fn set_ini_filename<T: Into<Option<ImString>>>(&mut self, ini_filename: T) {
+        let ini_filename = ini_filename.into();
+        self.io_mut().ini_filename = ini_filename
+            .as_ref()
+            .map(|x| x.as_ptr())
+            .unwrap_or(ptr::null());
+        self.ini_filename = ini_filename;
     }
     pub fn log_filename(&self) -> Option<&ImStr> {
         let io = self.io();
@@ -123,21 +123,56 @@ impl Context {
             unsafe { Some(ImStr::from_cstr_unchecked(CStr::from_ptr(io.log_filename))) }
         }
     }
-    pub fn set_log_filename<T: Into<Option<Cow<'static, ImStr>>>>(&mut self, log_filename: T) {
-        let value = log_filename.into();
-        {
-            let io = self.io_mut();
-            io.log_filename = match value {
-                Some(ref x) => x.as_ptr(),
-                None => ptr::null(),
+    pub fn set_log_filename<T: Into<Option<ImString>>>(&mut self, log_filename: T) {
+        let log_filename = log_filename.into();
+        self.io_mut().log_filename = log_filename
+            .as_ref()
+            .map(|x| x.as_ptr())
+            .unwrap_or(ptr::null());
+        self.log_filename = log_filename;
+    }
+    pub fn platform_name(&self) -> Option<&ImStr> {
+        let io = self.io();
+        if io.backend_platform_name.is_null() {
+            None
+        } else {
+            unsafe {
+                Some(ImStr::from_cstr_unchecked(CStr::from_ptr(
+                    io.backend_platform_name,
+                )))
             }
         }
-        self.log_filename = value;
+    }
+    pub fn set_platform_name<T: Into<Option<ImString>>>(&mut self, platform_name: T) {
+        let platform_name = platform_name.into();
+        self.io_mut().backend_platform_name = platform_name
+            .as_ref()
+            .map(|x| x.as_ptr())
+            .unwrap_or(ptr::null());
+        self.platform_name = platform_name;
+    }
+    pub fn renderer_name(&self) -> Option<&ImStr> {
+        let io = self.io();
+        if io.backend_renderer_name.is_null() {
+            None
+        } else {
+            unsafe {
+                Some(ImStr::from_cstr_unchecked(CStr::from_ptr(
+                    io.backend_renderer_name,
+                )))
+            }
+        }
+    }
+    pub fn set_renderer_name<T: Into<Option<ImString>>>(&mut self, renderer_name: T) {
+        let renderer_name = renderer_name.into();
+        self.io_mut().backend_renderer_name = renderer_name
+            .as_ref()
+            .map(|x| x.as_ptr())
+            .unwrap_or(ptr::null());
+        self.renderer_name = renderer_name;
     }
     pub fn load_ini_settings(&mut self, data: &str) {
-        unsafe {
-            sys::igLoadIniSettingsFromMemory(data.as_ptr() as *const _, data.len())
-        }
+        unsafe { sys::igLoadIniSettingsFromMemory(data.as_ptr() as *const _, data.len()) }
     }
     pub fn save_ini_settings(&mut self, buf: &mut String) {
         let data = unsafe { CStr::from_ptr(sys::igSaveIniSettingsToMemory(ptr::null_mut())) };
@@ -150,13 +185,15 @@ impl Context {
             "A new active context cannot be created, because another one already exists"
         );
         // Dear ImGui implicitly sets the current context during igCreateContext if the current
-        // context doesn't exists
+        // context doesn't exist
         let raw = unsafe { sys::igCreateContext(ptr::null_mut()) };
         Context {
             raw,
             shared_font_atlas,
             ini_filename: None,
             log_filename: None,
+            platform_name: None,
+            renderer_name: None,
         }
     }
     fn is_current_context(&self) -> bool {
@@ -232,6 +269,8 @@ impl SuspendedContext {
             shared_font_atlas,
             ini_filename: None,
             log_filename: None,
+            platform_name: None,
+            renderer_name: None,
         };
         if ctx.is_current_context() {
             // Oops, the context was activated -> deactivate
@@ -392,5 +431,12 @@ impl Context {
                 FontAtlasRefMut::Unique(fonts)
             },
         }
+    }
+    pub fn frame<'ui, 'a: 'ui>(&'a mut self) -> Ui<'ui> {
+        // TODO: precondition checks
+        unsafe {
+            sys::igNewFrame();
+        }
+        Ui { ctx: self }
     }
 }

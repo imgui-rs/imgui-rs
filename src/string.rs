@@ -1,4 +1,4 @@
-use std::borrow::Borrow;
+use std::borrow::{Borrow, Cow};
 use std::ffi::CStr;
 use std::fmt;
 use std::ops::{Deref, Index, RangeFull};
@@ -95,6 +95,12 @@ impl<'a> Default for ImString {
 impl From<String> for ImString {
     fn from(s: String) -> ImString {
         ImString::new(s)
+    }
+}
+
+impl<'a> From<ImString> for Cow<'a, ImStr> {
+    fn from(s: ImString) -> Cow<'a, ImStr> {
+        Cow::Owned(s)
     }
 }
 
@@ -208,6 +214,12 @@ impl AsRef<ImStr> for ImStr {
 impl AsRef<str> for ImStr {
     fn as_ref(&self) -> &str {
         self.to_str()
+    }
+}
+
+impl<'a> From<&'a ImStr> for Cow<'a, ImStr> {
+    fn from(s: &'a ImStr) -> Cow<'a, ImStr> {
+        Cow::Borrowed(s)
     }
 }
 

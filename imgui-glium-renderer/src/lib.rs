@@ -1,29 +1,31 @@
 use glium::backend::{Context, Facade};
 use glium::index::{self, PrimitiveType};
-use glium::program;
-use glium::texture;
-use glium::vertex;
-use glium::{uniform, DrawError, IndexBuffer, Program, Surface, Texture2d, VertexBuffer};
-use imgui::{DrawList, FrameSize, ImGui, ImTexture, Textures, Ui};
+use glium::program::ProgramChooserCreationError;
+use glium::texture::{ClientFormat, MipmapsOption, RawImage2d, TextureCreationError};
+use glium::uniforms::{MagnifySamplerFilter, MinifySamplerFilter};
+use glium::{
+    program, uniform, vertex, Blend, DrawError, DrawParameters, GlObject, IndexBuffer, Program,
+    Rect, Surface, Texture2d, VertexBuffer,
+};
+use imgui::{DrawCmd, DrawData, ImString, Renderer, TextureId};
 use std::borrow::Cow;
+use std::collections::HashMap;
 use std::fmt;
 use std::rc::Rc;
 
-pub type RendererResult<T> = Result<T, RendererError>;
-
 #[derive(Clone, Debug)]
-pub enum RendererError {
+pub enum GliumRendererError {
     Vertex(vertex::BufferCreationError),
     Index(index::BufferCreationError),
-    Program(program::ProgramChooserCreationError),
-    Texture(texture::TextureCreationError),
+    Program(ProgramChooserCreationError),
+    Texture(TextureCreationError),
     Draw(DrawError),
-    BadTexture(ImTexture),
+    BadTexture(TextureId),
 }
 
-impl fmt::Display for RendererError {
+impl fmt::Display for GliumRendererError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        use self::RendererError::*;
+        use self::GliumRendererError::*;
         match *self {
             Vertex(_) => write!(f, "Vertex buffer creation failed"),
             Index(_) => write!(f, "Index buffer creation failed"),
@@ -35,159 +37,205 @@ impl fmt::Display for RendererError {
     }
 }
 
-impl From<vertex::BufferCreationError> for RendererError {
-    fn from(e: vertex::BufferCreationError) -> RendererError {
-        RendererError::Vertex(e)
+impl From<vertex::BufferCreationError> for GliumRendererError {
+    fn from(e: vertex::BufferCreationError) -> GliumRendererError {
+        GliumRendererError::Vertex(e)
     }
 }
 
-impl From<index::BufferCreationError> for RendererError {
-    fn from(e: index::BufferCreationError) -> RendererError {
-        RendererError::Index(e)
+impl From<index::BufferCreationError> for GliumRendererError {
+    fn from(e: index::BufferCreationError) -> GliumRendererError {
+        GliumRendererError::Index(e)
     }
 }
 
-impl From<program::ProgramChooserCreationError> for RendererError {
-    fn from(e: program::ProgramChooserCreationError) -> RendererError {
-        RendererError::Program(e)
+impl From<ProgramChooserCreationError> for GliumRendererError {
+    fn from(e: ProgramChooserCreationError) -> GliumRendererError {
+        GliumRendererError::Program(e)
     }
 }
 
-impl From<texture::TextureCreationError> for RendererError {
-    fn from(e: texture::TextureCreationError) -> RendererError {
-        RendererError::Texture(e)
+impl From<TextureCreationError> for GliumRendererError {
+    fn from(e: TextureCreationError) -> GliumRendererError {
+        GliumRendererError::Texture(e)
     }
 }
 
-impl From<DrawError> for RendererError {
-    fn from(e: DrawError) -> RendererError {
-        RendererError::Draw(e)
+impl From<DrawError> for GliumRendererError {
+    fn from(e: DrawError) -> GliumRendererError {
+        GliumRendererError::Draw(e)
     }
 }
 
-pub struct Renderer {
+pub struct GliumRenderer {
     ctx: Rc<Context>,
-    device_objects: DeviceObjects,
+    program: Program,
+    font_texture: Texture2d,
+    textures: HashMap<TextureId, Rc<Texture2d>>,
 }
 
-impl Renderer {
-    pub fn init<F: Facade>(imgui: &mut ImGui, ctx: &F) -> RendererResult<Renderer> {
-        let device_objects = DeviceObjects::init(imgui, ctx)?;
-        Ok(Renderer {
-            ctx: Rc::clone(ctx.get_context()),
-            device_objects,
+impl GliumRenderer {
+    pub fn init<F: Facade>(
+        ctx: &mut imgui::Context,
+        facade: &F,
+    ) -> Result<GliumRenderer, GliumRendererError> {
+        ctx.set_renderer_name(Some(ImString::from(format!(
+            "imgui-glium-renderer {}",
+            env!("CARGO_PKG_VERSION")
+        ))));
+        let program = compile_default_program(facade)?;
+        let font_texture = upload_font_texture(ctx.fonts(), facade.get_context())?;
+        Ok(GliumRenderer {
+            ctx: Rc::clone(facade.get_context()),
+            program,
+            font_texture,
+            textures: HashMap::new(),
         })
     }
-
-    pub fn textures(&mut self) -> &mut Textures<Texture2d> {
-        &mut self.device_objects.textures
+    fn lookup_texture(&self, texture_id: TextureId) -> Result<&Texture2d, GliumRendererError> {
+        if texture_id.id() == self.font_texture.get_id() as usize {
+            Ok(&self.font_texture)
+        } else if let Some(texture) = self.textures.get(&texture_id) {
+            Ok(texture)
+        } else {
+            Err(GliumRendererError::BadTexture(texture_id))
+        }
     }
+}
 
-    pub fn render<'a, S: Surface>(&mut self, surface: &mut S, ui: Ui<'a>) -> RendererResult<()> {
-        let _ = self.ctx.insert_debug_marker("imgui-rs: starting rendering");
-        let FrameSize {
-            logical_size: (width, height),
-            hidpi_factor,
-        } = ui.frame_size();
-        if !(width > 0.0 && height > 0.0) {
+impl<T> Renderer<T> for GliumRenderer
+where
+    T: Surface,
+{
+    type Error = GliumRendererError;
+    type Texture = Rc<Texture2d>;
+    fn reload_font_texture(&mut self, ctx: &mut imgui::Context) -> Result<(), GliumRendererError> {
+        self.font_texture = upload_font_texture(ctx.fonts(), &self.ctx)?;
+        Ok(())
+    }
+    fn register_texture(&mut self, texture: Rc<Texture2d>) -> TextureId {
+        let texture_id = TextureId::from(texture.get_id() as usize);
+        self.textures.insert(texture_id, texture);
+        texture_id
+    }
+    fn get_texture(&self, texture_id: TextureId) -> Option<&Rc<Texture2d>> {
+        self.textures.get(&texture_id)
+    }
+    fn deregister_texture(&mut self, texture_id: TextureId) -> Option<Rc<Texture2d>> {
+        self.textures.remove(&texture_id)
+    }
+    fn render_draw_data(
+        &mut self,
+        draw_data: &DrawData,
+        target: &mut T,
+    ) -> Result<(), GliumRendererError> {
+        let fb_width = draw_data.display_size[0] * draw_data.framebuffer_scale[0];
+        let fb_height = draw_data.display_size[1] * draw_data.framebuffer_scale[1];
+        if !(fb_width > 0.0 && fb_height > 0.0) {
             return Ok(());
         }
-        let fb_size = (
-            (width * hidpi_factor) as f32,
-            (height * hidpi_factor) as f32,
-        );
-
+        let _ = self.ctx.insert_debug_marker("imgui-rs: starting rendering");
+        let left = draw_data.display_pos[0];
+        let right = draw_data.display_pos[0] + draw_data.display_size[0];
+        let top = draw_data.display_pos[1];
+        let bottom = draw_data.display_pos[1] + draw_data.display_size[1];
         let matrix = [
-            [(2.0 / width) as f32, 0.0, 0.0, 0.0],
-            [0.0, (2.0 / -height) as f32, 0.0, 0.0],
+            [(2.0 / (right - left)), 0.0, 0.0, 0.0],
+            [0.0, (2.0 / (top - bottom)), 0.0, 0.0],
             [0.0, 0.0, -1.0, 0.0],
-            [-1.0, 1.0, 0.0, 1.0],
+            [
+                (right + left) / (left - right),
+                (top + bottom) / (bottom - top),
+                0.0,
+                1.0,
+            ],
         ];
-        let result = ui.render(|ui, mut draw_data| {
-            draw_data.scale_clip_rects(ui.imgui().display_framebuffer_scale());
-            for draw_list in &draw_data {
-                self.render_draw_list(surface, &draw_list, fb_size, matrix)?;
-            }
-            Ok(())
-        });
-        let _ = self.ctx.insert_debug_marker("imgui-rs: rendering finished");
-        result
-    }
-
-    fn render_draw_list<'a, S: Surface>(
-        &mut self,
-        surface: &mut S,
-        draw_list: &DrawList<'a>,
-        fb_size: (f32, f32),
-        matrix: [[f32; 4]; 4],
-    ) -> RendererResult<()> {
-        use glium::{Blend, DrawParameters, Rect};
-
-        let (fb_width, fb_height) = fb_size;
-
-        let vtx_buffer = VertexBuffer::immutable(&self.ctx, draw_list.vtx_buffer)?;
-        let idx_buffer = IndexBuffer::immutable(
-            &self.ctx,
-            PrimitiveType::TrianglesList,
-            draw_list.idx_buffer,
-        )?;
-
-        let mut idx_start = 0;
-        for cmd in draw_list.cmd_buffer {
-            let texture_id = cmd.texture_id.into();
-            let texture = self
-                .device_objects
-                .textures
-                .get(texture_id)
-                .ok_or_else(|| RendererError::BadTexture(texture_id))?;
-
-            let idx_end = idx_start + cmd.elem_count as usize;
-
-            surface.draw(
-                &vtx_buffer,
-                &idx_buffer
-                    .slice(idx_start..idx_end)
-                    .expect("Invalid index buffer range"),
-                &self.device_objects.program,
-                &uniform! {
-                    matrix: matrix,
-                    tex: texture.sampled()
-                },
-                &DrawParameters {
-                    blend: Blend::alpha_blending(),
-                    scissor: Some(Rect {
-                        left: cmd.clip_rect.x.max(0.0).min(fb_width).round() as u32,
-                        bottom: (fb_height - cmd.clip_rect.w).max(0.0).min(fb_width).round() as u32,
-                        width: (cmd.clip_rect.z - cmd.clip_rect.x)
-                            .abs()
-                            .min(fb_width)
-                            .round() as u32,
-                        height: (cmd.clip_rect.w - cmd.clip_rect.y)
-                            .abs()
-                            .min(fb_height)
-                            .round() as u32,
-                    }),
-                    ..DrawParameters::default()
-                },
+        let clip_off = draw_data.display_pos;
+        let clip_scale = draw_data.framebuffer_scale;
+        for draw_list in draw_data.draw_lists() {
+            let vtx_buffer = VertexBuffer::immutable(&self.ctx, draw_list.vtx_buffer())?;
+            let idx_buffer = IndexBuffer::immutable(
+                &self.ctx,
+                PrimitiveType::TrianglesList,
+                draw_list.idx_buffer(),
             )?;
+            let mut idx_start = 0;
+            for cmd in draw_list.commands() {
+                // TODO: Support for draw callbacks
+                match cmd {
+                    DrawCmd::Elements {
+                        count,
+                        clip_rect,
+                        texture_id,
+                    } => {
+                        let idx_end = idx_start + count;
+                        let clip_rect = [
+                            (clip_rect[0] - clip_off[0]) * clip_scale[0],
+                            (clip_rect[1] - clip_off[1]) * clip_scale[1],
+                            (clip_rect[2] - clip_off[0]) * clip_scale[0],
+                            (clip_rect[3] - clip_off[1]) * clip_scale[1],
+                        ];
 
-            idx_start = idx_end;
+                        if clip_rect[0] < fb_width
+                            && clip_rect[1] < fb_height
+                            && clip_rect[2] >= 0.0
+                            && clip_rect[3] >= 0.0
+                        {
+                            target.draw(
+                                &vtx_buffer,
+                                &idx_buffer
+                                    .slice(idx_start..idx_end)
+                                    .expect("Invalid index buffer range"),
+                                &self.program,
+                                &uniform! {
+                                    matrix: matrix,
+                                    tex: self.lookup_texture(texture_id)?.sampled()
+                                        .minify_filter(MinifySamplerFilter::Linear)
+                                        .magnify_filter(MagnifySamplerFilter::Linear)
+                                },
+                                &DrawParameters {
+                                    blend: Blend::alpha_blending(),
+                                    scissor: Some(Rect {
+                                        left: f32::max(0.0, clip_rect[0]).floor() as u32,
+                                        bottom: f32::max(0.0, fb_height - clip_rect[3]).floor()
+                                            as u32,
+                                        width: (clip_rect[2] - clip_rect[0]).abs().ceil() as u32,
+                                        height: (clip_rect[3] - clip_rect[1]).abs().ceil() as u32,
+                                    }),
+                                    ..DrawParameters::default()
+                                },
+                            )?;
+                        }
+
+                        idx_start = idx_end;
+                    }
+                }
+            }
         }
-
+        let _ = self.ctx.insert_debug_marker("imgui-rs: rendering finished");
         Ok(())
     }
 }
 
-pub struct DeviceObjects {
-    program: Program,
-    textures: Textures<Texture2d>,
+fn upload_font_texture(
+    mut fonts: imgui::FontAtlasRefMut,
+    ctx: &Rc<Context>,
+) -> Result<Texture2d, GliumRendererError> {
+    let texture = fonts.build_rgba32_texture();
+    let data = RawImage2d {
+        data: Cow::Borrowed(texture.data),
+        width: texture.width,
+        height: texture.height,
+        format: ClientFormat::U8U8U8U8,
+    };
+    let font_texture = Texture2d::with_mipmaps(ctx, data, MipmapsOption::NoMipmap)?;
+    fonts.set_texture_id(TextureId::from(font_texture.get_id() as usize));
+    Ok(font_texture)
 }
 
-fn compile_default_program<F: Facade>(
-    ctx: &F,
-) -> Result<Program, program::ProgramChooserCreationError> {
+fn compile_default_program<F: Facade>(facade: &F) -> Result<Program, ProgramChooserCreationError> {
     program!(
-        ctx,
+        facade,
         400 => {
             vertex: include_str!("shader/glsl_400.vert"),
             fragment: include_str!("shader/glsl_400.frag"),
@@ -219,25 +267,4 @@ fn compile_default_program<F: Facade>(
             outputs_srgb: true,
         },
     )
-}
-
-impl DeviceObjects {
-    pub fn init<F: Facade>(im_gui: &mut ImGui, ctx: &F) -> RendererResult<DeviceObjects> {
-        use glium::texture::{ClientFormat, RawImage2d};
-
-        let program = compile_default_program(ctx)?;
-        let texture = im_gui.prepare_texture(|handle| {
-            let data = RawImage2d {
-                data: Cow::Borrowed(handle.pixels),
-                width: handle.width,
-                height: handle.height,
-                format: ClientFormat::U8U8U8U8,
-            };
-            Texture2d::new(ctx, data)
-        })?;
-        let mut textures = Textures::new();
-        im_gui.set_font_texture_id(textures.insert(texture));
-
-        Ok(DeviceObjects { program, textures })
-    }
 }

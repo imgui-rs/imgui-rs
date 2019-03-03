@@ -1,259 +1,388 @@
-//! This crate provides support functions to simplify integrating imgui-rs with winit.
+//! This crate provides a winit-based backend platform for imgui-rs.
+//!
+//! A backend platform handles window/input device events and manages their state.
 //!
 //! # Using the library
 //!
-//! In your initialization code call `configure_keys`:
+//! There are five things you need to do to use this library correctly:
+//!
+//! 1. Initialize a `WinitPlatform` instance
+//! 2. Attach it to a winit `Window`
+//! 3. Pass events to the platform (every frame)
+//! 4. Call frame preparation callback (every frame)
+//! 5. Call render preparation callback (every frame)
+//!
+//! ## Complete example (without a renderer)
 //!
 //! ```rust,no_run
-//! use imgui::ImGui;
+//! use imgui::Context;
+//! use imgui_winit_support::{HiDpiMode, WinitPlatform};
+//! use std::time::Instant;
+//! use winit::{Event, EventsLoop, Window, WindowEvent};
 //!
-//! # fn main() {
-//! let mut imgui = ImGui::init();
-//! imgui_winit_support::configure_keys(&mut imgui);
-//! # }
-//! ```
+//! fn main() {
+//!     let mut events_loop = EventsLoop::new();
+//!     let mut window = Window::new(&events_loop).unwrap();
 //!
-//! In your main loop you should already be retrieving events from winit and handling them. All
-//! you need to do is pass each event to `imgui_winit_support` as well:
+//!     let mut imgui = Context::create();
+//!     // configure imgui-rs Context if necessary
 //!
-//! ```rust,no_run
-//! # use imgui::ImGui;
-//! # use winit::EventsLoop;
-//! # fn main() {
-//! # let mut events_loop = EventsLoop::new();
-//! # let mut imgui = ImGui::init();
-//! # let window_hidpi_factor = 1.0;
-//! # let app_hidpi_factor = 1.0;
-//! events_loop.poll_events(|event| {
-//!     // do application-specific stuff with event
+//!     let mut platform = WinitPlatform::init(&mut imgui); // step 1
+//!     platform.attach_window(imgui.io_mut(), &window, HiDpiMode::Default); // step 2
 //!
-//!     imgui_winit_support::handle_event(
-//!         &mut imgui,
-//!         &event,
-//!         window_hidpi_factor,
-//!         app_hidpi_factor
-//!     );
-//! });
-//! # }
-//! ```
+//!     let mut last_frame = Instant::now();
+//!     let mut run = true;
+//!     while run {
+//!         events_loop.poll_events(|event| {
+//!             platform.handle_event(imgui.io_mut(), &window, &event); // step 3
 //!
-//! # Advanced use cases
-//!
-//! In more advanced use cases you might want to handle and filter events yourself and call some of
-//! the various smaller helper functions exported by the library.
-//!
-//! For example, you might want to customize mouse wheel line scrolling amount:
-//!
-//! ```rust,no_run
-//! # use imgui::ImGui;
-//! # use winit::{EventsLoop, Event, WindowEvent, MouseScrollDelta, TouchPhase};
-//! # fn main() {
-//! # let mut events_loop = EventsLoop::new();
-//! # let mut imgui = ImGui::init();
-//! # let window_hidpi_factor = 1.0;
-//! # let app_hidpi_factor = 1.0;
-//! events_loop.poll_events(|event| {
-//!     // do application-specific stuff with event
-//!
-//!     // default handling for events
-//!     imgui_winit_support::handle_event(
-//!         &mut imgui,
-//!         &event,
-//!         window_hidpi_factor,
-//!         app_hidpi_factor
-//!     );
-//!
-//!     // Scroll 10 times the pixels per line by handling LineDelta events again and
-//!     // overriding the mouse wheel value
-//!     if let Event::WindowEvent { event, .. } = event {
-//!         match event {
-//!             WindowEvent::MouseWheel {
-//!                 delta: MouseScrollDelta::LineDelta(_, lines),
-//!                 phase: TouchPhase::Moved,
-//!                 ..
-//!             } => {
-//!                 imgui.set_mouse_wheel(lines * 10.0);
+//!             // application-specific event handling
+//!             // for example:
+//!             if let Event::WindowEvent { event, .. } = event {
+//!                 match event {
+//!                     WindowEvent::CloseRequested => run = false,
+//!                     _ => (),
+//!                 }
 //!             }
-//!             _ => ()
-//!         }
+//!         });
+//!
+//!         // application-specific rendering *under the UI*
+//!
+//!         platform.prepare_frame(imgui.io_mut(), &window) // step 4
+//!             .expect("Failed to prepare frame");
+//!         last_frame = imgui.io_mut().update_delta_time(last_frame);
+//!         let ui = imgui.frame();
+//!
+//!         // construct the UI
+//!
+//!         platform.prepare_render(&ui, &window); // step 5
+//!         // render the UI with a renderer
+//!         // ui.render_with(&mut renderer, &mut target).expect("Failed to render UI");
+//!
+//!         // application-specific rendering *over the UI*
 //!     }
-//! });
-//! # }
+//! }
 //! ```
 
-use imgui::{FrameSize, ImGui, ImGuiKey, ImGuiMouseCursor};
+use imgui::{self, BackendFlags, ConfigFlags, Context, ImString, Io, Key, Ui};
+use std::cmp::Ordering;
+use winit::dpi::{LogicalPosition, LogicalSize};
 use winit::{
-    ElementState, Event, KeyboardInput, ModifiersState, MouseButton, MouseCursor, MouseScrollDelta,
+    DeviceEvent, ElementState, Event, KeyboardInput, MouseButton, MouseCursor, MouseScrollDelta,
     TouchPhase, VirtualKeyCode, Window, WindowEvent,
 };
 
-/// Configure imgui key map with winit `VirtualKeyCode` values
-pub fn configure_keys(imgui: &mut ImGui) {
-    imgui.set_imgui_key(ImGuiKey::Tab, VirtualKeyCode::Tab as _);
-    imgui.set_imgui_key(ImGuiKey::LeftArrow, VirtualKeyCode::Left as _);
-    imgui.set_imgui_key(ImGuiKey::RightArrow, VirtualKeyCode::Right as _);
-    imgui.set_imgui_key(ImGuiKey::UpArrow, VirtualKeyCode::Up as _);
-    imgui.set_imgui_key(ImGuiKey::DownArrow, VirtualKeyCode::Down as _);
-    imgui.set_imgui_key(ImGuiKey::PageUp, VirtualKeyCode::PageUp as _);
-    imgui.set_imgui_key(ImGuiKey::PageDown, VirtualKeyCode::PageDown as _);
-    imgui.set_imgui_key(ImGuiKey::Home, VirtualKeyCode::Home as _);
-    imgui.set_imgui_key(ImGuiKey::End, VirtualKeyCode::End as _);
-    imgui.set_imgui_key(ImGuiKey::Delete, VirtualKeyCode::Delete as _);
-    imgui.set_imgui_key(ImGuiKey::Backspace, VirtualKeyCode::Back as _);
-    imgui.set_imgui_key(ImGuiKey::Enter, VirtualKeyCode::Return as _);
-    imgui.set_imgui_key(ImGuiKey::Escape, VirtualKeyCode::Escape as _);
-    imgui.set_imgui_key(ImGuiKey::A, VirtualKeyCode::A as _);
-    imgui.set_imgui_key(ImGuiKey::C, VirtualKeyCode::C as _);
-    imgui.set_imgui_key(ImGuiKey::V, VirtualKeyCode::V as _);
-    imgui.set_imgui_key(ImGuiKey::X, VirtualKeyCode::X as _);
-    imgui.set_imgui_key(ImGuiKey::Y, VirtualKeyCode::Y as _);
-    imgui.set_imgui_key(ImGuiKey::Z, VirtualKeyCode::Z as _);
+/// winit backend platform state
+#[derive(Debug)]
+pub struct WinitPlatform {
+    hidpi_mode: ActiveHiDpiMode,
+    hidpi_factor: f64,
 }
 
-/// Update imgui keyboard state
-pub fn handle_keyboard_input(imgui: &mut ImGui, event: KeyboardInput) {
-    handle_modifiers(imgui, event.modifiers);
-    if let Some(key) = event.virtual_keycode {
-        let state_bool = event.state == ElementState::Pressed;
-        imgui.set_key(key as _, state_bool);
-        match key {
-            VirtualKeyCode::LShift | VirtualKeyCode::RShift => imgui.set_key_shift(state_bool),
-            VirtualKeyCode::LControl | VirtualKeyCode::RControl => imgui.set_key_ctrl(state_bool),
-            VirtualKeyCode::LAlt | VirtualKeyCode::RAlt => imgui.set_key_alt(state_bool),
-            VirtualKeyCode::LWin | VirtualKeyCode::RWin => imgui.set_key_super(state_bool),
+#[derive(Copy, Clone, Debug, PartialEq)]
+enum ActiveHiDpiMode {
+    Default,
+    Rounded,
+    Locked,
+}
+
+/// DPI factor handling mode.
+///
+/// Applications that use imgui-rs might want to customize the used DPI factor and not use
+/// directly the value coming from winit.
+///
+/// **Note: if you use a mode other than default and the DPI factor is adjusted, winit and imgui-rs
+/// will use different logical coordinates, so be careful if you pass around logical size or
+/// position values.**
+#[derive(Copy, Clone, Debug, PartialEq)]
+pub enum HiDpiMode {
+    /// The DPI factor from winit is used directly without adjustment
+    Default,
+    /// The DPI factor from winit is rounded to an integer value.
+    ///
+    /// This prevents the user interface from becoming blurry with non-integer scaling.
+    Rounded,
+    /// The DPI factor from winit is ignored, and the included value is used instead.
+    ///
+    /// This is useful if you want to force some DPI factor (e.g. 1.0) and not care about the value
+    /// coming from winit.
+    Locked(f64),
+}
+
+impl HiDpiMode {
+    fn apply(&self, hidpi_factor: f64) -> (ActiveHiDpiMode, f64) {
+        match *self {
+            HiDpiMode::Default => (ActiveHiDpiMode::Default, hidpi_factor),
+            HiDpiMode::Rounded => (ActiveHiDpiMode::Rounded, hidpi_factor.round()),
+            HiDpiMode::Locked(value) => (ActiveHiDpiMode::Locked, value),
+        }
+    }
+}
+
+impl WinitPlatform {
+    /// Initializes a winit platform instance and configures imgui.
+    ///
+    /// This function configures imgui-rs in the following ways:
+    ///
+    /// * backend flags are updated
+    /// * keys are configured
+    /// * platform name is set
+    pub fn init(imgui: &mut Context) -> WinitPlatform {
+        let io = imgui.io_mut();
+        io.backend_flags.insert(BackendFlags::HAS_MOUSE_CURSORS);
+        io.backend_flags.insert(BackendFlags::HAS_SET_MOUSE_POS);
+        io[Key::Tab] = VirtualKeyCode::Tab as _;
+        io[Key::LeftArrow] = VirtualKeyCode::Left as _;
+        io[Key::RightArrow] = VirtualKeyCode::Right as _;
+        io[Key::UpArrow] = VirtualKeyCode::Up as _;
+        io[Key::DownArrow] = VirtualKeyCode::Down as _;
+        io[Key::PageUp] = VirtualKeyCode::PageUp as _;
+        io[Key::PageDown] = VirtualKeyCode::PageDown as _;
+        io[Key::Home] = VirtualKeyCode::Home as _;
+        io[Key::End] = VirtualKeyCode::End as _;
+        io[Key::Insert] = VirtualKeyCode::Insert as _;
+        io[Key::Delete] = VirtualKeyCode::Delete as _;
+        io[Key::Backspace] = VirtualKeyCode::Back as _;
+        io[Key::Space] = VirtualKeyCode::Space as _;
+        io[Key::Enter] = VirtualKeyCode::Return as _;
+        io[Key::Escape] = VirtualKeyCode::Escape as _;
+        io[Key::A] = VirtualKeyCode::A as _;
+        io[Key::C] = VirtualKeyCode::C as _;
+        io[Key::V] = VirtualKeyCode::V as _;
+        io[Key::X] = VirtualKeyCode::X as _;
+        io[Key::Y] = VirtualKeyCode::Y as _;
+        io[Key::Z] = VirtualKeyCode::Z as _;
+        imgui.set_platform_name(Some(ImString::from(format!(
+            "imgui-winit-support {}",
+            env!("CARGO_PKG_VERSION")
+        ))));
+        WinitPlatform {
+            hidpi_mode: ActiveHiDpiMode::Default,
+            hidpi_factor: 1.0,
+        }
+    }
+    /// Attaches the platform instance to a winit window.
+    ///
+    /// This function configures imgui-rs in the following ways:
+    ///
+    /// * framebuffer scale (= DPI factor) is set
+    /// * display size is set
+    pub fn attach_window(&mut self, io: &mut Io, window: &Window, hidpi_mode: HiDpiMode) {
+        let (hidpi_mode, hidpi_factor) = hidpi_mode.apply(window.get_hidpi_factor());
+        self.hidpi_mode = hidpi_mode;
+        self.hidpi_factor = hidpi_factor;
+        io.display_framebuffer_scale = [hidpi_factor as f32, hidpi_factor as f32];
+        if let Some(logical_size) = window.get_inner_size() {
+            let logical_size = self.scale_size_from_winit(window, logical_size);
+            io.display_size = [logical_size.width as f32, logical_size.height as f32];
+        }
+    }
+    /// Returns the current DPI factor.
+    ///
+    /// The value might not be the same as the winit DPI factor (depends on the used DPI mode)
+    pub fn hidpi_factor(&self) -> f64 {
+        self.hidpi_factor
+    }
+    /// Scales a logical size coming from winit using the current DPI mode.
+    ///
+    /// This utility function is useful if you are using a DPI mode other than default, and want
+    /// your application to use the same logical coordinates as imgui-rs.
+    pub fn scale_size_from_winit(&self, window: &Window, logical_size: LogicalSize) -> LogicalSize {
+        match self.hidpi_mode {
+            ActiveHiDpiMode::Default => logical_size,
+            _ => logical_size
+                .to_physical(window.get_hidpi_factor())
+                .to_logical(self.hidpi_factor),
+        }
+    }
+    /// Scales a logical position coming from winit using the current DPI mode.
+    ///
+    /// This utility function is useful if you are using a DPI mode other than default, and want
+    /// your application to use the same logical coordinates as imgui-rs.
+    pub fn scale_pos_from_winit(
+        &self,
+        window: &Window,
+        logical_pos: LogicalPosition,
+    ) -> LogicalPosition {
+        match self.hidpi_mode {
+            ActiveHiDpiMode::Default => logical_pos,
+            _ => logical_pos
+                .to_physical(window.get_hidpi_factor())
+                .to_logical(self.hidpi_factor),
+        }
+    }
+    /// Scales a logical position for winit using the current DPI mode.
+    ///
+    /// This utility function is useful if you are using a DPI mode other than default, and want
+    /// your application to use the same logical coordinates as imgui-rs.
+    pub fn scale_pos_for_winit(
+        &self,
+        window: &Window,
+        logical_pos: LogicalPosition,
+    ) -> LogicalPosition {
+        match self.hidpi_mode {
+            ActiveHiDpiMode::Default => logical_pos,
+            _ => logical_pos
+                .to_physical(self.hidpi_factor)
+                .to_logical(window.get_hidpi_factor()),
+        }
+    }
+    /// Handles a winit event.
+    ///
+    /// This function performs the following actions (depends on the event):
+    ///
+    /// * window size / dpi factor changes are applied
+    /// * keyboard state is updated
+    /// * mouse state is updated
+    pub fn handle_event(&mut self, io: &mut Io, window: &Window, event: &Event) {
+        match *event {
+            Event::WindowEvent {
+                window_id,
+                ref event,
+            } if window_id == window.id() => {
+                self.handle_window_event(io, window, event);
+            }
+            // Track key release events outside our window. If we don't do this,
+            // we might never see the release event if some other window gets focus.
+            Event::DeviceEvent {
+                event:
+                    DeviceEvent::Key(KeyboardInput {
+                        state: ElementState::Released,
+                        virtual_keycode: Some(key),
+                        ..
+                    }),
+                ..
+            } => {
+                io.keys_down[key as usize] = false;
+                match key {
+                    VirtualKeyCode::LShift | VirtualKeyCode::RShift => io.key_shift = false,
+                    VirtualKeyCode::LControl | VirtualKeyCode::RControl => io.key_ctrl = false,
+                    VirtualKeyCode::LAlt | VirtualKeyCode::RAlt => io.key_alt = false,
+                    VirtualKeyCode::LWin | VirtualKeyCode::RWin => io.key_super = false,
+                    _ => (),
+                }
+            }
             _ => (),
         }
     }
-}
-
-/// Update imgui keyboard modifier state
-pub fn handle_modifiers(imgui: &mut ImGui, modifiers: ModifiersState) {
-    imgui.set_key_shift(modifiers.shift);
-    imgui.set_key_ctrl(modifiers.ctrl);
-    imgui.set_key_alt(modifiers.alt);
-    imgui.set_key_super(modifiers.logo);
-}
-
-/// Update imgui mouse wheel position
-pub fn handle_mouse_scroll_delta(
-    imgui: &mut ImGui,
-    delta: MouseScrollDelta,
-    window_hidpi_factor: f64,
-    app_hidpi_factor: f64,
-) {
-    match delta {
-        MouseScrollDelta::LineDelta(_, y) => imgui.set_mouse_wheel(y),
-        MouseScrollDelta::PixelDelta(pos) => {
-            let pos = pos
-                .to_physical(window_hidpi_factor)
-                .to_logical(app_hidpi_factor);
-            imgui.set_mouse_wheel(pos.y as f32)
+    fn handle_window_event(&mut self, io: &mut Io, window: &Window, event: &WindowEvent) {
+        match *event {
+            WindowEvent::Resized(logical_size) => {
+                let logical_size = self.scale_size_from_winit(window, logical_size);
+                io.display_size = [logical_size.width as f32, logical_size.height as f32];
+            }
+            WindowEvent::HiDpiFactorChanged(scale) => {
+                match self.hidpi_mode {
+                    ActiveHiDpiMode::Default => self.hidpi_factor = scale,
+                    ActiveHiDpiMode::Rounded => self.hidpi_factor = scale.round(),
+                    _ => (),
+                }
+                io.display_framebuffer_scale = [self.hidpi_factor as f32, self.hidpi_factor as f32];
+            }
+            WindowEvent::KeyboardInput {
+                input:
+                    KeyboardInput {
+                        virtual_keycode: Some(key),
+                        state,
+                        ..
+                    },
+                ..
+            } => {
+                let pressed = state == ElementState::Pressed;
+                io.keys_down[key as usize] = pressed;
+                match key {
+                    VirtualKeyCode::LShift | VirtualKeyCode::RShift => io.key_shift = pressed,
+                    VirtualKeyCode::LControl | VirtualKeyCode::RControl => io.key_ctrl = pressed,
+                    VirtualKeyCode::LAlt | VirtualKeyCode::RAlt => io.key_alt = pressed,
+                    VirtualKeyCode::LWin | VirtualKeyCode::RWin => io.key_super = pressed,
+                    _ => (),
+                }
+            }
+            WindowEvent::ReceivedCharacter(ch) => io.add_input_character(ch),
+            WindowEvent::CursorMoved { position, .. } => {
+                let position = self.scale_pos_from_winit(window, position);
+                io.mouse_pos = [position.x as f32, position.y as f32];
+            }
+            WindowEvent::MouseWheel {
+                delta,
+                phase: TouchPhase::Moved,
+                ..
+            } => match delta {
+                MouseScrollDelta::LineDelta(h, v) => {
+                    io.mouse_wheel_h = h;
+                    io.mouse_wheel = v;
+                }
+                MouseScrollDelta::PixelDelta(pos) => {
+                    match pos.x.partial_cmp(&0.0) {
+                        Some(Ordering::Greater) => io.mouse_wheel_h += 1.0,
+                        Some(Ordering::Less) => io.mouse_wheel_h -= 1.0,
+                        _ => (),
+                    }
+                    match pos.y.partial_cmp(&0.0) {
+                        Some(Ordering::Greater) => io.mouse_wheel += 1.0,
+                        Some(Ordering::Less) => io.mouse_wheel -= 1.0,
+                        _ => (),
+                    }
+                }
+            },
+            WindowEvent::MouseInput { state, button, .. } => {
+                let pressed = state == ElementState::Pressed;
+                match button {
+                    MouseButton::Left => io.mouse_down[0] = pressed,
+                    MouseButton::Right => io.mouse_down[1] = pressed,
+                    MouseButton::Middle => io.mouse_down[2] = pressed,
+                    MouseButton::Other(idx @ 0...4) => io.mouse_down[idx as usize] = pressed,
+                    _ => (),
+                }
+            }
+            _ => (),
         }
     }
-}
-
-/// Update imgui mouse button state
-pub fn handle_mouse_button_state(imgui: &mut ImGui, button: MouseButton, state: ElementState) {
-    let mut states = imgui.mouse_down();
-    let state_bool = state == ElementState::Pressed;
-    match button {
-        MouseButton::Left => states[0] = state_bool,
-        MouseButton::Right => states[1] = state_bool,
-        MouseButton::Middle => states[2] = state_bool,
-        MouseButton::Other(idx @ 0...4) => states[idx as usize] = state_bool,
-        _ => (),
-    }
-    imgui.set_mouse_down(states);
-}
-
-/// Update imgui state from winit event
-pub fn handle_event(
-    imgui: &mut ImGui,
-    event: &Event,
-    window_hidpi_factor: f64,
-    app_hidpi_factor: f64,
-) {
-    if let Event::WindowEvent { ref event, .. } = event {
-        handle_window_event(imgui, event, window_hidpi_factor, app_hidpi_factor)
-    }
-}
-
-/// Update imgui state from winit window event
-pub fn handle_window_event(
-    imgui: &mut ImGui,
-    event: &WindowEvent,
-    window_hidpi_factor: f64,
-    app_hidpi_factor: f64,
-) {
-    use self::WindowEvent::*;
-    match event {
-        KeyboardInput { input, .. } => handle_keyboard_input(imgui, *input),
-        ReceivedCharacter(ch) => imgui.add_input_character(*ch),
-        CursorMoved {
-            position,
-            modifiers,
-            ..
-        } => {
-            let position = position
-                .to_physical(window_hidpi_factor)
-                .to_logical(app_hidpi_factor);
-            imgui.set_mouse_pos(position.x as f32, position.y as f32);
-            handle_modifiers(imgui, *modifiers);
+    /// Frame preparation callback.
+    ///
+    /// Call this before calling the imgui-rs context `frame` function.
+    /// This function performs the following actions:
+    ///
+    /// * mouse cursor is repositioned (if requested by imgui-rs)
+    pub fn prepare_frame(&self, io: &mut Io, window: &Window) -> Result<(), String> {
+        if io.want_set_mouse_pos {
+            let logical_pos = self.scale_pos_for_winit(
+                window,
+                LogicalPosition::new(f64::from(io.mouse_pos[0]), f64::from(io.mouse_pos[1])),
+            );
+            window.set_cursor_position(logical_pos)
+        } else {
+            Ok(())
         }
-        MouseWheel {
-            delta,
-            modifiers,
-            phase: TouchPhase::Moved,
-            ..
-        } => {
-            handle_mouse_scroll_delta(imgui, *delta, window_hidpi_factor, app_hidpi_factor);
-            handle_modifiers(imgui, *modifiers);
-        }
-        MouseInput {
-            state,
-            button,
-            modifiers,
-            ..
-        } => {
-            handle_mouse_button_state(imgui, *button, *state);
-            handle_modifiers(imgui, *modifiers);
-        }
-        _ => (),
     }
-}
-
-/// Update winit window mouse cursor state
-pub fn update_mouse_cursor(imgui: &ImGui, window: &Window) {
-    let mouse_cursor = imgui.mouse_cursor();
-    if imgui.mouse_draw_cursor() || mouse_cursor == ImGuiMouseCursor::None {
-        // Hide OS cursor
-        window.hide_cursor(true);
-    } else {
-        // Set OS cursor
-        window.hide_cursor(false);
-        window.set_cursor(match mouse_cursor {
-            ImGuiMouseCursor::None => unreachable!("mouse_cursor was None!"),
-            ImGuiMouseCursor::Arrow => MouseCursor::Arrow,
-            ImGuiMouseCursor::TextInput => MouseCursor::Text,
-            ImGuiMouseCursor::ResizeAll => MouseCursor::Move,
-            ImGuiMouseCursor::ResizeNS => MouseCursor::NsResize,
-            ImGuiMouseCursor::ResizeEW => MouseCursor::EwResize,
-            ImGuiMouseCursor::ResizeNESW => MouseCursor::NeswResize,
-            ImGuiMouseCursor::ResizeNWSE => MouseCursor::NwseResize,
-            ImGuiMouseCursor::Hand => MouseCursor::Hand,
-        });
+    /// Render preparation callback.
+    ///
+    /// Call this before calling the imgui-rs UI `render_with`/`render` function.
+    /// This function performs the following actions:
+    ///
+    /// * mouse cursor is changed and/or hidden (if requested by imgui-rs)
+    pub fn prepare_render(&self, ui: &Ui, window: &Window) {
+        let io = ui.io();
+        if !io
+            .config_flags
+            .contains(ConfigFlags::NO_MOUSE_CURSOR_CHANGE)
+        {
+            match ui.mouse_cursor() {
+                Some(mouse_cursor) if !io.mouse_draw_cursor => {
+                    window.hide_cursor(false);
+                    window.set_cursor(match mouse_cursor {
+                        imgui::MouseCursor::Arrow => MouseCursor::Arrow,
+                        imgui::MouseCursor::TextInput => MouseCursor::Text,
+                        imgui::MouseCursor::ResizeAll => MouseCursor::Move,
+                        imgui::MouseCursor::ResizeNS => MouseCursor::NsResize,
+                        imgui::MouseCursor::ResizeEW => MouseCursor::EwResize,
+                        imgui::MouseCursor::ResizeNESW => MouseCursor::NeswResize,
+                        imgui::MouseCursor::ResizeNWSE => MouseCursor::NwseResize,
+                        imgui::MouseCursor::Hand => MouseCursor::Hand,
+                    });
+                }
+                _ => window.hide_cursor(true),
+            }
+        }
     }
-}
-
-/// Get the current frame size for imgui frame rendering.
-///
-/// Returns `None` if the window no longer exists
-pub fn get_frame_size(window: &Window, app_hidpi_factor: f64) -> Option<FrameSize> {
-    window.get_inner_size().map(|logical_size| FrameSize {
-        logical_size: logical_size
-            .to_physical(window.get_hidpi_factor())
-            .to_logical(app_hidpi_factor)
-            .into(),
-        hidpi_factor: app_hidpi_factor,
-    })
 }

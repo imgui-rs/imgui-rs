@@ -5,6 +5,7 @@ use std::ptr;
 use std::slice;
 
 use crate::sys;
+use crate::TextureId;
 
 #[repr(transparent)]
 #[derive(Debug)]
@@ -49,7 +50,7 @@ impl FontAtlas {
         let mut height: c_int = 0;
         let mut bytes_per_pixel: c_int = 0;
         unsafe {
-            sys::ImFontAtlas_GetTexDataAsAlpha8(
+            sys::ImFontAtlas_GetTexDataAsRGBA32(
                 &mut self.0,
                 &mut pixels,
                 &mut width,
@@ -75,11 +76,11 @@ impl FontAtlas {
             }
         }
     }
-    pub fn texture_id(&self) -> usize {
-        self.0.TexID as usize
+    pub fn texture_id(&self) -> TextureId {
+        TextureId::from(self.0.TexID as usize)
     }
-    pub fn set_texture_id(&mut self, value: usize) {
-        self.0.TexID = value as *mut c_void;
+    pub fn set_texture_id(&mut self, value: TextureId) {
+        self.0.TexID = value.id() as *mut c_void;
     }
     pub fn clear(&mut self) {
         unsafe {
