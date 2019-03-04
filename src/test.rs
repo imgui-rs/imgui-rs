@@ -1,4 +1,5 @@
 use parking_lot::{ReentrantMutex, ReentrantMutexGuard};
+use std::ptr;
 
 use crate::context::Context;
 
@@ -8,5 +9,7 @@ lazy_static! {
 
 pub fn test_ctx() -> (ReentrantMutexGuard<'static, ()>, Context) {
     let guard = TEST_MUTEX.lock();
-    (guard, Context::create())
+    let mut ctx = Context::create();
+    ctx.io_mut().ini_filename = ptr::null();
+    (guard, ctx)
 }
