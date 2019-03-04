@@ -211,7 +211,7 @@ pub struct Io {
     pub key_repeat_rate: f32,
 
     user_data: *mut c_void,
-    fonts: *mut sys::ImFontAtlas,
+    pub(crate) fonts: *mut sys::ImFontAtlas,
 
     /// Global scale for all fonts
     pub font_global_scale: f32,

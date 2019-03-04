@@ -425,18 +425,22 @@ impl Context {
         match self.shared_font_atlas {
             Some(ref font_atlas) => FontAtlasRefMut::Shared(font_atlas.borrow_mut()),
             None => unsafe {
-                let io = sys::igGetIO();
                 // safe because FontAtlas is a transparent wrapper around sys::ImFontAtlas
-                let fonts = &mut *((*io).Fonts as *mut FontAtlas);
-                FontAtlasRefMut::Unique(fonts)
+                let fonts = &mut *(self.io_mut().fonts as *mut FontAtlas);
+                FontAtlasRefMut::Owned(fonts)
             },
         }
     }
+    /// # Panics
+    ///
+    /// Panics if the context uses a shared font atlas that is already borrowed
     pub fn frame<'ui, 'a: 'ui>(&'a mut self) -> Ui<'ui> {
+        // NewFrame/Render/EndFrame mutate the font atlas so we need exclusive access to it
+        let font_atlas = self.shared_font_atlas.as_ref().map(|font_atlas| font_atlas.borrow_mut());
         // TODO: precondition checks
         unsafe {
             sys::igNewFrame();
         }
-        Ui { ctx: self }
+        Ui { ctx: self, font_atlas }
     }
 }

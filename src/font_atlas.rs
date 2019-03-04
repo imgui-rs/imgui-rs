@@ -145,8 +145,8 @@ impl DerefMut for SharedFontAtlas {
 
 /// An immutably borrowed reference to a (possibly shared) font atlas
 pub enum FontAtlasRef<'a> {
-    Unique(&'a FontAtlas),
-    Shared(cell::Ref<'a, SharedFontAtlas>),
+    Owned(&'a FontAtlas),
+    Shared(&'a cell::RefMut<'a, SharedFontAtlas>),
 }
 
 impl<'a> Deref for FontAtlasRef<'a> {
@@ -154,7 +154,7 @@ impl<'a> Deref for FontAtlasRef<'a> {
     fn deref(&self) -> &FontAtlas {
         use self::FontAtlasRef::*;
         match self {
-            Unique(atlas) => atlas,
+            Owned(atlas) => atlas,
             Shared(cell) => cell,
         }
     }
@@ -163,7 +163,7 @@ impl<'a> Deref for FontAtlasRef<'a> {
 /// A mutably borrowed reference to a (possibly shared) font atlas
 #[derive(Debug)]
 pub enum FontAtlasRefMut<'a> {
-    Unique(&'a mut FontAtlas),
+    Owned(&'a mut FontAtlas),
     Shared(cell::RefMut<'a, SharedFontAtlas>),
 }
 
@@ -172,7 +172,7 @@ impl<'a> Deref for FontAtlasRefMut<'a> {
     fn deref(&self) -> &FontAtlas {
         use self::FontAtlasRefMut::*;
         match self {
-            Unique(atlas) => atlas,
+            Owned(atlas) => atlas,
             Shared(cell) => cell,
         }
     }
@@ -182,7 +182,7 @@ impl<'a> DerefMut for FontAtlasRefMut<'a> {
     fn deref_mut(&mut self) -> &mut FontAtlas {
         use self::FontAtlasRefMut::*;
         match self {
-            Unique(atlas) => atlas,
+            Owned(atlas) => atlas,
             Shared(cell) => cell,
         }
     }

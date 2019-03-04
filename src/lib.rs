@@ -13,6 +13,7 @@ mod style;
 #[cfg(test)]
 mod test;
 
+use std::cell;
 use std::ffi::CStr;
 use std::str;
 
@@ -39,11 +40,21 @@ fn test_get_version() {
 
 pub struct Ui<'ui> {
     ctx: &'ui Context,
+    font_atlas: Option<cell::RefMut<'ui, SharedFontAtlas>>,
 }
 
 impl<'ui> Ui<'ui> {
     pub fn io(&self) -> &Io {
         unsafe { &*(sys::igGetIO() as *const Io) }
+    }
+    pub fn fonts(&self) -> FontAtlasRef {
+        match self.font_atlas {
+            Some(ref font_atlas) => FontAtlasRef::Shared(font_atlas),
+            None => unsafe {
+                let fonts = &*(self.io().fonts as *const FontAtlas);
+                FontAtlasRef::Owned(fonts)
+            }
+        }
     }
     pub fn clone_style(&self) -> Style {
         *self.ctx.style()
