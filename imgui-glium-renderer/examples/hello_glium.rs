@@ -58,8 +58,7 @@ fn main() {
         let mut target = display.draw();
         target.clear_color_srgb(1.0, 1.0, 1.0, 1.0);
         platform.prepare_render(&ui, &window);
-        ui.render_with(&mut renderer, &mut target)
-            .expect("Rendering failed");
+        renderer.render(&mut target, ui).expect("Rendering failed");
         target.finish().expect("Failed to swap buffers");
     }
 }

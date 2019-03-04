@@ -172,6 +172,52 @@ use glium::implement_vertex;
 #[cfg(feature = "glium")]
 implement_vertex!(DrawVert, pos, uv, col);
 
+#[cfg(feature = "gfx")]
+unsafe impl gfx::traits::Pod for DrawVert {}
+#[cfg(feature = "gfx")]
+impl gfx::pso::buffer::Structure<gfx::format::Format> for DrawVert {
+    fn query(name: &str) -> Option<gfx::pso::buffer::Element<gfx::format::Format>> {
+        // array query hack from gfx_impl_struct_meta macro
+        use gfx::format::Formatted;
+        use gfx::pso::buffer::{ElemOffset, Element};
+        use std::mem::{size_of, transmute};
+        // using "1" here as a simple non-zero pointer addres
+        let tmp: &DrawVert = unsafe { transmute(1usize) };
+        let base = tmp as *const _ as usize;
+        //HACK: special treatment of array queries
+        let (sub_name, big_offset) = {
+            let mut split = name.split(|c| c == '[' || c == ']');
+            let _ = split.next().unwrap();
+            match split.next() {
+                Some(s) => {
+                    let array_id: ElemOffset = s.parse().unwrap();
+                    let sub_name = match split.next() {
+                        Some(s) if s.starts_with('.') => &s[1..],
+                        _ => name,
+                    };
+                    (sub_name, array_id * (size_of::<DrawVert>() as ElemOffset))
+                }
+                None => (name, 0),
+            }
+        };
+        match sub_name {
+            "pos" => Some(Element {
+                format: <[f32; 2] as Formatted>::get_format(),
+                offset: ((&tmp.pos as *const _ as usize) - base) as ElemOffset + big_offset,
+            }),
+            "uv" => Some(Element {
+                format: <[f32; 2] as Formatted>::get_format(),
+                offset: ((&tmp.uv as *const _ as usize) - base) as ElemOffset + big_offset,
+            }),
+            "col" => Some(Element {
+                format: <[gfx::format::U8Norm; 4] as Formatted>::get_format(),
+                offset: ((&tmp.col as *const _ as usize) - base) as ElemOffset + big_offset,
+            }),
+            _ => None,
+        }
+    }
+}
+
 #[test]
 fn test_drawvert_memory_layout() {
     use std::mem;

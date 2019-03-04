@@ -1,92 +1,42 @@
+use gfx::format::BlendFormat;
 use gfx::handle::{Buffer, RenderTargetView};
 use gfx::memory::Bind;
-use gfx::pso::{PipelineData, PipelineState};
-use gfx::texture::{FilterMethod, SamplerInfo, WrapMode};
+use gfx::pso::PipelineState;
 use gfx::traits::FactoryExt;
 use gfx::{CommandBuffer, Encoder, Factory, IntoIndexBuffer, Rect, Resources, Slice};
-use imgui::{DrawList, FrameSize, ImDrawIdx, ImDrawVert, ImGui, ImTexture, Textures, Ui};
-
-pub type RendererResult<T> = Result<T, RendererError>;
+use imgui::{DrawCmd, DrawIdx, DrawVert, ImString, TextureId, Textures, Ui};
+use std::usize;
 
 #[derive(Clone, Debug)]
-pub enum RendererError {
+pub enum GfxRendererError {
     Update(gfx::UpdateError<usize>),
     Buffer(gfx::buffer::CreationError),
     Pipeline(gfx::PipelineStateError<String>),
     Combined(gfx::CombinedError),
-    BadTexture(ImTexture),
+    BadTexture(TextureId),
 }
 
-impl From<gfx::UpdateError<usize>> for RendererError {
-    fn from(e: gfx::UpdateError<usize>) -> RendererError {
-        RendererError::Update(e)
+impl From<gfx::UpdateError<usize>> for GfxRendererError {
+    fn from(e: gfx::UpdateError<usize>) -> GfxRendererError {
+        GfxRendererError::Update(e)
     }
 }
 
-impl From<gfx::buffer::CreationError> for RendererError {
-    fn from(e: gfx::buffer::CreationError) -> RendererError {
-        RendererError::Buffer(e)
+impl From<gfx::buffer::CreationError> for GfxRendererError {
+    fn from(e: gfx::buffer::CreationError) -> GfxRendererError {
+        GfxRendererError::Buffer(e)
     }
 }
 
-impl From<gfx::PipelineStateError<String>> for RendererError {
-    fn from(e: gfx::PipelineStateError<String>) -> RendererError {
-        RendererError::Pipeline(e)
+impl From<gfx::PipelineStateError<String>> for GfxRendererError {
+    fn from(e: gfx::PipelineStateError<String>) -> GfxRendererError {
+        GfxRendererError::Pipeline(e)
     }
 }
 
-impl From<gfx::CombinedError> for RendererError {
-    fn from(e: gfx::CombinedError) -> RendererError {
-        RendererError::Combined(e)
-    }
-}
-
-// Based on gfx_defines! / gfx_pipeline!, to allow for not having to clone Arcs
-// every draw call when selecting which texture is going to be shown.
-macro_rules! extended_defines {
-    (pipeline $module:ident { $( $field:ident: $ty:ty = $value:expr, )* }) => {
-        #[allow(missing_docs)]
-        mod $module {
-            #[allow(unused_imports)]
-            use crate::*;
-            #[allow(unused_imports)]
-            use gfx::gfx_pipeline_inner;
-            gfx_pipeline_inner!{ $(
-                $field: $ty,
-            )*}
-
-            pub fn new() -> Init<'static> {
-                Init {
-                    $( $field: $value, )*
-                }
-            }
-
-            pub struct BorrowedData<'a, R: Resources> {
-                $(pub $field: &'a <$ty as DataBind<R>>::Data,)*
-            }
-
-            impl<'a, R: Resources> gfx::pso::PipelineData<R> for BorrowedData<'a, R> {
-                type Meta = pipe::Meta;
-
-                fn bake_to(&self, out: &mut RawDataSet<R>, meta: &Self::Meta, man: &mut gfx::handle::Manager<R>, access: &mut AccessInfo<R>) {
-                    $(meta.$field.bind_to(out, &self.$field, man, access);)*
-                }
-            }
-        }
-    }
-}
-
-extended_defines! {
-    pipeline pipe {
-        vertex_buffer: gfx::VertexBuffer<ImDrawVert> = (),
-        matrix: gfx::Global<[[f32; 4]; 4]> = "matrix",
-        tex: gfx::TextureSampler<[f32; 4]> = "tex",
-        out: gfx::BlendTarget<gfx::format::Rgba8> = (
-            "Target0",
-            gfx::state::ColorMask::all(),
-            gfx::preset::blend::ALPHA,
-        ),
-        scissor: gfx::Scissor = (),
+impl From<gfx::CombinedError> for GfxRendererError {
+    fn from(e: gfx::CombinedError) -> GfxRendererError {
+        GfxRendererError::Combined(e)
     }
 }
 
@@ -137,50 +87,40 @@ pub type Texture<R> = (
     gfx::handle::Sampler<R>,
 );
 
-pub struct Renderer<R: Resources> {
-    bundle: Bundle<R, pipe::Data<R>>,
-    index_buffer: Buffer<R, u16>,
+pub struct GfxRenderer<Cf: BlendFormat, R: Resources> {
+    vertex_buffer: Buffer<R, DrawVert>,
+    index_buffer: Buffer<R, DrawIdx>,
+    slice: Slice<R>,
+    pso: PipelineState<R, pipeline::Meta<Cf>>,
+    font_texture: Texture<R>,
     textures: Textures<Texture<R>>,
 }
 
-impl<R: Resources> Renderer<R> {
+impl<Cf, R> GfxRenderer<Cf, R>
+where
+    Cf: BlendFormat,
+    R: Resources,
+{
     pub fn init<F: Factory<R>>(
-        imgui: &mut ImGui,
+        ctx: &mut imgui::Context,
         factory: &mut F,
         shaders: Shaders,
-        out: RenderTargetView<R, gfx::format::Rgba8>,
-    ) -> RendererResult<Renderer<R>> {
+    ) -> Result<GfxRenderer<Cf, R>, GfxRendererError> {
         let (vs_code, ps_code) = shaders.get_program_code();
-        let pso = factory.create_pipeline_simple(vs_code, ps_code, pipe::new())?;
-        let vertex_buffer = factory.create_buffer::<ImDrawVert>(
+        let pso = factory.create_pipeline_simple(vs_code, ps_code, pipeline::new::<Cf>())?;
+        let vertex_buffer = factory.create_buffer::<DrawVert>(
             256,
             gfx::buffer::Role::Vertex,
             gfx::memory::Usage::Dynamic,
             Bind::empty(),
         )?;
-        let index_buffer = factory.create_buffer::<ImDrawIdx>(
+        let index_buffer = factory.create_buffer::<DrawIdx>(
             256,
             gfx::buffer::Role::Index,
             gfx::memory::Usage::Dynamic,
             Bind::empty(),
         )?;
-        let (_, texture) = imgui.prepare_texture(|handle| {
-            factory.create_texture_immutable_u8::<gfx::format::Rgba8>(
-                gfx::texture::Kind::D2(
-                    handle.width as u16,
-                    handle.height as u16,
-                    gfx::texture::AaMode::Single,
-                ),
-                gfx::texture::Mipmap::Provided,
-                &[handle.pixels],
-            )
-        })?;
-        let sampler =
-            factory.create_sampler(SamplerInfo::new(FilterMethod::Trilinear, WrapMode::Clamp));
-        let pair = (texture, sampler);
-        let mut textures = Textures::new();
-        imgui.set_font_texture_id(textures.insert(pair));
-
+        let font_texture = upload_font_texture(ctx.fonts(), factory)?;
         let slice = Slice {
             start: 0,
             end: 0,
@@ -188,103 +128,106 @@ impl<R: Resources> Renderer<R> {
             instances: None,
             buffer: index_buffer.clone().into_index_buffer(factory),
         };
-        Ok(Renderer {
-            bundle: Bundle {
-                slice,
-                pso,
-                vertex_buffer,
-                out,
-            },
+        ctx.set_renderer_name(Some(ImString::from(format!(
+            "imgui-gfx-renderer {}",
+            env!("CARGO_PKG_VERSION")
+        ))));
+        Ok(GfxRenderer {
+            vertex_buffer,
             index_buffer,
-            textures,
+            slice,
+            pso,
+            font_texture,
+            textures: Textures::new(),
         })
     }
-
-    pub fn update_render_target(&mut self, out: RenderTargetView<R, gfx::format::Rgba8>) {
-        self.bundle.out = out;
+    pub fn reload_font_texture<F: Factory<R>>(
+        &mut self,
+        ctx: &mut imgui::Context,
+        factory: &mut F,
+    ) -> Result<(), GfxRendererError> {
+        self.font_texture = upload_font_texture(ctx.fonts(), factory)?;
+        Ok(())
     }
-
     pub fn textures(&mut self) -> &mut Textures<Texture<R>> {
         &mut self.textures
     }
-
-    pub fn render<'a, F: Factory<R>, C: CommandBuffer<R>>(
+    pub fn render<'ui, F: Factory<R>, C: CommandBuffer<R>>(
         &mut self,
-        ui: Ui<'a>,
         factory: &mut F,
         encoder: &mut Encoder<R, C>,
-    ) -> RendererResult<()> {
-        let FrameSize {
-            logical_size: (width, height),
-            hidpi_factor,
-        } = ui.frame_size();
-
-        if !(width > 0.0 && height > 0.0) {
+        target: &mut RenderTargetView<R, Cf>,
+        ui: Ui<'ui>,
+    ) -> Result<(), GfxRendererError> {
+        let draw_data = ui.render();
+        let fb_width = draw_data.display_size[0] * draw_data.framebuffer_scale[0];
+        let fb_height = draw_data.display_size[1] * draw_data.framebuffer_scale[1];
+        if !(fb_width > 0.0 && fb_height > 0.0) {
             return Ok(());
         }
-        let fb_size = (
-            (width * hidpi_factor) as f32,
-            (height * hidpi_factor) as f32,
-        );
-
+        let left = draw_data.display_pos[0];
+        let right = draw_data.display_pos[0] + draw_data.display_size[0];
+        let top = draw_data.display_pos[1];
+        let bottom = draw_data.display_pos[1] + draw_data.display_size[1];
         let matrix = [
-            [(2.0 / width) as f32, 0.0, 0.0, 0.0],
-            [0.0, (2.0 / -height) as f32, 0.0, 0.0],
+            [(2.0 / (right - left)), 0.0, 0.0, 0.0],
+            [0.0, (2.0 / (top - bottom)), 0.0, 0.0],
             [0.0, 0.0, -1.0, 0.0],
-            [-1.0, 1.0, 0.0, 1.0],
+            [
+                (right + left) / (left - right),
+                (top + bottom) / (bottom - top),
+                0.0,
+                1.0,
+            ],
         ];
+        let clip_off = draw_data.display_pos;
+        let clip_scale = draw_data.framebuffer_scale;
+        for draw_list in draw_data.draw_lists() {
+            self.upload_vertex_buffer(factory, encoder, draw_list.vtx_buffer())?;
+            self.upload_index_buffer(factory, encoder, draw_list.idx_buffer())?;
+            self.slice.start = 0;
+            for cmd in draw_list.commands() {
+                // TODO: Support for draw callbacks
+                match cmd {
+                    DrawCmd::Elements {
+                        count,
+                        clip_rect,
+                        texture_id,
+                    } => {
+                        let clip_rect = [
+                            (clip_rect[0] - clip_off[0]) * clip_scale[0],
+                            (clip_rect[1] - clip_off[1]) * clip_scale[1],
+                            (clip_rect[2] - clip_off[0]) * clip_scale[0],
+                            (clip_rect[3] - clip_off[1]) * clip_scale[1],
+                        ];
 
-        ui.render(|ui, mut draw_data| {
-            draw_data.scale_clip_rects(ui.imgui().display_framebuffer_scale());
-            for draw_list in &draw_data {
-                self.render_draw_list(factory, encoder, &draw_list, fb_size, &matrix)?;
+                        self.slice.end = self.slice.start + count as u32;
+
+                        if clip_rect[0] < fb_width
+                            && clip_rect[1] < fb_height
+                            && clip_rect[2] >= 0.0
+                            && clip_rect[3] >= 0.0
+                        {
+                            let scissor = Rect {
+                                x: f32::max(0.0, clip_rect[0]).floor() as u16,
+                                y: f32::max(0.0, clip_rect[1]).floor() as u16,
+                                w: (clip_rect[2] - clip_rect[0]).abs().ceil() as u16,
+                                h: (clip_rect[3] - clip_rect[1]).abs().ceil() as u16,
+                            };
+                            let tex = self.lookup_texture(texture_id)?;
+                            let data = pipeline::Data {
+                                vertex_buffer: &self.vertex_buffer,
+                                matrix: &matrix,
+                                tex,
+                                scissor: &scissor,
+                                target,
+                            };
+                            encoder.draw(&self.slice, &self.pso, &data);
+                        }
+                        self.slice.start = self.slice.end;
+                    }
+                }
             }
-            Ok(())
-        })
-    }
-    fn render_draw_list<'a, F: Factory<R>, C: CommandBuffer<R>>(
-        &mut self,
-        factory: &mut F,
-        encoder: &mut Encoder<R, C>,
-        draw_list: &DrawList<'a>,
-        fb_size: (f32, f32),
-        matrix: &[[f32; 4]; 4],
-    ) -> RendererResult<()> {
-        let (fb_width, fb_height) = fb_size;
-
-        self.upload_vertex_buffer(factory, encoder, draw_list.vtx_buffer)?;
-        self.upload_index_buffer(factory, encoder, draw_list.idx_buffer)?;
-
-        self.bundle.slice.start = 0;
-        for cmd in draw_list.cmd_buffer {
-            let texture_id = cmd.texture_id.into();
-            let tex = self
-                .textures
-                .get(texture_id)
-                .ok_or_else(|| RendererError::BadTexture(texture_id))?;
-
-            self.bundle.slice.end = self.bundle.slice.start + cmd.elem_count;
-            let scissor = Rect {
-                x: cmd.clip_rect.x.max(0.0).min(fb_width).round() as u16,
-                y: cmd.clip_rect.y.max(0.0).min(fb_height).round() as u16,
-                w: (cmd.clip_rect.z - cmd.clip_rect.x)
-                    .abs()
-                    .min(fb_width)
-                    .round() as u16,
-                h: (cmd.clip_rect.w - cmd.clip_rect.y)
-                    .abs()
-                    .min(fb_height)
-                    .round() as u16,
-            };
-            let data = pipe::BorrowedData {
-                vertex_buffer: &self.bundle.vertex_buffer,
-                matrix,
-                tex,
-                out: &self.bundle.out,
-                scissor: &scissor,
-            };
-            encoder.draw(&self.bundle.slice, &self.bundle.pso, &data);
-            self.bundle.slice.start = self.bundle.slice.end;
         }
         Ok(())
     }
@@ -292,42 +235,213 @@ impl<R: Resources> Renderer<R> {
         &mut self,
         factory: &mut F,
         encoder: &mut Encoder<R, C>,
-        vtx_buffer: &[ImDrawVert],
-    ) -> RendererResult<()> {
-        if self.bundle.vertex_buffer.len() < vtx_buffer.len() {
-            self.bundle.vertex_buffer = factory.create_buffer::<ImDrawVert>(
+        vtx_buffer: &[DrawVert],
+    ) -> Result<(), GfxRendererError> {
+        if self.vertex_buffer.len() < vtx_buffer.len() {
+            self.vertex_buffer = factory.create_buffer::<DrawVert>(
                 vtx_buffer.len(),
                 gfx::buffer::Role::Vertex,
                 gfx::memory::Usage::Dynamic,
                 Bind::empty(),
             )?;
         }
-        encoder.update_buffer(&self.bundle.vertex_buffer, vtx_buffer, 0)?;
+        encoder.update_buffer(&self.vertex_buffer, vtx_buffer, 0)?;
         Ok(())
     }
     fn upload_index_buffer<F: Factory<R>, C: CommandBuffer<R>>(
         &mut self,
         factory: &mut F,
         encoder: &mut Encoder<R, C>,
-        idx_buffer: &[ImDrawIdx],
-    ) -> RendererResult<()> {
+        idx_buffer: &[DrawIdx],
+    ) -> Result<(), GfxRendererError> {
         if self.index_buffer.len() < idx_buffer.len() {
-            self.index_buffer = factory.create_buffer::<ImDrawIdx>(
+            self.index_buffer = factory.create_buffer::<DrawIdx>(
                 idx_buffer.len(),
                 gfx::buffer::Role::Index,
                 gfx::memory::Usage::Dynamic,
                 Bind::empty(),
             )?;
-            self.bundle.slice.buffer = self.index_buffer.clone().into_index_buffer(factory);
+            self.slice.buffer = self.index_buffer.clone().into_index_buffer(factory);
         }
         encoder.update_buffer(&self.index_buffer, idx_buffer, 0)?;
         Ok(())
     }
+    fn lookup_texture(&self, texture_id: TextureId) -> Result<&Texture<R>, GfxRendererError> {
+        if texture_id.id() == usize::MAX {
+            Ok(&self.font_texture)
+        } else if let Some(texture) = self.textures.get(texture_id) {
+            Ok(texture)
+        } else {
+            Err(GfxRendererError::BadTexture(texture_id))
+        }
+    }
 }
 
-struct Bundle<R: Resources, Data: PipelineData<R>> {
-    slice: Slice<R>,
-    pso: PipelineState<R, Data::Meta>,
-    vertex_buffer: Buffer<R, ImDrawVert>,
-    out: RenderTargetView<R, gfx::format::Rgba8>,
+fn upload_font_texture<R: Resources, F: Factory<R>>(
+    mut fonts: imgui::FontAtlasRefMut,
+    factory: &mut F,
+) -> Result<Texture<R>, GfxRendererError> {
+    let texture = fonts.build_rgba32_texture();
+    let (_, texture_view) = factory.create_texture_immutable_u8::<gfx::format::Srgba8>(
+        gfx::texture::Kind::D2(
+            texture.width as u16,
+            texture.height as u16,
+            gfx::texture::AaMode::Single,
+        ),
+        gfx::texture::Mipmap::Provided,
+        &[texture.data],
+    )?;
+    fonts.set_texture_id(TextureId::from(usize::MAX));
+    let sampler = factory.create_sampler_linear();
+    let font_texture = (texture_view, sampler);
+    Ok(font_texture)
+}
+
+// This is basically what gfx_pipeline generates, but with some changes:
+//
+// * Data struct contains references to avoid copying
+// * Everything is parameterized with BlendFormat
+// * Pipeline init is specialized for our structs
+mod pipeline {
+    use gfx::format::BlendFormat;
+    use gfx::handle::Manager;
+    use gfx::preset::blend;
+    use gfx::pso::{
+        AccessInfo, DataBind, DataLink, Descriptor, InitError, PipelineData, PipelineInit,
+        RawDataSet,
+    };
+    use gfx::state::ColorMask;
+    use gfx::{ProgramInfo, Resources};
+    use imgui::DrawVert;
+
+    #[derive(Clone, Debug, PartialEq)]
+    pub struct Data<'a, R: Resources, Cf: BlendFormat + 'a> {
+        pub vertex_buffer: &'a <gfx::VertexBuffer<DrawVert> as DataBind<R>>::Data,
+        pub matrix: &'a <gfx::Global<[[f32; 4]; 4]> as DataBind<R>>::Data,
+        pub tex: &'a <gfx::TextureSampler<[f32; 4]> as DataBind<R>>::Data,
+        pub target: &'a <gfx::BlendTarget<Cf> as DataBind<R>>::Data,
+        pub scissor: &'a <gfx::Scissor as DataBind<R>>::Data,
+    }
+
+    #[derive(Clone, Debug, Hash, PartialEq)]
+    pub struct Meta<Cf: BlendFormat> {
+        vertex_buffer: gfx::VertexBuffer<DrawVert>,
+        matrix: gfx::Global<[[f32; 4]; 4]>,
+        tex: gfx::TextureSampler<[f32; 4]>,
+        target: gfx::BlendTarget<Cf>,
+        scissor: gfx::Scissor,
+    }
+
+    #[derive(Clone, Debug, PartialEq)]
+    pub struct Init<'a, Cf: BlendFormat> {
+        vertex_buffer: <gfx::VertexBuffer<DrawVert> as DataLink<'a>>::Init,
+        matrix: <gfx::Global<[[f32; 4]; 4]> as DataLink<'a>>::Init,
+        tex: <gfx::TextureSampler<[f32; 4]> as DataLink<'a>>::Init,
+        target: <gfx::BlendTarget<Cf> as DataLink<'a>>::Init,
+        scissor: <gfx::Scissor as DataLink<'a>>::Init,
+    }
+
+    impl<'a, Cf: BlendFormat> PipelineInit for Init<'a, Cf> {
+        type Meta = Meta<Cf>;
+        fn link_to<'s>(
+            &self,
+            desc: &mut Descriptor,
+            info: &'s ProgramInfo,
+        ) -> Result<Meta<Cf>, InitError<&'s str>> {
+            let mut meta = Meta {
+                vertex_buffer: DataLink::new(),
+                matrix: DataLink::new(),
+                tex: DataLink::new(),
+                target: DataLink::new(),
+                scissor: DataLink::new(),
+            };
+            if let Some(d) = meta
+                .vertex_buffer
+                .link_vertex_buffer(0, &self.vertex_buffer)
+            {
+                assert!(meta.vertex_buffer.is_active());
+                desc.vertex_buffers[0] = Some(d);
+            }
+            for at in &info.vertex_attributes {
+                match meta.vertex_buffer.link_input(at, &self.vertex_buffer) {
+                    Some(Ok(d)) => {
+                        assert!(meta.vertex_buffer.is_active());
+                        desc.attributes[at.slot as usize] = Some(d);
+                        continue;
+                    }
+                    Some(Err(fm)) => return Err(InitError::VertexImport(&at.name, Some(fm))),
+                    None => return Err(InitError::VertexImport(&at.name, None)),
+                }
+            }
+            for gc in &info.globals {
+                match meta.matrix.link_global_constant(gc, &self.matrix) {
+                    Some(Ok(())) => assert!(meta.matrix.is_active()),
+                    Some(Err(e)) => return Err(InitError::GlobalConstant(&gc.name, Some(e))),
+                    None => return Err(InitError::GlobalConstant(&gc.name, None)),
+                }
+            }
+            for srv in &info.textures {
+                match meta.tex.link_resource_view(srv, &self.tex) {
+                    Some(Ok(d)) => {
+                        assert!(meta.tex.is_active());
+                        desc.resource_views[srv.slot as usize] = Some(d);
+                    }
+                    Some(Err(_)) => return Err(InitError::ResourceView(&srv.name, Some(()))),
+                    None => return Err(InitError::ResourceView(&srv.name, None)),
+                }
+            }
+            for sm in &info.samplers {
+                match meta.tex.link_sampler(sm, &self.tex) {
+                    Some(d) => {
+                        assert!(meta.tex.is_active());
+                        desc.samplers[sm.slot as usize] = Some(d);
+                    }
+                    None => return Err(InitError::Sampler(&sm.name, None)),
+                }
+            }
+            for out in &info.outputs {
+                match meta.target.link_output(out, &self.target) {
+                    Some(Ok(d)) => {
+                        assert!(meta.target.is_active());
+                        desc.color_targets[out.slot as usize] = Some(d);
+                    }
+                    Some(Err(fm)) => return Err(InitError::PixelExport(&out.name, Some(fm))),
+                    None => return Err(InitError::PixelExport(&out.name, None)),
+                }
+            }
+            if meta.scissor.link_scissor() {
+                assert!(meta.scissor.is_active());
+                desc.scissor = true;
+            }
+            Ok(meta)
+        }
+    }
+
+    impl<'a, R: Resources, Cf: BlendFormat> PipelineData<R> for Data<'a, R, Cf> {
+        type Meta = Meta<Cf>;
+        fn bake_to(
+            &self,
+            out: &mut RawDataSet<R>,
+            meta: &Meta<Cf>,
+            man: &mut Manager<R>,
+            access: &mut AccessInfo<R>,
+        ) {
+            meta.vertex_buffer
+                .bind_to(out, self.vertex_buffer, man, access);
+            meta.matrix.bind_to(out, self.matrix, man, access);
+            meta.tex.bind_to(out, self.tex, man, access);
+            meta.target.bind_to(out, self.target, man, access);
+            meta.scissor.bind_to(out, self.scissor, man, access);
+        }
+    }
+
+    pub fn new<Cf: BlendFormat>() -> Init<'static, Cf> {
+        Init {
+            vertex_buffer: (),
+            matrix: "matrix",
+            tex: "tex",
+            target: ("Target0", ColorMask::all(), blend::ALPHA),
+            scissor: (),
+        }
+    }
 }

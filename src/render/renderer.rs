@@ -1,15 +1,4 @@
-use crate::{Context, DrawData};
-
-pub trait Renderer<T> {
-    type Error;
-    type Texture;
-    fn reload_font_texture(&mut self, ctx: &mut Context) -> Result<(), Self::Error>;
-    fn register_texture(&mut self, texture: Self::Texture) -> TextureId;
-    fn get_texture(&self, texture_id: TextureId) -> Option<&Self::Texture>;
-    fn deregister_texture(&mut self, texture_id: TextureId) -> Option<Self::Texture>;
-    fn render_draw_data(&mut self, draw_data: &DrawData, target: &mut T)
-        -> Result<(), Self::Error>;
-}
+use std::collections::HashMap;
 
 #[derive(Copy, Clone, Debug, Eq, PartialEq, Hash)]
 pub struct TextureId(usize);
@@ -35,5 +24,40 @@ impl<T> From<*const T> for TextureId {
 impl<T> From<*mut T> for TextureId {
     fn from(ptr: *mut T) -> Self {
         TextureId(ptr as usize)
+    }
+}
+
+/// Generic texture mapping for use by renderers.
+#[derive(Debug, Default)]
+pub struct Textures<T> {
+    textures: HashMap<usize, T>,
+    next: usize,
+}
+
+impl<T> Textures<T> {
+    pub fn new() -> Self {
+        Textures {
+            textures: HashMap::new(),
+            next: 0,
+        }
+    }
+
+    pub fn insert(&mut self, texture: T) -> TextureId {
+        let id = self.next;
+        self.textures.insert(id, texture);
+        self.next += 1;
+        TextureId::from(id)
+    }
+
+    pub fn replace(&mut self, id: TextureId, texture: T) -> Option<T> {
+        self.textures.insert(id.0, texture)
+    }
+
+    pub fn remove(&mut self, id: TextureId) -> Option<T> {
+        self.textures.remove(&id.0)
+    }
+
+    pub fn get(&self, id: TextureId) -> Option<&T> {
+        self.textures.get(&id.0)
     }
 }

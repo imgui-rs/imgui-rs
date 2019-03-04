@@ -4,14 +4,14 @@ use glium::program::ProgramChooserCreationError;
 use glium::texture::{ClientFormat, MipmapsOption, RawImage2d, TextureCreationError};
 use glium::uniforms::{MagnifySamplerFilter, MinifySamplerFilter};
 use glium::{
-    program, uniform, vertex, Blend, DrawError, DrawParameters, GlObject, IndexBuffer, Program,
-    Rect, Surface, Texture2d, VertexBuffer,
+    program, uniform, vertex, Blend, DrawError, DrawParameters, IndexBuffer, Program, Rect,
+    Surface, Texture2d, VertexBuffer,
 };
-use imgui::{DrawCmd, DrawData, ImString, Renderer, TextureId};
+use imgui::{DrawCmd, ImString, TextureId, Textures, Ui};
 use std::borrow::Cow;
-use std::collections::HashMap;
 use std::fmt;
 use std::rc::Rc;
+use std::usize;
 
 #[derive(Clone, Debug)]
 pub enum GliumRendererError {
@@ -71,7 +71,7 @@ pub struct GliumRenderer {
     ctx: Rc<Context>,
     program: Program,
     font_texture: Texture2d,
-    textures: HashMap<TextureId, Rc<Texture2d>>,
+    textures: Textures<Rc<Texture2d>>,
 }
 
 impl GliumRenderer {
@@ -79,56 +79,44 @@ impl GliumRenderer {
         ctx: &mut imgui::Context,
         facade: &F,
     ) -> Result<GliumRenderer, GliumRendererError> {
+        let program = compile_default_program(facade)?;
+        let font_texture = upload_font_texture(ctx.fonts(), facade.get_context())?;
         ctx.set_renderer_name(Some(ImString::from(format!(
             "imgui-glium-renderer {}",
             env!("CARGO_PKG_VERSION")
         ))));
-        let program = compile_default_program(facade)?;
-        let font_texture = upload_font_texture(ctx.fonts(), facade.get_context())?;
         Ok(GliumRenderer {
             ctx: Rc::clone(facade.get_context()),
             program,
             font_texture,
-            textures: HashMap::new(),
+            textures: Textures::new(),
         })
     }
+    pub fn reload_font_texture(
+        &mut self,
+        ctx: &mut imgui::Context,
+    ) -> Result<(), GliumRendererError> {
+        self.font_texture = upload_font_texture(ctx.fonts(), &self.ctx)?;
+        Ok(())
+    }
+    pub fn textures(&mut self) -> &mut Textures<Rc<Texture2d>> {
+        &mut self.textures
+    }
     fn lookup_texture(&self, texture_id: TextureId) -> Result<&Texture2d, GliumRendererError> {
-        if texture_id.id() == self.font_texture.get_id() as usize {
+        if texture_id.id() == usize::MAX {
             Ok(&self.font_texture)
-        } else if let Some(texture) = self.textures.get(&texture_id) {
+        } else if let Some(texture) = self.textures.get(texture_id) {
             Ok(texture)
         } else {
             Err(GliumRendererError::BadTexture(texture_id))
         }
     }
-}
-
-impl<T> Renderer<T> for GliumRenderer
-where
-    T: Surface,
-{
-    type Error = GliumRendererError;
-    type Texture = Rc<Texture2d>;
-    fn reload_font_texture(&mut self, ctx: &mut imgui::Context) -> Result<(), GliumRendererError> {
-        self.font_texture = upload_font_texture(ctx.fonts(), &self.ctx)?;
-        Ok(())
-    }
-    fn register_texture(&mut self, texture: Rc<Texture2d>) -> TextureId {
-        let texture_id = TextureId::from(texture.get_id() as usize);
-        self.textures.insert(texture_id, texture);
-        texture_id
-    }
-    fn get_texture(&self, texture_id: TextureId) -> Option<&Rc<Texture2d>> {
-        self.textures.get(&texture_id)
-    }
-    fn deregister_texture(&mut self, texture_id: TextureId) -> Option<Rc<Texture2d>> {
-        self.textures.remove(&texture_id)
-    }
-    fn render_draw_data(
+    pub fn render<'ui, T: Surface>(
         &mut self,
-        draw_data: &DrawData,
         target: &mut T,
+        ui: Ui<'ui>,
     ) -> Result<(), GliumRendererError> {
+        let draw_data = ui.render();
         let fb_width = draw_data.display_size[0] * draw_data.framebuffer_scale[0];
         let fb_height = draw_data.display_size[1] * draw_data.framebuffer_scale[1];
         if !(fb_width > 0.0 && fb_height > 0.0) {
@@ -229,7 +217,7 @@ fn upload_font_texture(
         format: ClientFormat::U8U8U8U8,
     };
     let font_texture = Texture2d::with_mipmaps(ctx, data, MipmapsOption::NoMipmap)?;
-    fonts.set_texture_id(TextureId::from(font_texture.get_id() as usize));
+    fonts.set_texture_id(TextureId::from(usize::MAX));
     Ok(font_texture)
 }
 

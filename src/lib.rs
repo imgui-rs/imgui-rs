@@ -53,7 +53,7 @@ impl<'ui> Ui<'ui> {
             None => unsafe {
                 let fonts = &*(self.io().fonts as *const FontAtlas);
                 FontAtlasRef::Owned(fonts)
-            }
+            },
         }
     }
     pub fn clone_style(&self) -> Style {
@@ -64,14 +64,6 @@ impl<'ui> Ui<'ui> {
             sys::igRender();
             &*(sys::igGetDrawData() as *mut DrawData)
         }
-    }
-    pub fn render_with<T, R: Renderer<T>>(
-        self,
-        renderer: &mut R,
-        output: &mut T,
-    ) -> Result<(), R::Error> {
-        let draw_data = self.render();
-        renderer.render_draw_data(draw_data, output)
     }
     pub fn show_demo_window(&self, opened: &mut bool) {
         unsafe {
