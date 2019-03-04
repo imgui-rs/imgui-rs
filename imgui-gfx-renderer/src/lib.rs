@@ -2,6 +2,7 @@ use gfx::format::BlendFormat;
 use gfx::handle::{Buffer, RenderTargetView};
 use gfx::memory::Bind;
 use gfx::pso::PipelineState;
+use gfx::texture::{FilterMethod, SamplerInfo, WrapMode};
 use gfx::traits::FactoryExt;
 use gfx::{CommandBuffer, Encoder, Factory, IntoIndexBuffer, Rect, Resources, Slice};
 use imgui::{DrawCmd, DrawIdx, DrawVert, ImString, TextureId, Textures, Ui};
@@ -292,7 +293,7 @@ fn upload_font_texture<R: Resources, F: Factory<R>>(
         &[texture.data],
     )?;
     fonts.set_texture_id(TextureId::from(usize::MAX));
-    let sampler = factory.create_sampler_linear();
+    let sampler = factory.create_sampler(SamplerInfo::new(FilterMethod::Bilinear, WrapMode::Tile));
     let font_texture = (texture_view, sampler);
     Ok(font_texture)
 }
@@ -407,6 +408,24 @@ mod pipeline {
                     }
                     Some(Err(fm)) => return Err(InitError::PixelExport(&out.name, Some(fm))),
                     None => return Err(InitError::PixelExport(&out.name, None)),
+                }
+            }
+            if !info.knows_outputs {
+                use gfx::shade::core::*;
+                let mut out = OutputVar {
+                    name: String::new(),
+                    slot: 0,
+                    base_type: BaseType::F32,
+                    container: ContainerType::Vector(4),
+                };
+                match meta.target.link_output(&out, &self.target) {
+                    Some(Ok(d)) => {
+                        assert!(meta.target.is_active());
+                        desc.color_targets[out.slot as usize] = Some(d);
+                        out.slot += 1;
+                    }
+                    Some(Err(fm)) => return Err(InitError::PixelExport(&"!known", Some(fm))),
+                    None => (),
                 }
             }
             if meta.scissor.link_scissor() {

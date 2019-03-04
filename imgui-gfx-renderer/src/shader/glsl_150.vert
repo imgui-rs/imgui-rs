@@ -14,6 +14,10 @@ out vec4 f_color;
 
 void main() {
   f_uv = uv;
-  f_color = col;
+  float gamma = 2.2;
+  f_color = vec4(
+    pow(col.rgb, vec3(gamma)),
+    1.0 - pow(1.0 - col.a, gamma)
+  );
   gl_Position = matrix * vec4(pos.xy, 0, 1);
 }
