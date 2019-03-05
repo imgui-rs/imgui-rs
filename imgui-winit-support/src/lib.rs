@@ -272,12 +272,26 @@ impl WinitPlatform {
                 io.display_size = [logical_size.width as f32, logical_size.height as f32];
             }
             WindowEvent::HiDpiFactorChanged(scale) => {
-                match self.hidpi_mode {
-                    ActiveHiDpiMode::Default => self.hidpi_factor = scale,
-                    ActiveHiDpiMode::Rounded => self.hidpi_factor = scale.round(),
-                    _ => (),
+                let hidpi_factor = match self.hidpi_mode {
+                    ActiveHiDpiMode::Default => scale,
+                    ActiveHiDpiMode::Rounded => scale.round(),
+                    _ => return,
+                };
+                // Mouse position needs to be changed while we still have both the old and the new
+                // values
+                if io.mouse_pos[0].is_finite() && io.mouse_pos[1].is_finite() {
+                    io.mouse_pos = [
+                        io.mouse_pos[0] * (hidpi_factor / self.hidpi_factor) as f32,
+                        io.mouse_pos[1] * (hidpi_factor / self.hidpi_factor) as f32,
+                    ];
                 }
-                io.display_framebuffer_scale = [self.hidpi_factor as f32, self.hidpi_factor as f32];
+                self.hidpi_factor = hidpi_factor;
+                io.display_framebuffer_scale = [hidpi_factor as f32, hidpi_factor as f32];
+                // Window size might change too if we are using DPI rounding
+                if let Some(logical_size) = window.get_inner_size() {
+                    let logical_size = self.scale_size_from_winit(window, logical_size);
+                    io.display_size = [logical_size.width as f32, logical_size.height as f32];
+                }
             }
             WindowEvent::KeyboardInput {
                 input:
