@@ -5,7 +5,7 @@ use gfx::pso::PipelineState;
 use gfx::texture::{FilterMethod, SamplerInfo, WrapMode};
 use gfx::traits::FactoryExt;
 use gfx::{CommandBuffer, Encoder, Factory, IntoIndexBuffer, Rect, Resources, Slice};
-use imgui::{DrawCmd, DrawIdx, DrawVert, ImString, TextureId, Textures, Ui};
+use imgui::{DrawCmd, DrawCmdParams, DrawIdx, DrawVert, ImString, TextureId, Textures, Ui};
 use std::usize;
 
 #[derive(Clone, Debug)]
@@ -188,12 +188,14 @@ where
             self.upload_index_buffer(factory, encoder, draw_list.idx_buffer())?;
             self.slice.start = 0;
             for cmd in draw_list.commands() {
-                // TODO: Support for draw callbacks
                 match cmd {
                     DrawCmd::Elements {
                         count,
-                        clip_rect,
-                        texture_id,
+                        cmd_params:
+                            DrawCmdParams {
+                                clip_rect,
+                                texture_id,
+                            },
                     } => {
                         let clip_rect = [
                             (clip_rect[0] - clip_off[0]) * clip_scale[0],
@@ -227,6 +229,17 @@ where
                         }
                         self.slice.start = self.slice.end;
                     }
+                    DrawCmd::FnCallback {
+                        callback,
+                        cmd_params,
+                    } => callback(&draw_list, &cmd_params),
+                    DrawCmd::ClosureCallback {
+                        mut callback,
+                        cmd_params,
+                    } => callback(&draw_list, &cmd_params),
+                    DrawCmd::RawCallback { callback, raw_cmd } => unsafe {
+                        callback(draw_list.raw(), raw_cmd)
+                    },
                 }
             }
         }

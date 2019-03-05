@@ -1,3 +1,4 @@
+use std::mem;
 use std::slice;
 
 use crate::render::renderer::TextureId;
@@ -101,6 +102,12 @@ fn test_drawdata_memory_layout() {
 pub struct DrawList(sys::ImDrawList);
 
 impl DrawList {
+    pub unsafe fn raw(&self) -> &sys::ImDrawList {
+        &self.0
+    }
+    pub unsafe fn raw_mut(&mut self) -> &mut sys::ImDrawList {
+        &mut self.0
+    }
     pub(crate) unsafe fn cmd_buffer(&self) -> &[sys::ImDrawCmd] {
         slice::from_raw_parts(
             self.0.CmdBuffer.Data as *const sys::ImDrawCmd,
@@ -140,23 +147,77 @@ impl<'a> Iterator for DrawCmdIterator<'a> {
     type Item = DrawCmd;
 
     fn next(&mut self) -> Option<Self::Item> {
-        self.iter.next().map(|&cmd| DrawCmd::Elements {
-            count: cmd.ElemCount as usize,
-            clip_rect: cmd.ClipRect.into(),
-            texture_id: TextureId::from(cmd.TextureId),
+        self.iter.next().map(|cmd| {
+            let cmd_params = DrawCmdParams {
+                clip_rect: cmd.ClipRect.into(),
+                texture_id: TextureId::from(cmd.TextureId),
+            };
+            if let Some(raw_callback) = cmd.UserCallback {
+                if raw_callback == fn_callback_marker {
+                    assert!(!cmd.UserCallbackData.is_null());
+                    let callback: FnCallback = unsafe { mem::transmute(cmd.UserCallbackData) };
+                    DrawCmd::FnCallback {
+                        callback,
+                        cmd_params,
+                    }
+                } else if raw_callback == closure_callback_marker {
+                    assert!(!cmd.UserCallbackData.is_null());
+                    let callback =
+                        unsafe { Box::from_raw(cmd.UserCallbackData as *mut ClosureCallback) };
+                    DrawCmd::ClosureCallback {
+                        callback,
+                        cmd_params,
+                    }
+                } else {
+                    DrawCmd::RawCallback {
+                        callback: raw_callback,
+                        raw_cmd: cmd,
+                    }
+                }
+            } else {
+                DrawCmd::Elements {
+                    count: cmd.ElemCount as usize,
+                    cmd_params,
+                }
+            }
         })
     }
 }
 
+pub type FnCallback = fn(&DrawList, &DrawCmdParams);
+pub unsafe extern "C" fn fn_callback_marker(_: *const sys::ImDrawList, _: *const sys::ImDrawCmd) {}
+pub type ClosureCallback = Box<dyn FnMut(&DrawList, &DrawCmdParams)>;
+pub unsafe extern "C" fn closure_callback_marker(
+    _: *const sys::ImDrawList,
+    _: *const sys::ImDrawCmd,
+) {
+}
+
 pub type DrawIdx = sys::ImDrawIdx;
+
+#[derive(Copy, Clone, Debug, PartialEq)]
+pub struct DrawCmdParams {
+    pub clip_rect: [f32; 4],
+    pub texture_id: TextureId,
+}
 
 pub enum DrawCmd {
     Elements {
         count: usize,
-        clip_rect: [f32; 4],
-        texture_id: TextureId,
+        cmd_params: DrawCmdParams,
     },
-    // TODO: Support for draw callbacks
+    FnCallback {
+        callback: FnCallback,
+        cmd_params: DrawCmdParams,
+    },
+    ClosureCallback {
+        callback: Box<ClosureCallback>,
+        cmd_params: DrawCmdParams,
+    },
+    RawCallback {
+        callback: unsafe extern "C" fn(*const sys::ImDrawList, cmd: *const sys::ImDrawCmd),
+        raw_cmd: *const sys::ImDrawCmd,
+    },
 }
 
 #[repr(C)]

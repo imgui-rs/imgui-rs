@@ -7,7 +7,7 @@ use glium::{
     program, uniform, vertex, Blend, DrawError, DrawParameters, IndexBuffer, Program, Rect,
     Surface, Texture2d, VertexBuffer,
 };
-use imgui::{DrawCmd, ImString, TextureId, Textures, Ui};
+use imgui::{DrawCmd, DrawCmdParams, ImString, TextureId, Textures, Ui};
 use std::borrow::Cow;
 use std::fmt;
 use std::rc::Rc;
@@ -149,12 +149,14 @@ impl GliumRenderer {
             )?;
             let mut idx_start = 0;
             for cmd in draw_list.commands() {
-                // TODO: Support for draw callbacks
                 match cmd {
                     DrawCmd::Elements {
                         count,
-                        clip_rect,
-                        texture_id,
+                        cmd_params:
+                            DrawCmdParams {
+                                clip_rect,
+                                texture_id,
+                            },
                     } => {
                         let idx_end = idx_start + count;
                         let clip_rect = [
@@ -194,9 +196,19 @@ impl GliumRenderer {
                                 },
                             )?;
                         }
-
                         idx_start = idx_end;
                     }
+                    DrawCmd::FnCallback {
+                        callback,
+                        cmd_params,
+                    } => callback(&draw_list, &cmd_params),
+                    DrawCmd::ClosureCallback {
+                        mut callback,
+                        cmd_params,
+                    } => callback(&draw_list, &cmd_params),
+                    DrawCmd::RawCallback { callback, raw_cmd } => unsafe {
+                        callback(draw_list.raw(), raw_cmd)
+                    },
                 }
             }
         }
