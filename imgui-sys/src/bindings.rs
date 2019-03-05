@@ -4423,7 +4423,6 @@ pub struct Pair {
     pub __bindgen_anon_1: Pair__bindgen_ty_1,
 }
 #[repr(C)]
-#[repr(align(8))]
 #[derive(Copy, Clone)]
 pub union Pair__bindgen_ty_1 {
     pub val_i: ::std::os::raw::c_int,
