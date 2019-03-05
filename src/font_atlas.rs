@@ -9,9 +9,15 @@ use crate::TextureId;
 
 #[repr(transparent)]
 #[derive(Debug)]
-pub struct FontAtlas(pub sys::ImFontAtlas);
+pub struct FontAtlas(sys::ImFontAtlas);
 
 impl FontAtlas {
+    pub unsafe fn raw(&self) -> &sys::ImFontAtlas {
+        &self.0
+    }
+    pub unsafe fn raw_mut(&mut self) -> &mut sys::ImFontAtlas {
+        &mut self.0
+    }
     pub fn build_alpha8_texture(&mut self) -> FontAtlasTexture {
         let mut pixels: *mut c_uchar = ptr::null_mut();
         let mut width: c_int = 0;
