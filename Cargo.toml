@@ -17,17 +17,14 @@ travis-ci = { repository = "Gekkio/imgui-rs" }
 imgui-sys = { version = "0.0.23-pre", path = "imgui-sys" }
 
 [workspace]
-<<<<<<< HEAD
-members = ["imgui-examples", "imgui-sys", "imgui-gfx-renderer", "imgui-glium-renderer", "imgui-vulkano-renderer", "imgui-glutin-support"]
-=======
 members = [
     "imgui-sys",
     "imgui-gfx-renderer",
     "imgui-glium-renderer",
-    "imgui-winit-support"
+    "imgui-winit-support",
+    "imgui-vulkano-renderer"
 ]
 exclude = [
     "imgui-examples",
     "imgui-glium-examples",
 ]
->>>>>>> upstream/master
