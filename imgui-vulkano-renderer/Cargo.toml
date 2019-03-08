@@ -15,5 +15,5 @@ travis-ci = { repository = "Gekkio/imgui-rs" }
 image = "0.20"
 vulkano = "0.10"
 vulkano-shader-derive = "0.10"
-imgui = { version = "0.0.21-pre", path = "../" }
-imgui-sys = { version = "0.0.21-pre", path = "../imgui-sys", features = ["vulkano"] }
+imgui = { version = "0.0.23-pre", path = "../" }
+imgui-sys = { version = "0.0.23-pre", path = "../imgui-sys", features = ["vulkano"] }
