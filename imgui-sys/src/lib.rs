@@ -1,8 +1,5 @@
 #![allow(non_upper_case_globals)]
 
-#[cfg(feature = "vulkano")]
-extern crate vulkano;
-
 use libc::size_t;
 use std::convert::From;
 use std::os::raw::{c_char, c_double, c_float, c_int, c_uint, c_ushort, c_void};

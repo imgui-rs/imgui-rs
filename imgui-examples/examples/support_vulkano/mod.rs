@@ -1,7 +1,6 @@
 pub mod vulkano_window;
 
 use imgui::*;
-use winit::VirtualKeyCode;
 
 #[derive(Copy, Clone, PartialEq, Debug, Default)]
 pub struct MouseState {

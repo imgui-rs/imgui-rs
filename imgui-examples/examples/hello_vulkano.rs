@@ -1,5 +1,5 @@
 #[macro_use] extern crate vulkano;
-#[macro_use] extern crate vulkano_shader_derive;
+extern crate vulkano_shader_derive;
 extern crate winit;
 extern crate vulkano_win;
 
@@ -19,9 +19,7 @@ mod feature {
     use super::*;
     extern crate image;
 
-    use std::mem;
     use std::sync::Arc;
-    use std::path::Path;
 
     use support::MouseState;
 
@@ -48,7 +46,8 @@ mod feature {
         },
     };
 
-    use imgui::{FontGlyphRange, FrameSize, ImFontConfig, ImGui, ImGuiMouseCursor, Ui};
+    use winit::VirtualKeyCode as Key;
+    use imgui::{FontGlyphRange, FrameSize, ImFontConfig, ImGui, };
 
     const WIN_W: u32 = 1024;
     const WIN_H: u32 =  768;
@@ -58,8 +57,6 @@ mod feature {
         let mut window = support::vulkano_window::Window::new(WIN_W, WIN_H, "Conrod with vulkano");
 
         let subpass = vulkano::framebuffer::Subpass::from(window.render_pass.clone(), 0).expect("Couldn't create subpass for gui!");
-        let queue = window.queue.clone();
-
         let mut render_helper = RenderHelper::new(&window);
 
         // IMGUI //
@@ -71,7 +68,7 @@ mod feature {
         let font_size = 13.0 as f32;
 
         imgui.fonts().add_font_with_config(
-            include_bytes!("mplus-1p-regular.ttf"),
+            include_bytes!("../../resources/mplus-1p-regular.ttf"),
             ImFontConfig::new()
                 .oversample_h(1)
                 .pixel_snap_h(true)
@@ -110,8 +107,6 @@ mod feature {
                     match event {
                         CloseRequested => should_quit = true,
                         KeyboardInput { input, .. } => {
-                            use winit::VirtualKeyCode as Key;
-
                             let pressed = input.state == winit::ElementState::Pressed;
                             match input.virtual_keycode {
                                 Some(Key::Tab) => imgui.set_key(0, pressed),
@@ -241,13 +236,13 @@ mod feature {
             match future {
                 Ok(future) => previous_frame_end = Box::new(future) as Box<_>,
                 Err(FlushError::OutOfDate) => previous_frame_end = Box::new(now(window.device.clone())) as Box<_>,
-                Err(e) => {
+                Err(_) => {
                     previous_frame_end = Box::new(now(window.device.clone())) as Box<_>;
                 }
             }
 
-            let winit_window_handle = window.surface.clone();
-            let winit_window_handle = winit_window_handle.window();
+            //let winit_window_handle = window.surface.clone();
+            //let winit_window_handle = winit_window_handle.window();
 
             if should_quit {
                 break 'main;
@@ -300,7 +295,7 @@ mod feature {
                     .add(self.depth_buffer.clone()).unwrap()
                     .build().unwrap())
             }).collect::<Vec<_>>();
-            mem::replace(&mut self.frame_buffers, new_framebuffers);
+            std::mem::replace(&mut self.frame_buffers, new_framebuffers);
         }
     }
 }

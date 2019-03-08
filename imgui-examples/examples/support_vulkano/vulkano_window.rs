@@ -25,7 +25,6 @@ use winit;
 use winit::EventsLoop;
 use vulkano_win::required_extensions;
 use vulkano::instance::debug::DebugCallback;
-use std::mem;
 
 pub struct Window {
     pub surface: Arc<Surface<winit::Window>>,
@@ -39,7 +38,7 @@ pub struct Window {
 }
 
 impl Window {
-    pub fn new(width: u32, height: u32, title: &str) -> Self {
+    pub fn new(width: u32, height: u32, _: &str) -> Self {
         let instance = {
             let mut extensions = required_extensions();
             extensions.ext_debug_report = true;

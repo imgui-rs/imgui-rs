@@ -18,6 +18,8 @@ imgui-gfx-renderer = { version = "0.0.23-pre", path = "../imgui-gfx-renderer" }
 imgui-winit-support = { version = "0.0.23-pre", path = "../imgui-winit-support" }
 imgui-vulkano-renderer = { version = "*", path = "../imgui-vulkano-renderer" }
 
+image = "0.21.0"
+winit = "^0.17"
 vulkano = "0.10"
 vulkano-win = "0.10"
 vulkano-shader-derive = "0.10"
