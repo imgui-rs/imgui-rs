@@ -100,7 +100,7 @@ impl<'ui, 'p> TreeNode<'ui, 'p> {
             if !self.opened_cond.is_empty() {
                 sys::igSetNextTreeNodeOpen(self.opened, self.opened_cond);
             }
-            sys::igTreeNodeExStr(
+            sys::igTreeNodeExStrStr(
                 self.id.as_ptr(),
                 self.flags,
                 super::fmt_ptr(),

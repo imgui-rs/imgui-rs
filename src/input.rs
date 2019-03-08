@@ -126,16 +126,6 @@ macro_rules! impl_step_params {
     }
 }
 
-macro_rules! impl_precision_params {
-    ($InputType:ident) => {
-        #[inline]
-        pub fn decimal_precision(mut self, value: i32) -> Self {
-            self.decimal_precision = value;
-            self
-        }
-    }
-}
-
 #[must_use]
 pub struct InputText<'ui, 'p> {
     label: &'p ImStr,
@@ -257,7 +247,6 @@ pub struct InputFloat<'ui, 'p> {
     value: &'p mut f32,
     step: f32,
     step_fast: f32,
-    decimal_precision: i32,
     flags: ImGuiInputTextFlags,
     _phantom: PhantomData<&'ui Ui<'ui>>,
 }
@@ -269,7 +258,6 @@ impl<'ui, 'p> InputFloat<'ui, 'p> {
             value,
             step: 0.0,
             step_fast: 0.0,
-            decimal_precision: -1,
             flags: ImGuiInputTextFlags::empty(),
             _phantom: PhantomData,
         }
@@ -282,14 +270,13 @@ impl<'ui, 'p> InputFloat<'ui, 'p> {
                 self.value as *mut f32,
                 self.step,
                 self.step_fast,
-                self.decimal_precision,
+                b"%.3f\0".as_ptr() as *const _,
                 self.flags,
             )
         }
     }
 
     impl_step_params!(InputFloat, f32);
-    impl_precision_params!(InputFloat);
     impl_text_flags!(InputFloat);
 }
 
@@ -299,7 +286,6 @@ macro_rules! impl_input_floatn {
         pub struct $InputFloatN<'ui, 'p> {
             label: &'p ImStr,
             value: &'p mut [f32; $N],
-            decimal_precision: i32,
             flags: ImGuiInputTextFlags,
             _phantom: PhantomData<&'ui Ui<'ui>>,
         }
@@ -309,7 +295,6 @@ macro_rules! impl_input_floatn {
                 $InputFloatN {
                     label,
                     value,
-                    decimal_precision: -1,
                     flags: ImGuiInputTextFlags::empty(),
                     _phantom: PhantomData,
                 }
@@ -320,13 +305,12 @@ macro_rules! impl_input_floatn {
                     sys::$igInputFloatN(
                         self.label.as_ptr(),
                         self.value.as_mut_ptr(),
-                        self.decimal_precision,
+                        b"%.3f\0".as_ptr() as *const _,
                         self.flags,
                     )
                 }
             }
 
-            impl_precision_params!($InputFloatN);
             impl_text_flags!($InputFloatN);
         }
     };

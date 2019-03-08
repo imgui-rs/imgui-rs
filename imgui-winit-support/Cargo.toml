@@ -1,8 +1,9 @@
 [package]
-name = "imgui-glutin-support"
-version = "0.0.21-pre"
+name = "imgui-winit-support"
+version = "0.0.23-pre"
+edition = "2018"
 authors = ["Joonas Javanainen <joonas.javanainen@gmail.com>", "imgui-rs contributors"]
-description = "glutin support code for the imgui crate"
+description = "winit support code for the imgui crate"
 homepage = "https://github.com/Gekkio/imgui-rs"
 repository = "https://github.com/Gekkio/imgui-rs"
 license = "MIT/Apache-2.0"
@@ -12,5 +13,5 @@ categories = ["gui"]
 travis-ci = { repository = "Gekkio/imgui-rs" }
 
 [dependencies]
-glutin = ">= 0.17, <= 0.18"
-imgui = { version = "0.0.21-pre", path = "../" }
+imgui = { version = "0.0.23-pre", path = "../" }
+winit = ">= 0.16, <= 0.18"

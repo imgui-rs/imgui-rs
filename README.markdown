@@ -2,7 +2,9 @@
 
 **Still fairly experimental!**
 
-Minimum Rust version: 1.26
+Minimum Rust version: 1.31
+
+Wrapped Dear ImGui version: 1.66b
 
 [![Build Status](https://travis-ci.org/Gekkio/imgui-rs.svg?branch=master)](https://travis-ci.org/Gekkio/imgui-rs)
 [![Latest release on crates.io](https://meritbadge.herokuapp.com/imgui)](https://crates.io/crates/imgui)
@@ -49,12 +51,22 @@ ui.window(im_str!("Hello world"))
 
 ## Compiling and running the demos
 
-Examples are under the imgui-examples directory.
 
     git clone https://github.com/Gekkio/imgui-rs
     cd imgui-rs
     git submodule update --init --recursive
+
+Examples for gfx backend are under the imgui-examples directory.
+
     cd imgui-examples
+    cargo test
+
+    cargo run --example hello_gfx
+
+Examples for glium backend are located into the imgui-glium-examples directory.
+
+    # At the reposity root
+    cd imgui-glium-examples
     cargo test
 
     cargo run --example hello_world
@@ -84,7 +96,7 @@ Licensed under either of
 
 at your option.
 
-Uses [ImGui](https://github.com/ocornut/imgui) and [cimgui](https://github.com/Extrawurst/cimgui).
+Uses [ImGui](https://github.com/ocornut/imgui) and [cimgui](https://github.com/cimgui/cimgui).
 
 ### Contribution
 

@@ -1,9 +1,10 @@
 use gfx::format::{Format, Formatted, U8Norm};
+use gfx::gfx_format;
 use gfx::pso::buffer::{ElemOffset, Element, Structure};
 use gfx::traits::Pod;
 use std::mem;
 
-use super::{ImDrawVert, ImVec2};
+use crate::{ImDrawVert, ImVec2};
 
 unsafe impl Pod for ImDrawVert {}
 

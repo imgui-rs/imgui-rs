@@ -5,11 +5,19 @@ rust:
   - stable
   - beta
   - nightly
-  - 1.26.0
+  - 1.31.0
 os:
   - linux
   - osx
-cache: cargo
+  - windows
+
+cache:
+  directories:
+    - /home/travis/.cargo
+
+before_cache:
+  - rm -rf /home/travis/.cargo/registry
+
 matrix:
   allow_failures:
     - rust: nightly
@@ -20,3 +28,5 @@ before_install:
 script:
   - cargo build --all --verbose
   - cargo test --all --verbose
+  - cargo build --all --verbose --manifest-path imgui-examples/Cargo.toml
+  - cargo build --all --verbose --manifest-path imgui-glium-examples/Cargo.toml

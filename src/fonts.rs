@@ -1,12 +1,14 @@
+use std::f32;
 use std::marker::PhantomData;
 use std::mem;
-use std::os::raw::{c_int, c_void};
+use std::os::raw::{c_float, c_int, c_void};
 use std::ptr;
 use sys;
 
 #[derive(Clone, Eq, PartialEq, Hash, Debug)]
 enum FontGlyphRangeData {
-    Chinese,
+    ChineseSimplifiedCommon,
+    ChineseFull,
     Cyrillic,
     Default,
     Japanese,
@@ -24,9 +26,13 @@ impl FontGlyphRange {
         FontGlyphRange(FontGlyphRangeData::Default)
     }
 
+    /// A set of glyph ranges appropriate for use with simplified common Chinese text.
+    pub fn chinese_simplified_common() -> FontGlyphRange {
+        FontGlyphRange(FontGlyphRangeData::ChineseSimplifiedCommon)
+    }
     /// A set of glyph ranges appropriate for use with Chinese text.
-    pub fn chinese() -> FontGlyphRange {
-        FontGlyphRange(FontGlyphRangeData::Chinese)
+    pub fn chinese_full() -> FontGlyphRange {
+        FontGlyphRange(FontGlyphRangeData::ChineseFull)
     }
     /// A set of glyph ranges appropriate for use with Cyrillic text.
     pub fn cyrillic() -> FontGlyphRange {
@@ -121,15 +127,18 @@ impl FontGlyphRange {
     }
 
     unsafe fn to_ptr(&self, atlas: *mut sys::ImFontAtlas) -> *const sys::ImWchar {
-        match &self.0 {
-            &FontGlyphRangeData::Chinese => sys::ImFontAtlas_GetGlyphRangesChinese(atlas),
-            &FontGlyphRangeData::Cyrillic => sys::ImFontAtlas_GetGlyphRangesCyrillic(atlas),
-            &FontGlyphRangeData::Default => sys::ImFontAtlas_GetGlyphRangesDefault(atlas),
-            &FontGlyphRangeData::Japanese => sys::ImFontAtlas_GetGlyphRangesJapanese(atlas),
-            &FontGlyphRangeData::Korean => sys::ImFontAtlas_GetGlyphRangesKorean(atlas),
-            &FontGlyphRangeData::Thai => sys::ImFontAtlas_GetGlyphRangesThai(atlas),
+        match self.0 {
+            FontGlyphRangeData::ChineseFull => sys::ImFontAtlas_GetGlyphRangesChineseFull(atlas),
+            FontGlyphRangeData::ChineseSimplifiedCommon => {
+                sys::ImFontAtlas_GetGlyphRangesChineseSimplifiedCommon(atlas)
+            }
+            FontGlyphRangeData::Cyrillic => sys::ImFontAtlas_GetGlyphRangesCyrillic(atlas),
+            FontGlyphRangeData::Default => sys::ImFontAtlas_GetGlyphRangesDefault(atlas),
+            FontGlyphRangeData::Japanese => sys::ImFontAtlas_GetGlyphRangesJapanese(atlas),
+            FontGlyphRangeData::Korean => sys::ImFontAtlas_GetGlyphRangesKorean(atlas),
+            FontGlyphRangeData::Thai => sys::ImFontAtlas_GetGlyphRangesThai(atlas),
 
-            &FontGlyphRangeData::Custom(ptr) => ptr,
+            FontGlyphRangeData::Custom(ptr) => ptr,
         }
     }
 }
@@ -195,8 +204,9 @@ impl ImFontConfig {
 
     fn make_config(self) -> sys::ImFontConfig {
         let mut config = unsafe {
-            let mut config = mem::uninitialized();
-            sys::ImFontConfig_DefaultConstructor(&mut config);
+            let mut config = mem::zeroed::<sys::ImFontConfig>();
+            config.font_data_owned_by_atlas = true;
+            config.glyph_max_advance_x = f32::MAX as c_float;
             config
         };
         config.size_pixels = self.size_pixels;
@@ -258,25 +268,27 @@ impl<'a> ImFont<'a> {
     }
 
     pub fn font_size(&self) -> f32 {
-        unsafe { sys::ImFont_GetFontSize(self.font) }
+        unsafe { (*self.font).font_size }
     }
     pub fn set_font_size(&mut self, size: f32) -> ImFont {
-        unsafe { sys::ImFont_SetFontSize(self.font, size) }
+        unsafe {
+            (*self.font).font_size = size;
+        }
         self.chain()
     }
 
     pub fn scale(&self) -> f32 {
-        unsafe { sys::ImFont_GetScale(self.font) }
+        unsafe { (*self.font).scale }
     }
     pub fn set_scale(&mut self, size: f32) -> ImFont {
-        unsafe { sys::ImFont_SetScale(self.font, size) }
+        unsafe {
+            (*self.font).scale = size;
+        }
         self.chain()
     }
 
     pub fn display_offset(&self) -> (f32, f32) {
-        let mut display_offset = unsafe { mem::uninitialized() };
-        unsafe { sys::ImFont_GetDisplayOffset(self.font, &mut display_offset) }
-        display_offset.into()
+        unsafe { (*self.font).display_offset.into() }
     }
 }
 
@@ -350,7 +362,7 @@ impl<'a> ImFontAtlas<'a> {
 
     /// The number of fonts currently registered in the atlas.
     pub fn font_count(&self) -> usize {
-        unsafe { sys::ImFontAtlas_Fonts_size(self.atlas) as usize }
+        unsafe { (*self.atlas).fonts.size as usize }
     }
 
     /// Gets a font from the atlas.
@@ -360,8 +372,9 @@ impl<'a> ImFontAtlas<'a> {
     ///
     /// Panics if the index is out of range.
     pub fn index_font(&mut self, index: usize) -> ImFont {
-        assert!(index < self.font_count(), "Font index is out of range.");
-        unsafe { ImFont::from_ptr(sys::ImFontAtlas_Fonts_index(self.atlas, index as c_int)) }
+        let fonts = unsafe { (*self.atlas).fonts.as_slice() };
+        assert!(index < fonts.len(), "Font index is out of range.");
+        unsafe { ImFont::from_ptr(fonts[index]) }
     }
 
     /// Clears all fonts associated with this texture atlas.

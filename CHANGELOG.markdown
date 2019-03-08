@@ -4,12 +4,47 @@
 
 ### Added
 
+- Support for image buttons: `Ui::image_button`
+
+### Removed
+
+- Various things that were deprecated in imgui-rs 0.0.21 and 0.0.22
+
+## [0.0.22] - 2019-02-05
+
+### Added
+
+- `Ui::with_test_wrap_pos`
+- `Ui::get_content_region_max`
+- `Ui::get_window_content_region_min`
+- `Ui::get_window_content_region_max`
+
+### Changed
+
+- Upgrade to cimgui 1.66.2+ / imgui 1.66b. **This is a very big update, so there
+  are a lot of breaking changes**
+- Bump minimum Rust version to 1.31 (1.28 required by the glutin crate, and
+  1.31 required by the stb_truetype crate)
+- Upgrade to glium 0.23
+- Replaced `imgui-glutin-support` with `imgui-winit-support`
+
+## [0.0.21] - 2018-10-11
+
+### Added
+
 - `ImGui::mouse_down`
+- `ImGui::key_super`
 - `Ui::get_window_pos`
 - `Ui::is_window_focused`
 - `Ui::is_root_window_focused`
 - `Ui::is_child_window_focused`
+- `Ui::popup_modal`
 - `imgui-glutin-support` crate
+- Support for custom textures
+
+### Fixed
+
+- Possible crash if rendering was skipped during a frame
 
 ### Changed
 
@@ -386,7 +421,9 @@ by setting the environment variable `WINIT_HIDPI_FACTOR=1` if you use X11.
 
 - Initial release with cimgui/imgui 1.44, glium 0.9
 
-[Unreleased]: https://github.com/Gekkio/imgui-rs/compare/v0.0.20...HEAD
+[Unreleased]: https://github.com/Gekkio/imgui-rs/compare/v0.0.22...HEAD
+[0.0.22]: https://github.com/Gekkio/imgui-rs/compare/v0.0.21...v0.0.22
+[0.0.21]: https://github.com/Gekkio/imgui-rs/compare/v0.0.20...v0.0.21
 [0.0.20]: https://github.com/Gekkio/imgui-rs/compare/v0.0.19...v0.0.20
 [0.0.19]: https://github.com/Gekkio/imgui-rs/compare/v0.0.18...v0.0.19
 [0.0.18]: https://github.com/Gekkio/imgui-rs/compare/v0.0.17...v0.0.18

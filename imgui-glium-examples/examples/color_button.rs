@@ -1,8 +1,3 @@
-extern crate glium;
-#[macro_use]
-extern crate imgui;
-extern crate imgui_glium_renderer;
-
 use imgui::*;
 
 mod support;
@@ -31,7 +26,7 @@ impl Default for State {
 
 fn main() {
     let mut state = State::default();
-    support::run("color_button.rs".to_owned(), CLEAR_COLOR, |ui| {
+    support::run("color_button.rs".to_owned(), CLEAR_COLOR, |ui, _, _| {
         example_selector(&mut state, ui);
         match state.example {
             1 => example_1(&mut state, ui),
@@ -144,8 +139,9 @@ fn example_2(ui: &Ui) {
             ui.color_button(
                 im_str!("Red + ColorPreview::HalfAlpha"),
                 (1.0, 0.0, 0.0, 0.5),
-            ).preview(ColorPreview::HalfAlpha)
-                .build();
+            )
+            .preview(ColorPreview::HalfAlpha)
+            .build();
 
             ui.separator();
             ui.text_wrapped(im_str!(

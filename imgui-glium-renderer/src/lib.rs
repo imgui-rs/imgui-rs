@@ -1,14 +1,10 @@
-#[macro_use]
-extern crate glium;
-extern crate imgui;
-
 use glium::backend::{Context, Facade};
 use glium::index::{self, PrimitiveType};
 use glium::program;
 use glium::texture;
 use glium::vertex;
-use glium::{DrawError, GlObject, IndexBuffer, Program, Surface, Texture2d, VertexBuffer};
-use imgui::{DrawList, FrameSize, ImDrawIdx, ImDrawVert, ImGui, Ui};
+use glium::{uniform, DrawError, IndexBuffer, Program, Surface, Texture2d, VertexBuffer};
+use imgui::{DrawList, FrameSize, ImGui, ImTexture, Textures, Ui};
 use std::borrow::Cow;
 use std::fmt;
 use std::rc::Rc;
@@ -22,6 +18,7 @@ pub enum RendererError {
     Program(program::ProgramChooserCreationError),
     Texture(texture::TextureCreationError),
     Draw(DrawError),
+    BadTexture(ImTexture),
 }
 
 impl fmt::Display for RendererError {
@@ -33,6 +30,7 @@ impl fmt::Display for RendererError {
             Program(ref e) => write!(f, "Program creation failed: {}", e),
             Texture(_) => write!(f, "Texture creation failed"),
             Draw(ref e) => write!(f, "Drawing failed: {}", e),
+            BadTexture(ref t) => write!(f, "Bad texture ID: {}", t.id()),
         }
     }
 }
@@ -77,8 +75,12 @@ impl Renderer {
         let device_objects = DeviceObjects::init(imgui, ctx)?;
         Ok(Renderer {
             ctx: Rc::clone(ctx.get_context()),
-            device_objects: device_objects,
+            device_objects,
         })
+    }
+
+    pub fn textures(&mut self) -> &mut Textures<Texture2d> {
+        &mut self.device_objects.textures
     }
 
     pub fn render<'a, S: Surface>(&mut self, surface: &mut S, ui: Ui<'a>) -> RendererResult<()> {
@@ -103,7 +105,7 @@ impl Renderer {
         ];
         let result = ui.render(|ui, mut draw_data| {
             draw_data.scale_clip_rects(ui.imgui().display_framebuffer_scale());
-            for draw_list in draw_data.into_iter() {
+            for draw_list in &draw_data {
                 self.render_draw_list(surface, &draw_list, fb_size, matrix)?;
             }
             Ok(())
@@ -123,31 +125,33 @@ impl Renderer {
 
         let (fb_width, fb_height) = fb_size;
 
-        self.device_objects
-            .upload_vertex_buffer(&self.ctx, draw_list.vtx_buffer)?;
-        self.device_objects
-            .upload_index_buffer(&self.ctx, draw_list.idx_buffer)?;
-
-        let font_texture_id = self.device_objects.texture.get_id() as usize;
+        let vtx_buffer = VertexBuffer::immutable(&self.ctx, draw_list.vtx_buffer)?;
+        let idx_buffer = IndexBuffer::immutable(
+            &self.ctx,
+            PrimitiveType::TrianglesList,
+            draw_list.idx_buffer,
+        )?;
 
         let mut idx_start = 0;
         for cmd in draw_list.cmd_buffer {
-            // We don't support custom textures...yet!
-            assert!(cmd.texture_id as usize == font_texture_id);
+            let texture_id = cmd.texture_id.into();
+            let texture = self
+                .device_objects
+                .textures
+                .get(texture_id)
+                .ok_or_else(|| RendererError::BadTexture(texture_id))?;
 
             let idx_end = idx_start + cmd.elem_count as usize;
 
             surface.draw(
-                &self.device_objects.vertex_buffer,
-                &self
-                    .device_objects
-                    .index_buffer
+                &vtx_buffer,
+                &idx_buffer
                     .slice(idx_start..idx_end)
                     .expect("Invalid index buffer range"),
                 &self.device_objects.program,
                 &uniform! {
                     matrix: matrix,
-                    tex: self.device_objects.texture.sampled()
+                    tex: texture.sampled()
                 },
                 &DrawParameters {
                     blend: Blend::alpha_blending(),
@@ -175,10 +179,8 @@ impl Renderer {
 }
 
 pub struct DeviceObjects {
-    vertex_buffer: VertexBuffer<ImDrawVert>,
-    index_buffer: IndexBuffer<ImDrawIdx>,
     program: Program,
-    texture: Texture2d,
+    textures: Textures<Texture2d>,
 }
 
 fn compile_default_program<F: Facade>(
@@ -189,6 +191,11 @@ fn compile_default_program<F: Facade>(
         400 => {
             vertex: include_str!("shader/glsl_400.vert"),
             fragment: include_str!("shader/glsl_400.frag"),
+            outputs_srgb: true,
+        },
+        150 => {
+            vertex: include_str!("shader/glsl_150.vert"),
+            fragment: include_str!("shader/glsl_150.frag"),
             outputs_srgb: true,
         },
         130 => {
@@ -218,9 +225,6 @@ impl DeviceObjects {
     pub fn init<F: Facade>(im_gui: &mut ImGui, ctx: &F) -> RendererResult<DeviceObjects> {
         use glium::texture::{ClientFormat, RawImage2d};
 
-        let vertex_buffer = VertexBuffer::empty_dynamic(ctx, 0)?;
-        let index_buffer = IndexBuffer::empty_dynamic(ctx, PrimitiveType::TrianglesList, 0)?;
-
         let program = compile_default_program(ctx)?;
         let texture = im_gui.prepare_texture(|handle| {
             let data = RawImage2d {
@@ -231,47 +235,9 @@ impl DeviceObjects {
             };
             Texture2d::new(ctx, data)
         })?;
-        im_gui.set_texture_id(texture.get_id() as usize);
+        let mut textures = Textures::new();
+        im_gui.set_font_texture_id(textures.insert(texture));
 
-        Ok(DeviceObjects {
-            vertex_buffer: vertex_buffer,
-            index_buffer: index_buffer,
-            program: program,
-            texture: texture,
-        })
-    }
-    pub fn upload_vertex_buffer<F: Facade>(
-        &mut self,
-        ctx: &F,
-        vtx_buffer: &[ImDrawVert],
-    ) -> RendererResult<()> {
-        self.vertex_buffer.invalidate();
-        if let Some(slice) = self.vertex_buffer.slice_mut(0..vtx_buffer.len()) {
-            slice.write(vtx_buffer);
-            return Ok(());
-        }
-        self.vertex_buffer = VertexBuffer::dynamic(ctx, vtx_buffer)?;
-        let _ = ctx.get_context().insert_debug_marker(&format!(
-            "imgui-rs: resized vertex buffer to {} bytes",
-            self.vertex_buffer.get_size()
-        ));
-        Ok(())
-    }
-    pub fn upload_index_buffer<F: Facade>(
-        &mut self,
-        ctx: &F,
-        idx_buffer: &[ImDrawIdx],
-    ) -> RendererResult<()> {
-        self.index_buffer.invalidate();
-        if let Some(slice) = self.index_buffer.slice_mut(0..idx_buffer.len()) {
-            slice.write(idx_buffer);
-            return Ok(());
-        }
-        self.index_buffer = IndexBuffer::dynamic(ctx, PrimitiveType::TrianglesList, idx_buffer)?;
-        let _ = ctx.get_context().insert_debug_marker(&format!(
-            "imgui-rs: resized index buffer to {} bytes",
-            self.index_buffer.get_size()
-        ));
-        Ok(())
+        Ok(DeviceObjects { program, textures })
     }
 }
