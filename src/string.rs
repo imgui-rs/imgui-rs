@@ -179,6 +179,9 @@ impl ImStr {
     pub fn new<S: AsRef<ImStr> + ?Sized>(s: &S) -> &ImStr {
         s.as_ref()
     }
+    pub unsafe fn from_ptr_unchecked<'a>(ptr: *const c_char) -> &'a ImStr {
+        ImStr::from_cstr_unchecked(CStr::from_ptr(ptr))
+    }
     /// Converts a slice of bytes to an imgui-rs string slice without checking for valid UTF-8 or
     /// null termination.
     pub unsafe fn from_utf8_with_nul_unchecked(bytes: &[u8]) -> &ImStr {

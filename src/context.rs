@@ -104,7 +104,7 @@ impl Context {
         if io.ini_filename.is_null() {
             None
         } else {
-            unsafe { Some(ImStr::from_cstr_unchecked(CStr::from_ptr(io.ini_filename))) }
+            unsafe { Some(ImStr::from_ptr_unchecked(io.ini_filename)) }
         }
     }
     pub fn set_ini_filename<T: Into<Option<ImString>>>(&mut self, ini_filename: T) {
@@ -120,7 +120,7 @@ impl Context {
         if io.log_filename.is_null() {
             None
         } else {
-            unsafe { Some(ImStr::from_cstr_unchecked(CStr::from_ptr(io.log_filename))) }
+            unsafe { Some(ImStr::from_ptr_unchecked(io.log_filename)) }
         }
     }
     pub fn set_log_filename<T: Into<Option<ImString>>>(&mut self, log_filename: T) {
@@ -136,11 +136,7 @@ impl Context {
         if io.backend_platform_name.is_null() {
             None
         } else {
-            unsafe {
-                Some(ImStr::from_cstr_unchecked(CStr::from_ptr(
-                    io.backend_platform_name,
-                )))
-            }
+            unsafe { Some(ImStr::from_ptr_unchecked(io.backend_platform_name)) }
         }
     }
     pub fn set_platform_name<T: Into<Option<ImString>>>(&mut self, platform_name: T) {
@@ -156,11 +152,7 @@ impl Context {
         if io.backend_renderer_name.is_null() {
             None
         } else {
-            unsafe {
-                Some(ImStr::from_cstr_unchecked(CStr::from_ptr(
-                    io.backend_renderer_name,
-                )))
-            }
+            unsafe { Some(ImStr::from_ptr_unchecked(io.backend_renderer_name)) }
         }
     }
     pub fn set_renderer_name<T: Into<Option<ImString>>>(&mut self, renderer_name: T) {
