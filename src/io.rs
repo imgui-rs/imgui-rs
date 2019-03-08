@@ -252,10 +252,11 @@ pub struct Io {
     backend_platform_user_data: *mut c_void,
     backend_renderer_user_data: *mut c_void,
     backend_language_user_data: *mut c_void,
-    get_clipboard_text_fn: Option<unsafe extern "C" fn(user_data: *mut c_void) -> *const c_char>,
-    set_clipboard_text_fn:
+    pub(crate) get_clipboard_text_fn:
+        Option<unsafe extern "C" fn(user_data: *mut c_void) -> *const c_char>,
+    pub(crate) set_clipboard_text_fn:
         Option<unsafe extern "C" fn(user_data: *mut c_void, text: *const c_char)>,
-    clipboard_user_data: *mut c_void,
+    pub(crate) clipboard_user_data: *mut c_void,
     ime_set_input_screen_pos_fn: Option<unsafe extern "C" fn(x: c_int, y: c_int)>,
     ime_window_handle: *mut c_void,
     render_draw_lists_fn_unused: *mut c_void,

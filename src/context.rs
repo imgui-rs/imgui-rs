@@ -5,6 +5,7 @@ use std::ops::Drop;
 use std::ptr;
 use std::rc::Rc;
 
+use crate::clipboard::{Clipboard, ClipboardContext};
 use crate::font_atlas::{FontAtlas, FontAtlasRefMut, SharedFontAtlas};
 use crate::io::Io;
 use crate::string::{ImStr, ImString};
@@ -54,6 +55,7 @@ pub struct Context {
     log_filename: Option<ImString>,
     platform_name: Option<ImString>,
     renderer_name: Option<ImString>,
+    clipboard_ctx: Option<Box<ClipboardContext>>,
 }
 
 lazy_static! {
@@ -170,6 +172,15 @@ impl Context {
         let data = unsafe { CStr::from_ptr(sys::igSaveIniSettingsToMemory(ptr::null_mut())) };
         buf.push_str(&data.to_string_lossy());
     }
+    pub fn set_clipboard(&mut self, clipboard: Box<dyn Clipboard>) {
+        use std::borrow::BorrowMut;
+        let mut clipboard_ctx = Box::new(ClipboardContext(clipboard));
+        let io = self.io_mut();
+        io.set_clipboard_text_fn = Some(crate::clipboard::set_clipboard_text);
+        io.get_clipboard_text_fn = Some(crate::clipboard::get_clipboard_text);
+        io.clipboard_user_data = clipboard_ctx.borrow_mut() as *mut ClipboardContext as *mut _;
+        self.clipboard_ctx.replace(clipboard_ctx);
+    }
     fn create_internal(shared_font_atlas: Option<Rc<RefCell<SharedFontAtlas>>>) -> Self {
         let _guard = CTX_MUTEX.lock();
         assert!(
@@ -186,6 +197,7 @@ impl Context {
             log_filename: None,
             platform_name: None,
             renderer_name: None,
+            clipboard_ctx: None,
         }
     }
     fn is_current_context(&self) -> bool {
@@ -263,6 +275,7 @@ impl SuspendedContext {
             log_filename: None,
             platform_name: None,
             renderer_name: None,
+            clipboard_ctx: None,
         };
         if ctx.is_current_context() {
             // Oops, the context was activated -> deactivate

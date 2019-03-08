@@ -4,6 +4,7 @@ extern crate parking_lot;
 
 pub extern crate imgui_sys as sys;
 
+mod clipboard;
 mod context;
 mod font_atlas;
 mod io;
@@ -17,6 +18,7 @@ use std::cell;
 use std::ffi::CStr;
 use std::str;
 
+pub use self::clipboard::Clipboard;
 pub use self::context::*;
 pub use self::font_atlas::*;
 pub use self::io::*;
