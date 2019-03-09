@@ -174,7 +174,7 @@ impl Context {
     }
     pub fn set_clipboard(&mut self, clipboard: Box<dyn Clipboard>) {
         use std::borrow::BorrowMut;
-        let mut clipboard_ctx = Box::new(ClipboardContext(clipboard));
+        let mut clipboard_ctx = Box::new(ClipboardContext::new(clipboard));
         let io = self.io_mut();
         io.set_clipboard_text_fn = Some(crate::clipboard::set_clipboard_text);
         io.get_clipboard_text_fn = Some(crate::clipboard::get_clipboard_text);
