@@ -7,6 +7,134 @@
 
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
+pub struct ImVec2_Simple {
+    pub x: f32,
+    pub y: f32,
+}
+#[test]
+fn bindgen_test_layout_ImVec2_Simple() {
+    assert_eq!(
+        ::std::mem::size_of::<ImVec2_Simple>(),
+        8usize,
+        concat!("Size of: ", stringify!(ImVec2_Simple))
+    );
+    assert_eq!(
+        ::std::mem::align_of::<ImVec2_Simple>(),
+        4usize,
+        concat!("Alignment of ", stringify!(ImVec2_Simple))
+    );
+    assert_eq!(
+        unsafe { &(*(::std::ptr::null::<ImVec2_Simple>())).x as *const _ as usize },
+        0usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(ImVec2_Simple),
+            "::",
+            stringify!(x)
+        )
+    );
+    assert_eq!(
+        unsafe { &(*(::std::ptr::null::<ImVec2_Simple>())).y as *const _ as usize },
+        4usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(ImVec2_Simple),
+            "::",
+            stringify!(y)
+        )
+    );
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct ImVec4_Simple {
+    pub x: f32,
+    pub y: f32,
+    pub z: f32,
+    pub w: f32,
+}
+#[test]
+fn bindgen_test_layout_ImVec4_Simple() {
+    assert_eq!(
+        ::std::mem::size_of::<ImVec4_Simple>(),
+        16usize,
+        concat!("Size of: ", stringify!(ImVec4_Simple))
+    );
+    assert_eq!(
+        ::std::mem::align_of::<ImVec4_Simple>(),
+        4usize,
+        concat!("Alignment of ", stringify!(ImVec4_Simple))
+    );
+    assert_eq!(
+        unsafe { &(*(::std::ptr::null::<ImVec4_Simple>())).x as *const _ as usize },
+        0usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(ImVec4_Simple),
+            "::",
+            stringify!(x)
+        )
+    );
+    assert_eq!(
+        unsafe { &(*(::std::ptr::null::<ImVec4_Simple>())).y as *const _ as usize },
+        4usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(ImVec4_Simple),
+            "::",
+            stringify!(y)
+        )
+    );
+    assert_eq!(
+        unsafe { &(*(::std::ptr::null::<ImVec4_Simple>())).z as *const _ as usize },
+        8usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(ImVec4_Simple),
+            "::",
+            stringify!(z)
+        )
+    );
+    assert_eq!(
+        unsafe { &(*(::std::ptr::null::<ImVec4_Simple>())).w as *const _ as usize },
+        12usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(ImVec4_Simple),
+            "::",
+            stringify!(w)
+        )
+    );
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct ImColor_Simple {
+    pub Value: ImVec4_Simple,
+}
+#[test]
+fn bindgen_test_layout_ImColor_Simple() {
+    assert_eq!(
+        ::std::mem::size_of::<ImColor_Simple>(),
+        16usize,
+        concat!("Size of: ", stringify!(ImColor_Simple))
+    );
+    assert_eq!(
+        ::std::mem::align_of::<ImColor_Simple>(),
+        4usize,
+        concat!("Alignment of ", stringify!(ImColor_Simple))
+    );
+    assert_eq!(
+        unsafe { &(*(::std::ptr::null::<ImColor_Simple>())).Value as *const _ as usize },
+        0usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(ImColor_Simple),
+            "::",
+            stringify!(Value)
+        )
+    );
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
 pub struct ImGuiContext {
     _unused: [u8; 0],
 }
@@ -24,6 +152,7 @@ pub type ImGuiDataType = ::std::os::raw::c_int;
 pub type ImGuiDir = ::std::os::raw::c_int;
 pub type ImGuiKey = ::std::os::raw::c_int;
 pub type ImGuiMouseCursor = ::std::os::raw::c_int;
+pub type ImGuiStyleVar = ::std::os::raw::c_int;
 pub type ImDrawListFlags = ::std::os::raw::c_int;
 pub type ImFontAtlasFlags = ::std::os::raw::c_int;
 pub type ImGuiBackendFlags = ::std::os::raw::c_int;
@@ -4617,10 +4746,16 @@ extern "C" {
     pub fn ImVec2_destroy(self_: *mut ImVec2);
 }
 extern "C" {
+    pub fn ImVec2_ImVec2Float(_x: f32, _y: f32) -> *mut ImVec2;
+}
+extern "C" {
     pub fn ImVec4_ImVec4() -> *mut ImVec4;
 }
 extern "C" {
     pub fn ImVec4_destroy(self_: *mut ImVec4);
+}
+extern "C" {
+    pub fn ImVec4_ImVec4Float(_x: f32, _y: f32, _z: f32, _w: f32) -> *mut ImVec4;
 }
 extern "C" {
     pub fn igCreateContext(shared_font_atlas: *mut ImFontAtlas) -> *mut ImGuiContext;
@@ -4714,6 +4849,10 @@ extern "C" {
     ) -> bool;
 }
 extern "C" {
+    pub fn igBeginChildID(id: ImGuiID, size: ImVec2, border: bool, flags: ImGuiWindowFlags)
+        -> bool;
+}
+extern "C" {
     pub fn igEndChild();
 }
 extern "C" {
@@ -4788,10 +4927,35 @@ extern "C" {
     pub fn igSetNextWindowBgAlpha(alpha: f32);
 }
 extern "C" {
+    pub fn igSetWindowPosVec2(pos: ImVec2, cond: ImGuiCond);
+}
+extern "C" {
+    pub fn igSetWindowSizeVec2(size: ImVec2, cond: ImGuiCond);
+}
+extern "C" {
+    pub fn igSetWindowCollapsedBool(collapsed: bool, cond: ImGuiCond);
+}
+extern "C" {
     pub fn igSetWindowFocus();
 }
 extern "C" {
     pub fn igSetWindowFontScale(scale: f32);
+}
+extern "C" {
+    pub fn igSetWindowPosStr(name: *const ::std::os::raw::c_char, pos: ImVec2, cond: ImGuiCond);
+}
+extern "C" {
+    pub fn igSetWindowSizeStr(name: *const ::std::os::raw::c_char, size: ImVec2, cond: ImGuiCond);
+}
+extern "C" {
+    pub fn igSetWindowCollapsedStr(
+        name: *const ::std::os::raw::c_char,
+        collapsed: bool,
+        cond: ImGuiCond,
+    );
+}
+extern "C" {
+    pub fn igSetWindowFocusStr(name: *const ::std::os::raw::c_char);
 }
 extern "C" {
     pub fn igGetScrollX() -> f32;
@@ -4824,10 +4988,19 @@ extern "C" {
     pub fn igPopFont();
 }
 extern "C" {
+    pub fn igPushStyleColorU32(idx: ImGuiCol, col: ImU32);
+}
+extern "C" {
     pub fn igPushStyleColor(idx: ImGuiCol, col: ImVec4);
 }
 extern "C" {
     pub fn igPopStyleColor(count: ::std::os::raw::c_int);
+}
+extern "C" {
+    pub fn igPushStyleVarFloat(idx: ImGuiStyleVar, val: f32);
+}
+extern "C" {
+    pub fn igPushStyleVarVec2(idx: ImGuiStyleVar, val: ImVec2);
 }
 extern "C" {
     pub fn igPopStyleVar(count: ::std::os::raw::c_int);
@@ -4846,6 +5019,12 @@ extern "C" {
 }
 extern "C" {
     pub fn igGetColorU32(idx: ImGuiCol, alpha_mul: f32) -> ImU32;
+}
+extern "C" {
+    pub fn igGetColorU32Vec4(col: ImVec4) -> ImU32;
+}
+extern "C" {
+    pub fn igGetColorU32U32(col: ImU32) -> ImU32;
 }
 extern "C" {
     pub fn igPushItemWidth(item_width: f32);
@@ -4944,7 +5123,34 @@ extern "C" {
     pub fn igGetFrameHeightWithSpacing() -> f32;
 }
 extern "C" {
+    pub fn igPushIDStr(str_id: *const ::std::os::raw::c_char);
+}
+extern "C" {
+    pub fn igPushIDRange(
+        str_id_begin: *const ::std::os::raw::c_char,
+        str_id_end: *const ::std::os::raw::c_char,
+    );
+}
+extern "C" {
+    pub fn igPushIDPtr(ptr_id: *const ::std::os::raw::c_void);
+}
+extern "C" {
+    pub fn igPushIDInt(int_id: ::std::os::raw::c_int);
+}
+extern "C" {
     pub fn igPopID();
+}
+extern "C" {
+    pub fn igGetIDStr(str_id: *const ::std::os::raw::c_char) -> ImGuiID;
+}
+extern "C" {
+    pub fn igGetIDRange(
+        str_id_begin: *const ::std::os::raw::c_char,
+        str_id_end: *const ::std::os::raw::c_char,
+    ) -> ImGuiID;
+}
+extern "C" {
+    pub fn igGetIDPtr(ptr_id: *const ::std::os::raw::c_void) -> ImGuiID;
 }
 extern "C" {
     pub fn igTextUnformatted(
@@ -5018,6 +5224,16 @@ extern "C" {
     ) -> bool;
 }
 extern "C" {
+    pub fn igRadioButtonBool(label: *const ::std::os::raw::c_char, active: bool) -> bool;
+}
+extern "C" {
+    pub fn igRadioButtonIntPtr(
+        label: *const ::std::os::raw::c_char,
+        v: *mut ::std::os::raw::c_int,
+        v_button: ::std::os::raw::c_int,
+    ) -> bool;
+}
+extern "C" {
     pub fn igProgressBar(fraction: f32, size_arg: ImVec2, overlay: *const ::std::os::raw::c_char);
 }
 extern "C" {
@@ -5038,6 +5254,30 @@ extern "C" {
         label: *const ::std::os::raw::c_char,
         current_item: *mut ::std::os::raw::c_int,
         items: *const *const ::std::os::raw::c_char,
+        items_count: ::std::os::raw::c_int,
+        popup_max_height_in_items: ::std::os::raw::c_int,
+    ) -> bool;
+}
+extern "C" {
+    pub fn igComboStr(
+        label: *const ::std::os::raw::c_char,
+        current_item: *mut ::std::os::raw::c_int,
+        items_separated_by_zeros: *const ::std::os::raw::c_char,
+        popup_max_height_in_items: ::std::os::raw::c_int,
+    ) -> bool;
+}
+extern "C" {
+    pub fn igComboFnPtr(
+        label: *const ::std::os::raw::c_char,
+        current_item: *mut ::std::os::raw::c_int,
+        items_getter: ::std::option::Option<
+            unsafe extern "C" fn(
+                label: *mut ::std::os::raw::c_void,
+                current_item: ::std::os::raw::c_int,
+                items_getter: *mut *const ::std::os::raw::c_char,
+            ) -> bool,
+        >,
+        data: *mut ::std::os::raw::c_void,
         items_count: ::std::os::raw::c_int,
         popup_max_height_in_items: ::std::os::raw::c_int,
     ) -> bool;
@@ -5476,6 +5716,49 @@ extern "C" {
     pub fn igSetColorEditOptions(flags: ImGuiColorEditFlags);
 }
 extern "C" {
+    pub fn igTreeNodeStr(label: *const ::std::os::raw::c_char) -> bool;
+}
+extern "C" {
+    pub fn igTreeNodeStrStr(
+        str_id: *const ::std::os::raw::c_char,
+        fmt: *const ::std::os::raw::c_char,
+        ...
+    ) -> bool;
+}
+extern "C" {
+    pub fn igTreeNodePtr(
+        ptr_id: *const ::std::os::raw::c_void,
+        fmt: *const ::std::os::raw::c_char,
+        ...
+    ) -> bool;
+}
+extern "C" {
+    pub fn igTreeNodeExStr(label: *const ::std::os::raw::c_char, flags: ImGuiTreeNodeFlags)
+        -> bool;
+}
+extern "C" {
+    pub fn igTreeNodeExStrStr(
+        str_id: *const ::std::os::raw::c_char,
+        flags: ImGuiTreeNodeFlags,
+        fmt: *const ::std::os::raw::c_char,
+        ...
+    ) -> bool;
+}
+extern "C" {
+    pub fn igTreeNodeExPtr(
+        ptr_id: *const ::std::os::raw::c_void,
+        flags: ImGuiTreeNodeFlags,
+        fmt: *const ::std::os::raw::c_char,
+        ...
+    ) -> bool;
+}
+extern "C" {
+    pub fn igTreePushStr(str_id: *const ::std::os::raw::c_char);
+}
+extern "C" {
+    pub fn igTreePushPtr(ptr_id: *const ::std::os::raw::c_void);
+}
+extern "C" {
     pub fn igTreePop();
 }
 extern "C" {
@@ -5494,11 +5777,61 @@ extern "C" {
     ) -> bool;
 }
 extern "C" {
+    pub fn igCollapsingHeaderBoolPtr(
+        label: *const ::std::os::raw::c_char,
+        p_open: *mut bool,
+        flags: ImGuiTreeNodeFlags,
+    ) -> bool;
+}
+extern "C" {
     pub fn igSelectable(
         label: *const ::std::os::raw::c_char,
         selected: bool,
         flags: ImGuiSelectableFlags,
         size: ImVec2,
+    ) -> bool;
+}
+extern "C" {
+    pub fn igSelectableBoolPtr(
+        label: *const ::std::os::raw::c_char,
+        p_selected: *mut bool,
+        flags: ImGuiSelectableFlags,
+        size: ImVec2,
+    ) -> bool;
+}
+extern "C" {
+    pub fn igListBoxStr_arr(
+        label: *const ::std::os::raw::c_char,
+        current_item: *mut ::std::os::raw::c_int,
+        items: *const *const ::std::os::raw::c_char,
+        items_count: ::std::os::raw::c_int,
+        height_in_items: ::std::os::raw::c_int,
+    ) -> bool;
+}
+extern "C" {
+    pub fn igListBoxFnPtr(
+        label: *const ::std::os::raw::c_char,
+        current_item: *mut ::std::os::raw::c_int,
+        items_getter: ::std::option::Option<
+            unsafe extern "C" fn(
+                label: *mut ::std::os::raw::c_void,
+                current_item: ::std::os::raw::c_int,
+                items_getter: *mut *const ::std::os::raw::c_char,
+            ) -> bool,
+        >,
+        data: *mut ::std::os::raw::c_void,
+        items_count: ::std::os::raw::c_int,
+        height_in_items: ::std::os::raw::c_int,
+    ) -> bool;
+}
+extern "C" {
+    pub fn igListBoxHeaderVec2(label: *const ::std::os::raw::c_char, size: ImVec2) -> bool;
+}
+extern "C" {
+    pub fn igListBoxHeaderInt(
+        label: *const ::std::os::raw::c_char,
+        items_count: ::std::os::raw::c_int,
+        height_in_items: ::std::os::raw::c_int,
     ) -> bool;
 }
 extern "C" {
@@ -5518,6 +5851,71 @@ extern "C" {
     );
 }
 extern "C" {
+    pub fn igPlotLinesFnPtr(
+        label: *const ::std::os::raw::c_char,
+        values_getter: ::std::option::Option<
+            unsafe extern "C" fn(
+                label: *mut ::std::os::raw::c_void,
+                values_getter: ::std::os::raw::c_int,
+            ) -> f32,
+        >,
+        data: *mut ::std::os::raw::c_void,
+        values_count: ::std::os::raw::c_int,
+        values_offset: ::std::os::raw::c_int,
+        overlay_text: *const ::std::os::raw::c_char,
+        scale_min: f32,
+        scale_max: f32,
+        graph_size: ImVec2,
+    );
+}
+extern "C" {
+    pub fn igPlotHistogramFloatPtr(
+        label: *const ::std::os::raw::c_char,
+        values: *const f32,
+        values_count: ::std::os::raw::c_int,
+        values_offset: ::std::os::raw::c_int,
+        overlay_text: *const ::std::os::raw::c_char,
+        scale_min: f32,
+        scale_max: f32,
+        graph_size: ImVec2,
+        stride: ::std::os::raw::c_int,
+    );
+}
+extern "C" {
+    pub fn igPlotHistogramFnPtr(
+        label: *const ::std::os::raw::c_char,
+        values_getter: ::std::option::Option<
+            unsafe extern "C" fn(
+                label: *mut ::std::os::raw::c_void,
+                values_getter: ::std::os::raw::c_int,
+            ) -> f32,
+        >,
+        data: *mut ::std::os::raw::c_void,
+        values_count: ::std::os::raw::c_int,
+        values_offset: ::std::os::raw::c_int,
+        overlay_text: *const ::std::os::raw::c_char,
+        scale_min: f32,
+        scale_max: f32,
+        graph_size: ImVec2,
+    );
+}
+extern "C" {
+    pub fn igValueBool(prefix: *const ::std::os::raw::c_char, b: bool);
+}
+extern "C" {
+    pub fn igValueInt(prefix: *const ::std::os::raw::c_char, v: ::std::os::raw::c_int);
+}
+extern "C" {
+    pub fn igValueUint(prefix: *const ::std::os::raw::c_char, v: ::std::os::raw::c_uint);
+}
+extern "C" {
+    pub fn igValueFloat(
+        prefix: *const ::std::os::raw::c_char,
+        v: f32,
+        float_format: *const ::std::os::raw::c_char,
+    );
+}
+extern "C" {
     pub fn igBeginMainMenuBar() -> bool;
 }
 extern "C" {
@@ -5534,6 +5932,22 @@ extern "C" {
 }
 extern "C" {
     pub fn igEndMenu();
+}
+extern "C" {
+    pub fn igMenuItemBool(
+        label: *const ::std::os::raw::c_char,
+        shortcut: *const ::std::os::raw::c_char,
+        selected: bool,
+        enabled: bool,
+    ) -> bool;
+}
+extern "C" {
+    pub fn igMenuItemBoolPtr(
+        label: *const ::std::os::raw::c_char,
+        shortcut: *const ::std::os::raw::c_char,
+        p_selected: *mut bool,
+        enabled: bool,
+    ) -> bool;
 }
 extern "C" {
     pub fn igBeginTooltip();
@@ -5744,6 +6158,9 @@ extern "C" {
 }
 extern "C" {
     pub fn igIsRectVisible(size: ImVec2) -> bool;
+}
+extern "C" {
+    pub fn igIsRectVisibleVec2(rect_min: ImVec2, rect_max: ImVec2) -> bool;
 }
 extern "C" {
     pub fn igGetTime() -> f64;
@@ -6015,6 +6432,12 @@ extern "C" {
     pub fn TextRange_destroy(self_: *mut TextRange);
 }
 extern "C" {
+    pub fn TextRange_TextRangeStr(
+        _b: *const ::std::os::raw::c_char,
+        _e: *const ::std::os::raw::c_char,
+    ) -> *mut TextRange;
+}
+extern "C" {
     pub fn TextRange_begin(self_: *mut TextRange) -> *const ::std::os::raw::c_char;
 }
 extern "C" {
@@ -6065,7 +6488,16 @@ extern "C" {
     );
 }
 extern "C" {
+    pub fn Pair_PairInt(_key: ImGuiID, _val_i: ::std::os::raw::c_int) -> *mut Pair;
+}
+extern "C" {
     pub fn Pair_destroy(self_: *mut Pair);
+}
+extern "C" {
+    pub fn Pair_PairFloat(_key: ImGuiID, _val_f: f32) -> *mut Pair;
+}
+extern "C" {
+    pub fn Pair_PairPtr(_key: ImGuiID, _val_p: *mut ::std::os::raw::c_void) -> *mut Pair;
 }
 extern "C" {
     pub fn ImGuiStorage_Clear(self_: *mut ImGuiStorage);
@@ -6166,6 +6598,23 @@ extern "C" {
 }
 extern "C" {
     pub fn ImColor_destroy(self_: *mut ImColor);
+}
+extern "C" {
+    pub fn ImColor_ImColorInt(
+        r: ::std::os::raw::c_int,
+        g: ::std::os::raw::c_int,
+        b: ::std::os::raw::c_int,
+        a: ::std::os::raw::c_int,
+    ) -> *mut ImColor;
+}
+extern "C" {
+    pub fn ImColor_ImColorU32(rgba: ImU32) -> *mut ImColor;
+}
+extern "C" {
+    pub fn ImColor_ImColorFloat(r: f32, g: f32, b: f32, a: f32) -> *mut ImColor;
+}
+extern "C" {
+    pub fn ImColor_ImColorVec4(col: ImVec4) -> *mut ImColor;
 }
 extern "C" {
     pub fn ImColor_SetHSV(self_: *mut ImColor, h: f32, s: f32, v: f32, a: f32);
@@ -6318,6 +6767,19 @@ extern "C" {
         col: ImU32,
         text_begin: *const ::std::os::raw::c_char,
         text_end: *const ::std::os::raw::c_char,
+    );
+}
+extern "C" {
+    pub fn ImDrawList_AddTextFontPtr(
+        self_: *mut ImDrawList,
+        font: *const ImFont,
+        font_size: f32,
+        pos: ImVec2,
+        col: ImU32,
+        text_begin: *const ::std::os::raw::c_char,
+        text_end: *const ::std::os::raw::c_char,
+        wrap_width: f32,
+        cpu_fine_clip_rect: *const ImVec4,
     );
 }
 extern "C" {
@@ -6848,6 +7310,186 @@ extern "C" {
     pub fn ImFont_SetFallbackChar(self_: *mut ImFont, c: ImWchar);
 }
 extern "C" {
+    pub fn igGetWindowPos_nonUDT(pOut: *mut ImVec2);
+}
+extern "C" {
+    pub fn igGetWindowPos_nonUDT2() -> ImVec2_Simple;
+}
+extern "C" {
+    pub fn igGetWindowSize_nonUDT(pOut: *mut ImVec2);
+}
+extern "C" {
+    pub fn igGetWindowSize_nonUDT2() -> ImVec2_Simple;
+}
+extern "C" {
+    pub fn igGetContentRegionMax_nonUDT(pOut: *mut ImVec2);
+}
+extern "C" {
+    pub fn igGetContentRegionMax_nonUDT2() -> ImVec2_Simple;
+}
+extern "C" {
+    pub fn igGetContentRegionAvail_nonUDT(pOut: *mut ImVec2);
+}
+extern "C" {
+    pub fn igGetContentRegionAvail_nonUDT2() -> ImVec2_Simple;
+}
+extern "C" {
+    pub fn igGetWindowContentRegionMin_nonUDT(pOut: *mut ImVec2);
+}
+extern "C" {
+    pub fn igGetWindowContentRegionMin_nonUDT2() -> ImVec2_Simple;
+}
+extern "C" {
+    pub fn igGetWindowContentRegionMax_nonUDT(pOut: *mut ImVec2);
+}
+extern "C" {
+    pub fn igGetWindowContentRegionMax_nonUDT2() -> ImVec2_Simple;
+}
+extern "C" {
+    pub fn igGetFontTexUvWhitePixel_nonUDT(pOut: *mut ImVec2);
+}
+extern "C" {
+    pub fn igGetFontTexUvWhitePixel_nonUDT2() -> ImVec2_Simple;
+}
+extern "C" {
+    pub fn igGetCursorPos_nonUDT(pOut: *mut ImVec2);
+}
+extern "C" {
+    pub fn igGetCursorPos_nonUDT2() -> ImVec2_Simple;
+}
+extern "C" {
+    pub fn igGetCursorStartPos_nonUDT(pOut: *mut ImVec2);
+}
+extern "C" {
+    pub fn igGetCursorStartPos_nonUDT2() -> ImVec2_Simple;
+}
+extern "C" {
+    pub fn igGetCursorScreenPos_nonUDT(pOut: *mut ImVec2);
+}
+extern "C" {
+    pub fn igGetCursorScreenPos_nonUDT2() -> ImVec2_Simple;
+}
+extern "C" {
+    pub fn igGetItemRectMin_nonUDT(pOut: *mut ImVec2);
+}
+extern "C" {
+    pub fn igGetItemRectMin_nonUDT2() -> ImVec2_Simple;
+}
+extern "C" {
+    pub fn igGetItemRectMax_nonUDT(pOut: *mut ImVec2);
+}
+extern "C" {
+    pub fn igGetItemRectMax_nonUDT2() -> ImVec2_Simple;
+}
+extern "C" {
+    pub fn igGetItemRectSize_nonUDT(pOut: *mut ImVec2);
+}
+extern "C" {
+    pub fn igGetItemRectSize_nonUDT2() -> ImVec2_Simple;
+}
+extern "C" {
+    pub fn igCalcTextSize_nonUDT(
+        pOut: *mut ImVec2,
+        text: *const ::std::os::raw::c_char,
+        text_end: *const ::std::os::raw::c_char,
+        hide_text_after_double_hash: bool,
+        wrap_width: f32,
+    );
+}
+extern "C" {
+    pub fn igCalcTextSize_nonUDT2(
+        text: *const ::std::os::raw::c_char,
+        text_end: *const ::std::os::raw::c_char,
+        hide_text_after_double_hash: bool,
+        wrap_width: f32,
+    ) -> ImVec2_Simple;
+}
+extern "C" {
+    pub fn igColorConvertU32ToFloat4_nonUDT(pOut: *mut ImVec4, in_: ImU32);
+}
+extern "C" {
+    pub fn igColorConvertU32ToFloat4_nonUDT2(in_: ImU32) -> ImVec4_Simple;
+}
+extern "C" {
+    pub fn igGetMousePos_nonUDT(pOut: *mut ImVec2);
+}
+extern "C" {
+    pub fn igGetMousePos_nonUDT2() -> ImVec2_Simple;
+}
+extern "C" {
+    pub fn igGetMousePosOnOpeningCurrentPopup_nonUDT(pOut: *mut ImVec2);
+}
+extern "C" {
+    pub fn igGetMousePosOnOpeningCurrentPopup_nonUDT2() -> ImVec2_Simple;
+}
+extern "C" {
+    pub fn igGetMouseDragDelta_nonUDT(
+        pOut: *mut ImVec2,
+        button: ::std::os::raw::c_int,
+        lock_threshold: f32,
+    );
+}
+extern "C" {
+    pub fn igGetMouseDragDelta_nonUDT2(
+        button: ::std::os::raw::c_int,
+        lock_threshold: f32,
+    ) -> ImVec2_Simple;
+}
+extern "C" {
+    pub fn ImColor_HSV_nonUDT(
+        pOut: *mut ImColor,
+        self_: *mut ImColor,
+        h: f32,
+        s: f32,
+        v: f32,
+        a: f32,
+    );
+}
+extern "C" {
+    pub fn ImColor_HSV_nonUDT2(
+        self_: *mut ImColor,
+        h: f32,
+        s: f32,
+        v: f32,
+        a: f32,
+    ) -> ImColor_Simple;
+}
+extern "C" {
+    pub fn ImDrawList_GetClipRectMin_nonUDT(pOut: *mut ImVec2, self_: *mut ImDrawList);
+}
+extern "C" {
+    pub fn ImDrawList_GetClipRectMin_nonUDT2(self_: *mut ImDrawList) -> ImVec2_Simple;
+}
+extern "C" {
+    pub fn ImDrawList_GetClipRectMax_nonUDT(pOut: *mut ImVec2, self_: *mut ImDrawList);
+}
+extern "C" {
+    pub fn ImDrawList_GetClipRectMax_nonUDT2(self_: *mut ImDrawList) -> ImVec2_Simple;
+}
+extern "C" {
+    pub fn ImFont_CalcTextSizeA_nonUDT(
+        pOut: *mut ImVec2,
+        self_: *mut ImFont,
+        size: f32,
+        max_width: f32,
+        wrap_width: f32,
+        text_begin: *const ::std::os::raw::c_char,
+        text_end: *const ::std::os::raw::c_char,
+        remaining: *mut *const ::std::os::raw::c_char,
+    );
+}
+extern "C" {
+    pub fn ImFont_CalcTextSizeA_nonUDT2(
+        self_: *mut ImFont,
+        size: f32,
+        max_width: f32,
+        wrap_width: f32,
+        text_begin: *const ::std::os::raw::c_char,
+        text_end: *const ::std::os::raw::c_char,
+        remaining: *mut *const ::std::os::raw::c_char,
+    ) -> ImVec2_Simple;
+}
+extern "C" {
     pub fn ImVector_float_ImVector_float() -> *mut ImVector_float;
 }
 extern "C" {
@@ -6948,6 +7590,77 @@ extern "C" {
 }
 extern "C" {
     pub fn ImVector_ImVec2_destroy(self_: *mut ImVector_ImVec2);
+}
+extern "C" {
+    pub fn ImVector_float_ImVector_floatVector(src: ImVector_float) -> *mut ImVector_float;
+}
+extern "C" {
+    pub fn ImVector_ImWchar_ImVector_ImWcharVector(src: ImVector_ImWchar) -> *mut ImVector_ImWchar;
+}
+extern "C" {
+    pub fn ImVector_ImFontConfig_ImVector_ImFontConfigVector(
+        src: ImVector_ImFontConfig,
+    ) -> *mut ImVector_ImFontConfig;
+}
+extern "C" {
+    pub fn ImVector_ImFontGlyph_ImVector_ImFontGlyphVector(
+        src: ImVector_ImFontGlyph,
+    ) -> *mut ImVector_ImFontGlyph;
+}
+extern "C" {
+    pub fn ImVector_TextRange_ImVector_TextRangeVector(
+        src: ImVector_TextRange,
+    ) -> *mut ImVector_TextRange;
+}
+extern "C" {
+    pub fn ImVector_CustomRect_ImVector_CustomRectVector(
+        src: ImVector_CustomRect,
+    ) -> *mut ImVector_CustomRect;
+}
+extern "C" {
+    pub fn ImVector_ImDrawChannel_ImVector_ImDrawChannelVector(
+        src: ImVector_ImDrawChannel,
+    ) -> *mut ImVector_ImDrawChannel;
+}
+extern "C" {
+    pub fn ImVector_char_ImVector_charVector(src: ImVector_char) -> *mut ImVector_char;
+}
+extern "C" {
+    pub fn ImVector_ImTextureID_ImVector_ImTextureIDVector(
+        src: ImVector_ImTextureID,
+    ) -> *mut ImVector_ImTextureID;
+}
+extern "C" {
+    pub fn ImVector_ImDrawVert_ImVector_ImDrawVertVector(
+        src: ImVector_ImDrawVert,
+    ) -> *mut ImVector_ImDrawVert;
+}
+extern "C" {
+    pub fn ImVector_int_ImVector_intVector(src: ImVector_int) -> *mut ImVector_int;
+}
+extern "C" {
+    pub fn ImVector_Pair_ImVector_PairVector(src: ImVector_Pair) -> *mut ImVector_Pair;
+}
+extern "C" {
+    pub fn ImVector_ImFontPtr_ImVector_ImFontPtrVector(
+        src: ImVector_ImFontPtr,
+    ) -> *mut ImVector_ImFontPtr;
+}
+extern "C" {
+    pub fn ImVector_ImVec4_ImVector_ImVec4Vector(src: ImVector_ImVec4) -> *mut ImVector_ImVec4;
+}
+extern "C" {
+    pub fn ImVector_ImDrawCmd_ImVector_ImDrawCmdVector(
+        src: ImVector_ImDrawCmd,
+    ) -> *mut ImVector_ImDrawCmd;
+}
+extern "C" {
+    pub fn ImVector_ImDrawIdx_ImVector_ImDrawIdxVector(
+        src: ImVector_ImDrawIdx,
+    ) -> *mut ImVector_ImDrawIdx;
+}
+extern "C" {
+    pub fn ImVector_ImVec2_ImVector_ImVec2Vector(src: ImVector_ImVec2) -> *mut ImVector_ImVec2;
 }
 extern "C" {
     pub fn ImVector_float_empty(self_: *const ImVector_float) -> bool;
@@ -7289,6 +8002,65 @@ extern "C" {
     pub fn ImVector_ImVec2_begin(self_: *mut ImVector_ImVec2) -> *mut ImVec2;
 }
 extern "C" {
+    pub fn ImVector_float_begin_const(self_: *const ImVector_float) -> *const f32;
+}
+extern "C" {
+    pub fn ImVector_ImWchar_begin_const(self_: *const ImVector_ImWchar) -> *const ImWchar;
+}
+extern "C" {
+    pub fn ImVector_ImFontConfig_begin_const(
+        self_: *const ImVector_ImFontConfig,
+    ) -> *const ImFontConfig;
+}
+extern "C" {
+    pub fn ImVector_ImFontGlyph_begin_const(
+        self_: *const ImVector_ImFontGlyph,
+    ) -> *const ImFontGlyph;
+}
+extern "C" {
+    pub fn ImVector_TextRange_begin_const(self_: *const ImVector_TextRange) -> *const TextRange;
+}
+extern "C" {
+    pub fn ImVector_CustomRect_begin_const(self_: *const ImVector_CustomRect) -> *const CustomRect;
+}
+extern "C" {
+    pub fn ImVector_ImDrawChannel_begin_const(
+        self_: *const ImVector_ImDrawChannel,
+    ) -> *const ImDrawChannel;
+}
+extern "C" {
+    pub fn ImVector_char_begin_const(self_: *const ImVector_char) -> *const ::std::os::raw::c_char;
+}
+extern "C" {
+    pub fn ImVector_ImTextureID_begin_const(
+        self_: *const ImVector_ImTextureID,
+    ) -> *const ImTextureID;
+}
+extern "C" {
+    pub fn ImVector_ImDrawVert_begin_const(self_: *const ImVector_ImDrawVert) -> *const ImDrawVert;
+}
+extern "C" {
+    pub fn ImVector_int_begin_const(self_: *const ImVector_int) -> *const ::std::os::raw::c_int;
+}
+extern "C" {
+    pub fn ImVector_Pair_begin_const(self_: *const ImVector_Pair) -> *const Pair;
+}
+extern "C" {
+    pub fn ImVector_ImFontPtr_begin_const(self_: *const ImVector_ImFontPtr) -> *const *mut ImFont;
+}
+extern "C" {
+    pub fn ImVector_ImVec4_begin_const(self_: *const ImVector_ImVec4) -> *const ImVec4;
+}
+extern "C" {
+    pub fn ImVector_ImDrawCmd_begin_const(self_: *const ImVector_ImDrawCmd) -> *const ImDrawCmd;
+}
+extern "C" {
+    pub fn ImVector_ImDrawIdx_begin_const(self_: *const ImVector_ImDrawIdx) -> *const ImDrawIdx;
+}
+extern "C" {
+    pub fn ImVector_ImVec2_begin_const(self_: *const ImVector_ImVec2) -> *const ImVec2;
+}
+extern "C" {
     pub fn ImVector_float_end(self_: *mut ImVector_float) -> *mut f32;
 }
 extern "C" {
@@ -7338,6 +8110,63 @@ extern "C" {
 }
 extern "C" {
     pub fn ImVector_ImVec2_end(self_: *mut ImVector_ImVec2) -> *mut ImVec2;
+}
+extern "C" {
+    pub fn ImVector_float_end_const(self_: *const ImVector_float) -> *const f32;
+}
+extern "C" {
+    pub fn ImVector_ImWchar_end_const(self_: *const ImVector_ImWchar) -> *const ImWchar;
+}
+extern "C" {
+    pub fn ImVector_ImFontConfig_end_const(
+        self_: *const ImVector_ImFontConfig,
+    ) -> *const ImFontConfig;
+}
+extern "C" {
+    pub fn ImVector_ImFontGlyph_end_const(self_: *const ImVector_ImFontGlyph)
+        -> *const ImFontGlyph;
+}
+extern "C" {
+    pub fn ImVector_TextRange_end_const(self_: *const ImVector_TextRange) -> *const TextRange;
+}
+extern "C" {
+    pub fn ImVector_CustomRect_end_const(self_: *const ImVector_CustomRect) -> *const CustomRect;
+}
+extern "C" {
+    pub fn ImVector_ImDrawChannel_end_const(
+        self_: *const ImVector_ImDrawChannel,
+    ) -> *const ImDrawChannel;
+}
+extern "C" {
+    pub fn ImVector_char_end_const(self_: *const ImVector_char) -> *const ::std::os::raw::c_char;
+}
+extern "C" {
+    pub fn ImVector_ImTextureID_end_const(self_: *const ImVector_ImTextureID)
+        -> *const ImTextureID;
+}
+extern "C" {
+    pub fn ImVector_ImDrawVert_end_const(self_: *const ImVector_ImDrawVert) -> *const ImDrawVert;
+}
+extern "C" {
+    pub fn ImVector_int_end_const(self_: *const ImVector_int) -> *const ::std::os::raw::c_int;
+}
+extern "C" {
+    pub fn ImVector_Pair_end_const(self_: *const ImVector_Pair) -> *const Pair;
+}
+extern "C" {
+    pub fn ImVector_ImFontPtr_end_const(self_: *const ImVector_ImFontPtr) -> *const *mut ImFont;
+}
+extern "C" {
+    pub fn ImVector_ImVec4_end_const(self_: *const ImVector_ImVec4) -> *const ImVec4;
+}
+extern "C" {
+    pub fn ImVector_ImDrawCmd_end_const(self_: *const ImVector_ImDrawCmd) -> *const ImDrawCmd;
+}
+extern "C" {
+    pub fn ImVector_ImDrawIdx_end_const(self_: *const ImVector_ImDrawIdx) -> *const ImDrawIdx;
+}
+extern "C" {
+    pub fn ImVector_ImVec2_end_const(self_: *const ImVector_ImVec2) -> *const ImVec2;
 }
 extern "C" {
     pub fn ImVector_float_front(self_: *mut ImVector_float) -> *mut f32;
@@ -7391,6 +8220,65 @@ extern "C" {
     pub fn ImVector_ImVec2_front(self_: *mut ImVector_ImVec2) -> *mut ImVec2;
 }
 extern "C" {
+    pub fn ImVector_float_front_const(self_: *const ImVector_float) -> *const f32;
+}
+extern "C" {
+    pub fn ImVector_ImWchar_front_const(self_: *const ImVector_ImWchar) -> *const ImWchar;
+}
+extern "C" {
+    pub fn ImVector_ImFontConfig_front_const(
+        self_: *const ImVector_ImFontConfig,
+    ) -> *const ImFontConfig;
+}
+extern "C" {
+    pub fn ImVector_ImFontGlyph_front_const(
+        self_: *const ImVector_ImFontGlyph,
+    ) -> *const ImFontGlyph;
+}
+extern "C" {
+    pub fn ImVector_TextRange_front_const(self_: *const ImVector_TextRange) -> *const TextRange;
+}
+extern "C" {
+    pub fn ImVector_CustomRect_front_const(self_: *const ImVector_CustomRect) -> *const CustomRect;
+}
+extern "C" {
+    pub fn ImVector_ImDrawChannel_front_const(
+        self_: *const ImVector_ImDrawChannel,
+    ) -> *const ImDrawChannel;
+}
+extern "C" {
+    pub fn ImVector_char_front_const(self_: *const ImVector_char) -> *const ::std::os::raw::c_char;
+}
+extern "C" {
+    pub fn ImVector_ImTextureID_front_const(
+        self_: *const ImVector_ImTextureID,
+    ) -> *const ImTextureID;
+}
+extern "C" {
+    pub fn ImVector_ImDrawVert_front_const(self_: *const ImVector_ImDrawVert) -> *const ImDrawVert;
+}
+extern "C" {
+    pub fn ImVector_int_front_const(self_: *const ImVector_int) -> *const ::std::os::raw::c_int;
+}
+extern "C" {
+    pub fn ImVector_Pair_front_const(self_: *const ImVector_Pair) -> *const Pair;
+}
+extern "C" {
+    pub fn ImVector_ImFontPtr_front_const(self_: *const ImVector_ImFontPtr) -> *const *mut ImFont;
+}
+extern "C" {
+    pub fn ImVector_ImVec4_front_const(self_: *const ImVector_ImVec4) -> *const ImVec4;
+}
+extern "C" {
+    pub fn ImVector_ImDrawCmd_front_const(self_: *const ImVector_ImDrawCmd) -> *const ImDrawCmd;
+}
+extern "C" {
+    pub fn ImVector_ImDrawIdx_front_const(self_: *const ImVector_ImDrawIdx) -> *const ImDrawIdx;
+}
+extern "C" {
+    pub fn ImVector_ImVec2_front_const(self_: *const ImVector_ImVec2) -> *const ImVec2;
+}
+extern "C" {
     pub fn ImVector_float_back(self_: *mut ImVector_float) -> *mut f32;
 }
 extern "C" {
@@ -7440,6 +8328,65 @@ extern "C" {
 }
 extern "C" {
     pub fn ImVector_ImVec2_back(self_: *mut ImVector_ImVec2) -> *mut ImVec2;
+}
+extern "C" {
+    pub fn ImVector_float_back_const(self_: *const ImVector_float) -> *const f32;
+}
+extern "C" {
+    pub fn ImVector_ImWchar_back_const(self_: *const ImVector_ImWchar) -> *const ImWchar;
+}
+extern "C" {
+    pub fn ImVector_ImFontConfig_back_const(
+        self_: *const ImVector_ImFontConfig,
+    ) -> *const ImFontConfig;
+}
+extern "C" {
+    pub fn ImVector_ImFontGlyph_back_const(
+        self_: *const ImVector_ImFontGlyph,
+    ) -> *const ImFontGlyph;
+}
+extern "C" {
+    pub fn ImVector_TextRange_back_const(self_: *const ImVector_TextRange) -> *const TextRange;
+}
+extern "C" {
+    pub fn ImVector_CustomRect_back_const(self_: *const ImVector_CustomRect) -> *const CustomRect;
+}
+extern "C" {
+    pub fn ImVector_ImDrawChannel_back_const(
+        self_: *const ImVector_ImDrawChannel,
+    ) -> *const ImDrawChannel;
+}
+extern "C" {
+    pub fn ImVector_char_back_const(self_: *const ImVector_char) -> *const ::std::os::raw::c_char;
+}
+extern "C" {
+    pub fn ImVector_ImTextureID_back_const(
+        self_: *const ImVector_ImTextureID,
+    ) -> *const ImTextureID;
+}
+extern "C" {
+    pub fn ImVector_ImDrawVert_back_const(self_: *const ImVector_ImDrawVert) -> *const ImDrawVert;
+}
+extern "C" {
+    pub fn ImVector_int_back_const(self_: *const ImVector_int) -> *const ::std::os::raw::c_int;
+}
+extern "C" {
+    pub fn ImVector_Pair_back_const(self_: *const ImVector_Pair) -> *const Pair;
+}
+extern "C" {
+    pub fn ImVector_ImFontPtr_back_const(self_: *const ImVector_ImFontPtr) -> *const *mut ImFont;
+}
+extern "C" {
+    pub fn ImVector_ImVec4_back_const(self_: *const ImVector_ImVec4) -> *const ImVec4;
+}
+extern "C" {
+    pub fn ImVector_ImDrawCmd_back_const(self_: *const ImVector_ImDrawCmd) -> *const ImDrawCmd;
+}
+extern "C" {
+    pub fn ImVector_ImDrawIdx_back_const(self_: *const ImVector_ImDrawIdx) -> *const ImDrawIdx;
+}
+extern "C" {
+    pub fn ImVector_ImVec2_back_const(self_: *const ImVector_ImVec2) -> *const ImVec2;
 }
 extern "C" {
     pub fn ImVector_float_swap(self_: *mut ImVector_float, rhs: ImVector_float);
@@ -7680,6 +8627,125 @@ extern "C" {
 }
 extern "C" {
     pub fn ImVector_ImVec2_resize(self_: *mut ImVector_ImVec2, new_size: ::std::os::raw::c_int);
+}
+extern "C" {
+    pub fn ImVector_float_resizeT(
+        self_: *mut ImVector_float,
+        new_size: ::std::os::raw::c_int,
+        v: f32,
+    );
+}
+extern "C" {
+    pub fn ImVector_ImWchar_resizeT(
+        self_: *mut ImVector_ImWchar,
+        new_size: ::std::os::raw::c_int,
+        v: ImWchar,
+    );
+}
+extern "C" {
+    pub fn ImVector_ImFontConfig_resizeT(
+        self_: *mut ImVector_ImFontConfig,
+        new_size: ::std::os::raw::c_int,
+        v: ImFontConfig,
+    );
+}
+extern "C" {
+    pub fn ImVector_ImFontGlyph_resizeT(
+        self_: *mut ImVector_ImFontGlyph,
+        new_size: ::std::os::raw::c_int,
+        v: ImFontGlyph,
+    );
+}
+extern "C" {
+    pub fn ImVector_TextRange_resizeT(
+        self_: *mut ImVector_TextRange,
+        new_size: ::std::os::raw::c_int,
+        v: TextRange,
+    );
+}
+extern "C" {
+    pub fn ImVector_CustomRect_resizeT(
+        self_: *mut ImVector_CustomRect,
+        new_size: ::std::os::raw::c_int,
+        v: CustomRect,
+    );
+}
+extern "C" {
+    pub fn ImVector_ImDrawChannel_resizeT(
+        self_: *mut ImVector_ImDrawChannel,
+        new_size: ::std::os::raw::c_int,
+        v: ImDrawChannel,
+    );
+}
+extern "C" {
+    pub fn ImVector_char_resizeT(
+        self_: *mut ImVector_char,
+        new_size: ::std::os::raw::c_int,
+        v: ::std::os::raw::c_char,
+    );
+}
+extern "C" {
+    pub fn ImVector_ImTextureID_resizeT(
+        self_: *mut ImVector_ImTextureID,
+        new_size: ::std::os::raw::c_int,
+        v: ImTextureID,
+    );
+}
+extern "C" {
+    pub fn ImVector_ImDrawVert_resizeT(
+        self_: *mut ImVector_ImDrawVert,
+        new_size: ::std::os::raw::c_int,
+        v: ImDrawVert,
+    );
+}
+extern "C" {
+    pub fn ImVector_int_resizeT(
+        self_: *mut ImVector_int,
+        new_size: ::std::os::raw::c_int,
+        v: ::std::os::raw::c_int,
+    );
+}
+extern "C" {
+    pub fn ImVector_Pair_resizeT(
+        self_: *mut ImVector_Pair,
+        new_size: ::std::os::raw::c_int,
+        v: Pair,
+    );
+}
+extern "C" {
+    pub fn ImVector_ImFontPtr_resizeT(
+        self_: *mut ImVector_ImFontPtr,
+        new_size: ::std::os::raw::c_int,
+        v: *mut ImFont,
+    );
+}
+extern "C" {
+    pub fn ImVector_ImVec4_resizeT(
+        self_: *mut ImVector_ImVec4,
+        new_size: ::std::os::raw::c_int,
+        v: ImVec4,
+    );
+}
+extern "C" {
+    pub fn ImVector_ImDrawCmd_resizeT(
+        self_: *mut ImVector_ImDrawCmd,
+        new_size: ::std::os::raw::c_int,
+        v: ImDrawCmd,
+    );
+}
+extern "C" {
+    pub fn ImVector_ImDrawIdx_resizeT(
+        self_: *mut ImVector_ImDrawIdx,
+        new_size: ::std::os::raw::c_int,
+        v: ImDrawIdx,
+    );
+}
+extern "C" {
+    pub fn ImVector_ImVec2_resizeT(
+        self_: *mut ImVector_ImVec2,
+        new_size: ::std::os::raw::c_int,
+        v: ImVec2,
+    );
 }
 extern "C" {
     pub fn ImVector_float_reserve(self_: *mut ImVector_float, new_capacity: ::std::os::raw::c_int);
@@ -8011,6 +9077,125 @@ extern "C" {
 }
 extern "C" {
     pub fn ImVector_ImVec2_erase(self_: *mut ImVector_ImVec2, it: *const ImVec2) -> *mut ImVec2;
+}
+extern "C" {
+    pub fn ImVector_float_eraseTPtr(
+        self_: *mut ImVector_float,
+        it: *const f32,
+        it_last: *const f32,
+    ) -> *mut f32;
+}
+extern "C" {
+    pub fn ImVector_ImWchar_eraseTPtr(
+        self_: *mut ImVector_ImWchar,
+        it: *const ImWchar,
+        it_last: *const ImWchar,
+    ) -> *mut ImWchar;
+}
+extern "C" {
+    pub fn ImVector_ImFontConfig_eraseTPtr(
+        self_: *mut ImVector_ImFontConfig,
+        it: *const ImFontConfig,
+        it_last: *const ImFontConfig,
+    ) -> *mut ImFontConfig;
+}
+extern "C" {
+    pub fn ImVector_ImFontGlyph_eraseTPtr(
+        self_: *mut ImVector_ImFontGlyph,
+        it: *const ImFontGlyph,
+        it_last: *const ImFontGlyph,
+    ) -> *mut ImFontGlyph;
+}
+extern "C" {
+    pub fn ImVector_TextRange_eraseTPtr(
+        self_: *mut ImVector_TextRange,
+        it: *const TextRange,
+        it_last: *const TextRange,
+    ) -> *mut TextRange;
+}
+extern "C" {
+    pub fn ImVector_CustomRect_eraseTPtr(
+        self_: *mut ImVector_CustomRect,
+        it: *const CustomRect,
+        it_last: *const CustomRect,
+    ) -> *mut CustomRect;
+}
+extern "C" {
+    pub fn ImVector_ImDrawChannel_eraseTPtr(
+        self_: *mut ImVector_ImDrawChannel,
+        it: *const ImDrawChannel,
+        it_last: *const ImDrawChannel,
+    ) -> *mut ImDrawChannel;
+}
+extern "C" {
+    pub fn ImVector_char_eraseTPtr(
+        self_: *mut ImVector_char,
+        it: *const ::std::os::raw::c_char,
+        it_last: *const ::std::os::raw::c_char,
+    ) -> *mut ::std::os::raw::c_char;
+}
+extern "C" {
+    pub fn ImVector_ImTextureID_eraseTPtr(
+        self_: *mut ImVector_ImTextureID,
+        it: *const ImTextureID,
+        it_last: *const ImTextureID,
+    ) -> *mut ImTextureID;
+}
+extern "C" {
+    pub fn ImVector_ImDrawVert_eraseTPtr(
+        self_: *mut ImVector_ImDrawVert,
+        it: *const ImDrawVert,
+        it_last: *const ImDrawVert,
+    ) -> *mut ImDrawVert;
+}
+extern "C" {
+    pub fn ImVector_int_eraseTPtr(
+        self_: *mut ImVector_int,
+        it: *const ::std::os::raw::c_int,
+        it_last: *const ::std::os::raw::c_int,
+    ) -> *mut ::std::os::raw::c_int;
+}
+extern "C" {
+    pub fn ImVector_Pair_eraseTPtr(
+        self_: *mut ImVector_Pair,
+        it: *const Pair,
+        it_last: *const Pair,
+    ) -> *mut Pair;
+}
+extern "C" {
+    pub fn ImVector_ImFontPtr_eraseTPtr(
+        self_: *mut ImVector_ImFontPtr,
+        it: *const *mut ImFont,
+        it_last: *const *mut ImFont,
+    ) -> *mut *mut ImFont;
+}
+extern "C" {
+    pub fn ImVector_ImVec4_eraseTPtr(
+        self_: *mut ImVector_ImVec4,
+        it: *const ImVec4,
+        it_last: *const ImVec4,
+    ) -> *mut ImVec4;
+}
+extern "C" {
+    pub fn ImVector_ImDrawCmd_eraseTPtr(
+        self_: *mut ImVector_ImDrawCmd,
+        it: *const ImDrawCmd,
+        it_last: *const ImDrawCmd,
+    ) -> *mut ImDrawCmd;
+}
+extern "C" {
+    pub fn ImVector_ImDrawIdx_eraseTPtr(
+        self_: *mut ImVector_ImDrawIdx,
+        it: *const ImDrawIdx,
+        it_last: *const ImDrawIdx,
+    ) -> *mut ImDrawIdx;
+}
+extern "C" {
+    pub fn ImVector_ImVec2_eraseTPtr(
+        self_: *mut ImVector_ImVec2,
+        it: *const ImVec2,
+        it_last: *const ImVec2,
+    ) -> *mut ImVec2;
 }
 extern "C" {
     pub fn ImVector_float_erase_unsorted(self_: *mut ImVector_float, it: *const f32) -> *mut f32;
