@@ -14,4 +14,4 @@ travis-ci = { repository = "Gekkio/imgui-rs" }
 
 [dependencies]
 imgui = { version = "0.0.23-pre", path = "../" }
-winit = ">= 0.16, <= 0.18"
+winit = ">= 0.16, <= 0.19"
