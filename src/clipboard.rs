@@ -7,21 +7,21 @@ use std::ptr;
 use crate::string::{ImStr, ImString};
 use crate::Ui;
 
-pub trait Clipboard {
+pub trait ClipboardBackend {
     fn get(&mut self) -> Option<ImString>;
     fn set(&mut self, value: &ImStr);
 }
 
 pub(crate) struct ClipboardContext {
-    clipboard: Box<dyn Clipboard>,
+    backend: Box<dyn ClipboardBackend>,
     // needed to keep ownership of the value when the raw C callback is called
     last_value: ImString,
 }
 
 impl ClipboardContext {
-    pub fn new(clipboard: Box<dyn Clipboard>) -> ClipboardContext {
+    pub fn new(backend: Box<dyn ClipboardBackend>) -> ClipboardContext {
         ClipboardContext {
-            clipboard,
+            backend,
             last_value: ImString::default(),
         }
     }
@@ -32,7 +32,7 @@ impl fmt::Debug for ClipboardContext {
         write!(
             f,
             "ClipboardContext({:?}, {:?})",
-            &(*self.clipboard) as *const _,
+            &(*self.backend) as *const _,
             self.last_value
         )
     }
@@ -41,7 +41,7 @@ impl fmt::Debug for ClipboardContext {
 pub(crate) unsafe extern "C" fn get_clipboard_text(user_data: *mut c_void) -> *const c_char {
     let result = catch_unwind(|| {
         let ctx = &mut *(user_data as *mut ClipboardContext);
-        match ctx.clipboard.get() {
+        match ctx.backend.get() {
             Some(text) => {
                 ctx.last_value = text;
                 ctx.last_value.as_ptr()
@@ -59,7 +59,7 @@ pub(crate) unsafe extern "C" fn set_clipboard_text(user_data: *mut c_void, text:
     let result = catch_unwind(|| {
         let ctx = &mut *(user_data as *mut ClipboardContext);
         let text = ImStr::from_ptr_unchecked(text);
-        ctx.clipboard.set(text);
+        ctx.backend.set(text);
     });
     result.unwrap_or_else(|_| {
         eprintln!("Clipboard setter panicked");
@@ -76,7 +76,7 @@ impl<'ui> Ui<'ui> {
             // Bypass FFI if we end up calling our own function anyway
             if get_clipboard_text_fn == get_clipboard_text {
                 let ctx = unsafe { &mut *(io.clipboard_user_data as *mut ClipboardContext) };
-                ctx.clipboard.get()
+                ctx.backend.get()
             } else {
                 unsafe {
                     let text_ptr = get_clipboard_text_fn(io.clipboard_user_data);
@@ -98,7 +98,7 @@ impl<'ui> Ui<'ui> {
             // Bypass FFI if we end up calling our own function anyway
             if set_clipboard_text_fn == set_clipboard_text {
                 let ctx = unsafe { &mut *(io.clipboard_user_data as *mut ClipboardContext) };
-                ctx.clipboard.set(text);
+                ctx.backend.set(text);
             } else {
                 unsafe {
                     set_clipboard_text_fn(io.clipboard_user_data, text.as_ptr());

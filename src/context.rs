@@ -5,7 +5,7 @@ use std::ops::Drop;
 use std::ptr;
 use std::rc::Rc;
 
-use crate::clipboard::{Clipboard, ClipboardContext};
+use crate::clipboard::{ClipboardBackend, ClipboardContext};
 use crate::font_atlas::{FontAtlas, FontAtlasRefMut, SharedFontAtlas};
 use crate::io::Io;
 use crate::string::{ImStr, ImString};
@@ -172,9 +172,9 @@ impl Context {
         let data = unsafe { CStr::from_ptr(sys::igSaveIniSettingsToMemory(ptr::null_mut())) };
         buf.push_str(&data.to_string_lossy());
     }
-    pub fn set_clipboard(&mut self, clipboard: Box<dyn Clipboard>) {
+    pub fn set_clipboard_backend(&mut self, backend: Box<dyn ClipboardBackend>) {
         use std::borrow::BorrowMut;
-        let mut clipboard_ctx = Box::new(ClipboardContext::new(clipboard));
+        let mut clipboard_ctx = Box::new(ClipboardContext::new(backend));
         let io = self.io_mut();
         io.set_clipboard_text_fn = Some(crate::clipboard::set_clipboard_text);
         io.get_clipboard_text_fn = Some(crate::clipboard::get_clipboard_text);

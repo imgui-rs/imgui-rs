@@ -21,7 +21,7 @@ use std::cell;
 use std::ffi::CStr;
 use std::str;
 
-pub use self::clipboard::Clipboard;
+pub use self::clipboard::ClipboardBackend;
 pub use self::context::*;
 pub use self::font_atlas::*;
 pub use self::io::*;
