@@ -22,7 +22,7 @@ impl ClipboardContext {
     pub fn new(clipboard: Box<dyn Clipboard>) -> ClipboardContext {
         ClipboardContext {
             clipboard,
-            last_value: ImString::with_capacity(0),
+            last_value: ImString::default(),
         }
     }
 }
