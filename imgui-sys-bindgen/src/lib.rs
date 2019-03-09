@@ -29,6 +29,8 @@ struct Definition {
     #[serde(rename = "argsT")]
     args_t: Vec<DefinitionArg>,
     ov_cimguiname: String,
+    #[serde(rename = "nonUDT")]
+    non_udt: Option<u32>,
 }
 
 #[derive(Debug, Clone)]
@@ -36,6 +38,10 @@ struct Whitelist {
     enums: Vec<String>,
     structs: Vec<String>,
     definitions: Vec<String>,
+}
+
+fn only_key<K, V>((key, _): (K, V)) -> K {
+    key
 }
 
 fn parse_whitelist<R: Read>(
@@ -49,12 +55,17 @@ fn parse_whitelist<R: Read>(
     let definitions: HashMap<String, Vec<Definition>> = serde_json::from_reader(definitions)?;
     let definitions = definitions
         .into_iter()
-        .flat_map(|(_, defs)| defs.into_iter())
+        .flat_map(|(_, defs)| {
+            let require_non_udt = defs.iter().any(|def| def.non_udt.is_some());
+            defs.into_iter()
+                .filter(move |def| !require_non_udt || def.non_udt.is_some())
+        })
         .filter_map(|d| {
-            if d.args_t.iter().all(|a| a.type_ != "va_list") {
-                Some(d.ov_cimguiname)
-            } else {
+            let uses_va_list = d.args_t.iter().any(|a| a.type_ == "va_list");
+            if uses_va_list {
                 None
+            } else {
+                Some(d.ov_cimguiname)
             }
         })
         .collect();

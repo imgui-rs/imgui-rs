@@ -4871,31 +4871,13 @@ extern "C" {
     pub fn igGetWindowDrawList() -> *mut ImDrawList;
 }
 extern "C" {
-    pub fn igGetWindowPos() -> ImVec2;
-}
-extern "C" {
-    pub fn igGetWindowSize() -> ImVec2;
-}
-extern "C" {
     pub fn igGetWindowWidth() -> f32;
 }
 extern "C" {
     pub fn igGetWindowHeight() -> f32;
 }
 extern "C" {
-    pub fn igGetContentRegionMax() -> ImVec2;
-}
-extern "C" {
-    pub fn igGetContentRegionAvail() -> ImVec2;
-}
-extern "C" {
     pub fn igGetContentRegionAvailWidth() -> f32;
-}
-extern "C" {
-    pub fn igGetWindowContentRegionMin() -> ImVec2;
-}
-extern "C" {
-    pub fn igGetWindowContentRegionMax() -> ImVec2;
 }
 extern "C" {
     pub fn igGetWindowContentRegionWidth() -> f32;
@@ -5015,9 +4997,6 @@ extern "C" {
     pub fn igGetFontSize() -> f32;
 }
 extern "C" {
-    pub fn igGetFontTexUvWhitePixel() -> ImVec2;
-}
-extern "C" {
     pub fn igGetColorU32(idx: ImGuiCol, alpha_mul: f32) -> ImU32;
 }
 extern "C" {
@@ -5081,9 +5060,6 @@ extern "C" {
     pub fn igEndGroup();
 }
 extern "C" {
-    pub fn igGetCursorPos() -> ImVec2;
-}
-extern "C" {
     pub fn igGetCursorPosX() -> f32;
 }
 extern "C" {
@@ -5097,12 +5073,6 @@ extern "C" {
 }
 extern "C" {
     pub fn igSetCursorPosY(local_y: f32);
-}
-extern "C" {
-    pub fn igGetCursorStartPos() -> ImVec2;
-}
-extern "C" {
-    pub fn igGetCursorScreenPos() -> ImVec2;
 }
 extern "C" {
     pub fn igSetCursorScreenPos(pos: ImVec2);
@@ -6145,15 +6115,6 @@ extern "C" {
     pub fn igIsAnyItemFocused() -> bool;
 }
 extern "C" {
-    pub fn igGetItemRectMin() -> ImVec2;
-}
-extern "C" {
-    pub fn igGetItemRectMax() -> ImVec2;
-}
-extern "C" {
-    pub fn igGetItemRectSize() -> ImVec2;
-}
-extern "C" {
     pub fn igSetItemAllowOverlap();
 }
 extern "C" {
@@ -6184,14 +6145,6 @@ extern "C" {
     pub fn igGetStateStorage() -> *mut ImGuiStorage;
 }
 extern "C" {
-    pub fn igCalcTextSize(
-        text: *const ::std::os::raw::c_char,
-        text_end: *const ::std::os::raw::c_char,
-        hide_text_after_double_hash: bool,
-        wrap_width: f32,
-    ) -> ImVec2;
-}
-extern "C" {
     pub fn igCalcListClipping(
         items_count: ::std::os::raw::c_int,
         items_height: f32,
@@ -6204,9 +6157,6 @@ extern "C" {
 }
 extern "C" {
     pub fn igEndChildFrame();
-}
-extern "C" {
-    pub fn igColorConvertU32ToFloat4(in_: ImU32) -> ImVec4;
 }
 extern "C" {
     pub fn igColorConvertFloat4ToU32(in_: ImVec4) -> ImU32;
@@ -6253,15 +6203,6 @@ extern "C" {
 }
 extern "C" {
     pub fn igIsMousePosValid(mouse_pos: *const ImVec2) -> bool;
-}
-extern "C" {
-    pub fn igGetMousePos() -> ImVec2;
-}
-extern "C" {
-    pub fn igGetMousePosOnOpeningCurrentPopup() -> ImVec2;
-}
-extern "C" {
-    pub fn igGetMouseDragDelta(button: ::std::os::raw::c_int, lock_threshold: f32) -> ImVec2;
 }
 extern "C" {
     pub fn igResetMouseDragDelta(button: ::std::os::raw::c_int);
@@ -6620,9 +6561,6 @@ extern "C" {
     pub fn ImColor_SetHSV(self_: *mut ImColor, h: f32, s: f32, v: f32, a: f32);
 }
 extern "C" {
-    pub fn ImColor_HSV(self_: *mut ImColor, h: f32, s: f32, v: f32, a: f32) -> ImColor;
-}
-extern "C" {
     pub fn ImDrawCmd_ImDrawCmd() -> *mut ImDrawCmd;
 }
 extern "C" {
@@ -6653,12 +6591,6 @@ extern "C" {
 }
 extern "C" {
     pub fn ImDrawList_PopTextureID(self_: *mut ImDrawList);
-}
-extern "C" {
-    pub fn ImDrawList_GetClipRectMin(self_: *mut ImDrawList) -> ImVec2;
-}
-extern "C" {
-    pub fn ImDrawList_GetClipRectMax(self_: *mut ImDrawList) -> ImVec2;
 }
 extern "C" {
     pub fn ImDrawList_AddLine(
@@ -7234,17 +7166,6 @@ extern "C" {
 }
 extern "C" {
     pub fn ImFont_GetDebugName(self_: *mut ImFont) -> *const ::std::os::raw::c_char;
-}
-extern "C" {
-    pub fn ImFont_CalcTextSizeA(
-        self_: *mut ImFont,
-        size: f32,
-        max_width: f32,
-        wrap_width: f32,
-        text_begin: *const ::std::os::raw::c_char,
-        text_end: *const ::std::os::raw::c_char,
-        remaining: *mut *const ::std::os::raw::c_char,
-    ) -> ImVec2;
 }
 extern "C" {
     pub fn ImFont_CalcWordWrapPositionA(
