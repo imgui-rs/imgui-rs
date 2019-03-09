@@ -123,6 +123,13 @@ impl Key {
     pub const COUNT: usize = sys::ImGuiKey_COUNT as usize;
 }
 
+#[test]
+fn test_key_variants() {
+    for (idx, &value) in Key::VARIANTS.iter().enumerate() {
+        assert_eq!(idx, value as usize);
+    }
+}
+
 /// An input identifier for navigation
 #[repr(u32)]
 #[derive(Copy, Clone, Debug, Hash, Eq, PartialEq)]
@@ -169,6 +176,13 @@ impl NavInput {
     const INTERNAL_COUNT: usize = 5;
     /// Total count of `NavInput` variants
     pub const COUNT: usize = sys::ImGuiNavInput_COUNT as usize - NavInput::INTERNAL_COUNT;
+}
+
+#[test]
+fn test_nav_input_variants() {
+    for (idx, &value) in NavInput::VARIANTS.iter().enumerate() {
+        assert_eq!(idx, value as usize);
+    }
 }
 
 /// Settings and inputs/outputs for imgui-rs

@@ -1,3 +1,5 @@
+use crate::sys;
+
 /// Marks a type as a transparent wrapper over a raw type
 pub trait RawWrapper {
     /// Wrapped raw type
@@ -22,4 +24,14 @@ pub unsafe trait RawCast<T>: Sized {
     unsafe fn raw_mut(&mut self) -> &mut T {
         &mut *(self as *mut _ as *mut T)
     }
+}
+
+/// Raw function used as a marker for `DrawCmd::FnCallback`
+pub unsafe extern "C" fn fn_callback_marker(_: *const sys::ImDrawList, _: *const sys::ImDrawCmd) {}
+
+/// Raw function used as a marker for `DrawCmd::ClosureCallback`
+pub unsafe extern "C" fn closure_callback_marker(
+    _: *const sys::ImDrawList,
+    _: *const sys::ImDrawCmd,
+) {
 }

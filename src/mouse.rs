@@ -33,7 +33,7 @@ pub enum MouseCursor {
 }
 impl MouseCursor {
     /// All possible `MouseCursor` varirants
-    pub const VARIANTS: [MouseCursor; 8] = [
+    pub const VARIANTS: [MouseCursor; MouseCursor::COUNT] = [
         MouseCursor::Arrow,
         MouseCursor::TextInput,
         MouseCursor::ResizeAll,
@@ -43,9 +43,15 @@ impl MouseCursor {
         MouseCursor::ResizeNWSE,
         MouseCursor::Hand,
     ];
-    const SKIPPED_COUNT: usize = 1;
     /// Total count of `MouseCursor` variants
-    pub const COUNT: usize = sys::ImGuiMouseCursor_COUNT as usize - MouseCursor::SKIPPED_COUNT;
+    pub const COUNT: usize = sys::ImGuiMouseCursor_COUNT as usize;
+}
+
+#[test]
+fn test_mouse_cursor_variants() {
+    for (idx, &value) in MouseCursor::VARIANTS.iter().enumerate() {
+        assert_eq!(idx, value as usize);
+    }
 }
 
 impl<'ui> Ui<'ui> {

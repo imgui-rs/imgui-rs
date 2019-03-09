@@ -1,7 +1,7 @@
 use std::mem;
 use std::slice;
 
-use crate::internal::{RawCast, RawWrapper};
+use crate::internal::{RawCast, RawWrapper, fn_callback_marker, closure_callback_marker};
 use crate::render::renderer::TextureId;
 use crate::sys;
 
@@ -199,13 +199,7 @@ impl<'a> Iterator for DrawCmdIterator<'a> {
 }
 
 pub type FnCallback = fn(&DrawList, &DrawCmdParams);
-pub unsafe extern "C" fn fn_callback_marker(_: *const sys::ImDrawList, _: *const sys::ImDrawCmd) {}
 pub type ClosureCallback = Box<dyn FnMut(&DrawList, &DrawCmdParams)>;
-pub unsafe extern "C" fn closure_callback_marker(
-    _: *const sys::ImDrawList,
-    _: *const sys::ImDrawCmd,
-) {
-}
 
 pub type DrawIdx = sys::ImDrawIdx;
 
