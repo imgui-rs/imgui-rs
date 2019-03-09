@@ -1,7 +1,7 @@
 use std::mem;
 use std::slice;
 
-use crate::internal::{RawCast, RawWrapper, fn_callback_marker, closure_callback_marker};
+use crate::internal::{closure_callback_marker, fn_callback_marker, RawCast, RawWrapper};
 use crate::render::renderer::TextureId;
 use crate::sys;
 

@@ -5,6 +5,7 @@ use std::os::raw::{c_char, c_int, c_void};
 use std::time::Instant;
 
 use crate::internal::RawCast;
+use crate::keyboard::Key;
 use crate::mouse::MouseButton;
 use crate::sys;
 
@@ -64,69 +65,6 @@ bitflags! {
         ///
         /// Only used if `ConfigFlags::NavEnableSetMousePos` is set.
         const HAS_SET_MOUSE_POS = sys::ImGuiBackendFlags_HasSetMousePos;
-    }
-}
-
-/// A key identifier
-#[repr(u32)]
-#[derive(Copy, Clone, Debug, Hash, Eq, PartialEq)]
-pub enum Key {
-    Tab = sys::ImGuiKey_Tab,
-    LeftArrow = sys::ImGuiKey_LeftArrow,
-    RightArrow = sys::ImGuiKey_RightArrow,
-    UpArrow = sys::ImGuiKey_UpArrow,
-    DownArrow = sys::ImGuiKey_DownArrow,
-    PageUp = sys::ImGuiKey_PageUp,
-    PageDown = sys::ImGuiKey_PageDown,
-    Home = sys::ImGuiKey_Home,
-    End = sys::ImGuiKey_End,
-    Insert = sys::ImGuiKey_Insert,
-    Delete = sys::ImGuiKey_Delete,
-    Backspace = sys::ImGuiKey_Backspace,
-    Space = sys::ImGuiKey_Space,
-    Enter = sys::ImGuiKey_Enter,
-    Escape = sys::ImGuiKey_Escape,
-    A = sys::ImGuiKey_A,
-    C = sys::ImGuiKey_C,
-    V = sys::ImGuiKey_V,
-    X = sys::ImGuiKey_X,
-    Y = sys::ImGuiKey_Y,
-    Z = sys::ImGuiKey_Z,
-}
-
-impl Key {
-    /// All possible `Key` variants
-    pub const VARIANTS: [Key; Key::COUNT] = [
-        Key::Tab,
-        Key::LeftArrow,
-        Key::RightArrow,
-        Key::UpArrow,
-        Key::DownArrow,
-        Key::PageUp,
-        Key::PageDown,
-        Key::Home,
-        Key::End,
-        Key::Insert,
-        Key::Delete,
-        Key::Backspace,
-        Key::Space,
-        Key::Enter,
-        Key::Escape,
-        Key::A,
-        Key::C,
-        Key::V,
-        Key::X,
-        Key::Y,
-        Key::Z,
-    ];
-    /// Total count of `Key` variants
-    pub const COUNT: usize = sys::ImGuiKey_COUNT as usize;
-}
-
-#[test]
-fn test_key_variants() {
-    for (idx, &value) in Key::VARIANTS.iter().enumerate() {
-        assert_eq!(idx, value as usize);
     }
 }
 
