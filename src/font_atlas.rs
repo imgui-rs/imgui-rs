@@ -4,6 +4,7 @@ use std::os::raw::{c_int, c_uchar, c_void};
 use std::ptr;
 use std::slice;
 
+use crate::internal::RawWrapper;
 use crate::sys;
 use crate::TextureId;
 
@@ -11,13 +12,17 @@ use crate::TextureId;
 #[derive(Debug)]
 pub struct FontAtlas(sys::ImFontAtlas);
 
-impl FontAtlas {
-    pub unsafe fn raw(&self) -> &sys::ImFontAtlas {
+impl RawWrapper for FontAtlas {
+    type Raw = sys::ImFontAtlas;
+    unsafe fn raw(&self) -> &sys::ImFontAtlas {
         &self.0
     }
-    pub unsafe fn raw_mut(&mut self) -> &mut sys::ImFontAtlas {
+    unsafe fn raw_mut(&mut self) -> &mut sys::ImFontAtlas {
         &mut self.0
     }
+}
+
+impl FontAtlas {
     pub fn build_alpha8_texture(&mut self) -> FontAtlasTexture {
         let mut pixels: *mut c_uchar = ptr::null_mut();
         let mut width: c_int = 0;

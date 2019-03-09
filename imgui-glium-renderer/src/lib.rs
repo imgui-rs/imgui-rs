@@ -7,6 +7,7 @@ use glium::{
     program, uniform, vertex, Blend, DrawError, DrawParameters, IndexBuffer, Program, Rect,
     Surface, Texture2d, VertexBuffer,
 };
+use imgui::internal::RawWrapper;
 use imgui::{DrawCmd, DrawCmdParams, ImString, TextureId, Textures, Ui};
 use std::borrow::Cow;
 use std::fmt;

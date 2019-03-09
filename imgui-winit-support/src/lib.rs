@@ -46,18 +46,18 @@
 //!             }
 //!         });
 //!
-//!         // application-specific rendering *under the UI*
-//!
 //!         platform.prepare_frame(imgui.io_mut(), &window) // step 4
 //!             .expect("Failed to prepare frame");
 //!         last_frame = imgui.io_mut().update_delta_time(last_frame);
 //!         let ui = imgui.frame();
 //!
+//!         // application-specific rendering *under the UI*
+//!
 //!         // construct the UI
 //!
 //!         platform.prepare_render(&ui, &window); // step 5
 //!         // render the UI with a renderer
-//!         // ui.render_with(&mut renderer, &mut target).expect("Failed to render UI");
+//!         // renderer.render(..., ui).expect("UI rendering failed");
 //!
 //!         // application-specific rendering *over the UI*
 //!     }

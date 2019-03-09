@@ -1,22 +1,39 @@
 use std::mem;
 use std::slice;
 
+use crate::internal::{RawCast, RawWrapper};
 use crate::render::renderer::TextureId;
 use crate::sys;
 
+/// All draw data required to render a frame.
 #[repr(C)]
 pub struct DrawData {
-    pub valid: bool,
+    valid: bool,
     cmd_lists: *mut *mut DrawList,
     cmd_lists_count: i32,
+    /// For convenience, sum of all draw list index buffer sizes
     pub total_idx_count: i32,
+    /// For convenience, sum of all draw list vertex buffer sizes
     pub total_vtx_count: i32,
+    /// Upper-left position of the viewport to render.
+    ///
+    /// (= upper-left corner of the orthogonal projection matrix to use)
     pub display_pos: [f32; 2],
+    /// Size of the viewport to render.
+    ///
+    /// (= display_pos + display_size == lower-right corner of the orthogonal matrix to use)
     pub display_size: [f32; 2],
+    /// Amount of pixels for each unit of display_size.
+    ///
+    /// Based on io.display_frame_buffer_scale. Typically [1.0, 1.0] on normal displays, and
+    /// [2.0, 2.0] on Retina displays, but fractional values are also possible.
     pub framebuffer_scale: [f32; 2],
 }
 
+unsafe impl RawCast<sys::ImDrawData> for DrawData {}
+
 impl DrawData {
+    /// Returns an iterator over the draw lists included in the draw data
     pub fn draw_lists(&self) -> DrawListIterator {
         unsafe {
             DrawListIterator {
@@ -30,11 +47,19 @@ impl DrawData {
             self.cmd_lists_count as usize,
         )
     }
+    /// Converts all buffers from indexed to non-indexed, in case you cannot render indexed
+    /// buffers.
+    ///
+    /// **This is slow and most likely a waste of resources. Always prefer indexed rendering!**
     pub fn deindex_all_buffers(&mut self) {
         unsafe {
             sys::ImDrawData_DeIndexAllBuffers(self.raw_mut());
         }
     }
+    /// Scales the clip rect of each draw command.
+    ///
+    /// Can be used if your final output buffer is at a different scale than imgui-rs expects, or
+    /// if there is a difference between your window resolution and framebuffer resolution.
     pub fn scale_clip_rects(&mut self, fb_scale: [f32; 2]) {
         unsafe {
             sys::ImDrawData_ScaleClipRects(self.raw_mut(), fb_scale.into());
@@ -42,23 +67,7 @@ impl DrawData {
     }
 }
 
-impl DrawData {
-    pub unsafe fn from_raw(raw: &sys::ImDrawData) -> &Self {
-        &*(raw as *const _ as *const DrawData)
-    }
-    pub unsafe fn from_raw_mut(raw: &mut sys::ImDrawData) -> &mut Self {
-        &mut *(raw as *mut _ as *mut DrawData)
-    }
-    /// Returns an immutable reference to the underlying raw Dear ImGui draw data
-    pub unsafe fn raw(&self) -> &sys::ImDrawData {
-        &*(self as *const _ as *const sys::ImDrawData)
-    }
-    /// Returns a mutable reference to the underlying raw Dear ImGui draw data
-    pub unsafe fn raw_mut(&mut self) -> &mut sys::ImDrawData {
-        &mut *(self as *mut _ as *mut sys::ImDrawData)
-    }
-}
-
+/// Iterator over draw lists
 pub struct DrawListIterator<'a> {
     iter: std::slice::Iter<'a, *const DrawList>,
 }
@@ -98,16 +107,21 @@ fn test_drawdata_memory_layout() {
     assert_field_offset!(framebuffer_scale, FramebufferScale);
 }
 
+/// Draw command list
 #[repr(transparent)]
 pub struct DrawList(sys::ImDrawList);
 
-impl DrawList {
-    pub unsafe fn raw(&self) -> &sys::ImDrawList {
+impl RawWrapper for DrawList {
+    type Raw = sys::ImDrawList;
+    unsafe fn raw(&self) -> &sys::ImDrawList {
         &self.0
     }
-    pub unsafe fn raw_mut(&mut self) -> &mut sys::ImDrawList {
+    unsafe fn raw_mut(&mut self) -> &mut sys::ImDrawList {
         &mut self.0
     }
+}
+
+impl DrawList {
     pub(crate) unsafe fn cmd_buffer(&self) -> &[sys::ImDrawCmd] {
         slice::from_raw_parts(
             self.0.CmdBuffer.Data as *const sys::ImDrawCmd,
@@ -220,6 +234,7 @@ pub enum DrawCmd {
     },
 }
 
+/// A single vertex
 #[repr(C)]
 #[derive(Copy, Clone, Debug, PartialEq)]
 pub struct DrawVert {

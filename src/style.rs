@@ -1,5 +1,6 @@
 use std::ops::{Index, IndexMut};
 
+use crate::internal::RawCast;
 use crate::sys;
 
 /// User interface style/colors
@@ -109,9 +110,17 @@ pub struct Style {
     pub anti_aliased_lines: bool,
     /// Enable anti-aliasing on filled shapes (rounded rectangles, circles, etc.)
     pub anti_aliased_fill: bool,
+    /// Tessellation tolerance when using path_bezier_curve_to without a specific number of
+    /// segments.
+    ///
+    /// Decrease for highly tessellated curves (higher quality, more polygons), increase to reduce
+    /// quality.
     pub curve_tessellation_tol: f32,
+    /// Style colors.
     pub colors: [[f32; 4]; 48],
 }
+
+unsafe impl RawCast<sys::ImGuiStyle> for Style {}
 
 impl Style {
     /// Scales all sizes in the style
@@ -141,23 +150,6 @@ impl Style {
             sys::igStyleColorsLight(self.raw_mut());
         }
         self
-    }
-}
-
-impl Style {
-    pub unsafe fn from_raw(raw: &sys::ImGuiStyle) -> &Self {
-        &*(raw as *const _ as *const Style)
-    }
-    pub unsafe fn from_raw_mut(raw: &mut sys::ImGuiStyle) -> &mut Self {
-        &mut *(raw as *mut _ as *mut Style)
-    }
-    /// Returns an immutable reference to the underlying raw Dear ImGui style
-    pub unsafe fn raw(&self) -> &sys::ImGuiStyle {
-        &*(self as *const _ as *const sys::ImGuiStyle)
-    }
-    /// Returns a mutable reference to the underlying raw Dear ImGui style
-    pub unsafe fn raw_mut(&mut self) -> &mut sys::ImGuiStyle {
-        &mut *(self as *mut _ as *mut sys::ImGuiStyle)
     }
 }
 

@@ -5,6 +5,7 @@ use gfx::pso::PipelineState;
 use gfx::texture::{FilterMethod, SamplerInfo, WrapMode};
 use gfx::traits::FactoryExt;
 use gfx::{CommandBuffer, Encoder, Factory, IntoIndexBuffer, Rect, Resources, Slice};
+use imgui::internal::RawWrapper;
 use imgui::{DrawCmd, DrawCmdParams, DrawIdx, DrawVert, ImString, TextureId, Textures, Ui};
 use std::usize;
 

@@ -4,17 +4,9 @@ use std::ops::{Index, IndexMut};
 use std::os::raw::{c_char, c_int, c_void};
 use std::time::Instant;
 
+use crate::internal::RawCast;
+use crate::mouse::MouseButton;
 use crate::sys;
-
-/// Represents one of the supported mouse buttons
-#[derive(Copy, Clone, Eq, PartialEq, Debug)]
-pub enum MouseButton {
-    Left = 0,
-    Right = 1,
-    Middle = 2,
-    Extra1 = 3,
-    Extra2 = 4,
-}
 
 bitflags! {
     /// Configuration flags
@@ -355,6 +347,8 @@ pub struct Io {
     input_queue_characters: sys::ImVector_ImWchar,
 }
 
+unsafe impl RawCast<sys::ImGuiIO> for Io {}
+
 impl Io {
     /// Queue new character input
     pub fn add_input_character(&mut self, character: char) {
@@ -381,23 +375,6 @@ impl Io {
         }
         self.delta_time = delta_s;
         now
-    }
-}
-
-impl Io {
-    pub unsafe fn from_raw(raw: &sys::ImGuiIO) -> &Self {
-        &*(raw as *const _ as *const Io)
-    }
-    pub unsafe fn from_raw_mut(raw: &mut sys::ImGuiIO) -> &mut Self {
-        &mut *(raw as *mut _ as *mut Io)
-    }
-    /// Returns an immutable reference to the underlying raw Dear ImGui IO object
-    pub unsafe fn raw(&self) -> &sys::ImGuiIO {
-        &*(self as *const _ as *const sys::ImGuiIO)
-    }
-    /// Returns a mutable reference to the underlying raw Dear ImGui IO object
-    pub unsafe fn raw_mut(&mut self) -> &mut sys::ImGuiIO {
-        &mut *(self as *mut _ as *mut sys::ImGuiIO)
     }
 }
 
