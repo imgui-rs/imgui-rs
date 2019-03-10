@@ -1,19 +1,21 @@
 use gfx::{self, Device};
 use gfx_window_glutin;
 use glutin::{self, Event, WindowEvent};
-use imgui::Context;
+use imgui::{Context, Ui};
 use imgui_gfx_renderer::{GfxRenderer, Shaders};
 use imgui_winit_support::{HiDpiMode, WinitPlatform};
 use std::time::Instant;
 
+mod clipboard;
+
 type ColorFormat = gfx::format::Srgba8;
 type DepthFormat = gfx::format::Depth;
 
-fn main() {
+pub fn run<F: FnMut(&mut bool, &mut Ui)>(title: &str, mut run_ui: F) {
     let mut events_loop = glutin::EventsLoop::new();
     let context = glutin::ContextBuilder::new().with_vsync(true);
     let builder = glutin::WindowBuilder::new()
-        .with_title(file!().to_owned())
+        .with_title(title.to_owned())
         .with_dimensions(glutin::dpi::LogicalSize::new(1024f64, 768f64));
     let (window, mut device, mut factory, mut main_color, mut main_depth) =
         gfx_window_glutin::init::<ColorFormat, DepthFormat>(builder, context, &events_loop)
@@ -42,6 +44,12 @@ fn main() {
 
     let mut imgui = Context::create();
     imgui.set_ini_filename(None);
+
+    if let Some(backend) = clipboard::init() {
+        imgui.set_clipboard_backend(Box::new(backend));
+    } else {
+        eprintln!("Failed to initialize clipboard");
+    }
 
     let mut platform = WinitPlatform::init(&mut imgui);
     platform.attach_window(imgui.io_mut(), &window, HiDpiMode::Rounded);
@@ -72,8 +80,9 @@ fn main() {
             .prepare_frame(io, &window)
             .expect("Failed to start frame");
         last_frame = io.update_delta_time(last_frame);
-        let ui = imgui.frame();
-        ui.show_about_window(&mut run);
+        let mut ui = imgui.frame();
+
+        run_ui(&mut run, &mut ui);
 
         encoder.clear(&main_color, [1.0, 1.0, 1.0, 1.0]);
         platform.prepare_render(&ui, &window);

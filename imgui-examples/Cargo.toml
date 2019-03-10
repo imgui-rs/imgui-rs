@@ -10,8 +10,9 @@ license = "MIT/Apache-2.0"
 publish = false
 
 [dev-dependencies]
-gfx = "0.17"
-gfx_window_glutin = "0.28"
+clipboard = "0.5"
+gfx = "0.18"
+gfx_window_glutin = "0.29"
 glutin = "0.19"
 imgui = { version = "0.0.23-pre", path = "../" }
 imgui-gfx-renderer = { version = "0.0.23-pre", path = "../imgui-gfx-renderer" }

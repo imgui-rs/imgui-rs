@@ -1,15 +1,9 @@
 use glium::glutin::{self, Event, WindowEvent};
 use glium::{Display, Surface};
-use imgui::{Context, Ui};
+use imgui::Context;
 use imgui_glium_renderer::GliumRenderer;
 use imgui_winit_support::{HiDpiMode, WinitPlatform};
 use std::time::Instant;
-
-fn run_ui(ui: &Ui) -> bool {
-    let mut opened = true;
-    ui.show_about_window(&mut opened);
-    opened
-}
 
 fn main() {
     let mut events_loop = glutin::EventsLoop::new();
@@ -50,10 +44,7 @@ fn main() {
             .expect("Failed to start frame");
         last_frame = io.update_delta_time(last_frame);
         let ui = imgui.frame();
-
-        if !run_ui(&ui) {
-            break;
-        }
+        ui.show_about_window(&mut run);
 
         let mut target = display.draw();
         target.clear_color_srgb(1.0, 1.0, 1.0, 1.0);

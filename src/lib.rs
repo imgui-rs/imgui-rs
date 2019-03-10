@@ -7,14 +7,17 @@ pub extern crate imgui_sys as sys;
 mod clipboard;
 mod context;
 mod font_atlas;
-pub mod internal;
 mod input;
+pub mod internal;
 mod io;
+mod layout;
 mod render;
 mod string;
 mod style;
 #[cfg(test)]
 mod test;
+mod widget;
+mod window;
 
 use std::cell;
 use std::ffi::CStr;
@@ -30,6 +33,8 @@ pub use self::render::draw_data::*;
 pub use self::render::renderer::*;
 pub use self::string::*;
 pub use self::style::*;
+pub use self::widget::misc::*;
+pub use self::window::*;
 
 /// Returns the underlying Dear ImGui library version
 pub fn get_dear_imgui_version() -> &'static str {
@@ -71,7 +76,7 @@ impl<'ui> Ui<'ui> {
             &*(sys::igGetDrawData() as *mut DrawData)
         }
     }
-    pub fn show_demo_window(&self, opened: &mut bool) {
+    pub fn show_demo_window(&mut self, opened: &mut bool) {
         unsafe {
             sys::igShowDemoWindow(opened);
         }
@@ -94,4 +99,22 @@ impl<'ui> Drop for Ui<'ui> {
             sys::igEndFrame();
         }
     }
+}
+
+/// Condition for applying a setting
+#[repr(i8)]
+#[derive(Copy, Clone, Debug, Eq, PartialEq)]
+pub enum Condition {
+    /// Never apply the setting
+    Never = -1,
+    /// Always apply the setting
+    Always = sys::ImGuiCond_Always as i8,
+    /// Apply the setting once per runtime session (only the first call will succeed)
+    Once = sys::ImGuiCond_Once as i8,
+    /// Apply the setting if the object/window has no persistently saved data (no entry in .ini
+    /// file)
+    FirstUseEver = sys::ImGuiCond_FirstUseEver as i8,
+    /// Apply the setting if the object/window is appearing after being hidden/inactive (or the
+    /// first time)
+    Appearing = sys::ImGuiCond_Appearing as i8,
 }
