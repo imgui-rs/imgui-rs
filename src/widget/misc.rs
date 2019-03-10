@@ -21,8 +21,8 @@ impl<'ui> Ui<'ui> {
     pub fn small_button(&self, label: &ImStr) -> bool {
         unsafe { sys::igSmallButton(label.as_ptr()) }
     }
-    pub fn invisible_button(&self, label: &ImStr, size: [f32; 2]) -> bool {
-        unsafe { sys::igInvisibleButton(label.as_ptr(), size.into()) }
+    pub fn invisible_button(&self, id: &ImStr, size: [f32; 2]) -> bool {
+        unsafe { sys::igInvisibleButton(id.as_ptr(), size.into()) }
     }
     pub fn arrow_button(&self, id: &ImStr, direction: Direction) -> bool {
         unsafe { sys::igArrowButton(id.as_ptr(), direction as i32) }
@@ -45,12 +45,17 @@ impl<'ui> Ui<'ui> {
         }
         pressed
     }
+    /// Constructs a simple radio button. If `active` is true, the button is considered selected.
+    ///
+    /// Returns true if this button was clicked
+    pub fn radio_button_bool(&self, label: &ImStr, active: bool) -> bool {
+        unsafe { sys::igRadioButtonBool(label.as_ptr(), active) }
+    }
     pub fn radio_button<T>(&self, label: &ImStr, value: &mut T, button_value: T) -> bool
     where
         T: Copy + PartialEq,
     {
-        let active = *value == button_value;
-        let pressed = unsafe { sys::igRadioButtonBool(label.as_ptr(), active) };
+        let pressed = self.radio_button_bool(label, *value == button_value);
         if pressed {
             *value = button_value;
         }

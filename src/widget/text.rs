@@ -19,12 +19,15 @@ impl<'ui> Ui<'ui> {
             sys::igTextUnformatted(start as *const c_char, end as *const c_char);
         }
     }
+    // TODO: replace with pure Rust code
     pub fn text_colored(&self, color: [f32; 4], text: &ImStr) {
         unsafe { sys::igTextColored(color.into(), fmt_ptr(), text.as_ptr()) }
     }
+    // TODO: replace with pure Rust code
     pub fn text_disabled(&self, text: &ImStr) {
         unsafe { sys::igTextDisabled(fmt_ptr(), text.as_ptr()) }
     }
+    // TODO: replace with pure Rust code
     pub fn text_wrapped(&self, text: &ImStr) {
         unsafe { sys::igTextWrapped(fmt_ptr(), text.as_ptr()) }
     }

@@ -1,10 +1,12 @@
 use clipboard::{ClipboardContext, ClipboardProvider};
-use imgui::{ClipboardBackend, ImString, ImStr};
+use imgui::{ClipboardBackend, ImStr, ImString};
 
 pub struct ClipboardSupport(ClipboardContext);
 
 pub fn init() -> Option<ClipboardSupport> {
-    ClipboardContext::new().ok().map(|ctx| ClipboardSupport(ctx))
+    ClipboardContext::new()
+        .ok()
+        .map(|ctx| ClipboardSupport(ctx))
 }
 
 impl ClipboardBackend for ClipboardSupport {
