@@ -4,9 +4,9 @@ use std::ops::{Index, IndexMut};
 use std::os::raw::{c_char, c_int, c_void};
 use std::time::Instant;
 
+use crate::input::keyboard::Key;
+use crate::input::mouse::MouseButton;
 use crate::internal::RawCast;
-use crate::keyboard::Key;
-use crate::mouse::MouseButton;
 use crate::sys;
 
 bitflags! {
