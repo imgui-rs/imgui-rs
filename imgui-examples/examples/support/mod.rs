@@ -1,15 +1,11 @@
-use gfx::{self, Device};
-use gfx_window_glutin;
-use glutin::{self, Event, WindowEvent};
+use glium::glutin::{self, Event, WindowEvent};
+use glium::{Display, Surface};
 use imgui::{Context, Ui};
-use imgui_gfx_renderer::{GfxRenderer, Shaders};
+use imgui_glium_renderer::GliumRenderer;
 use imgui_winit_support::{HiDpiMode, WinitPlatform};
 use std::time::Instant;
 
 mod clipboard;
-
-type ColorFormat = gfx::format::Srgba8;
-type DepthFormat = gfx::format::Depth;
 
 pub fn run<F: FnMut(&mut bool, &mut Ui)>(title: &str, mut run_ui: F) {
     let mut events_loop = glutin::EventsLoop::new();
@@ -17,30 +13,9 @@ pub fn run<F: FnMut(&mut bool, &mut Ui)>(title: &str, mut run_ui: F) {
     let builder = glutin::WindowBuilder::new()
         .with_title(title.to_owned())
         .with_dimensions(glutin::dpi::LogicalSize::new(1024f64, 768f64));
-    let (window, mut device, mut factory, mut main_color, mut main_depth) =
-        gfx_window_glutin::init::<ColorFormat, DepthFormat>(builder, context, &events_loop)
-            .expect("Failed to initalize graphics");
-    let mut encoder: gfx::Encoder<_, _> = factory.create_command_buffer().into();
-    let shaders = {
-        let version = device.get_info().shading_language;
-        if version.is_embedded {
-            if version.major >= 3 {
-                Shaders::GlSlEs300
-            } else {
-                Shaders::GlSlEs100
-            }
-        } else if version.major >= 4 {
-            Shaders::GlSl400
-        } else if version.major >= 3 {
-            if version.minor >= 2 {
-                Shaders::GlSl150
-            } else {
-                Shaders::GlSl130
-            }
-        } else {
-            Shaders::GlSl110
-        }
-    };
+    let display =
+        Display::new(builder, context, &events_loop).expect("Failed to initialize display");
+    let window = display.gl_window();
 
     let mut imgui = Context::create();
     imgui.set_ini_filename(None);
@@ -54,8 +29,8 @@ pub fn run<F: FnMut(&mut bool, &mut Ui)>(title: &str, mut run_ui: F) {
     let mut platform = WinitPlatform::init(&mut imgui);
     platform.attach_window(imgui.io_mut(), &window, HiDpiMode::Rounded);
 
-    let mut renderer = GfxRenderer::init(&mut imgui, &mut factory, shaders)
-        .expect("Failed to initialize renderer");
+    let mut renderer =
+        GliumRenderer::init(&mut imgui, &display).expect("Failed to initialize renderer");
 
     let mut last_frame = Instant::now();
     let mut run = true;
@@ -65,12 +40,8 @@ pub fn run<F: FnMut(&mut bool, &mut Ui)>(title: &str, mut run_ui: F) {
             platform.handle_event(imgui.io_mut(), &window, &event);
 
             if let Event::WindowEvent { event, .. } = event {
-                match event {
-                    WindowEvent::Resized(_) => {
-                        gfx_window_glutin::update_views(&window, &mut main_color, &mut main_depth)
-                    }
-                    WindowEvent::CloseRequested => run = false,
-                    _ => (),
+                if let WindowEvent::CloseRequested = event {
+                    run = false;
                 }
             }
         });
@@ -81,16 +52,12 @@ pub fn run<F: FnMut(&mut bool, &mut Ui)>(title: &str, mut run_ui: F) {
             .expect("Failed to start frame");
         last_frame = io.update_delta_time(last_frame);
         let mut ui = imgui.frame();
-
         run_ui(&mut run, &mut ui);
 
-        encoder.clear(&main_color, [1.0, 1.0, 1.0, 1.0]);
+        let mut target = display.draw();
+        target.clear_color_srgb(1.0, 1.0, 1.0, 1.0);
         platform.prepare_render(&ui, &window);
-        renderer
-            .render(&mut factory, &mut encoder, &mut main_color, ui)
-            .expect("Rendering failed");
-        encoder.flush(&mut device);
-        window.swap_buffers().expect("Failed to swap buffers");
-        device.cleanup();
+        renderer.render(&mut target, ui).expect("Rendering failed");
+        target.finish().expect("Failed to swap buffers");
     }
 }
