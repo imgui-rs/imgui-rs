@@ -46,7 +46,7 @@ pub fn get_dear_imgui_version() -> &'static str {
 
 #[test]
 fn test_get_version() {
-    assert_eq!(get_dear_imgui_version(), "1.68");
+    assert_eq!(get_dear_imgui_version(), "1.69");
 }
 
 pub struct Ui<'ui> {
