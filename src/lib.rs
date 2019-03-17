@@ -528,6 +528,11 @@ impl<'ui> Ui<'ui> {
         let io = self.imgui.io();
         io.want_capture_keyboard
     }
+    pub fn set_keyboard_focus_here(&self, offset: i32) {
+        unsafe {
+            sys::igSetKeyboardFocusHere(offset);
+        }
+    }
     pub fn framerate(&self) -> f32 {
         let io = self.imgui.io();
         io.framerate
