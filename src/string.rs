@@ -6,7 +6,7 @@ use std::os::raw::c_char;
 use std::str;
 
 #[derive(Clone, Hash, Ord, Eq, PartialOrd, PartialEq)]
-pub struct ImString(Vec<u8>);
+pub struct ImString(pub(crate) Vec<u8>);
 
 impl ImString {
     pub fn new<T: Into<String>>(value: T) -> ImString {
@@ -61,7 +61,7 @@ impl ImString {
     /// Dear imgui accesses pointers directly, so the length doesn't get updated when the contents
     /// change. This is normally OK, because Deref to ImStr always calculates the slice length
     /// based on contents. However, we need to refresh the length in some ImString functions.
-    fn refresh_len(&mut self) {
+    pub(crate) fn refresh_len(&mut self) {
         let len = self.to_str().len();
         unsafe {
             self.0.set_len(len);
