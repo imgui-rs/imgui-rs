@@ -14,4 +14,4 @@ glium = { version = "0.23", default-features = true }
 imgui = { version = "0.0.23-pre", path = "../" }
 imgui-glium-renderer = { version = "0.0.23-pre", path = "../imgui-glium-renderer" }
 imgui-winit-support = { version = "0.0.23-pre", path = "../imgui-winit-support" }
-image = "0.20"
+image = "0.21"

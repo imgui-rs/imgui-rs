@@ -7,7 +7,7 @@ use glium::{
     texture::{ClientFormat, RawImage2d},
     Texture2d,
 };
-use image::{jpeg::JPEGDecoder, DecodingResult, ImageDecoder};
+use image::{jpeg::JPEGDecoder, ImageDecoder};
 use imgui::*;
 
 mod support;
@@ -51,7 +51,7 @@ impl CustomTexturesApp {
             }
 
             let raw = RawImage2d {
-                data: Cow::Borrowed(&data),
+                data: Cow::Owned(data),
                 width: WIDTH as u32,
                 height: HEIGHT as u32,
                 format: ClientFormat::U8U8U8,
@@ -94,19 +94,15 @@ impl Lenna {
     {
         let lenna_bytes = include_bytes!("../../resources/Lenna.jpg");
         let byte_stream = Cursor::new(lenna_bytes.as_ref());
-        let mut decoder = JPEGDecoder::new(byte_stream);
+        let decoder = JPEGDecoder::new(byte_stream)?;
 
-        let (width, height) = decoder.dimensions()?;
+        let (width, height) = decoder.dimensions();
         let image = decoder.read_image()?;
-        let raw = if let DecodingResult::U8(data) = &image {
-            RawImage2d {
-                data: Cow::Borrowed(data),
-                width,
-                height,
-                format: ClientFormat::U8U8U8,
-            }
-        } else {
-            unimplemented!("I only know how to deal with U8 data")
+        let raw = RawImage2d {
+            data: Cow::Owned(image),
+            width: width as u32,
+            height: height as u32,
+            format: ClientFormat::U8U8U8,
         };
         let gl_texture = Texture2d::new(gl_ctx, raw)?;
         let texture_id = textures.insert(gl_texture);
