@@ -342,35 +342,35 @@ dependencies = [
 
 [[package]]
 name = "imgui"
-version = "0.0.23-pre"
+version = "0.0.24-pre"
 dependencies = [
- "imgui-sys 0.0.23-pre",
+ "imgui-sys 0.0.24-pre",
 ]
 
 [[package]]
 name = "imgui-examples"
-version = "0.0.23-pre"
+version = "0.0.24-pre"
 dependencies = [
  "gfx 0.18.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "gfx_window_glutin 0.30.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "glutin 0.20.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "imgui 0.0.23-pre",
- "imgui-gfx-renderer 0.0.23-pre",
- "imgui-winit-support 0.0.23-pre",
+ "imgui 0.0.24-pre",
+ "imgui-gfx-renderer 0.0.24-pre",
+ "imgui-winit-support 0.0.24-pre",
 ]
 
 [[package]]
 name = "imgui-gfx-renderer"
-version = "0.0.23-pre"
+version = "0.0.24-pre"
 dependencies = [
  "gfx 0.18.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "imgui 0.0.23-pre",
- "imgui-sys 0.0.23-pre",
+ "imgui 0.0.24-pre",
+ "imgui-sys 0.0.24-pre",
 ]
 
 [[package]]
 name = "imgui-sys"
-version = "0.0.23-pre"
+version = "0.0.24-pre"
 dependencies = [
  "bitflags 1.0.4 (registry+https://github.com/rust-lang/crates.io-index)",
  "cc 1.0.35 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -380,9 +380,9 @@ dependencies = [
 
 [[package]]
 name = "imgui-winit-support"
-version = "0.0.23-pre"
+version = "0.0.24-pre"
 dependencies = [
- "imgui 0.0.23-pre",
+ "imgui 0.0.24-pre",
  "winit 0.19.1 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
