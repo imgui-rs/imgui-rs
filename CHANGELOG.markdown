@@ -5,6 +5,8 @@
 ### Added
 
 - Support for image buttons: `Ui::image_button`
+- `Ui::set_keyboard_focus_here`
+- Support for window position pivot
 
 ### Removed
 
