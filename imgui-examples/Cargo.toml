@@ -1,6 +1,6 @@
 [package]
 name = "imgui-examples"
-version = "0.0.23-pre"
+version = "0.0.23"
 edition = "2018"
 authors = ["Joonas Javanainen <joonas.javanainen@gmail.com>", "imgui-rs contributors"]
 description = "imgui crate examples"
@@ -13,6 +13,6 @@ publish = false
 gfx = "0.18"
 gfx_window_glutin = "0.30"
 glutin = "0.20"
-imgui = { version = "0.0.23-pre", path = "../" }
-imgui-gfx-renderer = { version = "0.0.23-pre", path = "../imgui-gfx-renderer" }
-imgui-winit-support = { version = "0.0.23-pre", path = "../imgui-winit-support" }
+imgui = { version = "0.0.23", path = "../" }
+imgui-gfx-renderer = { version = "0.0.23", path = "../imgui-gfx-renderer" }
+imgui-winit-support = { version = "0.0.23", path = "../imgui-winit-support" }
