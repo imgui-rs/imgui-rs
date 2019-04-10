@@ -321,34 +321,34 @@ dependencies = [
 
 [[package]]
 name = "imgui"
-version = "0.0.22-pre"
+version = "0.0.23-pre"
 dependencies = [
- "imgui-sys 0.0.22-pre",
+ "imgui-sys 0.0.23-pre",
 ]
 
 [[package]]
 name = "imgui-glium-examples"
-version = "0.0.22-pre"
+version = "0.0.23-pre"
 dependencies = [
  "glium 0.23.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "image 0.20.1 (registry+https://github.com/rust-lang/crates.io-index)",
- "imgui 0.0.22-pre",
- "imgui-glium-renderer 0.0.22-pre",
- "imgui-winit-support 0.0.22-pre",
+ "imgui 0.0.23-pre",
+ "imgui-glium-renderer 0.0.23-pre",
+ "imgui-winit-support 0.0.23-pre",
 ]
 
 [[package]]
 name = "imgui-glium-renderer"
-version = "0.0.22-pre"
+version = "0.0.23-pre"
 dependencies = [
  "glium 0.23.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "imgui 0.0.22-pre",
- "imgui-sys 0.0.22-pre",
+ "imgui 0.0.23-pre",
+ "imgui-sys 0.0.23-pre",
 ]
 
 [[package]]
 name = "imgui-sys"
-version = "0.0.22-pre"
+version = "0.0.23-pre"
 dependencies = [
  "bitflags 1.0.4 (registry+https://github.com/rust-lang/crates.io-index)",
  "cc 1.0.28 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -358,9 +358,9 @@ dependencies = [
 
 [[package]]
 name = "imgui-winit-support"
-version = "0.0.22-pre"
+version = "0.0.23-pre"
 dependencies = [
- "imgui 0.0.22-pre",
+ "imgui 0.0.23-pre",
  "winit 0.18.0 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 

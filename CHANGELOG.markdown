@@ -8,6 +8,10 @@
 - `Ui::set_keyboard_focus_here`
 - Support for window position pivot
 
+### Changed
+
+- Upgrade to gfx 0.18
+
 ### Removed
 
 - Various things that were deprecated in imgui-rs 0.0.21 and 0.0.22
