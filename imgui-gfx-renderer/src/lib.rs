@@ -76,10 +76,27 @@ macro_rules! extended_defines {
     }
 }
 
+#[cfg(not(windows))]
 extended_defines! {
     pipeline pipe {
         vertex_buffer: gfx::VertexBuffer<ImDrawVert> = (),
         matrix: gfx::Global<[[f32; 4]; 4]> = "matrix",
+        tex: gfx::TextureSampler<[f32; 4]> = "tex",
+        out: gfx::BlendTarget<gfx::format::Rgba8> = (
+            "Target0",
+            gfx::state::ColorMask::all(),
+            gfx::preset::blend::ALPHA,
+        ),
+        scissor: gfx::Scissor = (),
+    }
+}
+
+// TODO need constant buffer support
+#[cfg(windows)]
+extended_defines! {
+    pipeline pipe {
+        vertex_buffer: gfx::VertexBuffer<ImDrawVert> = (),
+        matrix: gfx::Global<[[f32; 4]; 4]> = "transform",
         tex: gfx::TextureSampler<[f32; 4]> = "tex",
         out: gfx::BlendTarget<gfx::format::Rgba8> = (
             "Target0",
@@ -98,6 +115,7 @@ pub enum Shaders {
     GlSl110,   // OpenGL 2.0+
     GlSlEs300, // OpenGL ES 3.0+
     GlSlEs100, // OpenGL ES 2.0+
+    HlslSm40,  // HLSL Shader Model 4.0+
 }
 
 impl Shaders {
@@ -128,6 +146,21 @@ impl Shaders {
                 include_bytes!("shader/glsles_100.vert"),
                 include_bytes!("shader/glsles_100.frag"),
             ),
+            HlslSm40 => {
+                #[cfg(not(windows))]
+                {
+                    // panic instead?
+                    (&[0], &[0])
+                }
+
+                #[cfg(windows)]
+                {
+                    (
+                        include_bytes!(concat!(env!("OUT_DIR"), "/hlsl_vertex_shader_bytecode")),
+                        include_bytes!(concat!(env!("OUT_DIR"), "/hlsl_pixel_shader_bytecode")),
+                    )
+                }
+            }
         }
     }
 }

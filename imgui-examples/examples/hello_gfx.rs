@@ -5,7 +5,7 @@ mod support_gfx;
 const CLEAR_COLOR: [f32; 4] = [1.0, 1.0, 1.0, 1.0];
 
 fn main() {
-    support_gfx::run("hello_gfx.rs".to_owned(), CLEAR_COLOR, hello_world);
+    support_gfx::run_dx11("hello_gfx.rs".to_owned(), CLEAR_COLOR, hello_world);
 }
 
 fn hello_world<'a>(ui: &Ui<'a>) -> bool {
