@@ -390,7 +390,7 @@ impl ImGui {
             sys::ImGuiIO_AddInputCharactersUTF8(self.io_mut(), buf.as_ptr() as *const _);
         }
     }
-    pub fn get_time(&self) -> f32 {
+    pub fn get_time(&self) -> f64 {
         unsafe { sys::igGetTime() }
     }
     pub fn get_frame_count(&self) -> i32 {
