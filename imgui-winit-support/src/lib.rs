@@ -83,7 +83,7 @@
 
 use imgui::{FrameSize, ImGui, ImGuiKey, ImGuiMouseCursor};
 use winit::{
-    ElementState, Event, KeyboardInput, ModifiersState, MouseButton, MouseCursor, MouseScrollDelta,
+    DeviceEvent, ElementState, Event, KeyboardInput, ModifiersState, MouseButton, MouseCursor, MouseScrollDelta,
     TouchPhase, VirtualKeyCode, Window, WindowEvent,
 };
 
@@ -173,9 +173,19 @@ pub fn handle_event(
     window_hidpi_factor: f64,
     app_hidpi_factor: f64,
 ) {
-    if let Event::WindowEvent { ref event, .. } = event {
-        handle_window_event(imgui, event, window_hidpi_factor, app_hidpi_factor)
+    match event {
+        Event::WindowEvent { ref event, .. } => handle_window_event(imgui, event, window_hidpi_factor, app_hidpi_factor),
+        Event::DeviceEvent { ref event, .. } => handle_device_event(imgui, event),
+        _ => (),
     }
+}
+
+/// Update imgui state from winit device event
+pub fn handle_device_event(imgui: &mut ImGui, event: &DeviceEvent) {
+    match event {
+        DeviceEvent::Key(keyboard_input) => handle_keyboard_input(imgui, *keyboard_input),
+        _ => (),
+    };
 }
 
 /// Update imgui state from winit window event
@@ -187,7 +197,6 @@ pub fn handle_window_event(
 ) {
     use self::WindowEvent::*;
     match event {
-        KeyboardInput { input, .. } => handle_keyboard_input(imgui, *input),
         ReceivedCharacter(ch) => imgui.add_input_character(*ch),
         CursorMoved {
             position,
