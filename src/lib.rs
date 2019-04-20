@@ -6,6 +6,7 @@ use std::os::raw::{c_char, c_float, c_int, c_uchar, c_void};
 use std::ptr;
 use std::slice;
 use std::str;
+use std::thread;
 use sys::ImGuiStyleVar;
 
 pub use self::child_frame::ChildFrame;
@@ -588,7 +589,7 @@ impl<'ui> Ui<'ui> {
 
 impl<'a> Drop for Ui<'a> {
     fn drop(&mut self) {
-        if self.needs_cleanup {
+        if self.needs_cleanup && !thread::panicking() {
             unsafe {
                 sys::igEndFrame();
                 CURRENT_UI = None;
