@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Changed
+
+- Upgrade to glium 0.24
+
 ## [0.0.23] - 2019-04-10
 
 ### Added
