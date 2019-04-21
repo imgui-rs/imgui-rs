@@ -23,7 +23,7 @@ fn main() {
                 ui.with_font(dokdo, || {
                     ui.text("Hello, I'm Dokdo Regular!");
                 });
-                ui.text("Hello, I'm Robot Regular again!");
+                ui.text("Hello, I'm Roboto Regular again!");
             });
             ui.text("Hello, I'm the default font again!");
         });
