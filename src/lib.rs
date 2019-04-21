@@ -39,6 +39,7 @@ pub use self::string::*;
 pub use self::style::*;
 pub use self::widget::color_editors::*;
 pub use self::widget::misc::*;
+pub use self::widget::progress_bar::*;
 pub use self::window::*;
 
 /// Returns the underlying Dear ImGui library version
