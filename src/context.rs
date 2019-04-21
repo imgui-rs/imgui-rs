@@ -6,7 +6,7 @@ use std::ptr;
 use std::rc::Rc;
 
 use crate::clipboard::{ClipboardBackend, ClipboardContext};
-use crate::font_atlas::{FontAtlas, FontAtlasRefMut, SharedFontAtlas};
+use crate::fonts::atlas::{FontAtlas, FontAtlasRefMut, FontId, SharedFontAtlas};
 use crate::io::Io;
 use crate::string::{ImStr, ImString};
 use crate::style::Style;
@@ -440,6 +440,11 @@ impl Context {
     ///
     /// Panics if the context uses a shared font atlas that is already borrowed
     pub fn frame<'ui, 'a: 'ui>(&'a mut self) -> Ui<'ui> {
+        // Clear default font if it no longer exists. This could be an error in the future
+        let default_font = self.io().font_default;
+        if !default_font.is_null() && self.fonts().get_font(FontId(default_font)).is_none() {
+            self.io_mut().font_default = ptr::null_mut();
+        }
         // NewFrame/Render/EndFrame mutate the font atlas so we need exclusive access to it
         let font_atlas = self
             .shared_font_atlas

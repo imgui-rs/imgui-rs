@@ -4,7 +4,8 @@ mod support;
 
 fn main() {
     let mut state = State::default();
-    support::run(file!(), |run, ui| {
+    let system = support::init(file!());
+    system.main_loop(|run, ui| {
         example_selector(run, ui, &mut state);
         match state.example {
             1 => example_1(ui, &mut state),
@@ -67,8 +68,9 @@ fn example_2(ui: &Ui, state: &mut State) {
     w.build(&ui, || {
         ui.text_wrapped(im_str!(
             "Normal radio buttons accept a mutable reference to state, and the value \
-            corresponding to this button. They are very flexible, because the value can be any \
-            type that is both Copy and PartialEq. This is especially useful with Rust enums"));
+             corresponding to this button. They are very flexible, because the value can be any \
+             type that is both Copy and PartialEq. This is especially useful with Rust enums"
+        ));
         ui.text(state.notify_text);
 
         ui.separator();
@@ -107,7 +109,11 @@ struct State {
 }
 
 #[derive(Copy, Clone, PartialEq)]
-enum Choice { A, B, C }
+enum Choice {
+    A,
+    B,
+    C,
+}
 
 impl State {
     fn reset(&mut self) {

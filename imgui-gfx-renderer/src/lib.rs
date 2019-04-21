@@ -306,7 +306,7 @@ fn upload_font_texture<R: Resources, F: Factory<R>>(
         gfx::texture::Mipmap::Provided,
         &[texture.data],
     )?;
-    fonts.set_texture_id(TextureId::from(usize::MAX));
+    fonts.tex_id = TextureId::from(usize::MAX);
     let sampler = factory.create_sampler(SamplerInfo::new(FilterMethod::Bilinear, WrapMode::Tile));
     let font_texture = (texture_view, sampler);
     Ok(font_texture)

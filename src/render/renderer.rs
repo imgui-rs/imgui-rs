@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 
 #[derive(Copy, Clone, Debug, Eq, PartialEq, Hash)]
+#[repr(transparent)]
 pub struct TextureId(usize);
 
 impl TextureId {
@@ -25,6 +26,19 @@ impl<T> From<*mut T> for TextureId {
     fn from(ptr: *mut T) -> Self {
         TextureId(ptr as usize)
     }
+}
+
+#[test]
+fn test_texture_id_memory_layout() {
+    use std::mem;
+    assert_eq!(
+        mem::size_of::<TextureId>(),
+        mem::size_of::<sys::ImTextureID>()
+    );
+    assert_eq!(
+        mem::align_of::<TextureId>(),
+        mem::align_of::<sys::ImTextureID>()
+    );
 }
 
 /// Generic texture mapping for use by renderers.

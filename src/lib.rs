@@ -6,7 +6,7 @@ pub extern crate imgui_sys as sys;
 
 mod clipboard;
 mod context;
-mod font_atlas;
+mod fonts;
 mod input;
 pub mod internal;
 mod io;
@@ -25,7 +25,10 @@ use std::str;
 
 pub use self::clipboard::ClipboardBackend;
 pub use self::context::*;
-pub use self::font_atlas::*;
+pub use self::fonts::atlas::*;
+pub use self::fonts::font::*;
+pub use self::fonts::glyph::*;
+pub use self::fonts::glyph_ranges::*;
 pub use self::input::keyboard::*;
 pub use self::input::mouse::*;
 pub use self::io::*;

@@ -230,7 +230,7 @@ fn upload_font_texture(
         format: ClientFormat::U8U8U8U8,
     };
     let font_texture = Texture2d::with_mipmaps(ctx, data, MipmapsOption::NoMipmap)?;
-    fonts.set_texture_id(TextureId::from(usize::MAX));
+    fonts.tex_id = TextureId::from(usize::MAX);
     Ok(font_texture)
 }
 

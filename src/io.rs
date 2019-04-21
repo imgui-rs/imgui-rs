@@ -4,9 +4,11 @@ use std::ops::{Index, IndexMut};
 use std::os::raw::{c_char, c_int, c_void};
 use std::time::Instant;
 
+use crate::fonts::atlas::FontAtlas;
+use crate::fonts::font::Font;
 use crate::input::keyboard::Key;
 use crate::input::mouse::MouseButton;
-use crate::internal::RawCast;
+use crate::internal::{ImVector, RawCast};
 use crate::sys;
 
 bitflags! {
@@ -155,14 +157,14 @@ pub struct Io {
     pub key_repeat_rate: f32,
 
     user_data: *mut c_void,
-    pub(crate) fonts: *mut sys::ImFontAtlas,
+    pub(crate) fonts: *mut FontAtlas,
 
     /// Global scale for all fonts
     pub font_global_scale: f32,
     /// Allow user to scale text of individual window with CTRL+wheel
     pub font_allow_user_scaling: bool,
 
-    font_default: *mut sys::ImFont,
+    pub(crate) font_default: *mut Font,
 
     /// For retina display or other situations where window coordinates are different from
     /// framebuffer coordinates
@@ -296,7 +298,7 @@ pub struct Io {
     keys_down_duration_prev: [f32; 512],
     nav_inputs_down_duration: [f32; NavInput::COUNT + NavInput::INTERNAL_COUNT],
     nav_inputs_down_duration_prev: [f32; NavInput::COUNT + NavInput::INTERNAL_COUNT],
-    input_queue_characters: sys::ImVector_ImWchar,
+    input_queue_characters: ImVector<sys::ImWchar>,
 }
 
 unsafe impl RawCast<sys::ImGuiIO> for Io {}
