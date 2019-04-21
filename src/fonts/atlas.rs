@@ -380,9 +380,7 @@ impl SharedFontAtlas {
 
 impl Drop for SharedFontAtlas {
     fn drop(&mut self) {
-        unsafe {
-            sys::ImFontAtlas_destroy(self.0);
-        }
+        unsafe { sys::ImFontAtlas_destroy(self.0) };
     }
 }
 

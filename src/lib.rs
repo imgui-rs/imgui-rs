@@ -22,6 +22,7 @@ mod window;
 use std::cell;
 use std::ffi::CStr;
 use std::str;
+use std::thread;
 
 pub use self::clipboard::ClipboardBackend;
 pub use self::context::*;
@@ -98,8 +99,12 @@ impl<'ui> Ui<'ui> {
 
 impl<'ui> Drop for Ui<'ui> {
     fn drop(&mut self) {
-        unsafe {
-            sys::igEndFrame();
+        // If we are panicking, we can't call igEndFrame safely because we might be in an
+        // inconsistent state and igEndFrame might abort the process with an assert
+        if !thread::panicking() {
+            unsafe {
+                sys::igEndFrame();
+            }
         }
     }
 }
