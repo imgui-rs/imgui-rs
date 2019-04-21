@@ -5250,9 +5250,9 @@ extern "C" {
         current_item: *mut ::std::os::raw::c_int,
         items_getter: ::std::option::Option<
             unsafe extern "C" fn(
-                label: *mut ::std::os::raw::c_void,
-                current_item: ::std::os::raw::c_int,
-                items_getter: *mut *const ::std::os::raw::c_char,
+                data: *mut ::std::os::raw::c_void,
+                idx: ::std::os::raw::c_int,
+                out_text: *mut *const ::std::os::raw::c_char,
             ) -> bool,
         >,
         data: *mut ::std::os::raw::c_void,
@@ -5803,9 +5803,9 @@ extern "C" {
         current_item: *mut ::std::os::raw::c_int,
         items_getter: ::std::option::Option<
             unsafe extern "C" fn(
-                label: *mut ::std::os::raw::c_void,
-                current_item: ::std::os::raw::c_int,
-                items_getter: *mut *const ::std::os::raw::c_char,
+                data: *mut ::std::os::raw::c_void,
+                idx: ::std::os::raw::c_int,
+                out_text: *mut *const ::std::os::raw::c_char,
             ) -> bool,
         >,
         data: *mut ::std::os::raw::c_void,
@@ -5844,8 +5844,8 @@ extern "C" {
         label: *const ::std::os::raw::c_char,
         values_getter: ::std::option::Option<
             unsafe extern "C" fn(
-                label: *mut ::std::os::raw::c_void,
-                values_getter: ::std::os::raw::c_int,
+                data: *mut ::std::os::raw::c_void,
+                idx: ::std::os::raw::c_int,
             ) -> f32,
         >,
         data: *mut ::std::os::raw::c_void,
@@ -5875,8 +5875,8 @@ extern "C" {
         label: *const ::std::os::raw::c_char,
         values_getter: ::std::option::Option<
             unsafe extern "C" fn(
-                label: *mut ::std::os::raw::c_void,
-                values_getter: ::std::os::raw::c_int,
+                data: *mut ::std::os::raw::c_void,
+                idx: ::std::os::raw::c_int,
             ) -> f32,
         >,
         data: *mut ::std::os::raw::c_void,
@@ -6266,14 +6266,14 @@ extern "C" {
     pub fn igSetAllocatorFunctions(
         alloc_func: ::std::option::Option<
             unsafe extern "C" fn(
-                alloc_func: usize,
-                free_func: *mut ::std::os::raw::c_void,
+                sz: usize,
+                user_data: *mut ::std::os::raw::c_void,
             ) -> *mut ::std::os::raw::c_void,
         >,
         free_func: ::std::option::Option<
             unsafe extern "C" fn(
-                alloc_func: *mut ::std::os::raw::c_void,
-                free_func: *mut ::std::os::raw::c_void,
+                ptr: *mut ::std::os::raw::c_void,
+                user_data: *mut ::std::os::raw::c_void,
             ),
         >,
         user_data: *mut ::std::os::raw::c_void,
