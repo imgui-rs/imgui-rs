@@ -40,7 +40,7 @@ pub use self::widget::misc::*;
 pub use self::window::*;
 
 /// Returns the underlying Dear ImGui library version
-pub fn get_dear_imgui_version() -> &'static str {
+pub fn dear_imgui_version() -> &'static str {
     unsafe {
         let bytes = CStr::from_ptr(sys::igGetVersion()).to_bytes();
         str::from_utf8_unchecked(bytes)
@@ -48,8 +48,8 @@ pub fn get_dear_imgui_version() -> &'static str {
 }
 
 #[test]
-fn test_get_version() {
-    assert_eq!(get_dear_imgui_version(), "1.69");
+fn test_version() {
+    assert_eq!(dear_imgui_version(), "1.69");
 }
 
 pub struct Ui<'ui> {

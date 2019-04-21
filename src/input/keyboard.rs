@@ -68,7 +68,7 @@ impl<'ui> Ui<'ui> {
     /// Returns the key index of the given key identifier.
     ///
     /// Equivalent to indexing the Io struct `key_map` field: `ui.io().key_map[key]`
-    pub fn get_key_index(&self, key: Key) -> u32 {
+    pub fn key_index(&self, key: Key) -> u32 {
         unsafe { sys::igGetKeyIndex(key as i32) as u32 }
     }
     /// Returns true if the key is being held.
@@ -87,7 +87,7 @@ impl<'ui> Ui<'ui> {
     ///
     /// Usually returns 0 or 1, but might be >1 if `rate` is small enough that `io.delta_time` >
     /// `rate`.
-    pub fn get_key_pressed_amount(&self, key_index: u32, repeat_delay: f32, rate: f32) -> u32 {
+    pub fn key_pressed_amount(&self, key_index: u32, repeat_delay: f32, rate: f32) -> u32 {
         unsafe { sys::igGetKeyPressedAmount(key_index as i32, repeat_delay, rate) as u32 }
     }
 }

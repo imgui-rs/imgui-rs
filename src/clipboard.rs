@@ -70,7 +70,7 @@ pub(crate) unsafe extern "C" fn set_clipboard_text(user_data: *mut c_void, text:
 impl<'ui> Ui<'ui> {
     /// Returns the current clipboard contents as text or None if clipboard cannot be accessed or
     /// it is empty
-    pub fn get_clipboard_text(&self) -> Option<ImString> {
+    pub fn clipboard_text(&self) -> Option<ImString> {
         let io = self.io();
         io.get_clipboard_text_fn.and_then(|get_clipboard_text_fn| {
             // Bypass FFI if we end up calling our own function anyway

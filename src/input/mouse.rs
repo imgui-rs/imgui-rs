@@ -109,14 +109,14 @@ impl<'ui> Ui<'ui> {
         unsafe { sys::igIsMouseHoveringRect(r_min.into(), r_max.into(), true) }
     }
     /// Returns the mouse position backed up at the time of opening a popup
-    pub fn get_mouse_pos_on_opening_current_popup(&self) -> [f32; 2] {
+    pub fn mouse_pos_on_opening_current_popup(&self) -> [f32; 2] {
         unsafe { sys::igGetMousePosOnOpeningCurrentPopup_nonUDT2().into() }
     }
     /// Returns the delta from the initial clicking position.
     ///
     /// This is locked and returns [0.0, 0.0] until the mouse has moved past the global distance
     /// threshold (`io.mouse_drag_threshold`).
-    pub fn get_mouse_drag_delta(&self, button: MouseButton) -> [f32; 2] {
+    pub fn mouse_drag_delta(&self, button: MouseButton) -> [f32; 2] {
         unsafe { sys::igGetMouseDragDelta_nonUDT2(button as i32, -1.0).into() }
     }
     /// Returns the delta from the initial clicking position.
@@ -124,11 +124,7 @@ impl<'ui> Ui<'ui> {
     /// This is locked and returns [0.0, 0.0] until the mouse has moved past the given threshold.
     /// If the given threshold is invalid or negative, the global distance threshold is used
     /// (`io.mouse_drag_threshold`).
-    pub fn get_mouse_drag_delta_with_threshold(
-        &self,
-        button: MouseButton,
-        threshold: f32,
-    ) -> [f32; 2] {
+    pub fn mouse_drag_delta_with_threshold(&self, button: MouseButton, threshold: f32) -> [f32; 2] {
         unsafe { sys::igGetMouseDragDelta_nonUDT2(button as i32, threshold).into() }
     }
     /// Resets the current delta from initial clicking position.
