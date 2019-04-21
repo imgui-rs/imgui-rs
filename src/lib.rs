@@ -12,6 +12,7 @@ pub mod internal;
 mod io;
 mod layout;
 mod render;
+mod stacks;
 mod string;
 mod style;
 #[cfg(test)]
@@ -35,6 +36,7 @@ pub use self::input::mouse::*;
 pub use self::io::*;
 pub use self::render::draw_data::*;
 pub use self::render::renderer::*;
+pub use self::stacks::*;
 pub use self::string::*;
 pub use self::style::*;
 pub use self::widget::color_editors::*;

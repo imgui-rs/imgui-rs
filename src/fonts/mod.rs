@@ -1,4 +1,3 @@
-use crate::fonts::atlas::FontId;
 use crate::fonts::font::Font;
 use crate::internal::RawCast;
 use crate::Ui;
@@ -9,19 +8,6 @@ pub mod glyph;
 pub mod glyph_ranges;
 
 impl<'ui> Ui<'ui> {
-    pub fn with_font<T, F>(&self, id: FontId, f: F) -> T
-    where
-        F: FnOnce() -> T,
-    {
-        let fonts = self.fonts();
-        let font = fonts
-            .get_font(id)
-            .expect("Font atlas did not contain the given font");
-        unsafe { sys::igPushFont(font.raw() as *const _ as *mut _) };
-        let result = f();
-        unsafe { sys::igPopFont() };
-        result
-    }
     /// Returns the current font
     pub fn current_font(&self) -> &Font {
         unsafe { Font::from_raw(&*sys::igGetFont()) }
