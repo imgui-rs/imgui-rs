@@ -78,6 +78,9 @@ impl<'ui> Ui<'ui> {
     pub fn clone_style(&self) -> Style {
         *self.ctx.style()
     }
+    pub fn style_color(&self, style_color: StyleColor) -> [f32; 4] {
+        self.ctx.style()[style_color]
+    }
     pub fn render(self) -> &'ui DrawData {
         unsafe {
             sys::igRender();
