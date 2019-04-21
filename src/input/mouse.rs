@@ -24,6 +24,13 @@ impl MouseButton {
     pub const COUNT: usize = 5;
 }
 
+#[test]
+fn test_mouse_button_variants() {
+    for (idx, &value) in MouseButton::VARIANTS.iter().enumerate() {
+        assert_eq!(idx, value as usize);
+    }
+}
+
 /// Mouse cursor type identifier
 #[repr(i32)]
 #[derive(Copy, Clone, Debug, Hash, Eq, PartialEq)]
@@ -44,6 +51,7 @@ pub enum MouseCursor {
     /// Not used automatically, use for e.g. hyperlinks
     Hand = sys::ImGuiMouseCursor_Hand,
 }
+
 impl MouseCursor {
     /// All possible `MouseCursor` varirants
     pub const VARIANTS: [MouseCursor; MouseCursor::COUNT] = [
@@ -307,4 +315,109 @@ fn test_set_get_mouse_cursor() {
     assert_eq!(None, ui.mouse_cursor());
     ui.set_mouse_cursor(Some(MouseCursor::Hand));
     assert_eq!(Some(MouseCursor::Hand), ui.mouse_cursor());
+}
+
+#[test]
+fn test_mouse_drags() {
+    for &button in MouseButton::VARIANTS.iter() {
+        let (_guard, mut ctx) = crate::test::test_ctx_initialized();
+        {
+            ctx.io_mut().mouse_pos = [0.0, 0.0];
+            ctx.io_mut().mouse_down = [false; 5];
+            let ui = ctx.frame();
+            assert!(!ui.is_mouse_dragging(button));
+            assert!(!ui.is_mouse_dragging_with_threshold(button, 200.0));
+            assert_eq!(ui.mouse_drag_delta(button), [0.0, 0.0]);
+            assert_eq!(
+                ui.mouse_drag_delta_with_threshold(button, 200.0),
+                [0.0, 0.0]
+            );
+        }
+        {
+            ctx.io_mut()[button] = true;
+            let ui = ctx.frame();
+            assert!(!ui.is_mouse_dragging(button));
+            assert!(!ui.is_mouse_dragging_with_threshold(button, 200.0));
+            assert_eq!(ui.mouse_drag_delta(button), [0.0, 0.0]);
+            assert_eq!(
+                ui.mouse_drag_delta_with_threshold(button, 200.0),
+                [0.0, 0.0]
+            );
+        }
+        {
+            ctx.io_mut().mouse_pos = [0.0, 100.0];
+            let ui = ctx.frame();
+            assert!(ui.is_mouse_dragging(button));
+            assert!(!ui.is_mouse_dragging_with_threshold(button, 200.0));
+            assert_eq!(ui.mouse_drag_delta(button), [0.0, 100.0]);
+            assert_eq!(
+                ui.mouse_drag_delta_with_threshold(button, 200.0),
+                [0.0, 0.0]
+            );
+        }
+        {
+            ctx.io_mut().mouse_pos = [0.0, 200.0];
+            let ui = ctx.frame();
+            assert!(ui.is_mouse_dragging(button));
+            assert!(ui.is_mouse_dragging_with_threshold(button, 200.0));
+            assert_eq!(ui.mouse_drag_delta(button), [0.0, 200.0]);
+            assert_eq!(
+                ui.mouse_drag_delta_with_threshold(button, 200.0),
+                [0.0, 200.0]
+            );
+        }
+        {
+            ctx.io_mut().mouse_pos = [10.0, 10.0];
+            ctx.io_mut()[button] = false;
+            let ui = ctx.frame();
+            assert!(!ui.is_mouse_dragging(button));
+            assert!(!ui.is_mouse_dragging_with_threshold(button, 200.0));
+            assert_eq!(ui.mouse_drag_delta(button), [0.0, 0.0]);
+            assert_eq!(
+                ui.mouse_drag_delta_with_threshold(button, 200.0),
+                [0.0, 0.0]
+            );
+        }
+        {
+            ctx.io_mut()[button] = true;
+            let ui = ctx.frame();
+            assert!(!ui.is_mouse_dragging(button));
+            assert!(!ui.is_mouse_dragging_with_threshold(button, 200.0));
+            assert_eq!(ui.mouse_drag_delta(button), [0.0, 0.0]);
+            assert_eq!(
+                ui.mouse_drag_delta_with_threshold(button, 200.0),
+                [0.0, 0.0]
+            );
+        }
+        {
+            ctx.io_mut().mouse_pos = [180.0, 180.0];
+            let ui = ctx.frame();
+            assert!(ui.is_mouse_dragging(button));
+            assert!(ui.is_mouse_dragging_with_threshold(button, 200.0));
+            assert_eq!(ui.mouse_drag_delta(button), [170.0, 170.0]);
+            assert_eq!(
+                ui.mouse_drag_delta_with_threshold(button, 200.0),
+                [170.0, 170.0]
+            );
+            ui.reset_mouse_drag_delta(button);
+            assert!(ui.is_mouse_dragging(button));
+            assert!(ui.is_mouse_dragging_with_threshold(button, 200.0));
+            assert_eq!(ui.mouse_drag_delta(button), [0.0, 0.0]);
+            assert_eq!(
+                ui.mouse_drag_delta_with_threshold(button, 200.0),
+                [0.0, 0.0]
+            );
+        }
+        {
+            ctx.io_mut().mouse_pos = [200.0, 200.0];
+            let ui = ctx.frame();
+            assert!(ui.is_mouse_dragging(button));
+            assert!(ui.is_mouse_dragging_with_threshold(button, 200.0));
+            assert_eq!(ui.mouse_drag_delta(button), [20.0, 20.0]);
+            assert_eq!(
+                ui.mouse_drag_delta_with_threshold(button, 200.0),
+                [20.0, 20.0]
+            );
+        }
+    }
 }
