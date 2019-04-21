@@ -37,6 +37,7 @@ pub use self::render::draw_data::*;
 pub use self::render::renderer::*;
 pub use self::string::*;
 pub use self::style::*;
+pub use self::widget::color_editors::*;
 pub use self::widget::misc::*;
 pub use self::window::*;
 
