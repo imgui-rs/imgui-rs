@@ -1,6 +1,6 @@
 [package]
 name = "imgui"
-version = "0.0.23-pre"
+version = "0.0.24-pre"
 edition = "2018"
 authors = ["Joonas Javanainen <joonas.javanainen@gmail.com>", "imgui-rs contributors"]
 description = "High-level Rust bindings to dear imgui"
@@ -15,9 +15,9 @@ travis-ci = { repository = "Gekkio/imgui-rs" }
 
 [dependencies]
 bitflags = "1.0"
-glium = { version = "0.23", default-features = false, optional = true }
+glium = { version = "0.24", default-features = false, optional = true }
 gfx = { version = "0.18", optional = true }
-imgui-sys = { version = "0.0.23-pre", path = "imgui-sys" }
+imgui-sys = { version = "0.0.24-pre", path = "imgui-sys" }
 lazy_static = "1.1"
 parking_lot = "0.7"
 

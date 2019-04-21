@@ -21,7 +21,7 @@ macro_rules! im_str {
 
 /// A UTF-8 encoded, growable, implicitly null-terminated string.
 #[derive(Clone, Hash, Ord, Eq, PartialOrd, PartialEq)]
-pub struct ImString(Vec<u8>);
+pub struct ImString(pub(crate) Vec<u8>);
 
 impl ImString {
     /// Creates a new `ImString` from an existing string.
@@ -86,7 +86,7 @@ impl ImString {
     /// Dear imgui accesses pointers directly, so the length doesn't get updated when the contents
     /// change. This is normally OK, because Deref to ImStr always calculates the slice length
     /// based on contents. However, we need to refresh the length in some ImString functions.
-    fn refresh_len(&mut self) {
+    pub(crate) fn refresh_len(&mut self) {
         let len = self.to_str().len();
         unsafe {
             self.0.set_len(len);
