@@ -1,16 +1,9 @@
 cbuffer Constants : register(b0) {
-  float4x4 transform;
+  float4x4 matrix_;
 }
 
 Texture2D tex;
-
-// Should be trilinear clamp
-SamplerState linear_clamp_sampler
-{
-    Filter = MIN_MAG_MIP_LINEAR;
-    AddressU = Clamp;
-    AddressV = Clamp;
-};
+SamplerState tex_;
 
 struct VIn {
   float2 position : pos;
@@ -28,7 +21,7 @@ struct VOut
 VOut VertexMain(VIn vertex)
 {
     VOut output;
-    output.position = mul(transform, float4(vertex.position, 0.0, 1.0));
+    output.position = mul(matrix_, float4(vertex.position, 0.0, 1.0));
     output.uv = vertex.uv;
     output.color = vertex.color;
 
@@ -37,5 +30,5 @@ VOut VertexMain(VIn vertex)
 
 float4 PixelMain(VOut vout) : SV_TARGET
 {
-  return vout.color * tex.Sample(linear_clamp_sampler, vout.uv);
+  return vout.color * tex.Sample(tex_, vout.uv);
 }

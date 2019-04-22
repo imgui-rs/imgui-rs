@@ -5,11 +5,17 @@ mod support_gfx;
 const CLEAR_COLOR: [f32; 4] = [1.0, 1.0, 1.0, 1.0];
 
 fn main() {
-    support_gfx::run_dx11("hello_gfx.rs".to_owned(), CLEAR_COLOR, hello_world);
+    support_gfx::run("hello_gfx.rs".to_owned(), CLEAR_COLOR, hello_world);
 }
 
 fn hello_world<'a>(ui: &Ui<'a>) -> bool {
-    ui.window(im_str!("Hello world"))
+    #[cfg(feature = "opengl")]
+    let window_title = im_str!("Hello world (OpenGL)");
+
+    #[cfg(feature = "directx")]
+    let window_title = im_str!("Hello world (DirectX)");
+
+    ui.window(window_title)
         .size((300.0, 100.0), ImGuiCond::FirstUseEver)
         .build(|| {
             ui.text(im_str!("Hello world!"));

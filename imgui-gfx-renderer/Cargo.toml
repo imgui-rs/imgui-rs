@@ -9,6 +9,11 @@ repository = "https://github.com/Gekkio/imgui-rs"
 license = "MIT/Apache-2.0"
 categories = ["gui", "rendering"]
 
+[features]
+opengl = []
+directx = []
+default = ["opengl"]
+
 [badges]
 travis-ci = { repository = "Gekkio/imgui-rs" }
 

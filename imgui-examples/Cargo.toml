@@ -9,6 +9,11 @@ repository = "https://github.com/Gekkio/imgui-rs"
 license = "MIT/Apache-2.0"
 publish = false
 
+[features]
+opengl = ["imgui-gfx-renderer/opengl"]
+directx = ["imgui-gfx-renderer/directx"]
+default = ["opengl"]
+
 [dev-dependencies]
 gfx = "0.17"
 gfx_window_glutin = "0.28"

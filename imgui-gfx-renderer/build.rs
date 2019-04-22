@@ -21,6 +21,8 @@ mod hlsl_build {
             .join("shader")
             .join("sm_40.hlsl");
 
+        println!("cargo:rerun-if-changed={}", source_path.display());
+
         let src_data = fs::read_to_string(&source_path).unwrap();
 
         let out_dir = PathBuf::from(env::var("OUT_DIR").unwrap());

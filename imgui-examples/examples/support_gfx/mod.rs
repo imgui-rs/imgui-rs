@@ -3,6 +3,7 @@ use imgui_gfx_renderer::{Renderer, Shaders};
 use imgui_winit_support;
 use std::time::Instant;
 
+#[cfg(feature = "opengl")]
 pub fn run<F: FnMut(&Ui) -> bool>(title: String, clear_color: [f32; 4], mut run_ui: F) {
     use gfx::{self, Device};
     use gfx_window_glutin;
@@ -146,8 +147,8 @@ pub fn run<F: FnMut(&Ui) -> bool>(title: String, clear_color: [f32; 4], mut run_
     }
 }
 
-// #[cfg(windows)]
-pub fn run_dx11<F: FnMut(&Ui) -> bool>(title: String, clear_color: [f32; 4], mut run_ui: F) {
+#[cfg(feature = "directx")]
+pub fn run<F: FnMut(&Ui) -> bool>(title: String, clear_color: [f32; 4], mut run_ui: F) {
     use gfx::{self, Device};
     use gfx_window_dxgi;
     use glutin;
