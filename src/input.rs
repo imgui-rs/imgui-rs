@@ -1,4 +1,5 @@
 use std::marker::PhantomData;
+use std::os::raw::{c_int, c_void};
 use std::ptr;
 use sys;
 
@@ -73,6 +74,12 @@ macro_rules! impl_text_flags {
         }
 
         #[inline]
+        pub fn resize_buffer(mut self, value: bool) -> Self {
+            self.flags.set(ImGuiInputTextFlags::CallbackResize, value);
+            self
+        }
+
+        #[inline]
         pub fn allow_tab_input(mut self, value: bool) -> Self {
             self.flags.set(ImGuiInputTextFlags::AllowTabInput, value);
             self
@@ -126,6 +133,27 @@ macro_rules! impl_step_params {
     }
 }
 
+extern "C" fn resize_callback(data: *mut sys::ImGuiInputTextCallbackData) -> c_int {
+    unsafe {
+        if (*data).event_flag == ImGuiInputTextFlags::CallbackResize {
+            if let Some(buffer) = ((*data).user_data as *mut ImString).as_mut() {
+                let requested_size = (*data).buf_size as usize;
+                if requested_size > buffer.capacity_with_nul() {
+                    // Refresh the buffer's length to take into account changes made by dear imgui.
+                    buffer.refresh_len();
+                    // Add 1 to include the null terminator, so that reserve sees the right length.
+                    // After we're done we'll call refresh_len, so this won't be visible to the user.
+                    buffer.0.set_len(buffer.0.len() + 1);
+                    buffer.reserve(requested_size - buffer.0.len());
+                    (*data).buf = buffer.as_mut_ptr();
+                    (*data).buf_dirty = true;
+                }
+            }
+        }
+        return 0
+    }
+}
+
 #[must_use]
 pub struct InputText<'ui, 'p> {
     label: &'p ImStr,
@@ -150,15 +178,19 @@ impl<'ui, 'p> InputText<'ui, 'p> {
     // pub fn callback(self) -> Self { }
 
     pub fn build(self) -> bool {
+        let (ptr, capacity) = (self.buf.as_mut_ptr(), self.buf.capacity_with_nul());
+        let (callback, data): (sys::ImGuiInputTextCallback, _) = {
+            if self.flags.contains(ImGuiInputTextFlags::CallbackResize) {
+                (Some(resize_callback), self.buf as *mut _ as *mut c_void)
+            } else { 
+                (None, ptr::null_mut()) 
+            }
+        };
+        
         unsafe {
-            sys::igInputText(
-                self.label.as_ptr(),
-                self.buf.as_mut_ptr(),
-                self.buf.capacity_with_nul(),
-                self.flags,
-                None,
-                ptr::null_mut(),
-            )
+            let result = sys::igInputText(self.label.as_ptr(), ptr, capacity, self.flags, callback, data);
+            self.buf.refresh_len();
+            result
         }
     }
 }
@@ -189,16 +221,19 @@ impl<'ui, 'p> InputTextMultiline<'ui, 'p> {
     // pub fn callback(self) -> Self { }
 
     pub fn build(self) -> bool {
+        let (ptr, capacity) = (self.buf.as_mut_ptr(), self.buf.capacity_with_nul());
+        let (callback, data): (sys::ImGuiInputTextCallback, _) = {
+            if self.flags.contains(ImGuiInputTextFlags::CallbackResize) {
+                (Some(resize_callback), self.buf as *mut _ as *mut c_void)
+            } else { 
+                (None, ptr::null_mut()) 
+            }
+        };
+        
         unsafe {
-            sys::igInputTextMultiline(
-                self.label.as_ptr(),
-                self.buf.as_mut_ptr(),
-                self.buf.capacity_with_nul(),
-                self.size,
-                self.flags,
-                None,
-                ptr::null_mut(),
-            )
+            let result = sys::igInputTextMultiline(self.label.as_ptr(), ptr, capacity, self.size, self.flags, callback, data);
+            self.buf.refresh_len();
+            result
         }
     }
 }

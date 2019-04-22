@@ -1033,7 +1033,7 @@ extern "C" {
     pub fn igSetItemAllowOverlap();
     pub fn igIsRectVisible(size: ImVec2) -> bool;
     pub fn igIsRectVisibleVec2(rect_min: ImVec2, rect_max: ImVec2) -> bool;
-    pub fn igGetTime() -> c_float;
+    pub fn igGetTime() -> c_double;
     pub fn igGetFrameCount() -> c_int;
     pub fn igGetOverlayDrawList() -> *mut ImDrawList;
     pub fn igGetDrawListSharedData() -> *mut ImDrawListSharedData;

@@ -1,6 +1,6 @@
 [package]
 name = "imgui-glium-renderer"
-version = "0.0.23-pre"
+version = "0.0.24-pre"
 edition = "2018"
 authors = ["Joonas Javanainen <joonas.javanainen@gmail.com>", "imgui-rs contributors"]
 description = "Glium renderer for the imgui crate"
@@ -13,6 +13,6 @@ categories = ["gui", "rendering"]
 travis-ci = { repository = "Gekkio/imgui-rs" }
 
 [dependencies]
-glium = { version = "0.23", default-features = false }
-imgui = { version = "0.0.23-pre", path = "../" }
-imgui-sys = { version = "0.0.23-pre", path = "../imgui-sys", features = ["glium"] }
+glium = { version = "0.24", default-features = false }
+imgui = { version = "0.0.24-pre", path = "../" }
+imgui-sys = { version = "0.0.24-pre", path = "../imgui-sys", features = ["glium"] }
