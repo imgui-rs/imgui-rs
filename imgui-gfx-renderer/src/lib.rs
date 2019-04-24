@@ -168,19 +168,19 @@ impl Shaders {
                 include_bytes!("shader/glsles_100.frag"),
             ),
             HlslSm40 => {
-                #[cfg(not(feature = "directx"))]
-                {
-                    // panic instead?
-                    (&[0], &[0])
+                cfg_if::cfg_if! {
+                    if #[cfg(all(feature = "directx", windows))] {
+                        const HLSL_BYTECODE: (&[u8], &[u8]) = (
+                            include_bytes!(concat!(env!("OUT_DIR"), "/hlsl_vertex_shader_bytecode")),
+                            include_bytes!(concat!(env!("OUT_DIR"), "/hlsl_pixel_shader_bytecode")),
+                        );
+                    } else {
+                        // panic instead?
+                        const HLSL_BYTECODE: (&[u8], &[u8]) = (&[0], &[0]);
+                    }
                 }
 
-                #[cfg(feature = "directx")]
-                {
-                    (
-                        include_bytes!(concat!(env!("OUT_DIR"), "/hlsl_vertex_shader_bytecode")),
-                        include_bytes!(concat!(env!("OUT_DIR"), "/hlsl_pixel_shader_bytecode")),
-                    )
-                }
+                HLSL_BYTECODE
             }
         }
     }
