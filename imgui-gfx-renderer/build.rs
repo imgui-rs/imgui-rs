@@ -34,6 +34,9 @@ mod hlsl_build {
 
         let src_data = fs::read_to_string(&source_path).unwrap();
 
+        if vertex_destination.exists() {
+            fs::remove_file(vertex_destination).unwrap();
+        }
         fs::write(
             vertex_destination,
             compile_shader(&src_data, &source_path, "VertexMain", "vs_4_0").unwrap_or_else(
@@ -45,6 +48,9 @@ mod hlsl_build {
         )
         .unwrap();
 
+        if pixel_destination.exists() {
+            fs::remove_file(pixel_destination).unwrap();
+        }
         fs::write(
             pixel_destination,
             compile_shader(&src_data, &source_path, "PixelMain", "ps_4_0").unwrap_or_else(
