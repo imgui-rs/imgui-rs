@@ -1,14 +1,14 @@
 cbuffer Constants : register(b0) {
-  float4x4 matrix_;
+    float4x4 matrix_;
 }
 
 Texture2D tex;
 SamplerState tex_;
 
 struct VIn {
-  float2 position : pos;
-  float2 uv : uv;
-  float4 color : col;
+    float2 position : pos;
+    float2 uv : uv;
+    float4 color : col;
 };
 
 struct VOut
@@ -30,5 +30,5 @@ VOut VertexMain(VIn vertex)
 
 float4 PixelMain(VOut vout) : SV_TARGET
 {
-  return vout.color * tex.Sample(tex_, vout.uv);
+    return vout.color * tex.Sample(tex_, vout.uv);
 }

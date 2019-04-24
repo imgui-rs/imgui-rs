@@ -1,34 +1,41 @@
 fn main() {
     #[cfg(windows)]
-    hlsl_build::compile_hlsl_shaders();
+    {
+        // Note: When building on Windows, this build script will automatically recompile the HLSL shaders.
+
+        use std::env;
+        use std::path::PathBuf;
+
+        let src_dir = PathBuf::from(env::var("CARGO_MANIFEST_DIR").unwrap()).join("src");
+
+        hlsl_build::update_hlsl_shaders(
+            &src_dir.join("shader").join("sm_40.hlsl"),
+            &src_dir.join("data").join("vertex.fx"),
+            &src_dir.join("data").join("pixel.fx"),
+        );
+    }
 }
 
 #[cfg(windows)]
 mod hlsl_build {
-    use std::env;
-    use std::ffi::CStr;
     use std::ffi::CString;
     use std::fs;
     use std::path::Path;
-    use std::path::PathBuf;
     use std::ptr;
     use std::slice;
     use std::str;
 
-    pub fn compile_hlsl_shaders() {
-        let source_path = PathBuf::from(env::var("CARGO_MANIFEST_DIR").unwrap())
-            .join("src")
-            .join("shader")
-            .join("sm_40.hlsl");
-
+    pub fn update_hlsl_shaders(
+        source_path: &Path,
+        vertex_destination: &Path,
+        pixel_destination: &Path,
+    ) {
         println!("cargo:rerun-if-changed={}", source_path.display());
 
         let src_data = fs::read_to_string(&source_path).unwrap();
 
-        let out_dir = PathBuf::from(env::var("OUT_DIR").unwrap());
-
         fs::write(
-            out_dir.join("hlsl_vertex_shader_bytecode"),
+            vertex_destination,
             compile_shader(&src_data, &source_path, "VertexMain", "vs_4_0").unwrap_or_else(
                 |error_message| {
                     eprintln!("{}", error_message);
@@ -39,7 +46,7 @@ mod hlsl_build {
         .unwrap();
 
         fs::write(
-            out_dir.join("hlsl_pixel_shader_bytecode"),
+            pixel_destination,
             compile_shader(&src_data, &source_path, "PixelMain", "ps_4_0").unwrap_or_else(
                 |error_message| {
                     eprintln!("{}", error_message);
