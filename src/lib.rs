@@ -271,6 +271,10 @@ impl ImGui {
         let io = self.io();
         io.mouse_wheel
     }
+    pub fn mouse_drag_delta(&self, button: ImMouseButton) -> (f32, f32) {
+        let delta = unsafe { sys::igGetMouseDragDelta_nonUDT2(button as c_int, -1.0) };
+        delta.into()
+    }
     /// Set to `true` to have ImGui draw the cursor in software.
     /// If `false`, the OS cursor is used (default to `false`).
     pub fn set_mouse_draw_cursor(&mut self, value: bool) {
