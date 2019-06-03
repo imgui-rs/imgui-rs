@@ -9,6 +9,11 @@ repository = "https://github.com/Gekkio/imgui-rs"
 license = "MIT/Apache-2.0"
 categories = ["gui", "rendering"]
 
+[features]
+opengl = []
+directx = []
+default = ["opengl"]
+
 [badges]
 travis-ci = { repository = "Gekkio/imgui-rs" }
 
@@ -16,3 +21,6 @@ travis-ci = { repository = "Gekkio/imgui-rs" }
 gfx = "0.18"
 imgui = { version = "0.0.24-pre", path = "../" }
 imgui-sys = { version = "0.0.24-pre", path = "../imgui-sys", features = ["gfx"] }
+
+[target.'cfg(windows)'.build-dependencies]
+winapi = { version = "0.3", features = ["d3dcompiler"] }

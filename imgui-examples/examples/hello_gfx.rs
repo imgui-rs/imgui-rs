@@ -9,7 +9,13 @@ fn main() {
 }
 
 fn hello_world<'a>(ui: &Ui<'a>) -> bool {
-    ui.window(im_str!("Hello world"))
+    #[cfg(feature = "opengl")]
+    let window_title = im_str!("Hello world (OpenGL)");
+
+    #[cfg(feature = "directx")]
+    let window_title = im_str!("Hello world (DirectX)");
+
+    ui.window(window_title)
         .size((300.0, 100.0), ImGuiCond::FirstUseEver)
         .build(|| {
             ui.text(im_str!("Hello world!"));
