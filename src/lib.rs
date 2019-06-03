@@ -1256,14 +1256,14 @@ impl<'ui> Ui<'ui> {
 
 // Widgets: Combos
 impl<'ui> Ui<'ui> {
-    pub fn combo<'p>(
+    pub fn combo<'p, StringType: AsRef<ImStr> + ?Sized>(
         &self,
         label: &'p ImStr,
         current_item: &mut i32,
-        items: &'p [&'p ImStr],
+        items: &'p [&'p StringType],
         height_in_items: i32,
     ) -> bool {
-        let items_inner: Vec<*const c_char> = items.into_iter().map(|item| item.as_ptr()).collect();
+        let items_inner: Vec<*const c_char> = items.into_iter().map(|item| item.as_ref().as_ptr()).collect();
         unsafe {
             sys::igCombo(
                 label.as_ptr(),
@@ -1278,14 +1278,14 @@ impl<'ui> Ui<'ui> {
 
 // Widgets: ListBox
 impl<'ui> Ui<'ui> {
-    pub fn list_box<'p>(
+    pub fn list_box<'p, StringType: AsRef<ImStr> + ?Sized>(
         &self,
         label: &'p ImStr,
         current_item: &mut i32,
-        items: &'p [&'p ImStr],
+        items: &'p [&'p StringType],
         height_in_items: i32,
     ) -> bool {
-        let items_inner: Vec<*const c_char> = items.into_iter().map(|item| item.as_ptr()).collect();
+        let items_inner: Vec<*const c_char> = items.into_iter().map(|item| item.as_ref().as_ptr()).collect();
         unsafe {
             sys::igListBoxStr_arr(
                 label.as_ptr(),
