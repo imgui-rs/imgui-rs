@@ -111,7 +111,7 @@ impl<'ui> Image<'ui> {
 
 
 /// Represent an image button about to be drawn.
-/// See [`Ui::image`].
+/// See [`Ui::image_button`].
 ///
 /// Create your image button using the builder pattern then [`ImageButton::build`] it.
 #[must_use]
