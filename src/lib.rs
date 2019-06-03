@@ -1656,6 +1656,11 @@ impl<'ui> Ui<'ui> {
         unsafe { sys::igIsItemActive() }
     }
 
+    /// Allow last item to be overlapped by a subsequent item. Both may be activated during the same frame before the later one takes priority.
+    pub fn set_item_allow_overlap(&self) {
+        unsafe{ sys::igSetItemAllowOverlap(); }
+    }
+
     /// Group items together as a single item.
     ///
     /// May be useful to handle the same mouse event on a group of items, for example.
