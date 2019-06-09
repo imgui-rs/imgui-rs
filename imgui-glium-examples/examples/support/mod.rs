@@ -23,7 +23,8 @@ where
         .with_title(title)
         .with_dimensions(glutin::dpi::LogicalSize::new(1024f64, 768f64));
     let display = Display::new(builder, context, &events_loop).unwrap();
-    let window = display.gl_window();
+    let gl_window = display.gl_window();
+    let window = gl_window.window();
 
     let mut imgui = ImGui::init();
     imgui.set_ini_filename(None);
