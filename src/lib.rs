@@ -50,6 +50,7 @@ mod drag;
 mod fonts;
 mod image;
 mod input;
+mod internal;
 mod menus;
 mod plothistogram;
 mod plotlines;
@@ -152,7 +153,7 @@ impl ImGui {
         unsafe { &mut *sys::igGetStyle() }
     }
     pub fn fonts(&mut self) -> ImFontAtlas {
-        unsafe { ImFontAtlas::from_ptr(self.io_mut().fonts) }
+        unsafe { ImFontAtlas::from_ptr(self.io_mut().Fonts) }
     }
     pub fn prepare_texture<'a, F, T>(&mut self, f: F) -> T
     where
@@ -165,7 +166,7 @@ impl ImGui {
         let mut bytes_per_pixel: c_int = 0;
         unsafe {
             sys::ImFontAtlas_GetTexDataAsRGBA32(
-                io.fonts,
+                io.Fonts,
                 &mut pixels,
                 &mut width,
                 &mut height,
@@ -184,7 +185,7 @@ impl ImGui {
     pub fn set_ini_filename(&mut self, value: Option<ImString>) {
         {
             let io = self.io_mut();
-            io.ini_filename = match value {
+            io.IniFilename = match value {
                 Some(ref x) => x.as_ptr(),
                 None => ptr::null(),
             }
@@ -194,7 +195,7 @@ impl ImGui {
     pub fn set_log_filename(&mut self, value: Option<ImString>) {
         {
             let io = self.io_mut();
-            io.log_filename = match value {
+            io.LogFilename = match value {
                 Some(ref x) => x.as_ptr(),
                 None => ptr::null(),
             }
@@ -203,89 +204,84 @@ impl ImGui {
     }
     pub fn set_ini_saving_rate(&mut self, value: f32) {
         let io = self.io_mut();
-        io.ini_saving_rate = value;
+        io.IniSavingRate = value;
     }
     pub fn set_font_global_scale(&mut self, value: f32) {
         let io = self.io_mut();
-        io.font_global_scale = value;
+        io.FontGlobalScale = value;
     }
     pub fn set_mouse_double_click_time(&mut self, value: f32) {
         let io = self.io_mut();
-        io.mouse_double_click_time = value;
+        io.MouseDoubleClickTime = value;
     }
     pub fn set_mouse_double_click_max_dist(&mut self, value: f32) {
         let io = self.io_mut();
-        io.mouse_double_click_max_dist = value;
+        io.MouseDoubleClickMaxDist = value;
     }
     pub fn set_mouse_drag_threshold(&mut self, value: f32) {
         let io = self.io_mut();
-        io.mouse_drag_threshold = value;
+        io.MouseDragThreshold = value;
     }
     pub fn set_key_repeat_delay(&mut self, value: f32) {
         let io = self.io_mut();
-        io.key_repeat_delay = value;
+        io.KeyRepeatDelay = value;
     }
     pub fn set_key_repeat_rate(&mut self, value: f32) {
         let io = self.io_mut();
-        io.key_repeat_rate = value;
+        io.KeyRepeatRate = value;
     }
     pub fn display_size(&self) -> (f32, f32) {
         let io = self.io();
-        (io.display_size.x, io.display_size.y)
+        (io.DisplaySize.x, io.DisplaySize.y)
     }
     pub fn display_framebuffer_scale(&self) -> (f32, f32) {
         let io = self.io();
-        (
-            io.display_framebuffer_scale.x,
-            io.display_framebuffer_scale.y,
-        )
+        (io.DisplayFramebufferScale.x, io.DisplayFramebufferScale.y)
     }
     pub fn mouse_pos(&self) -> (f32, f32) {
         let io = self.io();
-        (io.mouse_pos.x, io.mouse_pos.y)
+        (io.MousePos.x, io.MousePos.y)
     }
     pub fn set_mouse_pos(&mut self, x: f32, y: f32) {
         let io = self.io_mut();
-        io.mouse_pos.x = x;
-        io.mouse_pos.y = y;
+        io.MousePos.x = x;
+        io.MousePos.y = y;
     }
     /// Get mouse's position's delta between the current and the last frame.
     pub fn mouse_delta(&self) -> (f32, f32) {
         let io = self.io();
-        (io.mouse_delta.x, io.mouse_delta.y)
+        (io.MouseDelta.x, io.MouseDelta.y)
     }
     pub fn mouse_down(&self) -> [bool; 5] {
         let io = self.io();
-        io.mouse_down
+        io.MouseDown
     }
     pub fn set_mouse_down(&mut self, states: [bool; 5]) {
         let io = self.io_mut();
-        io.mouse_down = states;
+        io.MouseDown = states;
     }
     pub fn set_mouse_wheel(&mut self, value: f32) {
         let io = self.io_mut();
-        io.mouse_wheel = value;
+        io.MouseWheel = value;
     }
     /// Get mouse wheel delta
     pub fn mouse_wheel(&self) -> f32 {
         let io = self.io();
-        io.mouse_wheel
+        io.MouseWheel
     }
     pub fn mouse_drag_delta(&self, button: ImMouseButton) -> (f32, f32) {
-        let delta = unsafe {
-            sys::igGetMouseDragDelta_nonUDT2(button as c_int, -1.0)
-        };
+        let delta = unsafe { sys::igGetMouseDragDelta_nonUDT2(button as c_int, -1.0) };
         delta.into()
     }
     /// Set to `true` to have ImGui draw the cursor in software.
     /// If `false`, the OS cursor is used (default to `false`).
     pub fn set_mouse_draw_cursor(&mut self, value: bool) {
         let io = self.io_mut();
-        io.mouse_draw_cursor = value;
+        io.MouseDrawCursor = value;
     }
     pub fn mouse_draw_cursor(&self) -> bool {
         let io = self.io();
-        io.mouse_draw_cursor
+        io.MouseDrawCursor
     }
     /// Set currently displayed cursor.
     /// Requires support in the windowing back-end if OS cursor is used.
@@ -323,43 +319,43 @@ impl ImGui {
     }
     pub fn key_ctrl(&self) -> bool {
         let io = self.io();
-        io.key_ctrl
+        io.KeyCtrl
     }
     pub fn set_key_ctrl(&mut self, value: bool) {
         let io = self.io_mut();
-        io.key_ctrl = value;
+        io.KeyCtrl = value;
     }
     pub fn key_shift(&self) -> bool {
         let io = self.io();
-        io.key_shift
+        io.KeyShift
     }
     pub fn set_key_shift(&mut self, value: bool) {
         let io = self.io_mut();
-        io.key_shift = value;
+        io.KeyShift = value;
     }
     pub fn key_alt(&self) -> bool {
         let io = self.io();
-        io.key_alt
+        io.KeyAlt
     }
     pub fn set_key_alt(&mut self, value: bool) {
         let io = self.io_mut();
-        io.key_alt = value;
+        io.KeyAlt = value;
     }
     pub fn key_super(&self) -> bool {
         let io = self.io();
-        io.key_super
+        io.KeySuper
     }
     pub fn set_key_super(&mut self, value: bool) {
         let io = self.io_mut();
-        io.key_super = value;
+        io.KeySuper = value;
     }
     pub fn set_key(&mut self, key: u8, pressed: bool) {
         let io = self.io_mut();
-        io.keys_down[key as usize] = pressed;
+        io.KeysDown[key as usize] = pressed;
     }
     pub fn set_imgui_key(&mut self, key: ImGuiKey, mapping: u8) {
         let io = self.io_mut();
-        io.key_map[key as usize] = i32::from(mapping);
+        io.KeyMap[key as usize] = i32::from(mapping);
     }
     /// Map [`ImGuiKey`] values into user's key index
     pub fn get_key_index(&self, key: ImGuiKey) -> usize {
@@ -404,16 +400,16 @@ impl ImGui {
         unsafe { sys::igGetFrameCount() }
     }
     pub fn get_frame_rate(&self) -> f32 {
-        self.io().framerate
+        self.io().Framerate
     }
     pub fn frame<'ui, 'a: 'ui>(&'a mut self, frame_size: FrameSize, delta_time: f32) -> Ui<'ui> {
         {
             let io = self.io_mut();
-            io.display_size.x = frame_size.logical_size.0 as c_float;
-            io.display_size.y = frame_size.logical_size.1 as c_float;
-            io.display_framebuffer_scale.x = frame_size.hidpi_factor as c_float;
-            io.display_framebuffer_scale.y = frame_size.hidpi_factor as c_float;
-            io.delta_time = delta_time;
+            io.DisplaySize.x = frame_size.logical_size.0 as c_float;
+            io.DisplaySize.y = frame_size.logical_size.1 as c_float;
+            io.DisplayFramebufferScale.x = frame_size.hidpi_factor as c_float;
+            io.DisplayFramebufferScale.y = frame_size.hidpi_factor as c_float;
+            io.DeltaTime = delta_time;
         }
         unsafe {
             sys::igNewFrame();
@@ -529,11 +525,11 @@ impl<'ui> Ui<'ui> {
     }
     pub fn want_capture_mouse(&self) -> bool {
         let io = self.imgui.io();
-        io.want_capture_mouse
+        io.WantCaptureMouse
     }
     pub fn want_capture_keyboard(&self) -> bool {
         let io = self.imgui.io();
-        io.want_capture_keyboard
+        io.WantCaptureKeyboard
     }
     pub fn set_keyboard_focus_here(&self, offset: i32) {
         unsafe {
@@ -542,19 +538,19 @@ impl<'ui> Ui<'ui> {
     }
     pub fn framerate(&self) -> f32 {
         let io = self.imgui.io();
-        io.framerate
+        io.Framerate
     }
     pub fn metrics_render_vertices(&self) -> i32 {
         let io = self.imgui.io();
-        io.metrics_render_vertices
+        io.MetricsRenderVertices
     }
     pub fn metrics_render_indices(&self) -> i32 {
         let io = self.imgui.io();
-        io.metrics_render_indices
+        io.MetricsRenderIndices
     }
     pub fn metrics_active_windows(&self) -> i32 {
         let io = self.imgui.io();
-        io.metrics_active_windows
+        io.MetricsActiveWindows
     }
     pub fn render<F, E>(self, f: F) -> Result<(), E>
     where
@@ -1269,7 +1265,10 @@ impl<'ui> Ui<'ui> {
         items: &'p [&'p StringType],
         height_in_items: i32,
     ) -> bool {
-        let items_inner: Vec<*const c_char> = items.into_iter().map(|item| item.as_ref().as_ptr()).collect();
+        let items_inner: Vec<*const c_char> = items
+            .into_iter()
+            .map(|item| item.as_ref().as_ptr())
+            .collect();
         unsafe {
             sys::igCombo(
                 label.as_ptr(),
@@ -1291,7 +1290,10 @@ impl<'ui> Ui<'ui> {
         items: &'p [&'p StringType],
         height_in_items: i32,
     ) -> bool {
-        let items_inner: Vec<*const c_char> = items.into_iter().map(|item| item.as_ref().as_ptr()).collect();
+        let items_inner: Vec<*const c_char> = items
+            .into_iter()
+            .map(|item| item.as_ref().as_ptr())
+            .collect();
         unsafe {
             sys::igListBoxStr_arr(
                 label.as_ptr(),
@@ -1664,7 +1666,9 @@ impl<'ui> Ui<'ui> {
 
     /// Allow last item to be overlapped by a subsequent item. Both may be activated during the same frame before the later one takes priority.
     pub fn set_item_allow_overlap(&self) {
-        unsafe{ sys::igSetItemAllowOverlap(); }
+        unsafe {
+            sys::igSetItemAllowOverlap();
+        }
     }
 
     /// Group items together as a single item.

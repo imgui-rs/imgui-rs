@@ -109,7 +109,6 @@ impl<'ui> Image<'ui> {
     }
 }
 
-
 /// Represent an image button about to be drawn.
 /// See [`Ui::image_button`].
 ///

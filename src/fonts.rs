@@ -3,7 +3,9 @@ use std::marker::PhantomData;
 use std::mem;
 use std::os::raw::{c_float, c_int, c_void};
 use std::ptr;
-use sys;
+
+use crate::internal::ImVector;
+use crate::sys;
 
 #[derive(Clone, Eq, PartialEq, Hash, Debug)]
 enum FontGlyphRangeData {
@@ -205,18 +207,18 @@ impl ImFontConfig {
     fn make_config(self) -> sys::ImFontConfig {
         let mut config = unsafe {
             let mut config = mem::zeroed::<sys::ImFontConfig>();
-            config.font_data_owned_by_atlas = true;
-            config.glyph_max_advance_x = f32::MAX as c_float;
+            config.FontDataOwnedByAtlas = true;
+            config.GlyphMaxAdvanceX = f32::MAX as c_float;
             config
         };
-        config.size_pixels = self.size_pixels;
-        config.oversample_h = self.oversample_h as c_int;
-        config.oversample_v = self.oversample_v as c_int;
-        config.pixel_snap_h = self.pixel_snap_h;
-        config.glyph_extra_spacing = self.glyph_extra_spacing;
-        config.glyph_offset = self.glyph_offset;
-        config.merge_mode = self.merge_mode;
-        config.rasterizer_multiply = self.rasterizer_multiply;
+        config.SizePixels = self.size_pixels;
+        config.OversampleH = self.oversample_h as c_int;
+        config.OversampleV = self.oversample_v as c_int;
+        config.PixelSnapH = self.pixel_snap_h;
+        config.GlyphExtraSpacing = self.glyph_extra_spacing;
+        config.GlyphOffset = self.glyph_offset;
+        config.MergeMode = self.merge_mode;
+        config.RasterizerMultiply = self.rasterizer_multiply;
         config
     }
 
@@ -268,27 +270,27 @@ impl<'a> ImFont<'a> {
     }
 
     pub fn font_size(&self) -> f32 {
-        unsafe { (*self.font).font_size }
+        unsafe { (*self.font).FontSize }
     }
     pub fn set_font_size(&mut self, size: f32) -> ImFont {
         unsafe {
-            (*self.font).font_size = size;
+            (*self.font).FontSize = size;
         }
         self.chain()
     }
 
     pub fn scale(&self) -> f32 {
-        unsafe { (*self.font).scale }
+        unsafe { (*self.font).Scale }
     }
     pub fn set_scale(&mut self, size: f32) -> ImFont {
         unsafe {
-            (*self.font).scale = size;
+            (*self.font).Scale = size;
         }
         self.chain()
     }
 
     pub fn display_offset(&self) -> (f32, f32) {
-        unsafe { (*self.font).display_offset.into() }
+        unsafe { (*self.font).DisplayOffset.into() }
     }
 }
 
@@ -329,11 +331,11 @@ impl<'a> ImFontAtlas<'a> {
         );
         unsafe {
             let mut config = config.make_config();
-            assert!(config.size_pixels > 0.0, "Font size cannot be zero.");
-            config.font_data = data.as_ptr() as *mut c_void;
-            config.font_data_size = data.len() as c_int;
-            config.glyph_ranges = range.to_ptr(self.atlas);
-            config.font_data_owned_by_atlas = false;
+            assert!(config.SizePixels > 0.0, "Font size cannot be zero.");
+            config.FontData = data.as_ptr() as *mut c_void;
+            config.FontDataSize = data.len() as c_int;
+            config.GlyphRanges = range.to_ptr(self.atlas);
+            config.FontDataOwnedByAtlas = false;
 
             ImFont::from_ptr(sys::ImFontAtlas_AddFont(self.atlas, &config))
         }
@@ -362,7 +364,7 @@ impl<'a> ImFontAtlas<'a> {
 
     /// The number of fonts currently registered in the atlas.
     pub fn font_count(&self) -> usize {
-        unsafe { (*self.atlas).fonts.size as usize }
+        unsafe { (*self.atlas).Fonts.Size as usize }
     }
 
     /// Gets a font from the atlas.
@@ -372,7 +374,11 @@ impl<'a> ImFontAtlas<'a> {
     ///
     /// Panics if the index is out of range.
     pub fn index_font(&mut self, index: usize) -> ImFont {
-        let fonts = unsafe { (*self.atlas).fonts.as_slice() };
+        let fonts = unsafe {
+            let fonts: &sys::ImVector_ImFontPtr = &(*self.atlas).Fonts;
+            let fonts: &ImVector<*mut sys::ImFont> = ::std::mem::transmute(fonts);
+            fonts.as_slice()
+        };
         assert!(index < fonts.len(), "Font index is out of range.");
         unsafe { ImFont::from_ptr(fonts[index]) }
     }
@@ -383,11 +389,11 @@ impl<'a> ImFontAtlas<'a> {
     }
 
     pub fn texture_id(&self) -> usize {
-        unsafe { (*self.atlas).tex_id as usize }
+        unsafe { (*self.atlas).TexID as usize }
     }
     pub fn set_texture_id(&mut self, value: usize) {
         unsafe {
-            (*self.atlas).tex_id = value as *mut c_void;
+            (*self.atlas).TexID = value as *mut c_void;
         }
     }
 }

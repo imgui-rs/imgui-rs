@@ -22,7 +22,6 @@ extern "C" {
 
 // Main
 extern "C" {
-    pub fn igGetIO() -> *mut ImGuiIO;
     pub fn igGetStyle() -> *mut ImGuiStyle;
     pub fn igNewFrame();
     pub fn igEndFrame();

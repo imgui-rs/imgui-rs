@@ -150,7 +150,7 @@ extern "C" fn resize_callback(data: *mut sys::ImGuiInputTextCallbackData) -> c_i
                 }
             }
         }
-        return 0
+        return 0;
     }
 }
 
@@ -182,13 +182,20 @@ impl<'ui, 'p> InputText<'ui, 'p> {
         let (callback, data): (sys::ImGuiInputTextCallback, _) = {
             if self.flags.contains(ImGuiInputTextFlags::CallbackResize) {
                 (Some(resize_callback), self.buf as *mut _ as *mut c_void)
-            } else { 
-                (None, ptr::null_mut()) 
+            } else {
+                (None, ptr::null_mut())
             }
         };
-        
+
         unsafe {
-            let result = sys::igInputText(self.label.as_ptr(), ptr, capacity, self.flags, callback, data);
+            let result = sys::igInputText(
+                self.label.as_ptr(),
+                ptr,
+                capacity,
+                self.flags,
+                callback,
+                data,
+            );
             self.buf.refresh_len();
             result
         }
@@ -225,13 +232,21 @@ impl<'ui, 'p> InputTextMultiline<'ui, 'p> {
         let (callback, data): (sys::ImGuiInputTextCallback, _) = {
             if self.flags.contains(ImGuiInputTextFlags::CallbackResize) {
                 (Some(resize_callback), self.buf as *mut _ as *mut c_void)
-            } else { 
-                (None, ptr::null_mut()) 
+            } else {
+                (None, ptr::null_mut())
             }
         };
-        
+
         unsafe {
-            let result = sys::igInputTextMultiline(self.label.as_ptr(), ptr, capacity, self.size, self.flags, callback, data);
+            let result = sys::igInputTextMultiline(
+                self.label.as_ptr(),
+                ptr,
+                capacity,
+                self.size,
+                self.flags,
+                callback,
+                data,
+            );
             self.buf.refresh_len();
             result
         }
