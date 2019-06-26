@@ -135,9 +135,9 @@ macro_rules! impl_step_params {
 
 extern "C" fn resize_callback(data: *mut sys::ImGuiInputTextCallbackData) -> c_int {
     unsafe {
-        if (*data).event_flag == ImGuiInputTextFlags::CallbackResize {
-            if let Some(buffer) = ((*data).user_data as *mut ImString).as_mut() {
-                let requested_size = (*data).buf_size as usize;
+        if (*data).EventFlag == ImGuiInputTextFlags::CallbackResize.bits() {
+            if let Some(buffer) = ((*data).UserData as *mut ImString).as_mut() {
+                let requested_size = (*data).BufSize as usize;
                 if requested_size > buffer.capacity_with_nul() {
                     // Refresh the buffer's length to take into account changes made by dear imgui.
                     buffer.refresh_len();
@@ -145,8 +145,8 @@ extern "C" fn resize_callback(data: *mut sys::ImGuiInputTextCallbackData) -> c_i
                     // After we're done we'll call refresh_len, so this won't be visible to the user.
                     buffer.0.set_len(buffer.0.len() + 1);
                     buffer.reserve(requested_size - buffer.0.len());
-                    (*data).buf = buffer.as_mut_ptr();
-                    (*data).buf_dirty = true;
+                    (*data).Buf = buffer.as_mut_ptr();
+                    (*data).BufDirty = true;
                 }
             }
         }

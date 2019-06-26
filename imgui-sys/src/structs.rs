@@ -191,24 +191,6 @@ pub struct ImFontGlyph {
     pub v1: c_float,
 }
 
-/// Shared state of input text callback
-#[repr(C)]
-pub struct ImGuiInputTextCallbackData {
-    pub event_flag: ImGuiInputTextFlags,
-    pub flags: ImGuiInputTextFlags,
-    pub user_data: *mut c_void,
-
-    pub event_char: ImWchar,
-    pub event_key: ImGuiKey,
-    pub buf: *mut c_char,
-    pub buf_text_len: c_int,
-    pub buf_size: c_int,
-    pub buf_dirty: bool,
-    pub cursor_pos: c_int,
-    pub selection_start: c_int,
-    pub selection_end: c_int,
-}
-
 /// Main configuration and I/O between your application and ImGui
 #[repr(C)]
 pub struct ImGuiIO {
@@ -561,22 +543,6 @@ extern "C" {
     ) -> *mut *mut c_void;
     pub fn ImGuiStorage_SetAllInt(this: *mut ImGuiStorage, val: c_int);
     pub fn ImGuiStorage_BuildSortByKey(this: *mut ImGuiStorage);
-}
-
-// ImGuiInputTextCallbackData
-extern "C" {
-    pub fn ImGuiInputTextCallbackData_DeleteChars(
-        this: *mut ImGuiInputTextCallbackData,
-        pos: c_int,
-        bytes_count: c_int,
-    );
-    pub fn ImGuiInputTextCallbackData_InsertChars(
-        this: *mut ImGuiInputTextCallbackData,
-        pos: c_int,
-        text: *const c_char,
-        text_end: *const c_char,
-    );
-    pub fn ImGuiInputTextCallbackData_HasSelection(this: *mut ImGuiInputTextCallbackData) -> bool;
 }
 
 // ImGuiPayload
