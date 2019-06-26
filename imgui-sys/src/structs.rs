@@ -1,32 +1,12 @@
-use std::os::raw::{c_char, c_float, c_int, c_short, c_uchar, c_uint, c_ushort, c_void};
+use std::os::raw::{c_char, c_float, c_int, c_uint, c_void};
 use std::slice;
 
-use crate::enums::{ImGuiCol, ImGuiKey, ImGuiMouseCursor, ImGuiNavInput};
-use crate::flags::{
-    ImDrawCornerFlags, ImDrawListFlags, ImFontAtlasFlags, ImGuiBackendFlags, ImGuiConfigFlags,
-    ImGuiInputTextFlags,
+use crate::enums::{ImGuiCol, ImGuiDir, ImGuiKey, ImGuiMouseCursor, ImGuiNavInput};
+use crate::flags::{ImDrawCornerFlags, ImDrawListFlags};
+use crate::{
+    ImDrawCallback, ImDrawIdx, ImDrawListSharedData, ImDrawListSplitter, ImDrawVert, ImFont,
+    ImGuiID, ImGuiStorage, ImTextureID, ImU32, ImVec2, ImVec4,
 };
-use crate::ImFont;
-use crate::{ImDrawCallback, ImDrawIdx, ImGuiID, ImTextureID, ImU32, ImVec2, ImVec4, ImWchar};
-
-/// Font atlas glyph range builder
-#[repr(C)]
-pub struct GlyphRangesBuilder {
-    pub used_chars: ImVector<c_uchar>,
-}
-
-/// Font atlas custom rectangle
-#[repr(C)]
-pub struct CustomRect {
-    pub id: c_uint,
-    pub width: c_ushort,
-    pub height: c_ushort,
-    pub x: c_ushort,
-    pub y: c_ushort,
-    pub glyph_advance_x: c_float,
-    pub glyph_offset: ImVec2,
-    pub font: *mut ImFont,
-}
 
 /// Temporary storage for outputting drawing commands out of order
 #[repr(C)]
@@ -41,6 +21,8 @@ pub struct ImDrawCmd {
     pub elem_count: c_uint,
     pub clip_rect: ImVec4,
     pub texture_id: ImTextureID,
+    pub vtx_offset: c_uint,
+    pub idx_offset: c_uint,
     pub user_callback: ImDrawCallback,
     pub user_callback_data: *mut c_void,
 }
@@ -55,6 +37,7 @@ pub struct ImDrawData {
     pub total_vtx_count: c_int,
     pub display_pos: ImVec2,
     pub display_size: ImVec2,
+    pub framebuffer_scale: ImVec2,
 }
 
 impl ImDrawData {
@@ -74,51 +57,14 @@ pub struct ImDrawList {
 
     data: *const ImDrawListSharedData,
     owner_name: *const c_char,
+    vtx_current_offset: c_uint,
     vtx_current_idx: c_uint,
     vtx_write_ptr: *mut ImDrawVert,
     idx_write_ptr: *mut ImDrawIdx,
     clip_rect_stack: ImVector<ImVec4>,
     texture_id_stack: ImVector<ImTextureID>,
     path: ImVector<ImVec2>,
-    channels_current: c_int,
-    channels_count: c_int,
-    channels: ImVector<ImDrawChannel>,
-}
-
-/// Data shared among multiple draw lists
-#[repr(C)]
-pub struct ImDrawListSharedData {
-    /// UV of white pixel in the atlas
-    tex_uv_white_pixel: ImVec2,
-    /// Current/default font (optional, for simplified AddText overload)
-    font: *mut ImFont,
-    /// Current/default font size (optional, for simplified AddText overload)
-    font_size: c_float,
-    curve_tessellation_tol: c_float,
-    /// Value for PushClipRectFullscreen()
-    clip_rect_fullscreen: ImVec4,
-    circle_vtx12: [ImVec2; 12],
-}
-
-/// A single vertex
-#[repr(C)]
-#[derive(Copy, Clone, Debug, Default)]
-pub struct ImDrawVert {
-    pub pos: ImVec2,
-    pub uv: ImVec2,
-    pub col: ImU32,
-}
-
-/// Helper to manually clip large list of items
-#[repr(C)]
-#[derive(Copy, Clone, Debug)]
-pub struct ImGuiListClipper {
-    pub start_pos_y: c_float,
-    pub items_height: c_float,
-    pub items_count: c_int,
-    pub step_no: c_int,
-    pub display_start: c_int,
-    pub display_end: c_int,
+    splitter: ImDrawListSplitter,
 }
 
 /// Data payload for Drag and Drop operations
@@ -152,12 +98,6 @@ pub struct ImGuiSizeCallbackData {
     pub desired_size: ImVec2,
 }
 
-/// Key->value storage
-#[repr(C)]
-pub struct ImGuiStorage {
-    pub data: ImVector<Pair>,
-}
-
 /// Runtime data for styling/colors
 #[repr(C)]
 #[derive(Clone)]
@@ -176,6 +116,7 @@ pub struct ImGuiStyle {
     pub window_min_size: ImVec2,
     /// Alignment for title bar text. Defaults to (0.0, 0.5) for left-aligned, vertically centered.
     pub window_title_align: ImVec2,
+    pub window_menu_button_position: ImGuiDir,
     /// Radius of child window corners rounding. Set to 0.0 to have rectangular windows.
     pub child_rounding: c_float,
     /// Thickness of border around child windows. Generally set to 0.0 or 1.0. (Other values are
@@ -216,9 +157,12 @@ pub struct ImGuiStyle {
     pub grab_min_size: c_float,
     /// Radius of grabs corners rounding. Set to 0.0 to have rectangular slider grabs.
     pub grab_rounding: c_float,
+    pub tab_rounding: c_float,
+    pub tab_border_size: c_float,
     /// Alignment of button text when button is larger than text. Defaults to (0.5, 0.5) for
     /// horizontally+vertically centered.
     pub button_text_align: ImVec2,
+    pub selectable_text_align: ImVec2,
     /// Window position are clamped to be visible within the display area by at least this amount.
     /// Only applies to regular windows.
     pub display_window_padding: ImVec2,
@@ -378,17 +322,6 @@ extern "C" {
     pub fn ImGuiPayload_IsDataType(this: *mut ImGuiPayload, type_: *const c_char) -> bool;
     pub fn ImGuiPayload_IsPreview(this: *mut ImGuiPayload) -> bool;
     pub fn ImGuiPayload_IsDelivery(this: *mut ImGuiPayload) -> bool;
-}
-
-// ImGuiListClipper
-extern "C" {
-    pub fn ImGuiListClipper_Step(this: *mut ImGuiListClipper) -> bool;
-    pub fn ImGuiListClipper_Begin(
-        this: *mut ImGuiListClipper,
-        items_count: c_int,
-        items_height: c_float,
-    );
-    pub fn ImGuiListClipper_End(this: *mut ImGuiListClipper);
 }
 
 // ImDrawList
@@ -651,26 +584,4 @@ extern "C" {
     pub fn ImDrawData_Clear(this: *mut ImDrawData);
     pub fn ImDrawData_DeIndexAllBuffers(this: *mut ImDrawData);
     pub fn ImDrawData_ScaleClipRects(this: *mut ImDrawData, sc: ImVec2);
-}
-
-// GlyphRangesBuilder
-extern "C" {
-    pub fn GlyphRangesBuilder_GetBit(this: *mut GlyphRangesBuilder, n: c_int) -> bool;
-    pub fn GlyphRangesBuilder_SetBit(this: *mut GlyphRangesBuilder, n: c_int);
-    pub fn GlyphRangesBuilder_AddChar(this: *mut GlyphRangesBuilder, c: ImWchar);
-    pub fn GlyphRangesBuilder_AddText(
-        this: *mut GlyphRangesBuilder,
-        text: *const c_char,
-        text_end: *const c_char,
-    );
-    pub fn GlyphRangesBuilder_AddRanges(this: *mut GlyphRangesBuilder, ranges: *const ImWchar);
-    pub fn GlyphRangesBuilder_BuildRanges(
-        this: *mut GlyphRangesBuilder,
-        out_ranges: *mut ImVector<ImWchar>,
-    );
-}
-
-// CustomRect
-extern "C" {
-    pub fn CustomRect_IsPacked(this: *mut CustomRect) -> bool;
 }

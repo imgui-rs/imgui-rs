@@ -13,19 +13,20 @@ mod legacy;
 mod structs;
 
 pub use bindings::{
-    igGetIO, ImDrawCallback, ImDrawIdx, ImFont, ImFontAtlas, ImFontAtlas_AddFont,
-    ImFontAtlas_AddFontDefault, ImFontAtlas_Clear, ImFontAtlas_GetGlyphRangesChineseFull,
+    igGetIO, CustomRect, ImDrawCallback, ImDrawIdx, ImDrawListSharedData, ImDrawListSplitter,
+    ImDrawVert, ImFont, ImFontAtlas, ImFontAtlas_AddFont, ImFontAtlas_AddFontDefault,
+    ImFontAtlas_Clear, ImFontAtlas_GetGlyphRangesChineseFull,
     ImFontAtlas_GetGlyphRangesChineseSimplifiedCommon, ImFontAtlas_GetGlyphRangesCyrillic,
     ImFontAtlas_GetGlyphRangesDefault, ImFontAtlas_GetGlyphRangesJapanese,
     ImFontAtlas_GetGlyphRangesKorean, ImFontAtlas_GetGlyphRangesThai,
     ImFontAtlas_GetGlyphRangesVietnamese, ImFontAtlas_GetTexDataAsRGBA32, ImFontConfig,
-    ImGuiContext, ImGuiID, ImGuiIO, ImGuiIO_AddInputCharacter, ImGuiIO_AddInputCharactersUTF8,
-    ImGuiIO_ClearInputCharacters, ImGuiInputTextCallback, ImGuiInputTextCallbackData,
-    ImGuiInputTextCallbackData_DeleteChars, ImGuiInputTextCallbackData_HasSelection,
-    ImGuiInputTextCallbackData_ImGuiInputTextCallbackData, ImGuiInputTextCallbackData_InsertChars,
-    ImGuiInputTextCallbackData_destroy, ImGuiSizeCallback, ImTextureID, ImU32, ImVec2,
-    ImVec2_Simple, ImVec4, ImVec4_Simple, ImVector_ImFontPtr, ImVector_ImWchar, ImVector_char,
-    ImWchar,
+    ImFontGlyphRangesBuilder, ImGuiContext, ImGuiID, ImGuiIO, ImGuiIO_AddInputCharacter,
+    ImGuiIO_AddInputCharactersUTF8, ImGuiIO_ClearInputCharacters, ImGuiInputTextCallback,
+    ImGuiInputTextCallbackData, ImGuiInputTextCallbackData_DeleteChars,
+    ImGuiInputTextCallbackData_HasSelection, ImGuiInputTextCallbackData_ImGuiInputTextCallbackData,
+    ImGuiInputTextCallbackData_InsertChars, ImGuiInputTextCallbackData_destroy, ImGuiListClipper,
+    ImGuiSizeCallback, ImGuiStorage, ImTextureID, ImU32, ImVec2, ImVec2_Simple, ImVec4,
+    ImVec4_Simple, ImVector_ImFontPtr, ImVector_ImWchar, ImVector_char, ImWchar,
 };
 pub use legacy::*;
 
