@@ -2,15 +2,15 @@ use std::marker::PhantomData;
 use std::ptr;
 use sys;
 
-use super::{ImGuiCond, ImGuiWindowFlags, ImStr, Ui};
+use super::{Condition, ImGuiWindowFlags, ImStr, Ui};
 
 #[must_use]
 pub struct Window<'ui, 'p> {
     pos: (f32, f32),
-    pos_cond: ImGuiCond,
+    pos_cond: Condition,
     pos_pivot: (f32, f32),
     size: (f32, f32),
-    size_cond: ImGuiCond,
+    size_cond: Condition,
     name: &'p ImStr,
     opened: Option<&'p mut bool>,
     flags: ImGuiWindowFlags,
@@ -21,10 +21,10 @@ impl<'ui, 'p> Window<'ui, 'p> {
     pub fn new(_: &Ui<'ui>, name: &'p ImStr) -> Window<'ui, 'p> {
         Window {
             pos: (0.0, 0.0),
-            pos_cond: ImGuiCond::empty(),
+            pos_cond: Condition::Never,
             pos_pivot: (0.0, 0.0),
             size: (0.0, 0.0),
-            size_cond: ImGuiCond::empty(),
+            size_cond: Condition::Never,
             name,
             opened: None,
             flags: ImGuiWindowFlags::empty(),
@@ -32,7 +32,7 @@ impl<'ui, 'p> Window<'ui, 'p> {
         }
     }
     #[inline]
-    pub fn position(mut self, pos: (f32, f32), cond: ImGuiCond) -> Self {
+    pub fn position(mut self, pos: (f32, f32), cond: Condition) -> Self {
         self.pos = pos;
         self.pos_cond = cond;
         self
@@ -43,7 +43,7 @@ impl<'ui, 'p> Window<'ui, 'p> {
         self
     }
     #[inline]
-    pub fn size(mut self, size: (f32, f32), cond: ImGuiCond) -> Self {
+    pub fn size(mut self, size: (f32, f32), cond: Condition) -> Self {
         self.size = size;
         self.size_cond = cond;
         self
@@ -144,11 +144,11 @@ impl<'ui, 'p> Window<'ui, 'p> {
     }
     pub fn build<F: FnOnce()>(self, f: F) {
         let render = unsafe {
-            if !self.pos_cond.is_empty() {
-                sys::igSetNextWindowPos(self.pos.into(), self.pos_cond, self.pos_pivot.into());
+            if self.pos_cond != Condition::Never {
+                sys::igSetNextWindowPos(self.pos.into(), self.pos_cond as _, self.pos_pivot.into());
             }
-            if !self.size_cond.is_empty() {
-                sys::igSetNextWindowSize(self.size.into(), self.size_cond);
+            if self.size_cond != Condition::Never {
+                sys::igSetNextWindowSize(self.size.into(), self.size_cond as _);
             }
             sys::igBegin(
                 self.name.as_ptr(),

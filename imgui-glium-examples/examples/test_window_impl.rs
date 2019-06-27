@@ -284,7 +284,7 @@ fn show_test_window(ui: &Ui, state: &mut State, opened: &mut bool) {
         .scroll_bar(!state.no_scrollbar)
         .collapsible(!state.no_collapse)
         .menu_bar(!state.no_menu)
-        .size((550.0, 680.0), ImGuiCond::FirstUseEver);
+        .size((550.0, 680.0), Condition::FirstUseEver);
     if !state.no_close {
         window = window.opened(opened)
     }
@@ -810,7 +810,7 @@ fn show_example_app_fixed_overlay(ui: &Ui, opened: &mut bool) {
     ui.with_color_var(ImGuiCol::WindowBg, (0.0, 0.0, 0.0, 0.3), || {
         ui.window(im_str!("Example: Fixed Overlay"))
             .opened(opened)
-            .position(window_pos, ImGuiCond::Always)
+            .position(window_pos, Condition::Always)
             .title_bar(false)
             .resizable(false)
             .always_auto_resize(true)
@@ -830,7 +830,7 @@ fn show_example_app_fixed_overlay(ui: &Ui, opened: &mut bool) {
 
 fn show_example_app_manipulating_window_title(ui: &Ui) {
     ui.window(im_str!("Same title as another window##1"))
-        .position((100.0, 100.0), ImGuiCond::FirstUseEver)
+        .position((100.0, 100.0), Condition::FirstUseEver)
         .build(|| {
             ui.text(
                 "This is window 1.
@@ -838,7 +838,7 @@ My title is the same as window 2, but my identifier is unique.",
             );
         });
     ui.window(im_str!("Same title as another window##2"))
-        .position((100.0, 200.0), ImGuiCond::FirstUseEver)
+        .position((100.0, 200.0), Condition::FirstUseEver)
         .build(|| {
             ui.text(
                 "This is window 2.
@@ -850,13 +850,13 @@ My title is the same as window 1, but my identifier is unique.",
     let num = ui.imgui().get_frame_count(); // The C++ version uses rand() here
     let title = im_str!("Animated title {} {}###AnimatedTitle", chars[ch_idx], num);
     ui.window(title)
-        .position((100.0, 300.0), ImGuiCond::FirstUseEver)
+        .position((100.0, 300.0), Condition::FirstUseEver)
         .build(|| ui.text("This window has a changing title"));
 }
 
 fn show_example_app_custom_rendering(ui: &Ui, state: &mut CustomRenderingState, opened: &mut bool) {
     ui.window(im_str!("Example: Custom rendering"))
-        .size((350.0, 560.0), ImGuiCond::FirstUseEver)
+        .size((350.0, 560.0), Condition::FirstUseEver)
         .opened(opened)
         .build(|| {
             ui.text("Primitives");

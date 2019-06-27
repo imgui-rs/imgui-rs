@@ -97,23 +97,6 @@ bitflags!(
 );
 
 bitflags!(
-    /// Condition flags
-    #[repr(C)]
-    pub struct ImGuiCond: c_int {
-        /// Set the variable
-        const Always = 1;
-        /// Set the variable once per runtime session (only the first call with succeed)
-        const Once = 1 << 1;
-        /// Set the variable if the object/window has no persistently saved data (no entry in .ini
-        /// file)
-        const FirstUseEver = 1 << 2;
-        /// Set the variable if the object/window is appearing after being hidden/inactive (or the
-        /// first time)
-        const Appearing = 1 << 3;
-    }
-);
-
-bitflags!(
     /// Configuration flags
     #[repr(C)]
     pub struct ImGuiConfigFlags: c_int {

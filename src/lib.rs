@@ -36,9 +36,9 @@ pub use self::sliders::{
 pub use self::string::{ImStr, ImString};
 pub use self::style::StyleVar;
 pub use self::sys::{
-    ImDrawIdx, ImDrawVert, ImGuiCol, ImGuiColorEditFlags, ImGuiCond, ImGuiFocusedFlags,
-    ImGuiHoveredFlags, ImGuiInputTextFlags, ImGuiKey, ImGuiMouseCursor, ImGuiSelectableFlags,
-    ImGuiStyle, ImGuiTreeNodeFlags, ImGuiWindowFlags, ImVec2, ImVec4,
+    ImDrawIdx, ImDrawVert, ImGuiCol, ImGuiColorEditFlags, ImGuiFocusedFlags, ImGuiHoveredFlags,
+    ImGuiInputTextFlags, ImGuiKey, ImGuiMouseCursor, ImGuiSelectableFlags, ImGuiStyle,
+    ImGuiTreeNodeFlags, ImGuiWindowFlags, ImVec2, ImVec4,
 };
 pub use self::trees::{CollapsingHeader, TreeNode};
 pub use self::window::Window;
@@ -1729,4 +1729,22 @@ impl<'ui> Ui<'ui> {
     pub fn get_window_draw_list(&'ui self) -> WindowDrawList<'ui> {
         WindowDrawList::new(self)
     }
+}
+
+/// Condition for applying a setting
+#[repr(i8)]
+#[derive(Copy, Clone, Debug, Eq, PartialEq)]
+pub enum Condition {
+    /// Never apply the setting
+    Never = -1,
+    /// Always apply the setting
+    Always = sys::ImGuiCond_Always as i8,
+    /// Apply the setting once per runtime session (only the first call will succeed)
+    Once = sys::ImGuiCond_Once as i8,
+    /// Apply the setting if the object/window has no persistently saved data (no entry in .ini
+    /// file)
+    FirstUseEver = sys::ImGuiCond_FirstUseEver as i8,
+    /// Apply the setting if the object/window is appearing after being hidden/inactive (or the
+    /// first time)
+    Appearing = sys::ImGuiCond_Appearing as i8,
 }

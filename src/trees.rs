@@ -1,14 +1,14 @@
 use std::marker::PhantomData;
 use sys;
 
-use super::{ImGuiCond, ImGuiTreeNodeFlags, ImStr, Ui};
+use super::{Condition, ImGuiTreeNodeFlags, ImStr, Ui};
 
 #[must_use]
 pub struct TreeNode<'ui, 'p> {
     id: &'p ImStr,
     label: Option<&'p ImStr>,
     opened: bool,
-    opened_cond: ImGuiCond,
+    opened_cond: Condition,
     flags: ImGuiTreeNodeFlags,
     _phantom: PhantomData<&'ui Ui<'ui>>,
 }
@@ -19,7 +19,7 @@ impl<'ui, 'p> TreeNode<'ui, 'p> {
             id,
             label: None,
             opened: false,
-            opened_cond: ImGuiCond::empty(),
+            opened_cond: Condition::Never,
             flags: ImGuiTreeNodeFlags::empty(),
             _phantom: PhantomData,
         }
@@ -30,7 +30,7 @@ impl<'ui, 'p> TreeNode<'ui, 'p> {
         self
     }
     #[inline]
-    pub fn opened(mut self, opened: bool, cond: ImGuiCond) -> Self {
+    pub fn opened(mut self, opened: bool, cond: Condition) -> Self {
         self.opened = opened;
         self.opened_cond = cond;
         self
@@ -97,8 +97,8 @@ impl<'ui, 'p> TreeNode<'ui, 'p> {
     }
     pub fn build<F: FnOnce()>(self, f: F) {
         let render = unsafe {
-            if !self.opened_cond.is_empty() {
-                sys::igSetNextItemOpen(self.opened, self.opened_cond);
+            if self.opened_cond != Condition::Never {
+                sys::igSetNextItemOpen(self.opened, self.opened_cond as _);
             }
             sys::igTreeNodeExStrStr(
                 self.id.as_ptr(),

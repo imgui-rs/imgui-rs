@@ -12,7 +12,7 @@ fn main() {
 
 fn hello_world<'a>(ui: &Ui<'a>) -> bool {
     ui.window(im_str!("Hello world"))
-        .size((300.0, 100.0), ImGuiCond::FirstUseEver)
+        .size((300.0, 100.0), Condition::FirstUseEver)
         .build(|| {
             ui.text(im_str!("Hello world!"));
             ui.text(im_str!("こんにちは世界！"));

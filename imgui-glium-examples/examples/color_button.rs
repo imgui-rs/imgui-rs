@@ -39,8 +39,8 @@ fn main() {
 
 fn example_selector(state: &mut State, ui: &Ui) {
     ui.window(im_str!("Color button examples"))
-        .position((20.0, 20.0), ImGuiCond::Appearing)
-        .size((700.0, 80.0), ImGuiCond::Appearing)
+        .position((20.0, 20.0), Condition::Appearing)
+        .size((700.0, 80.0), Condition::Appearing)
         .resizable(false)
         .build(|| {
             let ex1 = ui.radio_button(im_str!("Example 1: Basics"), &mut state.example, 1);
@@ -53,8 +53,8 @@ fn example_selector(state: &mut State, ui: &Ui) {
 
 fn example_1(state: &mut State, ui: &Ui) {
     ui.window(im_str!("Example 1: Basics"))
-        .size((700.0, 300.0), ImGuiCond::Appearing)
-        .position((20.0, 120.0), ImGuiCond::Appearing)
+        .size((700.0, 300.0), Condition::Appearing)
+        .position((20.0, 120.0), Condition::Appearing)
         .build(|| {
             ui.text_wrapped(im_str!(
                 "Color button is a widget that displays a color value as a clickable rectangle. \
@@ -101,8 +101,8 @@ fn example_1(state: &mut State, ui: &Ui) {
 
 fn example_2(ui: &Ui) {
     ui.window(im_str!("Example 2: Alpha component"))
-        .size((700.0, 320.0), ImGuiCond::Appearing)
-        .position((20.0, 140.0), ImGuiCond::Appearing)
+        .size((700.0, 320.0), Condition::Appearing)
+        .position((20.0, 140.0), Condition::Appearing)
         .build(|| {
             ui.text_wrapped(im_str!(
                 "The displayed color is passed to the button as four float values between \

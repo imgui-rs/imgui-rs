@@ -16,7 +16,7 @@ fn hello_world<'a>(ui: &Ui<'a>) -> bool {
     let window_title = im_str!("Hello world (DirectX)");
 
     ui.window(window_title)
-        .size((300.0, 100.0), ImGuiCond::FirstUseEver)
+        .size((300.0, 100.0), Condition::FirstUseEver)
         .build(|| {
             ui.text(im_str!("Hello world!"));
             ui.text(im_str!("こんにちは世界！"));
