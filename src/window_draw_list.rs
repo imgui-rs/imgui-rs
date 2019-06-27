@@ -1,7 +1,8 @@
 use sys;
-use sys::{ImDrawCornerFlags, ImDrawList, ImU32};
+use sys::{ImDrawList, ImU32};
 
 use super::{ImVec2, ImVec4, Ui};
+use crate::legacy::ImDrawCornerFlags;
 
 use std::marker::PhantomData;
 

@@ -1,9 +1,9 @@
 use std::marker::PhantomData;
 use std::ptr;
 
-use super::{ImGuiWindowFlags, ImStr, Ui};
-
-use sys;
+use crate::legacy::ImGuiWindowFlags;
+use crate::sys;
+use crate::{ImStr, Ui};
 
 /// Created by call to [`Ui::popup_modal`].
 #[must_use]
@@ -109,7 +109,7 @@ impl<'ui, 'p> PopupModal<'ui, 'p> {
                 self.opened
                     .map(|x| x as *mut bool)
                     .unwrap_or(ptr::null_mut()),
-                self.flags,
+                self.flags.bits(),
             )
         };
         if render {

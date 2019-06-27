@@ -1,9 +1,10 @@
 #![warn(missing_docs)]
 use std::marker::PhantomData;
 use std::ptr;
-use sys;
 
-use crate::{ImGuiColorEditFlags, ImStr, ImVec2, ImVec4, Ui};
+use crate::legacy::ImGuiColorEditFlags;
+use crate::sys;
+use crate::{ImStr, ImVec2, ImVec4, Ui};
 
 /// Mutable reference to an editable color value.
 #[derive(Debug)]
@@ -196,10 +197,10 @@ impl<'ui, 'p> ColorEdit<'ui, 'p> {
     pub fn build(self) -> bool {
         match self.value {
             EditableColor::Float3(value) => unsafe {
-                sys::igColorEdit3(self.label.as_ptr(), value.as_mut_ptr(), self.flags)
+                sys::igColorEdit3(self.label.as_ptr(), value.as_mut_ptr(), self.flags.bits())
             },
             EditableColor::Float4(value) => unsafe {
-                sys::igColorEdit4(self.label.as_ptr(), value.as_mut_ptr(), self.flags)
+                sys::igColorEdit4(self.label.as_ptr(), value.as_mut_ptr(), self.flags.bits())
             },
         }
     }
@@ -344,7 +345,7 @@ impl<'ui, 'p> ColorPicker<'ui, 'p> {
             sys::igColorPicker4(
                 self.label.as_ptr(),
                 self.value.as_mut_ptr(),
-                self.flags,
+                self.flags.bits(),
                 ref_color,
             )
         }
@@ -413,6 +414,13 @@ impl<'ui, 'p> ColorButton<'ui, 'p> {
     }
     /// Builds the color button.
     pub fn build(self) -> bool {
-        unsafe { sys::igColorButton(self.desc_id.as_ptr(), self.color, self.flags, self.size) }
+        unsafe {
+            sys::igColorButton(
+                self.desc_id.as_ptr(),
+                self.color,
+                self.flags.bits(),
+                self.size,
+            )
+        }
     }
 }

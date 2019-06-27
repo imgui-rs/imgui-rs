@@ -2,7 +2,8 @@ use std::marker::PhantomData;
 use std::ptr;
 use sys;
 
-use super::{Condition, ImGuiWindowFlags, ImStr, Ui};
+use crate::legacy::ImGuiWindowFlags;
+use crate::{Condition, ImStr, Ui};
 
 #[must_use]
 pub struct Window<'ui, 'p> {
@@ -155,7 +156,7 @@ impl<'ui, 'p> Window<'ui, 'p> {
                 self.opened
                     .map(|x| x as *mut bool)
                     .unwrap_or(ptr::null_mut()),
-                self.flags,
+                self.flags.bits(),
             )
         };
         if render {

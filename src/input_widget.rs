@@ -1,9 +1,10 @@
 use std::marker::PhantomData;
 use std::os::raw::{c_int, c_void};
 use std::ptr;
-use sys;
 
-use super::{ImGuiInputTextFlags, ImStr, ImString, Ui};
+use crate::legacy::ImGuiInputTextFlags;
+use crate::sys;
+use crate::{ImStr, ImString, Ui};
 
 macro_rules! impl_text_flags {
     ($InputType:ident) => {
@@ -192,7 +193,7 @@ impl<'ui, 'p> InputText<'ui, 'p> {
                 self.label.as_ptr(),
                 ptr,
                 capacity,
-                self.flags,
+                self.flags.bits(),
                 callback,
                 data,
             );
@@ -243,7 +244,7 @@ impl<'ui, 'p> InputTextMultiline<'ui, 'p> {
                 ptr,
                 capacity,
                 self.size,
-                self.flags,
+                self.flags.bits(),
                 callback,
                 data,
             );
@@ -282,7 +283,7 @@ impl<'ui, 'p> InputInt<'ui, 'p> {
                 self.value as *mut i32,
                 self.step,
                 self.step_fast,
-                self.flags,
+                self.flags.bits(),
             )
         }
     }
@@ -321,7 +322,7 @@ impl<'ui, 'p> InputFloat<'ui, 'p> {
                 self.step,
                 self.step_fast,
                 b"%.3f\0".as_ptr() as *const _,
-                self.flags,
+                self.flags.bits(),
             )
         }
     }
@@ -356,7 +357,7 @@ macro_rules! impl_input_floatn {
                         self.label.as_ptr(),
                         self.value.as_mut_ptr(),
                         b"%.3f\0".as_ptr() as *const _,
-                        self.flags,
+                        self.flags.bits(),
                     )
                 }
             }
@@ -392,7 +393,11 @@ macro_rules! impl_input_intn {
 
             pub fn build(self) -> bool {
                 unsafe {
-                    sys::$igInputIntN(self.label.as_ptr(), self.value.as_mut_ptr(), self.flags)
+                    sys::$igInputIntN(
+                        self.label.as_ptr(),
+                        self.value.as_mut_ptr(),
+                        self.flags.bits(),
+                    )
                 }
             }
 

@@ -1,7 +1,8 @@
 use std::marker::PhantomData;
 use sys;
 
-use super::{Condition, ImGuiTreeNodeFlags, ImStr, Ui};
+use super::{Condition, ImStr, Ui};
+use crate::legacy::ImGuiTreeNodeFlags;
 
 #[must_use]
 pub struct TreeNode<'ui, 'p> {
@@ -102,7 +103,7 @@ impl<'ui, 'p> TreeNode<'ui, 'p> {
             }
             sys::igTreeNodeExStrStr(
                 self.id.as_ptr(),
-                self.flags,
+                self.flags.bits(),
                 super::fmt_ptr(),
                 self.label.unwrap_or(self.id).as_ptr(),
             )
@@ -167,6 +168,6 @@ impl<'ui, 'p> CollapsingHeader<'ui, 'p> {
         self
     }
     pub fn build(self) -> bool {
-        unsafe { sys::igCollapsingHeader(self.label.as_ptr(), self.flags) }
+        unsafe { sys::igCollapsingHeader(self.label.as_ptr(), self.flags.bits()) }
     }
 }

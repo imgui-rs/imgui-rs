@@ -1,7 +1,8 @@
 use std::marker::PhantomData;
-use sys;
 
-use super::{ImGuiWindowFlags, ImStr, ImVec2, Ui};
+use crate::legacy::ImGuiWindowFlags;
+use crate::sys;
+use crate::{ImStr, ImVec2, Ui};
 
 #[must_use]
 pub struct ChildFrame<'ui, 'p> {
@@ -97,8 +98,14 @@ impl<'ui, 'p> ChildFrame<'ui, 'p> {
         self
     }
     pub fn build<F: FnOnce()>(self, f: F) {
-        let render_child_frame =
-            unsafe { sys::igBeginChild(self.name.as_ptr(), self.size, self.border, self.flags) };
+        let render_child_frame = unsafe {
+            sys::igBeginChild(
+                self.name.as_ptr(),
+                self.size,
+                self.border,
+                self.flags.bits(),
+            )
+        };
         if render_child_frame {
             f();
         }

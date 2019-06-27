@@ -1,3 +1,4 @@
+#![allow(non_upper_case_globals)]
 use bitflags::bitflags;
 use std::os::raw::c_int;
 

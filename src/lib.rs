@@ -29,6 +29,7 @@ pub use self::input_widget::{
     InputText, InputTextMultiline,
 };
 pub use self::io::*;
+pub use self::legacy::*;
 pub use self::menus::{Menu, MenuItem};
 pub use self::plothistogram::PlotHistogram;
 pub use self::plotlines::PlotLines;
@@ -41,8 +42,7 @@ pub use self::sliders::{
 pub use self::string::{ImStr, ImString};
 pub use self::style::*;
 pub use self::sys::{
-    ImDrawIdx, ImDrawVert, ImGuiColorEditFlags, ImGuiFocusedFlags, ImGuiHoveredFlags,
-    ImGuiInputTextFlags, ImGuiSelectableFlags, ImGuiTreeNodeFlags, ImGuiWindowFlags, ImVec2,
+    ImDrawIdx, ImDrawVert, ImVec2,
     ImVec4,
 };
 pub use self::trees::{CollapsingHeader, TreeNode};
@@ -60,6 +60,7 @@ mod input;
 mod input_widget;
 mod internal;
 mod io;
+mod legacy;
 mod menus;
 mod plothistogram;
 mod plotlines;
@@ -980,7 +981,7 @@ impl<'ui> Ui<'ui> {
     /// use .options(false) in your widget builders.
     pub fn set_color_edit_options(&self, flags: ImGuiColorEditFlags) {
         unsafe {
-            sys::igSetColorEditOptions(flags);
+            sys::igSetColorEditOptions(flags.bits());
         }
     }
 }
@@ -1004,7 +1005,7 @@ impl<'ui> Ui<'ui> {
         flags: ImGuiSelectableFlags,
         size: S,
     ) -> bool {
-        unsafe { sys::igSelectable(label.as_ptr(), selected, flags, size.into()) }
+        unsafe { sys::igSelectable(label.as_ptr(), selected, flags.bits(), size.into()) }
     }
 }
 
@@ -1095,7 +1096,8 @@ impl<'ui> Ui<'ui> {
     where
         F: FnOnce(),
     {
-        let render = unsafe { sys::igBeginPopup(str_id.as_ptr(), ImGuiWindowFlags::empty()) };
+        let render =
+            unsafe { sys::igBeginPopup(str_id.as_ptr(), ImGuiWindowFlags::empty().bits()) };
         if render {
             f();
             unsafe { sys::igEndPopup() };
@@ -1267,14 +1269,16 @@ impl<'ui> Ui<'ui> {
         hide_text_after_double_hash: bool,
         wrap_width: f32,
     ) -> ImVec2 {
-        unsafe {
+        let result: [f32; 2] = unsafe {
             sys::igCalcTextSize_nonUDT2(
                 text.as_ptr(),
                 std::ptr::null(),
                 hide_text_after_double_hash,
                 wrap_width,
             )
-        }
+            .into()
+        };
+        result.into()
     }
 }
 
@@ -1546,35 +1550,35 @@ impl<'ui> Ui<'ui> {
     /// # }
     /// ```
     pub fn is_item_hovered(&self) -> bool {
-        unsafe { sys::igIsItemHovered(ImGuiHoveredFlags::empty()) }
+        unsafe { sys::igIsItemHovered(ImGuiHoveredFlags::empty().bits()) }
     }
 
     pub fn is_item_hovered_with_flags(&self, flags: ImGuiHoveredFlags) -> bool {
-        unsafe { sys::igIsItemHovered(flags) }
+        unsafe { sys::igIsItemHovered(flags.bits()) }
     }
 
     /// Return `true` if the current window is being hovered by the mouse.
     pub fn is_window_hovered(&self) -> bool {
-        unsafe { sys::igIsWindowHovered(ImGuiHoveredFlags::empty()) }
+        unsafe { sys::igIsWindowHovered(ImGuiHoveredFlags::empty().bits()) }
     }
 
     pub fn is_window_hovered_with_flags(&self, flags: ImGuiHoveredFlags) -> bool {
-        unsafe { sys::igIsWindowHovered(flags) }
+        unsafe { sys::igIsWindowHovered(flags.bits()) }
     }
 
     /// Return `true` if the current window is currently focused.
     pub fn is_window_focused(&self) -> bool {
-        unsafe { sys::igIsWindowFocused(ImGuiFocusedFlags::RootAndChildWindows) }
+        unsafe { sys::igIsWindowFocused(ImGuiFocusedFlags::RootAndChildWindows.bits()) }
     }
 
     /// Return `true` if the current root window is currently focused.
     pub fn is_root_window_focused(&self) -> bool {
-        unsafe { sys::igIsWindowFocused(ImGuiFocusedFlags::RootWindow) }
+        unsafe { sys::igIsWindowFocused(ImGuiFocusedFlags::RootWindow.bits()) }
     }
 
     /// Return `true` if the current child window is currently focused.
     pub fn is_child_window_focused(&self) -> bool {
-        unsafe { sys::igIsWindowFocused(ImGuiFocusedFlags::ChildWindows) }
+        unsafe { sys::igIsWindowFocused(ImGuiFocusedFlags::ChildWindows.bits()) }
     }
 
     /// Returns `true` if the last item is being active.
