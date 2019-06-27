@@ -1,9 +1,7 @@
 use parking_lot::ReentrantMutex;
-use std::cell::RefCell;
 use std::ffi::CStr;
 use std::ops::Drop;
 use std::ptr;
-use std::rc::Rc;
 
 use crate::io::Io;
 use crate::string::{ImStr, ImString};

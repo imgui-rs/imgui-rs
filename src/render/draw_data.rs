@@ -1,4 +1,3 @@
-use std::mem;
 use std::slice;
 
 use crate::internal::{RawCast, RawWrapper};
