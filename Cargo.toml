@@ -16,7 +16,7 @@ travis-ci = { repository = "Gekkio/imgui-rs" }
 [dependencies]
 imgui-sys = { version = "0.0.24-pre", path = "imgui-sys" }
 lazy_static = "1.1"
-parking_lot = "0.7"
+parking_lot = "0.8"
 
 [dev-dependencies]
 memoffset = "0.3"
