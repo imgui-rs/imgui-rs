@@ -134,14 +134,14 @@ impl Renderer {
 
         let mut idx_start = 0;
         for cmd in draw_list.cmd_buffer {
-            let texture_id = cmd.texture_id.into();
+            let texture_id = cmd.TextureId.into();
             let texture = self
                 .device_objects
                 .textures
                 .get(texture_id)
                 .ok_or_else(|| RendererError::BadTexture(texture_id))?;
 
-            let idx_end = idx_start + cmd.elem_count as usize;
+            let idx_end = idx_start + cmd.ElemCount as usize;
 
             surface.draw(
                 &vtx_buffer,
@@ -156,13 +156,13 @@ impl Renderer {
                 &DrawParameters {
                     blend: Blend::alpha_blending(),
                     scissor: Some(Rect {
-                        left: cmd.clip_rect.x.max(0.0).min(fb_width).round() as u32,
-                        bottom: (fb_height - cmd.clip_rect.w).max(0.0).min(fb_width).round() as u32,
-                        width: (cmd.clip_rect.z - cmd.clip_rect.x)
+                        left: cmd.ClipRect.x.max(0.0).min(fb_width).round() as u32,
+                        bottom: (fb_height - cmd.ClipRect.w).max(0.0).min(fb_width).round() as u32,
+                        width: (cmd.ClipRect.z - cmd.ClipRect.x)
                             .abs()
                             .min(fb_width)
                             .round() as u32,
-                        height: (cmd.clip_rect.w - cmd.clip_rect.y)
+                        height: (cmd.ClipRect.w - cmd.ClipRect.y)
                             .abs()
                             .min(fb_height)
                             .round() as u32,

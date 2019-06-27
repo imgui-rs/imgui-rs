@@ -423,7 +423,7 @@ impl<'ui> Rect<'ui> {
                     self.p2,
                     self.color.into(),
                     self.rounding,
-                    self.flags,
+                    self.flags.bits(),
                 );
             }
         } else {
@@ -434,7 +434,7 @@ impl<'ui> Rect<'ui> {
                     self.p2,
                     self.color.into(),
                     self.rounding,
-                    self.flags,
+                    self.flags.bits(),
                     self.thickness,
                 );
             }

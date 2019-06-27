@@ -304,21 +304,21 @@ impl<R: Resources> Renderer<R> {
 
         self.bundle.slice.start = 0;
         for cmd in draw_list.cmd_buffer {
-            let texture_id = cmd.texture_id.into();
+            let texture_id = cmd.TextureId.into();
             let tex = self
                 .textures
                 .get(texture_id)
                 .ok_or_else(|| RendererError::BadTexture(texture_id))?;
 
-            self.bundle.slice.end = self.bundle.slice.start + cmd.elem_count;
+            self.bundle.slice.end = self.bundle.slice.start + cmd.ElemCount;
             let scissor = Rect {
-                x: cmd.clip_rect.x.max(0.0).min(fb_width).round() as u16,
-                y: cmd.clip_rect.y.max(0.0).min(fb_height).round() as u16,
-                w: (cmd.clip_rect.z - cmd.clip_rect.x)
+                x: cmd.ClipRect.x.max(0.0).min(fb_width).round() as u16,
+                y: cmd.ClipRect.y.max(0.0).min(fb_height).round() as u16,
+                w: (cmd.ClipRect.z - cmd.ClipRect.x)
                     .abs()
                     .min(fb_width)
                     .round() as u16,
-                h: (cmd.clip_rect.w - cmd.clip_rect.y)
+                h: (cmd.ClipRect.w - cmd.ClipRect.y)
                     .abs()
                     .min(fb_height)
                     .round() as u16,

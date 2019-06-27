@@ -444,16 +444,16 @@ pub struct DrawData<'a> {
 
 impl<'a> DrawData<'a> {
     pub fn is_valid(&self) -> bool {
-        self.raw.valid
+        self.raw.Valid
     }
     pub fn draw_list_count(&self) -> usize {
-        self.raw.cmd_lists_count as usize
+        self.raw.CmdListsCount as usize
     }
     pub fn total_vtx_count(&self) -> usize {
-        self.raw.total_vtx_count as usize
+        self.raw.TotalVtxCount as usize
     }
     pub fn total_idx_count(&self) -> usize {
-        self.raw.total_idx_count as usize
+        self.raw.TotalIdxCount as usize
     }
     pub fn deindex_all_buffers(&mut self) {
         unsafe {
@@ -473,8 +473,12 @@ impl<'a> IntoIterator for &'a DrawData<'a> {
 
     fn into_iter(self) -> Self::IntoIter {
         unsafe {
+            let cmd_lists = slice::from_raw_parts(
+                self.raw.CmdLists as *const *const sys::ImDrawList,
+                self.raw.CmdListsCount as usize,
+            );
             DrawListIterator {
-                iter: self.raw.cmd_lists().iter(),
+                iter: cmd_lists.iter(),
             }
         }
     }
@@ -489,10 +493,16 @@ impl<'a> Iterator for DrawListIterator<'a> {
 
     fn next(&mut self) -> Option<Self::Item> {
         self.iter.next().map(|&ptr| unsafe {
+            let cmd_buffer =
+                slice::from_raw_parts((*ptr).CmdBuffer.Data, (*ptr).CmdBuffer.Size as usize);
+            let idx_buffer =
+                slice::from_raw_parts((*ptr).IdxBuffer.Data, (*ptr).IdxBuffer.Size as usize);
+            let vtx_buffer =
+                slice::from_raw_parts((*ptr).VtxBuffer.Data, (*ptr).VtxBuffer.Size as usize);
             DrawList {
-                cmd_buffer: (*ptr).cmd_buffer.as_slice(),
-                idx_buffer: (*ptr).idx_buffer.as_slice(),
-                vtx_buffer: (*ptr).vtx_buffer.as_slice(),
+                cmd_buffer,
+                idx_buffer,
+                vtx_buffer,
             }
         })
     }
