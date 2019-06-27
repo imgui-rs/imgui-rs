@@ -10,6 +10,6 @@ lazy_static! {
 pub fn test_ctx() -> (ReentrantMutexGuard<'static, ()>, Context) {
     let guard = TEST_MUTEX.lock();
     let mut ctx = Context::create();
-    ctx.io_mut().IniFilename = ptr::null();
+    ctx.io_mut().ini_filename = ptr::null();
     (guard, ctx)
 }

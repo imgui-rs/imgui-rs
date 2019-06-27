@@ -5,6 +5,7 @@ use std::ops::Drop;
 use std::ptr;
 use std::rc::Rc;
 
+use crate::io::Io;
 use crate::string::{ImStr, ImString};
 use crate::style::Style;
 use crate::sys;
@@ -90,15 +91,15 @@ impl Context {
     }
     pub fn ini_filename(&self) -> Option<&ImStr> {
         let io = self.io();
-        if io.IniFilename.is_null() {
+        if io.ini_filename.is_null() {
             None
         } else {
-            unsafe { Some(ImStr::from_ptr_unchecked(io.IniFilename)) }
+            unsafe { Some(ImStr::from_ptr_unchecked(io.ini_filename)) }
         }
     }
     pub fn set_ini_filename<T: Into<Option<ImString>>>(&mut self, ini_filename: T) {
         let ini_filename = ini_filename.into();
-        self.io_mut().IniFilename = ini_filename
+        self.io_mut().ini_filename = ini_filename
             .as_ref()
             .map(|x| x.as_ptr())
             .unwrap_or(ptr::null());
@@ -106,15 +107,15 @@ impl Context {
     }
     pub fn log_filename(&self) -> Option<&ImStr> {
         let io = self.io();
-        if io.LogFilename.is_null() {
+        if io.log_filename.is_null() {
             None
         } else {
-            unsafe { Some(ImStr::from_ptr_unchecked(io.LogFilename)) }
+            unsafe { Some(ImStr::from_ptr_unchecked(io.log_filename)) }
         }
     }
     pub fn set_log_filename<T: Into<Option<ImString>>>(&mut self, log_filename: T) {
         let log_filename = log_filename.into();
-        self.io_mut().LogFilename = log_filename
+        self.io_mut().log_filename = log_filename
             .as_ref()
             .map(|x| x.as_ptr())
             .unwrap_or(ptr::null());
@@ -122,15 +123,15 @@ impl Context {
     }
     pub fn platform_name(&self) -> Option<&ImStr> {
         let io = self.io();
-        if io.BackendPlatformName.is_null() {
+        if io.backend_platform_name.is_null() {
             None
         } else {
-            unsafe { Some(ImStr::from_ptr_unchecked(io.BackendPlatformName)) }
+            unsafe { Some(ImStr::from_ptr_unchecked(io.backend_platform_name)) }
         }
     }
     pub fn set_platform_name<T: Into<Option<ImString>>>(&mut self, platform_name: T) {
         let platform_name = platform_name.into();
-        self.io_mut().BackendPlatformName = platform_name
+        self.io_mut().backend_platform_name = platform_name
             .as_ref()
             .map(|x| x.as_ptr())
             .unwrap_or(ptr::null());
@@ -138,15 +139,15 @@ impl Context {
     }
     pub fn renderer_name(&self) -> Option<&ImStr> {
         let io = self.io();
-        if io.BackendRendererName.is_null() {
+        if io.backend_renderer_name.is_null() {
             None
         } else {
-            unsafe { Some(ImStr::from_ptr_unchecked(io.BackendRendererName)) }
+            unsafe { Some(ImStr::from_ptr_unchecked(io.backend_renderer_name)) }
         }
     }
     pub fn set_renderer_name<T: Into<Option<ImString>>>(&mut self, renderer_name: T) {
         let renderer_name = renderer_name.into();
-        self.io_mut().BackendRendererName = renderer_name
+        self.io_mut().backend_renderer_name = renderer_name
             .as_ref()
             .map(|x| x.as_ptr())
             .unwrap_or(ptr::null());
@@ -335,4 +336,35 @@ Collapsed=0";
     let mut buf = String::new();
     ctx.save_ini_settings(&mut buf);
     assert_eq!(data.trim(), buf.trim());
+}
+
+impl Context {
+    /// Returns an immutable reference to the inputs/outputs object
+    pub fn io(&self) -> &Io {
+        unsafe {
+            // safe because Io is a transparent wrapper around sys::ImGuiIO
+            &*(sys::igGetIO() as *const Io)
+        }
+    }
+    /// Returns a mutable reference to the inputs/outputs object
+    pub fn io_mut(&mut self) -> &mut Io {
+        unsafe {
+            // safe because Io is a transparent wrapper around sys::ImGuiIO
+            &mut *(sys::igGetIO() as *mut Io)
+        }
+    }
+    /// Returns an immutable reference to the user interface style
+    pub fn style(&self) -> &Style {
+        unsafe {
+            // safe because Style is a transparent wrapper around sys::ImGuiStyle
+            &*(sys::igGetStyle() as *const Style)
+        }
+    }
+    /// Returns a mutable reference to the user interface style
+    pub fn style_mut(&mut self) -> &mut Style {
+        unsafe {
+            // safe because Style is a transparent wrapper around sys::ImGuiStyle
+            &mut *(sys::igGetStyle() as *mut Style)
+        }
+    }
 }

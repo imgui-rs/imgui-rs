@@ -2,19 +2,6 @@ use bitflags::bitflags;
 use std::os::raw::c_int;
 
 bitflags!(
-    /// Back-end capability flags
-    #[repr(C)]
-    pub struct ImGuiBackendFlags: c_int {
-        /// Back-end supports gamepad and currently has one connected.
-        const HasGamepad = 1;
-        /// Back-end supports honoring GetMouseCursor() value to change the OS cursor shape.
-        const HasMouseCursors = 1 << 1;
-        /// Back-end supports want_set_mouse_pos requests to reposition the OS mouse position.
-        const HasSetMousePos = 1 << 2;
-    }
-);
-
-bitflags!(
     /// Color edit flags
     #[repr(C)]
     pub struct ImGuiColorEditFlags: c_int {
@@ -93,31 +80,6 @@ bitflags!(
             | ImGuiComboFlags::HeightRegular.bits
             | ImGuiComboFlags::HeightLarge.bits
             | ImGuiComboFlags::HeightLargest.bits;
-    }
-);
-
-bitflags!(
-    /// Configuration flags
-    #[repr(C)]
-    pub struct ImGuiConfigFlags: c_int {
-        /// Master keyboard navigation enable flag.
-        const NavEnableKeyboard = 1;
-        /// Master gamepad navigation enable flag.
-        const NavEnableGamepad = 1 << 1;
-        /// Instruct navigation to move the mouse cursor. May be useful on TV/console systems where
-        /// moving a virtual mouse is awkward.
-        const NavEnableSetMousePos = 1 << 2;
-        /// Instruct navigation to not set the want_capture_keyboard flag when nav_active is set.
-        const NavNoCaptureKeyboard = 1 << 3;
-        /// Instruct imgui to clear mouse position/buttons on a new frame. This allows ignoring the
-        /// mouse information set by the back-end.
-        const NoMouse = 1 << 4;
-        /// Instruct back-end to not alter mouse cursor shape and visibility.
-        const NoMouseCursorChange = 1 << 5;
-        /// Application is SRGB-aware.
-        const IsSRGB = 1 << 20;
-        /// Application is using a touch screen instead of a mouse.
-        const IsTouchScreen = 1 << 21;
     }
 );
 

@@ -26,6 +26,7 @@ pub use self::input::{
     InputFloat, InputFloat2, InputFloat3, InputFloat4, InputInt, InputInt2, InputInt3, InputInt4,
     InputText, InputTextMultiline,
 };
+pub use self::io::*;
 pub use self::menus::{Menu, MenuItem};
 pub use self::plothistogram::PlotHistogram;
 pub use self::plotlines::PlotLines;
@@ -55,6 +56,7 @@ mod fonts;
 mod image;
 mod input;
 mod internal;
+mod io;
 mod menus;
 mod plothistogram;
 mod plotlines;
@@ -108,20 +110,8 @@ impl FrameSize {
 }
 
 impl Context {
-    fn io(&self) -> &sys::ImGuiIO {
-        unsafe { &*sys::igGetIO() }
-    }
-    fn io_mut(&mut self) -> &mut sys::ImGuiIO {
-        unsafe { &mut *sys::igGetIO() }
-    }
-    pub fn style(&self) -> &Style {
-        unsafe { Style::from_raw(&*sys::igGetStyle()) }
-    }
-    pub fn style_mut(&mut self) -> &mut Style {
-        unsafe { Style::from_raw_mut(&mut *sys::igGetStyle()) }
-    }
     pub fn fonts(&mut self) -> ImFontAtlas {
-        unsafe { ImFontAtlas::from_ptr(self.io_mut().Fonts) }
+        unsafe { ImFontAtlas::from_ptr(self.io_mut().fonts) }
     }
     pub fn prepare_texture<'a, F, T>(&mut self, f: F) -> T
     where
@@ -134,7 +124,7 @@ impl Context {
         let mut bytes_per_pixel: c_int = 0;
         unsafe {
             sys::ImFontAtlas_GetTexDataAsRGBA32(
-                io.Fonts,
+                io.fonts,
                 &mut pixels,
                 &mut width,
                 &mut height,
@@ -152,70 +142,69 @@ impl Context {
     }
     pub fn set_ini_saving_rate(&mut self, value: f32) {
         let io = self.io_mut();
-        io.IniSavingRate = value;
+        io.ini_saving_rate = value;
     }
     pub fn set_font_global_scale(&mut self, value: f32) {
         let io = self.io_mut();
-        io.FontGlobalScale = value;
+        io.font_global_scale = value;
     }
     pub fn set_mouse_double_click_time(&mut self, value: f32) {
         let io = self.io_mut();
-        io.MouseDoubleClickTime = value;
+        io.mouse_double_click_time = value;
     }
     pub fn set_mouse_double_click_max_dist(&mut self, value: f32) {
         let io = self.io_mut();
-        io.MouseDoubleClickMaxDist = value;
+        io.mouse_double_click_max_dist = value;
     }
     pub fn set_mouse_drag_threshold(&mut self, value: f32) {
         let io = self.io_mut();
-        io.MouseDragThreshold = value;
+        io.mouse_drag_threshold = value;
     }
     pub fn set_key_repeat_delay(&mut self, value: f32) {
         let io = self.io_mut();
-        io.KeyRepeatDelay = value;
+        io.key_repeat_delay = value;
     }
     pub fn set_key_repeat_rate(&mut self, value: f32) {
         let io = self.io_mut();
-        io.KeyRepeatRate = value;
+        io.key_repeat_rate = value;
     }
     pub fn display_size(&self) -> (f32, f32) {
         let io = self.io();
-        (io.DisplaySize.x, io.DisplaySize.y)
+        (io.display_size[0], io.display_size[1])
     }
     pub fn display_framebuffer_scale(&self) -> (f32, f32) {
         let io = self.io();
-        (io.DisplayFramebufferScale.x, io.DisplayFramebufferScale.y)
+        (io.display_framebuffer_scale[0], io.display_framebuffer_scale[1])
     }
     pub fn mouse_pos(&self) -> (f32, f32) {
         let io = self.io();
-        (io.MousePos.x, io.MousePos.y)
+        (io.mouse_pos[0], io.mouse_pos[1])
     }
     pub fn set_mouse_pos(&mut self, x: f32, y: f32) {
         let io = self.io_mut();
-        io.MousePos.x = x;
-        io.MousePos.y = y;
+        io.mouse_pos = [x, y];
     }
     /// Get mouse's position's delta between the current and the last frame.
     pub fn mouse_delta(&self) -> (f32, f32) {
         let io = self.io();
-        (io.MouseDelta.x, io.MouseDelta.y)
+        (io.mouse_delta[0], io.mouse_delta[1])
     }
     pub fn mouse_down(&self) -> [bool; 5] {
         let io = self.io();
-        io.MouseDown
+        io.mouse_down
     }
     pub fn set_mouse_down(&mut self, states: [bool; 5]) {
         let io = self.io_mut();
-        io.MouseDown = states;
+        io.mouse_down = states;
     }
     pub fn set_mouse_wheel(&mut self, value: f32) {
         let io = self.io_mut();
-        io.MouseWheel = value;
+        io.mouse_wheel = value;
     }
     /// Get mouse wheel delta
     pub fn mouse_wheel(&self) -> f32 {
         let io = self.io();
-        io.MouseWheel
+        io.mouse_wheel
     }
     pub fn mouse_drag_delta(&self, button: ImMouseButton) -> (f32, f32) {
         let delta = unsafe { sys::igGetMouseDragDelta_nonUDT2(button as c_int, -1.0) };
@@ -225,11 +214,11 @@ impl Context {
     /// If `false`, the OS cursor is used (default to `false`).
     pub fn set_mouse_draw_cursor(&mut self, value: bool) {
         let io = self.io_mut();
-        io.MouseDrawCursor = value;
+        io.mouse_draw_cursor = value;
     }
     pub fn mouse_draw_cursor(&self) -> bool {
         let io = self.io();
-        io.MouseDrawCursor
+        io.mouse_draw_cursor
     }
     /// Set currently displayed cursor.
     /// Requires support in the windowing back-end if OS cursor is used.
@@ -267,43 +256,43 @@ impl Context {
     }
     pub fn key_ctrl(&self) -> bool {
         let io = self.io();
-        io.KeyCtrl
+        io.key_ctrl
     }
     pub fn set_key_ctrl(&mut self, value: bool) {
         let io = self.io_mut();
-        io.KeyCtrl = value;
+        io.key_ctrl = value;
     }
     pub fn key_shift(&self) -> bool {
         let io = self.io();
-        io.KeyShift
+        io.key_shift
     }
     pub fn set_key_shift(&mut self, value: bool) {
         let io = self.io_mut();
-        io.KeyShift = value;
+        io.key_shift = value;
     }
     pub fn key_alt(&self) -> bool {
         let io = self.io();
-        io.KeyAlt
+        io.key_alt
     }
     pub fn set_key_alt(&mut self, value: bool) {
         let io = self.io_mut();
-        io.KeyAlt = value;
+        io.key_alt = value;
     }
     pub fn key_super(&self) -> bool {
         let io = self.io();
-        io.KeySuper
+        io.key_super
     }
     pub fn set_key_super(&mut self, value: bool) {
         let io = self.io_mut();
-        io.KeySuper = value;
+        io.key_super = value;
     }
     pub fn set_key(&mut self, key: u8, pressed: bool) {
         let io = self.io_mut();
-        io.KeysDown[key as usize] = pressed;
+        io.keys_down[key as usize] = pressed;
     }
     pub fn set_imgui_key(&mut self, key: ImGuiKey, mapping: u8) {
         let io = self.io_mut();
-        io.KeyMap[key as usize] = i32::from(mapping);
+        io.key_map[key as usize] = u32::from(mapping);
     }
     /// Map [`ImGuiKey`] values into user's key index
     pub fn get_key_index(&self, key: ImGuiKey) -> usize {
@@ -338,7 +327,7 @@ impl Context {
         let mut buf = [0; 5];
         character.encode_utf8(&mut buf);
         unsafe {
-            sys::ImGuiIO_AddInputCharactersUTF8(self.io_mut(), buf.as_ptr() as *const _);
+            sys::ImGuiIO_AddInputCharactersUTF8(self.io_mut().raw_mut(), buf.as_ptr() as *const _);
         }
     }
     pub fn get_time(&self) -> f64 {
@@ -348,16 +337,16 @@ impl Context {
         unsafe { sys::igGetFrameCount() }
     }
     pub fn get_frame_rate(&self) -> f32 {
-        self.io().Framerate
+        self.io().framerate
     }
     pub fn frame<'ui, 'a: 'ui>(&'a mut self, frame_size: FrameSize, delta_time: f32) -> Ui<'ui> {
         {
             let io = self.io_mut();
-            io.DisplaySize.x = frame_size.logical_size.0 as c_float;
-            io.DisplaySize.y = frame_size.logical_size.1 as c_float;
-            io.DisplayFramebufferScale.x = frame_size.hidpi_factor as c_float;
-            io.DisplayFramebufferScale.y = frame_size.hidpi_factor as c_float;
-            io.DeltaTime = delta_time;
+            io.display_size[0] = frame_size.logical_size.0 as c_float;
+            io.display_size[1] = frame_size.logical_size.1 as c_float;
+            io.display_framebuffer_scale[0] = frame_size.hidpi_factor as c_float;
+            io.display_framebuffer_scale[1] = frame_size.hidpi_factor as c_float;
+            io.delta_time = delta_time;
         }
         unsafe {
             sys::igNewFrame();
@@ -465,11 +454,11 @@ impl<'ui> Ui<'ui> {
     }
     pub fn want_capture_mouse(&self) -> bool {
         let io = self.imgui.io();
-        io.WantCaptureMouse
+        io.want_capture_mouse
     }
     pub fn want_capture_keyboard(&self) -> bool {
         let io = self.imgui.io();
-        io.WantCaptureKeyboard
+        io.want_capture_keyboard
     }
     pub fn set_keyboard_focus_here(&self, offset: i32) {
         unsafe {
@@ -478,19 +467,19 @@ impl<'ui> Ui<'ui> {
     }
     pub fn framerate(&self) -> f32 {
         let io = self.imgui.io();
-        io.Framerate
+        io.framerate
     }
     pub fn metrics_render_vertices(&self) -> i32 {
         let io = self.imgui.io();
-        io.MetricsRenderVertices
+        io.metrics_render_vertices
     }
     pub fn metrics_render_indices(&self) -> i32 {
         let io = self.imgui.io();
-        io.MetricsRenderIndices
+        io.metrics_render_indices
     }
     pub fn metrics_active_windows(&self) -> i32 {
         let io = self.imgui.io();
-        io.MetricsActiveWindows
+        io.metrics_active_windows
     }
     pub fn render<F, E>(self, f: F) -> Result<(), E>
     where
