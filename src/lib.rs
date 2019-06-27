@@ -22,7 +22,9 @@ pub use self::drag::{
 };
 pub use self::fonts::{FontGlyphRange, ImFont, ImFontAtlas, ImFontConfig};
 pub use self::image::{ImTexture, Image, ImageButton, Textures};
-pub use self::input::{
+pub use self::input::keyboard::*;
+pub use self::input::mouse::*;
+pub use self::input_widget::{
     InputFloat, InputFloat2, InputFloat3, InputFloat4, InputInt, InputInt2, InputInt3, InputInt4,
     InputText, InputTextMultiline,
 };
@@ -40,8 +42,8 @@ pub use self::string::{ImStr, ImString};
 pub use self::style::*;
 pub use self::sys::{
     ImDrawIdx, ImDrawVert, ImGuiColorEditFlags, ImGuiFocusedFlags, ImGuiHoveredFlags,
-    ImGuiInputTextFlags, ImGuiKey, ImGuiMouseCursor, ImGuiSelectableFlags, ImGuiTreeNodeFlags,
-    ImGuiWindowFlags, ImVec2, ImVec4,
+    ImGuiInputTextFlags, ImGuiSelectableFlags, ImGuiTreeNodeFlags, ImGuiWindowFlags, ImVec2,
+    ImVec4,
 };
 pub use self::trees::{CollapsingHeader, TreeNode};
 pub use self::window::Window;
@@ -55,6 +57,7 @@ mod drag;
 mod fonts;
 mod image;
 mod input;
+mod input_widget;
 mod internal;
 mod io;
 mod menus;
@@ -81,31 +84,6 @@ pub fn get_version() -> &'static str {
     unsafe {
         let bytes = CStr::from_ptr(sys::igGetVersion()).to_bytes();
         str::from_utf8_unchecked(bytes)
-    }
-}
-
-/// Represents one of the buttons of the mouse
-#[derive(Copy, Clone, Eq, PartialEq, Debug)]
-pub enum ImMouseButton {
-    Left = 0,
-    Right = 1,
-    Middle = 2,
-    Extra1 = 3,
-    Extra2 = 4,
-}
-
-#[derive(Copy, Clone, Debug, PartialEq)]
-pub struct FrameSize {
-    pub logical_size: (f64, f64),
-    pub hidpi_factor: f64,
-}
-
-impl FrameSize {
-    pub fn new(width: f64, height: f64, hidpi_factor: f64) -> FrameSize {
-        FrameSize {
-            logical_size: (width, height),
-            hidpi_factor,
-        }
     }
 }
 
@@ -174,7 +152,10 @@ impl Context {
     }
     pub fn display_framebuffer_scale(&self) -> (f32, f32) {
         let io = self.io();
-        (io.display_framebuffer_scale[0], io.display_framebuffer_scale[1])
+        (
+            io.display_framebuffer_scale[0],
+            io.display_framebuffer_scale[1],
+        )
     }
     pub fn mouse_pos(&self) -> (f32, f32) {
         let io = self.io();
@@ -206,7 +187,7 @@ impl Context {
         let io = self.io();
         io.mouse_wheel
     }
-    pub fn mouse_drag_delta(&self, button: ImMouseButton) -> (f32, f32) {
+    pub fn mouse_drag_delta(&self, button: MouseButton) -> (f32, f32) {
         let delta = unsafe { sys::igGetMouseDragDelta_nonUDT2(button as c_int, -1.0) };
         delta.into()
     }
@@ -220,38 +201,25 @@ impl Context {
         let io = self.io();
         io.mouse_draw_cursor
     }
-    /// Set currently displayed cursor.
-    /// Requires support in the windowing back-end if OS cursor is used.
-    /// OS cursor is used if `mouse_draw_cursor` is set to `false` with
-    /// [set_mouse_draw_cursor](#method.set_mouse_draw_cursor).
-    pub fn set_mouse_cursor(&self, cursor: ImGuiMouseCursor) {
-        unsafe {
-            sys::igSetMouseCursor(cursor);
-        }
-    }
-    /// Get currently displayed cursor.
-    pub fn mouse_cursor(&self) -> ImGuiMouseCursor {
-        unsafe { sys::igGetMouseCursor() }
-    }
     /// Returns `true` if mouse is currently dragging with the `button` provided
     /// as argument.
-    pub fn is_mouse_dragging(&self, button: ImMouseButton) -> bool {
+    pub fn is_mouse_dragging(&self, button: MouseButton) -> bool {
         unsafe { sys::igIsMouseDragging(button as c_int, -1.0) }
     }
     /// Returns `true` if the `button` provided as argument is currently down.
-    pub fn is_mouse_down(&self, button: ImMouseButton) -> bool {
+    pub fn is_mouse_down(&self, button: MouseButton) -> bool {
         unsafe { sys::igIsMouseDown(button as c_int) }
     }
     /// Returns `true` if the `button` provided as argument is being clicked.
-    pub fn is_mouse_clicked(&self, button: ImMouseButton) -> bool {
+    pub fn is_mouse_clicked(&self, button: MouseButton) -> bool {
         unsafe { sys::igIsMouseClicked(button as c_int, false) }
     }
     /// Returns `true` if the `button` provided as argument is being double-clicked.
-    pub fn is_mouse_double_clicked(&self, button: ImMouseButton) -> bool {
+    pub fn is_mouse_double_clicked(&self, button: MouseButton) -> bool {
         unsafe { sys::igIsMouseDoubleClicked(button as c_int) }
     }
     /// Returns `true` if the `button` provided as argument was released
-    pub fn is_mouse_released(&self, button: ImMouseButton) -> bool {
+    pub fn is_mouse_released(&self, button: MouseButton) -> bool {
         unsafe { sys::igIsMouseReleased(button as c_int) }
     }
     pub fn key_ctrl(&self) -> bool {
@@ -290,23 +258,23 @@ impl Context {
         let io = self.io_mut();
         io.keys_down[key as usize] = pressed;
     }
-    pub fn set_imgui_key(&mut self, key: ImGuiKey, mapping: u8) {
+    pub fn set_imgui_key(&mut self, key: Key, mapping: u8) {
         let io = self.io_mut();
         io.key_map[key as usize] = u32::from(mapping);
     }
-    /// Map [`ImGuiKey`] values into user's key index
-    pub fn get_key_index(&self, key: ImGuiKey) -> usize {
-        unsafe { sys::igGetKeyIndex(key) as usize }
+    /// Map [`Key`] values into user's key index
+    pub fn get_key_index(&self, key: Key) -> usize {
+        unsafe { sys::igGetKeyIndex(key as i32) as usize }
     }
     /// Return whether specific key is being held
     ///
     /// # Example
     ///
     /// ```rust
-    /// use imgui::{ImGuiKey, Ui};
+    /// use imgui::{Key, Ui};
     ///
     /// fn test(ui: &Ui) {
-    ///     let delete_key_index = ui.imgui().get_key_index(ImGuiKey::Delete);
+    ///     let delete_key_index = ui.imgui().get_key_index(Key::Delete);
     ///     if ui.imgui().is_key_down(delete_key_index) {
     ///         println!("Delete is being held!");
     ///     }
@@ -338,23 +306,6 @@ impl Context {
     }
     pub fn get_frame_rate(&self) -> f32 {
         self.io().framerate
-    }
-    pub fn frame<'ui, 'a: 'ui>(&'a mut self, frame_size: FrameSize, delta_time: f32) -> Ui<'ui> {
-        {
-            let io = self.io_mut();
-            io.display_size[0] = frame_size.logical_size.0 as c_float;
-            io.display_size[1] = frame_size.logical_size.1 as c_float;
-            io.display_framebuffer_scale[0] = frame_size.hidpi_factor as c_float;
-            io.display_framebuffer_scale[1] = frame_size.hidpi_factor as c_float;
-            io.delta_time = delta_time;
-        }
-        unsafe {
-            sys::igNewFrame();
-        }
-        Ui {
-            imgui: self,
-            frame_size,
-        }
     }
 }
 
@@ -435,8 +386,7 @@ pub struct DrawList<'a> {
 }
 
 pub struct Ui<'ui> {
-    imgui: &'ui Context,
-    frame_size: FrameSize,
+    ctx: &'ui Context,
 }
 
 static FMT: &'static [u8] = b"%s\0";
@@ -446,18 +396,18 @@ fn fmt_ptr() -> *const c_char {
 }
 
 impl<'ui> Ui<'ui> {
-    pub fn frame_size(&self) -> FrameSize {
-        self.frame_size
+    pub fn io(&self) -> &Io {
+        unsafe { &*(sys::igGetIO() as *const Io) }
     }
     pub fn imgui(&self) -> &Context {
-        self.imgui
+        self.ctx
     }
     pub fn want_capture_mouse(&self) -> bool {
-        let io = self.imgui.io();
+        let io = self.io();
         io.want_capture_mouse
     }
     pub fn want_capture_keyboard(&self) -> bool {
-        let io = self.imgui.io();
+        let io = self.io();
         io.want_capture_keyboard
     }
     pub fn set_keyboard_focus_here(&self, offset: i32) {
@@ -466,19 +416,19 @@ impl<'ui> Ui<'ui> {
         }
     }
     pub fn framerate(&self) -> f32 {
-        let io = self.imgui.io();
+        let io = self.io();
         io.framerate
     }
     pub fn metrics_render_vertices(&self) -> i32 {
-        let io = self.imgui.io();
+        let io = self.io();
         io.metrics_render_vertices
     }
     pub fn metrics_render_indices(&self) -> i32 {
-        let io = self.imgui.io();
+        let io = self.io();
         io.metrics_render_indices
     }
     pub fn metrics_active_windows(&self) -> i32 {
-        let io = self.imgui.io();
+        let io = self.io();
         io.metrics_active_windows
     }
     pub fn render<F, E>(self, f: F) -> Result<(), E>
@@ -1157,7 +1107,7 @@ impl<'ui> Ui<'ui> {
     /// ```rust,no_run
     /// # use imgui::*;
     /// # let mut imgui = Context::create();
-    /// # let ui = imgui.frame(FrameSize::new(100.0, 100.0, 1.0), 0.1);
+    /// # let ui = imgui.frame();
     /// if ui.button(im_str!("Show modal"), (0.0, 0.0)) {
     ///     ui.open_popup(im_str!("modal"));
     /// }
@@ -1237,7 +1187,7 @@ impl<'ui> Ui<'ui> {
     /// ```rust,no_run
     /// # use imgui::*;
     /// # let mut imgui = Context::create();
-    /// # let ui = imgui.frame(FrameSize::new(100.0, 100.0, 1.0), 0.1);
+    /// # let ui = imgui.frame();
     /// # let mut selected_radio_value = 2;
     /// ui.radio_button(im_str!("Item 1"), &mut selected_radio_value, 1);
     /// ui.radio_button(im_str!("Item 2"), &mut selected_radio_value, 2);
@@ -1254,7 +1204,7 @@ impl<'ui> Ui<'ui> {
     /// ```rust,no_run
     /// # use imgui::*;
     /// # let mut imgui = Context::create();
-    /// # let ui = imgui.frame(FrameSize::new(100.0, 100.0, 1.0), 0.1);
+    /// # let ui = imgui.frame();
     /// # let mut radio_button_test = "cats".to_string();
     /// if ui.radio_button_bool(im_str!("Cats"), radio_button_test == "cats") {
     ///     radio_button_test = "cats".to_string();
@@ -1347,7 +1297,7 @@ impl<'ui> Ui<'ui> {
     /// ```rust,no_run
     /// # use imgui::*;
     /// # let mut imgui = Context::create();
-    /// # let ui = imgui.frame(FrameSize::new(100.0, 100.0, 1.0), 0.1);
+    /// # let ui = imgui.frame();
     /// ui.progress_bar(0.6)
     ///     .size((100.0, 12.0))
     ///     .overlay_text(im_str!("Progress!"))
@@ -1365,7 +1315,7 @@ impl<'ui> Ui<'ui> {
     /// ```rust,no_run
     /// # use imgui::*;
     /// # let mut imgui = Context::create();
-    /// # let ui = imgui.frame(FrameSize::new(100.0, 100.0, 1.0), 0.1);
+    /// # let ui = imgui.frame();
     /// ui.window(im_str!("ChatWindow"))
     ///     .title_bar(true)
     ///     .scrollable(false)
@@ -1395,7 +1345,7 @@ impl<'ui> Ui<'ui> {
     /// ```rust,no_run
     /// # use imgui::*;
     /// # let mut imgui = Context::create();
-    /// # let ui = imgui.frame(FrameSize::new(100.0, 100.0, 1.0), 0.1);
+    /// # let ui = imgui.frame();
     /// ui.with_style_var(StyleVar::Alpha(0.2), || {
     ///     ui.text(im_str!("AB"));
     /// });
@@ -1413,7 +1363,7 @@ impl<'ui> Ui<'ui> {
     /// ```rust,no_run
     /// # use imgui::*;
     /// # let mut imgui = Context::create();
-    /// # let ui = imgui.frame(FrameSize::new(100.0, 100.0, 1.0), 0.1);
+    /// # let ui = imgui.frame();
     /// # let styles = [StyleVar::Alpha(0.2), StyleVar::WindowPadding([1.0, 1.0])];
     /// ui.with_style_vars(&styles, || {
     ///     ui.text(im_str!("A"));
@@ -1513,7 +1463,7 @@ impl<'ui> Ui<'ui> {
     /// ```rust,no_run
     /// # use imgui::*;
     /// # let mut imgui = Context::create();
-    /// # let ui = imgui.frame(FrameSize::new(100.0, 100.0, 1.0), 0.1);
+    /// # let ui = imgui.frame();
     /// ui.with_color_var(StyleColor::Text, [1.0, 0.0, 0.0, 1.0], || {
     ///     ui.text_wrapped(im_str!("AB"));
     /// });
@@ -1539,7 +1489,7 @@ impl<'ui> Ui<'ui> {
     /// ```rust,no_run
     /// # use imgui::*;
     /// # let mut imgui = Context::create();
-    /// # let ui = imgui.frame(FrameSize::new(100.0, 100.0, 1.0), 0.1);
+    /// # let ui = imgui.frame();
     /// let red = [1.0, 0.0, 0.0, 1.0];
     /// let green = [0.0, 1.0, 0.0, 1.0];
     /// # let vars = [(StyleColor::Text, red), (StyleColor::TextDisabled, green)];

@@ -4,6 +4,8 @@ use std::ops::{Index, IndexMut};
 use std::os::raw::{c_char, c_int, c_void};
 use std::time::Instant;
 
+use crate::input::keyboard::Key;
+use crate::input::mouse::MouseButton;
 use crate::internal::{ImVector, RawCast};
 use crate::sys;
 
@@ -331,6 +333,45 @@ impl Io {
         }
         self.delta_time = delta_s;
         now
+    }
+}
+
+impl Index<Key> for Io {
+    type Output = u32;
+    fn index(&self, index: Key) -> &u32 {
+        &self.key_map[index as usize]
+    }
+}
+
+impl IndexMut<Key> for Io {
+    fn index_mut(&mut self, index: Key) -> &mut u32 {
+        &mut self.key_map[index as usize]
+    }
+}
+
+impl Index<NavInput> for Io {
+    type Output = f32;
+    fn index(&self, index: NavInput) -> &f32 {
+        &self.nav_inputs[index as usize]
+    }
+}
+
+impl IndexMut<NavInput> for Io {
+    fn index_mut(&mut self, index: NavInput) -> &mut f32 {
+        &mut self.nav_inputs[index as usize]
+    }
+}
+
+impl Index<MouseButton> for Io {
+    type Output = bool;
+    fn index(&self, index: MouseButton) -> &bool {
+        &self.mouse_down[index as usize]
+    }
+}
+
+impl IndexMut<MouseButton> for Io {
+    fn index_mut(&mut self, index: MouseButton) -> &mut bool {
+        &mut self.mouse_down[index as usize]
     }
 }
 

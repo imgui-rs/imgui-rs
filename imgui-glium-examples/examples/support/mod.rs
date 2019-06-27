@@ -3,7 +3,7 @@ use glium::{
     Texture2d,
 };
 use imgui::{FontGlyphRange, ImFontConfig, self, Ui};
-use imgui_winit_support;
+use imgui_winit_support::{HiDpiMode, WinitPlatform};
 use std::rc::Rc;
 use std::time::Instant;
 
@@ -29,10 +29,10 @@ where
     let mut imgui = imgui::Context::create();
     imgui.set_ini_filename(None);
 
-    // In the examples we only use integer DPI factors, because the UI can get very blurry
-    // otherwise. This might or might not be what you want in a real application.
-    let hidpi_factor = window.get_hidpi_factor().round();
+    let mut platform = WinitPlatform::init(&mut imgui);
+    platform.attach_window(imgui.io_mut(), &window, HiDpiMode::Rounded);
 
+    let hidpi_factor = platform.hidpi_factor();
     let font_size = (13.0 * hidpi_factor) as f32;
 
     imgui.fonts().add_default_font_with_config(
@@ -53,11 +53,9 @@ where
         &FontGlyphRange::japanese(),
     );
 
-    imgui.set_font_global_scale((1.0 / hidpi_factor) as f32);
+    imgui.io_mut().font_global_scale = (1.0 / hidpi_factor) as f32;
 
     let mut renderer = Renderer::init(&mut imgui, &display).expect("Failed to initialize renderer");
-
-    imgui_winit_support::configure_keys(&mut imgui);
 
     let mut last_frame = Instant::now();
     let mut quit = false;
@@ -66,12 +64,7 @@ where
         events_loop.poll_events(|event| {
             use glium::glutin::{Event, WindowEvent::CloseRequested};
 
-            imgui_winit_support::handle_event(
-                &mut imgui,
-                &event,
-                window.get_hidpi_factor(),
-                hidpi_factor,
-            );
+            platform.handle_event(imgui.io_mut(), &window, &event);
 
             if let Event::WindowEvent { event, .. } = event {
                 match event {
@@ -81,16 +74,12 @@ where
             }
         });
 
-        let now = Instant::now();
-        let delta = now - last_frame;
-        let delta_s = delta.as_secs() as f32 + delta.subsec_nanos() as f32 / 1_000_000_000.0;
-        last_frame = now;
-
-        imgui_winit_support::update_mouse_cursor(&imgui, &window);
-
-        let frame_size = imgui_winit_support::get_frame_size(&window, hidpi_factor).unwrap();
-
-        let ui = imgui.frame(frame_size, delta_s);
+        let io = imgui.io_mut();
+        platform
+            .prepare_frame(io, &window)
+            .expect("Failed to start frame");
+        last_frame = io.update_delta_time(last_frame);
+        let ui = imgui.frame();
         if !run_ui(&ui, display.get_context(), renderer.textures()) {
             break;
         }
@@ -102,6 +91,7 @@ where
             clear_color[2],
             clear_color[3],
         );
+        platform.prepare_render(&ui, &window);
         renderer.render(&mut target, ui).expect("Rendering failed");
         target.finish().unwrap();
 

@@ -4,7 +4,7 @@ use glium::program;
 use glium::texture;
 use glium::vertex;
 use glium::{uniform, DrawError, IndexBuffer, Program, Surface, Texture2d, VertexBuffer};
-use imgui::{self, DrawList, FrameSize, ImTexture, Textures, Ui};
+use imgui::{self, DrawList, ImTexture, Textures, Ui};
 use std::borrow::Cow;
 use std::fmt;
 use std::rc::Rc;
@@ -85,10 +85,8 @@ impl Renderer {
 
     pub fn render<'a, S: Surface>(&mut self, surface: &mut S, ui: Ui<'a>) -> RendererResult<()> {
         let _ = self.ctx.insert_debug_marker("imgui-rs: starting rendering");
-        let FrameSize {
-            logical_size: (width, height),
-            hidpi_factor,
-        } = ui.frame_size();
+        let [width, height] = ui.io().display_size;
+        let hidpi_factor = ui.io().display_framebuffer_scale[0];
         if !(width > 0.0 && height > 0.0) {
             return Ok(());
         }

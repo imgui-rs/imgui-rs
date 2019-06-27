@@ -367,4 +367,10 @@ impl Context {
             &mut *(sys::igGetStyle() as *mut Style)
         }
     }
+    pub fn frame<'ui, 'a: 'ui>(&'a mut self) -> Ui<'ui> {
+        unsafe {
+            sys::igNewFrame();
+        }
+        Ui { ctx: self }
+    }
 }

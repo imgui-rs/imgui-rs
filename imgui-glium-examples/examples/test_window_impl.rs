@@ -1051,17 +1051,17 @@ fn show_example_app_custom_rendering(ui: &Ui, state: &mut CustomRenderingState, 
             if state.adding_line {
                 adding_preview = true;
                 state.points.push(mouse_pos_in_canvas);
-                if !ui.imgui().is_mouse_down(ImMouseButton::Left) {
+                if !ui.imgui().is_mouse_down(MouseButton::Left) {
                     state.adding_line = false;
                     adding_preview = false;
                 }
             }
             if ui.is_item_hovered() {
-                if !state.adding_line && ui.imgui().is_mouse_clicked(ImMouseButton::Left) {
+                if !state.adding_line && ui.imgui().is_mouse_clicked(MouseButton::Left) {
                     state.points.push(mouse_pos_in_canvas);
                     state.adding_line = true;
                 }
-                if ui.imgui().is_mouse_clicked(ImMouseButton::Right) && !state.points.is_empty() {
+                if ui.imgui().is_mouse_clicked(MouseButton::Right) && !state.points.is_empty() {
                     state.adding_line = false;
                     adding_preview = false;
                     state.points.pop();

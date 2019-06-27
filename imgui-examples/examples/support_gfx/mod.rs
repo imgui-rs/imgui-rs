@@ -1,13 +1,11 @@
 use imgui::{FontGlyphRange, ImFontConfig, Context, Ui};
 use imgui_gfx_renderer::{Renderer, Shaders};
-use imgui_winit_support;
+use imgui_winit_support::{WinitPlatform, HiDpiMode};
 use std::time::Instant;
 
 #[cfg(feature = "opengl")]
 pub fn run<F: FnMut(&Ui) -> bool>(title: String, clear_color: [f32; 4], mut run_ui: F) {
-    use gfx::{self, Device};
-    use gfx_window_glutin;
-    use glutin;
+    use gfx::{Device};
 
     type ColorFormat = gfx::format::Rgba8;
     type DepthFormat = gfx::format::DepthStencil;
@@ -60,10 +58,10 @@ pub fn run<F: FnMut(&Ui) -> bool>(title: String, clear_color: [f32; 4], mut run_
     }
     imgui.set_ini_filename(None);
 
-    // In the examples we only use integer DPI factors, because the UI can get very blurry
-    // otherwise. This might or might not be what you want in a real application.
-    let hidpi_factor = window.get_hidpi_factor().round();
+    let mut platform = WinitPlatform::init(&mut imgui);
+    platform.attach_window(imgui.io_mut(), &window, HiDpiMode::Rounded);
 
+    let hidpi_factor = platform.hidpi_factor();
     let font_size = (13.0 * hidpi_factor) as f32;
 
     imgui.fonts().add_default_font_with_config(
@@ -89,8 +87,6 @@ pub fn run<F: FnMut(&Ui) -> bool>(title: String, clear_color: [f32; 4], mut run_
     let mut renderer = Renderer::init(&mut imgui, &mut factory, shaders, main_color.clone())
         .expect("Failed to initialize renderer");
 
-    imgui_winit_support::configure_keys(&mut imgui);
-
     let mut last_frame = Instant::now();
     let mut quit = false;
 
@@ -101,12 +97,7 @@ pub fn run<F: FnMut(&Ui) -> bool>(title: String, clear_color: [f32; 4], mut run_
                 WindowEvent::{CloseRequested, Resized},
             };
 
-            imgui_winit_support::handle_event(
-                &mut imgui,
-                &event,
-                window.get_hidpi_factor(),
-                hidpi_factor,
-            );
+            platform.handle_event(imgui.io_mut(), &window, &event);
 
             if let Event::WindowEvent { event, .. } = event {
                 match event {
@@ -123,16 +114,11 @@ pub fn run<F: FnMut(&Ui) -> bool>(title: String, clear_color: [f32; 4], mut run_
             break;
         }
 
-        let now = Instant::now();
-        let delta = now - last_frame;
-        let delta_s = delta.as_secs() as f32 + delta.subsec_nanos() as f32 / 1_000_000_000.0;
-        last_frame = now;
+        let io = imgui.io_mut();
+        platform.prepare_frame(io, &window).expect("Failed to start frame");
+        last_frame = io.update_delta_time(last_frame);
 
-        imgui_winit_support::update_mouse_cursor(&imgui, &window);
-
-        let frame_size = imgui_winit_support::get_frame_size(&window, hidpi_factor).unwrap();
-
-        let ui = imgui.frame(frame_size, delta_s);
+        let ui = imgui.frame();
         if !run_ui(&ui) {
             break;
         }
@@ -266,6 +252,7 @@ pub fn run<F: FnMut(&Ui) -> bool>(title: String, clear_color: [f32; 4], mut run_
         }
 
         encoder.clear(&main_color, clear_color);
+        platform.prepare_render(&ui, &window);
         renderer
             .render(ui, &mut factory, &mut encoder)
             .expect("Rendering failed");

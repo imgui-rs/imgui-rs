@@ -4,7 +4,7 @@ use gfx::pso::{PipelineData, PipelineState};
 use gfx::texture::{FilterMethod, SamplerInfo, WrapMode};
 use gfx::traits::FactoryExt;
 use gfx::{CommandBuffer, Encoder, Factory, IntoIndexBuffer, Rect, Resources, Slice};
-use imgui::{Context, DrawList, FrameSize, ImDrawIdx, ImDrawVert, ImTexture, Textures, Ui};
+use imgui::{Context, DrawList, ImDrawIdx, ImDrawVert, ImTexture, Textures, Ui};
 
 pub type RendererResult<T> = Result<T, RendererError>;
 
@@ -261,10 +261,8 @@ impl<R: Resources> Renderer<R> {
         factory: &mut F,
         encoder: &mut Encoder<R, C>,
     ) -> RendererResult<()> {
-        let FrameSize {
-            logical_size: (width, height),
-            hidpi_factor,
-        } = ui.frame_size();
+        let [width, height] = ui.io().display_size;
+        let hidpi_factor = ui.io().display_framebuffer_scale[0];
 
         if !(width > 0.0 && height > 0.0) {
             return Ok(());
