@@ -15,9 +15,3 @@ travis-ci = { repository = "Gekkio/imgui-rs" }
 
 [build-dependencies]
 cc = "1.0"
-
-[target.'cfg(target_os = "macos")'.dependencies]
-core-foundation = "0.6"
-
-[target.'cfg(windows)'.dependencies]
-winapi = { version = "0.3", features = ["imm"] }

@@ -25,6 +25,10 @@ fn assert_file_exists(path: &str) -> io::Result<()> {
 fn main() -> io::Result<()> {
     let mut build = cc::Build::new();
     build.cpp(true);
+    // Disabled due to linking issues
+    build
+        .define("IMGUI_DISABLE_WIN32_FUNCTIONS", None)
+        .define("IMGUI_DISABLE_OSX_FUNCTIONS", None);
     for path in &CPP_FILES {
         assert_file_exists(path)?;
         build.file(path);
