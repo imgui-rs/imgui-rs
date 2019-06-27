@@ -33,7 +33,7 @@ ui.window(im_str!("Hello world"))
 * Not horrible way of defining and passing null-terminated UTF-8 to ImGui.
   The macro `im_str!` needs to be used most of the time. For more
   information and justification for this design, please see [issue #7](https://github.com/Gekkio/imgui-rs/issues/7)
-* Parts of imgui\_demo.cpp reimplemented in Rust as an API usage example (examples/test\_window\_impl.rs)
+* Parts of imgui\_demo.cpp reimplemented in Rust as an API usage example (imgui-examples/examples/test\_window\_impl.rs)
 
 ## Important but unimplemented things
 
@@ -56,22 +56,22 @@ ui.window(im_str!("Hello world"))
     cd imgui-rs
     git submodule update --init --recursive
 
-Examples for gfx backend are under the imgui-examples directory.
-
-    cd imgui-examples
-    cargo test
-
-    cargo run --example hello_gfx
-
-Examples for glium backend are located into the imgui-glium-examples directory.
+Main examples are located in the imgui-examples directory.
 
     # At the reposity root
-    cd imgui-glium-examples
+    cd imgui-examples
     cargo test
 
     cargo run --example hello_world
     cargo run --example test_window
     cargo run --example test_window_impl
+
+Examples for the gfx backend are under the imgui-gfx-examples directory.
+
+    cd imgui-gfx-examples
+    cargo test
+
+    cargo run --example hello_gfx
 
 Note to Windows users:  You will need to use the *MSVC ABI* version of the Rust compiler along
 with its associated [dependencies](https://www.rust-lang.org/en-US/downloads.html#win-foot) to

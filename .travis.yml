@@ -30,5 +30,5 @@ script:
   - cargo test --all --verbose
   - cargo build --all --verbose --manifest-path imgui-examples/Cargo.toml
   - cargo test --all --verbose --manifest-path imgui-examples/Cargo.toml
-  - cargo build --all --verbose --manifest-path imgui-glium-examples/Cargo.toml
-  - cargo test --all --verbose --manifest-path imgui-glium-examples/Cargo.toml
+  - cargo build --all --verbose --manifest-path imgui-gfx-examples/Cargo.toml
+  - cargo test --all --verbose --manifest-path imgui-gfx-examples/Cargo.toml

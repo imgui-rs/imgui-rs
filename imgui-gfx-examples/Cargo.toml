@@ -1,17 +1,26 @@
 [package]
-name = "imgui-glium-examples"
+name = "imgui-gfx-examples"
 version = "0.0.24-pre"
 edition = "2018"
 authors = ["Joonas Javanainen <joonas.javanainen@gmail.com>", "imgui-rs contributors"]
-description = "imgui crate examples using Glium backend"
+description = "imgui crate examples"
 homepage = "https://github.com/Gekkio/imgui-rs"
 repository = "https://github.com/Gekkio/imgui-rs"
 license = "MIT/Apache-2.0"
 publish = false
 
+[features]
+opengl = ["imgui-gfx-renderer/opengl"]
+directx = ["imgui-gfx-renderer/directx"]
+default = ["opengl"]
+
 [dev-dependencies]
-glium = { version = "0.25", default-features = true }
+gfx = "0.18"
+gfx_window_glutin = "0.31"
+glutin = "0.21"
 imgui = { version = "0.0.24-pre", path = "../" }
-imgui-glium-renderer = { version = "0.0.24-pre", path = "../imgui-glium-renderer" }
+imgui-gfx-renderer = { version = "0.0.24-pre", path = "../imgui-gfx-renderer" }
 imgui-winit-support = { version = "0.0.24-pre", path = "../imgui-winit-support" }
-image = "0.21"
+
+[target.'cfg(windows)'.dev-dependencies]
+gfx_window_dxgi = "0.19"

@@ -33,6 +33,6 @@ members = [
 ]
 exclude = [
     "imgui-examples",
-    "imgui-glium-examples",
+    "imgui-gfx-examples",
     "imgui-sys-bindgen"
 ]
