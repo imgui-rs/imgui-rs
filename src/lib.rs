@@ -7,7 +7,6 @@ use std::ptr;
 use std::slice;
 use std::str;
 use std::thread;
-use sys::ImGuiStyleVar;
 
 pub use self::child_frame::ChildFrame;
 pub use self::color_editors::{
@@ -34,15 +33,16 @@ pub use self::sliders::{
     SliderInt4,
 };
 pub use self::string::{ImStr, ImString};
-pub use self::style::StyleVar;
+pub use self::style::*;
 pub use self::sys::{
-    ImDrawIdx, ImDrawVert, ImGuiCol, ImGuiColorEditFlags, ImGuiFocusedFlags, ImGuiHoveredFlags,
-    ImGuiInputTextFlags, ImGuiKey, ImGuiMouseCursor, ImGuiSelectableFlags, ImGuiStyle,
-    ImGuiTreeNodeFlags, ImGuiWindowFlags, ImVec2, ImVec4,
+    ImDrawIdx, ImDrawVert, ImGuiColorEditFlags, ImGuiFocusedFlags, ImGuiHoveredFlags,
+    ImGuiInputTextFlags, ImGuiKey, ImGuiMouseCursor, ImGuiSelectableFlags, ImGuiTreeNodeFlags,
+    ImGuiWindowFlags, ImVec2, ImVec4,
 };
 pub use self::trees::{CollapsingHeader, TreeNode};
 pub use self::window::Window;
 pub use self::window_draw_list::{ChannelsSplit, ImColor, WindowDrawList};
+use internal::RawCast;
 
 mod child_frame;
 mod color_editors;
@@ -89,13 +89,6 @@ pub struct TextureHandle<'a> {
     pub width: u32,
     pub height: u32,
     pub pixels: &'a [c_uchar],
-}
-
-pub fn get_style_color_name(color: ImGuiCol) -> &'static ImStr {
-    unsafe {
-        let bytes = CStr::from_ptr(sys::igGetStyleColorName(color)).to_bytes_with_nul();
-        ImStr::from_utf8_with_nul_unchecked(bytes)
-    }
 }
 
 pub fn get_version() -> &'static str {
@@ -146,11 +139,11 @@ impl ImGui {
     fn io_mut(&mut self) -> &mut sys::ImGuiIO {
         unsafe { &mut *sys::igGetIO() }
     }
-    pub fn style(&self) -> &ImGuiStyle {
-        unsafe { &*sys::igGetStyle() }
+    pub fn style(&self) -> &Style {
+        unsafe { Style::from_raw(&*sys::igGetStyle()) }
     }
-    pub fn style_mut(&mut self) -> &mut ImGuiStyle {
-        unsafe { &mut *sys::igGetStyle() }
+    pub fn style_mut(&mut self) -> &mut Style {
+        unsafe { Style::from_raw_mut(&mut *sys::igGetStyle()) }
     }
     pub fn fonts(&mut self) -> ImFontAtlas {
         unsafe { ImFontAtlas::from_ptr(self.io_mut().Fonts) }
@@ -582,9 +575,9 @@ impl<'ui> Ui<'ui> {
     pub fn show_default_style_editor(&self) {
         unsafe { sys::igShowStyleEditor(ptr::null_mut()) };
     }
-    pub fn show_style_editor<'p>(&self, style: &'p mut ImGuiStyle) {
+    pub fn show_style_editor<'p>(&self, style: &'p mut Style) {
         unsafe {
-            sys::igShowStyleEditor(style as *mut ImGuiStyle);
+            sys::igShowStyleEditor(style.raw_mut());
         }
     }
     pub fn show_demo_window(&self, opened: &mut bool) {
@@ -1502,7 +1495,7 @@ impl<'ui> Ui<'ui> {
     /// # use imgui::*;
     /// # let mut imgui = ImGui::init();
     /// # let ui = imgui.frame(FrameSize::new(100.0, 100.0, 1.0), 0.1);
-    /// # let styles = [StyleVar::Alpha(0.2), StyleVar::WindowPadding(ImVec2::new(1.0, 1.0))];
+    /// # let styles = [StyleVar::Alpha(0.2), StyleVar::WindowPadding([1.0, 1.0])];
     /// ui.with_style_vars(&styles, || {
     ///     ui.text(im_str!("A"));
     ///     ui.text(im_str!("B"));
@@ -1520,30 +1513,76 @@ impl<'ui> Ui<'ui> {
 
     #[inline]
     fn push_style_var(&self, style_var: StyleVar) {
-        use self::StyleVar::*;
-        use sys::{igPushStyleVarFloat, igPushStyleVarVec2};
+        use crate::style::StyleVar::*;
+        use crate::sys::{igPushStyleVarFloat, igPushStyleVarVec2};
         match style_var {
-            Alpha(v) => unsafe { igPushStyleVarFloat(ImGuiStyleVar::Alpha, v) },
-            WindowPadding(v) => unsafe { igPushStyleVarVec2(ImGuiStyleVar::WindowPadding, v) },
-            WindowRounding(v) => unsafe { igPushStyleVarFloat(ImGuiStyleVar::WindowRounding, v) },
+            Alpha(v) => unsafe { igPushStyleVarFloat(sys::ImGuiStyleVar_Alpha as i32, v) },
+            WindowPadding(v) => unsafe {
+                igPushStyleVarVec2(sys::ImGuiStyleVar_WindowPadding as i32, v.into())
+            },
+            WindowRounding(v) => unsafe {
+                igPushStyleVarFloat(sys::ImGuiStyleVar_WindowRounding as i32, v)
+            },
             WindowBorderSize(v) => unsafe {
-                igPushStyleVarFloat(ImGuiStyleVar::WindowBorderSize, v)
+                igPushStyleVarFloat(sys::ImGuiStyleVar_WindowBorderSize as i32, v)
             },
-            WindowMinSize(v) => unsafe { igPushStyleVarVec2(ImGuiStyleVar::WindowMinSize, v) },
-            ChildRounding(v) => unsafe { igPushStyleVarFloat(ImGuiStyleVar::ChildRounding, v) },
-            ChildBorderSize(v) => unsafe { igPushStyleVarFloat(ImGuiStyleVar::ChildBorderSize, v) },
-            PopupRounding(v) => unsafe { igPushStyleVarFloat(ImGuiStyleVar::PopupRounding, v) },
-            PopupBorderSize(v) => unsafe { igPushStyleVarFloat(ImGuiStyleVar::PopupBorderSize, v) },
-            FramePadding(v) => unsafe { igPushStyleVarVec2(ImGuiStyleVar::FramePadding, v) },
-            FrameRounding(v) => unsafe { igPushStyleVarFloat(ImGuiStyleVar::FrameRounding, v) },
-            FrameBorderSize(v) => unsafe { igPushStyleVarFloat(ImGuiStyleVar::FrameBorderSize, v) },
-            ItemSpacing(v) => unsafe { igPushStyleVarVec2(ImGuiStyleVar::ItemSpacing, v) },
+            WindowMinSize(v) => unsafe {
+                igPushStyleVarVec2(sys::ImGuiStyleVar_WindowMinSize as i32, v.into())
+            },
+            WindowTitleAlign(v) => unsafe {
+                igPushStyleVarVec2(sys::ImGuiStyleVar_WindowTitleAlign as i32, v.into())
+            },
+            ChildRounding(v) => unsafe {
+                igPushStyleVarFloat(sys::ImGuiStyleVar_ChildRounding as i32, v)
+            },
+            ChildBorderSize(v) => unsafe {
+                igPushStyleVarFloat(sys::ImGuiStyleVar_ChildBorderSize as i32, v)
+            },
+            PopupRounding(v) => unsafe {
+                igPushStyleVarFloat(sys::ImGuiStyleVar_PopupRounding as i32, v)
+            },
+            PopupBorderSize(v) => unsafe {
+                igPushStyleVarFloat(sys::ImGuiStyleVar_PopupBorderSize as i32, v)
+            },
+            FramePadding(v) => unsafe {
+                igPushStyleVarVec2(sys::ImGuiStyleVar_FramePadding as i32, v.into())
+            },
+            FrameRounding(v) => unsafe {
+                igPushStyleVarFloat(sys::ImGuiStyleVar_FrameRounding as i32, v)
+            },
+            FrameBorderSize(v) => unsafe {
+                igPushStyleVarFloat(sys::ImGuiStyleVar_FrameBorderSize as i32, v)
+            },
+            ItemSpacing(v) => unsafe {
+                igPushStyleVarVec2(sys::ImGuiStyleVar_ItemSpacing as i32, v.into())
+            },
             ItemInnerSpacing(v) => unsafe {
-                igPushStyleVarVec2(ImGuiStyleVar::ItemInnerSpacing, v)
+                igPushStyleVarVec2(sys::ImGuiStyleVar_ItemInnerSpacing as i32, v.into())
             },
-            IndentSpacing(v) => unsafe { igPushStyleVarFloat(ImGuiStyleVar::IndentSpacing, v) },
-            GrabMinSize(v) => unsafe { igPushStyleVarFloat(ImGuiStyleVar::GrabMinSize, v) },
-            ButtonTextAlign(v) => unsafe { igPushStyleVarVec2(ImGuiStyleVar::ButtonTextAlign, v) },
+            IndentSpacing(v) => unsafe {
+                igPushStyleVarFloat(sys::ImGuiStyleVar_IndentSpacing as i32, v)
+            },
+            ScrollbarSize(v) => unsafe {
+                igPushStyleVarFloat(sys::ImGuiStyleVar_ScrollbarSize as i32, v)
+            },
+            ScrollbarRounding(v) => unsafe {
+                igPushStyleVarFloat(sys::ImGuiStyleVar_ScrollbarRounding as i32, v)
+            },
+            GrabMinSize(v) => unsafe {
+                igPushStyleVarFloat(sys::ImGuiStyleVar_GrabMinSize as i32, v)
+            },
+            GrabRounding(v) => unsafe {
+                igPushStyleVarFloat(sys::ImGuiStyleVar_GrabRounding as i32, v)
+            },
+            TabRounding(v) => unsafe {
+                igPushStyleVarFloat(sys::ImGuiStyleVar_TabRounding as i32, v)
+            },
+            ButtonTextAlign(v) => unsafe {
+                igPushStyleVarVec2(sys::ImGuiStyleVar_ButtonTextAlign as i32, v.into())
+            },
+            SelectableTextAlign(v) => unsafe {
+                igPushStyleVarVec2(sys::ImGuiStyleVar_SelectableTextAlign as i32, v.into())
+            },
         }
     }
 }
@@ -1556,18 +1595,18 @@ impl<'ui> Ui<'ui> {
     /// # use imgui::*;
     /// # let mut imgui = ImGui::init();
     /// # let ui = imgui.frame(FrameSize::new(100.0, 100.0, 1.0), 0.1);
-    /// ui.with_color_var(ImGuiCol::Text, (1.0, 0.0, 0.0, 1.0), || {
+    /// ui.with_color_var(StyleColor::Text, [1.0, 0.0, 0.0, 1.0], || {
     ///     ui.text_wrapped(im_str!("AB"));
     /// });
     /// ```
     pub fn with_color_var<F: FnOnce(), C: Into<ImVec4> + Copy>(
         &self,
-        var: ImGuiCol,
+        var: StyleColor,
         color: C,
         f: F,
     ) {
         unsafe {
-            sys::igPushStyleColor(var, color.into());
+            sys::igPushStyleColor(var as _, color.into());
         }
         f();
         unsafe {
@@ -1582,21 +1621,21 @@ impl<'ui> Ui<'ui> {
     /// # use imgui::*;
     /// # let mut imgui = ImGui::init();
     /// # let ui = imgui.frame(FrameSize::new(100.0, 100.0, 1.0), 0.1);
-    /// let red = (1.0, 0.0, 0.0, 1.0);
-    /// let green = (0.0, 1.0, 0.0, 1.0);
-    /// # let vars = [(ImGuiCol::Text, red), (ImGuiCol::TextDisabled, green)];
+    /// let red = [1.0, 0.0, 0.0, 1.0];
+    /// let green = [0.0, 1.0, 0.0, 1.0];
+    /// # let vars = [(StyleColor::Text, red), (StyleColor::TextDisabled, green)];
     /// ui.with_color_vars(&vars, || {
     ///     ui.text_wrapped(im_str!("AB"));
     /// });
     /// ```
     pub fn with_color_vars<F: FnOnce(), C: Into<ImVec4> + Copy>(
         &self,
-        color_vars: &[(ImGuiCol, C)],
+        color_vars: &[(StyleColor, C)],
         f: F,
     ) {
         for &(color_var, color) in color_vars {
             unsafe {
-                sys::igPushStyleColor(color_var, color.into());
+                sys::igPushStyleColor(color_var as _, color.into());
             }
         }
         f();
@@ -1610,7 +1649,7 @@ impl<'ui> Ui<'ui> {
     pub fn with_style_and_color_vars<F, C>(
         &self,
         style_vars: &[StyleVar],
-        color_vars: &[(ImGuiCol, C)],
+        color_vars: &[(StyleColor, C)],
         f: F,
     ) where
         F: FnOnce(),
@@ -1747,4 +1786,14 @@ pub enum Condition {
     /// Apply the setting if the object/window is appearing after being hidden/inactive (or the
     /// first time)
     Appearing = sys::ImGuiCond_Appearing as i8,
+}
+
+/// A cardinal direction
+#[repr(i32)]
+#[derive(Copy, Clone, Debug, Eq, PartialEq)]
+pub enum Direction {
+    Left = sys::ImGuiDir_Left,
+    Right = sys::ImGuiDir_Right,
+    Up = sys::ImGuiDir_Up,
+    Down = sys::ImGuiDir_Down,
 }

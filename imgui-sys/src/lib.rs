@@ -4,26 +4,24 @@ use std::convert::From;
 
 pub use self::enums::*;
 pub use self::flags::*;
-pub use self::structs::*;
 
 mod bindings;
 mod enums;
 mod flags;
 mod legacy;
-mod structs;
 
 pub use bindings::{
-    igGetIO, CustomRect, ImDrawCallback, ImDrawChannel, ImDrawCmd, ImDrawData, ImDrawData_Clear,
-    ImDrawData_DeIndexAllBuffers, ImDrawData_ScaleClipRects, ImDrawIdx, ImDrawList,
-    ImDrawListSharedData, ImDrawListSplitter, ImDrawList_AddBezierCurve, ImDrawList_AddCallback,
-    ImDrawList_AddCircle, ImDrawList_AddCircleFilled, ImDrawList_AddConvexPolyFilled,
-    ImDrawList_AddDrawCmd, ImDrawList_AddImage, ImDrawList_AddImageQuad,
-    ImDrawList_AddImageRounded, ImDrawList_AddLine, ImDrawList_AddPolyline, ImDrawList_AddQuad,
-    ImDrawList_AddQuadFilled, ImDrawList_AddRect, ImDrawList_AddRectFilled,
-    ImDrawList_AddRectFilledMultiColor, ImDrawList_AddText, ImDrawList_AddTextFontPtr,
-    ImDrawList_AddTriangle, ImDrawList_AddTriangleFilled, ImDrawList_ChannelsMerge,
-    ImDrawList_ChannelsSetCurrent, ImDrawList_ChannelsSplit, ImDrawList_Clear,
-    ImDrawList_ClearFreeMemory, ImDrawList_CloneOutput, ImDrawList_ImDrawList,
+    igGetIO, igPushStyleVarFloat, igPushStyleVarVec2, CustomRect, ImDrawCallback, ImDrawChannel,
+    ImDrawCmd, ImDrawData, ImDrawData_Clear, ImDrawData_DeIndexAllBuffers,
+    ImDrawData_ScaleClipRects, ImDrawIdx, ImDrawList, ImDrawListSharedData, ImDrawListSplitter,
+    ImDrawList_AddBezierCurve, ImDrawList_AddCallback, ImDrawList_AddCircle,
+    ImDrawList_AddCircleFilled, ImDrawList_AddConvexPolyFilled, ImDrawList_AddDrawCmd,
+    ImDrawList_AddImage, ImDrawList_AddImageQuad, ImDrawList_AddImageRounded, ImDrawList_AddLine,
+    ImDrawList_AddPolyline, ImDrawList_AddQuad, ImDrawList_AddQuadFilled, ImDrawList_AddRect,
+    ImDrawList_AddRectFilled, ImDrawList_AddRectFilledMultiColor, ImDrawList_AddText,
+    ImDrawList_AddTextFontPtr, ImDrawList_AddTriangle, ImDrawList_AddTriangleFilled,
+    ImDrawList_ChannelsMerge, ImDrawList_ChannelsSetCurrent, ImDrawList_ChannelsSplit,
+    ImDrawList_Clear, ImDrawList_ClearFreeMemory, ImDrawList_CloneOutput, ImDrawList_ImDrawList,
     ImDrawList_PathArcTo, ImDrawList_PathArcToFast, ImDrawList_PathBezierCurveTo,
     ImDrawList_PathClear, ImDrawList_PathFillConvex, ImDrawList_PathLineTo,
     ImDrawList_PathLineToMergeDuplicate, ImDrawList_PathRect, ImDrawList_PathStroke,
@@ -37,15 +35,39 @@ pub use bindings::{
     ImFontAtlas_GetGlyphRangesDefault, ImFontAtlas_GetGlyphRangesJapanese,
     ImFontAtlas_GetGlyphRangesKorean, ImFontAtlas_GetGlyphRangesThai,
     ImFontAtlas_GetGlyphRangesVietnamese, ImFontAtlas_GetTexDataAsRGBA32, ImFontConfig,
-    ImFontGlyphRangesBuilder, ImGuiCond, ImGuiCond_, ImGuiCond_Always, ImGuiCond_Appearing,
-    ImGuiCond_FirstUseEver, ImGuiCond_Once, ImGuiContext, ImGuiID, ImGuiIO,
-    ImGuiIO_AddInputCharacter, ImGuiIO_AddInputCharactersUTF8, ImGuiIO_ClearInputCharacters,
-    ImGuiInputTextCallback, ImGuiInputTextCallbackData, ImGuiInputTextCallbackData_DeleteChars,
+    ImFontGlyphRangesBuilder, ImGuiCol, ImGuiCol_, ImGuiCol_Border, ImGuiCol_BorderShadow,
+    ImGuiCol_Button, ImGuiCol_ButtonActive, ImGuiCol_ButtonHovered, ImGuiCol_COUNT,
+    ImGuiCol_CheckMark, ImGuiCol_ChildBg, ImGuiCol_DragDropTarget, ImGuiCol_FrameBg,
+    ImGuiCol_FrameBgActive, ImGuiCol_FrameBgHovered, ImGuiCol_Header, ImGuiCol_HeaderActive,
+    ImGuiCol_HeaderHovered, ImGuiCol_MenuBarBg, ImGuiCol_ModalWindowDimBg, ImGuiCol_NavHighlight,
+    ImGuiCol_NavWindowingDimBg, ImGuiCol_NavWindowingHighlight, ImGuiCol_PlotHistogram,
+    ImGuiCol_PlotHistogramHovered, ImGuiCol_PlotLines, ImGuiCol_PlotLinesHovered, ImGuiCol_PopupBg,
+    ImGuiCol_ResizeGrip, ImGuiCol_ResizeGripActive, ImGuiCol_ResizeGripHovered,
+    ImGuiCol_ScrollbarBg, ImGuiCol_ScrollbarGrab, ImGuiCol_ScrollbarGrabActive,
+    ImGuiCol_ScrollbarGrabHovered, ImGuiCol_Separator, ImGuiCol_SeparatorActive,
+    ImGuiCol_SeparatorHovered, ImGuiCol_SliderGrab, ImGuiCol_SliderGrabActive, ImGuiCol_Tab,
+    ImGuiCol_TabActive, ImGuiCol_TabHovered, ImGuiCol_TabUnfocused, ImGuiCol_TabUnfocusedActive,
+    ImGuiCol_Text, ImGuiCol_TextDisabled, ImGuiCol_TextSelectedBg, ImGuiCol_TitleBg,
+    ImGuiCol_TitleBgActive, ImGuiCol_TitleBgCollapsed, ImGuiCol_WindowBg, ImGuiCond, ImGuiCond_,
+    ImGuiCond_Always, ImGuiCond_Appearing, ImGuiCond_FirstUseEver, ImGuiCond_Once, ImGuiContext,
+    ImGuiDir, ImGuiDir_, ImGuiDir_COUNT, ImGuiDir_Down, ImGuiDir_Left, ImGuiDir_None,
+    ImGuiDir_Right, ImGuiDir_Up, ImGuiID, ImGuiIO, ImGuiIO_AddInputCharacter,
+    ImGuiIO_AddInputCharactersUTF8, ImGuiIO_ClearInputCharacters, ImGuiInputTextCallback,
+    ImGuiInputTextCallbackData, ImGuiInputTextCallbackData_DeleteChars,
     ImGuiInputTextCallbackData_HasSelection, ImGuiInputTextCallbackData_ImGuiInputTextCallbackData,
     ImGuiInputTextCallbackData_InsertChars, ImGuiInputTextCallbackData_destroy, ImGuiListClipper,
-    ImGuiPayload, ImGuiSizeCallback, ImGuiStorage, ImGuiTextBuffer, ImGuiTextFilter, ImTextureID,
-    ImU32, ImVec2, ImVec2_Simple, ImVec4, ImVec4_Simple, ImVector_ImFontPtr, ImVector_ImWchar,
-    ImVector_char, ImWchar,
+    ImGuiPayload, ImGuiSizeCallback, ImGuiStorage, ImGuiStyle, ImGuiStyleVar, ImGuiStyleVar_,
+    ImGuiStyleVar_Alpha, ImGuiStyleVar_ButtonTextAlign, ImGuiStyleVar_COUNT,
+    ImGuiStyleVar_ChildBorderSize, ImGuiStyleVar_ChildRounding, ImGuiStyleVar_FrameBorderSize,
+    ImGuiStyleVar_FramePadding, ImGuiStyleVar_FrameRounding, ImGuiStyleVar_GrabMinSize,
+    ImGuiStyleVar_GrabRounding, ImGuiStyleVar_IndentSpacing, ImGuiStyleVar_ItemInnerSpacing,
+    ImGuiStyleVar_ItemSpacing, ImGuiStyleVar_PopupBorderSize, ImGuiStyleVar_PopupRounding,
+    ImGuiStyleVar_ScrollbarRounding, ImGuiStyleVar_ScrollbarSize,
+    ImGuiStyleVar_SelectableTextAlign, ImGuiStyleVar_TabRounding, ImGuiStyleVar_WindowBorderSize,
+    ImGuiStyleVar_WindowMinSize, ImGuiStyleVar_WindowPadding, ImGuiStyleVar_WindowRounding,
+    ImGuiStyleVar_WindowTitleAlign, ImGuiStyle_ScaleAllSizes, ImGuiTextBuffer, ImGuiTextFilter,
+    ImTextureID, ImU32, ImVec2, ImVec2_Simple, ImVec4, ImVec4_Simple, ImVector_ImFontPtr,
+    ImVector_ImWchar, ImVector_char, ImWchar,
 };
 pub use legacy::*;
 

@@ -1,4 +1,4 @@
-use imgui::{FontGlyphRange, ImFontConfig, ImGui, ImVec4, Ui};
+use imgui::{FontGlyphRange, ImFontConfig, ImGui, Ui};
 use imgui_gfx_renderer::{Renderer, Shaders};
 use imgui_winit_support;
 use std::time::Instant;
@@ -45,12 +45,12 @@ pub fn run<F: FnMut(&Ui) -> bool>(title: String, clear_color: [f32; 4], mut run_
     let mut imgui = ImGui::init();
     {
         // Fix incorrect colors with sRGB framebuffer
-        fn imgui_gamma_to_linear(col: ImVec4) -> ImVec4 {
-            let x = col.x.powf(2.2);
-            let y = col.y.powf(2.2);
-            let z = col.z.powf(2.2);
-            let w = 1.0 - (1.0 - col.w).powf(2.2);
-            ImVec4::new(x, y, z, w)
+        fn imgui_gamma_to_linear(col: [f32; 4]) -> [f32; 4] {
+            let x = col[0].powf(2.2);
+            let y = col[1].powf(2.2);
+            let z = col[2].powf(2.2);
+            let w = 1.0 - (1.0 - col[3]).powf(2.2);
+            [x, y, z, w]
         }
 
         let style = imgui.style_mut();

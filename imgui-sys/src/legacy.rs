@@ -123,8 +123,6 @@ extern "C" {
     pub fn igPushStyleColorU32(idx: ImGuiCol, col: ImU32);
     pub fn igPushStyleColor(idx: ImGuiCol, col: ImVec4);
     pub fn igPopStyleColor(count: c_int);
-    pub fn igPushStyleVarFloat(idx: ImGuiStyleVar, val: c_float);
-    pub fn igPushStyleVarVec2(idx: ImGuiStyleVar, val: ImVec2);
     pub fn igPopStyleVar(count: c_int);
     pub fn igGetStyleColorVec4(idx: ImGuiCol) -> *const ImVec4;
     pub fn igGetFont() -> *mut ImFont;

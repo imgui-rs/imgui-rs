@@ -656,7 +656,7 @@ CTRL+click on individual component to input value.\n",
                 ui.popup_modal(im_str!("Delete?")).always_auto_resize(true).build(|| {
                     ui.text("All those beautiful files will be deleted.\nThis operation cannot be undone!\n\n");
                     ui.separator();
-                    ui.with_style_var(StyleVar::FramePadding(ImVec2::new(0.0, 0.0)), || {
+                    ui.with_style_var(StyleVar::FramePadding([0.0, 0.0]), || {
                         ui.checkbox(im_str!("Don't ask me next time"), &mut state.dont_ask_me_next_time);
 
                         if ui.button(im_str!("OK"), (120.0, 0.0)) {
@@ -675,7 +675,7 @@ CTRL+click on individual component to input value.\n",
                 ui.popup_modal(im_str!("Stacked 1")).build(|| {
                     ui.text(
                        "Hello from Stacked The First\n\
-                        Using style.Colors[ImGuiCol_ModalWindowDarkening] for darkening."
+                        Using style[StyleColor::ModalWindowDarkening] for darkening."
                     );
 
                     let items = &[im_str!("aaaa"), im_str!("bbbb"), im_str!("cccc"), im_str!("dddd"), im_str!("eeee")];
@@ -773,8 +773,8 @@ fn show_example_menu_file<'a>(ui: &Ui<'a>, state: &mut FileMenuState) {
         ui.checkbox(im_str!("Check"), &mut state.b);
     });
     ui.menu(im_str!("Colors")).build(|| {
-        for &col in ImGuiCol::VARIANTS.iter() {
-            ui.menu_item(imgui::get_style_color_name(col)).build();
+        for &col in StyleColor::VARIANTS.iter() {
+            ui.menu_item(im_str!("{:?}", col)).build();
         }
     });
     ui.menu(im_str!("Disabled")).enabled(false).build(|| {
@@ -807,7 +807,7 @@ output your content because that would create a feedback loop.",
 fn show_example_app_fixed_overlay(ui: &Ui, opened: &mut bool) {
     const DISTANCE: f32 = 10.0;
     let window_pos = (DISTANCE, DISTANCE);
-    ui.with_color_var(ImGuiCol::WindowBg, (0.0, 0.0, 0.0, 0.3), || {
+    ui.with_color_var(StyleColor::WindowBg, [0.0, 0.0, 0.0, 0.3], || {
         ui.window(im_str!("Example: Fixed Overlay"))
             .opened(opened)
             .position(window_pos, Condition::Always)
