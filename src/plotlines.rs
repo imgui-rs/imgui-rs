@@ -3,7 +3,7 @@ use std::os::raw::c_float;
 use std::{f32, mem, ptr};
 use sys;
 
-use super::{ImStr, ImVec2, Ui};
+use super::{ImStr, Ui};
 
 #[must_use]
 pub struct PlotLines<'ui, 'p> {
@@ -13,7 +13,7 @@ pub struct PlotLines<'ui, 'p> {
     overlay_text: Option<&'p ImStr>,
     scale_min: f32,
     scale_max: f32,
-    graph_size: ImVec2,
+    graph_size: [f32; 2],
     _phantom: PhantomData<&'ui Ui<'ui>>,
 }
 
@@ -26,7 +26,7 @@ impl<'ui, 'p> PlotLines<'ui, 'p> {
             overlay_text: None,
             scale_min: f32::MAX,
             scale_max: f32::MAX,
-            graph_size: ImVec2::new(0.0f32, 0.0f32),
+            graph_size: [0.0, 0.0],
             _phantom: PhantomData,
         }
     }
@@ -56,8 +56,8 @@ impl<'ui, 'p> PlotLines<'ui, 'p> {
     }
 
     #[inline]
-    pub fn graph_size<S: Into<ImVec2>>(mut self, graph_size: S) -> Self {
-        self.graph_size = graph_size.into();
+    pub fn graph_size(mut self, graph_size: [f32; 2]) -> Self {
+        self.graph_size = graph_size;
         self
     }
 
@@ -71,7 +71,7 @@ impl<'ui, 'p> PlotLines<'ui, 'p> {
                 self.overlay_text.map(|x| x.as_ptr()).unwrap_or(ptr::null()),
                 self.scale_min,
                 self.scale_max,
-                self.graph_size,
+                self.graph_size.into(),
                 mem::size_of::<f32>() as i32,
             );
         }

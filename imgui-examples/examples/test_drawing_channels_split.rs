@@ -23,14 +23,14 @@ fn main() {
                 draw_list
                     .add_line(
                         canvas_pos,
-                        [canvas_pos.0 + RADIUS, canvas_pos.1 + RADIUS],
+                        [canvas_pos[0] + RADIUS, canvas_pos[1] + RADIUS],
                         RED,
                     )
                     .thickness(5.0)
                     .build();
 
                 channels.set_current(0);
-                let center = (canvas_pos.0 + RADIUS, canvas_pos.1 + RADIUS);
+                let center = [canvas_pos[0] + RADIUS, canvas_pos[1] + RADIUS];
                 draw_list
                     .add_circle(center, RADIUS, WHITE)
                     .thickness(10.0)

@@ -4,7 +4,7 @@ use std::ptr;
 
 use crate::legacy::ImGuiColorEditFlags;
 use crate::sys;
-use crate::{ImStr, ImVec2, ImVec4, Ui};
+use crate::{ImStr, Ui};
 
 /// Mutable reference to an editable color value.
 #[derive(Debug)]
@@ -356,20 +356,20 @@ impl<'ui, 'p> ColorPicker<'ui, 'p> {
 #[must_use]
 pub struct ColorButton<'ui, 'p> {
     desc_id: &'p ImStr,
-    color: ImVec4,
+    color: [f32; 4],
     flags: ImGuiColorEditFlags,
-    size: ImVec2,
+    size: [f32; 2],
     _phantom: PhantomData<&'ui Ui<'ui>>,
 }
 
 impl<'ui, 'p> ColorButton<'ui, 'p> {
     /// Constructs a new color button builder.
-    pub fn new(_: &Ui<'ui>, desc_id: &'p ImStr, color: ImVec4) -> Self {
+    pub fn new(_: &Ui<'ui>, desc_id: &'p ImStr, color: [f32; 4]) -> Self {
         ColorButton {
             desc_id,
             color,
             flags: ImGuiColorEditFlags::empty(),
-            size: ImVec2::zero(),
+            size: [0.0, 0.0],
             _phantom: PhantomData,
         }
     }
@@ -408,7 +408,7 @@ impl<'ui, 'p> ColorButton<'ui, 'p> {
     ///
     /// Use 0.0 for width and/or height to use the default size.
     #[inline]
-    pub fn size<S: Into<ImVec2>>(mut self, size: S) -> Self {
+    pub fn size(mut self, size: [f32; 2]) -> Self {
         self.size = size.into();
         self
     }
@@ -417,9 +417,9 @@ impl<'ui, 'p> ColorButton<'ui, 'p> {
         unsafe {
             sys::igColorButton(
                 self.desc_id.as_ptr(),
-                self.color,
+                self.color.into(),
                 self.flags.bits(),
-                self.size,
+                self.size.into(),
             )
         }
     }

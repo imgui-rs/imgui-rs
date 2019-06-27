@@ -42,7 +42,6 @@ pub use self::sliders::{
 };
 pub use self::string::{ImStr, ImString};
 pub use self::style::*;
-pub use self::sys::{ImVec2, ImVec4};
 pub use self::trees::{CollapsingHeader, TreeNode};
 pub use self::window::Window;
 pub use self::window_draw_list::{ChannelsSplit, ImColor, WindowDrawList};
@@ -209,22 +208,22 @@ impl<'ui> Ui<'ui> {
         Window::new(self, name)
     }
     /// Get current window's size in pixels
-    pub fn get_window_size(&self) -> (f32, f32) {
+    pub fn get_window_size(&self) -> [f32; 2] {
         let size = unsafe { sys::igGetWindowSize_nonUDT2() };
         size.into()
     }
     /// Get current window's position in pixels
-    pub fn get_window_pos(&self) -> (f32, f32) {
+    pub fn get_window_pos(&self) -> [f32; 2] {
         let size = unsafe { sys::igGetWindowPos_nonUDT2() };
         size.into()
     }
 
-    pub fn get_window_content_region_min(&self) -> (f32, f32) {
+    pub fn get_window_content_region_min(&self) -> [f32; 2] {
         let size = unsafe { sys::igGetWindowContentRegionMin_nonUDT2() };
         size.into()
     }
 
-    pub fn get_window_content_region_max(&self) -> (f32, f32) {
+    pub fn get_window_content_region_max(&self) -> [f32; 2] {
         let size = unsafe { sys::igGetWindowContentRegionMax_nonUDT2() };
         size.into()
     }
@@ -301,7 +300,7 @@ impl<'ui> Ui<'ui> {
 
     /// Fill a space of `size` in pixels with nothing on the current window.
     /// Can be used to move the cursor on the window.
-    pub fn dummy<S: Into<ImVec2>>(&self, size: S) {
+    pub fn dummy(&self, size: [f32; 2]) {
         unsafe { sys::igDummy(size.into()) }
     }
 
@@ -310,37 +309,37 @@ impl<'ui> Ui<'ui> {
     ///
     /// This is especially useful for drawing, as the drawing API uses
     /// screen coordiantes.
-    pub fn get_cursor_screen_pos(&self) -> (f32, f32) {
+    pub fn get_cursor_screen_pos(&self) -> [f32; 2] {
         let size = unsafe { sys::igGetCursorScreenPos_nonUDT2() };
         size.into()
     }
 
     /// Set cursor position on the screen, in screen coordinates.
     /// This sets the point on which the next widget will be drawn.
-    pub fn set_cursor_screen_pos<P: Into<ImVec2>>(&self, pos: P) {
+    pub fn set_cursor_screen_pos(&self, pos: [f32; 2]) {
         unsafe { sys::igSetCursorScreenPos(pos.into()) }
     }
 
     /// Get cursor position on the screen, in window coordinates.
-    pub fn get_cursor_pos(&self) -> (f32, f32) {
+    pub fn get_cursor_pos(&self) -> [f32; 2] {
         let size = unsafe { sys::igGetCursorPos_nonUDT2() };
         size.into()
     }
 
     /// Set cursor position on the screen, in window coordinates.
     /// This sets the point on which the next widget will be drawn.
-    pub fn set_cursor_pos<P: Into<ImVec2>>(&self, pos: P) {
+    pub fn set_cursor_pos(&self, pos: [f32; 2]) {
         unsafe { sys::igSetCursorPos(pos.into()) }
     }
 
-    pub fn get_content_region_max(&self) -> (f32, f32) {
+    pub fn get_content_region_max(&self) -> [f32; 2] {
         let size = unsafe { sys::igGetContentRegionMax_nonUDT2() };
         size.into()
     }
 
     /// Get available space left between the cursor and the edges of the current
     /// window.
-    pub fn get_content_region_avail(&self) -> (f32, f32) {
+    pub fn get_content_region_avail(&self) -> [f32; 2] {
         let size = unsafe { sys::igGetContentRegionAvail_nonUDT2() };
         size.into()
     }
@@ -429,10 +428,7 @@ impl<'ui> Ui<'ui> {
             sys::igTextUnformatted(start as *const c_char, end as *const c_char);
         }
     }
-    pub fn text_colored<'p, A>(&self, col: A, text: &'p ImStr)
-    where
-        A: Into<ImVec4>,
-    {
+    pub fn text_colored<'p>(&self, col: [f32; 4], text: &'p ImStr) {
         unsafe {
             sys::igTextColored(col.into(), fmt_ptr(), text.as_ptr());
         }
@@ -475,7 +471,7 @@ impl<'ui> Ui<'ui> {
             sys::igBulletText(fmt_ptr(), text.as_ptr());
         }
     }
-    pub fn button<'p, S: Into<ImVec2>>(&self, label: &'p ImStr, size: S) -> bool {
+    pub fn button(&self, label: &ImStr, size: [f32; 2]) -> bool {
         unsafe { sys::igButton(label.as_ptr(), size.into()) }
     }
     pub fn small_button<'p>(&self, label: &'p ImStr) -> bool {
@@ -483,7 +479,7 @@ impl<'ui> Ui<'ui> {
     }
     /// Make a invisible event. Can be used to conveniently catch events when
     /// mouse hovers or click the area covered by this invisible button.
-    pub fn invisible_button<'p, S: Into<ImVec2>>(&self, label: &'p ImStr, size: S) -> bool {
+    pub fn invisible_button(&self, label: &ImStr, size: [f32; 2]) -> bool {
         unsafe { sys::igInvisibleButton(label.as_ptr(), size.into()) }
     }
     pub fn checkbox<'p>(&self, label: &'p ImStr, value: &'p mut bool) -> bool {
@@ -496,11 +492,11 @@ impl<'ui> Ui<'ui> {
     pub fn input_text<'p>(&self, label: &'p ImStr, buf: &'p mut ImString) -> InputText<'ui, 'p> {
         InputText::new(self, label, buf)
     }
-    pub fn input_text_multiline<'p, S: Into<ImVec2>>(
+    pub fn input_text_multiline<'p>(
         &self,
         label: &'p ImStr,
         buf: &'p mut ImString,
-        size: S,
+        size: [f32; 2],
     ) -> InputTextMultiline<'ui, 'p> {
         InputTextMultiline::new(self, label, buf, size.into())
     }
@@ -693,11 +689,7 @@ impl<'ui> Ui<'ui> {
         ColorPicker::new(self, label, value.into())
     }
     /// Constructs a new color button builder.
-    pub fn color_button<'p, C: Into<ImVec4>>(
-        &self,
-        desc_id: &'p ImStr,
-        color: C,
-    ) -> ColorButton<'ui, 'p> {
+    pub fn color_button<'p>(&self, desc_id: &'p ImStr, color: [f32; 4]) -> ColorButton<'ui, 'p> {
         ColorButton::new(self, desc_id, color.into())
     }
     /// Initialize current options (generally on application startup) if you want to select a
@@ -722,12 +714,12 @@ impl<'ui> Ui<'ui> {
 
 // Widgets: Selectable / Lists
 impl<'ui> Ui<'ui> {
-    pub fn selectable<'p, S: Into<ImVec2>>(
+    pub fn selectable(
         &self,
-        label: &'p ImStr,
+        label: &ImStr,
         selected: bool,
         flags: ImGuiSelectableFlags,
-        size: S,
+        size: [f32; 2],
     ) -> bool {
         unsafe { sys::igSelectable(label.as_ptr(), selected, flags.bits(), size.into()) }
     }
@@ -747,7 +739,7 @@ impl<'ui> Ui<'ui> {
     ///     ui.text("Hover over me");
     ///     if ui.is_item_hovered() {
     ///         ui.tooltip(|| {
-    ///             ui.text_colored((1.0, 0.0, 0.0, 1.0), im_str!("I'm red!"));
+    ///             ui.text_colored([1.0, 0.0, 0.0, 1.0], im_str!("I'm red!"));
     ///         });
     ///     }
     /// }
@@ -834,12 +826,12 @@ impl<'ui> Ui<'ui> {
     /// # use imgui::*;
     /// # let mut imgui = Context::create();
     /// # let ui = imgui.frame();
-    /// if ui.button(im_str!("Show modal"), (0.0, 0.0)) {
+    /// if ui.button(im_str!("Show modal"), [0.0, 0.0]) {
     ///     ui.open_popup(im_str!("modal"));
     /// }
     /// ui.popup_modal(im_str!("modal")).build(|| {
     ///     ui.text("Content of my modal");
-    ///     if ui.button(im_str!("OK"), (0.0, 0.0)) {
+    ///     if ui.button(im_str!("OK"), [0.0, 0.0]) {
     ///         ui.close_current_popup();
     ///     }
     /// });
@@ -962,20 +954,14 @@ impl<'ui> Ui<'ui> {
 
 // Image
 impl<'ui> Ui<'ui> {
-    pub fn image<S>(&self, texture: TextureId, size: S) -> Image
-    where
-        S: Into<ImVec2>,
-    {
+    pub fn image(&self, texture: TextureId, size: [f32; 2]) -> Image {
         Image::new(self, texture, size)
     }
 }
 
 // ImageButton
 impl<'ui> Ui<'ui> {
-    pub fn image_button<S>(&self, texture: TextureId, size: S) -> ImageButton
-    where
-        S: Into<ImVec2>,
-    {
+    pub fn image_button(&self, texture: TextureId, size: [f32; 2]) -> ImageButton {
         ImageButton::new(self, texture, size)
     }
 }
@@ -992,8 +978,8 @@ impl<'ui> Ui<'ui> {
         text: &ImStr,
         hide_text_after_double_hash: bool,
         wrap_width: f32,
-    ) -> ImVec2 {
-        let result: [f32; 2] = unsafe {
+    ) -> [f32; 2] {
+        unsafe {
             sys::igCalcTextSize_nonUDT2(
                 text.as_ptr(),
                 std::ptr::null(),
@@ -1001,8 +987,7 @@ impl<'ui> Ui<'ui> {
                 wrap_width,
             )
             .into()
-        };
-        result.into()
+        }
     }
 }
 
@@ -1012,7 +997,7 @@ impl<'ui> Ui<'ui> {
         unsafe { sys::igGetTextLineHeightWithSpacing() }
     }
     /// Get previously drawn item's size
-    pub fn get_item_rect_size(&self) -> (f32, f32) {
+    pub fn get_item_rect_size(&self) -> [f32; 2] {
         let size = unsafe { sys::igGetItemRectSize_nonUDT2() };
         size.into()
     }
@@ -1027,7 +1012,7 @@ impl<'ui> Ui<'ui> {
     /// # let mut imgui = Context::create();
     /// # let ui = imgui.frame();
     /// ui.progress_bar(0.6)
-    ///     .size((100.0, 12.0))
+    ///     .size([100.0, 12.0])
     ///     .overlay_text(im_str!("Progress!"))
     ///     .build();
     /// ```
@@ -1050,19 +1035,15 @@ impl<'ui> Ui<'ui> {
     ///     .build(|| {
     ///         ui.separator();
     ///
-    ///         ui.child_frame(im_str!("child frame"), (400.0, 100.0))
+    ///         ui.child_frame(im_str!("child frame"), [400.0, 100.0])
     ///             .show_borders(true)
     ///             .always_show_vertical_scroll_bar(true)
     ///             .build(|| {
-    ///                 ui.text_colored((1.0, 0.0, 0.0, 1.0), im_str!("hello mate!"));
+    ///                 ui.text_colored([1.0, 0.0, 0.0, 1.0], im_str!("hello mate!"));
     ///             });
     /// });
-    pub fn child_frame<'p, S: Into<ImVec2>>(
-        &self,
-        name: &'p ImStr,
-        size: S,
-    ) -> ChildFrame<'ui, 'p> {
-        ChildFrame::new(self, name, size.into())
+    pub fn child_frame<'p>(&self, name: &'p ImStr, size: [f32; 2]) -> ChildFrame<'ui, 'p> {
+        ChildFrame::new(self, name, size)
     }
 }
 
@@ -1196,12 +1177,7 @@ impl<'ui> Ui<'ui> {
     ///     ui.text_wrapped(im_str!("AB"));
     /// });
     /// ```
-    pub fn with_color_var<F: FnOnce(), C: Into<ImVec4> + Copy>(
-        &self,
-        var: StyleColor,
-        color: C,
-        f: F,
-    ) {
+    pub fn with_color_var<F: FnOnce()>(&self, var: StyleColor, color: [f32; 4], f: F) {
         unsafe {
             sys::igPushStyleColor(var as _, color.into());
         }
@@ -1225,11 +1201,7 @@ impl<'ui> Ui<'ui> {
     ///     ui.text_wrapped(im_str!("AB"));
     /// });
     /// ```
-    pub fn with_color_vars<F: FnOnce(), C: Into<ImVec4> + Copy>(
-        &self,
-        color_vars: &[(StyleColor, C)],
-        f: F,
-    ) {
+    pub fn with_color_vars<F: FnOnce()>(&self, color_vars: &[(StyleColor, [f32; 4])], f: F) {
         for &(color_var, color) in color_vars {
             unsafe {
                 sys::igPushStyleColor(color_var as _, color.into());
@@ -1243,14 +1215,13 @@ impl<'ui> Ui<'ui> {
 impl<'ui> Ui<'ui> {
     /// Runs a function after temporarily pushing an array of values to the
     /// style and color stack.
-    pub fn with_style_and_color_vars<F, C>(
+    pub fn with_style_and_color_vars<F>(
         &self,
         style_vars: &[StyleVar],
-        color_vars: &[(StyleColor, C)],
+        color_vars: &[(StyleColor, [f32; 4])],
         f: F,
     ) where
         F: FnOnce(),
-        C: Into<ImVec4> + Copy,
     {
         self.with_style_vars(style_vars, || {
             self.with_color_vars(color_vars, f);

@@ -208,12 +208,12 @@ pub struct InputTextMultiline<'ui, 'p> {
     label: &'p ImStr,
     buf: &'p mut ImString,
     flags: ImGuiInputTextFlags,
-    size: sys::ImVec2,
+    size: [f32; 2],
     _phantom: PhantomData<&'ui Ui<'ui>>,
 }
 
 impl<'ui, 'p> InputTextMultiline<'ui, 'p> {
-    pub fn new(_: &Ui<'ui>, label: &'p ImStr, buf: &'p mut ImString, size: sys::ImVec2) -> Self {
+    pub fn new(_: &Ui<'ui>, label: &'p ImStr, buf: &'p mut ImString, size: [f32; 2]) -> Self {
         InputTextMultiline {
             label,
             buf,
@@ -243,7 +243,7 @@ impl<'ui, 'p> InputTextMultiline<'ui, 'p> {
                 self.label.as_ptr(),
                 ptr,
                 capacity,
-                self.size,
+                self.size.into(),
                 self.flags.bits(),
                 callback,
                 data,

@@ -2,7 +2,7 @@ use glium::{
     backend::{Context, Facade},
     Texture2d,
 };
-use imgui::{FontGlyphRange, ImFontConfig, self, Ui};
+use imgui::{self, FontGlyphRange, ImFontConfig, Ui};
 use imgui_winit_support::{HiDpiMode, WinitPlatform};
 use std::rc::Rc;
 use std::time::Instant;
@@ -55,7 +55,8 @@ where
 
     imgui.io_mut().font_global_scale = (1.0 / hidpi_factor) as f32;
 
-    let mut renderer = GliumRenderer::init(&mut imgui, &display).expect("Failed to initialize renderer");
+    let mut renderer =
+        GliumRenderer::init(&mut imgui, &display).expect("Failed to initialize renderer");
 
     let mut last_frame = Instant::now();
     let mut quit = false;

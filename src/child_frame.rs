@@ -2,19 +2,19 @@ use std::marker::PhantomData;
 
 use crate::legacy::ImGuiWindowFlags;
 use crate::sys;
-use crate::{ImStr, ImVec2, Ui};
+use crate::{ImStr, Ui};
 
 #[must_use]
 pub struct ChildFrame<'ui, 'p> {
     name: &'p ImStr,
-    size: ImVec2,
+    size: [f32; 2],
     border: bool,
     flags: ImGuiWindowFlags,
     _phantom: PhantomData<&'ui Ui<'ui>>,
 }
 
 impl<'ui, 'p> ChildFrame<'ui, 'p> {
-    pub fn new<S: Into<ImVec2>>(_: &Ui<'ui>, name: &'p ImStr, size: S) -> ChildFrame<'ui, 'p> {
+    pub fn new(_: &Ui<'ui>, name: &'p ImStr, size: [f32; 2]) -> ChildFrame<'ui, 'p> {
         ChildFrame {
             name,
             size: size.into(),
@@ -101,7 +101,7 @@ impl<'ui, 'p> ChildFrame<'ui, 'p> {
         let render_child_frame = unsafe {
             sys::igBeginChild(
                 self.name.as_ptr(),
-                self.size,
+                self.size.into(),
                 self.border,
                 self.flags.bits(),
             )

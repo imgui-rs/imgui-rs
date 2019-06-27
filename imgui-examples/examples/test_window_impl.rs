@@ -167,7 +167,7 @@ impl Default for AutoResizeState {
 struct CustomRenderingState {
     sz: f32,
     col: [f32; 3],
-    points: Vec<(f32, f32)>,
+    points: Vec<[f32; 2]>,
     adding_line: bool,
 }
 
@@ -284,7 +284,7 @@ fn show_test_window(ui: &Ui, state: &mut State, opened: &mut bool) {
         .scroll_bar(!state.no_scrollbar)
         .collapsible(!state.no_collapse)
         .menu_bar(!state.no_menu)
-        .size((550.0, 680.0), Condition::FirstUseEver);
+        .size([550.0, 680.0], Condition::FirstUseEver);
     if !state.no_close {
         window = window.opened(opened)
     }
@@ -390,8 +390,8 @@ fn show_test_window(ui: &Ui, state: &mut State, opened: &mut bool) {
                 ui.small_button(im_str!("Button"));
             });
             ui.tree_node(im_str!("Colored text")).build(|| {
-                ui.text_colored((1.0, 0.0, 1.0, 1.0), im_str!("Pink"));
-                ui.text_colored((1.0, 1.0, 0.0, 1.0), im_str!("Yellow"));
+                ui.text_colored([1.0, 0.0, 1.0, 1.0], im_str!("Pink"));
+                ui.text_colored([1.0, 1.0, 0.0, 1.0], im_str!("Yellow"));
                 ui.text_disabled(im_str!("Disabled"));
             });
 
@@ -399,7 +399,7 @@ fn show_test_window(ui: &Ui, state: &mut State, opened: &mut bool) {
                 ui.input_text_multiline(
                     im_str!("multiline"),
                     &mut state.text_multiline,
-                    (300., 100.),
+                    [300., 100.],
                 ).build();
             });
 
@@ -636,7 +636,7 @@ CTRL+click on individual component to input value.\n",
                             name,
                             false,
                             ImGuiSelectableFlags::empty(),
-                            ImVec2::new(0.0, 0.0),
+                            [0.0, 0.0]
                         ) {
                             state.selected_fish = Some(index);
                         }
@@ -650,7 +650,7 @@ CTRL+click on individual component to input value.\n",
                      them by clicking outside the window."
                 ));
 
-                if ui.button(im_str!("Delete.."), (0.0, 0.0)) {
+                if ui.button(im_str!("Delete.."), [0.0, 0.0]) {
                     ui.open_popup(im_str!("Delete?"));
                 }
                 ui.popup_modal(im_str!("Delete?")).always_auto_resize(true).build(|| {
@@ -659,17 +659,17 @@ CTRL+click on individual component to input value.\n",
                     ui.with_style_var(StyleVar::FramePadding([0.0, 0.0]), || {
                         ui.checkbox(im_str!("Don't ask me next time"), &mut state.dont_ask_me_next_time);
 
-                        if ui.button(im_str!("OK"), (120.0, 0.0)) {
+                        if ui.button(im_str!("OK"), [120.0, 0.0]) {
                             ui.close_current_popup();
                         }
                         ui.same_line(0.0);
-                        if ui.button(im_str!("Cancel"), (120.0, 0.0)) {
+                        if ui.button(im_str!("Cancel"), [120.0, 0.0]) {
                             ui.close_current_popup();
                         }
                     });
                 });
 
-                if ui.button(im_str!("Stacked modals.."), (0.0, 0.0)) {
+                if ui.button(im_str!("Stacked modals.."), [0.0, 0.0]) {
                     ui.open_popup(im_str!("Stacked 1"));
                 }
                 ui.popup_modal(im_str!("Stacked 1")).build(|| {
@@ -683,17 +683,17 @@ CTRL+click on individual component to input value.\n",
 
                     ui.color_edit(im_str!("color"), &mut state.stacked_modals_color).build();
 
-                    if ui.button(im_str!("Add another modal.."), (0.0, 0.0)) {
+                    if ui.button(im_str!("Add another modal.."), [0.0, 0.0]) {
                         ui.open_popup(im_str!("Stacked 2"))   ;
                     }
                     ui.popup_modal(im_str!("Stacked 2")).build(|| {
                         ui.text("Hello from Stacked The Second");
-                        if ui.button(im_str!("Close"), (0.0, 0.0)) {
+                        if ui.button(im_str!("Close"), [0.0, 0.0]) {
                             ui.close_current_popup();
                         }
                     });
 
-                    if ui.button(im_str!("Close"), (0.0, 0.0)) {
+                    if ui.button(im_str!("Close"), [0.0, 0.0]) {
                         ui.close_current_popup();
                     }
                 });
@@ -756,7 +756,7 @@ fn show_example_menu_file<'a>(ui: &Ui<'a>, state: &mut FileMenuState) {
         ui.menu_item(im_str!("Enabled"))
             .selected(&mut state.enabled)
             .build();
-        ui.child_frame(im_str!("child"), (0.0, 60.0))
+        ui.child_frame(im_str!("child"), [0.0, 60.0])
             .show_borders(true)
             .build(|| {
                 for i in 0..10 {
@@ -806,7 +806,7 @@ output your content because that would create a feedback loop.",
 
 fn show_example_app_fixed_overlay(ui: &Ui, opened: &mut bool) {
     const DISTANCE: f32 = 10.0;
-    let window_pos = (DISTANCE, DISTANCE);
+    let window_pos = [DISTANCE, DISTANCE];
     ui.with_color_var(StyleColor::WindowBg, [0.0, 0.0, 0.0, 0.3], || {
         ui.window(im_str!("Example: Fixed Overlay"))
             .opened(opened)
@@ -830,7 +830,7 @@ fn show_example_app_fixed_overlay(ui: &Ui, opened: &mut bool) {
 
 fn show_example_app_manipulating_window_title(ui: &Ui) {
     ui.window(im_str!("Same title as another window##1"))
-        .position((100.0, 100.0), Condition::FirstUseEver)
+        .position([100.0, 100.0], Condition::FirstUseEver)
         .build(|| {
             ui.text(
                 "This is window 1.
@@ -838,7 +838,7 @@ My title is the same as window 2, but my identifier is unique.",
             );
         });
     ui.window(im_str!("Same title as another window##2"))
-        .position((100.0, 200.0), Condition::FirstUseEver)
+        .position([100.0, 200.0], Condition::FirstUseEver)
         .build(|| {
             ui.text(
                 "This is window 2.
@@ -850,13 +850,13 @@ My title is the same as window 1, but my identifier is unique.",
     let num = ui.get_frame_count(); // The C++ version uses rand() here
     let title = im_str!("Animated title {} {}###AnimatedTitle", chars[ch_idx], num);
     ui.window(&title)
-        .position((100.0, 300.0), Condition::FirstUseEver)
+        .position([100.0, 300.0], Condition::FirstUseEver)
         .build(|| ui.text("This window has a changing title"));
 }
 
 fn show_example_app_custom_rendering(ui: &Ui, state: &mut CustomRenderingState, opened: &mut bool) {
     ui.window(im_str!("Example: Custom rendering"))
-        .size((350.0, 560.0), Condition::FirstUseEver)
+        .size([350.0, 560.0], Condition::FirstUseEver)
         .opened(opened)
         .build(|| {
             ui.text("Primitives");
@@ -865,13 +865,13 @@ fn show_example_app_custom_rendering(ui: &Ui, state: &mut CustomRenderingState, 
             let draw_list = ui.get_window_draw_list();
             let p = ui.get_cursor_screen_pos();
             let spacing = 8.0;
-            let mut y = p.1 + 4.0;
+            let mut y = p[1] + 4.0;
             for n in 0..2 {
-                let mut x = p.0 + 4.0;
+                let mut x = p[0] + 4.0;
                 let thickness = if n == 0 { 1.0 } else { 4.0 };
                 draw_list
                     .add_circle(
-                        (x + state.sz * 0.5, y + state.sz * 0.5),
+                        [x + state.sz * 0.5, y + state.sz * 0.5],
                         state.sz * 0.5,
                         state.col,
                     )
@@ -880,18 +880,18 @@ fn show_example_app_custom_rendering(ui: &Ui, state: &mut CustomRenderingState, 
                     .build();
                 x += state.sz + spacing;
                 draw_list
-                    .add_rect((x, y), (x + state.sz, y + state.sz), state.col)
+                    .add_rect([x, y], [x + state.sz, y + state.sz], state.col)
                     .thickness(thickness)
                     .build();
                 x += state.sz + spacing;
                 draw_list
-                    .add_rect((x, y), (x + state.sz, y + state.sz), state.col)
+                    .add_rect([x, y], [x + state.sz, y + state.sz], state.col)
                     .thickness(thickness)
                     .rounding(10.0)
                     .build();
                 x += state.sz + spacing;
                 draw_list
-                    .add_rect((x, y), (x + state.sz, y + state.sz), state.col)
+                    .add_rect([x, y], [x + state.sz, y + state.sz], state.col)
                     .thickness(thickness)
                     .rounding(10.0)
                     .round_top_right(false)
@@ -900,45 +900,45 @@ fn show_example_app_custom_rendering(ui: &Ui, state: &mut CustomRenderingState, 
                 x += state.sz + spacing;
                 draw_list
                     .add_triangle(
-                        (x + state.sz * 0.5, y),
-                        (x + state.sz, y + state.sz - 0.5),
-                        (x, y + state.sz - 0.5),
+                        [x + state.sz * 0.5, y],
+                        [x + state.sz, y + state.sz - 0.5],
+                        [x, y + state.sz - 0.5],
                         state.col,
                     )
                     .thickness(thickness)
                     .build();
                 x += state.sz + spacing;
                 draw_list
-                    .add_line((x, y), (x + state.sz, y), state.col)
+                    .add_line([x, y], [x + state.sz, y], state.col)
                     .thickness(thickness)
                     .build();
                 x += state.sz + spacing;
                 draw_list
-                    .add_line((x, y), (x + state.sz, y + state.sz), state.col)
+                    .add_line([x, y], [x + state.sz, y + state.sz], state.col)
                     .thickness(thickness)
                     .build();
                 x += state.sz + spacing;
                 draw_list
-                    .add_line((x, y), (x, y + state.sz), state.col)
+                    .add_line([x, y], [x, y + state.sz], state.col)
                     .thickness(thickness)
                     .build();
                 x += spacing;
                 draw_list
                     .add_bezier_curve(
-                        (x, y),
-                        (x + state.sz * 1.3, y + state.sz * 0.3),
-                        (x + state.sz - state.sz * 1.3, y + state.sz - state.sz * 0.3),
-                        (x + state.sz, y + state.sz),
+                        [x, y],
+                        [x + state.sz * 1.3, y + state.sz * 0.3],
+                        [x + state.sz - state.sz * 1.3, y + state.sz - state.sz * 0.3],
+                        [x + state.sz, y + state.sz],
                         state.col,
                     )
                     .thickness(thickness)
                     .build();
                 y += state.sz + spacing;
             }
-            let mut x = p.0 + 4.0;
+            let mut x = p[0] + 4.0;
             draw_list
                 .add_circle(
-                    (x + state.sz * 0.5, y + state.sz * 0.5),
+                    [x + state.sz * 0.5, y + state.sz * 0.5],
                     state.sz * 0.5,
                     state.col,
                 )
@@ -947,18 +947,18 @@ fn show_example_app_custom_rendering(ui: &Ui, state: &mut CustomRenderingState, 
                 .build();
             x += state.sz + spacing;
             draw_list
-                .add_rect((x, y), (x + state.sz, y + state.sz), state.col)
+                .add_rect([x, y], [x + state.sz, y + state.sz], state.col)
                 .filled(true)
                 .build();
             x += state.sz + spacing;
             draw_list
-                .add_rect((x, y), (x + state.sz, y + state.sz), state.col)
+                .add_rect([x, y], [x + state.sz, y + state.sz], state.col)
                 .filled(true)
                 .rounding(10.0)
                 .build();
             x += state.sz + spacing;
             draw_list
-                .add_rect((x, y), (x + state.sz, y + state.sz), state.col)
+                .add_rect([x, y], [x + state.sz, y + state.sz], state.col)
                 .filled(true)
                 .rounding(10.0)
                 .round_top_right(false)
@@ -967,9 +967,9 @@ fn show_example_app_custom_rendering(ui: &Ui, state: &mut CustomRenderingState, 
             x += state.sz + spacing;
             draw_list
                 .add_triangle(
-                    (x + state.sz * 0.5, y),
-                    (x + state.sz, y + state.sz - 0.5),
-                    (x, y + state.sz - 0.5),
+                    [x + state.sz * 0.5, y],
+                    [x + state.sz, y + state.sz - 0.5],
+                    [x, y + state.sz - 0.5],
                     state.col,
                 )
                 .filled(true)
@@ -980,23 +980,23 @@ fn show_example_app_custom_rendering(ui: &Ui, state: &mut CustomRenderingState, 
             const MULTICOLOR_RECT_CORNER_COLOR3: [f32; 3] = [1.0, 1.0, 0.0];
             const MULTICOLOR_RECT_CORNER_COLOR4: [f32; 3] = [0.0, 1.0, 0.0];
             draw_list.add_rect_filled_multicolor(
-                (x, y),
-                (x + state.sz, y + state.sz),
+                [x, y],
+                [x + state.sz, y + state.sz],
                 MULTICOLOR_RECT_CORNER_COLOR1,
                 MULTICOLOR_RECT_CORNER_COLOR2,
                 MULTICOLOR_RECT_CORNER_COLOR3,
                 MULTICOLOR_RECT_CORNER_COLOR4,
             );
-            ui.dummy(((state.sz + spacing) * 8.0, (state.sz + spacing) * 3.0));
+            ui.dummy([(state.sz + spacing) * 8.0, (state.sz + spacing) * 3.0]);
             ui.separator();
 
             ui.text(im_str!("Canvas example"));
-            if ui.button(im_str!("Clear"), (0.0, 0.0)) {
+            if ui.button(im_str!("Clear"), [0.0, 0.0]) {
                 state.points.clear();
             }
             if state.points.len() >= 2 {
                 ui.same_line(0.0);
-                if ui.button(im_str!("Undo"), (0.0, 0.0)) {
+                if ui.button(im_str!("Undo"), [0.0, 0.0]) {
                     state.points.pop();
                     state.points.pop();
                 }
@@ -1017,11 +1017,11 @@ fn show_example_app_custom_rendering(ui: &Ui, state: &mut CustomRenderingState, 
             let canvas_pos = ui.get_cursor_screen_pos();
             // Resize canvas to what's available
             let mut canvas_size = ui.get_content_region_avail();
-            if canvas_size.0 < 50.0 {
-                canvas_size.0 = 50.0;
+            if canvas_size[0] < 50.0 {
+                canvas_size[0] = 50.0;
             }
-            if canvas_size.1 < 50.0 {
-                canvas_size.1 = 50.0;
+            if canvas_size[1] < 50.0 {
+                canvas_size[1] = 50.0;
             }
             const CANVAS_CORNER_COLOR1: [f32; 3] = [0.2, 0.2, 0.2];
             const CANVAS_CORNER_COLOR2: [f32; 3] = [0.2, 0.2, 0.24];
@@ -1029,7 +1029,10 @@ fn show_example_app_custom_rendering(ui: &Ui, state: &mut CustomRenderingState, 
             const CANVAS_CORNER_COLOR4: [f32; 3] = [0.2, 0.2, 0.24];
             draw_list.add_rect_filled_multicolor(
                 canvas_pos,
-                (canvas_pos.0 + canvas_size.0, canvas_pos.1 + canvas_size.1),
+                [
+                    canvas_pos[0] + canvas_size[0],
+                    canvas_pos[1] + canvas_size[1],
+                ],
                 CANVAS_CORNER_COLOR1,
                 CANVAS_CORNER_COLOR2,
                 CANVAS_CORNER_COLOR3,
@@ -1039,7 +1042,10 @@ fn show_example_app_custom_rendering(ui: &Ui, state: &mut CustomRenderingState, 
             draw_list
                 .add_rect(
                     canvas_pos,
-                    (canvas_pos.0 + canvas_size.0, canvas_pos.1 + canvas_size.1),
+                    [
+                        canvas_pos[0] + canvas_size[0],
+                        canvas_pos[1] + canvas_size[1],
+                    ],
                     CANVAS_BORDER_COLOR,
                 )
                 .build();
@@ -1047,7 +1053,7 @@ fn show_example_app_custom_rendering(ui: &Ui, state: &mut CustomRenderingState, 
             let mut adding_preview = false;
             ui.invisible_button(im_str!("canvas"), canvas_size);
             let mouse_pos = ui.io().mouse_pos;
-            let mouse_pos_in_canvas = (mouse_pos[0] - canvas_pos.0, mouse_pos[1] - canvas_pos.1);
+            let mouse_pos_in_canvas = [mouse_pos[0] - canvas_pos[0], mouse_pos[1] - canvas_pos[1]];
             if state.adding_line {
                 adding_preview = true;
                 state.points.push(mouse_pos_in_canvas);
@@ -1070,7 +1076,10 @@ fn show_example_app_custom_rendering(ui: &Ui, state: &mut CustomRenderingState, 
             }
             draw_list.with_clip_rect_intersect(
                 canvas_pos,
-                (canvas_pos.0 + canvas_size.0, canvas_pos.1 + canvas_size.1),
+                [
+                    canvas_pos[0] + canvas_size[0],
+                    canvas_pos[1] + canvas_size[1],
+                ],
                 || {
                     const LINE_COLOR: [f32; 3] = [1.0, 1.0, 0.0];
                     for line in state.points.chunks(2) {
@@ -1080,8 +1089,8 @@ fn show_example_app_custom_rendering(ui: &Ui, state: &mut CustomRenderingState, 
                         let (p1, p2) = (line[0], line[1]);
                         draw_list
                             .add_line(
-                                (canvas_pos.0 + p1.0, canvas_pos.1 + p1.1),
-                                (canvas_pos.0 + p2.0, canvas_pos.1 + p2.1),
+                                [canvas_pos[0] + p1[0], canvas_pos[1] + p1[1]],
+                                [canvas_pos[0] + p2[0], canvas_pos[1] + p2[1]],
                                 LINE_COLOR,
                             )
                             .thickness(2.0)

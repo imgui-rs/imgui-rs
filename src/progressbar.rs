@@ -3,13 +3,13 @@ use std::marker::PhantomData;
 use std::ptr;
 use sys;
 
-use super::{ImStr, ImVec2, Ui};
+use super::{ImStr, Ui};
 
 /// Progress bar widget.
 #[must_use]
 pub struct ProgressBar<'ui, 'p> {
     fraction: f32,
-    size: ImVec2,
+    size: [f32; 2],
     overlay_text: Option<&'p ImStr>,
     _phantom: PhantomData<&'ui Ui<'ui>>,
 }
@@ -23,7 +23,7 @@ impl<'ui, 'p> ProgressBar<'ui, 'p> {
     pub fn new(_: &Ui<'ui>, fraction: f32) -> Self {
         ProgressBar {
             fraction,
-            size: ImVec2::new(-1.0, 0.0),
+            size: [-1.0, 0.0],
             overlay_text: None,
             _phantom: PhantomData,
         }
@@ -40,8 +40,8 @@ impl<'ui, 'p> ProgressBar<'ui, 'p> {
     /// align to the end of the axis, zero will let the progress bar choose a
     /// size and positive values will use the given size.
     #[inline]
-    pub fn size<S: Into<ImVec2>>(mut self, size: S) -> Self {
-        self.size = size.into();
+    pub fn size(mut self, size: [f32; 2]) -> Self {
+        self.size = size;
         self
     }
 
@@ -51,7 +51,7 @@ impl<'ui, 'p> ProgressBar<'ui, 'p> {
         unsafe {
             sys::igProgressBar(
                 self.fraction,
-                self.size,
+                self.size.into(),
                 self.overlay_text.map(|x| x.as_ptr()).unwrap_or(ptr::null()),
             );
         }

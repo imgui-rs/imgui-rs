@@ -7,10 +7,10 @@ use crate::{Condition, ImStr, Ui};
 
 #[must_use]
 pub struct Window<'ui, 'p> {
-    pos: (f32, f32),
+    pos: [f32; 2],
     pos_cond: Condition,
-    pos_pivot: (f32, f32),
-    size: (f32, f32),
+    pos_pivot: [f32; 2],
+    size: [f32; 2],
     size_cond: Condition,
     name: &'p ImStr,
     opened: Option<&'p mut bool>,
@@ -21,10 +21,10 @@ pub struct Window<'ui, 'p> {
 impl<'ui, 'p> Window<'ui, 'p> {
     pub fn new(_: &Ui<'ui>, name: &'p ImStr) -> Window<'ui, 'p> {
         Window {
-            pos: (0.0, 0.0),
+            pos: [0.0, 0.0],
             pos_cond: Condition::Never,
-            pos_pivot: (0.0, 0.0),
-            size: (0.0, 0.0),
+            pos_pivot: [0.0, 0.0],
+            size: [0.0, 0.0],
             size_cond: Condition::Never,
             name,
             opened: None,
@@ -33,18 +33,18 @@ impl<'ui, 'p> Window<'ui, 'p> {
         }
     }
     #[inline]
-    pub fn position(mut self, pos: (f32, f32), cond: Condition) -> Self {
+    pub fn position(mut self, pos: [f32; 2], cond: Condition) -> Self {
         self.pos = pos;
         self.pos_cond = cond;
         self
     }
     #[inline]
-    pub fn position_pivot(mut self, pivot: (f32, f32)) -> Self {
+    pub fn position_pivot(mut self, pivot: [f32; 2]) -> Self {
         self.pos_pivot = pivot;
         self
     }
     #[inline]
-    pub fn size(mut self, size: (f32, f32), cond: Condition) -> Self {
+    pub fn size(mut self, size: [f32; 2], cond: Condition) -> Self {
         self.size = size;
         self.size_cond = cond;
         self

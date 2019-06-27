@@ -3,7 +3,7 @@ use std::os::raw::c_void;
 
 use crate::render::renderer::TextureId;
 use crate::sys;
-use crate::{ImVec2, ImVec4, Ui};
+use crate::Ui;
 
 /// Represent an image about to be drawn.
 /// See [`Ui::image`].
@@ -12,36 +12,23 @@ use crate::{ImVec2, ImVec4, Ui};
 #[must_use]
 pub struct Image<'ui> {
     texture_id: TextureId,
-    size: ImVec2,
-    uv0: ImVec2,
-    uv1: ImVec2,
-    tint_col: ImVec4,
-    border_col: ImVec4,
+    size: [f32; 2],
+    uv0: [f32; 2],
+    uv1: [f32; 2],
+    tint_col: [f32; 4],
+    border_col: [f32; 4],
     _phantom: PhantomData<&'ui Ui<'ui>>,
 }
 
 impl<'ui> Image<'ui> {
-    pub fn new<S>(_: &Ui<'ui>, texture_id: TextureId, size: S) -> Self
-    where
-        S: Into<ImVec2>,
-    {
-        const DEFAULT_UV0: ImVec2 = ImVec2 { x: 0.0, y: 0.0 };
-        const DEFAULT_UV1: ImVec2 = ImVec2 { x: 1.0, y: 1.0 };
-        const DEFAULT_TINT_COL: ImVec4 = ImVec4 {
-            x: 1.0,
-            y: 1.0,
-            z: 1.0,
-            w: 1.0,
-        };
-        const DEFAULT_BORDER_COL: ImVec4 = ImVec4 {
-            x: 0.0,
-            y: 0.0,
-            z: 0.0,
-            w: 0.0,
-        };
+    pub fn new(_: &Ui<'ui>, texture_id: TextureId, size: [f32; 2]) -> Self {
+        const DEFAULT_UV0: [f32; 2] = [0.0, 0.0];
+        const DEFAULT_UV1: [f32; 2] = [1.0, 1.0];
+        const DEFAULT_TINT_COL: [f32; 4] = [1.0, 1.0, 1.0, 1.0];
+        const DEFAULT_BORDER_COL: [f32; 4] = [0.0, 0.0, 0.0, 0.0];
         Image {
             texture_id,
-            size: size.into(),
+            size,
             uv0: DEFAULT_UV0,
             uv1: DEFAULT_UV1,
             tint_col: DEFAULT_TINT_COL,
@@ -50,28 +37,28 @@ impl<'ui> Image<'ui> {
         }
     }
     /// Set size (default based on texture)
-    pub fn size<T: Into<ImVec2>>(mut self, size: T) -> Self {
-        self.size = size.into();
+    pub fn size(mut self, size: [f32; 2]) -> Self {
+        self.size = size;
         self
     }
     /// Set uv0 (default `[0.0, 0.0]`)
-    pub fn uv0<T: Into<ImVec2>>(mut self, uv0: T) -> Self {
-        self.uv0 = uv0.into();
+    pub fn uv0(mut self, uv0: [f32; 2]) -> Self {
+        self.uv0 = uv0;
         self
     }
     /// Set uv1 (default `[1.0, 1.0]`)
-    pub fn uv1<T: Into<ImVec2>>(mut self, uv1: T) -> Self {
-        self.uv1 = uv1.into();
+    pub fn uv1(mut self, uv1: [f32; 2]) -> Self {
+        self.uv1 = uv1;
         self
     }
     /// Set tint color (default: no tint color)
-    pub fn tint_col<T: Into<ImVec4>>(mut self, tint_col: T) -> Self {
-        self.tint_col = tint_col.into();
+    pub fn tint_col(mut self, tint_col: [f32; 4]) -> Self {
+        self.tint_col = tint_col;
         self
     }
     /// Set border color (default: no border)
-    pub fn border_col<T: Into<ImVec4>>(mut self, border_col: T) -> Self {
-        self.border_col = border_col.into();
+    pub fn border_col(mut self, border_col: [f32; 4]) -> Self {
+        self.border_col = border_col;
         self
     }
     /// Draw image where the cursor currently is
@@ -79,11 +66,11 @@ impl<'ui> Image<'ui> {
         unsafe {
             sys::igImage(
                 self.texture_id.id() as *mut c_void,
-                self.size,
-                self.uv0,
-                self.uv1,
-                self.tint_col,
-                self.border_col,
+                self.size.into(),
+                self.uv0.into(),
+                self.uv1.into(),
+                self.tint_col.into(),
+                self.border_col.into(),
             );
         }
     }
@@ -96,38 +83,25 @@ impl<'ui> Image<'ui> {
 #[must_use]
 pub struct ImageButton<'ui> {
     texture_id: TextureId,
-    size: ImVec2,
-    uv0: ImVec2,
-    uv1: ImVec2,
+    size: [f32; 2],
+    uv0: [f32; 2],
+    uv1: [f32; 2],
     frame_padding: i32,
-    bg_col: ImVec4,
-    tint_col: ImVec4,
+    bg_col: [f32; 4],
+    tint_col: [f32; 4],
     _phantom: PhantomData<&'ui Ui<'ui>>,
 }
 
 impl<'ui> ImageButton<'ui> {
-    pub fn new<S>(_: &Ui<'ui>, texture_id: TextureId, size: S) -> Self
-    where
-        S: Into<ImVec2>,
-    {
-        const DEFAULT_UV0: ImVec2 = ImVec2 { x: 0.0, y: 0.0 };
-        const DEFAULT_UV1: ImVec2 = ImVec2 { x: 1.0, y: 1.0 };
+    pub fn new(_: &Ui<'ui>, texture_id: TextureId, size: [f32; 2]) -> Self {
+        const DEFAULT_UV0: [f32; 2] = [0.0, 0.0];
+        const DEFAULT_UV1: [f32; 2] = [1.0, 1.0];
         const DEFAULT_FRAME_PADDING: i32 = -1;
-        const DEFAULT_BG_COL: ImVec4 = ImVec4 {
-            x: 0.0,
-            y: 0.0,
-            z: 0.0,
-            w: 0.0,
-        };
-        const DEFAULT_TINT_COL: ImVec4 = ImVec4 {
-            x: 1.0,
-            y: 1.0,
-            z: 1.0,
-            w: 1.0,
-        };
+        const DEFAULT_BG_COL: [f32; 4] = [0.0, 0.0, 0.0, 0.0];
+        const DEFAULT_TINT_COL: [f32; 4] = [1.0, 1.0, 1.0, 1.0];
         ImageButton {
             texture_id,
-            size: size.into(),
+            size: size,
             uv0: DEFAULT_UV0,
             uv1: DEFAULT_UV1,
             frame_padding: DEFAULT_FRAME_PADDING,
@@ -137,18 +111,18 @@ impl<'ui> ImageButton<'ui> {
         }
     }
     /// Set size (default based on texture)
-    pub fn size<T: Into<ImVec2>>(mut self, size: T) -> Self {
-        self.size = size.into();
+    pub fn size(mut self, size: [f32; 2]) -> Self {
+        self.size = size;
         self
     }
     /// Set uv0 (default `[0.0, 0.0]`)
-    pub fn uv0<T: Into<ImVec2>>(mut self, uv0: T) -> Self {
-        self.uv0 = uv0.into();
+    pub fn uv0(mut self, uv0: [f32; 2]) -> Self {
+        self.uv0 = uv0;
         self
     }
     /// Set uv1 (default `[1.0, 1.0]`)
-    pub fn uv1<T: Into<ImVec2>>(mut self, uv1: T) -> Self {
-        self.uv1 = uv1.into();
+    pub fn uv1(mut self, uv1: [f32; 2]) -> Self {
+        self.uv1 = uv1;
         self
     }
     /// Set frame padding (default: uses frame padding from style).
@@ -160,13 +134,13 @@ impl<'ui> ImageButton<'ui> {
         self
     }
     /// Set tint color (default: no tint color)
-    pub fn tint_col<T: Into<ImVec4>>(mut self, tint_col: T) -> Self {
-        self.tint_col = tint_col.into();
+    pub fn tint_col(mut self, tint_col: [f32; 4]) -> Self {
+        self.tint_col = tint_col;
         self
     }
     /// Set background color (default: no background color)
-    pub fn background_col<T: Into<ImVec4>>(mut self, bg_col: T) -> Self {
-        self.bg_col = bg_col.into();
+    pub fn background_col(mut self, bg_col: [f32; 4]) -> Self {
+        self.bg_col = bg_col;
         self
     }
     /// Draw image button where the cursor currently is
@@ -174,12 +148,12 @@ impl<'ui> ImageButton<'ui> {
         unsafe {
             sys::igImageButton(
                 self.texture_id.id() as *mut c_void,
-                self.size,
-                self.uv0,
-                self.uv1,
+                self.size.into(),
+                self.uv0.into(),
+                self.uv1.into(),
                 self.frame_padding,
-                self.bg_col,
-                self.tint_col,
+                self.bg_col.into(),
+                self.tint_col.into(),
             )
         }
     }
