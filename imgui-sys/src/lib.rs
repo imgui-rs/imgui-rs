@@ -42,8 +42,9 @@ pub use bindings::{
     ImGuiInputTextCallbackData, ImGuiInputTextCallbackData_DeleteChars,
     ImGuiInputTextCallbackData_HasSelection, ImGuiInputTextCallbackData_ImGuiInputTextCallbackData,
     ImGuiInputTextCallbackData_InsertChars, ImGuiInputTextCallbackData_destroy, ImGuiListClipper,
-    ImGuiSizeCallback, ImGuiStorage, ImTextureID, ImU32, ImVec2, ImVec2_Simple, ImVec4,
-    ImVec4_Simple, ImVector_ImFontPtr, ImVector_ImWchar, ImVector_char, ImWchar,
+    ImGuiPayload, ImGuiSizeCallback, ImGuiStorage, ImGuiTextBuffer, ImGuiTextFilter, ImTextureID,
+    ImU32, ImVec2, ImVec2_Simple, ImVec4, ImVec4_Simple, ImVector_ImFontPtr, ImVector_ImWchar,
+    ImVector_char, ImWchar,
 };
 pub use legacy::*;
 
