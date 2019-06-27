@@ -819,10 +819,10 @@ fn show_example_app_fixed_overlay(ui: &Ui, opened: &mut bool) {
             .build(|| {
                 ui.text("Simple overlay\nin the corner of the screen.\n(right-click to change position)");
                 ui.separator();
-                let mouse_pos = ui.imgui().mouse_pos();
+                let mouse_pos = ui.io().mouse_pos;
                 ui.text(format!(
                     "Mouse Position: ({:.1},{:.1})",
-                    mouse_pos.0, mouse_pos.1
+                    mouse_pos[0], mouse_pos[1]
                 ));
             })
     })
@@ -846,8 +846,8 @@ My title is the same as window 1, but my identifier is unique.",
             );
         });
     let chars = ['|', '/', '-', '\\'];
-    let ch_idx = (ui.imgui().get_time() / 0.25) as usize & 3;
-    let num = ui.imgui().get_frame_count(); // The C++ version uses rand() here
+    let ch_idx = (ui.get_time() / 0.25) as usize & 3;
+    let num = ui.get_frame_count(); // The C++ version uses rand() here
     let title = im_str!("Animated title {} {}###AnimatedTitle", chars[ch_idx], num);
     ui.window(&title)
         .position((100.0, 300.0), Condition::FirstUseEver)
@@ -1046,22 +1046,22 @@ fn show_example_app_custom_rendering(ui: &Ui, state: &mut CustomRenderingState, 
 
             let mut adding_preview = false;
             ui.invisible_button(im_str!("canvas"), canvas_size);
-            let mouse_pos = ui.imgui().mouse_pos();
-            let mouse_pos_in_canvas = (mouse_pos.0 - canvas_pos.0, mouse_pos.1 - canvas_pos.1);
+            let mouse_pos = ui.io().mouse_pos;
+            let mouse_pos_in_canvas = (mouse_pos[0] - canvas_pos.0, mouse_pos[1] - canvas_pos.1);
             if state.adding_line {
                 adding_preview = true;
                 state.points.push(mouse_pos_in_canvas);
-                if !ui.imgui().is_mouse_down(MouseButton::Left) {
+                if !ui.is_mouse_down(MouseButton::Left) {
                     state.adding_line = false;
                     adding_preview = false;
                 }
             }
             if ui.is_item_hovered() {
-                if !state.adding_line && ui.imgui().is_mouse_clicked(MouseButton::Left) {
+                if !state.adding_line && ui.is_mouse_clicked(MouseButton::Left) {
                     state.points.push(mouse_pos_in_canvas);
                     state.adding_line = true;
                 }
-                if ui.imgui().is_mouse_clicked(MouseButton::Right) && !state.points.is_empty() {
+                if ui.is_mouse_clicked(MouseButton::Right) && !state.points.is_empty() {
                     state.adding_line = false;
                     adding_preview = false;
                     state.points.pop();

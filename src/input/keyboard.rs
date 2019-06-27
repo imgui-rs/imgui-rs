@@ -83,11 +83,19 @@ impl<'ui> Ui<'ui> {
     pub fn is_key_pressed(&self, key_index: u32) -> bool {
         unsafe { sys::igIsKeyPressed(key_index as i32, true) }
     }
+    pub fn is_key_released(&self, key_index: u32) -> bool {
+        unsafe { sys::igIsKeyReleased(key_index as i32) }
+    }
     /// Returns a count of key presses using the given repeat rate/delay settings.
     ///
     /// Usually returns 0 or 1, but might be >1 if `rate` is small enough that `io.delta_time` >
     /// `rate`.
     pub fn key_pressed_amount(&self, key_index: u32, repeat_delay: f32, rate: f32) -> u32 {
         unsafe { sys::igGetKeyPressedAmount(key_index as i32, repeat_delay, rate) as u32 }
+    }
+    pub fn set_keyboard_focus_here(&self, offset: i32) {
+        unsafe {
+            sys::igSetKeyboardFocusHere(offset);
+        }
     }
 }

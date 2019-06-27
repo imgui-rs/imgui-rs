@@ -2,6 +2,11 @@
 use bitflags::bitflags;
 use std::os::raw::c_int;
 
+use crate::input::keyboard::Key;
+use crate::input::mouse::MouseButton;
+use crate::internal::RawCast;
+use crate::{Context, Ui};
+
 bitflags!(
     /// Color edit flags
     #[repr(C)]
@@ -360,3 +365,305 @@ bitflags!(
             | ImGuiWindowFlags::NoNavFocus.bits;
     }
 );
+
+impl Context {
+    #[deprecated(since = "0.1.0", note = "Access Io::ini_saving_rate directly instead")]
+    pub fn set_ini_saving_rate(&mut self, value: f32) {
+        let io = self.io_mut();
+        io.ini_saving_rate = value;
+    }
+    #[deprecated(
+        since = "0.1.0",
+        note = "Access Io::font_global_scale directly instead"
+    )]
+    pub fn set_font_global_scale(&mut self, value: f32) {
+        let io = self.io_mut();
+        io.font_global_scale = value;
+    }
+    #[deprecated(
+        since = "0.1.0",
+        note = "Access Io::mouse_double_click_time directly instead"
+    )]
+    pub fn set_mouse_double_click_time(&mut self, value: f32) {
+        let io = self.io_mut();
+        io.mouse_double_click_time = value;
+    }
+    #[deprecated(
+        since = "0.1.0",
+        note = "Access Io::mouse_double_click_max_dist directly instead"
+    )]
+    pub fn set_mouse_double_click_max_dist(&mut self, value: f32) {
+        let io = self.io_mut();
+        io.mouse_double_click_max_dist = value;
+    }
+    #[deprecated(
+        since = "0.1.0",
+        note = "Access Io::mouse_drag_threshold directly instead"
+    )]
+    pub fn set_mouse_drag_threshold(&mut self, value: f32) {
+        let io = self.io_mut();
+        io.mouse_drag_threshold = value;
+    }
+    #[deprecated(since = "0.1.0", note = "Access Io::key_repeat_delay directly instead")]
+    pub fn set_key_repeat_delay(&mut self, value: f32) {
+        let io = self.io_mut();
+        io.key_repeat_delay = value;
+    }
+    #[deprecated(since = "0.1.0", note = "Access Io::key_repeat_rate directly instead")]
+    pub fn set_key_repeat_rate(&mut self, value: f32) {
+        let io = self.io_mut();
+        io.key_repeat_rate = value;
+    }
+    #[deprecated(since = "0.1.0", note = "Access Io::display_size directly instead")]
+    pub fn display_size(&self) -> (f32, f32) {
+        let io = self.io();
+        (io.display_size[0], io.display_size[1])
+    }
+    #[deprecated(
+        since = "0.1.0",
+        note = "Access Io::display_framebuffer_scale directly instead"
+    )]
+    pub fn display_framebuffer_scale(&self) -> (f32, f32) {
+        let io = self.io();
+        (
+            io.display_framebuffer_scale[0],
+            io.display_framebuffer_scale[1],
+        )
+    }
+    #[deprecated(since = "0.1.0", note = "Access Io::mouse_pos directly instead")]
+    pub fn mouse_pos(&self) -> (f32, f32) {
+        let io = self.io();
+        (io.mouse_pos[0], io.mouse_pos[1])
+    }
+    #[deprecated(since = "0.1.0", note = "Access Io::mouse_pos directly instead")]
+    pub fn set_mouse_pos(&mut self, x: f32, y: f32) {
+        let io = self.io_mut();
+        io.mouse_pos = [x, y];
+    }
+    /// Get mouse's position's delta between the current and the last frame.
+    #[deprecated(since = "0.1.0", note = "Access Io::mouse_delta directly instead")]
+    pub fn mouse_delta(&self) -> (f32, f32) {
+        let io = self.io();
+        (io.mouse_delta[0], io.mouse_delta[1])
+    }
+    #[deprecated(since = "0.1.0", note = "Access Io::mouse_down directly instead")]
+    pub fn mouse_down(&self) -> [bool; 5] {
+        let io = self.io();
+        io.mouse_down
+    }
+    #[deprecated(since = "0.1.0", note = "Access Io::mouse_down directly instead")]
+    pub fn set_mouse_down(&mut self, states: [bool; 5]) {
+        let io = self.io_mut();
+        io.mouse_down = states;
+    }
+    #[deprecated(since = "0.1.0", note = "Access Io::mouse_wheel directly instead")]
+    pub fn set_mouse_wheel(&mut self, value: f32) {
+        let io = self.io_mut();
+        io.mouse_wheel = value;
+    }
+    /// Get mouse wheel delta
+    #[deprecated(since = "0.1.0", note = "Access Io::mouse_wheel directly instead")]
+    pub fn mouse_wheel(&self) -> f32 {
+        let io = self.io();
+        io.mouse_wheel
+    }
+    #[deprecated(since = "0.1.0", note = "Use Ui::mouse_drag_delta instead")]
+    pub fn mouse_drag_delta(&self, button: MouseButton) -> (f32, f32) {
+        let delta = unsafe { sys::igGetMouseDragDelta_nonUDT2(button as c_int, -1.0) };
+        delta.into()
+    }
+    /// Set to `true` to have ImGui draw the cursor in software.
+    /// If `false`, the OS cursor is used (default to `false`).
+    #[deprecated(
+        since = "0.1.0",
+        note = "Access Io::mouse_draw_cursor directly instead"
+    )]
+    pub fn set_mouse_draw_cursor(&mut self, value: bool) {
+        let io = self.io_mut();
+        io.mouse_draw_cursor = value;
+    }
+    #[deprecated(
+        since = "0.1.0",
+        note = "Access Io::mouse_draw_cursor directly instead"
+    )]
+    pub fn mouse_draw_cursor(&self) -> bool {
+        let io = self.io();
+        io.mouse_draw_cursor
+    }
+    /// Returns `true` if mouse is currently dragging with the `button` provided
+    /// as argument.
+    #[deprecated(since = "0.1.0", note = "Use Ui::is_mouse_dragging instead")]
+    pub fn is_mouse_dragging(&self, button: MouseButton) -> bool {
+        unsafe { sys::igIsMouseDragging(button as c_int, -1.0) }
+    }
+    /// Returns `true` if the `button` provided as argument is currently down.
+    #[deprecated(since = "0.1.0", note = "Use Ui::is_mouse_down instead")]
+    pub fn is_mouse_down(&self, button: MouseButton) -> bool {
+        unsafe { sys::igIsMouseDown(button as c_int) }
+    }
+    /// Returns `true` if the `button` provided as argument is being clicked.
+    #[deprecated(since = "0.1.0", note = "Use Ui::is_mouse_clicked instead")]
+    pub fn is_mouse_clicked(&self, button: MouseButton) -> bool {
+        unsafe { sys::igIsMouseClicked(button as c_int, false) }
+    }
+    /// Returns `true` if the `button` provided as argument is being double-clicked.
+    #[deprecated(since = "0.1.0", note = "Use Ui::is_mouse_double_clicked instead")]
+    pub fn is_mouse_double_clicked(&self, button: MouseButton) -> bool {
+        unsafe { sys::igIsMouseDoubleClicked(button as c_int) }
+    }
+    /// Returns `true` if the `button` provided as argument was released
+    #[deprecated(since = "0.1.0", note = "Use Ui::is_mouse_released instead")]
+    pub fn is_mouse_released(&self, button: MouseButton) -> bool {
+        unsafe { sys::igIsMouseReleased(button as c_int) }
+    }
+    #[deprecated(since = "0.1.0", note = "Access Io::key_ctrl directly instead")]
+    pub fn key_ctrl(&self) -> bool {
+        let io = self.io();
+        io.key_ctrl
+    }
+    #[deprecated(since = "0.1.0", note = "Access Io::key_ctrl directly instead")]
+    pub fn set_key_ctrl(&mut self, value: bool) {
+        let io = self.io_mut();
+        io.key_ctrl = value;
+    }
+    #[deprecated(since = "0.1.0", note = "Access Io::key_shift directly instead")]
+    pub fn key_shift(&self) -> bool {
+        let io = self.io();
+        io.key_shift
+    }
+    #[deprecated(since = "0.1.0", note = "Access Io::key_shift directly instead")]
+    pub fn set_key_shift(&mut self, value: bool) {
+        let io = self.io_mut();
+        io.key_shift = value;
+    }
+    #[deprecated(since = "0.1.0", note = "Access Io::key_alt directly instead")]
+    pub fn key_alt(&self) -> bool {
+        let io = self.io();
+        io.key_alt
+    }
+    #[deprecated(since = "0.1.0", note = "Access Io::key_alt directly instead")]
+    pub fn set_key_alt(&mut self, value: bool) {
+        let io = self.io_mut();
+        io.key_alt = value;
+    }
+    #[deprecated(since = "0.1.0", note = "Access Io::key_super directly instead")]
+    pub fn key_super(&self) -> bool {
+        let io = self.io();
+        io.key_super
+    }
+    #[deprecated(since = "0.1.0", note = "Access Io::key_super directly instead")]
+    pub fn set_key_super(&mut self, value: bool) {
+        let io = self.io_mut();
+        io.key_super = value;
+    }
+    #[deprecated(since = "0.1.0", note = "Access Io::keys_down directly instead")]
+    pub fn set_key(&mut self, key: u8, pressed: bool) {
+        let io = self.io_mut();
+        io.keys_down[key as usize] = pressed;
+    }
+    #[deprecated(since = "0.1.0", note = "Index Io::key_map with the key instead")]
+    pub fn set_imgui_key(&mut self, key: Key, mapping: u8) {
+        let io = self.io_mut();
+        io.key_map[key as usize] = u32::from(mapping);
+    }
+    /// Map [`Key`] values into user's key index
+    #[deprecated(since = "0.1.0", note = "Index Io::key_map with the key instead")]
+    pub fn get_key_index(&self, key: Key) -> usize {
+        unsafe { sys::igGetKeyIndex(key as i32) as usize }
+    }
+    /// Return whether specific key is being held
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// use imgui::{Key, Ui};
+    ///
+    /// fn test(ui: &Ui) {
+    ///     let delete_key_index = ui.imgui().get_key_index(Key::Delete);
+    ///     if ui.imgui().is_key_down(delete_key_index) {
+    ///         println!("Delete is being held!");
+    ///     }
+    /// }
+    /// ```
+    #[deprecated(since = "0.1.0", note = "Use Ui::is_key_down instead")]
+    pub fn is_key_down(&self, user_key_index: usize) -> bool {
+        unsafe { sys::igIsKeyDown(user_key_index as c_int) }
+    }
+    /// Return whether specific key was pressed
+    #[deprecated(since = "0.1.0", note = "Use Ui::is_key_pressed instead")]
+    pub fn is_key_pressed(&self, user_key_index: usize) -> bool {
+        unsafe { sys::igIsKeyPressed(user_key_index as c_int, true) }
+    }
+    /// Return whether specific key was released
+    #[deprecated(since = "0.1.0", note = "Use Ui::is_key_released instead")]
+    pub fn is_key_released(&self, user_key_index: usize) -> bool {
+        unsafe { sys::igIsKeyReleased(user_key_index as c_int) }
+    }
+    #[deprecated(since = "0.1.0", note = "Use Io::add_input_character instead")]
+    pub fn add_input_character(&mut self, character: char) {
+        let mut buf = [0; 5];
+        character.encode_utf8(&mut buf);
+        unsafe {
+            sys::ImGuiIO_AddInputCharactersUTF8(self.io_mut().raw_mut(), buf.as_ptr() as *const _);
+        }
+    }
+    #[deprecated(since = "0.1.0", note = "Access Io::framerate directly instead")]
+    pub fn get_frame_rate(&self) -> f32 {
+        self.io().framerate
+    }
+}
+
+impl<'ui> Ui<'ui> {
+    #[deprecated(
+        since = "0.1.0",
+        note = "This function is potentially unsafe and will be removed"
+    )]
+    pub fn imgui(&self) -> &Context {
+        self.ctx
+    }
+    #[deprecated(
+        since = "0.1.0",
+        note = "Access Io::want_capture_mouse directly instead"
+    )]
+    pub fn want_capture_mouse(&self) -> bool {
+        let io = self.io();
+        io.want_capture_mouse
+    }
+    #[deprecated(
+        since = "0.1.0",
+        note = "Access Io::want_capture_keyboard directly instead"
+    )]
+    pub fn want_capture_keyboard(&self) -> bool {
+        let io = self.io();
+        io.want_capture_keyboard
+    }
+    #[deprecated(since = "0.1.0", note = "Access Io::framerate directly instead")]
+    pub fn framerate(&self) -> f32 {
+        let io = self.io();
+        io.framerate
+    }
+    #[deprecated(
+        since = "0.1.0",
+        note = "Access Io::metrics_render_vertices directly instead"
+    )]
+    pub fn metrics_render_vertices(&self) -> i32 {
+        let io = self.io();
+        io.metrics_render_vertices
+    }
+    #[deprecated(
+        since = "0.1.0",
+        note = "Access Io::metrics_render_indices directly instead"
+    )]
+    pub fn metrics_render_indices(&self) -> i32 {
+        let io = self.io();
+        io.metrics_render_indices
+    }
+    #[deprecated(
+        since = "0.1.0",
+        note = "Access Io::metrics_active_windows directly instead"
+    )]
+    pub fn metrics_active_windows(&self) -> i32 {
+        let io = self.io();
+        io.metrics_active_windows
+    }
+}

@@ -83,7 +83,7 @@ pub fn run<F: FnMut(&Ui) -> bool>(title: String, clear_color: [f32; 4], mut run_
         &FontGlyphRange::japanese(),
     );
 
-    imgui.set_font_global_scale((1.0 / hidpi_factor) as f32);
+    imgui.io_mut().font_global_scale = (1.0 / hidpi_factor) as f32;
 
     let mut renderer = GfxRenderer::init(&mut imgui, &mut factory, shaders)
         .expect("Failed to initialize renderer");

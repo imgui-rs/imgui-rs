@@ -74,6 +74,19 @@ mod trees;
 mod window;
 mod window_draw_list;
 
+/// Returns the underlying Dear ImGui library version
+pub fn dear_imgui_version() -> &'static str {
+    unsafe {
+        let bytes = CStr::from_ptr(sys::igGetVersion()).to_bytes();
+        str::from_utf8_unchecked(bytes)
+    }
+}
+
+#[test]
+fn test_version() {
+    assert_eq!(dear_imgui_version(), "1.71");
+}
+
 pub struct TextureHandle<'a> {
     pub width: u32,
     pub height: u32,
@@ -118,194 +131,11 @@ impl Context {
     pub fn set_font_texture_id(&mut self, value: TextureId) {
         self.fonts().set_texture_id(value.id());
     }
-    pub fn set_ini_saving_rate(&mut self, value: f32) {
-        let io = self.io_mut();
-        io.ini_saving_rate = value;
-    }
-    pub fn set_font_global_scale(&mut self, value: f32) {
-        let io = self.io_mut();
-        io.font_global_scale = value;
-    }
-    pub fn set_mouse_double_click_time(&mut self, value: f32) {
-        let io = self.io_mut();
-        io.mouse_double_click_time = value;
-    }
-    pub fn set_mouse_double_click_max_dist(&mut self, value: f32) {
-        let io = self.io_mut();
-        io.mouse_double_click_max_dist = value;
-    }
-    pub fn set_mouse_drag_threshold(&mut self, value: f32) {
-        let io = self.io_mut();
-        io.mouse_drag_threshold = value;
-    }
-    pub fn set_key_repeat_delay(&mut self, value: f32) {
-        let io = self.io_mut();
-        io.key_repeat_delay = value;
-    }
-    pub fn set_key_repeat_rate(&mut self, value: f32) {
-        let io = self.io_mut();
-        io.key_repeat_rate = value;
-    }
-    pub fn display_size(&self) -> (f32, f32) {
-        let io = self.io();
-        (io.display_size[0], io.display_size[1])
-    }
-    pub fn display_framebuffer_scale(&self) -> (f32, f32) {
-        let io = self.io();
-        (
-            io.display_framebuffer_scale[0],
-            io.display_framebuffer_scale[1],
-        )
-    }
-    pub fn mouse_pos(&self) -> (f32, f32) {
-        let io = self.io();
-        (io.mouse_pos[0], io.mouse_pos[1])
-    }
-    pub fn set_mouse_pos(&mut self, x: f32, y: f32) {
-        let io = self.io_mut();
-        io.mouse_pos = [x, y];
-    }
-    /// Get mouse's position's delta between the current and the last frame.
-    pub fn mouse_delta(&self) -> (f32, f32) {
-        let io = self.io();
-        (io.mouse_delta[0], io.mouse_delta[1])
-    }
-    pub fn mouse_down(&self) -> [bool; 5] {
-        let io = self.io();
-        io.mouse_down
-    }
-    pub fn set_mouse_down(&mut self, states: [bool; 5]) {
-        let io = self.io_mut();
-        io.mouse_down = states;
-    }
-    pub fn set_mouse_wheel(&mut self, value: f32) {
-        let io = self.io_mut();
-        io.mouse_wheel = value;
-    }
-    /// Get mouse wheel delta
-    pub fn mouse_wheel(&self) -> f32 {
-        let io = self.io();
-        io.mouse_wheel
-    }
-    pub fn mouse_drag_delta(&self, button: MouseButton) -> (f32, f32) {
-        let delta = unsafe { sys::igGetMouseDragDelta_nonUDT2(button as c_int, -1.0) };
-        delta.into()
-    }
-    /// Set to `true` to have ImGui draw the cursor in software.
-    /// If `false`, the OS cursor is used (default to `false`).
-    pub fn set_mouse_draw_cursor(&mut self, value: bool) {
-        let io = self.io_mut();
-        io.mouse_draw_cursor = value;
-    }
-    pub fn mouse_draw_cursor(&self) -> bool {
-        let io = self.io();
-        io.mouse_draw_cursor
-    }
-    /// Returns `true` if mouse is currently dragging with the `button` provided
-    /// as argument.
-    pub fn is_mouse_dragging(&self, button: MouseButton) -> bool {
-        unsafe { sys::igIsMouseDragging(button as c_int, -1.0) }
-    }
-    /// Returns `true` if the `button` provided as argument is currently down.
-    pub fn is_mouse_down(&self, button: MouseButton) -> bool {
-        unsafe { sys::igIsMouseDown(button as c_int) }
-    }
-    /// Returns `true` if the `button` provided as argument is being clicked.
-    pub fn is_mouse_clicked(&self, button: MouseButton) -> bool {
-        unsafe { sys::igIsMouseClicked(button as c_int, false) }
-    }
-    /// Returns `true` if the `button` provided as argument is being double-clicked.
-    pub fn is_mouse_double_clicked(&self, button: MouseButton) -> bool {
-        unsafe { sys::igIsMouseDoubleClicked(button as c_int) }
-    }
-    /// Returns `true` if the `button` provided as argument was released
-    pub fn is_mouse_released(&self, button: MouseButton) -> bool {
-        unsafe { sys::igIsMouseReleased(button as c_int) }
-    }
-    pub fn key_ctrl(&self) -> bool {
-        let io = self.io();
-        io.key_ctrl
-    }
-    pub fn set_key_ctrl(&mut self, value: bool) {
-        let io = self.io_mut();
-        io.key_ctrl = value;
-    }
-    pub fn key_shift(&self) -> bool {
-        let io = self.io();
-        io.key_shift
-    }
-    pub fn set_key_shift(&mut self, value: bool) {
-        let io = self.io_mut();
-        io.key_shift = value;
-    }
-    pub fn key_alt(&self) -> bool {
-        let io = self.io();
-        io.key_alt
-    }
-    pub fn set_key_alt(&mut self, value: bool) {
-        let io = self.io_mut();
-        io.key_alt = value;
-    }
-    pub fn key_super(&self) -> bool {
-        let io = self.io();
-        io.key_super
-    }
-    pub fn set_key_super(&mut self, value: bool) {
-        let io = self.io_mut();
-        io.key_super = value;
-    }
-    pub fn set_key(&mut self, key: u8, pressed: bool) {
-        let io = self.io_mut();
-        io.keys_down[key as usize] = pressed;
-    }
-    pub fn set_imgui_key(&mut self, key: Key, mapping: u8) {
-        let io = self.io_mut();
-        io.key_map[key as usize] = u32::from(mapping);
-    }
-    /// Map [`Key`] values into user's key index
-    pub fn get_key_index(&self, key: Key) -> usize {
-        unsafe { sys::igGetKeyIndex(key as i32) as usize }
-    }
-    /// Return whether specific key is being held
-    ///
-    /// # Example
-    ///
-    /// ```rust
-    /// use imgui::{Key, Ui};
-    ///
-    /// fn test(ui: &Ui) {
-    ///     let delete_key_index = ui.imgui().get_key_index(Key::Delete);
-    ///     if ui.imgui().is_key_down(delete_key_index) {
-    ///         println!("Delete is being held!");
-    ///     }
-    /// }
-    /// ```
-    pub fn is_key_down(&self, user_key_index: usize) -> bool {
-        unsafe { sys::igIsKeyDown(user_key_index as c_int) }
-    }
-    /// Return whether specific key was pressed
-    pub fn is_key_pressed(&self, user_key_index: usize) -> bool {
-        unsafe { sys::igIsKeyPressed(user_key_index as c_int, true) }
-    }
-    /// Return whether specific key was released
-    pub fn is_key_released(&self, user_key_index: usize) -> bool {
-        unsafe { sys::igIsKeyReleased(user_key_index as c_int) }
-    }
-    pub fn add_input_character(&mut self, character: char) {
-        let mut buf = [0; 5];
-        character.encode_utf8(&mut buf);
-        unsafe {
-            sys::ImGuiIO_AddInputCharactersUTF8(self.io_mut().raw_mut(), buf.as_ptr() as *const _);
-        }
-    }
     pub fn get_time(&self) -> f64 {
         unsafe { sys::igGetTime() }
     }
     pub fn get_frame_count(&self) -> i32 {
         unsafe { sys::igGetFrameCount() }
-    }
-    pub fn get_frame_rate(&self) -> f32 {
-        self.io().framerate
     }
 }
 
@@ -323,37 +153,11 @@ impl<'ui> Ui<'ui> {
     pub fn io(&self) -> &Io {
         unsafe { &*(sys::igGetIO() as *const Io) }
     }
-    pub fn imgui(&self) -> &Context {
-        self.ctx
+    pub fn get_time(&self) -> f64 {
+        unsafe { sys::igGetTime() }
     }
-    pub fn want_capture_mouse(&self) -> bool {
-        let io = self.io();
-        io.want_capture_mouse
-    }
-    pub fn want_capture_keyboard(&self) -> bool {
-        let io = self.io();
-        io.want_capture_keyboard
-    }
-    pub fn set_keyboard_focus_here(&self, offset: i32) {
-        unsafe {
-            sys::igSetKeyboardFocusHere(offset);
-        }
-    }
-    pub fn framerate(&self) -> f32 {
-        let io = self.io();
-        io.framerate
-    }
-    pub fn metrics_render_vertices(&self) -> i32 {
-        let io = self.io();
-        io.metrics_render_vertices
-    }
-    pub fn metrics_render_indices(&self) -> i32 {
-        let io = self.io();
-        io.metrics_render_indices
-    }
-    pub fn metrics_active_windows(&self) -> i32 {
-        let io = self.io();
-        io.metrics_active_windows
+    pub fn get_frame_count(&self) -> i32 {
+        unsafe { sys::igGetFrameCount() }
     }
     pub fn render(self) -> &'ui DrawData {
         unsafe {
@@ -361,26 +165,31 @@ impl<'ui> Ui<'ui> {
             &*(sys::igGetDrawData() as *mut DrawData)
         }
     }
-    pub fn show_user_guide(&self) {
-        unsafe { sys::igShowUserGuide() };
-    }
-    pub fn show_default_style_editor(&self) {
-        unsafe { sys::igShowStyleEditor(ptr::null_mut()) };
-    }
-    pub fn show_style_editor<'p>(&self, style: &'p mut Style) {
-        unsafe {
-            sys::igShowStyleEditor(style.raw_mut());
-        }
-    }
     pub fn show_demo_window(&self, opened: &mut bool) {
         unsafe {
             sys::igShowDemoWindow(opened);
+        }
+    }
+    pub fn show_about_window(&self, opened: &mut bool) {
+        unsafe {
+            sys::igShowAboutWindow(opened);
         }
     }
     pub fn show_metrics_window(&self, opened: &mut bool) {
         unsafe {
             sys::igShowMetricsWindow(opened);
         }
+    }
+    pub fn show_style_editor(&self, style: &mut Style) {
+        unsafe {
+            sys::igShowStyleEditor(style.raw_mut());
+        }
+    }
+    pub fn show_default_style_editor(&self) {
+        unsafe { sys::igShowStyleEditor(ptr::null_mut()) };
+    }
+    pub fn show_user_guide(&self) {
+        unsafe { sys::igShowUserGuide() };
     }
 }
 
