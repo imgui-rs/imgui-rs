@@ -1,24 +1,25 @@
+use gfx::Device;
+use glutin::{Event, WindowEvent};
 use imgui::{FontGlyphRange, ImFontConfig, Context, Ui};
-use imgui_gfx_renderer::{Renderer, Shaders};
+use imgui_gfx_renderer::{GfxRenderer, Shaders};
 use imgui_winit_support::{WinitPlatform, HiDpiMode};
 use std::time::Instant;
 
 #[cfg(feature = "opengl")]
 pub fn run<F: FnMut(&Ui) -> bool>(title: String, clear_color: [f32; 4], mut run_ui: F) {
-    use gfx::{Device};
-
     type ColorFormat = gfx::format::Rgba8;
     type DepthFormat = gfx::format::DepthStencil;
 
     let mut events_loop = glutin::EventsLoop::new();
     let context = glutin::ContextBuilder::new().with_vsync(true);
-    let window = glutin::WindowBuilder::new()
-        .with_title(title)
+    let builder = glutin::WindowBuilder::new()
+        .with_title(title.to_owned())
         .with_dimensions(glutin::dpi::LogicalSize::new(1024f64, 768f64));
     let (window, mut device, mut factory, mut main_color, mut main_depth) =
-        gfx_window_glutin::init::<ColorFormat, DepthFormat>(window, context, &events_loop)
-            .expect("Failed to initalize graphics");
+        gfx_window_glutin::init::<ColorFormat, DepthFormat>(builder, context, &events_loop)
+        .expect("Failed to initalize graphics");
     let mut encoder: gfx::Encoder<_, _> = factory.create_command_buffer().into();
+
     let shaders = {
         let version = device.get_info().shading_language;
         if version.is_embedded {
@@ -84,7 +85,7 @@ pub fn run<F: FnMut(&Ui) -> bool>(title: String, clear_color: [f32; 4], mut run_
 
     imgui.set_font_global_scale((1.0 / hidpi_factor) as f32);
 
-    let mut renderer = Renderer::init(&mut imgui, &mut factory, shaders, main_color.clone())
+    let mut renderer = GfxRenderer::init(&mut imgui, &mut factory, shaders)
         .expect("Failed to initialize renderer");
 
     let mut last_frame = Instant::now();
@@ -92,20 +93,14 @@ pub fn run<F: FnMut(&Ui) -> bool>(title: String, clear_color: [f32; 4], mut run_
 
     loop {
         events_loop.poll_events(|event| {
-            use glutin::{
-                Event,
-                WindowEvent::{CloseRequested, Resized},
-            };
-
             platform.handle_event(imgui.io_mut(), &window, &event);
 
             if let Event::WindowEvent { event, .. } = event {
                 match event {
-                    Resized(_) => {
-                        gfx_window_glutin::update_views(&window, &mut main_color, &mut main_depth);
-                        renderer.update_render_target(main_color.clone());
-                    }
-                    CloseRequested => quit = true,
+                    WindowEvent::Resized(_) => {
+                        gfx_window_glutin::update_views(&window, &mut main_color, &mut main_depth)
+                                                        },
+                    WindowEvent::CloseRequested => quit = true,
                     _ => (),
                 }
             }
@@ -125,7 +120,7 @@ pub fn run<F: FnMut(&Ui) -> bool>(title: String, clear_color: [f32; 4], mut run_
 
         encoder.clear(&main_color, clear_color);
         renderer
-            .render(ui, &mut factory, &mut encoder)
+            .render(&mut factory, &mut encoder, &mut main_color, ui)
             .expect("Rendering failed");
         encoder.flush(&mut device);
         window.swap_buffers().unwrap();
@@ -195,7 +190,7 @@ pub fn run<F: FnMut(&Ui) -> bool>(title: String, clear_color: [f32; 4], mut run_
 
     imgui.set_font_global_scale((1.0 / hidpi_factor) as f32);
 
-    let mut renderer = Renderer::init(
+    let mut renderer = GfxRenderer::init(
         &mut imgui,
         &mut factory,
         Shaders::HlslSm40,

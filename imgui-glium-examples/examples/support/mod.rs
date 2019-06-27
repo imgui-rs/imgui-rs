@@ -7,7 +7,7 @@ use imgui_winit_support::{HiDpiMode, WinitPlatform};
 use std::rc::Rc;
 use std::time::Instant;
 
-pub type Textures = imgui::Textures<Texture2d>;
+pub type Textures = imgui::Textures<Rc<Texture2d>>;
 
 pub fn run<F>(title: String, clear_color: [f32; 4], mut run_ui: F)
 where
@@ -15,7 +15,7 @@ where
 {
     use glium::glutin;
     use glium::{Display, Surface};
-    use imgui_glium_renderer::Renderer;
+    use imgui_glium_renderer::GliumRenderer;
 
     let mut events_loop = glutin::EventsLoop::new();
     let context = glutin::ContextBuilder::new().with_vsync(true);
@@ -55,7 +55,7 @@ where
 
     imgui.io_mut().font_global_scale = (1.0 / hidpi_factor) as f32;
 
-    let mut renderer = Renderer::init(&mut imgui, &display).expect("Failed to initialize renderer");
+    let mut renderer = GliumRenderer::init(&mut imgui, &display).expect("Failed to initialize renderer");
 
     let mut last_frame = Instant::now();
     let mut quit = false;

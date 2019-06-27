@@ -15,6 +15,8 @@ travis-ci = { repository = "Gekkio/imgui-rs" }
 
 [dependencies]
 bitflags = "1.0"
+glium = { version = "0.25", default-features = false, optional = true }
+gfx = { version = "0.18", optional = true }
 imgui-sys = { version = "0.0.24-pre", path = "imgui-sys" }
 lazy_static = "1.1"
 parking_lot = "0.8"

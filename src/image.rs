@@ -1,29 +1,10 @@
-use super::{ImVec2, ImVec4, Ui};
 use std::collections::HashMap;
 use std::marker::PhantomData;
 use std::os::raw::c_void;
-use sys;
 
-#[derive(Copy, Clone, Debug, Eq, PartialEq, Ord, PartialOrd, Hash)]
-pub struct ImTexture(usize);
-
-impl ImTexture {
-    pub fn id(self) -> usize {
-        self.0
-    }
-}
-
-impl From<usize> for ImTexture {
-    fn from(id: usize) -> Self {
-        ImTexture(id)
-    }
-}
-
-impl From<*mut c_void> for ImTexture {
-    fn from(ptr: *mut c_void) -> Self {
-        ImTexture(ptr as usize)
-    }
-}
+use crate::render::renderer::TextureId;
+use crate::sys;
+use crate::{ImVec2, ImVec4, Ui};
 
 /// Represent an image about to be drawn.
 /// See [`Ui::image`].
@@ -31,7 +12,7 @@ impl From<*mut c_void> for ImTexture {
 /// Create your image using the builder pattern then [`Image::build`] it.
 #[must_use]
 pub struct Image<'ui> {
-    texture_id: ImTexture,
+    texture_id: TextureId,
     size: ImVec2,
     uv0: ImVec2,
     uv1: ImVec2,
@@ -41,7 +22,7 @@ pub struct Image<'ui> {
 }
 
 impl<'ui> Image<'ui> {
-    pub fn new<S>(_: &Ui<'ui>, texture_id: ImTexture, size: S) -> Self
+    pub fn new<S>(_: &Ui<'ui>, texture_id: TextureId, size: S) -> Self
     where
         S: Into<ImVec2>,
     {
@@ -98,7 +79,7 @@ impl<'ui> Image<'ui> {
     pub fn build(self) {
         unsafe {
             sys::igImage(
-                self.texture_id.0 as *mut c_void,
+                self.texture_id.id() as *mut c_void,
                 self.size,
                 self.uv0,
                 self.uv1,
@@ -115,7 +96,7 @@ impl<'ui> Image<'ui> {
 /// Create your image button using the builder pattern then [`ImageButton::build`] it.
 #[must_use]
 pub struct ImageButton<'ui> {
-    texture_id: ImTexture,
+    texture_id: TextureId,
     size: ImVec2,
     uv0: ImVec2,
     uv1: ImVec2,
@@ -126,7 +107,7 @@ pub struct ImageButton<'ui> {
 }
 
 impl<'ui> ImageButton<'ui> {
-    pub fn new<S>(_: &Ui<'ui>, texture_id: ImTexture, size: S) -> Self
+    pub fn new<S>(_: &Ui<'ui>, texture_id: TextureId, size: S) -> Self
     where
         S: Into<ImVec2>,
     {
@@ -193,7 +174,7 @@ impl<'ui> ImageButton<'ui> {
     pub fn build(self) -> bool {
         unsafe {
             sys::igImageButton(
-                self.texture_id.0 as *mut c_void,
+                self.texture_id.id() as *mut c_void,
                 self.size,
                 self.uv0,
                 self.uv1,
@@ -220,22 +201,22 @@ impl<T> Textures<T> {
         }
     }
 
-    pub fn insert(&mut self, texture: T) -> ImTexture {
+    pub fn insert(&mut self, texture: T) -> TextureId {
         let id = self.next;
         self.textures.insert(id, texture);
         self.next += 1;
-        ImTexture(id)
+        TextureId::from(id)
     }
 
-    pub fn replace(&mut self, id: ImTexture, texture: T) -> Option<T> {
-        self.textures.insert(id.0, texture)
+    pub fn replace(&mut self, id: TextureId, texture: T) -> Option<T> {
+        self.textures.insert(id.id(), texture)
     }
 
-    pub fn remove(&mut self, id: ImTexture) -> Option<T> {
-        self.textures.remove(&id.0)
+    pub fn remove(&mut self, id: TextureId) -> Option<T> {
+        self.textures.remove(&id.id())
     }
 
-    pub fn get(&self, id: ImTexture) -> Option<&T> {
-        self.textures.get(&id.0)
+    pub fn get(&self, id: TextureId) -> Option<&T> {
+        self.textures.get(&id.id())
     }
 }

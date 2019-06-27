@@ -19,8 +19,7 @@ travis-ci = { repository = "Gekkio/imgui-rs" }
 
 [dependencies]
 gfx = "0.18"
-imgui = { version = "0.0.24-pre", path = "../" }
-imgui-sys = { version = "0.0.24-pre", path = "../imgui-sys", features = ["gfx"] }
+imgui = { version = "0.0.24-pre", path = "../", features = ["gfx"] }
 
 [target.'cfg(windows)'.build-dependencies]
 winapi = { version = "0.3", features = ["d3dcompiler"] }

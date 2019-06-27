@@ -2,12 +2,6 @@ mod bindings;
 
 pub use crate::bindings::*;
 
-#[cfg(feature = "gfx")]
-mod gfx_support;
-
-#[cfg(feature = "glium")]
-mod glium_support;
-
 impl ImVec2 {
     #[inline]
     pub fn new(x: f32, y: f32) -> ImVec2 {

@@ -13,9 +13,5 @@ build = "build.rs"
 [badges]
 travis-ci = { repository = "Gekkio/imgui-rs" }
 
-[dependencies]
-glium = { version = "0.25", default-features = false, optional = true }
-gfx = { version = "0.18", optional = true }
-
 [build-dependencies]
 cc = "1.0"

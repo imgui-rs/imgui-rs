@@ -3,8 +3,7 @@ pub extern crate imgui_sys as sys;
 extern crate lazy_static;
 
 use std::ffi::CStr;
-use std::mem;
-use std::os::raw::{c_char, c_float, c_int, c_uchar, c_void};
+use std::os::raw::{c_char, c_int, c_uchar, c_void};
 use std::ptr;
 use std::slice;
 use std::str;
@@ -21,7 +20,7 @@ pub use self::drag::{
     DragInt4, DragIntRange2,
 };
 pub use self::fonts::{FontGlyphRange, ImFont, ImFontAtlas, ImFontConfig};
-pub use self::image::{ImTexture, Image, ImageButton, Textures};
+pub use self::image::{Image, ImageButton};
 pub use self::input::keyboard::*;
 pub use self::input::mouse::*;
 pub use self::input_widget::{
@@ -35,16 +34,15 @@ pub use self::plothistogram::PlotHistogram;
 pub use self::plotlines::PlotLines;
 pub use self::popup_modal::PopupModal;
 pub use self::progressbar::ProgressBar;
+pub use self::render::draw_data::*;
+pub use self::render::renderer::*;
 pub use self::sliders::{
     SliderFloat, SliderFloat2, SliderFloat3, SliderFloat4, SliderInt, SliderInt2, SliderInt3,
     SliderInt4,
 };
 pub use self::string::{ImStr, ImString};
 pub use self::style::*;
-pub use self::sys::{
-    ImDrawIdx, ImDrawVert, ImVec2,
-    ImVec4,
-};
+pub use self::sys::{ImVec2, ImVec4};
 pub use self::trees::{CollapsingHeader, TreeNode};
 pub use self::window::Window;
 pub use self::window_draw_list::{ChannelsSplit, ImColor, WindowDrawList};
@@ -58,7 +56,7 @@ mod fonts;
 mod image;
 mod input;
 mod input_widget;
-mod internal;
+pub mod internal;
 mod io;
 mod legacy;
 mod menus;
@@ -66,6 +64,7 @@ mod plothistogram;
 mod plotlines;
 mod popup_modal;
 mod progressbar;
+mod render;
 mod sliders;
 mod string;
 mod style;
@@ -116,7 +115,7 @@ impl Context {
             })
         }
     }
-    pub fn set_font_texture_id(&mut self, value: ImTexture) {
+    pub fn set_font_texture_id(&mut self, value: TextureId) {
         self.fonts().set_texture_id(value.id());
     }
     pub fn set_ini_saving_rate(&mut self, value: f32) {
@@ -310,82 +309,6 @@ impl Context {
     }
 }
 
-pub struct DrawData<'a> {
-    raw: &'a mut sys::ImDrawData,
-}
-
-impl<'a> DrawData<'a> {
-    pub fn is_valid(&self) -> bool {
-        self.raw.Valid
-    }
-    pub fn draw_list_count(&self) -> usize {
-        self.raw.CmdListsCount as usize
-    }
-    pub fn total_vtx_count(&self) -> usize {
-        self.raw.TotalVtxCount as usize
-    }
-    pub fn total_idx_count(&self) -> usize {
-        self.raw.TotalIdxCount as usize
-    }
-    pub fn deindex_all_buffers(&mut self) {
-        unsafe {
-            sys::ImDrawData_DeIndexAllBuffers(self.raw);
-        }
-    }
-    pub fn scale_clip_rects<S: Into<ImVec2>>(&mut self, sc: S) {
-        unsafe {
-            sys::ImDrawData_ScaleClipRects(self.raw, sc.into());
-        }
-    }
-}
-
-impl<'a> IntoIterator for &'a DrawData<'a> {
-    type Item = DrawList<'a>;
-    type IntoIter = DrawListIterator<'a>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        unsafe {
-            let cmd_lists = slice::from_raw_parts(
-                self.raw.CmdLists as *const *const sys::ImDrawList,
-                self.raw.CmdListsCount as usize,
-            );
-            DrawListIterator {
-                iter: cmd_lists.iter(),
-            }
-        }
-    }
-}
-
-pub struct DrawListIterator<'a> {
-    iter: std::slice::Iter<'a, *const sys::ImDrawList>,
-}
-
-impl<'a> Iterator for DrawListIterator<'a> {
-    type Item = DrawList<'a>;
-
-    fn next(&mut self) -> Option<Self::Item> {
-        self.iter.next().map(|&ptr| unsafe {
-            let cmd_buffer =
-                slice::from_raw_parts((*ptr).CmdBuffer.Data, (*ptr).CmdBuffer.Size as usize);
-            let idx_buffer =
-                slice::from_raw_parts((*ptr).IdxBuffer.Data, (*ptr).IdxBuffer.Size as usize);
-            let vtx_buffer =
-                slice::from_raw_parts((*ptr).VtxBuffer.Data, (*ptr).VtxBuffer.Size as usize);
-            DrawList {
-                cmd_buffer,
-                idx_buffer,
-                vtx_buffer,
-            }
-        })
-    }
-}
-
-pub struct DrawList<'a> {
-    pub cmd_buffer: &'a [sys::ImDrawCmd],
-    pub idx_buffer: &'a [sys::ImDrawIdx],
-    pub vtx_buffer: &'a [sys::ImDrawVert],
-}
-
 pub struct Ui<'ui> {
     ctx: &'ui Context,
 }
@@ -432,19 +355,11 @@ impl<'ui> Ui<'ui> {
         let io = self.io();
         io.metrics_active_windows
     }
-    pub fn render<F, E>(self, f: F) -> Result<(), E>
-    where
-        F: FnOnce(&Ui, DrawData) -> Result<(), E>,
-    {
+    pub fn render(self) -> &'ui DrawData {
         unsafe {
             sys::igRender();
-
-            let draw_data = DrawData {
-                raw: &mut *sys::igGetDrawData(),
-            };
-            f(&self, draw_data)?;
+            &*(sys::igGetDrawData() as *mut DrawData)
         }
-        Ok(())
     }
     pub fn show_user_guide(&self) {
         unsafe { sys::igShowUserGuide() };
@@ -1238,7 +1153,7 @@ impl<'ui> Ui<'ui> {
 
 // Image
 impl<'ui> Ui<'ui> {
-    pub fn image<S>(&self, texture: ImTexture, size: S) -> Image
+    pub fn image<S>(&self, texture: TextureId, size: S) -> Image
     where
         S: Into<ImVec2>,
     {
@@ -1248,7 +1163,7 @@ impl<'ui> Ui<'ui> {
 
 // ImageButton
 impl<'ui> Ui<'ui> {
-    pub fn image_button<S>(&self, texture: ImTexture, size: S) -> ImageButton
+    pub fn image_button<S>(&self, texture: TextureId, size: S) -> ImageButton
     where
         S: Into<ImVec2>,
     {
