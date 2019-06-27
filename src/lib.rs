@@ -1,4 +1,6 @@
 pub extern crate imgui_sys as sys;
+#[macro_use]
+extern crate lazy_static;
 
 use std::ffi::CStr;
 use std::mem;
@@ -13,6 +15,7 @@ pub use self::color_editors::{
     ColorButton, ColorEdit, ColorEditMode, ColorFormat, ColorPicker, ColorPickerMode, ColorPreview,
     EditableColor,
 };
+pub use self::context::*;
 pub use self::drag::{
     DragFloat, DragFloat2, DragFloat3, DragFloat4, DragFloatRange2, DragInt, DragInt2, DragInt3,
     DragInt4, DragIntRange2,
@@ -46,6 +49,7 @@ use internal::RawCast;
 
 mod child_frame;
 mod color_editors;
+mod context;
 mod drag;
 mod fonts;
 mod image;
@@ -59,16 +63,11 @@ mod progressbar;
 mod sliders;
 mod string;
 mod style;
+#[cfg(test)]
+mod test;
 mod trees;
 mod window;
 mod window_draw_list;
-
-pub struct ImGui {
-    // We need to keep ownership of the ImStr values to ensure the *const char pointer
-    // lives long enough in case the ImStr contains a Cow::Owned
-    ini_filename: Option<ImString>,
-    log_filename: Option<ImString>,
-}
 
 pub struct TextureHandle<'a> {
     pub width: u32,
@@ -108,16 +107,7 @@ impl FrameSize {
     }
 }
 
-impl ImGui {
-    pub fn init() -> ImGui {
-        unsafe {
-            sys::igCreateContext(ptr::null_mut());
-        }
-        ImGui {
-            ini_filename: None,
-            log_filename: None,
-        }
-    }
+impl Context {
     fn io(&self) -> &sys::ImGuiIO {
         unsafe { &*sys::igGetIO() }
     }
@@ -159,26 +149,6 @@ impl ImGui {
     }
     pub fn set_font_texture_id(&mut self, value: ImTexture) {
         self.fonts().set_texture_id(value.id());
-    }
-    pub fn set_ini_filename(&mut self, value: Option<ImString>) {
-        {
-            let io = self.io_mut();
-            io.IniFilename = match value {
-                Some(ref x) => x.as_ptr(),
-                None => ptr::null(),
-            }
-        }
-        self.ini_filename = value;
-    }
-    pub fn set_log_filename(&mut self, value: Option<ImString>) {
-        {
-            let io = self.io_mut();
-            io.LogFilename = match value {
-                Some(ref x) => x.as_ptr(),
-                None => ptr::null(),
-            }
-        }
-        self.log_filename = value;
     }
     pub fn set_ini_saving_rate(&mut self, value: f32) {
         let io = self.io_mut();
@@ -391,30 +361,13 @@ impl ImGui {
         }
         unsafe {
             sys::igNewFrame();
-            CURRENT_UI = Some(Ui {
-                imgui: mem::transmute(self as &'a ImGui),
-                frame_size,
-                needs_cleanup: false,
-            });
         }
         Ui {
             imgui: self,
             frame_size,
-            needs_cleanup: true,
         }
     }
 }
-
-impl Drop for ImGui {
-    fn drop(&mut self) {
-        unsafe {
-            CURRENT_UI = None;
-            sys::igDestroyContext(ptr::null_mut());
-        }
-    }
-}
-
-static mut CURRENT_UI: Option<Ui<'static>> = None;
 
 pub struct DrawData<'a> {
     raw: &'a mut sys::ImDrawData,
@@ -493,9 +446,8 @@ pub struct DrawList<'a> {
 }
 
 pub struct Ui<'ui> {
-    imgui: &'ui ImGui,
+    imgui: &'ui Context,
     frame_size: FrameSize,
-    needs_cleanup: bool,
 }
 
 static FMT: &'static [u8] = b"%s\0";
@@ -508,7 +460,7 @@ impl<'ui> Ui<'ui> {
     pub fn frame_size(&self) -> FrameSize {
         self.frame_size
     }
-    pub fn imgui(&self) -> &ImGui {
+    pub fn imgui(&self) -> &Context {
         self.imgui
     }
     pub fn want_capture_mouse(&self) -> bool {
@@ -579,18 +531,11 @@ impl<'ui> Ui<'ui> {
 
 impl<'a> Drop for Ui<'a> {
     fn drop(&mut self) {
-        if self.needs_cleanup && !thread::panicking() {
+        if !thread::panicking() {
             unsafe {
                 sys::igEndFrame();
-                CURRENT_UI = None;
             }
         }
-    }
-}
-
-impl<'a> Ui<'a> {
-    pub unsafe fn current_ui() -> Option<&'a Ui<'a>> {
-        CURRENT_UI.as_ref()
     }
 }
 
@@ -1222,7 +1167,7 @@ impl<'ui> Ui<'ui> {
     /// # Example
     /// ```rust,no_run
     /// # use imgui::*;
-    /// # let mut imgui = ImGui::init();
+    /// # let mut imgui = Context::create();
     /// # let ui = imgui.frame(FrameSize::new(100.0, 100.0, 1.0), 0.1);
     /// if ui.button(im_str!("Show modal"), (0.0, 0.0)) {
     ///     ui.open_popup(im_str!("modal"));
@@ -1302,7 +1247,7 @@ impl<'ui> Ui<'ui> {
     /// # Example
     /// ```rust,no_run
     /// # use imgui::*;
-    /// # let mut imgui = ImGui::init();
+    /// # let mut imgui = Context::create();
     /// # let ui = imgui.frame(FrameSize::new(100.0, 100.0, 1.0), 0.1);
     /// # let mut selected_radio_value = 2;
     /// ui.radio_button(im_str!("Item 1"), &mut selected_radio_value, 1);
@@ -1319,7 +1264,7 @@ impl<'ui> Ui<'ui> {
     /// # Example
     /// ```rust,no_run
     /// # use imgui::*;
-    /// # let mut imgui = ImGui::init();
+    /// # let mut imgui = Context::create();
     /// # let ui = imgui.frame(FrameSize::new(100.0, 100.0, 1.0), 0.1);
     /// # let mut radio_button_test = "cats".to_string();
     /// if ui.radio_button_bool(im_str!("Cats"), radio_button_test == "cats") {
@@ -1412,7 +1357,7 @@ impl<'ui> Ui<'ui> {
     /// # Example
     /// ```rust,no_run
     /// # use imgui::*;
-    /// # let mut imgui = ImGui::init();
+    /// # let mut imgui = Context::create();
     /// # let ui = imgui.frame(FrameSize::new(100.0, 100.0, 1.0), 0.1);
     /// ui.progress_bar(0.6)
     ///     .size((100.0, 12.0))
@@ -1430,7 +1375,7 @@ impl<'ui> Ui<'ui> {
     /// # Example
     /// ```rust,no_run
     /// # use imgui::*;
-    /// # let mut imgui = ImGui::init();
+    /// # let mut imgui = Context::create();
     /// # let ui = imgui.frame(FrameSize::new(100.0, 100.0, 1.0), 0.1);
     /// ui.window(im_str!("ChatWindow"))
     ///     .title_bar(true)
@@ -1460,7 +1405,7 @@ impl<'ui> Ui<'ui> {
     /// # Example
     /// ```rust,no_run
     /// # use imgui::*;
-    /// # let mut imgui = ImGui::init();
+    /// # let mut imgui = Context::create();
     /// # let ui = imgui.frame(FrameSize::new(100.0, 100.0, 1.0), 0.1);
     /// ui.with_style_var(StyleVar::Alpha(0.2), || {
     ///     ui.text(im_str!("AB"));
@@ -1478,7 +1423,7 @@ impl<'ui> Ui<'ui> {
     /// # Example
     /// ```rust,no_run
     /// # use imgui::*;
-    /// # let mut imgui = ImGui::init();
+    /// # let mut imgui = Context::create();
     /// # let ui = imgui.frame(FrameSize::new(100.0, 100.0, 1.0), 0.1);
     /// # let styles = [StyleVar::Alpha(0.2), StyleVar::WindowPadding([1.0, 1.0])];
     /// ui.with_style_vars(&styles, || {
@@ -1578,7 +1523,7 @@ impl<'ui> Ui<'ui> {
     /// # Example
     /// ```rust,no_run
     /// # use imgui::*;
-    /// # let mut imgui = ImGui::init();
+    /// # let mut imgui = Context::create();
     /// # let ui = imgui.frame(FrameSize::new(100.0, 100.0, 1.0), 0.1);
     /// ui.with_color_var(StyleColor::Text, [1.0, 0.0, 0.0, 1.0], || {
     ///     ui.text_wrapped(im_str!("AB"));
@@ -1604,7 +1549,7 @@ impl<'ui> Ui<'ui> {
     /// # Example
     /// ```rust,no_run
     /// # use imgui::*;
-    /// # let mut imgui = ImGui::init();
+    /// # let mut imgui = Context::create();
     /// # let ui = imgui.frame(FrameSize::new(100.0, 100.0, 1.0), 0.1);
     /// let red = [1.0, 0.0, 0.0, 1.0];
     /// let green = [0.0, 1.0, 0.0, 1.0];

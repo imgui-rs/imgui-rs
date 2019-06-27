@@ -4,7 +4,7 @@ use glium::program;
 use glium::texture;
 use glium::vertex;
 use glium::{uniform, DrawError, IndexBuffer, Program, Surface, Texture2d, VertexBuffer};
-use imgui::{DrawList, FrameSize, ImGui, ImTexture, Textures, Ui};
+use imgui::{self, DrawList, FrameSize, ImTexture, Textures, Ui};
 use std::borrow::Cow;
 use std::fmt;
 use std::rc::Rc;
@@ -71,7 +71,7 @@ pub struct Renderer {
 }
 
 impl Renderer {
-    pub fn init<F: Facade>(imgui: &mut ImGui, ctx: &F) -> RendererResult<Renderer> {
+    pub fn init<F: Facade>(imgui: &mut imgui::Context, ctx: &F) -> RendererResult<Renderer> {
         let device_objects = DeviceObjects::init(imgui, ctx)?;
         Ok(Renderer {
             ctx: Rc::clone(ctx.get_context()),
@@ -222,7 +222,7 @@ fn compile_default_program<F: Facade>(
 }
 
 impl DeviceObjects {
-    pub fn init<F: Facade>(im_gui: &mut ImGui, ctx: &F) -> RendererResult<DeviceObjects> {
+    pub fn init<F: Facade>(im_gui: &mut imgui::Context, ctx: &F) -> RendererResult<DeviceObjects> {
         use glium::texture::{ClientFormat, RawImage2d};
 
         let program = compile_default_program(ctx)?;

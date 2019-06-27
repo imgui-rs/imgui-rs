@@ -2,7 +2,7 @@ use glium::{
     backend::{Context, Facade},
     Texture2d,
 };
-use imgui::{FontGlyphRange, ImFontConfig, ImGui, Ui};
+use imgui::{FontGlyphRange, ImFontConfig, self, Ui};
 use imgui_winit_support;
 use std::rc::Rc;
 use std::time::Instant;
@@ -26,7 +26,7 @@ where
     let gl_window = display.gl_window();
     let window = gl_window.window();
 
-    let mut imgui = ImGui::init();
+    let mut imgui = imgui::Context::create();
     imgui.set_ini_filename(None);
 
     // In the examples we only use integer DPI factors, because the UI can get very blurry

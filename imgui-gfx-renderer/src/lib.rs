@@ -4,7 +4,7 @@ use gfx::pso::{PipelineData, PipelineState};
 use gfx::texture::{FilterMethod, SamplerInfo, WrapMode};
 use gfx::traits::FactoryExt;
 use gfx::{CommandBuffer, Encoder, Factory, IntoIndexBuffer, Rect, Resources, Slice};
-use imgui::{DrawList, FrameSize, ImDrawIdx, ImDrawVert, ImGui, ImTexture, Textures, Ui};
+use imgui::{Context, DrawList, FrameSize, ImDrawIdx, ImDrawVert, ImTexture, Textures, Ui};
 
 pub type RendererResult<T> = Result<T, RendererError>;
 
@@ -190,7 +190,7 @@ pub struct Renderer<R: Resources> {
 
 impl<R: Resources> Renderer<R> {
     pub fn init<F: Factory<R>>(
-        imgui: &mut ImGui,
+        imgui: &mut Context,
         factory: &mut F,
         shaders: Shaders,
         out: RenderTargetView<R, gfx::format::Rgba8>,

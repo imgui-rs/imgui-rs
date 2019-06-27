@@ -1,4 +1,4 @@
-use imgui::{FontGlyphRange, ImFontConfig, ImGui, Ui};
+use imgui::{FontGlyphRange, ImFontConfig, Context, Ui};
 use imgui_gfx_renderer::{Renderer, Shaders};
 use imgui_winit_support;
 use std::time::Instant;
@@ -42,7 +42,7 @@ pub fn run<F: FnMut(&Ui) -> bool>(title: String, clear_color: [f32; 4], mut run_
         }
     };
 
-    let mut imgui = ImGui::init();
+    let mut imgui = Context::create();
     {
         // Fix incorrect colors with sRGB framebuffer
         fn imgui_gamma_to_linear(col: [f32; 4]) -> [f32; 4] {

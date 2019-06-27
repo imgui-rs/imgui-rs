@@ -372,6 +372,8 @@ name = "imgui"
 version = "0.0.24-pre"
 dependencies = [
  "imgui-sys 0.0.24-pre",
+ "lazy_static 1.3.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "parking_lot 0.7.1 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]

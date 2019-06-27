@@ -5,10 +5,10 @@
 //! In your initialization code call `configure_keys`:
 //!
 //! ```rust,no_run
-//! use imgui::ImGui;
+//! use imgui::Context;
 //!
 //! # fn main() {
-//! let mut imgui = ImGui::init();
+//! let mut imgui = Context::create();
 //! imgui_winit_support::configure_keys(&mut imgui);
 //! # }
 //! ```
@@ -17,11 +17,11 @@
 //! you need to do is pass each event to `imgui_winit_support` as well:
 //!
 //! ```rust,no_run
-//! # use imgui::ImGui;
+//! # use imgui::Context;
 //! # use winit::EventsLoop;
 //! # fn main() {
 //! # let mut events_loop = EventsLoop::new();
-//! # let mut imgui = ImGui::init();
+//! # let mut imgui = Context::create();
 //! # let window_hidpi_factor = 1.0;
 //! # let app_hidpi_factor = 1.0;
 //! events_loop.poll_events(|event| {
@@ -45,11 +45,11 @@
 //! For example, you might want to customize mouse wheel line scrolling amount:
 //!
 //! ```rust,no_run
-//! # use imgui::ImGui;
+//! # use imgui::Context;
 //! # use winit::{EventsLoop, Event, WindowEvent, MouseScrollDelta, TouchPhase};
 //! # fn main() {
 //! # let mut events_loop = EventsLoop::new();
-//! # let mut imgui = ImGui::init();
+//! # let mut imgui = Context::create();
 //! # let window_hidpi_factor = 1.0;
 //! # let app_hidpi_factor = 1.0;
 //! events_loop.poll_events(|event| {
@@ -81,14 +81,14 @@
 //! # }
 //! ```
 
-use imgui::{FrameSize, ImGui, ImGuiKey, ImGuiMouseCursor};
+use imgui::{Context, FrameSize, ImGuiKey, ImGuiMouseCursor};
 use winit::{
     ElementState, Event, KeyboardInput, ModifiersState, MouseButton, MouseCursor, MouseScrollDelta,
     TouchPhase, VirtualKeyCode, Window, WindowEvent,
 };
 
 /// Configure imgui key map with winit `VirtualKeyCode` values
-pub fn configure_keys(imgui: &mut ImGui) {
+pub fn configure_keys(imgui: &mut Context) {
     imgui.set_imgui_key(ImGuiKey::Tab, VirtualKeyCode::Tab as _);
     imgui.set_imgui_key(ImGuiKey::LeftArrow, VirtualKeyCode::Left as _);
     imgui.set_imgui_key(ImGuiKey::RightArrow, VirtualKeyCode::Right as _);
@@ -111,7 +111,7 @@ pub fn configure_keys(imgui: &mut ImGui) {
 }
 
 /// Update imgui keyboard state
-pub fn handle_keyboard_input(imgui: &mut ImGui, event: KeyboardInput) {
+pub fn handle_keyboard_input(imgui: &mut Context, event: KeyboardInput) {
     handle_modifiers(imgui, event.modifiers);
     if let Some(key) = event.virtual_keycode {
         let state_bool = event.state == ElementState::Pressed;
@@ -127,7 +127,7 @@ pub fn handle_keyboard_input(imgui: &mut ImGui, event: KeyboardInput) {
 }
 
 /// Update imgui keyboard modifier state
-pub fn handle_modifiers(imgui: &mut ImGui, modifiers: ModifiersState) {
+pub fn handle_modifiers(imgui: &mut Context, modifiers: ModifiersState) {
     imgui.set_key_shift(modifiers.shift);
     imgui.set_key_ctrl(modifiers.ctrl);
     imgui.set_key_alt(modifiers.alt);
@@ -136,7 +136,7 @@ pub fn handle_modifiers(imgui: &mut ImGui, modifiers: ModifiersState) {
 
 /// Update imgui mouse wheel position
 pub fn handle_mouse_scroll_delta(
-    imgui: &mut ImGui,
+    imgui: &mut Context,
     delta: MouseScrollDelta,
     window_hidpi_factor: f64,
     app_hidpi_factor: f64,
@@ -153,7 +153,7 @@ pub fn handle_mouse_scroll_delta(
 }
 
 /// Update imgui mouse button state
-pub fn handle_mouse_button_state(imgui: &mut ImGui, button: MouseButton, state: ElementState) {
+pub fn handle_mouse_button_state(imgui: &mut Context, button: MouseButton, state: ElementState) {
     let mut states = imgui.mouse_down();
     let state_bool = state == ElementState::Pressed;
     match button {
@@ -168,7 +168,7 @@ pub fn handle_mouse_button_state(imgui: &mut ImGui, button: MouseButton, state: 
 
 /// Update imgui state from winit event
 pub fn handle_event(
-    imgui: &mut ImGui,
+    imgui: &mut Context,
     event: &Event,
     window_hidpi_factor: f64,
     app_hidpi_factor: f64,
@@ -180,7 +180,7 @@ pub fn handle_event(
 
 /// Update imgui state from winit window event
 pub fn handle_window_event(
-    imgui: &mut ImGui,
+    imgui: &mut Context,
     event: &WindowEvent,
     window_hidpi_factor: f64,
     app_hidpi_factor: f64,
@@ -223,7 +223,7 @@ pub fn handle_window_event(
 }
 
 /// Update winit window mouse cursor state
-pub fn update_mouse_cursor(imgui: &ImGui, window: &Window) {
+pub fn update_mouse_cursor(imgui: &Context, window: &Window) {
     let mouse_cursor = imgui.mouse_cursor();
     if imgui.mouse_draw_cursor() || mouse_cursor == ImGuiMouseCursor::None {
         // Hide OS cursor
