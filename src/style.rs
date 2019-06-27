@@ -341,62 +341,62 @@ pub enum StyleVar {
     SelectableTextAlign([f32; 2]),
 }
 
-// #[test]
-// fn test_style_scaling() {
-//     let (_guard, mut ctx) = crate::test::test_ctx();
-//     let style = ctx.style_mut();
-//     style.window_padding = [1.0, 2.0];
-//     style.window_rounding = 3.0;
-//     style.window_min_size = [4.0, 5.0];
-//     style.child_rounding = 6.0;
-//     style.popup_rounding = 7.0;
-//     style.frame_padding = [8.0, 9.0];
-//     style.frame_rounding = 10.0;
-//     style.item_spacing = [11.0, 12.0];
-//     style.item_inner_spacing = [13.0, 14.0];
-//     style.touch_extra_padding = [15.0, 16.0];
-//     style.indent_spacing = 17.0;
-//     style.columns_min_spacing = 18.0;
-//     style.scrollbar_size = 19.0;
-//     style.scrollbar_rounding = 20.0;
-//     style.grab_min_size = 21.0;
-//     style.grab_rounding = 22.0;
-//     style.tab_rounding = 23.0;
-//     style.display_window_padding = [24.0, 25.0];
-//     style.display_safe_area_padding = [26.0, 27.0];
-//     style.mouse_cursor_scale = 28.0;
-//     style.scale_all_sizes(2.0);
-//     assert_eq!(style.window_padding, [2.0, 4.0]);
-//     assert_eq!(style.window_rounding, 6.0);
-//     assert_eq!(style.window_min_size, [8.0, 10.0]);
-//     assert_eq!(style.child_rounding, 12.0);
-//     assert_eq!(style.popup_rounding, 14.0);
-//     assert_eq!(style.frame_padding, [16.0, 18.0]);
-//     assert_eq!(style.frame_rounding, 20.0);
-//     assert_eq!(style.item_spacing, [22.0, 24.0]);
-//     assert_eq!(style.item_inner_spacing, [26.0, 28.0]);
-//     assert_eq!(style.touch_extra_padding, [30.0, 32.0]);
-//     assert_eq!(style.indent_spacing, 34.0);
-//     assert_eq!(style.columns_min_spacing, 36.0);
-//     assert_eq!(style.scrollbar_size, 38.0);
-//     assert_eq!(style.scrollbar_rounding, 40.0);
-//     assert_eq!(style.grab_min_size, 42.0);
-//     assert_eq!(style.grab_rounding, 44.0);
-//     assert_eq!(style.tab_rounding, 46.0);
-//     assert_eq!(style.display_window_padding, [48.0, 50.0]);
-//     assert_eq!(style.display_safe_area_padding, [52.0, 54.0]);
-//     assert_eq!(style.mouse_cursor_scale, 56.0);
-// }
+#[test]
+fn test_style_scaling() {
+    let (_guard, mut ctx) = crate::test::test_ctx();
+    let style = ctx.style_mut();
+    style.window_padding = [1.0, 2.0];
+    style.window_rounding = 3.0;
+    style.window_min_size = [4.0, 5.0];
+    style.child_rounding = 6.0;
+    style.popup_rounding = 7.0;
+    style.frame_padding = [8.0, 9.0];
+    style.frame_rounding = 10.0;
+    style.item_spacing = [11.0, 12.0];
+    style.item_inner_spacing = [13.0, 14.0];
+    style.touch_extra_padding = [15.0, 16.0];
+    style.indent_spacing = 17.0;
+    style.columns_min_spacing = 18.0;
+    style.scrollbar_size = 19.0;
+    style.scrollbar_rounding = 20.0;
+    style.grab_min_size = 21.0;
+    style.grab_rounding = 22.0;
+    style.tab_rounding = 23.0;
+    style.display_window_padding = [24.0, 25.0];
+    style.display_safe_area_padding = [26.0, 27.0];
+    style.mouse_cursor_scale = 28.0;
+    style.scale_all_sizes(2.0);
+    assert_eq!(style.window_padding, [2.0, 4.0]);
+    assert_eq!(style.window_rounding, 6.0);
+    assert_eq!(style.window_min_size, [8.0, 10.0]);
+    assert_eq!(style.child_rounding, 12.0);
+    assert_eq!(style.popup_rounding, 14.0);
+    assert_eq!(style.frame_padding, [16.0, 18.0]);
+    assert_eq!(style.frame_rounding, 20.0);
+    assert_eq!(style.item_spacing, [22.0, 24.0]);
+    assert_eq!(style.item_inner_spacing, [26.0, 28.0]);
+    assert_eq!(style.touch_extra_padding, [30.0, 32.0]);
+    assert_eq!(style.indent_spacing, 34.0);
+    assert_eq!(style.columns_min_spacing, 36.0);
+    assert_eq!(style.scrollbar_size, 38.0);
+    assert_eq!(style.scrollbar_rounding, 40.0);
+    assert_eq!(style.grab_min_size, 42.0);
+    assert_eq!(style.grab_rounding, 44.0);
+    assert_eq!(style.tab_rounding, 46.0);
+    assert_eq!(style.display_window_padding, [48.0, 50.0]);
+    assert_eq!(style.display_safe_area_padding, [52.0, 54.0]);
+    assert_eq!(style.mouse_cursor_scale, 56.0);
+}
 
-// #[test]
-// fn test_style_color_indexing() {
-//     let (_guard, mut ctx) = crate::test::test_ctx();
-//     let style = ctx.style_mut();
-//     let value = [0.1, 0.2, 0.3, 1.0];
-//     style[StyleColor::Tab] = value;
-//     assert_eq!(style[StyleColor::Tab], value);
-//     assert_eq!(style.colors[StyleColor::Tab as usize], value);
-// }
+#[test]
+fn test_style_color_indexing() {
+    let (_guard, mut ctx) = crate::test::test_ctx();
+    let style = ctx.style_mut();
+    let value = [0.1, 0.2, 0.3, 1.0];
+    style[StyleColor::Tab] = value;
+    assert_eq!(style[StyleColor::Tab], value);
+    assert_eq!(style.colors[StyleColor::Tab as usize], value);
+}
 
 #[test]
 fn test_style_memory_layout() {
