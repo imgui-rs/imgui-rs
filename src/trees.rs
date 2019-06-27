@@ -98,7 +98,7 @@ impl<'ui, 'p> TreeNode<'ui, 'p> {
     pub fn build<F: FnOnce()>(self, f: F) {
         let render = unsafe {
             if !self.opened_cond.is_empty() {
-                sys::igSetNextTreeNodeOpen(self.opened, self.opened_cond);
+                sys::igSetNextItemOpen(self.opened, self.opened_cond);
             }
             sys::igTreeNodeExStrStr(
                 self.id.as_ptr(),

@@ -646,7 +646,7 @@ extern "C" {
     pub fn igTreePop();
     pub fn igTreeAdvanceToLabelPos();
     pub fn igGetTreeNodeToLabelSpacing() -> c_float;
-    pub fn igSetNextTreeNodeOpen(opened: bool, cond: ImGuiCond);
+    pub fn igSetNextItemOpen(opened: bool, cond: ImGuiCond);
     pub fn igCollapsingHeader(label: *const c_char, flags: ImGuiTreeNodeFlags) -> bool;
     pub fn igCollapsingHeaderBoolPtr(
         label: *const c_char,
