@@ -30,8 +30,5 @@ fn main() -> io::Result<()> {
         build.file(path);
     }
     build.compile("libcimgui.a");
-    if std::env::var("TARGET").unwrap().contains("-apple") {
-        println!("cargo:rustc-link-lib=framework=CoreFoundation");
-    }
     Ok(())
 }
