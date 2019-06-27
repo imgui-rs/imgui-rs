@@ -1,6 +1,7 @@
 use std::borrow::Cow;
 use std::error::Error;
 use std::io::Cursor;
+use std::rc::Rc;
 
 use glium::{
     backend::Facade,
@@ -17,12 +18,12 @@ const CLEAR_COLOR: [f32; 4] = [1.0, 1.0, 1.0, 1.0];
 
 #[derive(Default)]
 struct CustomTexturesApp {
-    my_texture_id: Option<ImTexture>,
+    my_texture_id: Option<TextureId>,
     lenna: Option<Lenna>,
 }
 
 struct Lenna {
-    texture_id: ImTexture,
+    texture_id: TextureId,
     size: (f32, f32),
 }
 
@@ -57,7 +58,7 @@ impl CustomTexturesApp {
                 format: ClientFormat::U8U8U8,
             };
             let gl_texture = Texture2d::new(gl_ctx, raw)?;
-            let texture_id = textures.insert(gl_texture);
+            let texture_id = textures.insert(Rc::new(gl_texture));
 
             self.my_texture_id = Some(texture_id);
         }
@@ -105,7 +106,7 @@ impl Lenna {
             format: ClientFormat::U8U8U8,
         };
         let gl_texture = Texture2d::new(gl_ctx, raw)?;
-        let texture_id = textures.insert(gl_texture);
+        let texture_id = textures.insert(Rc::new(gl_texture));
         Ok(Lenna {
             texture_id,
             size: (width as f32, height as f32),
