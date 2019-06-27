@@ -371,7 +371,7 @@ fn show_test_window(ui: &Ui, state: &mut State, opened: &mut bool) {
         if ui.collapsing_header(im_str!("Widgets")).build() {
             ui.tree_node(im_str!("Tree")).build(|| {
                 for i in 0..5 {
-                    ui.tree_node(im_str!("Child {}", i)).build(|| {
+                    ui.tree_node(&im_str!("Child {}", i)).build(|| {
                         ui.text(im_str!("blah blah"));
                         ui.same_line(0.0);
                         if ui.small_button(im_str!("print")) {
@@ -774,7 +774,7 @@ fn show_example_menu_file<'a>(ui: &Ui<'a>, state: &mut FileMenuState) {
     });
     ui.menu(im_str!("Colors")).build(|| {
         for &col in StyleColor::VARIANTS.iter() {
-            ui.menu_item(im_str!("{:?}", col)).build();
+            ui.menu_item(&im_str!("{:?}", col)).build();
         }
     });
     ui.menu(im_str!("Disabled")).enabled(false).build(|| {
@@ -849,7 +849,7 @@ My title is the same as window 1, but my identifier is unique.",
     let ch_idx = (ui.imgui().get_time() / 0.25) as usize & 3;
     let num = ui.imgui().get_frame_count(); // The C++ version uses rand() here
     let title = im_str!("Animated title {} {}###AnimatedTitle", chars[ch_idx], num);
-    ui.window(title)
+    ui.window(&title)
         .position((100.0, 300.0), Condition::FirstUseEver)
         .build(|| ui.text("This window has a changing title"));
 }
