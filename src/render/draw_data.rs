@@ -167,16 +167,16 @@ impl<'a> Iterator for DrawCmdIterator<'a> {
                 vtx_offset: cmd.VtxOffset as usize,
                 idx_offset: cmd.IdxOffset as usize,
             };
-            if let Some(raw_callback) = cmd.UserCallback {
-                DrawCmd::RawCallback {
+            match cmd.UserCallback {
+                Some(raw_callback) if raw_callback as isize == -1 => DrawCmd::ResetRenderState,
+                Some(raw_callback) => DrawCmd::RawCallback {
                     callback: raw_callback,
                     raw_cmd: cmd,
-                }
-            } else {
-                DrawCmd::Elements {
+                },
+                None => DrawCmd::Elements {
                     count: cmd.ElemCount as usize,
                     cmd_params,
-                }
+                },
             }
         })
     }
@@ -197,6 +197,7 @@ pub enum DrawCmd {
         count: usize,
         cmd_params: DrawCmdParams,
     },
+    ResetRenderState,
     RawCallback {
         callback: unsafe extern "C" fn(*const sys::ImDrawList, cmd: *const sys::ImDrawCmd),
         raw_cmd: *const sys::ImDrawCmd,

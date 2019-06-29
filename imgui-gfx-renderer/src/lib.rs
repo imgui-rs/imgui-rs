@@ -255,6 +255,7 @@ where
                         }
                         self.slice.start = self.slice.end;
                     }
+                    DrawCmd::ResetRenderState => (), // TODO
                     DrawCmd::RawCallback { callback, raw_cmd } => unsafe {
                         callback(draw_list.raw(), raw_cmd)
                     },
