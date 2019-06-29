@@ -15,6 +15,10 @@ pub struct System {
 }
 
 pub fn init(title: &str) -> System {
+    let title = match title.rfind('/') {
+        Some(idx) => title.split_at(idx + 1).1,
+        None => title,
+    };
     let events_loop = glutin::EventsLoop::new();
     let context = glutin::ContextBuilder::new().with_vsync(true);
     let builder = glutin::WindowBuilder::new()
