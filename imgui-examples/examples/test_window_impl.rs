@@ -253,7 +253,7 @@ fn show_test_window(ui: &Ui, state: &mut State, opened: &mut bool) {
             .always_auto_resize(true)
             .opened(&mut state.show_app_about)
             .build(|| {
-                ui.text(format!("dear imgui, {}", imgui::get_version()));
+                ui.text(format!("dear imgui, {}", imgui::dear_imgui_version()));
                 ui.separator();
                 ui.text("By Omar Cornut and all github contributors.");
                 ui.text(
@@ -285,7 +285,7 @@ fn show_test_window(ui: &Ui, state: &mut State, opened: &mut bool) {
     }
     window.build(|| {
         ui.push_item_width(-140.0);
-        ui.text(format!("dear imgui says hello. ({})", imgui::get_version()));
+        ui.text(format!("dear imgui says hello. ({})", imgui::dear_imgui_version()));
         ui.menu_bar(|| {
             ui.menu(im_str!("Menu")).build(|| {
                 show_example_menu_file(ui, &mut state.file_menu);
