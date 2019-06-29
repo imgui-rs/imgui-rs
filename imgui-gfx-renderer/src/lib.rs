@@ -6,7 +6,7 @@ use gfx::texture::{FilterMethod, SamplerInfo, WrapMode};
 use gfx::traits::FactoryExt;
 use gfx::{CommandBuffer, Encoder, Factory, IntoIndexBuffer, Rect, Resources, Slice};
 use imgui::internal::RawWrapper;
-use imgui::{DrawCmd, DrawCmdParams, DrawIdx, DrawVert, ImString, TextureId, Textures, Ui};
+use imgui::{DrawCmd, DrawCmdParams, DrawData, DrawIdx, DrawVert, ImString, TextureId, Textures};
 use std::usize;
 
 #[derive(Clone, Debug)]
@@ -170,14 +170,13 @@ where
     pub fn textures(&mut self) -> &mut Textures<Texture<R>> {
         &mut self.textures
     }
-    pub fn render<'ui, F: Factory<R>, C: CommandBuffer<R>>(
+    pub fn render<F: Factory<R>, C: CommandBuffer<R>>(
         &mut self,
         factory: &mut F,
         encoder: &mut Encoder<R, C>,
         target: &mut RenderTargetView<R, Cf>,
-        ui: Ui<'ui>,
+        draw_data: &DrawData,
     ) -> Result<(), GfxRendererError> {
-        let draw_data = ui.render();
         let fb_width = draw_data.display_size[0] * draw_data.framebuffer_scale[0];
         let fb_height = draw_data.display_size[1] * draw_data.framebuffer_scale[1];
         if !(fb_width > 0.0 && fb_height > 0.0) {

@@ -57,7 +57,8 @@
 //!
 //!         platform.prepare_render(&ui, &window); // step 5
 //!         // render the UI with a renderer
-//!         // renderer.render(..., ui).expect("UI rendering failed");
+//!         let draw_data = ui.render();
+//!         // renderer.render(..., draw_data).expect("UI rendering failed");
 //!
 //!         // application-specific rendering *over the UI*
 //!     }

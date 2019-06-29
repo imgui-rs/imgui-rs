@@ -8,7 +8,7 @@ use glium::{
     Surface, Texture2d, VertexBuffer,
 };
 use imgui::internal::RawWrapper;
-use imgui::{DrawCmd, DrawCmdParams, ImString, TextureId, Textures, Ui};
+use imgui::{DrawCmd, DrawCmdParams, DrawData, ImString, TextureId, Textures};
 use std::borrow::Cow;
 use std::fmt;
 use std::rc::Rc;
@@ -112,12 +112,11 @@ impl GliumRenderer {
             Err(GliumRendererError::BadTexture(texture_id))
         }
     }
-    pub fn render<'ui, T: Surface>(
+    pub fn render<T: Surface>(
         &mut self,
         target: &mut T,
-        ui: Ui<'ui>,
+        draw_data: &DrawData,
     ) -> Result<(), GliumRendererError> {
-        let draw_data = ui.render();
         let fb_width = draw_data.display_size[0] * draw_data.framebuffer_scale[0];
         let fb_height = draw_data.display_size[1] * draw_data.framebuffer_scale[1];
         if !(fb_width > 0.0 && fb_height > 0.0) {

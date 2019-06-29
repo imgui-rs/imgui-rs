@@ -1,8 +1,8 @@
 use gfx::Device;
 use glutin::{Event, WindowEvent};
-use imgui::{FontGlyphRanges, FontConfig, FontSource, Context, Ui};
+use imgui::{Context, FontConfig, FontGlyphRanges, FontSource, Ui};
 use imgui_gfx_renderer::{GfxRenderer, Shaders};
-use imgui_winit_support::{WinitPlatform, HiDpiMode};
+use imgui_winit_support::{HiDpiMode, WinitPlatform};
 use std::time::Instant;
 
 type ColorFormat = gfx::format::Rgba8;
@@ -17,7 +17,7 @@ pub fn run<F: FnMut(&Ui) -> bool>(title: String, clear_color: [f32; 4], mut run_
         .with_dimensions(glutin::dpi::LogicalSize::new(1024f64, 768f64));
     let (windowed_context, mut device, mut factory, mut main_color, mut main_depth) =
         gfx_window_glutin::init::<ColorFormat, DepthFormat>(builder, context, &events_loop)
-        .expect("Failed to initialize graphics");
+            .expect("Failed to initialize graphics");
     let mut encoder: gfx::Encoder<_, _> = factory.create_command_buffer().into();
 
     let shaders = {
@@ -60,7 +60,11 @@ pub fn run<F: FnMut(&Ui) -> bool>(title: String, clear_color: [f32; 4], mut run_
     imgui.set_ini_filename(None);
 
     let mut platform = WinitPlatform::init(&mut imgui);
-    platform.attach_window(imgui.io_mut(), &windowed_context.window(), HiDpiMode::Rounded);
+    platform.attach_window(
+        imgui.io_mut(),
+        &windowed_context.window(),
+        HiDpiMode::Rounded,
+    );
 
     let hidpi_factor = platform.hidpi_factor();
     let font_size = (13.0 * hidpi_factor) as f32;
@@ -96,9 +100,11 @@ pub fn run<F: FnMut(&Ui) -> bool>(title: String, clear_color: [f32; 4], mut run_
 
             if let Event::WindowEvent { event, .. } = event {
                 match event {
-                    WindowEvent::Resized(_) => {
-                        gfx_window_glutin::update_views(&windowed_context, &mut main_color, &mut main_depth)
-                                                        },
+                    WindowEvent::Resized(_) => gfx_window_glutin::update_views(
+                        &windowed_context,
+                        &mut main_color,
+                        &mut main_depth,
+                    ),
                     WindowEvent::CloseRequested => quit = true,
                     _ => (),
                 }
@@ -109,7 +115,9 @@ pub fn run<F: FnMut(&Ui) -> bool>(title: String, clear_color: [f32; 4], mut run_
         }
 
         let io = imgui.io_mut();
-        platform.prepare_frame(io, &windowed_context.window()).expect("Failed to start frame");
+        platform
+            .prepare_frame(io, &windowed_context.window())
+            .expect("Failed to start frame");
         last_frame = io.update_delta_time(last_frame);
 
         let ui = imgui.frame();
@@ -118,8 +126,9 @@ pub fn run<F: FnMut(&Ui) -> bool>(title: String, clear_color: [f32; 4], mut run_
         }
 
         encoder.clear(&main_color, clear_color);
+        let draw_data = ui.render();
         renderer
-            .render(&mut factory, &mut encoder, &mut main_color, ui)
+            .render(&mut factory, &mut encoder, &mut main_color, draw_data)
             .expect("Rendering failed");
         encoder.flush(&mut device);
         windowed_context.swap_buffers().unwrap();

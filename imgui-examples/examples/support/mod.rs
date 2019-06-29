@@ -109,7 +109,10 @@ impl System {
             let mut target = display.draw();
             target.clear_color_srgb(1.0, 1.0, 1.0, 1.0);
             platform.prepare_render(&ui, &window);
-            renderer.render(&mut target, ui).expect("Rendering failed");
+            let draw_data = ui.render();
+            renderer
+                .render(&mut target, draw_data)
+                .expect("Rendering failed");
             target.finish().expect("Failed to swap buffers");
         }
     }
