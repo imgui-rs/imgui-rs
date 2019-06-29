@@ -64,6 +64,29 @@ fn test_key_variants() {
     }
 }
 
+/// Target widget selection for keyboard focus
+#[derive(Copy, Clone, Debug, Hash, Eq, PartialEq)]
+pub enum FocusedWidget {
+    /// Previous widget
+    Previous,
+    /// Next widget
+    Next,
+    /// Widget using a relative positive offset (0 is the next widget).
+    ///
+    /// Use this to access sub components of a multiple component widget.
+    Offset(u32),
+}
+
+impl FocusedWidget {
+    fn as_offset(&self) -> i32 {
+        match *self {
+            FocusedWidget::Previous => -1,
+            FocusedWidget::Next => 0,
+            FocusedWidget::Offset(offset) => offset as i32,
+        }
+    }
+}
+
 impl<'ui> Ui<'ui> {
     /// Returns the key index of the given key identifier.
     ///
@@ -83,6 +106,7 @@ impl<'ui> Ui<'ui> {
     pub fn is_key_pressed(&self, key_index: u32) -> bool {
         unsafe { sys::igIsKeyPressed(key_index as i32, true) }
     }
+    /// Returns true if the key was released (went from down to !down)
     pub fn is_key_released(&self, key_index: u32) -> bool {
         unsafe { sys::igIsKeyReleased(key_index as i32) }
     }
@@ -93,9 +117,10 @@ impl<'ui> Ui<'ui> {
     pub fn key_pressed_amount(&self, key_index: u32, repeat_delay: f32, rate: f32) -> u32 {
         unsafe { sys::igGetKeyPressedAmount(key_index as i32, repeat_delay, rate) as u32 }
     }
-    pub fn set_keyboard_focus_here(&self, offset: i32) {
+    /// Focus keyboard on a widget relative to current position
+    pub fn set_keyboard_focus_here(&self, target_widget: FocusedWidget) {
         unsafe {
-            sys::igSetKeyboardFocusHere(offset);
+            sys::igSetKeyboardFocusHere(target_widget.as_offset());
         }
     }
 }
