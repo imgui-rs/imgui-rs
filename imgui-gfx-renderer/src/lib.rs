@@ -212,6 +212,7 @@ where
                             DrawCmdParams {
                                 clip_rect,
                                 texture_id,
+                                ..
                             },
                     } => {
                         let clip_rect = [

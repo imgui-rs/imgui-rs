@@ -164,6 +164,8 @@ impl<'a> Iterator for DrawCmdIterator<'a> {
             let cmd_params = DrawCmdParams {
                 clip_rect: cmd.ClipRect.into(),
                 texture_id: TextureId::from(cmd.TextureId),
+                vtx_offset: cmd.VtxOffset as usize,
+                idx_offset: cmd.IdxOffset as usize,
             };
             if let Some(raw_callback) = cmd.UserCallback {
                 DrawCmd::RawCallback {
@@ -186,6 +188,8 @@ pub type DrawIdx = sys::ImDrawIdx;
 pub struct DrawCmdParams {
     pub clip_rect: [f32; 4],
     pub texture_id: TextureId,
+    pub vtx_offset: usize,
+    pub idx_offset: usize,
 }
 
 pub enum DrawCmd {

@@ -157,6 +157,7 @@ impl GliumRenderer {
                             DrawCmdParams {
                                 clip_rect,
                                 texture_id,
+                                ..
                             },
                     } => {
                         let idx_end = idx_start + count;
