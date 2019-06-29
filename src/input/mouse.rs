@@ -170,3 +170,254 @@ impl<'ui> Ui<'ui> {
         }
     }
 }
+
+#[test]
+fn test_mouse_down_clicked_released() {
+    for &button in MouseButton::VARIANTS.iter() {
+        let (_guard, mut ctx) = crate::test::test_ctx_initialized();
+        {
+            ctx.io_mut().mouse_down = [false; 5];
+            let ui = ctx.frame();
+            assert!(!ui.is_mouse_down(button));
+            assert!(!ui.is_any_mouse_down());
+            assert!(!ui.is_mouse_clicked(button));
+            assert!(!ui.is_mouse_released(button));
+        }
+        {
+            ctx.io_mut()[button] = true;
+            let ui = ctx.frame();
+            assert!(ui.is_mouse_down(button));
+            assert!(ui.is_any_mouse_down());
+            assert!(ui.is_mouse_clicked(button));
+            assert!(!ui.is_mouse_released(button));
+        }
+        {
+            let ui = ctx.frame();
+            assert!(ui.is_mouse_down(button));
+            assert!(ui.is_any_mouse_down());
+            assert!(!ui.is_mouse_clicked(button));
+            assert!(!ui.is_mouse_released(button));
+        }
+        {
+            ctx.io_mut()[button] = false;
+            let ui = ctx.frame();
+            assert!(!ui.is_mouse_down(button));
+            assert!(!ui.is_any_mouse_down());
+            assert!(!ui.is_mouse_clicked(button));
+            assert!(ui.is_mouse_released(button));
+        }
+        {
+            let ui = ctx.frame();
+            assert!(!ui.is_mouse_down(button));
+            assert!(!ui.is_any_mouse_down());
+            assert!(!ui.is_mouse_clicked(button));
+            assert!(!ui.is_mouse_released(button));
+        }
+    }
+}
+
+#[test]
+fn test_mouse_double_click() {
+    let (_guard, mut ctx) = crate::test::test_ctx_initialized();
+    // Workaround for dear imgui bug/feature:
+    // If a button is clicked before io.mouse_double_click_time seconds has passed after the
+    // context is initialized, the single click is interpreted as a double-click.  This happens
+    // because internally g.IO.MouseClickedTime is set to 0.0, so the context creation is
+    // considered a "click".
+    {
+        // Pass one second of time
+        ctx.io_mut().delta_time = 1.0;
+        let _ = ctx.frame();
+    }
+    // Fast clicks
+    ctx.io_mut().delta_time = 1.0 / 60.0;
+    for &button in MouseButton::VARIANTS.iter() {
+        {
+            ctx.io_mut().mouse_down = [false; 5];
+            let ui = ctx.frame();
+            assert!(!ui.is_mouse_clicked(button));
+            assert!(!ui.is_mouse_double_clicked(button));
+        }
+        {
+            ctx.io_mut()[button] = true;
+            let ui = ctx.frame();
+            assert!(ui.is_mouse_clicked(button));
+            assert!(!ui.is_mouse_double_clicked(button));
+        }
+        {
+            let ui = ctx.frame();
+            assert!(!ui.is_mouse_clicked(button));
+            assert!(!ui.is_mouse_double_clicked(button));
+        }
+        {
+            ctx.io_mut()[button] = false;
+            let ui = ctx.frame();
+            assert!(!ui.is_mouse_clicked(button));
+            assert!(!ui.is_mouse_double_clicked(button));
+        }
+        {
+            ctx.io_mut()[button] = true;
+            let ui = ctx.frame();
+            assert!(ui.is_mouse_clicked(button));
+            assert!(ui.is_mouse_double_clicked(button));
+        }
+        {
+            let ui = ctx.frame();
+            assert!(!ui.is_mouse_clicked(button));
+            assert!(!ui.is_mouse_double_clicked(button));
+        }
+    }
+    // Slow clicks
+    ctx.io_mut().delta_time = 1.0;
+    for &button in MouseButton::VARIANTS.iter() {
+        {
+            ctx.io_mut().mouse_down = [false; 5];
+            let ui = ctx.frame();
+            assert!(!ui.is_mouse_clicked(button));
+            assert!(!ui.is_mouse_double_clicked(button));
+        }
+        {
+            ctx.io_mut()[button] = true;
+            let ui = ctx.frame();
+            assert!(ui.is_mouse_clicked(button));
+            assert!(!ui.is_mouse_double_clicked(button));
+        }
+        {
+            let ui = ctx.frame();
+            assert!(!ui.is_mouse_clicked(button));
+            assert!(!ui.is_mouse_double_clicked(button));
+        }
+        {
+            ctx.io_mut()[button] = false;
+            let ui = ctx.frame();
+            assert!(!ui.is_mouse_clicked(button));
+            assert!(!ui.is_mouse_double_clicked(button));
+        }
+        {
+            ctx.io_mut()[button] = true;
+            let ui = ctx.frame();
+            assert!(ui.is_mouse_clicked(button));
+            assert!(!ui.is_mouse_double_clicked(button));
+        }
+        {
+            let ui = ctx.frame();
+            assert!(!ui.is_mouse_clicked(button));
+            assert!(!ui.is_mouse_double_clicked(button));
+        }
+    }
+}
+
+#[test]
+fn test_set_get_mouse_cursor() {
+    let (_guard, mut ctx) = crate::test::test_ctx_initialized();
+    let ui = ctx.frame();
+    ui.set_mouse_cursor(None);
+    assert_eq!(None, ui.mouse_cursor());
+    ui.set_mouse_cursor(Some(MouseCursor::Hand));
+    assert_eq!(Some(MouseCursor::Hand), ui.mouse_cursor());
+}
+
+#[test]
+fn test_mouse_drags() {
+    for &button in MouseButton::VARIANTS.iter() {
+        let (_guard, mut ctx) = crate::test::test_ctx_initialized();
+        {
+            ctx.io_mut().mouse_pos = [0.0, 0.0];
+            ctx.io_mut().mouse_down = [false; 5];
+            let ui = ctx.frame();
+            assert!(!ui.is_mouse_dragging(button));
+            assert!(!ui.is_mouse_dragging_with_threshold(button, 200.0));
+            assert_eq!(ui.mouse_drag_delta(button), [0.0, 0.0]);
+            assert_eq!(
+                ui.mouse_drag_delta_with_threshold(button, 200.0),
+                [0.0, 0.0]
+            );
+        }
+        {
+            ctx.io_mut()[button] = true;
+            let ui = ctx.frame();
+            assert!(!ui.is_mouse_dragging(button));
+            assert!(!ui.is_mouse_dragging_with_threshold(button, 200.0));
+            assert_eq!(ui.mouse_drag_delta(button), [0.0, 0.0]);
+            assert_eq!(
+                ui.mouse_drag_delta_with_threshold(button, 200.0),
+                [0.0, 0.0]
+            );
+        }
+        {
+            ctx.io_mut().mouse_pos = [0.0, 100.0];
+            let ui = ctx.frame();
+            assert!(ui.is_mouse_dragging(button));
+            assert!(!ui.is_mouse_dragging_with_threshold(button, 200.0));
+            assert_eq!(ui.mouse_drag_delta(button), [0.0, 100.0]);
+            assert_eq!(
+                ui.mouse_drag_delta_with_threshold(button, 200.0),
+                [0.0, 0.0]
+            );
+        }
+        {
+            ctx.io_mut().mouse_pos = [0.0, 200.0];
+            let ui = ctx.frame();
+            assert!(ui.is_mouse_dragging(button));
+            assert!(ui.is_mouse_dragging_with_threshold(button, 200.0));
+            assert_eq!(ui.mouse_drag_delta(button), [0.0, 200.0]);
+            assert_eq!(
+                ui.mouse_drag_delta_with_threshold(button, 200.0),
+                [0.0, 200.0]
+            );
+        }
+        {
+            ctx.io_mut().mouse_pos = [10.0, 10.0];
+            ctx.io_mut()[button] = false;
+            let ui = ctx.frame();
+            assert!(!ui.is_mouse_dragging(button));
+            assert!(!ui.is_mouse_dragging_with_threshold(button, 200.0));
+            assert_eq!(ui.mouse_drag_delta(button), [10.0, 10.0]);
+            assert_eq!(
+                ui.mouse_drag_delta_with_threshold(button, 200.0),
+                [10.0, 10.0]
+            );
+        }
+        {
+            ctx.io_mut()[button] = true;
+            let ui = ctx.frame();
+            assert!(!ui.is_mouse_dragging(button));
+            assert!(!ui.is_mouse_dragging_with_threshold(button, 200.0));
+            assert_eq!(ui.mouse_drag_delta(button), [0.0, 0.0]);
+            assert_eq!(
+                ui.mouse_drag_delta_with_threshold(button, 200.0),
+                [0.0, 0.0]
+            );
+        }
+        {
+            ctx.io_mut().mouse_pos = [180.0, 180.0];
+            let ui = ctx.frame();
+            assert!(ui.is_mouse_dragging(button));
+            assert!(ui.is_mouse_dragging_with_threshold(button, 200.0));
+            assert_eq!(ui.mouse_drag_delta(button), [170.0, 170.0]);
+            assert_eq!(
+                ui.mouse_drag_delta_with_threshold(button, 200.0),
+                [170.0, 170.0]
+            );
+            ui.reset_mouse_drag_delta(button);
+            assert!(ui.is_mouse_dragging(button));
+            assert!(ui.is_mouse_dragging_with_threshold(button, 200.0));
+            assert_eq!(ui.mouse_drag_delta(button), [0.0, 0.0]);
+            assert_eq!(
+                ui.mouse_drag_delta_with_threshold(button, 200.0),
+                [0.0, 0.0]
+            );
+        }
+        {
+            ctx.io_mut().mouse_pos = [200.0, 200.0];
+            let ui = ctx.frame();
+            assert!(ui.is_mouse_dragging(button));
+            assert!(ui.is_mouse_dragging_with_threshold(button, 200.0));
+            assert_eq!(ui.mouse_drag_delta(button), [20.0, 20.0]);
+            assert_eq!(
+                ui.mouse_drag_delta_with_threshold(button, 200.0),
+                [20.0, 20.0]
+            );
+        }
+    }
+}

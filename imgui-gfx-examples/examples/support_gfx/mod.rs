@@ -1,15 +1,15 @@
 use gfx::Device;
 use glutin::{Event, WindowEvent};
-use imgui::{FontGlyphRange, ImFontConfig, Context, Ui};
+use imgui::{FontGlyphRanges, FontConfig, FontSource, Context, Ui};
 use imgui_gfx_renderer::{GfxRenderer, Shaders};
 use imgui_winit_support::{WinitPlatform, HiDpiMode};
 use std::time::Instant;
 
+type ColorFormat = gfx::format::Rgba8;
+type DepthFormat = gfx::format::DepthStencil;
+
 #[cfg(feature = "opengl")]
 pub fn run<F: FnMut(&Ui) -> bool>(title: String, clear_color: [f32; 4], mut run_ui: F) {
-    type ColorFormat = gfx::format::Rgba8;
-    type DepthFormat = gfx::format::DepthStencil;
-
     let mut events_loop = glutin::EventsLoop::new();
     let context = glutin::ContextBuilder::new().with_vsync(true);
     let builder = glutin::WindowBuilder::new()
@@ -17,7 +17,7 @@ pub fn run<F: FnMut(&Ui) -> bool>(title: String, clear_color: [f32; 4], mut run_
         .with_dimensions(glutin::dpi::LogicalSize::new(1024f64, 768f64));
     let (windowed_context, mut device, mut factory, mut main_color, mut main_depth) =
         gfx_window_glutin::init::<ColorFormat, DepthFormat>(builder, context, &events_loop)
-        .expect("Failed to initalize graphics");
+        .expect("Failed to initialize graphics");
     let mut encoder: gfx::Encoder<_, _> = factory.create_command_buffer().into();
 
     let shaders = {
@@ -64,24 +64,23 @@ pub fn run<F: FnMut(&Ui) -> bool>(title: String, clear_color: [f32; 4], mut run_
 
     let hidpi_factor = platform.hidpi_factor();
     let font_size = (13.0 * hidpi_factor) as f32;
-
-    imgui.fonts().add_default_font_with_config(
-        ImFontConfig::new()
-            .oversample_h(1)
-            .pixel_snap_h(true)
-            .size_pixels(font_size),
-    );
-
-    imgui.fonts().add_font_with_config(
-        include_bytes!("../../../resources/mplus-1p-regular.ttf"),
-        ImFontConfig::new()
-            .merge_mode(true)
-            .oversample_h(1)
-            .pixel_snap_h(true)
-            .size_pixels(font_size)
-            .rasterizer_multiply(1.75),
-        &FontGlyphRange::japanese(),
-    );
+    imgui.fonts().add_font(&[
+        FontSource::DefaultFontData {
+            config: Some(FontConfig {
+                size_pixels: font_size,
+                ..FontConfig::default()
+            }),
+        },
+        FontSource::TtfData {
+            data: include_bytes!("../../../resources/mplus-1p-regular.ttf"),
+            size_pixels: font_size,
+            config: Some(FontConfig {
+                rasterizer_multiply: 1.75,
+                glyph_ranges: FontGlyphRanges::japanese(),
+                ..FontConfig::default()
+            }),
+        },
+    ]);
 
     imgui.io_mut().font_global_scale = (1.0 / hidpi_factor) as f32;
 
@@ -133,9 +132,6 @@ pub fn run<F: FnMut(&Ui) -> bool>(title: String, clear_color: [f32; 4], mut run_
     use gfx::{self, Device};
     use gfx_window_dxgi;
     use glutin;
-
-    type ColorFormat = gfx::format::Rgba8;
-    type DepthFormat = gfx::format::DepthStencil;
 
     let mut events_loop = glutin::EventsLoop::new();
     let window = glutin::WindowBuilder::new()

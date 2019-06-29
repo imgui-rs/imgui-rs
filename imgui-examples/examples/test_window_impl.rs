@@ -182,16 +182,11 @@ impl Default for CustomRenderingState {
     }
 }
 
-const CLEAR_COLOR: [f32; 4] = [114.0 / 255.0, 144.0 / 255.0, 154.0 / 255.0, 1.0];
-
 fn main() {
     let mut state = State::default();
 
-    support::run("test_window.rs".to_owned(), CLEAR_COLOR, |ui, _, _| {
-        let mut open = true;
-        show_test_window(ui, &mut state, &mut open);
-        open
-    });
+    let system = support::init(file!());
+    system.main_loop(|run, ui| show_test_window(ui, &mut state, run));
 }
 
 fn show_help_marker(ui: &Ui, desc: &str) {

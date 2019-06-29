@@ -1,7 +1,7 @@
 use glium::backend::{Context, Facade};
 use glium::index::{self, PrimitiveType};
 use glium::program::ProgramChooserCreationError;
-use glium::texture::{ClientFormat, RawImage2d, TextureCreationError};
+use glium::texture::{ClientFormat, MipmapsOption, RawImage2d, TextureCreationError};
 use glium::uniforms::{MagnifySamplerFilter, MinifySamplerFilter};
 use glium::{
     program, uniform, vertex, Blend, DrawError, DrawParameters, IndexBuffer, Program, Rect,
@@ -81,16 +81,7 @@ impl GliumRenderer {
         facade: &F,
     ) -> Result<GliumRenderer, GliumRendererError> {
         let program = compile_default_program(facade)?;
-        let font_texture = ctx.prepare_texture(|handle| {
-            let data = RawImage2d {
-                data: Cow::Borrowed(handle.pixels),
-                width: handle.width,
-                height: handle.height,
-                format: ClientFormat::U8U8U8U8,
-            };
-            Texture2d::new(facade, data)
-        })?;
-        ctx.set_font_texture_id(TextureId::from(usize::MAX));
+        let font_texture = upload_font_texture(ctx.fonts(), facade.get_context())?;
         ctx.set_renderer_name(Some(ImString::from(format!(
             "imgui-glium-renderer {}",
             env!("CARGO_PKG_VERSION")
@@ -101,6 +92,13 @@ impl GliumRenderer {
             font_texture,
             textures: Textures::new(),
         })
+    }
+    pub fn reload_font_texture(
+        &mut self,
+        ctx: &mut imgui::Context,
+    ) -> Result<(), GliumRendererError> {
+        self.font_texture = upload_font_texture(ctx.fonts(), &self.ctx)?;
+        Ok(())
     }
     pub fn textures(&mut self) -> &mut Textures<Rc<Texture2d>> {
         &mut self.textures
@@ -210,6 +208,22 @@ impl GliumRenderer {
         let _ = self.ctx.insert_debug_marker("imgui-rs: rendering finished");
         Ok(())
     }
+}
+
+fn upload_font_texture(
+    mut fonts: imgui::FontAtlasRefMut,
+    ctx: &Rc<Context>,
+) -> Result<Texture2d, GliumRendererError> {
+    let texture = fonts.build_rgba32_texture();
+    let data = RawImage2d {
+        data: Cow::Borrowed(texture.data),
+        width: texture.width,
+        height: texture.height,
+        format: ClientFormat::U8U8U8U8,
+    };
+    let font_texture = Texture2d::with_mipmaps(ctx, data, MipmapsOption::NoMipmap)?;
+    fonts.tex_id = TextureId::from(usize::MAX);
+    Ok(font_texture)
 }
 
 fn compile_default_program<F: Facade>(facade: &F) -> Result<Program, ProgramChooserCreationError> {

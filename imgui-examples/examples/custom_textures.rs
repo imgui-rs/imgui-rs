@@ -12,9 +12,6 @@ use image::{jpeg::JPEGDecoder, ImageDecoder};
 use imgui::*;
 
 mod support;
-use self::support::Textures;
-
-const CLEAR_COLOR: [f32; 4] = [1.0, 1.0, 1.0, 1.0];
 
 #[derive(Default)]
 struct CustomTexturesApp {
@@ -31,7 +28,7 @@ impl CustomTexturesApp {
     fn register_textures<F>(
         &mut self,
         gl_ctx: &F,
-        textures: &mut Textures,
+        textures: &mut Textures<Rc<Texture2d>>,
     ) -> Result<(), Box<dyn Error>>
     where
         F: Facade,
@@ -89,7 +86,7 @@ impl CustomTexturesApp {
 }
 
 impl Lenna {
-    fn new<F>(gl_ctx: &F, textures: &mut Textures) -> Result<Self, Box<dyn Error>>
+    fn new<F>(gl_ctx: &F, textures: &mut Textures<Rc<Texture2d>>) -> Result<Self, Box<dyn Error>>
     where
         F: Facade,
     {
@@ -121,16 +118,9 @@ impl Lenna {
 fn main() {
     let mut my_app = CustomTexturesApp::default();
 
-    support::run(
-        "custom_textures.rs".to_owned(),
-        CLEAR_COLOR,
-        |ui, gl_ctx, textures| {
-            if let Err(e) = my_app.register_textures(gl_ctx, textures) {
-                panic!("Failed to register textures! {}", e);
-            }
-            my_app.show_textures(ui);
-
-            true
-        },
-    );
+    let mut system = support::init(file!());
+    my_app
+        .register_textures(system.display.get_context(), system.renderer.textures())
+        .expect("Failed to register textures");
+    system.main_loop(|_, ui| my_app.show_textures(ui));
 }

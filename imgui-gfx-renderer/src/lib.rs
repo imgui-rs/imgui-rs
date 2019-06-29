@@ -136,21 +136,7 @@ where
             gfx::memory::Usage::Dynamic,
             Bind::empty(),
         )?;
-        let (_, texture) = ctx.prepare_texture(|handle| {
-            factory.create_texture_immutable_u8::<gfx::format::Rgba8>(
-                gfx::texture::Kind::D2(
-                    handle.width as u16,
-                    handle.height as u16,
-                    gfx::texture::AaMode::Single,
-                ),
-                gfx::texture::Mipmap::Provided,
-                &[handle.pixels],
-            )
-        })?;
-        let sampler =
-            factory.create_sampler(SamplerInfo::new(FilterMethod::Trilinear, WrapMode::Clamp));
-        ctx.set_font_texture_id(TextureId::from(usize::MAX));
-
+        let font_texture = upload_font_texture(ctx.fonts(), factory)?;
         let slice = Slice {
             start: 0,
             end: 0,
@@ -167,11 +153,19 @@ where
             index_buffer,
             slice,
             pso,
-            font_texture: (texture, sampler),
+            font_texture,
             textures: Textures::new(),
             #[cfg(feature = "directx")]
             constants: factory.create_constant_buffer(1),
         })
+    }
+    pub fn reload_font_texture<F: Factory<R>>(
+        &mut self,
+        ctx: &mut imgui::Context,
+        factory: &mut F,
+    ) -> Result<(), GfxRendererError> {
+        self.font_texture = upload_font_texture(ctx.fonts(), factory)?;
+        Ok(())
     }
     pub fn textures(&mut self) -> &mut Textures<Texture<R>> {
         &mut self.textures
@@ -312,6 +306,26 @@ where
             Err(GfxRendererError::BadTexture(texture_id))
         }
     }
+}
+
+fn upload_font_texture<R: Resources, F: Factory<R>>(
+    mut fonts: imgui::FontAtlasRefMut,
+    factory: &mut F,
+) -> Result<Texture<R>, GfxRendererError> {
+    let texture = fonts.build_rgba32_texture();
+    let (_, texture_view) = factory.create_texture_immutable_u8::<gfx::format::Srgba8>(
+        gfx::texture::Kind::D2(
+            texture.width as u16,
+            texture.height as u16,
+            gfx::texture::AaMode::Single,
+        ),
+        gfx::texture::Mipmap::Provided,
+        &[texture.data],
+    )?;
+    fonts.tex_id = TextureId::from(usize::MAX);
+    let sampler = factory.create_sampler(SamplerInfo::new(FilterMethod::Bilinear, WrapMode::Tile));
+    let font_texture = (texture_view, sampler);
+    Ok(font_texture)
 }
 
 #[cfg(feature = "directx")]

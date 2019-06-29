@@ -1,6 +1,8 @@
 #![allow(non_upper_case_globals)]
 use bitflags::bitflags;
+use std::ffi::CStr;
 use std::os::raw::c_int;
+use std::str;
 
 use crate::input::keyboard::Key;
 use crate::input::mouse::MouseButton;
@@ -170,17 +172,6 @@ bitflags!(
 
         const RootAndChildWindows =
             ImGuiFocusedFlags::RootWindow.bits | ImGuiFocusedFlags::ChildWindows.bits;
-    }
-);
-
-bitflags!(
-    /// Flags for font atlases
-    #[repr(C)]
-    pub struct ImFontAtlasFlags: c_int {
-        /// Don't round the height to next power of two
-        const NoPowerOfTwoHeight = 1;
-        /// Don't build software mouse cursors into the atlas
-        const NoMouseCursors = 1 << 1;
     }
 );
 
@@ -665,5 +656,13 @@ impl<'ui> Ui<'ui> {
     pub fn metrics_active_windows(&self) -> i32 {
         let io = self.io();
         io.metrics_active_windows
+    }
+}
+
+#[deprecated(since = "0.1.0", note = "Use dear_imgui_version instead")]
+pub fn get_version() -> &'static str {
+    unsafe {
+        let bytes = CStr::from_ptr(sys::igGetVersion()).to_bytes();
+        str::from_utf8_unchecked(bytes)
     }
 }

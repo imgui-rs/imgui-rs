@@ -4,13 +4,12 @@ use std::ops::{Index, IndexMut};
 use std::os::raw::{c_char, c_int, c_void};
 use std::time::Instant;
 
+use crate::fonts::atlas::FontAtlas;
+use crate::fonts::font::Font;
 use crate::input::keyboard::Key;
 use crate::input::mouse::MouseButton;
 use crate::internal::{ImVector, RawCast};
 use crate::sys;
-
-type FontAtlas = sys::ImFontAtlas;
-type Font = sys::ImFont;
 
 bitflags! {
     /// Configuration flags

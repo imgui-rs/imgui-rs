@@ -2,8 +2,6 @@ use imgui::*;
 
 mod support;
 
-const CLEAR_COLOR: [f32; 4] = [1.0, 1.0, 1.0, 1.0];
-
 struct State {
     example: i32,
     notify_text: &'static str,
@@ -25,15 +23,15 @@ impl Default for State {
 }
 
 fn main() {
+    let system = support::init(file!());
     let mut state = State::default();
-    support::run("color_button.rs".to_owned(), CLEAR_COLOR, |ui, _, _| {
+    system.main_loop(|_, ui| {
         example_selector(&mut state, ui);
         match state.example {
             1 => example_1(&mut state, ui),
             2 => example_2(ui),
             _ => (),
         }
-        true
     });
 }
 

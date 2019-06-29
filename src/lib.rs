@@ -2,10 +2,10 @@ pub extern crate imgui_sys as sys;
 #[macro_use]
 extern crate lazy_static;
 
+use std::cell;
 use std::ffi::CStr;
-use std::os::raw::{c_char, c_int, c_uchar, c_void};
+use std::os::raw::{c_char, c_void};
 use std::ptr;
-use std::slice;
 use std::str;
 use std::thread;
 
@@ -19,7 +19,10 @@ pub use self::drag::{
     DragFloat, DragFloat2, DragFloat3, DragFloat4, DragFloatRange2, DragInt, DragInt2, DragInt3,
     DragInt4, DragIntRange2,
 };
-pub use self::fonts::{FontGlyphRange, ImFont, ImFontAtlas, ImFontConfig};
+pub use self::fonts::atlas::*;
+pub use self::fonts::font::*;
+pub use self::fonts::glyph::*;
+pub use self::fonts::glyph_ranges::*;
 pub use self::image::{Image, ImageButton};
 pub use self::input::keyboard::*;
 pub use self::input::mouse::*;
@@ -86,50 +89,7 @@ fn test_version() {
     assert_eq!(dear_imgui_version(), "1.71");
 }
 
-pub struct TextureHandle<'a> {
-    pub width: u32,
-    pub height: u32,
-    pub pixels: &'a [c_uchar],
-}
-
-pub fn get_version() -> &'static str {
-    unsafe {
-        let bytes = CStr::from_ptr(sys::igGetVersion()).to_bytes();
-        str::from_utf8_unchecked(bytes)
-    }
-}
-
 impl Context {
-    pub fn fonts(&mut self) -> ImFontAtlas {
-        unsafe { ImFontAtlas::from_ptr(self.io_mut().fonts) }
-    }
-    pub fn prepare_texture<'a, F, T>(&mut self, f: F) -> T
-    where
-        F: FnOnce(TextureHandle<'a>) -> T,
-    {
-        let io = self.io();
-        let mut pixels: *mut c_uchar = ptr::null_mut();
-        let mut width: c_int = 0;
-        let mut height: c_int = 0;
-        let mut bytes_per_pixel: c_int = 0;
-        unsafe {
-            sys::ImFontAtlas_GetTexDataAsRGBA32(
-                io.fonts,
-                &mut pixels,
-                &mut width,
-                &mut height,
-                &mut bytes_per_pixel,
-            );
-            f(TextureHandle {
-                width: width as u32,
-                height: height as u32,
-                pixels: slice::from_raw_parts(pixels, (width * height * bytes_per_pixel) as usize),
-            })
-        }
-    }
-    pub fn set_font_texture_id(&mut self, value: TextureId) {
-        self.fonts().set_texture_id(value.id());
-    }
     pub fn get_time(&self) -> f64 {
         unsafe { sys::igGetTime() }
     }
@@ -140,6 +100,7 @@ impl Context {
 
 pub struct Ui<'ui> {
     ctx: &'ui Context,
+    font_atlas: Option<cell::RefMut<'ui, SharedFontAtlas>>,
 }
 
 static FMT: &'static [u8] = b"%s\0";
@@ -151,6 +112,15 @@ fn fmt_ptr() -> *const c_char {
 impl<'ui> Ui<'ui> {
     pub fn io(&self) -> &Io {
         unsafe { &*(sys::igGetIO() as *const Io) }
+    }
+    pub fn fonts(&self) -> FontAtlasRef {
+        match self.font_atlas {
+            Some(ref font_atlas) => FontAtlasRef::Shared(font_atlas),
+            None => unsafe {
+                let fonts = &*(self.io().fonts as *const FontAtlas);
+                FontAtlasRef::Owned(fonts)
+            },
+        }
     }
     pub fn get_time(&self) -> f64 {
         unsafe { sys::igGetTime() }
