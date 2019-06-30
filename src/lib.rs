@@ -369,29 +369,6 @@ impl<'ui> Ui<'ui> {
     }
 }
 
-// Widgets
-impl<'ui> Ui<'ui> {
-    pub fn bullet(&self) {
-        unsafe {
-            sys::igBullet();
-        }
-    }
-    pub fn button(&self, label: &ImStr, size: [f32; 2]) -> bool {
-        unsafe { sys::igButton(label.as_ptr(), size.into()) }
-    }
-    pub fn small_button<'p>(&self, label: &'p ImStr) -> bool {
-        unsafe { sys::igSmallButton(label.as_ptr()) }
-    }
-    /// Make a invisible event. Can be used to conveniently catch events when
-    /// mouse hovers or click the area covered by this invisible button.
-    pub fn invisible_button(&self, label: &ImStr, size: [f32; 2]) -> bool {
-        unsafe { sys::igInvisibleButton(label.as_ptr(), size.into()) }
-    }
-    pub fn checkbox<'p>(&self, label: &'p ImStr, value: &'p mut bool) -> bool {
-        unsafe { sys::igCheckbox(label.as_ptr(), value) }
-    }
-}
-
 // Widgets: Input
 impl<'ui> Ui<'ui> {
     pub fn input_text<'p>(&self, label: &'p ImStr, buf: &'p mut ImString) -> InputText<'ui, 'p> {
@@ -798,46 +775,6 @@ impl<'ui> Ui<'ui> {
                 height_in_items,
             )
         }
-    }
-}
-
-// Widgets: Radio
-impl<'ui> Ui<'ui> {
-    /// Creates a radio button for selecting an integer value.
-    /// Returns true if pressed.
-    ///
-    /// # Example
-    /// ```rust,no_run
-    /// # use imgui::*;
-    /// # let mut imgui = Context::create();
-    /// # let ui = imgui.frame();
-    /// # let mut selected_radio_value = 2;
-    /// ui.radio_button(im_str!("Item 1"), &mut selected_radio_value, 1);
-    /// ui.radio_button(im_str!("Item 2"), &mut selected_radio_value, 2);
-    /// ui.radio_button(im_str!("Item 3"), &mut selected_radio_value, 3);
-    /// ```
-    pub fn radio_button<'p>(&self, label: &'p ImStr, value: &'p mut i32, wanted: i32) -> bool {
-        unsafe { sys::igRadioButtonIntPtr(label.as_ptr(), value, wanted) }
-    }
-
-    /// Creates a radio button that shows as selected if the given value is true.
-    /// Returns true if pressed.
-    ///
-    /// # Example
-    /// ```rust,no_run
-    /// # use imgui::*;
-    /// # let mut imgui = Context::create();
-    /// # let ui = imgui.frame();
-    /// # let mut radio_button_test = "cats".to_string();
-    /// if ui.radio_button_bool(im_str!("Cats"), radio_button_test == "cats") {
-    ///     radio_button_test = "cats".to_string();
-    /// }
-    /// if ui.radio_button_bool(im_str!("Dogs"), radio_button_test == "dogs") {
-    ///     radio_button_test = "dogs".to_string();
-    /// }
-    /// ```
-    pub fn radio_button_bool<'p>(&self, label: &'p ImStr, value: bool) -> bool {
-        unsafe { sys::igRadioButtonBool(label.as_ptr(), value) }
     }
 }
 
