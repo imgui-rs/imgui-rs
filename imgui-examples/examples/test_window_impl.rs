@@ -802,23 +802,25 @@ fn show_example_app_fixed_overlay(ui: &Ui, opened: &mut bool) {
     const DISTANCE: f32 = 10.0;
     let window_pos = [DISTANCE, DISTANCE];
     let _token = ui.push_style_color(StyleColor::WindowBg, [0.0, 0.0, 0.0, 0.3]);
-        ui.window(im_str!("Example: Fixed Overlay"))
-            .opened(opened)
-            .position(window_pos, Condition::Always)
-            .title_bar(false)
-            .resizable(false)
-            .always_auto_resize(true)
-            .movable(false)
-            .save_settings(false)
-            .build(|| {
-                ui.text("Simple overlay\nin the corner of the screen.\n(right-click to change position)");
-                ui.separator();
-                let mouse_pos = ui.io().mouse_pos;
-                ui.text(format!(
-                    "Mouse Position: ({:.1},{:.1})",
-                    mouse_pos[0], mouse_pos[1]
-                ));
-            })
+    ui.window(im_str!("Example: Fixed Overlay"))
+        .opened(opened)
+        .position(window_pos, Condition::Always)
+        .title_bar(false)
+        .resizable(false)
+        .always_auto_resize(true)
+        .movable(false)
+        .save_settings(false)
+        .build(|| {
+            ui.text(
+                "Simple overlay\nin the corner of the screen.\n(right-click to change position)",
+            );
+            ui.separator();
+            let mouse_pos = ui.io().mouse_pos;
+            ui.text(format!(
+                "Mouse Position: ({:.1},{:.1})",
+                mouse_pos[0], mouse_pos[1]
+            ));
+        })
 }
 
 fn show_example_app_manipulating_window_title(ui: &Ui) {
