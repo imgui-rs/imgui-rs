@@ -28,6 +28,10 @@ before_install:
 script:
   - cargo build --all --verbose
   - cargo test --all --verbose
+  - cargo build --manifest-path imgui-winit-support/Cargo.toml --no-default-features --features winit-19
+  - cargo test --manifest-path imgui-winit-support/Cargo.toml --no-default-features --features winit-19
+  - cargo build --manifest-path imgui-winit-support/Cargo.toml --no-default-features --features winit-20
+  - cargo test --manifest-path imgui-winit-support/Cargo.toml --no-default-features --features winit-20
   - cargo build --all --verbose --manifest-path imgui-examples/Cargo.toml
   - cargo test --all --verbose --manifest-path imgui-examples/Cargo.toml
   - cargo build --all --verbose --manifest-path imgui-gfx-examples/Cargo.toml

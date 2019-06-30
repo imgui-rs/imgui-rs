@@ -14,7 +14,8 @@
 //!
 //! ## Complete example (without a renderer)
 //!
-//! ```rust,no_run
+//! ```rust,no_run,ignore
+//! # // TODO: Remove ignore when updated to winit 0.20
 //! use imgui::Context;
 //! use imgui_winit_support::{HiDpiMode, WinitPlatform};
 //! use std::time::Instant;
