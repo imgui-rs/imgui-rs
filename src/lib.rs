@@ -43,7 +43,8 @@ pub use self::sliders::{
     SliderFloat, SliderFloat2, SliderFloat3, SliderFloat4, SliderInt, SliderInt2, SliderInt3,
     SliderInt4,
 };
-pub use self::string::{ImStr, ImString};
+pub use self::stacks::*;
+pub use self::string::*;
 pub use self::style::*;
 pub use self::trees::{CollapsingHeader, TreeNode};
 pub use self::window::Window;
@@ -68,11 +69,13 @@ mod popup_modal;
 mod progressbar;
 mod render;
 mod sliders;
+mod stacks;
 mod string;
 mod style;
 #[cfg(test)]
 mod test;
 mod trees;
+mod widget;
 mod window;
 mod window_draw_list;
 
@@ -121,6 +124,12 @@ impl<'ui> Ui<'ui> {
                 FontAtlasRef::Owned(fonts)
             },
         }
+    }
+    pub fn clone_style(&self) -> Style {
+        *self.ctx.style()
+    }
+    pub fn style_color(&self, style_color: StyleColor) -> [f32; 4] {
+        self.ctx.style()[style_color]
     }
     pub fn get_time(&self) -> f64 {
         unsafe { sys::igGetTime() }
@@ -201,29 +210,6 @@ impl<'ui> Ui<'ui> {
 
 // Layout
 impl<'ui> Ui<'ui> {
-    /// Pushes a value to the item width stack.
-    pub fn push_item_width(&self, width: f32) {
-        unsafe { sys::igPushItemWidth(width) }
-    }
-
-    /// Pops a value from the item width stack.
-    ///
-    /// # Aborts
-    /// The current process is aborted if the item width stack is empty.
-    pub fn pop_item_width(&self) {
-        unsafe { sys::igPopItemWidth() }
-    }
-
-    /// Runs a function after temporarily pushing a value to the item width stack.
-    pub fn with_item_width<F>(&self, width: f32, f: F)
-    where
-        F: FnOnce(),
-    {
-        self.push_item_width(width);
-        f();
-        self.pop_item_width();
-    }
-
     pub fn separator(&self) {
         unsafe { sys::igSeparator() };
     }
@@ -390,55 +376,9 @@ impl<'ui> Ui<'ui> {
 
 // Widgets
 impl<'ui> Ui<'ui> {
-    pub fn text<T: AsRef<str>>(&self, text: T) {
-        let s = text.as_ref();
-        unsafe {
-            let start = s.as_ptr();
-            let end = start.add(s.len());
-            sys::igTextUnformatted(start as *const c_char, end as *const c_char);
-        }
-    }
-    pub fn text_colored<'p>(&self, col: [f32; 4], text: &'p ImStr) {
-        unsafe {
-            sys::igTextColored(col.into(), fmt_ptr(), text.as_ptr());
-        }
-    }
-    pub fn text_disabled<'p>(&self, text: &'p ImStr) {
-        unsafe {
-            sys::igTextDisabled(fmt_ptr(), text.as_ptr());
-        }
-    }
-    pub fn text_wrapped<'p>(&self, text: &'p ImStr) {
-        unsafe {
-            sys::igTextWrapped(fmt_ptr(), text.as_ptr());
-        }
-    }
-    /// Set word-wrapping for `text_*()` commands.
-    /// - `< 0.0`: no wrapping;
-    /// - `= 0.0`: wrap to end of window (or column);
-    /// - `> 0.0`: wrap at `wrap_pos_x` position in window local space
-    pub fn with_text_wrap_pos<F: FnOnce()>(&self, wrap_pos_x: f32, f: F) {
-        unsafe {
-            sys::igPushTextWrapPos(wrap_pos_x);
-        }
-        f();
-        unsafe {
-            sys::igPopTextWrapPos();
-        }
-    }
-    pub fn label_text<'p>(&self, label: &'p ImStr, text: &'p ImStr) {
-        unsafe {
-            sys::igLabelText(label.as_ptr(), fmt_ptr(), text.as_ptr());
-        }
-    }
     pub fn bullet(&self) {
         unsafe {
             sys::igBullet();
-        }
-    }
-    pub fn bullet_text<'p>(&self, text: &'p ImStr) {
-        unsafe {
-            sys::igBulletText(fmt_ptr(), text.as_ptr());
         }
     }
     pub fn button(&self, label: &ImStr, size: [f32; 2]) -> bool {
@@ -1014,188 +954,6 @@ impl<'ui> Ui<'ui> {
     /// });
     pub fn child_frame<'p>(&self, name: &'p ImStr, size: [f32; 2]) -> ChildFrame<'ui, 'p> {
         ChildFrame::new(self, name, size)
-    }
-}
-
-impl<'ui> Ui<'ui> {
-    /// Runs a function after temporarily pushing a value to the style stack.
-    ///
-    /// # Example
-    /// ```rust,no_run
-    /// # use imgui::*;
-    /// # let mut imgui = Context::create();
-    /// # let ui = imgui.frame();
-    /// ui.with_style_var(StyleVar::Alpha(0.2), || {
-    ///     ui.text(im_str!("AB"));
-    /// });
-    /// ```
-    pub fn with_style_var<F: FnOnce()>(&self, style_var: StyleVar, f: F) {
-        self.push_style_var(style_var);
-        f();
-        unsafe { sys::igPopStyleVar(1) }
-    }
-
-    /// Runs a function after temporarily pushing an array of values into the stack. Supporting
-    /// multiple is also easy since you can freely mix and match them in a safe manner.
-    ///
-    /// # Example
-    /// ```rust,no_run
-    /// # use imgui::*;
-    /// # let mut imgui = Context::create();
-    /// # let ui = imgui.frame();
-    /// # let styles = [StyleVar::Alpha(0.2), StyleVar::WindowPadding([1.0, 1.0])];
-    /// ui.with_style_vars(&styles, || {
-    ///     ui.text(im_str!("A"));
-    ///     ui.text(im_str!("B"));
-    ///     ui.text(im_str!("C"));
-    ///     ui.text(im_str!("D"));
-    /// });
-    /// ```
-    pub fn with_style_vars<F: FnOnce()>(&self, style_vars: &[StyleVar], f: F) {
-        for &style_var in style_vars {
-            self.push_style_var(style_var);
-        }
-        f();
-        unsafe { sys::igPopStyleVar(style_vars.len() as i32) };
-    }
-
-    #[inline]
-    fn push_style_var(&self, style_var: StyleVar) {
-        use crate::style::StyleVar::*;
-        use crate::sys::{igPushStyleVarFloat, igPushStyleVarVec2};
-        match style_var {
-            Alpha(v) => unsafe { igPushStyleVarFloat(sys::ImGuiStyleVar_Alpha as i32, v) },
-            WindowPadding(v) => unsafe {
-                igPushStyleVarVec2(sys::ImGuiStyleVar_WindowPadding as i32, v.into())
-            },
-            WindowRounding(v) => unsafe {
-                igPushStyleVarFloat(sys::ImGuiStyleVar_WindowRounding as i32, v)
-            },
-            WindowBorderSize(v) => unsafe {
-                igPushStyleVarFloat(sys::ImGuiStyleVar_WindowBorderSize as i32, v)
-            },
-            WindowMinSize(v) => unsafe {
-                igPushStyleVarVec2(sys::ImGuiStyleVar_WindowMinSize as i32, v.into())
-            },
-            WindowTitleAlign(v) => unsafe {
-                igPushStyleVarVec2(sys::ImGuiStyleVar_WindowTitleAlign as i32, v.into())
-            },
-            ChildRounding(v) => unsafe {
-                igPushStyleVarFloat(sys::ImGuiStyleVar_ChildRounding as i32, v)
-            },
-            ChildBorderSize(v) => unsafe {
-                igPushStyleVarFloat(sys::ImGuiStyleVar_ChildBorderSize as i32, v)
-            },
-            PopupRounding(v) => unsafe {
-                igPushStyleVarFloat(sys::ImGuiStyleVar_PopupRounding as i32, v)
-            },
-            PopupBorderSize(v) => unsafe {
-                igPushStyleVarFloat(sys::ImGuiStyleVar_PopupBorderSize as i32, v)
-            },
-            FramePadding(v) => unsafe {
-                igPushStyleVarVec2(sys::ImGuiStyleVar_FramePadding as i32, v.into())
-            },
-            FrameRounding(v) => unsafe {
-                igPushStyleVarFloat(sys::ImGuiStyleVar_FrameRounding as i32, v)
-            },
-            FrameBorderSize(v) => unsafe {
-                igPushStyleVarFloat(sys::ImGuiStyleVar_FrameBorderSize as i32, v)
-            },
-            ItemSpacing(v) => unsafe {
-                igPushStyleVarVec2(sys::ImGuiStyleVar_ItemSpacing as i32, v.into())
-            },
-            ItemInnerSpacing(v) => unsafe {
-                igPushStyleVarVec2(sys::ImGuiStyleVar_ItemInnerSpacing as i32, v.into())
-            },
-            IndentSpacing(v) => unsafe {
-                igPushStyleVarFloat(sys::ImGuiStyleVar_IndentSpacing as i32, v)
-            },
-            ScrollbarSize(v) => unsafe {
-                igPushStyleVarFloat(sys::ImGuiStyleVar_ScrollbarSize as i32, v)
-            },
-            ScrollbarRounding(v) => unsafe {
-                igPushStyleVarFloat(sys::ImGuiStyleVar_ScrollbarRounding as i32, v)
-            },
-            GrabMinSize(v) => unsafe {
-                igPushStyleVarFloat(sys::ImGuiStyleVar_GrabMinSize as i32, v)
-            },
-            GrabRounding(v) => unsafe {
-                igPushStyleVarFloat(sys::ImGuiStyleVar_GrabRounding as i32, v)
-            },
-            TabRounding(v) => unsafe {
-                igPushStyleVarFloat(sys::ImGuiStyleVar_TabRounding as i32, v)
-            },
-            ButtonTextAlign(v) => unsafe {
-                igPushStyleVarVec2(sys::ImGuiStyleVar_ButtonTextAlign as i32, v.into())
-            },
-            SelectableTextAlign(v) => unsafe {
-                igPushStyleVarVec2(sys::ImGuiStyleVar_SelectableTextAlign as i32, v.into())
-            },
-        }
-    }
-}
-
-impl<'ui> Ui<'ui> {
-    /// Runs a function after temporarily pushing a value to the color stack.
-    ///
-    /// # Example
-    /// ```rust,no_run
-    /// # use imgui::*;
-    /// # let mut imgui = Context::create();
-    /// # let ui = imgui.frame();
-    /// ui.with_color_var(StyleColor::Text, [1.0, 0.0, 0.0, 1.0], || {
-    ///     ui.text_wrapped(im_str!("AB"));
-    /// });
-    /// ```
-    pub fn with_color_var<F: FnOnce()>(&self, var: StyleColor, color: [f32; 4], f: F) {
-        unsafe {
-            sys::igPushStyleColor(var as _, color.into());
-        }
-        f();
-        unsafe {
-            sys::igPopStyleColor(1);
-        }
-    }
-
-    /// Runs a function after temporarily pushing an array of values to the color stack.
-    ///
-    /// # Example
-    /// ```rust,no_run
-    /// # use imgui::*;
-    /// # let mut imgui = Context::create();
-    /// # let ui = imgui.frame();
-    /// let red = [1.0, 0.0, 0.0, 1.0];
-    /// let green = [0.0, 1.0, 0.0, 1.0];
-    /// # let vars = [(StyleColor::Text, red), (StyleColor::TextDisabled, green)];
-    /// ui.with_color_vars(&vars, || {
-    ///     ui.text_wrapped(im_str!("AB"));
-    /// });
-    /// ```
-    pub fn with_color_vars<F: FnOnce()>(&self, color_vars: &[(StyleColor, [f32; 4])], f: F) {
-        for &(color_var, color) in color_vars {
-            unsafe {
-                sys::igPushStyleColor(color_var as _, color.into());
-            }
-        }
-        f();
-        unsafe { sys::igPopStyleColor(color_vars.len() as i32) };
-    }
-}
-
-impl<'ui> Ui<'ui> {
-    /// Runs a function after temporarily pushing an array of values to the
-    /// style and color stack.
-    pub fn with_style_and_color_vars<F>(
-        &self,
-        style_vars: &[StyleVar],
-        color_vars: &[(StyleColor, [f32; 4])],
-        f: F,
-    ) where
-        F: FnOnce(),
-    {
-        self.with_style_vars(style_vars, || {
-            self.with_color_vars(color_vars, f);
-        });
     }
 }
 

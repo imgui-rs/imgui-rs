@@ -284,7 +284,7 @@ fn show_test_window(ui: &Ui, state: &mut State, opened: &mut bool) {
         window = window.opened(opened)
     }
     window.build(|| {
-        ui.push_item_width(-140.0);
+        let _token = ui.push_item_width(-140.0);
         ui.text(format!("dear imgui says hello. ({})", imgui::dear_imgui_version()));
         ui.menu_bar(|| {
             ui.menu(im_str!("Menu")).build(|| {
@@ -651,17 +651,16 @@ CTRL+click on individual component to input value.\n",
                 ui.popup_modal(im_str!("Delete?")).always_auto_resize(true).build(|| {
                     ui.text("All those beautiful files will be deleted.\nThis operation cannot be undone!\n\n");
                     ui.separator();
-                    ui.with_style_var(StyleVar::FramePadding([0.0, 0.0]), || {
-                        ui.checkbox(im_str!("Don't ask me next time"), &mut state.dont_ask_me_next_time);
+                    let _token = ui.push_style_var(StyleVar::FramePadding([0.0, 0.0]));
+                    ui.checkbox(im_str!("Don't ask me next time"), &mut state.dont_ask_me_next_time);
 
-                        if ui.button(im_str!("OK"), [120.0, 0.0]) {
-                            ui.close_current_popup();
-                        }
-                        ui.same_line(0.0);
-                        if ui.button(im_str!("Cancel"), [120.0, 0.0]) {
-                            ui.close_current_popup();
-                        }
-                    });
+                    if ui.button(im_str!("OK"), [120.0, 0.0]) {
+                        ui.close_current_popup();
+                    }
+                    ui.same_line(0.0);
+                    if ui.button(im_str!("Cancel"), [120.0, 0.0]) {
+                        ui.close_current_popup();
+                    }
                 });
 
                 if ui.button(im_str!("Stacked modals.."), [0.0, 0.0]) {
@@ -802,7 +801,7 @@ output your content because that would create a feedback loop.",
 fn show_example_app_fixed_overlay(ui: &Ui, opened: &mut bool) {
     const DISTANCE: f32 = 10.0;
     let window_pos = [DISTANCE, DISTANCE];
-    ui.with_color_var(StyleColor::WindowBg, [0.0, 0.0, 0.0, 0.3], || {
+    let _token = ui.push_style_color(StyleColor::WindowBg, [0.0, 0.0, 0.0, 0.3]);
         ui.window(im_str!("Example: Fixed Overlay"))
             .opened(opened)
             .position(window_pos, Condition::Always)
@@ -820,7 +819,6 @@ fn show_example_app_fixed_overlay(ui: &Ui, opened: &mut bool) {
                     mouse_pos[0], mouse_pos[1]
                 ));
             })
-    })
 }
 
 fn show_example_app_manipulating_window_title(ui: &Ui) {

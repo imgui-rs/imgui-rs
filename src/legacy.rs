@@ -7,6 +7,7 @@ use std::str;
 use crate::input::keyboard::Key;
 use crate::input::mouse::MouseButton;
 use crate::internal::RawCast;
+use crate::style::{StyleColor, StyleVar};
 use crate::{Context, Ui};
 
 bitflags!(
@@ -664,5 +665,58 @@ pub fn get_version() -> &'static str {
     unsafe {
         let bytes = CStr::from_ptr(sys::igGetVersion()).to_bytes();
         str::from_utf8_unchecked(bytes)
+    }
+}
+
+impl<'ui> Ui<'ui> {
+    #[deprecated(since = "0.1.0", note = "use Ui::push_style_color instead")]
+    pub fn with_color_var<T, F>(&self, style_color: StyleColor, color: [f32; 4], f: F) -> T
+    where
+        F: FnOnce() -> T,
+    {
+        let _token = self.push_style_color(style_color, color);
+        f()
+    }
+    #[deprecated(since = "0.1.0", note = "use Ui::push_style_colors instead")]
+    pub fn with_color_vars<'a, T, F, I>(&self, style_colors: I, f: F) -> T
+    where
+        F: FnOnce() -> T,
+        I: IntoIterator<Item = &'a (StyleColor, [f32; 4])>,
+    {
+        let _token = self.push_style_colors(style_colors);
+        f()
+    }
+    #[deprecated(since = "0.1.0", note = "use Ui::push_style_var instead")]
+    pub fn with_style_var<T, F>(&self, style_var: StyleVar, f: F) -> T
+    where
+        F: FnOnce() -> T,
+    {
+        let _token = self.push_style_var(style_var);
+        f()
+    }
+    #[deprecated(since = "0.1.0", note = "use Ui::push_style_vars instead")]
+    pub fn with_style_vars<'a, T, F, I>(&self, style_vars: I, f: F) -> T
+    where
+        F: FnOnce() -> T,
+        I: IntoIterator<Item = &'a StyleVar>,
+    {
+        let _token = self.push_style_vars(style_vars);
+        f()
+    }
+    #[deprecated(since = "0.1.0", note = "use Ui::push_item_width instead")]
+    pub fn with_item_width<T, F>(&self, item_width: f32, f: F) -> T
+    where
+        F: FnOnce() -> T,
+    {
+        let _token = self.push_item_width(item_width);
+        f()
+    }
+    #[deprecated(since = "0.1.0", note = "use Ui::push_text_wrap_pos instead")]
+    pub fn with_text_wrap_pos<T, F>(&self, wrap_pos_x: f32, f: F) -> T
+    where
+        F: FnOnce() -> T,
+    {
+        let _token = self.push_text_wrap_pos(wrap_pos_x);
+        f()
     }
 }
