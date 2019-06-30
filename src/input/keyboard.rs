@@ -87,6 +87,7 @@ impl FocusedWidget {
     }
 }
 
+/// # Input: Keyboard
 impl<'ui> Ui<'ui> {
     /// Returns the key index of the given key identifier.
     ///

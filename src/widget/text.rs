@@ -11,6 +11,7 @@ fn fmt_ptr() -> *const c_char {
     FMT.as_ptr() as *const c_char
 }
 
+/// # Widgets: Text
 impl<'ui> Ui<'ui> {
     /// Renders simple text
     pub fn text<T: AsRef<str>>(&self, text: T) {
@@ -32,12 +33,15 @@ impl<'ui> Ui<'ui> {
         let _ = self.push_style_color(StyleColor::Text, color);
         self.text(text);
     }
+    /// Renders text wrapped to the end of window (or column)
     pub fn text_wrapped(&self, text: &ImStr) {
         unsafe { sys::igTextWrapped(fmt_ptr(), text.as_ptr()) }
     }
+    /// Render a text + label combination aligned the same way as value+label widgets
     pub fn label_text(&self, label: &ImStr, text: &ImStr) {
         unsafe { sys::igLabelText(label.as_ptr(), fmt_ptr(), text.as_ptr()) }
     }
+    /// Renders text with a little bullet aligned to the typical tree node
     pub fn bullet_text(&self, text: &ImStr) {
         unsafe { sys::igBulletText(fmt_ptr(), text.as_ptr()) }
     }

@@ -230,7 +230,7 @@ impl<'ui> Ui<'ui> {
     /// Changes the text wrapping position by pushing a change to the text wrapping position stack.
     ///
     /// - `> 0.0`: wrap at `wrap_pos_x` position in window local space
-    /// - `= 0.0`: wrap to end of window ( or column)
+    /// - `= 0.0`: wrap to end of window (or column)
     /// - `< 0.0`: no wrapping
     #[must_use]
     pub fn push_text_wrap_pos(&self, wrap_pos_x: f32) -> TextWrapPosStackToken {

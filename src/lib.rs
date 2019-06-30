@@ -61,6 +61,7 @@ mod input;
 mod input_widget;
 pub mod internal;
 mod io;
+mod layout;
 mod legacy;
 mod menus;
 mod plothistogram;
@@ -143,32 +144,6 @@ impl<'ui> Ui<'ui> {
             &*(sys::igGetDrawData() as *mut DrawData)
         }
     }
-    pub fn show_demo_window(&self, opened: &mut bool) {
-        unsafe {
-            sys::igShowDemoWindow(opened);
-        }
-    }
-    pub fn show_about_window(&self, opened: &mut bool) {
-        unsafe {
-            sys::igShowAboutWindow(opened);
-        }
-    }
-    pub fn show_metrics_window(&self, opened: &mut bool) {
-        unsafe {
-            sys::igShowMetricsWindow(opened);
-        }
-    }
-    pub fn show_style_editor(&self, style: &mut Style) {
-        unsafe {
-            sys::igShowStyleEditor(style.raw_mut());
-        }
-    }
-    pub fn show_default_style_editor(&self) {
-        unsafe { sys::igShowStyleEditor(ptr::null_mut()) };
-    }
-    pub fn show_user_guide(&self) {
-        unsafe { sys::igShowUserGuide() };
-    }
 }
 
 impl<'a> Drop for Ui<'a> {
@@ -178,6 +153,48 @@ impl<'a> Drop for Ui<'a> {
                 sys::igEndFrame();
             }
         }
+    }
+}
+
+/// # Demo, debug, information
+impl<'ui> Ui<'ui> {
+    /// Renders a demo window (previously called a test window), which demonstrates most
+    /// Dear Imgui features.
+    pub fn show_demo_window(&self, opened: &mut bool) {
+        unsafe {
+            sys::igShowDemoWindow(opened);
+        }
+    }
+    /// Renders an about window.
+    ///
+    /// Displays the Dear ImGui version/credits, and build/system information.
+    pub fn show_about_window(&self, opened: &mut bool) {
+        unsafe {
+            sys::igShowAboutWindow(opened);
+        }
+    }
+    /// Renders a metrics/debug window.
+    ///
+    /// Displays Dear ImGui internals: draw commands (with individual draw calls and vertices),
+    /// window list, basic internal state, etc.
+    pub fn show_metrics_window(&self, opened: &mut bool) {
+        unsafe {
+            sys::igShowMetricsWindow(opened);
+        }
+    }
+    /// Renders a style editor block (not a window) for the given `Style` structure
+    pub fn show_style_editor(&self, style: &mut Style) {
+        unsafe {
+            sys::igShowStyleEditor(style.raw_mut());
+        }
+    }
+    /// Renders a style editor block (not a window) for the currently active style
+    pub fn show_default_style_editor(&self) {
+        unsafe { sys::igShowStyleEditor(ptr::null_mut()) };
+    }
+    /// Renders a basic help/info block (not a window)
+    pub fn show_user_guide(&self) {
+        unsafe { sys::igShowUserGuide() };
     }
 }
 
@@ -210,22 +227,6 @@ impl<'ui> Ui<'ui> {
 
 // Layout
 impl<'ui> Ui<'ui> {
-    pub fn separator(&self) {
-        unsafe { sys::igSeparator() };
-    }
-    pub fn new_line(&self) {
-        unsafe { sys::igNewLine() }
-    }
-    pub fn same_line(&self, pos_x: f32) {
-        unsafe { sys::igSameLine(pos_x, -1.0f32) }
-    }
-    pub fn same_line_spacing(&self, pos_x: f32, spacing_w: f32) {
-        unsafe { sys::igSameLine(pos_x, spacing_w) }
-    }
-    pub fn spacing(&self) {
-        unsafe { sys::igSpacing() };
-    }
-
     pub fn columns<'p>(&self, count: i32, id: &'p ImStr, border: bool) {
         unsafe { sys::igColumns(count, id.as_ptr(), border) }
     }
@@ -252,12 +253,6 @@ impl<'ui> Ui<'ui> {
 
     pub fn get_columns_count(&self) -> i32 {
         unsafe { sys::igGetColumnsCount() }
-    }
-
-    /// Fill a space of `size` in pixels with nothing on the current window.
-    /// Can be used to move the cursor on the window.
-    pub fn dummy(&self, size: [f32; 2]) {
-        unsafe { sys::igDummy(size.into()) }
     }
 
     /// Get cursor position on the screen, in screen coordinates.

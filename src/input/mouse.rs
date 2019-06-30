@@ -75,6 +75,7 @@ fn test_mouse_cursor_variants() {
     }
 }
 
+/// # Input: Mouse
 impl<'ui> Ui<'ui> {
     /// Returns true if the given mouse button is held down.
     ///
