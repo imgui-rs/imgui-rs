@@ -94,10 +94,10 @@ fn test_version() {
 }
 
 impl Context {
-    pub fn get_time(&self) -> f64 {
+    pub fn time(&self) -> f64 {
         unsafe { sys::igGetTime() }
     }
-    pub fn get_frame_count(&self) -> i32 {
+    pub fn frame_count(&self) -> i32 {
         unsafe { sys::igGetFrameCount() }
     }
 }
@@ -132,10 +132,10 @@ impl<'ui> Ui<'ui> {
     pub fn style_color(&self, style_color: StyleColor) -> [f32; 4] {
         self.ctx.style()[style_color]
     }
-    pub fn get_time(&self) -> f64 {
+    pub fn time(&self) -> f64 {
         unsafe { sys::igGetTime() }
     }
-    pub fn get_frame_count(&self) -> i32 {
+    pub fn frame_count(&self) -> i32 {
         unsafe { sys::igGetFrameCount() }
     }
     pub fn render(self) -> &'ui DrawData {
