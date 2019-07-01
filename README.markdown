@@ -4,7 +4,7 @@
 
 Minimum Rust version: 1.33
 
-Wrapped Dear ImGui version: 1.66b
+Wrapped Dear ImGui version: 1.71
 
 [![Build Status](https://travis-ci.org/Gekkio/imgui-rs.svg?branch=master)](https://travis-ci.org/Gekkio/imgui-rs)
 [![Latest release on crates.io](https://meritbadge.herokuapp.com/imgui)](https://crates.io/crates/imgui)
@@ -20,7 +20,7 @@ ui.window(im_str!("Hello world"))
         ui.text(im_str!("こんにちは世界！"));
         ui.text(im_str!("This...is...imgui-rs!"));
         ui.separator();
-        let mouse_pos = ui.imgui().mouse_pos();
+        let mouse_pos = ui.io().mouse_pos;
         ui.text(im_str!("Mouse Position: ({:.1},{:.1})", mouse_pos[0], mouse_pos[1]));
     })
 ```
@@ -83,7 +83,7 @@ build this libary and run the examples.
 1. Change or add something
 2. Run rustfmt to guarantee code style conformance
 
-        rustup component add rustfmt-preview
+        rustup component add rustfmt
         cargo fmt
 
 3. Open a pull request in Github
