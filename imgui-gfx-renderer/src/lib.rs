@@ -430,22 +430,23 @@ mod pipeline {
                     None => return Err(InitError::VertexImport(&at.name, None)),
                 }
             }
-            for gc in &info.globals {
-                #[cfg(not(feature = "directx"))]
-                {
-                    match meta.matrix.link_global_constant(gc, &self.matrix) {
-                        Some(Ok(())) => assert!(meta.matrix.is_active()),
-                        Some(Err(e)) => return Err(InitError::GlobalConstant(&gc.name, Some(e))),
-                        None => return Err(InitError::GlobalConstant(&gc.name, None)),
+            #[cfg(feature = "directx")]
+            for cb in &info.constant_buffers {
+                match meta.constants.link_constant_buffer(cb, &self.constants) {
+                    Some(Ok(d)) => {
+                        assert!(meta.constants.is_active());
+                        desc.constant_buffers[cb.slot as usize] = Some(d);
                     }
+                    Some(Err(e)) => return Err(InitError::ConstantBuffer(&cb.name, Some(e))),
+                    None => return Err(InitError::ConstantBuffer(&cb.name, None)),
                 }
-                #[cfg(feature = "directx")]
-                {
-                    match meta.constants.link_global_constant(gc, &self.constants) {
-                        Some(Ok(())) => assert!(meta.constants.is_active()),
-                        Some(Err(e)) => return Err(InitError::GlobalConstant(&gc.name, Some(e))),
-                        None => return Err(InitError::GlobalConstant(&gc.name, None)),
-                    }
+            }
+            #[cfg(not(feature = "directx"))]
+            for gc in &info.globals {
+                match meta.matrix.link_global_constant(gc, &self.matrix) {
+                    Some(Ok(())) => assert!(meta.matrix.is_active()),
+                    Some(Err(e)) => return Err(InitError::GlobalConstant(&gc.name, Some(e))),
+                    None => return Err(InitError::GlobalConstant(&gc.name, None)),
                 }
             }
             for srv in &info.textures {
@@ -534,7 +535,7 @@ mod pipeline {
             #[cfg(not(feature = "directx"))]
             matrix: "matrix",
             #[cfg(feature = "directx")]
-            constants: "constants",
+            constants: "Constants",
             tex: "tex",
             target: ("Target0", ColorMask::all(), blend::ALPHA),
             scissor: (),
