@@ -5,15 +5,15 @@ use std::os::raw::c_int;
 use std::str;
 
 use crate::fonts::atlas::{FontAtlas, FontAtlasTexture, FontConfig};
-use crate::fonts::glyph_ranges::FontGlyphRanges;
 use crate::fonts::font::Font;
+use crate::fonts::glyph_ranges::FontGlyphRanges;
 use crate::input::keyboard::Key;
 use crate::input::mouse::{MouseButton, MouseCursor};
+use crate::internal::RawCast;
 use crate::render::draw_data::{DrawIdx, DrawVert};
 use crate::render::renderer::TextureId;
-use crate::internal::RawCast;
-use crate::style::{StyleColor, StyleVar, Style};
-use crate::{Context, Ui, Condition};
+use crate::style::{Style, StyleColor, StyleVar};
+use crate::{Condition, Context, Ui};
 
 #[deprecated(since = "0.1.0", note = "use Font instead")]
 pub type ImFont = Font;
@@ -409,6 +409,10 @@ bitflags!(
 );
 
 impl Context {
+    #[deprecated(since = "0.1.0", note = "Use Context::create instead")]
+    pub fn init() -> Context {
+        Context::create()
+    }
     #[deprecated(since = "0.1.0", note = "Access Io::ini_saving_rate directly instead")]
     pub fn set_ini_saving_rate(&mut self, value: f32) {
         let io = self.io_mut();
@@ -652,6 +656,14 @@ impl Context {
     #[deprecated(since = "0.1.0", note = "Access Io::framerate directly instead")]
     pub fn get_frame_rate(&self) -> f32 {
         self.io().framerate
+    }
+    #[deprecated(since = "0.1.0", note = "Use Context::time instead")]
+    pub fn get_time(&self) -> f64 {
+        self.time()
+    }
+    #[deprecated(since = "0.1.0", note = "Use Context::frame_count instead")]
+    pub fn get_frame_count(&self) -> i32 {
+        self.frame_count()
     }
 }
 
