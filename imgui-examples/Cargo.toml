@@ -1,6 +1,6 @@
 [package]
 name = "imgui-examples"
-version = "0.1.0-rc.1"
+version = "0.0.0"
 edition = "2018"
 authors = ["Joonas Javanainen <joonas.javanainen@gmail.com>", "imgui-rs contributors"]
 description = "imgui crate examples using Glium backend"
@@ -11,7 +11,7 @@ publish = false
 
 [dev-dependencies]
 glium = { version = "0.25", default-features = true }
-imgui = { version = "0.1.0-rc.1", path = "../" }
-imgui-glium-renderer = { version = "0.1.0-rc.1", path = "../imgui-glium-renderer" }
-imgui-winit-support = { version = "0.1.0-rc.1", path = "../imgui-winit-support" }
+imgui = { version = "0.1.0-pre", path = "../" }
+imgui-glium-renderer = { version = "0.1.0-pre", path = "../imgui-glium-renderer" }
+imgui-winit-support = { version = "0.1.0-pre", path = "../imgui-winit-support" }
 image = "0.21"
