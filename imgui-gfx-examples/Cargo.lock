@@ -361,6 +361,8 @@ name = "imgui-gfx-examples"
 version = "0.1.0-pre"
 dependencies = [
  "gfx 0.18.1 (registry+https://github.com/rust-lang/crates.io-index)",
+ "gfx_device_dx11 0.8.2 (registry+https://github.com/rust-lang/crates.io-index)",
+ "gfx_device_gl 0.16.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "gfx_window_dxgi 0.19.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "gfx_window_glutin 0.31.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "glutin 0.21.0 (registry+https://github.com/rust-lang/crates.io-index)",

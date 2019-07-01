@@ -16,6 +16,7 @@ default = ["opengl"]
 
 [dev-dependencies]
 gfx = "0.18"
+gfx_device_gl = "0.16"
 gfx_window_glutin = "0.31"
 glutin = "0.21"
 imgui = { version = "0.1.0-pre", path = "../" }
@@ -23,4 +24,5 @@ imgui-gfx-renderer = { version = "0.1.0-pre", path = "../imgui-gfx-renderer" }
 imgui-winit-support = { version = "0.1.0-pre", path = "../imgui-winit-support" }
 
 [target.'cfg(windows)'.dev-dependencies]
+gfx_device_dx11 = "0.8"
 gfx_window_dxgi = "0.19"
