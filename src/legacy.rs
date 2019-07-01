@@ -4,11 +4,61 @@ use std::ffi::CStr;
 use std::os::raw::c_int;
 use std::str;
 
+use crate::fonts::atlas::{FontAtlas, FontAtlasTexture, FontConfig};
+use crate::fonts::glyph_ranges::FontGlyphRanges;
+use crate::fonts::font::Font;
 use crate::input::keyboard::Key;
-use crate::input::mouse::MouseButton;
+use crate::input::mouse::{MouseButton, MouseCursor};
+use crate::render::draw_data::{DrawIdx, DrawVert};
+use crate::render::renderer::TextureId;
 use crate::internal::RawCast;
-use crate::style::{StyleColor, StyleVar};
-use crate::{Context, Ui};
+use crate::style::{StyleColor, StyleVar, Style};
+use crate::{Context, Ui, Condition};
+
+#[deprecated(since = "0.1.0", note = "use Font instead")]
+pub type ImFont = Font;
+
+#[deprecated(since = "0.1.0", note = "use Key instead")]
+pub type ImGuiKey = Key;
+
+#[deprecated(since = "0.1.0", note = "use MouseCursor instead")]
+pub type ImGuiMouseCursor = MouseCursor;
+
+#[deprecated(since = "0.1.0", note = "use MouseButton instead")]
+pub type ImMouseButton = MouseButton;
+
+#[deprecated(since = "0.1.0", note = "use FontConfig instead")]
+pub type ImFontConfig = FontConfig;
+
+#[deprecated(since = "0.1.0", note = "use FontAtlas instead")]
+pub type ImFontAtlas = FontAtlas;
+
+#[deprecated(since = "0.1.0", note = "use Context instead")]
+pub type ImGui = Context;
+
+#[deprecated(since = "0.1.0", note = "use Condition instead")]
+pub type ImGuiCond = Condition;
+
+#[deprecated(since = "0.1.0", note = "use StyleColor instead")]
+pub type ImGuiCol = StyleColor;
+
+#[deprecated(since = "0.1.0", note = "use TextureId instead")]
+pub type ImTexture = TextureId;
+
+#[deprecated(since = "0.1.0", note = "use Style instead")]
+pub type ImGuiStyle = Style;
+
+#[deprecated(since = "0.1.0", note = "use DrawIdx instead")]
+pub type ImDrawIdx = DrawIdx;
+
+#[deprecated(since = "0.1.0", note = "use DrawVert instead")]
+pub type ImDrawVert = DrawVert;
+
+#[deprecated(since = "0.1.0", note = "use FontAtlasTexture instead")]
+pub type TextureHandle<'a> = FontAtlasTexture<'a>;
+
+#[deprecated(since = "0.1.0", note = "use FontGlyphRanges instead")]
+pub type FontGlyphRange = FontGlyphRanges;
 
 bitflags!(
     /// Color edit flags
