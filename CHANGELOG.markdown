@@ -2,9 +2,35 @@
 
 ## [Unreleased]
 
+### Added
+
+- Support for font atlas sharing
+- Support for using multiple fonts
+- Support for suspended contexts (useful for having multiple independent
+  operating system windows)
+- Support for DX11 in imgui-gfx-renderer
+- Support for navigation input system
+- Support for backend/renderer name strings
+- Support for saving/loading INI settings manually
+
 ### Changed
 
-- Upgrade to glium 0.24
+- imgui-sys is now almost completely automatically generated. **This is a big
+  breaking change in imgui-sys API**
+- ImGui/Context API is now safer
+- The library context (known as Context, previously known as ImGui) is no longer Send or Sync
+- Many getter/setter APIs have been replaced with direct access to struct fields
+- [f32; 2] and [f32; 4] are now the main vector types. ImVec/ImVec4 and
+  corresponding tuples are no longer used in the main API
+- imgui-gfx-renderer is parameterized over the color format, so Rgba8 and
+  Srgba8 are both supported
+- imgui-winit-support has been rewritten to provide a more robust abstraction
+  that is easier to use correctly
+- Parameter stack (e.g. StyleVar) manipulation is now done using push functions
+  and automatically or manually droppable stack tokens
+- Upgrade to glium 0.25
+- Upgrade to cimgui / imgui 1.71
+- Bump minimum Rust version to 1.33
 
 ## [0.0.23] - 2019-04-10
 
