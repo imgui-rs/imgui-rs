@@ -225,3 +225,17 @@ fn test_imvec4_simple_memory_layout() {
     assert_eq!(&ref_a.z as *const _, &ref_b[2] as *const _);
     assert_eq!(&ref_a.w as *const _, &ref_b[3] as *const _);
 }
+
+impl From<ImVec2_Simple> for ImVec2 {
+    #[inline]
+    fn from(v: ImVec2_Simple) -> ImVec2 {
+        ImVec2::new(v.x, v.y)
+    }
+}
+
+impl From<ImVec4_Simple> for ImVec4 {
+    #[inline]
+    fn from(v: ImVec4_Simple) -> ImVec4 {
+        ImVec4::new(v.x, v.y, v.z, v.w)
+    }
+}
