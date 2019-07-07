@@ -29,10 +29,7 @@ fn test_imvector_memory_layout() {
     type VectorChar = ImVector<u8>;
     macro_rules! assert_field_offset {
         ($l:ident, $r:ident) => {
-            assert_eq!(
-                offset_of!(VectorChar, $l),
-                offset_of!(ImVector_char, $r)
-            );
+            assert_eq!(offset_of!(VectorChar, $l), offset_of!(ImVector_char, $r));
         };
     };
     assert_field_offset!(size, Size);
