@@ -841,8 +841,8 @@ My title is the same as window 1, but my identifier is unique.",
             );
         });
     let chars = ['|', '/', '-', '\\'];
-    let ch_idx = (ui.get_time() / 0.25) as usize & 3;
-    let num = ui.get_frame_count(); // The C++ version uses rand() here
+    let ch_idx = (ui.time() / 0.25) as usize & 3;
+    let num = ui.frame_count(); // The C++ version uses rand() here
     let title = im_str!("Animated title {} {}###AnimatedTitle", chars[ch_idx], num);
     ui.window(&title)
         .position([100.0, 300.0], Condition::FirstUseEver)
