@@ -91,9 +91,10 @@ fn test_drawdata_memory_layout() {
         mem::align_of::<sys::ImDrawData>()
     );
     use memoffset::offset_of;
+    use sys::ImDrawData;
     macro_rules! assert_field_offset {
         ($l:ident, $r:ident) => {
-            assert_eq!(offset_of!(DrawData, $l), offset_of!(sys::ImDrawData, $r));
+            assert_eq!(offset_of!(DrawData, $l), offset_of!(ImDrawData, $r));
         };
     };
     assert_field_offset!(valid, Valid);
@@ -276,9 +277,10 @@ fn test_drawvert_memory_layout() {
         mem::align_of::<sys::ImDrawVert>()
     );
     use memoffset::offset_of;
+    use sys::ImDrawVert;
     macro_rules! assert_field_offset {
         ($l:ident, $r:ident) => {
-            assert_eq!(offset_of!(DrawVert, $l), offset_of!(sys::ImDrawVert, $r));
+            assert_eq!(offset_of!(DrawVert, $l), offset_of!(ImDrawVert, $r));
         };
     };
     assert_field_offset!(pos, pos);

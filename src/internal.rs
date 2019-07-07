@@ -25,11 +25,13 @@ fn test_imvector_memory_layout() {
         mem::align_of::<sys::ImVector_char>()
     );
     use memoffset::offset_of;
+    use sys::ImVector_char;
+    type VectorChar = ImVector<u8>;
     macro_rules! assert_field_offset {
         ($l:ident, $r:ident) => {
             assert_eq!(
-                offset_of!(ImVector<u8>, $l),
-                offset_of!(sys::ImVector_char, $r)
+                offset_of!(VectorChar, $l),
+                offset_of!(ImVector_char, $r)
             );
         };
     };

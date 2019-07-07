@@ -22,7 +22,7 @@ lazy_static = "1.1"
 parking_lot = "0.8"
 
 [dev-dependencies]
-memoffset = "0.3"
+memoffset = "0.4"
 
 [workspace]
 members = [

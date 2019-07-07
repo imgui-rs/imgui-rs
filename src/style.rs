@@ -404,9 +404,10 @@ fn test_style_memory_layout() {
     assert_eq!(mem::size_of::<Style>(), mem::size_of::<sys::ImGuiStyle>());
     assert_eq!(mem::align_of::<Style>(), mem::align_of::<sys::ImGuiStyle>());
     use memoffset::offset_of;
+    use sys::ImGuiStyle;
     macro_rules! assert_field_offset {
         ($l:ident, $r:ident) => {
-            assert_eq!(offset_of!(Style, $l), offset_of!(sys::ImGuiStyle, $r));
+            assert_eq!(offset_of!(Style, $l), offset_of!(ImGuiStyle, $r));
         };
     };
     assert_field_offset!(alpha, Alpha);

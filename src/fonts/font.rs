@@ -39,9 +39,10 @@ fn test_font_memory_layout() {
     assert_eq!(mem::size_of::<Font>(), mem::size_of::<sys::ImFont>());
     assert_eq!(mem::align_of::<Font>(), mem::align_of::<sys::ImFont>());
     use memoffset::offset_of;
+    use sys::ImFont;
     macro_rules! assert_field_offset {
         ($l:ident, $r:ident) => {
-            assert_eq!(offset_of!(Font, $l), offset_of!(sys::ImFont, $r));
+            assert_eq!(offset_of!(Font, $l), offset_of!(ImFont, $r));
         };
     };
     assert_field_offset!(index_advance_x, IndexAdvanceX);

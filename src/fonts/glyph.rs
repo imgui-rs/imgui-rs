@@ -30,9 +30,10 @@ fn test_font_glyph_memory_layout() {
         mem::align_of::<sys::ImFontGlyph>()
     );
     use memoffset::offset_of;
+    use sys::ImFontGlyph;
     macro_rules! assert_field_offset {
         ($l:ident, $r:ident) => {
-            assert_eq!(offset_of!(FontGlyph, $l), offset_of!(sys::ImFontGlyph, $r));
+            assert_eq!(offset_of!(FontGlyph, $l), offset_of!(ImFontGlyph, $r));
         };
     };
     assert_field_offset!(codepoint, Codepoint);

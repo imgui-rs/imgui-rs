@@ -380,9 +380,10 @@ fn test_io_memory_layout() {
     assert_eq!(mem::size_of::<Io>(), mem::size_of::<sys::ImGuiIO>());
     assert_eq!(mem::align_of::<Io>(), mem::align_of::<sys::ImGuiIO>());
     use memoffset::offset_of;
+    use sys::ImGuiIO;
     macro_rules! assert_field_offset {
         ($l:ident, $r:ident) => {
-            assert_eq!(offset_of!(Io, $l), offset_of!(sys::ImGuiIO, $r));
+            assert_eq!(offset_of!(Io, $l), offset_of!(ImGuiIO, $r));
         };
     };
     assert_field_offset!(config_flags, ConfigFlags);

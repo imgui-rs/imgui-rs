@@ -232,9 +232,10 @@ fn test_font_atlas_memory_layout() {
         mem::align_of::<sys::ImFontAtlas>()
     );
     use memoffset::offset_of;
+    use sys::ImFontAtlas;
     macro_rules! assert_field_offset {
         ($l:ident, $r:ident) => {
-            assert_eq!(offset_of!(FontAtlas, $l), offset_of!(sys::ImFontAtlas, $r));
+            assert_eq!(offset_of!(FontAtlas, $l), offset_of!(ImFontAtlas, $r));
         };
     };
     assert_field_offset!(locked, Locked);
