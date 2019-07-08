@@ -10,7 +10,7 @@ use imgui::{DrawCmd, DrawCmdParams, DrawData, DrawIdx, DrawVert, ImString, Textu
 use std::usize;
 
 #[derive(Clone, Debug)]
-pub enum GfxRendererError {
+pub enum RendererError {
     Update(gfx::UpdateError<usize>),
     Buffer(gfx::buffer::CreationError),
     Pipeline(gfx::PipelineStateError<String>),
@@ -18,27 +18,27 @@ pub enum GfxRendererError {
     BadTexture(TextureId),
 }
 
-impl From<gfx::UpdateError<usize>> for GfxRendererError {
-    fn from(e: gfx::UpdateError<usize>) -> GfxRendererError {
-        GfxRendererError::Update(e)
+impl From<gfx::UpdateError<usize>> for RendererError {
+    fn from(e: gfx::UpdateError<usize>) -> RendererError {
+        RendererError::Update(e)
     }
 }
 
-impl From<gfx::buffer::CreationError> for GfxRendererError {
-    fn from(e: gfx::buffer::CreationError) -> GfxRendererError {
-        GfxRendererError::Buffer(e)
+impl From<gfx::buffer::CreationError> for RendererError {
+    fn from(e: gfx::buffer::CreationError) -> RendererError {
+        RendererError::Buffer(e)
     }
 }
 
-impl From<gfx::PipelineStateError<String>> for GfxRendererError {
-    fn from(e: gfx::PipelineStateError<String>) -> GfxRendererError {
-        GfxRendererError::Pipeline(e)
+impl From<gfx::PipelineStateError<String>> for RendererError {
+    fn from(e: gfx::PipelineStateError<String>) -> RendererError {
+        RendererError::Pipeline(e)
     }
 }
 
-impl From<gfx::CombinedError> for GfxRendererError {
-    fn from(e: gfx::CombinedError) -> GfxRendererError {
-        GfxRendererError::Combined(e)
+impl From<gfx::CombinedError> for RendererError {
+    fn from(e: gfx::CombinedError) -> RendererError {
+        RendererError::Combined(e)
     }
 }
 
@@ -101,7 +101,7 @@ pub type Texture<R> = (
     gfx::handle::Sampler<R>,
 );
 
-pub struct GfxRenderer<Cf: BlendFormat, R: Resources> {
+pub struct Renderer<Cf: BlendFormat, R: Resources> {
     vertex_buffer: Buffer<R, DrawVert>,
     index_buffer: Buffer<R, DrawIdx>,
     slice: Slice<R>,
@@ -112,7 +112,7 @@ pub struct GfxRenderer<Cf: BlendFormat, R: Resources> {
     constants: Buffer<R, constants::Constants>,
 }
 
-impl<Cf, R> GfxRenderer<Cf, R>
+impl<Cf, R> Renderer<Cf, R>
 where
     Cf: BlendFormat,
     R: Resources,
@@ -121,7 +121,7 @@ where
         ctx: &mut imgui::Context,
         factory: &mut F,
         shaders: Shaders,
-    ) -> Result<GfxRenderer<Cf, R>, GfxRendererError> {
+    ) -> Result<Renderer<Cf, R>, RendererError> {
         let (vs_code, ps_code) = shaders.get_program_code();
         let pso = factory.create_pipeline_simple(vs_code, ps_code, pipeline::new::<Cf>())?;
         let vertex_buffer = factory.create_buffer::<DrawVert>(
@@ -148,7 +148,7 @@ where
             "imgui-gfx-renderer {}",
             env!("CARGO_PKG_VERSION")
         ))));
-        Ok(GfxRenderer {
+        Ok(Renderer {
             vertex_buffer,
             index_buffer,
             slice,
@@ -163,7 +163,7 @@ where
         &mut self,
         ctx: &mut imgui::Context,
         factory: &mut F,
-    ) -> Result<(), GfxRendererError> {
+    ) -> Result<(), RendererError> {
         self.font_texture = upload_font_texture(ctx.fonts(), factory)?;
         Ok(())
     }
@@ -176,7 +176,7 @@ where
         encoder: &mut Encoder<R, C>,
         target: &mut RenderTargetView<R, Cf>,
         draw_data: &DrawData,
-    ) -> Result<(), GfxRendererError> {
+    ) -> Result<(), RendererError> {
         let fb_width = draw_data.display_size[0] * draw_data.framebuffer_scale[0];
         let fb_height = draw_data.display_size[1] * draw_data.framebuffer_scale[1];
         if !(fb_width > 0.0 && fb_height > 0.0) {
@@ -268,7 +268,7 @@ where
         factory: &mut F,
         encoder: &mut Encoder<R, C>,
         vtx_buffer: &[DrawVert],
-    ) -> Result<(), GfxRendererError> {
+    ) -> Result<(), RendererError> {
         if self.vertex_buffer.len() < vtx_buffer.len() {
             self.vertex_buffer = factory.create_buffer::<DrawVert>(
                 vtx_buffer.len(),
@@ -285,7 +285,7 @@ where
         factory: &mut F,
         encoder: &mut Encoder<R, C>,
         idx_buffer: &[DrawIdx],
-    ) -> Result<(), GfxRendererError> {
+    ) -> Result<(), RendererError> {
         if self.index_buffer.len() < idx_buffer.len() {
             self.index_buffer = factory.create_buffer::<DrawIdx>(
                 idx_buffer.len(),
@@ -298,13 +298,13 @@ where
         encoder.update_buffer(&self.index_buffer, idx_buffer, 0)?;
         Ok(())
     }
-    fn lookup_texture(&self, texture_id: TextureId) -> Result<&Texture<R>, GfxRendererError> {
+    fn lookup_texture(&self, texture_id: TextureId) -> Result<&Texture<R>, RendererError> {
         if texture_id.id() == usize::MAX {
             Ok(&self.font_texture)
         } else if let Some(texture) = self.textures.get(texture_id) {
             Ok(texture)
         } else {
-            Err(GfxRendererError::BadTexture(texture_id))
+            Err(RendererError::BadTexture(texture_id))
         }
     }
 }
@@ -312,7 +312,7 @@ where
 fn upload_font_texture<R: Resources, F: Factory<R>>(
     mut fonts: imgui::FontAtlasRefMut,
     factory: &mut F,
-) -> Result<Texture<R>, GfxRendererError> {
+) -> Result<Texture<R>, RendererError> {
     let texture = fonts.build_rgba32_texture();
     let (_, texture_view) = factory.create_texture_immutable_u8::<gfx::format::Srgba8>(
         gfx::texture::Kind::D2(

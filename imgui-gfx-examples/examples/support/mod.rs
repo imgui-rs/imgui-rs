@@ -1,7 +1,7 @@
 use gfx::Device;
 use glutin::{Event, WindowEvent};
 use imgui::{Context, FontConfig, FontGlyphRanges, FontSource, Ui};
-use imgui_gfx_renderer::{GfxRenderer, Shaders};
+use imgui_gfx_renderer::{Renderer, Shaders};
 use imgui_winit_support::{HiDpiMode, WinitPlatform};
 use std::time::Instant;
 
@@ -125,7 +125,7 @@ mod types {
 
 #[cfg(feature = "opengl")]
 pub struct RenderSystem {
-    pub renderer: GfxRenderer<ColorFormat, types::Resources>,
+    pub renderer: Renderer<ColorFormat, types::Resources>,
     pub windowed_context: glutin::WindowedContext<glutin::PossiblyCurrent>,
     pub device: types::Device,
     pub factory: types::Factory,
@@ -181,7 +181,7 @@ impl RenderSystem {
             }
         };
         let renderer =
-            GfxRenderer::init(imgui, &mut factory, shaders).expect("Failed to initialize renderer");
+            Renderer::init(imgui, &mut factory, shaders).expect("Failed to initialize renderer");
         RenderSystem {
             renderer,
             windowed_context,
@@ -217,7 +217,7 @@ mod types {
 
 #[cfg(feature = "directx")]
 pub struct RenderSystem {
-    pub renderer: GfxRenderer<ColorFormat, types::Resources>,
+    pub renderer: Renderer<ColorFormat, types::Resources>,
     pub window: gfx_window_dxgi::Window,
     pub device: types::Device,
     pub factory: types::Factory,
@@ -233,7 +233,7 @@ impl RenderSystem {
     ) -> RenderSystem {
         let (window, device, mut factory, main_color) =
             gfx_window_dxgi::init(builder, &events_loop).expect("Failed to initialize graphics");
-        let renderer = GfxRenderer::init(imgui, &mut factory, Shaders::HlslSm40)
+        let renderer = Renderer::init(imgui, &mut factory, Shaders::HlslSm40)
             .expect("Failed to initialize renderer");
         RenderSystem {
             renderer,

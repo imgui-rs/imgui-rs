@@ -15,7 +15,7 @@ use std::rc::Rc;
 use std::usize;
 
 #[derive(Clone, Debug)]
-pub enum GliumRendererError {
+pub enum RendererError {
     Vertex(vertex::BufferCreationError),
     Index(index::BufferCreationError),
     Program(ProgramChooserCreationError),
@@ -24,9 +24,9 @@ pub enum GliumRendererError {
     BadTexture(TextureId),
 }
 
-impl fmt::Display for GliumRendererError {
+impl fmt::Display for RendererError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        use self::GliumRendererError::*;
+        use self::RendererError::*;
         match *self {
             Vertex(_) => write!(f, "Vertex buffer creation failed"),
             Index(_) => write!(f, "Index buffer creation failed"),
@@ -38,85 +38,82 @@ impl fmt::Display for GliumRendererError {
     }
 }
 
-impl From<vertex::BufferCreationError> for GliumRendererError {
-    fn from(e: vertex::BufferCreationError) -> GliumRendererError {
-        GliumRendererError::Vertex(e)
+impl From<vertex::BufferCreationError> for RendererError {
+    fn from(e: vertex::BufferCreationError) -> RendererError {
+        RendererError::Vertex(e)
     }
 }
 
-impl From<index::BufferCreationError> for GliumRendererError {
-    fn from(e: index::BufferCreationError) -> GliumRendererError {
-        GliumRendererError::Index(e)
+impl From<index::BufferCreationError> for RendererError {
+    fn from(e: index::BufferCreationError) -> RendererError {
+        RendererError::Index(e)
     }
 }
 
-impl From<ProgramChooserCreationError> for GliumRendererError {
-    fn from(e: ProgramChooserCreationError) -> GliumRendererError {
-        GliumRendererError::Program(e)
+impl From<ProgramChooserCreationError> for RendererError {
+    fn from(e: ProgramChooserCreationError) -> RendererError {
+        RendererError::Program(e)
     }
 }
 
-impl From<TextureCreationError> for GliumRendererError {
-    fn from(e: TextureCreationError) -> GliumRendererError {
-        GliumRendererError::Texture(e)
+impl From<TextureCreationError> for RendererError {
+    fn from(e: TextureCreationError) -> RendererError {
+        RendererError::Texture(e)
     }
 }
 
-impl From<DrawError> for GliumRendererError {
-    fn from(e: DrawError) -> GliumRendererError {
-        GliumRendererError::Draw(e)
+impl From<DrawError> for RendererError {
+    fn from(e: DrawError) -> RendererError {
+        RendererError::Draw(e)
     }
 }
 
-pub struct GliumRenderer {
+pub struct Renderer {
     ctx: Rc<Context>,
     program: Program,
     font_texture: Texture2d,
     textures: Textures<Rc<Texture2d>>,
 }
 
-impl GliumRenderer {
+impl Renderer {
     pub fn init<F: Facade>(
         ctx: &mut imgui::Context,
         facade: &F,
-    ) -> Result<GliumRenderer, GliumRendererError> {
+    ) -> Result<Renderer, RendererError> {
         let program = compile_default_program(facade)?;
         let font_texture = upload_font_texture(ctx.fonts(), facade.get_context())?;
         ctx.set_renderer_name(Some(ImString::from(format!(
             "imgui-glium-renderer {}",
             env!("CARGO_PKG_VERSION")
         ))));
-        Ok(GliumRenderer {
+        Ok(Renderer {
             ctx: Rc::clone(facade.get_context()),
             program,
             font_texture,
             textures: Textures::new(),
         })
     }
-    pub fn reload_font_texture(
-        &mut self,
-        ctx: &mut imgui::Context,
-    ) -> Result<(), GliumRendererError> {
+    pub fn reload_font_texture(&mut self, ctx: &mut imgui::Context) -> Result<(), RendererError> {
         self.font_texture = upload_font_texture(ctx.fonts(), &self.ctx)?;
         Ok(())
     }
     pub fn textures(&mut self) -> &mut Textures<Rc<Texture2d>> {
         &mut self.textures
     }
-    fn lookup_texture(&self, texture_id: TextureId) -> Result<&Texture2d, GliumRendererError> {
+    fn lookup_texture(&self, texture_id: TextureId) -> Result<&Texture2d, RendererError> {
         if texture_id.id() == usize::MAX {
             Ok(&self.font_texture)
         } else if let Some(texture) = self.textures.get(texture_id) {
             Ok(texture)
         } else {
-            Err(GliumRendererError::BadTexture(texture_id))
+            Err(RendererError::BadTexture(texture_id))
         }
     }
     pub fn render<T: Surface>(
         &mut self,
         target: &mut T,
         draw_data: &DrawData,
-    ) -> Result<(), GliumRendererError> {
+    ) -> Result<(), RendererError> {
         let fb_width = draw_data.display_size[0] * draw_data.framebuffer_scale[0];
         let fb_height = draw_data.display_size[1] * draw_data.framebuffer_scale[1];
         if !(fb_width > 0.0 && fb_height > 0.0) {
@@ -214,7 +211,7 @@ impl GliumRenderer {
 fn upload_font_texture(
     mut fonts: imgui::FontAtlasRefMut,
     ctx: &Rc<Context>,
-) -> Result<Texture2d, GliumRendererError> {
+) -> Result<Texture2d, RendererError> {
     let texture = fonts.build_rgba32_texture();
     let data = RawImage2d {
         data: Cow::Borrowed(texture.data),
