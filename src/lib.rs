@@ -10,6 +10,7 @@ use std::str;
 use std::thread;
 
 pub use self::child_frame::ChildFrame;
+pub use self::clipboard::*;
 pub use self::color_editors::{
     ColorButton, ColorEdit, ColorEditMode, ColorFormat, ColorPicker, ColorPickerMode, ColorPreview,
     EditableColor,
@@ -52,6 +53,7 @@ pub use self::window_draw_list::{ChannelsSplit, ImColor, WindowDrawList};
 use internal::RawCast;
 
 mod child_frame;
+mod clipboard;
 mod color_editors;
 mod context;
 mod drag;

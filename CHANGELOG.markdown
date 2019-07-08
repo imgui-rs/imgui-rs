@@ -12,6 +12,7 @@
 - Support for navigation input system
 - Support for backend/renderer name strings
 - Support for saving/loading INI settings manually
+- Pluggable clipboard support
 
 ### Changed
 

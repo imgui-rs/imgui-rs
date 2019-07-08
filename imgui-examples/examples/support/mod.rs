@@ -5,6 +5,8 @@ use imgui_glium_renderer::GliumRenderer;
 use imgui_winit_support::{HiDpiMode, WinitPlatform};
 use std::time::Instant;
 
+mod clipboard;
+
 pub struct System {
     pub events_loop: glutin::EventsLoop,
     pub display: glium::Display,
@@ -29,6 +31,12 @@ pub fn init(title: &str) -> System {
 
     let mut imgui = Context::create();
     imgui.set_ini_filename(None);
+
+    if let Some(backend) = clipboard::init() {
+        imgui.set_clipboard_backend(Box::new(backend));
+    } else {
+        eprintln!("Failed to initialize clipboard");
+    }
 
     let mut platform = WinitPlatform::init(&mut imgui);
     {

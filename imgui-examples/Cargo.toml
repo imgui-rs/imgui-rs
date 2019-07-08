@@ -10,8 +10,9 @@ license = "MIT/Apache-2.0"
 publish = false
 
 [dev-dependencies]
+clipboard = "0.5"
 glium = { version = "0.25", default-features = true }
+image = "0.21"
 imgui = { version = "0.1.0-pre", path = "../" }
 imgui-glium-renderer = { version = "0.1.0-pre", path = "../imgui-glium-renderer" }
 imgui-winit-support = { version = "0.1.0-pre", path = "../imgui-winit-support" }
-image = "0.21"
