@@ -2,6 +2,16 @@
 
 ## [Unreleased]
 
+### Changed
+
+- Redesigned window API
+- Redesigned progress bar API
+- Redesigned color editor/picker API
+
+### Removed
+
+- Various things that were deprecated in imgui-rs 0.1.0
+
 ## [0.1.0] - 2019-07-12
 
 ### Added
