@@ -5,6 +5,7 @@
 ### Added
 
 - Window scrolling API
+- Full support for the column API
 
 ### Changed
 

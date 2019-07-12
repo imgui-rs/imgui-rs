@@ -351,3 +351,22 @@ impl<'ui> Ui<'ui> {
         unsafe { sys::igGetTextLineHeightWithSpacing() }
     }
 }
+
+impl<'ui> Ui<'ui> {
+    #[deprecated(since = "0.2.0", note = "use Ui::current_column_index instead")]
+    pub fn get_column_index(&self) -> i32 {
+        unsafe { sys::igGetColumnIndex() }
+    }
+    #[deprecated(since = "0.2.0", note = "use Ui::column_offset instead")]
+    pub fn get_column_offset(&self, column_index: i32) -> f32 {
+        unsafe { sys::igGetColumnOffset(column_index) }
+    }
+    #[deprecated(since = "0.2.0", note = "use Ui::column_width instead")]
+    pub fn get_column_width(&self, column_index: i32) -> f32 {
+        unsafe { sys::igGetColumnWidth(column_index) }
+    }
+    #[deprecated(since = "0.2.0", note = "use Ui::column_count instead")]
+    pub fn get_columns_count(&self) -> i32 {
+        unsafe { sys::igGetColumnsCount() }
+    }
+}

@@ -51,6 +51,7 @@ use internal::RawCast;
 
 mod child_frame;
 mod clipboard;
+mod columns;
 mod context;
 mod drag;
 mod fonts;
@@ -201,37 +202,6 @@ impl<'ui> Ui<'ui> {
     /// Renders a basic help/info block (not a window)
     pub fn show_user_guide(&self) {
         unsafe { sys::igShowUserGuide() };
-    }
-}
-
-// Layout
-impl<'ui> Ui<'ui> {
-    pub fn columns<'p>(&self, count: i32, id: &'p ImStr, border: bool) {
-        unsafe { sys::igColumns(count, id.as_ptr(), border) }
-    }
-
-    pub fn next_column(&self) {
-        unsafe { sys::igNextColumn() }
-    }
-
-    pub fn get_column_index(&self) -> i32 {
-        unsafe { sys::igGetColumnIndex() }
-    }
-
-    pub fn get_column_offset(&self, column_index: i32) -> f32 {
-        unsafe { sys::igGetColumnOffset(column_index) }
-    }
-
-    pub fn set_column_offset(&self, column_index: i32, offset_x: f32) {
-        unsafe { sys::igSetColumnOffset(column_index, offset_x) }
-    }
-
-    pub fn get_column_width(&self, column_index: i32) -> f32 {
-        unsafe { sys::igGetColumnWidth(column_index) }
-    }
-
-    pub fn get_columns_count(&self) -> i32 {
-        unsafe { sys::igGetColumnsCount() }
     }
 }
 
