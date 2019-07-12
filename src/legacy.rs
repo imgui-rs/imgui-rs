@@ -331,3 +331,23 @@ impl<'ui> Ui<'ui> {
         ColorButton::new(desc_id, color.into())
     }
 }
+
+impl<'ui> Ui<'ui> {
+    #[deprecated(since = "0.2.0", note = "use Ui::cursor_screen_pos instead")]
+    pub fn get_cursor_screen_pos(&self) -> [f32; 2] {
+        let size = unsafe { sys::igGetCursorScreenPos_nonUDT2() };
+        size.into()
+    }
+    #[deprecated(since = "0.2.0", note = "use Ui::cursor_pos instead")]
+    pub fn get_cursor_pos(&self) -> [f32; 2] {
+        let size = unsafe { sys::igGetCursorPos_nonUDT2() };
+        size.into()
+    }
+    #[deprecated(
+        since = "0.2.0",
+        note = "use Ui::text_line_height_with_spacing instead"
+    )]
+    pub fn get_text_line_height_with_spacing(&self) -> f32 {
+        unsafe { sys::igGetTextLineHeightWithSpacing() }
+    }
+}

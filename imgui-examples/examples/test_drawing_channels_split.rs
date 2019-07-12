@@ -15,7 +15,7 @@ fn main() {
         // the white circle.
         draw_list.channels_split(2, |channels| {
             const RADIUS: f32 = 100.0;
-            let canvas_pos = ui.get_cursor_screen_pos();
+            let canvas_pos = ui.cursor_screen_pos();
             channels.set_current(1);
             draw_list
                 .add_line(

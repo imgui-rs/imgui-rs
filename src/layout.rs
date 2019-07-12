@@ -1,7 +1,20 @@
+use std::marker::PhantomData;
+
 use crate::sys;
 use crate::Ui;
 
-/// # Cursor/layout
+/// Represents a layout group
+pub struct GroupToken<'ui> {
+    _ui: PhantomData<&'ui Ui<'ui>>,
+}
+
+impl<'ui> Drop for GroupToken<'ui> {
+    fn drop(&mut self) {
+        unsafe { sys::igEndGroup() };
+    }
+}
+
+/// # Cursor / Layout
 impl<'ui> Ui<'ui> {
     /// Renders a separator (generally horizontal).
     ///
@@ -50,5 +63,54 @@ impl<'ui> Ui<'ui> {
     /// Move content position to the left by `width`
     pub fn unindent_by(&self, width: f32) {
         unsafe { sys::igUnindent(width) };
+    }
+    /// Group items together as a single item.
+    ///
+    /// May be useful to handle the same mouse event on a group of items, for example.
+    pub fn group(&self) -> GroupToken {
+        unsafe { sys::igBeginGroup() };
+        GroupToken { _ui: PhantomData }
+    }
+    /// Returns the cursor position (in window coordinates)
+    pub fn cursor_pos(&self) -> [f32; 2] {
+        unsafe { sys::igGetCursorPos_nonUDT2().into() }
+    }
+    /// Set the cursor position (in window coordinates).
+    ///
+    /// This sets the point on which the next widget will be drawn.
+    pub fn set_cursor_pos(&self, pos: [f32; 2]) {
+        unsafe { sys::igSetCursorPos(pos.into()) };
+    }
+    /// Returns the initial cursor position (in window coordinates)
+    pub fn cursor_start_pos(&self) -> [f32; 2] {
+        unsafe { sys::igGetCursorStartPos_nonUDT2().into() }
+    }
+    /// Returns the cursor position (in absolute screen coordinates).
+    ///
+    /// This is especially useful for drawing, as the drawing API uses screen coordinates.
+    pub fn cursor_screen_pos(&self) -> [f32; 2] {
+        unsafe { sys::igGetCursorScreenPos_nonUDT2().into() }
+    }
+    /// Set the cursor position (in absolute screen coordinates)
+    pub fn set_cursor_screen_pos(&self, pos: [f32; 2]) {
+        unsafe { sys::igSetCursorScreenPos(pos.into()) }
+    }
+    /// Vertically align text baseline so that it will align properly to regularly frame items.
+    ///
+    /// Call this if you have text on a line before a framed item.
+    pub fn align_text_to_frame_padding(&self) {
+        unsafe { sys::igAlignTextToFramePadding() };
+    }
+    pub fn text_line_height(&self) -> f32 {
+        unsafe { sys::igGetTextLineHeight() }
+    }
+    pub fn text_line_height_with_spacing(&self) -> f32 {
+        unsafe { sys::igGetTextLineHeightWithSpacing() }
+    }
+    pub fn frame_height(&self) -> f32 {
+        unsafe { sys::igGetFrameHeight() }
+    }
+    pub fn frame_height_with_spacing(&self) -> f32 {
+        unsafe { sys::igGetFrameHeightWithSpacing() }
     }
 }

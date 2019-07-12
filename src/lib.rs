@@ -224,34 +224,6 @@ impl<'ui> Ui<'ui> {
     pub fn get_columns_count(&self) -> i32 {
         unsafe { sys::igGetColumnsCount() }
     }
-
-    /// Get cursor position on the screen, in screen coordinates.
-    /// This sets the point on which the next widget will be drawn.
-    ///
-    /// This is especially useful for drawing, as the drawing API uses
-    /// screen coordiantes.
-    pub fn get_cursor_screen_pos(&self) -> [f32; 2] {
-        let size = unsafe { sys::igGetCursorScreenPos_nonUDT2() };
-        size.into()
-    }
-
-    /// Set cursor position on the screen, in screen coordinates.
-    /// This sets the point on which the next widget will be drawn.
-    pub fn set_cursor_screen_pos(&self, pos: [f32; 2]) {
-        unsafe { sys::igSetCursorScreenPos(pos.into()) }
-    }
-
-    /// Get cursor position on the screen, in window coordinates.
-    pub fn get_cursor_pos(&self) -> [f32; 2] {
-        let size = unsafe { sys::igGetCursorPos_nonUDT2() };
-        size.into()
-    }
-
-    /// Set cursor position on the screen, in window coordinates.
-    /// This sets the point on which the next widget will be drawn.
-    pub fn set_cursor_pos(&self, pos: [f32; 2]) {
-        unsafe { sys::igSetCursorPos(pos.into()) }
-    }
 }
 
 pub enum ImId<'a> {
@@ -760,10 +732,6 @@ impl<'ui> Ui<'ui> {
 }
 
 impl<'ui> Ui<'ui> {
-    /// Get height of a line of previously drawn text item
-    pub fn get_text_line_height_with_spacing(&self) -> f32 {
-        unsafe { sys::igGetTextLineHeightWithSpacing() }
-    }
     /// Get previously drawn item's size
     pub fn get_item_rect_size(&self) -> [f32; 2] {
         let size = unsafe { sys::igGetItemRectSize_nonUDT2() };
@@ -829,19 +797,6 @@ impl<'ui> Ui<'ui> {
     pub fn set_item_allow_overlap(&self) {
         unsafe {
             sys::igSetItemAllowOverlap();
-        }
-    }
-
-    /// Group items together as a single item.
-    ///
-    /// May be useful to handle the same mouse event on a group of items, for example.
-    pub fn group<F: FnOnce()>(&self, f: F) {
-        unsafe {
-            sys::igBeginGroup();
-        }
-        f();
-        unsafe {
-            sys::igEndGroup();
         }
     }
 }

@@ -857,7 +857,7 @@ fn show_example_app_custom_rendering(ui: &Ui, state: &mut CustomRenderingState, 
             // TODO: Add DragFloat to change value of sz
             ColorEdit::new(im_str!("Color"), &mut state.col).build(ui);
             let draw_list = ui.get_window_draw_list();
-            let p = ui.get_cursor_screen_pos();
+            let p = ui.cursor_screen_pos();
             let spacing = 8.0;
             let mut y = p[1] + 4.0;
             for n in 0..2 {
@@ -1008,7 +1008,7 @@ fn show_example_app_custom_rendering(ui: &Ui, state: &mut CustomRenderingState, 
             // SetCursorPos(max).
 
             // ImDrawList API uses screen coordinates!
-            let canvas_pos = ui.get_cursor_screen_pos();
+            let canvas_pos = ui.cursor_screen_pos();
             // Resize canvas to what's available
             let mut canvas_size = ui.content_region_avail();
             if canvas_size[0] < 50.0 {
