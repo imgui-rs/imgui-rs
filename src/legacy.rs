@@ -5,7 +5,7 @@ use std::os::raw::c_int;
 use crate::string::ImStr;
 use crate::widget::color_editors::*;
 use crate::widget::progress_bar::ProgressBar;
-use crate::window::{Window, WindowFlags};
+use crate::window::{Window, WindowFlags, WindowFocusedFlags};
 use crate::{Id, Ui};
 
 #[deprecated(since = "0.2.0", note = "use ColorEditFlags instead")]
@@ -102,50 +102,6 @@ bitflags!(
     pub struct ImDrawListFlags: c_int {
         const AntiAliasedLines = 1;
         const AntiAliasedFill = 1 << 1;
-    }
-);
-
-bitflags!(
-    /// Flags for window focus checks
-    #[repr(C)]
-    pub struct ImGuiFocusedFlags: c_int {
-        /// Return true if any children of the window is focused
-        const ChildWindows = 1;
-        /// Test from root window (top most parent of the current hierarchy)
-        const RootWindow = 1 << 1;
-        /// Return true if any window is focused
-        const AnyWindow = 1 << 2;
-
-        const RootAndChildWindows =
-            ImGuiFocusedFlags::RootWindow.bits | ImGuiFocusedFlags::ChildWindows.bits;
-    }
-);
-
-bitflags!(
-    /// Flags for hover checks
-    #[repr(C)]
-    pub struct ImGuiHoveredFlags: c_int {
-        /// Window hover checks only: Return true if any children of the window is hovered
-        const ChildWindows = 1;
-        /// Window hover checks only: Test from root window (top most parent of the current hierarchy)
-        const RootWindow = 1 << 1;
-        /// Window hover checks only: Return true if any window is hovered
-        const AnyWindow = 1 << 2;
-        /// Return true even if a popup window is normally blocking access to this item/window
-        const AllowWhenBlockedByPopup = 1 << 3;
-        /// Return true even if an active item is blocking access to this item/window. Useful for
-        /// Drag and Drop patterns.
-        const AllowWhenBlockedByActiveItem = 1 << 5;
-        /// Return true even if the position is overlapped by another window
-        const AllowWhenOverlapped = 1 << 6;
-        /// Return true even if the item is disabled
-        const AllowWhenDisabled = 1 << 7;
-
-        const RectOnly = ImGuiHoveredFlags::AllowWhenBlockedByPopup.bits
-            | ImGuiHoveredFlags::AllowWhenBlockedByActiveItem.bits
-            | ImGuiHoveredFlags::AllowWhenOverlapped.bits;
-        const RootAndChildWindows = ImGuiFocusedFlags::RootWindow.bits
-            | ImGuiFocusedFlags::ChildWindows.bits;
     }
 );
 
@@ -291,14 +247,14 @@ impl<'ui> Ui<'ui> {
         note = "use Ui::is_window_focused(WindowFlags::RootWindow) instead"
     )]
     pub fn is_root_window_focused(&self) -> bool {
-        unsafe { sys::igIsWindowFocused(ImGuiFocusedFlags::RootWindow.bits()) }
+        unsafe { sys::igIsWindowFocused(WindowFocusedFlags::ROOT_WINDOW.bits() as i32) }
     }
     #[deprecated(
         since = "0.2.0",
         note = "use Ui::is_window_focused(WindowFlags::ChildWindows) instead"
     )]
     pub fn is_child_window_focused(&self) -> bool {
-        unsafe { sys::igIsWindowFocused(ImGuiFocusedFlags::ChildWindows.bits()) }
+        unsafe { sys::igIsWindowFocused(WindowFocusedFlags::CHILD_WINDOWS.bits() as i32) }
     }
 }
 
@@ -380,5 +336,13 @@ impl<'ui> Ui<'ui> {
     {
         let _token = self.push_id(id);
         f();
+    }
+}
+
+impl<'ui> Ui<'ui> {
+    #[deprecated(since = "0.2.0", note = "use Ui::item_rect_size instead")]
+    pub fn get_item_rect_size(&self) -> [f32; 2] {
+        let size = unsafe { sys::igGetItemRectSize_nonUDT2() };
+        size.into()
     }
 }

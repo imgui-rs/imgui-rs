@@ -42,6 +42,7 @@ pub use self::stacks::*;
 pub use self::string::*;
 pub use self::style::*;
 pub use self::trees::{CollapsingHeader, TreeNode};
+pub use self::utils::*;
 pub use self::widget::color_editors::*;
 pub use self::widget::progress_bar::*;
 pub use self::window::child_window::*;
@@ -73,6 +74,7 @@ mod style;
 #[cfg(test)]
 mod test;
 mod trees;
+mod utils;
 mod widget;
 mod window;
 mod window_draw_list;
@@ -91,9 +93,15 @@ fn test_version() {
 }
 
 impl Context {
+    /// Returns the global imgui-rs time.
+    ///
+    /// Incremented by Io::delta_time every frame.
     pub fn time(&self) -> f64 {
         unsafe { sys::igGetTime() }
     }
+    /// Returns the global imgui-rs frame count.
+    ///
+    /// Incremented by 1 every frame.
     pub fn frame_count(&self) -> i32 {
         unsafe { sys::igGetFrameCount() }
     }
@@ -129,19 +137,6 @@ impl<'ui> Ui<'ui> {
     /// Returns a clone of the user interface style
     pub fn clone_style(&self) -> Style {
         *self.ctx.style()
-    }
-    /// Returns a single style color from the user interface style.
-    ///
-    /// Use this function if you need to access the colors, but don't want to clone the entire
-    /// style object.
-    pub fn style_color(&self, style_color: StyleColor) -> [f32; 4] {
-        self.ctx.style()[style_color]
-    }
-    pub fn time(&self) -> f64 {
-        unsafe { sys::igGetTime() }
-    }
-    pub fn frame_count(&self) -> i32 {
-        unsafe { sys::igGetFrameCount() }
     }
     /// Renders the frame and returns a reference to the resulting draw data
     pub fn render(self) -> &'ui DrawData {
@@ -664,50 +659,6 @@ impl<'ui> Ui<'ui> {
                 wrap_width,
             )
             .into()
-        }
-    }
-}
-
-impl<'ui> Ui<'ui> {
-    /// Get previously drawn item's size
-    pub fn get_item_rect_size(&self) -> [f32; 2] {
-        let size = unsafe { sys::igGetItemRectSize_nonUDT2() };
-        size.into()
-    }
-}
-
-/// # Utilities
-impl<'ui> Ui<'ui> {
-    /// Returns `true` if the last item is being hovered by the mouse.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// # use imgui::*;
-    /// fn user_interface(ui: &Ui) {
-    ///     ui.text("Hover over me");
-    ///     let is_hover_over_me_text_hovered = ui.is_item_hovered();
-    /// }
-    /// # fn main() {
-    /// # }
-    /// ```
-    pub fn is_item_hovered(&self) -> bool {
-        unsafe { sys::igIsItemHovered(ImGuiHoveredFlags::empty().bits()) }
-    }
-
-    pub fn is_item_hovered_with_flags(&self, flags: ImGuiHoveredFlags) -> bool {
-        unsafe { sys::igIsItemHovered(flags.bits()) }
-    }
-
-    /// Returns `true` if the last item is being active.
-    pub fn is_item_active(&self) -> bool {
-        unsafe { sys::igIsItemActive() }
-    }
-
-    /// Allow last item to be overlapped by a subsequent item. Both may be activated during the same frame before the later one takes priority.
-    pub fn set_item_allow_overlap(&self) {
-        unsafe {
-            sys::igSetItemAllowOverlap();
         }
     }
 }
