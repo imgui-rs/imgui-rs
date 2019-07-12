@@ -9,7 +9,6 @@ use std::ptr;
 use std::str;
 use std::thread;
 
-pub use self::child_frame::ChildFrame;
 pub use self::clipboard::*;
 pub use self::context::*;
 pub use self::drag::{
@@ -45,11 +44,11 @@ pub use self::style::*;
 pub use self::trees::{CollapsingHeader, TreeNode};
 pub use self::widget::color_editors::*;
 pub use self::widget::progress_bar::*;
+pub use self::window::child_window::*;
 pub use self::window::*;
 pub use self::window_draw_list::{ChannelsSplit, ImColor, WindowDrawList};
 use internal::RawCast;
 
-mod child_frame;
 mod clipboard;
 mod columns;
 mod context;
@@ -674,32 +673,6 @@ impl<'ui> Ui<'ui> {
     pub fn get_item_rect_size(&self) -> [f32; 2] {
         let size = unsafe { sys::igGetItemRectSize_nonUDT2() };
         size.into()
-    }
-}
-
-impl<'ui> Ui<'ui> {
-    /// Creates a child frame. Size is size of child_frame within parent window.
-    ///
-    /// # Example
-    /// ```rust,no_run
-    /// # use imgui::*;
-    /// # let mut imgui = Context::create();
-    /// # let ui = imgui.frame();
-    /// Window::new(im_str!("ChatWindow"))
-    ///     .title_bar(true)
-    ///     .scrollable(false)
-    ///     .build(&ui, || {
-    ///         ui.separator();
-    ///
-    ///         ui.child_frame(im_str!("child frame"), [400.0, 100.0])
-    ///             .show_borders(true)
-    ///             .always_show_vertical_scroll_bar(true)
-    ///             .build(|| {
-    ///                 ui.text_colored([1.0, 0.0, 0.0, 1.0], im_str!("hello mate!"));
-    ///             });
-    /// });
-    pub fn child_frame<'p>(&self, name: &'p ImStr, size: [f32; 2]) -> ChildFrame<'ui, 'p> {
-        ChildFrame::new(self, name, size)
     }
 }
 

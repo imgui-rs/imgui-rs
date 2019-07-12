@@ -749,9 +749,10 @@ fn show_example_menu_file<'a>(ui: &Ui<'a>, state: &mut FileMenuState) {
         ui.menu_item(im_str!("Enabled"))
             .selected(&mut state.enabled)
             .build();
-        ui.child_frame(im_str!("child"), [0.0, 60.0])
-            .show_borders(true)
-            .build(|| {
+        ChildWindow::new("child")
+            .size([0.0, 60.0])
+            .border(true)
+            .build(ui, || {
                 for i in 0..10 {
                     ui.text(format!("Scrolling Text {}", i));
                 }

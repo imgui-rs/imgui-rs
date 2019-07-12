@@ -7,6 +7,7 @@ use crate::string::ImStr;
 use crate::sys;
 use crate::{Condition, Ui};
 
+pub(crate) mod child_window;
 pub(crate) mod content_region;
 pub(crate) mod scroll;
 
