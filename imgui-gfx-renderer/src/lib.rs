@@ -7,6 +7,8 @@ use gfx::traits::FactoryExt;
 use gfx::{CommandBuffer, Encoder, Factory, IntoIndexBuffer, Rect, Resources, Slice};
 use imgui::internal::RawWrapper;
 use imgui::{DrawCmd, DrawCmdParams, DrawData, DrawIdx, DrawVert, ImString, TextureId, Textures};
+use std::error::Error;
+use std::fmt;
 use std::usize;
 
 #[derive(Clone, Debug)]
@@ -16,6 +18,32 @@ pub enum RendererError {
     Pipeline(gfx::PipelineStateError<String>),
     Combined(gfx::CombinedError),
     BadTexture(TextureId),
+}
+
+impl fmt::Display for RendererError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        use self::RendererError::*;
+        match *self {
+            Update(ref e) => write!(f, "{}", e),
+            Buffer(ref e) => write!(f, "{}", e),
+            Pipeline(ref e) => write!(f, "{}", e),
+            Combined(ref e) => write!(f, "{}", e),
+            BadTexture(ref t) => write!(f, "Bad texture ID: {}", t.id()),
+        }
+    }
+}
+
+impl Error for RendererError {
+    fn source(&self) -> Option<&(dyn Error + 'static)> {
+        use self::RendererError::*;
+        match *self {
+            Update(ref e) => Some(e),
+            Buffer(ref e) => Some(e),
+            Pipeline(ref e) => Some(e),
+            Combined(ref e) => Some(e),
+            BadTexture(_) => None,
+        }
+    }
 }
 
 impl From<gfx::UpdateError<usize>> for RendererError {

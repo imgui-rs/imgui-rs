@@ -10,6 +10,7 @@ use glium::{
 use imgui::internal::RawWrapper;
 use imgui::{DrawCmd, DrawCmdParams, DrawData, ImString, TextureId, Textures};
 use std::borrow::Cow;
+use std::error::Error;
 use std::fmt;
 use std::rc::Rc;
 use std::usize;
@@ -22,6 +23,20 @@ pub enum RendererError {
     Texture(TextureCreationError),
     Draw(DrawError),
     BadTexture(TextureId),
+}
+
+impl Error for RendererError {
+    fn source(&self) -> Option<&(dyn Error + 'static)> {
+        use self::RendererError::*;
+        match *self {
+            Vertex(ref e) => Some(e),
+            Index(ref e) => Some(e),
+            Program(ref e) => Some(e),
+            Texture(ref e) => Some(e),
+            Draw(ref e) => Some(e),
+            BadTexture(_) => None,
+        }
+    }
 }
 
 impl fmt::Display for RendererError {

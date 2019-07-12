@@ -7,6 +7,7 @@
 - Redesigned window API
 - Redesigned progress bar API
 - Redesigned color editor/picker API
+- Renderer errors implement std::error::Error
 
 ### Removed
 
