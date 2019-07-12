@@ -479,8 +479,8 @@ fn show_test_window(ui: &Ui, state: &mut State, opened: &mut bool) {
                 .build();
             ui.input_float3(im_str!("input float3"), &mut state.vec3f)
                 .build();
-            ui.color_edit(im_str!("color 1"), &mut state.col1).build();
-            ui.color_edit(im_str!("color 2"), &mut state.col2).build();
+            ColorEdit::new(im_str!("color 1"), &mut state.col1).build(ui);
+            ColorEdit::new(im_str!("color 2"), &mut state.col2).build(ui);
 
             ui.tree_node(im_str!("Multi-component Widgets")).build(|| {
                 ui.input_float2(im_str!("input float2"), &mut state.vec2f)
@@ -519,13 +519,13 @@ fn show_test_window(ui: &Ui, state: &mut State, opened: &mut bool) {
                      show options.",
                 );
                 let misc_flags = {
-                    let mut f = ImGuiColorEditFlags::empty();
-                    f.set(ImGuiColorEditFlags::HDR, s.hdr);
-                    f.set(ImGuiColorEditFlags::AlphaPreviewHalf, s.alpha_half_preview);
+                    let mut f = ColorEditFlags::empty();
+                    f.set(ColorEditFlags::HDR, s.hdr);
+                    f.set(ColorEditFlags::ALPHA_PREVIEW_HALF, s.alpha_half_preview);
                     if !s.alpha_half_preview {
-                        f.set(ImGuiColorEditFlags::AlphaPreview, s.alpha_preview);
+                        f.set(ColorEditFlags::ALPHA_PREVIEW, s.alpha_preview);
                     }
-                    f.set(ImGuiColorEditFlags::NoOptions, !s.options_menu);
+                    f.set(ColorEditFlags::NO_OPTIONS, !s.options_menu);
                     f
                 };
 
@@ -536,22 +536,22 @@ fn show_test_window(ui: &Ui, state: &mut State, opened: &mut bool) {
                     "Click on the colored square to open a color picker.
 CTRL+click on individual component to input value.\n",
                 );
-                ui.color_edit(im_str!("MyColor##1"), &mut s.color)
+                ColorEdit::new(im_str!("MyColor##1"), &mut s.color)
                     .flags(misc_flags)
                     .alpha(false)
-                    .build();
+                    .build(ui);
 
                 ui.text(im_str!("Color widget HSV with Alpha:"));
-                ui.color_edit(im_str!("MyColor##2"), &mut s.color)
+                ColorEdit::new(im_str!("MyColor##2"), &mut s.color)
                     .flags(misc_flags)
-                    .mode(ColorEditMode::HSV)
-                    .build();
+                    .input_mode(ColorEditInputMode::HSV)
+                    .build(ui);
 
                 ui.text(im_str!("Color widget with Float Display:"));
-                ui.color_edit(im_str!("MyColor##2f"), &mut s.color)
+                ColorEdit::new(im_str!("MyColor##2f"), &mut s.color)
                     .flags(misc_flags)
                     .format(ColorFormat::Float)
-                    .build();
+                    .build(ui);
 
                 ui.text(im_str!("Color button with Picker:"));
                 ui.same_line(0.0);
@@ -562,11 +562,11 @@ CTRL+click on individual component to input value.\n",
                      With the label(false) function you can pass a non-empty label which \
                      will only be used for the tooltip and picker popup.",
                 );
-                ui.color_edit(im_str!("MyColor##3"), &mut s.color)
+                ColorEdit::new(im_str!("MyColor##3"), &mut s.color)
                     .flags(misc_flags)
                     .inputs(false)
                     .label(false)
-                    .build();
+                    .build(ui);
 
                 ui.text(im_str!("Color picker:"));
                 ui.checkbox(im_str!("With Alpha"), &mut s.alpha);
@@ -577,24 +577,24 @@ CTRL+click on individual component to input value.\n",
                     ui.checkbox(im_str!("With Ref Color"), &mut s.ref_color);
                     if s.ref_color {
                         ui.same_line(0.0);
-                        ui.color_edit(im_str!("##RefColor"), &mut s.ref_color_v)
+                        ColorEdit::new(im_str!("##RefColor"), &mut s.ref_color_v)
                             .flags(misc_flags)
                             .inputs(false)
-                            .build();
+                            .build(ui);
                     }
                 }
-                let mut b = ui
-                    .color_picker(im_str!("MyColor##4"), &mut s.color)
+                let mut b = ColorPicker::new
+                    (im_str!("MyColor##4"), &mut s.color)
                     .flags(misc_flags)
                     .alpha(s.alpha)
                     .alpha_bar(s.alpha_bar)
                     .side_preview(s.side_preview)
-                    .rgb(true);
+                    .display_rgb(true);
 
                 if s.ref_color {
                     b = b.reference_color(&s.ref_color_v)
                 }
-                b.build();
+                b.build(ui);
             });
         }
         if ui
@@ -674,7 +674,7 @@ CTRL+click on individual component to input value.\n",
                     let items = &[im_str!("aaaa"), im_str!("bbbb"), im_str!("cccc"), im_str!("dddd"), im_str!("eeee")];
                     ui.combo(im_str!("Combo"), &mut state.stacked_modals_item, items, -1);
 
-                    ui.color_edit(im_str!("color"), &mut state.stacked_modals_color).build();
+                    ColorEdit::new(im_str!("color"), &mut state.stacked_modals_color).build(ui);
 
                     if ui.button(im_str!("Add another modal.."), [0.0, 0.0]) {
                         ui.open_popup(im_str!("Stacked 2"))   ;
@@ -855,7 +855,7 @@ fn show_example_app_custom_rendering(ui: &Ui, state: &mut CustomRenderingState, 
         .build(ui, || {
             ui.text("Primitives");
             // TODO: Add DragFloat to change value of sz
-            ui.color_edit(im_str!("Color"), &mut state.col).build();
+            ColorEdit::new(im_str!("Color"), &mut state.col).build(ui);
             let draw_list = ui.get_window_draw_list();
             let p = ui.get_cursor_screen_pos();
             let spacing = 8.0;

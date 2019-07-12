@@ -11,10 +11,6 @@ use std::thread;
 
 pub use self::child_frame::ChildFrame;
 pub use self::clipboard::*;
-pub use self::color_editors::{
-    ColorButton, ColorEdit, ColorEditMode, ColorFormat, ColorPicker, ColorPickerMode, ColorPreview,
-    EditableColor,
-};
 pub use self::context::*;
 pub use self::drag::{
     DragFloat, DragFloat2, DragFloat3, DragFloat4, DragFloatRange2, DragInt, DragInt2, DragInt3,
@@ -47,6 +43,7 @@ pub use self::stacks::*;
 pub use self::string::*;
 pub use self::style::*;
 pub use self::trees::{CollapsingHeader, TreeNode};
+pub use self::widget::color_editors::*;
 pub use self::widget::progress_bar::*;
 pub use self::window::*;
 pub use self::window_draw_list::{ChannelsSplit, ImColor, WindowDrawList};
@@ -54,7 +51,6 @@ use internal::RawCast;
 
 mod child_frame;
 mod clipboard;
-mod color_editors;
 mod context;
 mod drag;
 mod fonts;
@@ -511,38 +507,6 @@ impl<'ui> Ui<'ui> {
         max: i32,
     ) -> SliderInt4<'ui, 'p> {
         SliderInt4::new(self, label, value, min, max)
-    }
-}
-
-// Widgets: Color Editor/Picker
-impl<'ui> Ui<'ui> {
-    /// Constructs a new color editor builder.
-    pub fn color_edit<'p, V: Into<EditableColor<'p>>>(
-        &self,
-        label: &'p ImStr,
-        value: V,
-    ) -> ColorEdit<'ui, 'p> {
-        ColorEdit::new(self, label, value.into())
-    }
-    /// Constructs a new color picker builder.
-    pub fn color_picker<'p, V: Into<EditableColor<'p>>>(
-        &self,
-        label: &'p ImStr,
-        value: V,
-    ) -> ColorPicker<'ui, 'p> {
-        ColorPicker::new(self, label, value.into())
-    }
-    /// Constructs a new color button builder.
-    pub fn color_button<'p>(&self, desc_id: &'p ImStr, color: [f32; 4]) -> ColorButton<'ui, 'p> {
-        ColorButton::new(self, desc_id, color.into())
-    }
-    /// Initialize current options (generally on application startup) if you want to select a
-    /// default format, picker type, etc. Users will be able to change many settings, unless you
-    /// use .options(false) in your widget builders.
-    pub fn set_color_edit_options(&self, flags: ImGuiColorEditFlags) {
-        unsafe {
-            sys::igSetColorEditOptions(flags.bits());
-        }
     }
 }
 

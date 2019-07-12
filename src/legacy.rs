@@ -3,65 +3,13 @@ use bitflags::bitflags;
 use std::os::raw::c_int;
 
 use crate::string::ImStr;
+use crate::widget::color_editors::*;
 use crate::widget::progress_bar::ProgressBar;
 use crate::window::{Window, WindowFlags};
 use crate::Ui;
 
-bitflags!(
-    /// Color edit flags
-    #[repr(C)]
-    pub struct ImGuiColorEditFlags: c_int {
-        /// ColorEdit, ColorPicker, ColorButton: ignore Alpha component (read 3 components from the
-        /// input pointer).
-        const NoAlpha = 1;
-        /// ColorEdit: disable picker when clicking on colored square.
-        const NoPicker = 1 << 2;
-        /// ColorEdit: disable toggling options menu when right-clicking on inputs/small preview.
-        const NoOptions = 1 << 3;
-        /// ColorEdit, ColorPicker: disable colored square preview next to the inputs. (e.g. to
-        /// show only the inputs)
-        const NoSmallPreview = 1 << 4;
-        /// ColorEdit, ColorPicker: disable inputs sliders/text widgets (e.g. to show only the
-        /// small preview colored square).
-        const NoInputs = 1 << 5;
-        /// ColorEdit, ColorPicker, ColorButton: disable tooltip when hovering the preview.
-        const NoTooltip = 1 << 6;
-        /// ColorEdit, ColorPicker: disable display of inline text label (the label is still
-        /// forwarded to the tooltip and picker).
-        const NoLabel = 1 << 7;
-        /// ColorPicker: disable bigger color preview on right side of the picker, use small
-        /// colored square preview instead.
-        const NoSidePreview = 1 << 8;
-        /// ColorEdit: disable drag and drop target. ColorButton: disable drag and drop source.
-        const NoDragDrop = 1 << 9;
-
-        /// ColorEdit, ColorPicker: show vertical alpha bar/gradient in picker.
-        const AlphaBar = 1 << 16;
-        /// ColorEdit, ColorPicker, ColorButton: display preview as a transparent color over a
-        /// checkerboard, instead of opaque.
-        const AlphaPreview = 1 << 17;
-        /// ColorEdit, ColorPicker, ColorButton: display half opaque / half checkerboard, instead
-        /// of opaque.
-        const AlphaPreviewHalf= 1 << 18;
-        /// (WIP) ColorEdit: Currently only disable 0.0f..1.0f limits in RGBA edition (note: you
-        /// probably want to use ImGuiColorEditFlags::Float flag as well).
-        const HDR = 1 << 19;
-        /// ColorEdit: choose one among RGB/HSV/HEX. ColorPicker: choose any combination using
-        /// RGB/HSV/HEX.
-        const RGB = 1 << 20;
-        const HSV = 1 << 21;
-        const HEX = 1 << 22;
-        /// ColorEdit, ColorPicker, ColorButton: _display_ values formatted as 0..255.
-        const Uint8 = 1 << 23;
-        /// ColorEdit, ColorPicker, ColorButton: _display_ values formatted as 0.0f..1.0f floats
-        /// instead of 0..255 integers. No round-trip of value via integers.
-        const Float = 1 << 24;
-        /// ColorPicker: bar for Hue, rectangle for Sat/Value.
-        const PickerHueBar = 1 << 25;
-        /// ColorPicker: wheel for Hue, triangle for Sat/Value.
-        const PickerHueWheel = 1 << 26;
-    }
-);
+#[deprecated(since = "0.2.0", note = "use ColorEditFlags instead")]
+pub type ImGuiColorEditFlags = ColorEditFlags;
 
 bitflags!(
     /// Flags for combo boxes
@@ -358,5 +306,28 @@ impl<'ui> Ui<'ui> {
     #[deprecated(since = "0.2.0", note = "use imgui::ProgressBar::new(...) instead")]
     pub fn progress_bar<'p>(&self, fraction: f32) -> ProgressBar<'p> {
         ProgressBar::new(fraction)
+    }
+}
+
+impl<'ui> Ui<'ui> {
+    #[deprecated(since = "0.2.0", note = "use imgui::ColorEdit::new(...) instead")]
+    pub fn color_edit<'p, V: Into<EditableColor<'p>>>(
+        &self,
+        label: &'p ImStr,
+        value: V,
+    ) -> ColorEdit<'p> {
+        ColorEdit::new(label, value.into())
+    }
+    #[deprecated(since = "0.2.0", note = "use imgui::ColorPicker::new(...) instead")]
+    pub fn color_picker<'p, V: Into<EditableColor<'p>>>(
+        &self,
+        label: &'p ImStr,
+        value: V,
+    ) -> ColorPicker<'p> {
+        ColorPicker::new(label, value.into())
+    }
+    #[deprecated(since = "0.2.0", note = "use imgui::ColorButton::new(...) instead")]
+    pub fn color_button<'p>(&self, desc_id: &'p ImStr, color: [f32; 4]) -> ColorButton<'p> {
+        ColorButton::new(desc_id, color.into())
     }
 }
