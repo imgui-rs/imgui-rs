@@ -48,7 +48,7 @@ pub use self::stacks::*;
 pub use self::string::*;
 pub use self::style::*;
 pub use self::trees::{CollapsingHeader, TreeNode};
-pub use self::window::Window;
+pub use self::window::*;
 pub use self::window_draw_list::{ChannelsSplit, ImColor, WindowDrawList};
 use internal::RawCast;
 
@@ -200,33 +200,6 @@ impl<'ui> Ui<'ui> {
     }
 }
 
-// Window
-impl<'ui> Ui<'ui> {
-    pub fn window<'p>(&self, name: &'p ImStr) -> Window<'ui, 'p> {
-        Window::new(self, name)
-    }
-    /// Get current window's size in pixels
-    pub fn get_window_size(&self) -> [f32; 2] {
-        let size = unsafe { sys::igGetWindowSize_nonUDT2() };
-        size.into()
-    }
-    /// Get current window's position in pixels
-    pub fn get_window_pos(&self) -> [f32; 2] {
-        let size = unsafe { sys::igGetWindowPos_nonUDT2() };
-        size.into()
-    }
-
-    pub fn get_window_content_region_min(&self) -> [f32; 2] {
-        let size = unsafe { sys::igGetWindowContentRegionMin_nonUDT2() };
-        size.into()
-    }
-
-    pub fn get_window_content_region_max(&self) -> [f32; 2] {
-        let size = unsafe { sys::igGetWindowContentRegionMax_nonUDT2() };
-        size.into()
-    }
-}
-
 // Layout
 impl<'ui> Ui<'ui> {
     pub fn columns<'p>(&self, count: i32, id: &'p ImStr, border: bool) {
@@ -283,18 +256,6 @@ impl<'ui> Ui<'ui> {
     /// This sets the point on which the next widget will be drawn.
     pub fn set_cursor_pos(&self, pos: [f32; 2]) {
         unsafe { sys::igSetCursorPos(pos.into()) }
-    }
-
-    pub fn get_content_region_max(&self) -> [f32; 2] {
-        let size = unsafe { sys::igGetContentRegionMax_nonUDT2() };
-        size.into()
-    }
-
-    /// Get available space left between the cursor and the edges of the current
-    /// window.
-    pub fn get_content_region_avail(&self) -> [f32; 2] {
-        let size = unsafe { sys::igGetContentRegionAvail_nonUDT2() };
-        size.into()
     }
 }
 
@@ -697,7 +658,7 @@ impl<'ui> Ui<'ui> {
         F: FnOnce(),
     {
         let render =
-            unsafe { sys::igBeginPopup(str_id.as_ptr(), ImGuiWindowFlags::empty().bits()) };
+            unsafe { sys::igBeginPopup(str_id.as_ptr(), WindowFlags::empty().bits() as i32) };
         if render {
             f();
             unsafe { sys::igEndPopup() };
@@ -873,10 +834,10 @@ impl<'ui> Ui<'ui> {
     /// # use imgui::*;
     /// # let mut imgui = Context::create();
     /// # let ui = imgui.frame();
-    /// ui.window(im_str!("ChatWindow"))
+    /// Window::new(im_str!("ChatWindow"))
     ///     .title_bar(true)
     ///     .scrollable(false)
-    ///     .build(|| {
+    ///     .build(&ui, || {
     ///         ui.separator();
     ///
     ///         ui.child_frame(im_str!("child frame"), [400.0, 100.0])
@@ -912,30 +873,6 @@ impl<'ui> Ui<'ui> {
 
     pub fn is_item_hovered_with_flags(&self, flags: ImGuiHoveredFlags) -> bool {
         unsafe { sys::igIsItemHovered(flags.bits()) }
-    }
-
-    /// Return `true` if the current window is being hovered by the mouse.
-    pub fn is_window_hovered(&self) -> bool {
-        unsafe { sys::igIsWindowHovered(ImGuiHoveredFlags::empty().bits()) }
-    }
-
-    pub fn is_window_hovered_with_flags(&self, flags: ImGuiHoveredFlags) -> bool {
-        unsafe { sys::igIsWindowHovered(flags.bits()) }
-    }
-
-    /// Return `true` if the current window is currently focused.
-    pub fn is_window_focused(&self) -> bool {
-        unsafe { sys::igIsWindowFocused(ImGuiFocusedFlags::RootAndChildWindows.bits()) }
-    }
-
-    /// Return `true` if the current root window is currently focused.
-    pub fn is_root_window_focused(&self) -> bool {
-        unsafe { sys::igIsWindowFocused(ImGuiFocusedFlags::RootWindow.bits()) }
-    }
-
-    /// Return `true` if the current child window is currently focused.
-    pub fn is_child_window_focused(&self) -> bool {
-        unsafe { sys::igIsWindowFocused(ImGuiFocusedFlags::ChildWindows.bits()) }
     }
 
     /// Returns `true` if the last item is being active.

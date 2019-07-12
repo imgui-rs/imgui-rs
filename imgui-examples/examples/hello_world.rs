@@ -5,9 +5,9 @@ mod support;
 fn main() {
     let system = support::init(file!());
     system.main_loop(|_, ui| {
-        ui.window(im_str!("Hello world"))
+        Window::new(im_str!("Hello world"))
             .size([300.0, 100.0], Condition::FirstUseEver)
-            .build(|| {
+            .build(ui, || {
                 ui.text(im_str!("Hello world!"));
                 ui.text(im_str!("こんにちは世界！"));
                 ui.text(im_str!("This...is...imgui-rs!"));

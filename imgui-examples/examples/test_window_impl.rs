@@ -244,15 +244,15 @@ fn show_test_window(ui: &Ui, state: &mut State, opened: &mut bool) {
         ui.show_metrics_window(&mut state.show_app_metrics);
     }
     if state.show_app_style_editor {
-        ui.window(im_str!("Style Editor"))
+        Window::new(im_str!("Style Editor"))
             .opened(&mut state.show_app_style_editor)
-            .build(|| ui.show_default_style_editor());
+            .build(ui, || ui.show_default_style_editor());
     }
     if state.show_app_about {
-        ui.window(im_str!("About ImGui"))
+        Window::new(im_str!("About ImGui"))
             .always_auto_resize(true)
             .opened(&mut state.show_app_about)
-            .build(|| {
+            .build(ui, || {
                 ui.text(format!("dear imgui, {}", imgui::dear_imgui_version()));
                 ui.separator();
                 ui.text("By Omar Cornut and all github contributors.");
@@ -271,8 +271,7 @@ fn show_test_window(ui: &Ui, state: &mut State, opened: &mut bool) {
         );
     }
 
-    let mut window = ui
-        .window(im_str!("ImGui Demo"))
+    let mut window = Window::new(im_str!("ImGui Demo"))
         .title_bar(!state.no_titlebar)
         .resizable(!state.no_resize)
         .movable(!state.no_move)
@@ -283,7 +282,7 @@ fn show_test_window(ui: &Ui, state: &mut State, opened: &mut bool) {
     if !state.no_close {
         window = window.opened(opened)
     }
-    window.build(|| {
+    window.build(ui, || {
         let _token = ui.push_item_width(-140.0);
         ui.text(format!("dear imgui says hello. ({})", imgui::dear_imgui_version()));
         ui.menu_bar(|| {
@@ -781,10 +780,10 @@ fn show_example_menu_file<'a>(ui: &Ui<'a>, state: &mut FileMenuState) {
 }
 
 fn show_example_app_auto_resize(ui: &Ui, state: &mut AutoResizeState, opened: &mut bool) {
-    ui.window(im_str!("Example: Auto-resizing window"))
+    Window::new(im_str!("Example: Auto-resizing window"))
         .opened(opened)
         .always_auto_resize(true)
-        .build(|| {
+        .build(ui, || {
             ui.text(
                 "Window will resize every-ui to the size of its content.
 Note that you probably don't want to query the window size to
@@ -802,7 +801,7 @@ fn show_example_app_fixed_overlay(ui: &Ui, opened: &mut bool) {
     const DISTANCE: f32 = 10.0;
     let window_pos = [DISTANCE, DISTANCE];
     let _token = ui.push_style_color(StyleColor::WindowBg, [0.0, 0.0, 0.0, 0.3]);
-    ui.window(im_str!("Example: Fixed Overlay"))
+    Window::new(im_str!("Example: Fixed Overlay"))
         .opened(opened)
         .position(window_pos, Condition::Always)
         .title_bar(false)
@@ -810,7 +809,7 @@ fn show_example_app_fixed_overlay(ui: &Ui, opened: &mut bool) {
         .always_auto_resize(true)
         .movable(false)
         .save_settings(false)
-        .build(|| {
+        .build(ui, || {
             ui.text(
                 "Simple overlay\nin the corner of the screen.\n(right-click to change position)",
             );
@@ -824,17 +823,17 @@ fn show_example_app_fixed_overlay(ui: &Ui, opened: &mut bool) {
 }
 
 fn show_example_app_manipulating_window_title(ui: &Ui) {
-    ui.window(im_str!("Same title as another window##1"))
+    Window::new(im_str!("Same title as another window##1"))
         .position([100.0, 100.0], Condition::FirstUseEver)
-        .build(|| {
+        .build(ui, || {
             ui.text(
                 "This is window 1.
 My title is the same as window 2, but my identifier is unique.",
             );
         });
-    ui.window(im_str!("Same title as another window##2"))
+    Window::new(im_str!("Same title as another window##2"))
         .position([100.0, 200.0], Condition::FirstUseEver)
-        .build(|| {
+        .build(ui, || {
             ui.text(
                 "This is window 2.
 My title is the same as window 1, but my identifier is unique.",
@@ -844,16 +843,16 @@ My title is the same as window 1, but my identifier is unique.",
     let ch_idx = (ui.time() / 0.25) as usize & 3;
     let num = ui.frame_count(); // The C++ version uses rand() here
     let title = im_str!("Animated title {} {}###AnimatedTitle", chars[ch_idx], num);
-    ui.window(&title)
+    Window::new(&title)
         .position([100.0, 300.0], Condition::FirstUseEver)
-        .build(|| ui.text("This window has a changing title"));
+        .build(ui, || ui.text("This window has a changing title"));
 }
 
 fn show_example_app_custom_rendering(ui: &Ui, state: &mut CustomRenderingState, opened: &mut bool) {
-    ui.window(im_str!("Example: Custom rendering"))
+    Window::new(im_str!("Example: Custom rendering"))
         .size([350.0, 560.0], Condition::FirstUseEver)
         .opened(opened)
-        .build(|| {
+        .build(ui, || {
             ui.text("Primitives");
             // TODO: Add DragFloat to change value of sz
             ui.color_edit(im_str!("Color"), &mut state.col).build();
@@ -1011,7 +1010,7 @@ fn show_example_app_custom_rendering(ui: &Ui, state: &mut CustomRenderingState, 
             // ImDrawList API uses screen coordinates!
             let canvas_pos = ui.get_cursor_screen_pos();
             // Resize canvas to what's available
-            let mut canvas_size = ui.get_content_region_avail();
+            let mut canvas_size = ui.content_region_avail();
             if canvas_size[0] < 50.0 {
                 canvas_size[0] = 50.0;
             }

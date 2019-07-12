@@ -12,9 +12,9 @@ fn main() {
     let window_title = im_str!("Hello world (DirectX)");
 
     system.main_loop(|_, ui| {
-        ui.window(window_title)
+        Window::new(window_title)
             .size([300.0, 100.0], Condition::FirstUseEver)
-            .build(|| {
+            .build(ui, || {
                 ui.text(im_str!("Hello world!"));
                 ui.text(im_str!("こんにちは世界！"));
                 ui.text(im_str!("This...is...imgui-rs!"));

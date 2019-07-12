@@ -2,6 +2,10 @@
 use bitflags::bitflags;
 use std::os::raw::c_int;
 
+use crate::string::ImStr;
+use crate::window::{Window, WindowFlags};
+use crate::Ui;
+
 bitflags!(
     /// Color edit flags
     #[repr(C)]
@@ -295,57 +299,56 @@ bitflags!(
     }
 );
 
-bitflags!(
-    /// Window flags
-    #[repr(C)]
-    pub struct ImGuiWindowFlags: c_int {
-        /// Disable title-bar.
-        const NoTitleBar = 1;
-        /// Disable user resizing with the lower-right grip.
-        const NoResize = 1 << 1;
-        /// Disable user moving the window.
-        const NoMove = 1 << 2;
-        /// Disable scrollbars (window can still scroll with mouse or programatically).
-        const NoScrollbar = 1 << 3;
-        /// Disable user vertically scrolling with mouse wheel. On child window, mouse wheel will
-        /// be forwarded to the parent unless NoScrollbar is also set.
-        const NoScrollWithMouse = 1 << 4;
-        /// Disable user collapsing window by double-clicking on it.
-        const NoCollapse = 1 << 5;
-        /// Resize every window to its content every frame.
-        const AlwaysAutoResize = 1 << 6;
-        /// Disable drawing background color (WindowBg, etc.) and outside border
-        const NoBackground = 1 << 7;
-        /// Never load/save settings in .ini file.
-        const NoSavedSettings = 1 << 8;
-        /// Disable catching mouse, hovering test with pass through.
-        const NoMouseInputs = 1 << 9;
-        /// Has a menu-bar.
-        const MenuBar = 1 << 10;
-        /// Allow horizontal scrollbar to appear (off by default).
-        const HorizontalScrollbar = 1 << 11;
-        /// Disable taking focus when transitioning from hidden to visible state.
-        const NoFocusOnAppearing = 1 << 12;
-        /// Disable bringing window to front when taking focus (e.g. clicking on it or
-        /// programmatically giving it focus).
-        const NoBringToFrontOnFocus = 1 << 13;
-        /// Always show vertical scrollbar.
-        const AlwaysVerticalScrollbar = 1 << 14;
-        /// Always show horizontal scrollbar.
-        const AlwaysHorizontalScrollbar = 1<< 15;
-        /// Ensure child windows without border use window padding (ignored by default for
-        /// non-bordered child windows, because more convenient).
-        const AlwaysUseWindowPadding = 1 << 16;
-        /// No gamepad/keyboard navigation within the window.
-        const NoNavInputs = 1 << 18;
-        /// No focusing toward this window with gamepad/keyboard navigation (e.g. skipped by
-        /// CTRL+TAB).
-        const NoNavFocus = 1 << 19;
+#[deprecated(since = "0.2.0", note = "use WindowFlags instead")]
+pub type ImGuiWindowFlags = WindowFlags;
 
-        const NoNav = ImGuiWindowFlags::NoNavInputs.bits | ImGuiWindowFlags::NoNavFocus.bits;
-        const NoDecoration = ImGuiWindowFlags::NoTitleBar.bits | ImGuiWindowFlags::NoResize.bits
-            | ImGuiWindowFlags::NoScrollbar.bits | ImGuiWindowFlags::NoCollapse.bits;
-        const NoInputs = ImGuiWindowFlags::NoMouseInputs.bits | ImGuiWindowFlags::NoNavInputs.bits
-            | ImGuiWindowFlags::NoNavFocus.bits;
+impl<'ui> Ui<'ui> {
+    #[deprecated(since = "0.2.0", note = "use imgui::Window::new(...) instead")]
+    pub fn window<'p>(&self, name: &'p ImStr) -> Window<'p> {
+        Window::new(name)
     }
-);
+    #[deprecated(since = "0.2.0", note = "use Ui::window_size instead")]
+    pub fn get_window_size(&self) -> [f32; 2] {
+        let size = unsafe { sys::igGetWindowSize_nonUDT2() };
+        size.into()
+    }
+    #[deprecated(since = "0.2.0", note = "use Ui::window_pos instead")]
+    pub fn get_window_pos(&self) -> [f32; 2] {
+        let size = unsafe { sys::igGetWindowPos_nonUDT2() };
+        size.into()
+    }
+    #[deprecated(since = "0.2.0", note = "use Ui::content_region_max instead")]
+    pub fn get_content_region_max(&self) -> [f32; 2] {
+        let size = unsafe { sys::igGetContentRegionMax_nonUDT2() };
+        size.into()
+    }
+    #[deprecated(since = "0.2.0", note = "use Ui::content_region_avail instead")]
+    pub fn get_content_region_avail(&self) -> [f32; 2] {
+        let size = unsafe { sys::igGetContentRegionAvail_nonUDT2() };
+        size.into()
+    }
+    #[deprecated(since = "0.2.0", note = "use Ui::window_content_region_min instead")]
+    pub fn get_window_content_region_min(&self) -> [f32; 2] {
+        let size = unsafe { sys::igGetWindowContentRegionMin_nonUDT2() };
+        size.into()
+    }
+    #[deprecated(since = "0.2.0", note = "use Ui::window_content_region_max instead")]
+    pub fn get_window_content_region_max(&self) -> [f32; 2] {
+        let size = unsafe { sys::igGetWindowContentRegionMax_nonUDT2() };
+        size.into()
+    }
+    #[deprecated(
+        since = "0.2.0",
+        note = "use Ui::is_window_focused(WindowFlags::RootWindow) instead"
+    )]
+    pub fn is_root_window_focused(&self) -> bool {
+        unsafe { sys::igIsWindowFocused(ImGuiFocusedFlags::RootWindow.bits()) }
+    }
+    #[deprecated(
+        since = "0.2.0",
+        note = "use Ui::is_window_focused(WindowFlags::ChildWindows) instead"
+    )]
+    pub fn is_child_window_focused(&self) -> bool {
+        unsafe { sys::igIsWindowFocused(ImGuiFocusedFlags::ChildWindows.bits()) }
+    }
+}
