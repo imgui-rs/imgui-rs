@@ -1,3 +1,6 @@
+pub extern crate gfx;
+pub extern crate imgui;
+
 use gfx::format::BlendFormat;
 use gfx::handle::{Buffer, RenderTargetView};
 use gfx::memory::Bind;

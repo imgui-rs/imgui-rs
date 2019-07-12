@@ -8,6 +8,8 @@
 - Redesigned progress bar API
 - Redesigned color editor/picker API
 - Renderer errors implement std::error::Error
+- Glium renderer re-exports imgui and glium
+- Gfx renderer re-exports imgui and gfx
 
 ### Removed
 
