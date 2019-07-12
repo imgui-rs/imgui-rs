@@ -15,6 +15,7 @@
 - Renderer errors implement std::error::Error
 - Glium renderer re-exports imgui and glium
 - Gfx renderer re-exports imgui and gfx
+- These functions now take/return PathBuf: log_filename, set_log_filename, ini_filename, set_logfilename
 
 ### Removed
 

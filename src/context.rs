@@ -2,6 +2,7 @@ use parking_lot::ReentrantMutex;
 use std::cell::RefCell;
 use std::ffi::CStr;
 use std::ops::Drop;
+use std::path::PathBuf;
 use std::ptr;
 use std::rc::Rc;
 
@@ -102,19 +103,23 @@ impl Context {
         SuspendedContext(self)
     }
     /// Returns the path to the ini file, or None if not set
-    pub fn ini_filename(&self) -> Option<&ImStr> {
+    pub fn ini_filename(&self) -> Option<PathBuf> {
         let io = self.io();
         if io.ini_filename.is_null() {
             None
         } else {
-            unsafe { Some(ImStr::from_ptr_unchecked(io.ini_filename)) }
+            let s = unsafe { ImStr::from_ptr_unchecked(io.ini_filename) };
+            Some(PathBuf::from(s.to_str().to_owned()))
         }
     }
     /// Sets the path to the ini file (default is "imgui.ini")
     ///
     /// Pass None to disable automatic .Ini saving.
-    pub fn set_ini_filename<T: Into<Option<ImString>>>(&mut self, ini_filename: T) {
-        let ini_filename = ini_filename.into();
+    pub fn set_ini_filename<T: Into<Option<PathBuf>>>(&mut self, ini_filename: T) {
+        let ini_filename = ini_filename
+            .into()
+            .and_then(|path| path.to_str().map(str::to_owned))
+            .map(ImString::from);
         self.io_mut().ini_filename = ini_filename
             .as_ref()
             .map(|x| x.as_ptr())
@@ -122,17 +127,21 @@ impl Context {
         self.ini_filename = ini_filename;
     }
     /// Returns the path to the log file, or None if not set
-    pub fn log_filename(&self) -> Option<&ImStr> {
+    pub fn log_filename(&self) -> Option<PathBuf> {
         let io = self.io();
         if io.log_filename.is_null() {
             None
         } else {
-            unsafe { Some(ImStr::from_ptr_unchecked(io.log_filename)) }
+            let s = unsafe { ImStr::from_ptr_unchecked(io.log_filename) };
+            Some(PathBuf::from(s.to_str().to_owned()))
         }
     }
     /// Sets the log filename (default is "imgui_log.txt").
-    pub fn set_log_filename<T: Into<Option<ImString>>>(&mut self, log_filename: T) {
-        let log_filename = log_filename.into();
+    pub fn set_log_filename<T: Into<Option<PathBuf>>>(&mut self, log_filename: T) {
+        let log_filename = log_filename
+            .into()
+            .and_then(|path| path.to_str().map(str::to_owned))
+            .map(ImString::from);
         self.io_mut().log_filename = log_filename
             .as_ref()
             .map(|x| x.as_ptr())
@@ -407,34 +416,30 @@ Collapsed=0";
 
 #[test]
 fn test_default_ini_filename() {
-    use crate::im_str;
     let _guard = crate::test::TEST_MUTEX.lock();
     let ctx = Context::create();
-    assert_eq!(ctx.ini_filename(), Some(im_str!("imgui.ini")));
+    assert_eq!(ctx.ini_filename(), Some(PathBuf::from("imgui.ini")));
 }
 
 #[test]
 fn test_set_ini_filename() {
-    use crate::im_str;
     let (_guard, mut ctx) = crate::test::test_ctx();
-    ctx.set_ini_filename(Some(im_str!("test.ini").to_owned()));
-    assert_eq!(ctx.ini_filename(), Some(im_str!("test.ini")));
+    ctx.set_ini_filename(Some(PathBuf::from("test.ini")));
+    assert_eq!(ctx.ini_filename(), Some(PathBuf::from("test.ini")));
 }
 
 #[test]
 fn test_default_log_filename() {
-    use crate::im_str;
     let _guard = crate::test::TEST_MUTEX.lock();
     let ctx = Context::create();
-    assert_eq!(ctx.log_filename(), Some(im_str!("imgui_log.txt")));
+    assert_eq!(ctx.log_filename(), Some(PathBuf::from("imgui_log.txt")));
 }
 
 #[test]
 fn test_set_log_filename() {
-    use crate::im_str;
     let (_guard, mut ctx) = crate::test::test_ctx();
-    ctx.set_log_filename(Some(im_str!("test.log").to_owned()));
-    assert_eq!(ctx.log_filename(), Some(im_str!("test.log")));
+    ctx.set_log_filename(Some(PathBuf::from("test.log")));
+    assert_eq!(ctx.log_filename(), Some(PathBuf::from("test.log")));
 }
 
 impl Context {
