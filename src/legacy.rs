@@ -3,6 +3,7 @@ use bitflags::bitflags;
 use std::os::raw::c_int;
 
 use crate::string::ImStr;
+use crate::widget::progress_bar::ProgressBar;
 use crate::window::{Window, WindowFlags};
 use crate::Ui;
 
@@ -350,5 +351,12 @@ impl<'ui> Ui<'ui> {
     )]
     pub fn is_child_window_focused(&self) -> bool {
         unsafe { sys::igIsWindowFocused(ImGuiFocusedFlags::ChildWindows.bits()) }
+    }
+}
+
+impl<'ui> Ui<'ui> {
+    #[deprecated(since = "0.2.0", note = "use imgui::ProgressBar::new(...) instead")]
+    pub fn progress_bar<'p>(&self, fraction: f32) -> ProgressBar<'p> {
+        ProgressBar::new(fraction)
     }
 }

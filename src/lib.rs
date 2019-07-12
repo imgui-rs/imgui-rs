@@ -37,7 +37,6 @@ pub use self::menus::{Menu, MenuItem};
 pub use self::plothistogram::PlotHistogram;
 pub use self::plotlines::PlotLines;
 pub use self::popup_modal::PopupModal;
-pub use self::progressbar::ProgressBar;
 pub use self::render::draw_data::*;
 pub use self::render::renderer::*;
 pub use self::sliders::{
@@ -48,6 +47,7 @@ pub use self::stacks::*;
 pub use self::string::*;
 pub use self::style::*;
 pub use self::trees::{CollapsingHeader, TreeNode};
+pub use self::widget::progress_bar::*;
 pub use self::window::*;
 pub use self::window_draw_list::{ChannelsSplit, ImColor, WindowDrawList};
 use internal::RawCast;
@@ -69,7 +69,6 @@ mod menus;
 mod plothistogram;
 mod plotlines;
 mod popup_modal;
-mod progressbar;
 mod render;
 mod sliders;
 mod stacks;
@@ -805,24 +804,6 @@ impl<'ui> Ui<'ui> {
     pub fn get_item_rect_size(&self) -> [f32; 2] {
         let size = unsafe { sys::igGetItemRectSize_nonUDT2() };
         size.into()
-    }
-}
-
-impl<'ui> Ui<'ui> {
-    /// Creates a progress bar. Fraction is the progress level with 0.0 = 0% and 1.0 = 100%.
-    ///
-    /// # Example
-    /// ```rust,no_run
-    /// # use imgui::*;
-    /// # let mut imgui = Context::create();
-    /// # let ui = imgui.frame();
-    /// ui.progress_bar(0.6)
-    ///     .size([100.0, 12.0])
-    ///     .overlay_text(im_str!("Progress!"))
-    ///     .build();
-    /// ```
-    pub fn progress_bar<'p>(&self, fraction: f32) -> ProgressBar<'ui, 'p> {
-        ProgressBar::new(self, fraction)
     }
 }
 
