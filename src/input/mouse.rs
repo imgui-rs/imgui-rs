@@ -142,7 +142,7 @@ impl<'ui> Ui<'ui> {
         // references to it
         unsafe { sys::igResetMouseDragDelta(button as i32) }
     }
-    /// Get the currently desired mouse cursor type.
+    /// Returns the currently desired mouse cursor type.
     ///
     /// Returns `None` if no cursor should be displayed
     pub fn mouse_cursor(&self) -> Option<MouseCursor> {
@@ -158,7 +158,7 @@ impl<'ui> Ui<'ui> {
             _ => None,
         }
     }
-    /// Set the desired mouse cursor type.
+    /// Sets the desired mouse cursor type.
     ///
     /// Passing `None` hides the mouse cursor.
     pub fn set_mouse_cursor(&self, cursor_type: Option<MouseCursor>) {

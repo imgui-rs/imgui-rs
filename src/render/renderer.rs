@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 
+/// An opaque texture identifier
 #[derive(Copy, Clone, Debug, Eq, PartialEq, Hash)]
 #[repr(transparent)]
 pub struct TextureId(usize);

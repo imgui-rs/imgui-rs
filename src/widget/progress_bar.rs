@@ -54,7 +54,7 @@ impl<'a> ProgressBar<'a> {
         self.size = size.into();
         self
     }
-    /// Builds the progress bar.
+    /// Builds the progress bar
     pub fn build(self, _: &Ui) {
         unsafe {
             sys::igProgressBar(

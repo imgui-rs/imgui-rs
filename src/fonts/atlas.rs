@@ -21,6 +21,7 @@ bitflags! {
     }
 }
 
+/// A font identifier
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
 pub struct FontId(pub(crate) *const Font);
 
@@ -255,11 +256,12 @@ fn test_font_atlas_memory_layout() {
     assert_field_offset!(custom_rect_ids, CustomRectIds);
 }
 
+/// A source for binary font data
 #[derive(Clone, Debug)]
 pub enum FontSource<'a> {
-    DefaultFontData {
-        config: Option<FontConfig>,
-    },
+    /// Default font included with the library (ProggyClean.ttf)
+    DefaultFontData { config: Option<FontConfig> },
+    /// Binary TTF/OTF font data
     TtfData {
         data: &'a [u8],
         size_pixels: f32,
@@ -267,18 +269,30 @@ pub enum FontSource<'a> {
     },
 }
 
+/// Configuration settings for a font
 #[derive(Clone, Debug)]
 pub struct FontConfig {
+    /// Size in pixels for the rasterizer
     pub size_pixels: f32,
+    /// Horizontal oversampling
     pub oversample_h: i32,
+    /// Vertical oversampling
     pub oversample_v: i32,
+    /// Align every glyph to pixel boundary
     pub pixel_snap_h: bool,
+    /// Extra spacing (in pixels) between glyphs
     pub glyph_extra_spacing: [f32; 2],
+    /// Offset for all glyphs in this font
     pub glyph_offset: [f32; 2],
+    /// Unicode ranges to use from this font
     pub glyph_ranges: FontGlyphRanges,
+    /// Minimum advance_x for glyphs
     pub glyph_min_advance_x: f32,
+    /// Maximum advance_x for glyphs
     pub glyph_max_advance_x: f32,
+    /// Settings for a custom font rasterizer if used
     pub rasterizer_flags: u32,
+    /// Brighten (>1.0) or darken (<1.0) font output
     pub rasterizer_multiply: f32,
 }
 
@@ -364,8 +378,13 @@ fn test_font_config_default() {
 /// Handle to a font atlas texture
 #[derive(Clone, Debug)]
 pub struct FontAtlasTexture<'a> {
+    /// Texture width (in pixels)
     pub width: u32,
+    /// Texture height (in pixels)
     pub height: u32,
+    /// Raw texture data (in bytes).
+    ///
+    /// The format depends on which function was called to obtain this data.
     pub data: &'a [u8],
 }
 

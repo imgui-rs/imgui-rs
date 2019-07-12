@@ -99,6 +99,7 @@ impl Context {
     }
 }
 
+/// A temporary reference for building the user interface for one frame
 pub struct Ui<'ui> {
     ctx: &'ui Context,
     font_atlas: Option<cell::RefMut<'ui, SharedFontAtlas>>,
@@ -111,9 +112,11 @@ fn fmt_ptr() -> *const c_char {
 }
 
 impl<'ui> Ui<'ui> {
+    /// Returns an immutable reference to the inputs/outputs object
     pub fn io(&self) -> &Io {
         unsafe { &*(sys::igGetIO() as *const Io) }
     }
+    /// Returns an immutable reference to the font atlas
     pub fn fonts(&self) -> FontAtlasRef {
         match self.font_atlas {
             Some(ref font_atlas) => FontAtlasRef::Shared(font_atlas),
@@ -123,9 +126,14 @@ impl<'ui> Ui<'ui> {
             },
         }
     }
+    /// Returns a clone of the user interface style
     pub fn clone_style(&self) -> Style {
         *self.ctx.style()
     }
+    /// Returns a single style color from the user interface style.
+    ///
+    /// Use this function if you need to access the colors, but don't want to clone the entire
+    /// style object.
     pub fn style_color(&self, style_color: StyleColor) -> [f32; 4] {
         self.ctx.style()[style_color]
     }
@@ -135,6 +143,7 @@ impl<'ui> Ui<'ui> {
     pub fn frame_count(&self) -> i32 {
         unsafe { sys::igGetFrameCount() }
     }
+    /// Renders the frame and returns a reference to the resulting draw data
     pub fn render(self) -> &'ui DrawData {
         unsafe {
             sys::igRender();

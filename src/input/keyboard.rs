@@ -118,7 +118,7 @@ impl<'ui> Ui<'ui> {
     pub fn key_pressed_amount(&self, key_index: u32, repeat_delay: f32, rate: f32) -> u32 {
         unsafe { sys::igGetKeyPressedAmount(key_index as i32, repeat_delay, rate) as u32 }
     }
-    /// Focus keyboard on a widget relative to current position
+    /// Focuses keyboard on a widget relative to current position
     pub fn set_keyboard_focus_here(&self, target_widget: FocusedWidget) {
         unsafe {
             sys::igSetKeyboardFocusHere(target_widget.as_offset());

@@ -603,9 +603,9 @@ impl<'a> ColorButton<'a> {
 
 /// # Widgets: Color Editor/Picker
 impl<'ui> Ui<'ui> {
-    /// Initialize current options (generally on application startup) if you want to select a
-    /// default format, picker type, etc. Users will be able to change many settings, unless you
-    /// use .options(false) in your widget builders.
+    /// Initializes current color editor/picker options (generally on application startup) if you
+    /// want to select a default format, picker type, etc. Users will be able to change many
+    /// settings, unless you use .options(false) in your widget builders.
     pub fn set_color_edit_options(&self, flags: ColorEditFlags) {
         unsafe {
             sys::igSetColorEditOptions(flags.bits() as i32);

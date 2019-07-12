@@ -183,6 +183,7 @@ impl<'a> Iterator for DrawCmdIterator<'a> {
     }
 }
 
+/// A vertex index
 pub type DrawIdx = sys::ImDrawIdx;
 
 #[derive(Copy, Clone, Debug, PartialEq)]
@@ -193,6 +194,7 @@ pub struct DrawCmdParams {
     pub idx_offset: usize,
 }
 
+/// A draw command
 pub enum DrawCmd {
     Elements {
         count: usize,

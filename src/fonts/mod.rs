@@ -7,6 +7,7 @@ pub mod font;
 pub mod glyph;
 pub mod glyph_ranges;
 
+/// # Fonts
 impl<'ui> Ui<'ui> {
     /// Returns the current font
     pub fn current_font(&self) -> &Font {
@@ -22,7 +23,7 @@ impl<'ui> Ui<'ui> {
     pub fn font_tex_uv_white_pixel(&self) -> [f32; 2] {
         unsafe { sys::igGetFontTexUvWhitePixel_nonUDT2().into() }
     }
-    /// Set the font scale of the current window
+    /// Sets the font scale of the current window
     pub fn set_window_font_scale(&self, scale: f32) {
         unsafe { sys::igSetWindowFontScale(scale) }
     }

@@ -7,8 +7,12 @@ use std::ptr;
 use crate::string::{ImStr, ImString};
 use crate::Ui;
 
+/// Trait for clipboard backends
 pub trait ClipboardBackend {
+    /// Returns the current clipboard contents as an owned imgui-rs string, or None if the
+    /// clipboard is empty or inaccessible
     fn get(&mut self) -> Option<ImString>;
+    /// Sets the clipboard contents to the given imgui-rs string slice.
     fn set(&mut self, value: &ImStr);
 }
 
@@ -67,9 +71,10 @@ pub(crate) unsafe extern "C" fn set_clipboard_text(user_data: *mut c_void, text:
     });
 }
 
+/// # Clipboard
 impl<'ui> Ui<'ui> {
-    /// Returns the current clipboard contents as text or None if clipboard cannot be accessed or
-    /// it is empty
+    /// Returns the current clipboard contents as text, or None if the clipboard is empty or cannot
+    /// be accessed
     pub fn clipboard_text(&self) -> Option<ImString> {
         let io = self.io();
         io.get_clipboard_text_fn.and_then(|get_clipboard_text_fn| {

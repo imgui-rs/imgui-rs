@@ -5,6 +5,7 @@ use crate::fonts::glyph::FontGlyph;
 use crate::internal::{ImVector, RawCast};
 use crate::sys;
 
+/// Runtime data for a single font within a font atlas
 #[repr(C)]
 pub struct Font {
     index_advance_x: ImVector<f32>,
@@ -28,6 +29,7 @@ pub struct Font {
 unsafe impl RawCast<sys::ImFont> for Font {}
 
 impl Font {
+    /// Returns the identifier of this font
     pub fn id(&self) -> FontId {
         FontId(self as *const _)
     }
