@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Added
+
+- Window scrolling API
+
 ### Changed
 
 - Redesigned window API
