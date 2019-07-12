@@ -1,6 +1,6 @@
 [package]
 name = "imgui-winit-support"
-version = "0.1.0-pre"
+version = "0.1.0"
 edition = "2018"
 authors = ["Joonas Javanainen <joonas.javanainen@gmail.com>", "imgui-rs contributors"]
 description = "winit support code for the imgui crate"
@@ -13,5 +13,5 @@ categories = ["gui"]
 travis-ci = { repository = "Gekkio/imgui-rs" }
 
 [dependencies]
-imgui = { version = "0.1.0-pre", path = "../" }
+imgui = { version = "0.1.0", path = "../" }
 winit = ">= 0.16, <= 0.19"
