@@ -1,11 +1,12 @@
 use std::marker::PhantomData;
 use std::mem;
+use std::os::raw::{c_char, c_void};
 
 use crate::fonts::atlas::FontId;
 use crate::internal::RawCast;
 use crate::style::{StyleColor, StyleVar};
 use crate::sys;
-use crate::Ui;
+use crate::{Id, Ui};
 
 /// # Parameter stacks (shared)
 impl<'ui> Ui<'ui> {
@@ -299,5 +300,38 @@ impl<'ui> Drop for ItemFlagsStackToken<'ui> {
         } else {
             unreachable!();
         }
+    }
+}
+
+/// # ID stack
+impl<'ui> Ui<'ui> {
+    /// Pushes an identifier to the ID stack
+    #[must_use]
+    pub fn push_id<'a, I: Into<Id<'a>>>(&self, id: I) -> IdStackToken {
+        let id = id.into();
+
+        unsafe {
+            match id {
+                Id::Int(i) => sys::igPushIDInt(i),
+                Id::Str(s) => {
+                    let start = s.as_ptr() as *const c_char;
+                    let end = start.add(s.len());
+                    sys::igPushIDRange(start, end)
+                }
+                Id::Ptr(p) => sys::igPushIDPtr(p as *const c_void),
+            }
+        }
+        IdStackToken { _ui: PhantomData }
+    }
+}
+
+/// Represents a change pushed to the ID stack
+pub struct IdStackToken<'ui> {
+    _ui: PhantomData<&'ui Ui<'ui>>,
+}
+
+impl<'ui> Drop for IdStackToken<'ui> {
+    fn drop(&mut self) {
+        unsafe { sys::igPopID() };
     }
 }

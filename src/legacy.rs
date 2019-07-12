@@ -6,7 +6,7 @@ use crate::string::ImStr;
 use crate::widget::color_editors::*;
 use crate::widget::progress_bar::ProgressBar;
 use crate::window::{Window, WindowFlags};
-use crate::Ui;
+use crate::{Id, Ui};
 
 #[deprecated(since = "0.2.0", note = "use ColorEditFlags instead")]
 pub type ImGuiColorEditFlags = ColorEditFlags;
@@ -368,5 +368,17 @@ impl<'ui> Ui<'ui> {
     #[deprecated(since = "0.2.0", note = "use Ui::column_count instead")]
     pub fn get_columns_count(&self) -> i32 {
         unsafe { sys::igGetColumnsCount() }
+    }
+}
+
+impl<'ui> Ui<'ui> {
+    #[deprecated(since = "0.2.0", note = "use Ui::push_id instead")]
+    pub fn with_id<'a, F, I>(&self, id: I, f: F)
+    where
+        F: FnOnce(),
+        I: Into<Id<'a>>,
+    {
+        let _token = self.push_id(id);
+        f();
     }
 }
