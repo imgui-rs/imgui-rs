@@ -19,7 +19,6 @@ pub use self::fonts::atlas::*;
 pub use self::fonts::font::*;
 pub use self::fonts::glyph::*;
 pub use self::fonts::glyph_ranges::*;
-pub use self::image::{Image, ImageButton};
 pub use self::input::keyboard::*;
 pub use self::input::mouse::*;
 pub use self::input_widget::{
@@ -44,6 +43,7 @@ pub use self::style::*;
 pub use self::trees::{CollapsingHeader, TreeNode};
 pub use self::utils::*;
 pub use self::widget::color_editors::*;
+pub use self::widget::image::*;
 pub use self::widget::progress_bar::*;
 pub use self::window::child_window::*;
 pub use self::window::*;
@@ -55,7 +55,6 @@ mod columns;
 mod context;
 mod drag;
 mod fonts;
-mod image;
 mod input;
 mod input_widget;
 pub mod internal;
@@ -621,20 +620,6 @@ impl<'ui> Ui<'ui> {
         values: &'p [f32],
     ) -> PlotHistogram<'ui, 'p> {
         PlotHistogram::new(self, label, values)
-    }
-}
-
-// Image
-impl<'ui> Ui<'ui> {
-    pub fn image(&self, texture: TextureId, size: [f32; 2]) -> Image {
-        Image::new(self, texture, size)
-    }
-}
-
-// ImageButton
-impl<'ui> Ui<'ui> {
-    pub fn image_button(&self, texture: TextureId, size: [f32; 2]) -> ImageButton {
-        ImageButton::new(self, texture, size)
     }
 }
 

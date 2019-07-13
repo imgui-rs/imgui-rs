@@ -74,7 +74,7 @@ impl CustomTexturesApp {
                 ui.text(im_str!("Hello textures!"));
                 if let Some(my_texture_id) = self.my_texture_id {
                     ui.text("Some generated texture");
-                    ui.image(my_texture_id, [100.0, 100.0]).build();
+                    Image::new(my_texture_id, [100.0, 100.0]).build(ui);
                 }
 
                 if let Some(lenna) = &self.lenna {
@@ -111,7 +111,7 @@ impl Lenna {
     }
 
     fn show(&self, ui: &Ui) {
-        ui.image(self.texture_id, self.size).build();
+        Image::new(self.texture_id, self.size).build(ui);
     }
 }
 

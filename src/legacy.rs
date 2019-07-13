@@ -2,8 +2,10 @@
 use bitflags::bitflags;
 use std::os::raw::c_int;
 
+use crate::render::renderer::TextureId;
 use crate::string::ImStr;
 use crate::widget::color_editors::*;
+use crate::widget::image::{Image, ImageButton};
 use crate::widget::progress_bar::ProgressBar;
 use crate::window::{Window, WindowFlags, WindowFocusedFlags};
 use crate::{Id, Ui};
@@ -344,5 +346,16 @@ impl<'ui> Ui<'ui> {
     pub fn get_item_rect_size(&self) -> [f32; 2] {
         let size = unsafe { sys::igGetItemRectSize_nonUDT2() };
         size.into()
+    }
+}
+
+impl<'ui> Ui<'ui> {
+    #[deprecated(since = "0.2.0", note = "use imgui::Image::new(...) instead")]
+    pub fn image(&self, texture: TextureId, size: [f32; 2]) -> Image {
+        Image::new(texture, size)
+    }
+    #[deprecated(since = "0.2.0", note = "use imgui::ImageButton::new(...) instead")]
+    pub fn image_button(&self, texture: TextureId, size: [f32; 2]) -> ImageButton {
+        ImageButton::new(texture, size)
     }
 }
