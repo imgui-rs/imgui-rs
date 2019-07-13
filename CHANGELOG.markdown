@@ -495,7 +495,8 @@ by setting the environment variable `WINIT_HIDPI_FACTOR=1` if you use X11.
 
 - Initial release with cimgui/imgui 1.44, glium 0.9
 
-[Unreleased]: https://github.com/Gekkio/imgui-rs/compare/v0.0.23...HEAD
+[Unreleased]: https://github.com/Gekkio/imgui-rs/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/Gekkio/imgui-rs/compare/v0.0.23...v0.1.0
 [0.0.23]: https://github.com/Gekkio/imgui-rs/compare/v0.0.22...v0.0.23
 [0.0.22]: https://github.com/Gekkio/imgui-rs/compare/v0.0.21...v0.0.22
 [0.0.21]: https://github.com/Gekkio/imgui-rs/compare/v0.0.20...v0.0.21
