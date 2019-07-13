@@ -623,12 +623,7 @@ CTRL+click on individual component to input value.\n",
                     ui.text(im_str!("Aquarium"));
                     ui.separator();
                     for (index, name) in names.iter().enumerate() {
-                        if ui.selectable(
-                            name,
-                            false,
-                            ImGuiSelectableFlags::empty(),
-                            [0.0, 0.0]
-                        ) {
+                        if Selectable::new(name).build(ui) {
                             state.selected_fish = Some(index);
                         }
                     }

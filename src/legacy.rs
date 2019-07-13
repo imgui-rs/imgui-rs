@@ -8,6 +8,7 @@ use crate::widget::color_editors::*;
 use crate::widget::combo_box::*;
 use crate::widget::image::{Image, ImageButton};
 use crate::widget::progress_bar::ProgressBar;
+use crate::widget::selectable::*;
 use crate::window::{Window, WindowFlags, WindowFocusedFlags};
 use crate::{Id, Ui};
 
@@ -131,20 +132,8 @@ bitflags!(
     }
 );
 
-bitflags!(
-    /// Flags for selectables
-    #[repr(C)]
-    pub struct ImGuiSelectableFlags: c_int {
-        /// Clicking this don't close parent popup window
-        const DontClosePopups = 1;
-        /// Selectable frame can span all columns (text will still fit in current column)
-        const SpanAllColumns = 1 << 1;
-        /// Generate press events on double clicks too
-        const AllowDoubleClick = 1 << 2;
-        /// Cannot be selected, display greyed out text
-        const Disabled = 1 << 3;
-    }
-);
+#[deprecated(since = "0.2.0", note = "use SelectableFlags instead")]
+pub type ImGuiSelectableFlags = SelectableFlags;
 
 bitflags!(
     /// Flags for trees and collapsing headers
@@ -363,5 +352,18 @@ impl<'ui> Ui<'ui> {
                 height_in_items,
             )
         }
+    }
+}
+
+impl<'ui> Ui<'ui> {
+    #[deprecated(since = "0.2.0", note = "use imgui::Selectable::new(...) instead")]
+    pub fn selectable(
+        &self,
+        label: &ImStr,
+        selected: bool,
+        flags: SelectableFlags,
+        size: [f32; 2],
+    ) -> bool {
+        unsafe { sys::igSelectable(label.as_ptr(), selected, flags.bits() as i32, size.into()) }
     }
 }

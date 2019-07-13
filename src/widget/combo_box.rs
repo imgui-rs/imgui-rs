@@ -192,6 +192,7 @@ impl<'a> ComboBox<'a> {
     where
         for<'b> L: Fn(&'b T) -> Cow<'b, ImStr>,
     {
+        use crate::widget::selectable::Selectable;
         let mut result = false;
         let mut cb = self;
         let preview_value = items.get(*current_item).map(label_fn);
@@ -204,10 +205,7 @@ impl<'a> ComboBox<'a> {
             for (idx, item) in items.iter().enumerate() {
                 let text = label_fn(item);
                 let selected = idx == *current_item;
-                // TODO: use safe API
-                let change =
-                    unsafe { sys::igSelectable(text.as_ptr(), selected, 0, [0.0, 0.0].into()) };
-                if change {
+                if Selectable::new(&text).selected(selected).build(ui) {
                     *current_item = idx;
                     result = true;
                 }

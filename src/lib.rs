@@ -46,6 +46,7 @@ pub use self::widget::color_editors::*;
 pub use self::widget::combo_box::*;
 pub use self::widget::image::*;
 pub use self::widget::progress_bar::*;
+pub use self::widget::selectable::*;
 pub use self::window::child_window::*;
 pub use self::window::*;
 pub use self::window_draw_list::{ChannelsSplit, ImColor, WindowDrawList};
@@ -421,19 +422,6 @@ impl<'ui> Ui<'ui> {
     }
     pub fn collapsing_header<'p>(&self, label: &'p ImStr) -> CollapsingHeader<'ui, 'p> {
         CollapsingHeader::new(self, label)
-    }
-}
-
-// Widgets: Selectable / Lists
-impl<'ui> Ui<'ui> {
-    pub fn selectable(
-        &self,
-        label: &ImStr,
-        selected: bool,
-        flags: ImGuiSelectableFlags,
-        size: [f32; 2],
-    ) -> bool {
-        unsafe { sys::igSelectable(label.as_ptr(), selected, flags.bits(), size.into()) }
     }
 }
 
