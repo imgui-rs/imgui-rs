@@ -26,6 +26,10 @@
 - Gfx renderer re-exports imgui and gfx
 - These functions now take/return PathBuf: log_filename, set_log_filename, ini_filename, set_logfilename
 - ID stack manipulation now uses stack tokens
+- Parameter stack pushes *must almost always be paired by a manual call to stack pop*
+- Container widget tokens *must be ended manually by calling end*.
+  Closure-based function (e.g. build()) are unaffected and do this
+  automatically
 
 ### Removed
 

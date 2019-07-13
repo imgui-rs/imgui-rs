@@ -283,13 +283,14 @@ fn show_test_window(ui: &Ui, state: &mut State, opened: &mut bool) {
         window = window.opened(opened)
     }
     window.build(ui, || {
-        let _token = ui.push_item_width(-140.0);
+        ui.push_item_width(-140.0);
         ui.text(format!("dear imgui says hello. ({})", imgui::dear_imgui_version()));
-        if let Some(_) = ui.menu_bar() {
-            if let Some(_) = ui.menu(im_str!("Menu"), true) {
+        if let Some(menu_bar) = ui.begin_menu_bar() {
+            if let Some(menu) = ui.begin_menu(im_str!("Menu"), true) {
                 show_example_menu_file(ui, &mut state.file_menu);
+                menu.end(ui);
             }
-            if let Some(_) = ui.menu(im_str!("Examples"), true) {
+            if let Some(menu) = ui.begin_menu(im_str!("Examples"), true) {
                 MenuItem::new(im_str!("Main menu bar"))
                     .build_with_ref(ui, &mut state.show_app_main_menu_bar);
                 MenuItem::new(im_str!("Console"))
@@ -312,15 +313,18 @@ fn show_test_window(ui: &Ui, state: &mut State, opened: &mut bool) {
                     .build_with_ref(ui, &mut state.show_app_manipulating_window_title);
                 MenuItem::new(im_str!("Custom rendering"))
                     .build_with_ref(ui, &mut state.show_app_custom_rendering);
+                menu.end(ui);
             }
-            if let Some(_) = ui.menu(im_str!("Help"), true) {
+            if let Some(menu) = ui.begin_menu(im_str!("Help"), true) {
                 MenuItem::new(im_str!("Metrics"))
                     .build_with_ref(ui, &mut state.show_app_metrics);
                 MenuItem::new(im_str!("Style Editor"))
                     .build_with_ref(ui, &mut state.show_app_style_editor);
                 MenuItem::new(im_str!("About ImGui"))
                     .build_with_ref(ui, &mut state.show_app_about);
+                menu.end(ui);
             }
+            menu_bar.end(ui);
         }
         ui.spacing();
         if ui.collapsing_header(im_str!("Help")).build() {
@@ -628,7 +632,7 @@ CTRL+click on individual component to input value.\n",
                 ui.popup_modal(im_str!("Delete?")).always_auto_resize(true).build(|| {
                     ui.text("All those beautiful files will be deleted.\nThis operation cannot be undone!\n\n");
                     ui.separator();
-                    let _token = ui.push_style_var(StyleVar::FramePadding([0.0, 0.0]));
+                    let style = ui.push_style_var(StyleVar::FramePadding([0.0, 0.0]));
                     ui.checkbox(im_str!("Don't ask me next time"), &mut state.dont_ask_me_next_time);
 
                     if ui.button(im_str!("OK"), [120.0, 0.0]) {
@@ -638,6 +642,7 @@ CTRL+click on individual component to input value.\n",
                     if ui.button(im_str!("Cancel"), [120.0, 0.0]) {
                         ui.close_current_popup();
                     }
+                    style.pop(ui);
                 });
 
                 if ui.button(im_str!("Stacked modals.."), [0.0, 0.0]) {
@@ -674,11 +679,12 @@ CTRL+click on individual component to input value.\n",
 }
 
 fn show_example_app_main_menu_bar<'a>(ui: &Ui<'a>, state: &mut State) {
-    if let Some(_) = ui.main_menu_bar() {
-        if let Some(_) = ui.menu(im_str!("File"), true) {
+    if let Some(menu_bar) = ui.begin_main_menu_bar() {
+        if let Some(menu) = ui.begin_menu(im_str!("File"), true) {
             show_example_menu_file(ui, &mut state.file_menu);
+            menu.end(ui);
         }
-        if let Some(_) = ui.menu(im_str!("Edit"), true) {
+        if let Some(menu) = ui.begin_menu(im_str!("Edit"), true) {
             MenuItem::new(im_str!("Undo"))
                 .shortcut(im_str!("CTRL+Z"))
                 .build(ui);
@@ -696,7 +702,9 @@ fn show_example_app_main_menu_bar<'a>(ui: &Ui<'a>, state: &mut State) {
             MenuItem::new(im_str!("Paste"))
                 .shortcut(im_str!("CTRL+V"))
                 .build(ui);
+            menu.end(ui);
         }
+        menu_bar.end(ui);
     }
 }
 
@@ -708,24 +716,27 @@ fn show_example_menu_file<'a>(ui: &Ui<'a>, state: &mut FileMenuState) {
     MenuItem::new(im_str!("Open"))
         .shortcut(im_str!("Ctrl+O"))
         .build(ui);
-    if let Some(_) = ui.menu(im_str!("Open Recent"), true) {
+    if let Some(menu) = ui.begin_menu(im_str!("Open Recent"), true) {
         MenuItem::new(im_str!("fish_hat.c")).build(ui);
         MenuItem::new(im_str!("fish_hat.inl")).build(ui);
         MenuItem::new(im_str!("fish_hat.h")).build(ui);
-        if let Some(_) = ui.menu(im_str!("More.."), true) {
+        if let Some(menu) = ui.begin_menu(im_str!("More.."), true) {
             MenuItem::new(im_str!("Hello")).build(ui);
             MenuItem::new(im_str!("Sailor")).build(ui);
-            if let Some(_) = ui.menu(im_str!("Recurse.."), true) {
+            if let Some(menu) = ui.begin_menu(im_str!("Recurse.."), true) {
                 show_example_menu_file(ui, state);
+                menu.end(ui);
             }
+            menu.end(ui);
         }
+        menu.end(ui);
     }
     MenuItem::new(im_str!("Save"))
         .shortcut(im_str!("Ctrl+S"))
         .build(ui);
     MenuItem::new(im_str!("Save As..")).build(ui);
     ui.separator();
-    if let Some(_) = ui.menu(im_str!("Options"), true) {
+    if let Some(menu) = ui.begin_menu(im_str!("Options"), true) {
         MenuItem::new(im_str!("Enabled")).build_with_ref(ui, &mut state.enabled);
         ChildWindow::new("child")
             .size([0.0, 60.0])
@@ -743,13 +754,15 @@ fn show_example_menu_file<'a>(ui: &Ui<'a>, state: &mut FileMenuState) {
         let items = [im_str!("Yes"), im_str!("No"), im_str!("Maybe")];
         ComboBox::new(im_str!("Combo")).build_simple_string(ui, &mut state.n, &items);
         ui.checkbox(im_str!("Check"), &mut state.b);
+        menu.end(ui);
     }
-    if let Some(_) = ui.menu(im_str!("Colors"), true) {
+    if let Some(menu) = ui.begin_menu(im_str!("Colors"), true) {
         for &col in StyleColor::VARIANTS.iter() {
             MenuItem::new(&im_str!("{:?}", col)).build(ui);
         }
+        menu.end(ui);
     }
-    if let Some(_) = ui.menu(im_str!("Disabled"), false) {
+    if let Some(_) = ui.begin_menu(im_str!("Disabled"), false) {
         unreachable!();
     }
     MenuItem::new(im_str!("Checked")).selected(true).build(ui);
@@ -778,7 +791,7 @@ output your content because that would create a feedback loop.",
 fn show_example_app_fixed_overlay(ui: &Ui, opened: &mut bool) {
     const DISTANCE: f32 = 10.0;
     let window_pos = [DISTANCE, DISTANCE];
-    let _token = ui.push_style_color(StyleColor::WindowBg, [0.0, 0.0, 0.0, 0.3]);
+    let style = ui.push_style_color(StyleColor::WindowBg, [0.0, 0.0, 0.0, 0.3]);
     Window::new(im_str!("Example: Fixed Overlay"))
         .opened(opened)
         .position(window_pos, Condition::Always)
@@ -797,7 +810,8 @@ fn show_example_app_fixed_overlay(ui: &Ui, opened: &mut bool) {
                 "Mouse Position: ({:.1},{:.1})",
                 mouse_pos[0], mouse_pos[1]
             ));
-        })
+        });
+    style.pop(ui);
 }
 
 fn show_example_app_manipulating_window_title(ui: &Ui) {

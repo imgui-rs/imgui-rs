@@ -1,8 +1,9 @@
 use bitflags::bitflags;
 use std::f32;
-use std::marker::PhantomData;
 use std::ptr;
+use std::thread;
 
+use crate::context::Context;
 use crate::string::ImStr;
 use crate::sys;
 use crate::{Condition, Ui};
@@ -470,8 +471,14 @@ impl<'a> Window<'a> {
         self.flags |= WindowFlags::NO_INPUTS;
         self
     }
-    /// Builds this window, pushes it to the window stack, and starts appending to it
-    pub fn begin<'ui>(self, _: &'ui Ui<'ui>) -> WindowToken<'ui> {
+    /// Creates a window and starts appending to it.
+    ///
+    /// Returns `Some(WindowToken)` if the window is visible. After content has been
+    /// rendered, the token must be ended by calling `.end()`.
+    ///
+    /// Returns `None` if the window is not visible and no content should be rendered.
+    #[must_use]
+    pub fn begin(self, ui: &Ui) -> Option<WindowToken> {
         if self.pos_cond != Condition::Never {
             unsafe {
                 sys::igSetNextWindowPos(
@@ -516,45 +523,42 @@ impl<'a> Window<'a> {
                 self.flags.bits() as i32,
             )
         };
-        WindowToken {
-            should_render,
-            should_end: true,
-            _ui: PhantomData,
+        if should_render {
+            Some(WindowToken { ctx: ui.ctx })
+        } else {
+            unsafe { sys::igEnd() };
+            None
         }
     }
-    /// Builds this window using the given closure to create the window content.
+    /// Creates a window and runs a closure to construct the contents.
     ///
     /// Note: the closure is not called if no window content is visible (e.g. window is collapsed
     /// or fully clipped).
     pub fn build<F: FnOnce()>(self, ui: &Ui, f: F) {
-        let window = self.begin(ui);
-        if window.should_render {
+        if let Some(window) = self.begin(ui) {
             f();
+            window.end(ui);
         }
-        window.end();
     }
 }
 
-/// Represents a window pushed to the window stack
-pub struct WindowToken<'ui> {
-    /// True, if the window contents should be rendered
-    pub should_render: bool,
-    should_end: bool,
-    _ui: PhantomData<&'ui Ui<'ui>>,
+/// Tracks a window that must be ended by calling `.end()`
+pub struct WindowToken {
+    ctx: *const Context,
 }
 
-impl<'ui> WindowToken<'ui> {
-    /// Finishes the current window and pops it from the window stack
-    pub fn end(mut self) {
-        self.should_end = false;
+impl WindowToken {
+    /// Ends a window
+    pub fn end(mut self, _: &Ui) {
+        self.ctx = ptr::null();
         unsafe { sys::igEnd() };
     }
 }
 
-impl<'ui> Drop for WindowToken<'ui> {
+impl Drop for WindowToken {
     fn drop(&mut self) {
-        if self.should_end {
-            unsafe { sys::igEnd() };
+        if !self.ctx.is_null() && !thread::panicking() {
+            panic!("A WindowToken was leaked. Did you call .end()?");
         }
     }
 }

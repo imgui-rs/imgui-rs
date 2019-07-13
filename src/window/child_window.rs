@@ -1,7 +1,9 @@
 use std::f32;
-use std::marker::PhantomData;
 use std::os::raw::{c_char, c_void};
+use std::ptr;
+use std::thread;
 
+use crate::context::Context;
 use crate::sys;
 use crate::window::WindowFlags;
 use crate::{Id, Ui};
@@ -228,8 +230,13 @@ impl<'a> ChildWindow<'a> {
         self.flags |= WindowFlags::NO_INPUTS;
         self
     }
-    /// Builds this window, pushes it to the window stack, and starts appending to it
-    pub fn begin<'ui>(self, _: &'ui Ui<'ui>) -> ChildWindowToken<'ui> {
+    /// Creates a child window and starts append to it.
+    ///
+    /// Returns `Some(ChildWindowToken)` if the window is visible. After content has been
+    /// rendered, the token must be ended by calling `.end()`.
+    ///
+    /// Returns `None` if the window is not visible and no content should be rendered.
+    pub fn begin(self, ui: &Ui) -> Option<ChildWindowToken> {
         if self.content_size[0] != 0.0 || self.content_size[1] != 0.0 {
             unsafe { sys::igSetNextWindowContentSize(self.content_size.into()) };
         }
@@ -253,45 +260,42 @@ impl<'a> ChildWindow<'a> {
         let should_render = unsafe {
             sys::igBeginChildID(id, self.size.into(), self.border, self.flags.bits() as i32)
         };
-        ChildWindowToken {
-            should_render,
-            should_end: true,
-            _ui: PhantomData,
+        if should_render {
+            Some(ChildWindowToken { ctx: ui.ctx })
+        } else {
+            unsafe { sys::igEndChild() };
+            None
         }
     }
-    /// Builds this child window using the given closure to create the window content.
+    /// Creates a child window and runs a closure to construct the contents.
     ///
     /// Note: the closure is not called if no window content is visible (e.g. window is collapsed
     /// or fully clipped).
     pub fn build<F: FnOnce()>(self, ui: &Ui, f: F) {
-        let window = self.begin(ui);
-        if window.should_render {
+        if let Some(window) = self.begin(ui) {
             f();
+            window.end(ui);
         }
-        window.end();
     }
 }
 
-/// Represents a child window pushed to the window stack
-pub struct ChildWindowToken<'ui> {
-    /// True, if the child window contents should be rendered
-    pub should_render: bool,
-    should_end: bool,
-    _ui: PhantomData<&'ui Ui<'ui>>,
+/// Tracks a child window that must be ended by calling `.end()`
+pub struct ChildWindowToken {
+    ctx: *const Context,
 }
 
-impl<'ui> ChildWindowToken<'ui> {
-    /// Finishes the current child window and pops it from the window stack
-    pub fn end(mut self) {
-        self.should_end = false;
+impl ChildWindowToken {
+    /// Ends a window
+    pub fn end(mut self, _: &Ui) {
+        self.ctx = ptr::null();
         unsafe { sys::igEndChild() };
     }
 }
 
-impl<'ui> Drop for ChildWindowToken<'ui> {
+impl Drop for ChildWindowToken {
     fn drop(&mut self) {
-        if self.should_end {
-            unsafe { sys::igEndChild() };
+        if !self.ctx.is_null() && !thread::panicking() {
+            panic!("A ChildWindowToken was leaked. Did you call .end()?");
         }
     }
 }

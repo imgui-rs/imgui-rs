@@ -24,14 +24,16 @@ impl<'ui> Ui<'ui> {
     }
     /// Renders simple text using the given text color
     pub fn text_colored<T: AsRef<str>>(&self, color: [f32; 4], text: T) {
-        let _ = self.push_style_color(StyleColor::Text, color);
+        let style = self.push_style_color(StyleColor::Text, color);
         self.text(text);
+        style.pop(self);
     }
     /// Renders simple text using `StyleColor::TextDisabled` color
     pub fn text_disabled<T: AsRef<str>>(&self, text: T) {
         let color = self.style_color(StyleColor::TextDisabled);
-        let _ = self.push_style_color(StyleColor::Text, color);
+        let style = self.push_style_color(StyleColor::Text, color);
         self.text(text);
+        style.pop(self);
     }
     /// Renders text wrapped to the end of window (or column)
     pub fn text_wrapped(&self, text: &ImStr) {

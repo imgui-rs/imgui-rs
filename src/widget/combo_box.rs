@@ -1,8 +1,9 @@
 use bitflags::bitflags;
 use std::borrow::Cow;
-use std::marker::PhantomData;
 use std::ptr;
+use std::thread;
 
+use crate::context::Context;
 use crate::string::ImStr;
 use crate::sys;
 use crate::Ui;
@@ -34,24 +35,24 @@ pub enum ComboBoxPreviewMode {
 }
 
 bitflags!(
-    /// Flags for combo boxes
-    #[repr(transparent)]
-    pub struct ComboBoxFlags: u32 {
-        /// Align the popup toward the left by default
-        const POPUP_ALIGN_LEFT = sys::ImGuiComboFlags_PopupAlignLeft;
-        /// Max ~4 items visible.
-        const HEIGHT_SMALL = sys::ImGuiComboFlags_HeightSmall;
-        /// Max ~8 items visible (default)
-        const HEIGHT_REGULAR = sys::ImGuiComboFlags_HeightRegular;
-        /// Max ~20 items visible
-        const HEIGHT_LARGE = sys::ImGuiComboFlags_HeightLarge;
-        /// As many fitting items as possible
-        const HEIGHT_LARGEST = sys::ImGuiComboFlags_HeightLargest;
-        /// Display on the preview box without the square arrow button
-        const NO_ARROW_BUTTON = sys::ImGuiComboFlags_NoArrowButton;
-        /// Display only a square arrow button
-        const NO_PREVIEW = sys::ImGuiComboFlags_NoPreview;
-    }
+/// Flags for combo boxes
+#[repr(transparent)]
+pub struct ComboBoxFlags: u32 {
+    /// Align the popup toward the left by default
+    const POPUP_ALIGN_LEFT = sys::ImGuiComboFlags_PopupAlignLeft;
+    /// Max ~4 items visible.
+    const HEIGHT_SMALL = sys::ImGuiComboFlags_HeightSmall;
+    /// Max ~8 items visible (default)
+    const HEIGHT_REGULAR = sys::ImGuiComboFlags_HeightRegular;
+    /// Max ~20 items visible
+    const HEIGHT_LARGE = sys::ImGuiComboFlags_HeightLarge;
+    /// As many fitting items as possible
+    const HEIGHT_LARGEST = sys::ImGuiComboFlags_HeightLargest;
+    /// Display on the preview box without the square arrow button
+    const NO_ARROW_BUTTON = sys::ImGuiComboFlags_NoArrowButton;
+    /// Display only a square arrow button
+    const NO_PREVIEW = sys::ImGuiComboFlags_NoPreview;
+}
 );
 
 /// Builder for a combo box widget
@@ -127,10 +128,14 @@ impl<'a> ComboBox<'a> {
         );
         self
     }
-    /// Builds this combo box, and starts appending to it.
+    /// Creates a combo box and starts appending to it.
+    ///
+    /// Returns `Some(ComboBoxToken)` if the combo box is open. After content has been
+    /// rendered, the token must be ended by calling `.end()`.
     ///
     /// Returns `None` if the combo box is not open and no content should be rendered.
-    pub fn begin<'ui>(self, _: &'ui Ui<'ui>) -> Option<ComboBoxToken<'ui>> {
+    #[must_use]
+    pub fn begin(self, ui: &Ui) -> Option<ComboBoxToken> {
         let should_render = unsafe {
             sys::igBeginCombo(
                 self.label.as_ptr(),
@@ -139,42 +144,40 @@ impl<'a> ComboBox<'a> {
             )
         };
         if should_render {
-            Some(ComboBoxToken {
-                should_end: true,
-                _ui: PhantomData,
-            })
+            Some(ComboBoxToken { ctx: ui.ctx })
         } else {
             None
         }
     }
-    /// Builds the combo box.
+    /// Creates a combo box and runs a closure to construct the popup contents.
     ///
-    /// Note: the closure is not called if the combo box is not open
+    /// Note: the closure is not called if the combo box is not open.
     pub fn build<F: FnOnce()>(self, ui: &Ui, f: F) {
-        if let Some(_combo) = self.begin(ui) {
+        if let Some(combo) = self.begin(ui) {
             f();
+            combo.end(ui);
         }
     }
 }
 
-/// Represents a combo box pushed to the window stack
-pub struct ComboBoxToken<'ui> {
-    should_end: bool,
-    _ui: PhantomData<&'ui Ui<'ui>>,
+/// Tracks a combo box that must be ended by calling `.end()`
+#[must_use]
+pub struct ComboBoxToken {
+    ctx: *const Context,
 }
 
-impl<'ui> ComboBoxToken<'ui> {
-    /// Finishes the current combo box and pops it from the window stack
-    pub fn end(mut self) {
-        self.should_end = false;
+impl ComboBoxToken {
+    /// Ends a combo box
+    pub fn end(mut self, _: &Ui) {
+        self.ctx = ptr::null();
         unsafe { sys::igEndCombo() };
     }
 }
 
-impl<'ui> Drop for ComboBoxToken<'ui> {
+impl Drop for ComboBoxToken {
     fn drop(&mut self) {
-        if self.should_end {
-            unsafe { sys::igEndCombo() };
+        if !self.ctx.is_null() && !thread::panicking() {
+            panic!("A ComboBoxToken was leaked. Did you call .end()?");
         }
     }
 }

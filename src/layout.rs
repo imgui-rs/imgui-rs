@@ -1,16 +1,29 @@
-use std::marker::PhantomData;
+use std::ptr;
+use std::thread;
 
+use crate::context::Context;
 use crate::sys;
 use crate::Ui;
 
-/// Represents a layout group
-pub struct GroupToken<'ui> {
-    _ui: PhantomData<&'ui Ui<'ui>>,
+/// Tracks a layout group that must be ended by calling `.end()`
+#[must_use]
+pub struct GroupToken {
+    ctx: *const Context,
 }
 
-impl<'ui> Drop for GroupToken<'ui> {
-    fn drop(&mut self) {
+impl GroupToken {
+    /// Ends a layout group
+    pub fn end(mut self, _: &Ui) {
+        self.ctx = ptr::null();
         unsafe { sys::igEndGroup() };
+    }
+}
+
+impl Drop for GroupToken {
+    fn drop(&mut self) {
+        if !self.ctx.is_null() && !thread::panicking() {
+            panic!("A GroupToken was leaked. Did you call .end()?");
+        }
     }
 }
 
@@ -67,9 +80,21 @@ impl<'ui> Ui<'ui> {
     /// Groups items together as a single item.
     ///
     /// May be useful to handle the same mouse event on a group of items, for example.
-    pub fn group(&self) -> GroupToken {
+    ///
+    /// Returns a `GroupToken` that must be ended by calling `.end()`
+    #[must_use]
+    pub fn begin_group(&self) -> GroupToken {
         unsafe { sys::igBeginGroup() };
-        GroupToken { _ui: PhantomData }
+        GroupToken { ctx: self.ctx }
+    }
+    /// Creates a layout group and runs a closure to construct the contents.
+    ///
+    /// May be useful to handle the same mouse event on a group of items, for example.
+    pub fn group<R, F: FnOnce() -> R>(&self, f: F) -> R {
+        let group = self.begin_group();
+        let result = f();
+        group.end(self);
+        result
     }
     /// Returns the cursor position (in window coordinates)
     pub fn cursor_pos(&self) -> [f32; 2] {

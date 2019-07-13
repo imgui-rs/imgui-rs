@@ -1,7 +1,9 @@
-use std::marker::PhantomData;
 use std::mem;
 use std::os::raw::{c_char, c_void};
+use std::ptr;
+use std::thread;
 
+use crate::context::Context;
 use crate::fonts::atlas::FontId;
 use crate::internal::RawCast;
 use crate::style::{StyleColor, StyleVar};
@@ -11,6 +13,8 @@ use crate::{Id, Ui};
 /// # Parameter stacks (shared)
 impl<'ui> Ui<'ui> {
     /// Switches to the given font by pushing it to the font stack.
+    ///
+    /// Returns a `FontStackToken` that must be popped by calling `.pop()`
     ///
     /// # Panics
     ///
@@ -26,8 +30,9 @@ impl<'ui> Ui<'ui> {
     /// let my_custom_font = ctx.fonts().add_font(&font_data_sources);
     /// # let ui = ctx.frame();
     /// // During UI construction
-    /// let _token = ui.push_font(my_custom_font);
+    /// let font = ui.push_font(my_custom_font);
     /// ui.text("I use the custom font!");
+    /// font.pop(&ui);
     /// ```
     #[must_use]
     pub fn push_font(&self, id: FontId) -> FontStackToken {
@@ -36,9 +41,11 @@ impl<'ui> Ui<'ui> {
             .get_font(id)
             .expect("Font atlas did not contain the given font");
         unsafe { sys::igPushFont(font.raw() as *const _ as *mut _) };
-        FontStackToken { _ui: PhantomData }
+        FontStackToken { ctx: self.ctx }
     }
     /// Changes a style color by pushing a change to the color stack.
+    ///
+    /// Returns a `ColorStackToken` that must be popped by calling `.pop()`
     ///
     /// # Examples
     ///
@@ -47,18 +54,21 @@ impl<'ui> Ui<'ui> {
     /// # let mut ctx = Context::create();
     /// # let ui = ctx.frame();
     /// const RED: [f32; 4] = [1.0, 0.0, 0.0, 1.0];
-    /// let _token = ui.push_style_color(StyleColor::Text, RED);
+    /// let color = ui.push_style_color(StyleColor::Text, RED);
     /// ui.text("I'm red!");
+    /// color.pop(&ui);
     /// ```
     #[must_use]
     pub fn push_style_color(&self, style_color: StyleColor, color: [f32; 4]) -> ColorStackToken {
         unsafe { sys::igPushStyleColor(style_color as i32, color.into()) };
         ColorStackToken {
             count: 1,
-            _ui: PhantomData,
+            ctx: self.ctx,
         }
     }
     /// Changes style colors by pushing several changes to the color stack.
+    ///
+    /// Returns a `ColorStackToken` that must be popped by calling `.pop()`
     ///
     /// # Examples
     ///
@@ -68,12 +78,13 @@ impl<'ui> Ui<'ui> {
     /// # let ui = ctx.frame();
     /// const RED: [f32; 4] = [1.0, 0.0, 0.0, 1.0];
     /// const GREEN: [f32; 4] = [0.0, 1.0, 0.0, 1.0];
-    /// let _token = ui.push_style_colors(&[
+    /// let colors = ui.push_style_colors(&[
     ///     (StyleColor::Text, RED),
     ///     (StyleColor::TextDisabled, GREEN),
     /// ]);
     /// ui.text("I'm red!");
     /// ui.text_disabled("I'm green!");
+    /// colors.pop(&ui);
     /// ```
     #[must_use]
     pub fn push_style_colors<'a, I>(&self, style_colors: I) -> ColorStackToken
@@ -87,10 +98,12 @@ impl<'ui> Ui<'ui> {
         }
         ColorStackToken {
             count,
-            _ui: PhantomData,
+            ctx: self.ctx,
         }
     }
     /// Changes a style variable by pushing a change to the style stack.
+    ///
+    /// Returns a `StyleStackToken` that must be popped by calling `.pop()`
     ///
     /// # Examples
     ///
@@ -98,18 +111,21 @@ impl<'ui> Ui<'ui> {
     /// # use imgui::*;
     /// # let mut ctx = Context::create();
     /// # let ui = ctx.frame();
-    /// let _token = ui.push_style_var(StyleVar::Alpha(0.2));
+    /// let style = ui.push_style_var(StyleVar::Alpha(0.2));
     /// ui.text("I'm transparent!");
+    /// style.pop(&ui);
     /// ```
     #[must_use]
     pub fn push_style_var(&self, style_var: StyleVar) -> StyleStackToken {
         unsafe { push_style_var(style_var) };
         StyleStackToken {
             count: 1,
-            _ui: PhantomData,
+            ctx: self.ctx,
         }
     }
     /// Changes style variables by pushing several changes to the style stack.
+    ///
+    /// Returns a `StyleStackToken` that must be popped by calling `.pop()`
     ///
     /// # Examples
     ///
@@ -117,12 +133,13 @@ impl<'ui> Ui<'ui> {
     /// # use imgui::*;
     /// # let mut ctx = Context::create();
     /// # let ui = ctx.frame();
-    /// let _token = ui.push_style_vars(&[
+    /// let styles = ui.push_style_vars(&[
     ///     StyleVar::Alpha(0.2),
     ///     StyleVar::ItemSpacing([50.0, 50.0])
     /// ]);
     /// ui.text("We're transparent...");
     /// ui.text("...with large spacing as well");
+    /// styles.pop(&ui);
     /// ```
     #[must_use]
     pub fn push_style_vars<'a, I>(&self, style_vars: I) -> StyleStackToken
@@ -136,43 +153,76 @@ impl<'ui> Ui<'ui> {
         }
         StyleStackToken {
             count,
-            _ui: PhantomData,
+            ctx: self.ctx,
         }
     }
 }
 
-/// Represents a change pushed to the font stack
-pub struct FontStackToken<'ui> {
-    _ui: PhantomData<&'ui Ui<'ui>>,
+/// Tracks a font pushed to the font stack that must be popped by calling `.pop()`
+#[must_use]
+pub struct FontStackToken {
+    ctx: *const Context,
 }
 
-impl<'ui> Drop for FontStackToken<'ui> {
-    fn drop(&mut self) {
+impl FontStackToken {
+    /// Pops a change from the font stack
+    pub fn pop(mut self, _: &Ui) {
+        self.ctx = ptr::null();
         unsafe { sys::igPopFont() };
     }
 }
 
-/// Represents one or more changes pushed to the color stack
-pub struct ColorStackToken<'ui> {
-    count: usize,
-    _ui: PhantomData<&'ui Ui<'ui>>,
+impl Drop for FontStackToken {
+    fn drop(&mut self) {
+        if !self.ctx.is_null() && !thread::panicking() {
+            panic!("A FontStackToken was leaked. Did you call .pop()?");
+        }
+    }
 }
 
-impl<'ui> Drop for ColorStackToken<'ui> {
-    fn drop(&mut self) {
+/// Tracks one or more changes pushed to the color stack that must be popped by calling `.pop()`
+#[must_use]
+pub struct ColorStackToken {
+    count: usize,
+    ctx: *const Context,
+}
+
+impl ColorStackToken {
+    /// Pops changes from the color stack
+    pub fn pop(mut self, _: &Ui) {
+        self.ctx = ptr::null();
         unsafe { sys::igPopStyleColor(self.count as i32) };
     }
 }
 
-/// Represents one or more changes pushed to the style stack
-pub struct StyleStackToken<'ui> {
-    count: usize,
-    _ui: PhantomData<&'ui Ui<'ui>>,
+impl Drop for ColorStackToken {
+    fn drop(&mut self) {
+        if !self.ctx.is_null() && !thread::panicking() {
+            panic!("A ColorStackToken was leaked. Did you call .pop()?");
+        }
+    }
 }
 
-impl<'ui> Drop for StyleStackToken<'ui> {
-    fn drop(&mut self) {
+/// Tracks one or more changes pushed to the style stack that must be popped by calling `.pop()`
+#[must_use]
+pub struct StyleStackToken {
+    count: usize,
+    ctx: *const Context,
+}
+
+impl StyleStackToken {
+    /// Pops changes from the style stack
+    pub fn pop(mut self, _: &Ui) {
+        self.ctx = ptr::null();
         unsafe { sys::igPopStyleVar(self.count as i32) };
+    }
+}
+
+impl Drop for StyleStackToken {
+    fn drop(&mut self) {
+        if !self.ctx.is_null() && !thread::panicking() {
+            panic!("A StyleStackToken was leaked. Did you call .pop()?");
+        }
     }
 }
 
@@ -219,14 +269,15 @@ unsafe fn push_style_var(style_var: StyleVar) {
 impl<'ui> Ui<'ui> {
     /// Changes the item width by pushing a change to the item width stack.
     ///
+    /// Returns an `ItemWidthStackToken` that may be popped by calling `.pop()`
+    ///
     /// - `> 0.0`: width is `item_width` pixels
     /// - `= 0.0`: default to ~2/3 of window width
     /// - `< 0.0`: `item_width` pixels relative to the right of window (-1.0 always aligns width to
     /// the right side)
-    #[must_use]
     pub fn push_item_width(&self, item_width: f32) -> ItemWidthStackToken {
         unsafe { sys::igPushItemWidth(item_width) };
-        ItemWidthStackToken { _ui: PhantomData }
+        ItemWidthStackToken { ctx: self.ctx }
     }
     /// Sets the width of the next item.
     ///
@@ -243,16 +294,18 @@ impl<'ui> Ui<'ui> {
     }
     /// Changes the text wrapping position by pushing a change to the text wrapping position stack.
     ///
+    /// Returns a `TextWrapPosStackToken` that may be popped by calling `.pop()`
+    ///
     /// - `> 0.0`: wrap at `wrap_pos_x` position in window local space
     /// - `= 0.0`: wrap to end of window (or column)
     /// - `< 0.0`: no wrapping
-    #[must_use]
     pub fn push_text_wrap_pos(&self, wrap_pos_x: f32) -> TextWrapPosStackToken {
         unsafe { sys::igPushTextWrapPos(wrap_pos_x) };
-        TextWrapPosStackToken { _ui: PhantomData }
+        TextWrapPosStackToken { ctx: self.ctx }
     }
-    /// Changes an item flag by pushing a change to the item flag stack
-    #[must_use]
+    /// Changes an item flag by pushing a change to the item flag stack.
+    ///
+    /// Returns a `ItemFlagsStackToken` that may be popped by calling `.pop()`
     pub fn push_item_flag(&self, item_flag: ItemFlag) -> ItemFlagsStackToken {
         use self::ItemFlag::*;
         match item_flag {
@@ -261,7 +314,7 @@ impl<'ui> Ui<'ui> {
         }
         ItemFlagsStackToken {
             discriminant: mem::discriminant(&item_flag),
-            _ui: PhantomData,
+            ctx: self.ctx,
         }
     }
 }
@@ -273,36 +326,42 @@ pub enum ItemFlag {
     ButtonRepeat(bool),
 }
 
-/// Represents a change pushed to the item width stack
-pub struct ItemWidthStackToken<'ui> {
-    _ui: PhantomData<&'ui Ui<'ui>>,
+/// Tracks a change pushed to the item width stack
+pub struct ItemWidthStackToken {
+    ctx: *const Context,
 }
 
-impl<'ui> Drop for ItemWidthStackToken<'ui> {
-    fn drop(&mut self) {
+impl ItemWidthStackToken {
+    /// Pops a change from the item width stack
+    pub fn pop(mut self, _: &Ui) {
+        self.ctx = ptr::null();
         unsafe { sys::igPopItemWidth() };
     }
 }
 
-/// Represents a change pushed to the text wrap position stack
-pub struct TextWrapPosStackToken<'ui> {
-    _ui: PhantomData<&'ui Ui<'ui>>,
+/// Tracks a change pushed to the text wrap position stack
+pub struct TextWrapPosStackToken {
+    ctx: *const Context,
 }
 
-impl<'ui> Drop for TextWrapPosStackToken<'ui> {
-    fn drop(&mut self) {
+impl TextWrapPosStackToken {
+    /// Pops a change from the text wrap position stack
+    pub fn pop(mut self, _: &Ui) {
+        self.ctx = ptr::null();
         unsafe { sys::igPopTextWrapPos() };
     }
 }
 
-/// Represents a change pushed to the item flags stack
-pub struct ItemFlagsStackToken<'ui> {
+/// Tracks a change pushed to the item flags stack
+pub struct ItemFlagsStackToken {
     discriminant: mem::Discriminant<ItemFlag>,
-    _ui: PhantomData<&'ui Ui<'ui>>,
+    ctx: *const Context,
 }
 
-impl<'ui> Drop for ItemFlagsStackToken<'ui> {
-    fn drop(&mut self) {
+impl ItemFlagsStackToken {
+    /// Pops a change from the item flags stack
+    pub fn pop(mut self, _: &Ui) {
+        self.ctx = ptr::null();
         const ALLOW_KEYBOARD_FOCUS: ItemFlag = ItemFlag::AllowKeyboardFocus(true);
         const BUTTON_REPEAT: ItemFlag = ItemFlag::ButtonRepeat(true);
 
@@ -318,7 +377,10 @@ impl<'ui> Drop for ItemFlagsStackToken<'ui> {
 
 /// # ID stack
 impl<'ui> Ui<'ui> {
-    /// Pushes an identifier to the ID stack
+    /// Pushes an identifier to the ID stack.
+    ///
+    /// Returns an `IdStackToken` that must be popped by calling `.pop()`
+    ///
     #[must_use]
     pub fn push_id<'a, I: Into<Id<'a>>>(&self, id: I) -> IdStackToken {
         let id = id.into();
@@ -334,17 +396,28 @@ impl<'ui> Ui<'ui> {
                 Id::Ptr(p) => sys::igPushIDPtr(p as *const c_void),
             }
         }
-        IdStackToken { _ui: PhantomData }
+        IdStackToken { ctx: self.ctx }
     }
 }
 
-/// Represents a change pushed to the ID stack
-pub struct IdStackToken<'ui> {
-    _ui: PhantomData<&'ui Ui<'ui>>,
+/// Tracks an ID pushed to the ID stack that must be popped by calling `.pop()`
+#[must_use]
+pub struct IdStackToken {
+    ctx: *const Context,
 }
 
-impl<'ui> Drop for IdStackToken<'ui> {
-    fn drop(&mut self) {
+impl IdStackToken {
+    /// Pops a change from the ID stack
+    pub fn pop(mut self, _: &Ui) {
+        self.ctx = ptr::null();
         unsafe { sys::igPopID() };
+    }
+}
+
+impl Drop for IdStackToken {
+    fn drop(&mut self) {
+        if !self.ctx.is_null() && !thread::panicking() {
+            panic!("A IdStackToken was leaked. Did you call .pop()?");
+        }
     }
 }

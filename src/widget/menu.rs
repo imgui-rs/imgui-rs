@@ -1,6 +1,7 @@
-use std::marker::PhantomData;
 use std::ptr;
+use std::thread;
 
+use crate::context::Context;
 use crate::string::ImStr;
 use crate::sys;
 use crate::Ui;
@@ -9,32 +10,71 @@ use crate::Ui;
 impl<'ui> Ui<'ui> {
     /// Creates and starts appending to a full-screen menu bar.
     ///
+    /// Returns `Some(MainMenuBarToken)` if the menu bar is visible. After content has been
+    /// rendered, the token must be ended by calling `.end()`.
+    ///
     /// Returns `None` if the menu bar is not visible and no content should be rendered.
-    pub fn main_menu_bar(&self) -> Option<MainMenuBarToken> {
+    #[must_use]
+    pub fn begin_main_menu_bar(&self) -> Option<MainMenuBarToken> {
         if unsafe { sys::igBeginMainMenuBar() } {
-            Some(MainMenuBarToken { _ui: PhantomData })
+            Some(MainMenuBarToken { ctx: self.ctx })
         } else {
             None
+        }
+    }
+    /// Creates a full-screen main menu bar and runs a closure to construct the contents.
+    ///
+    /// Note: the closure is not called if the menu bar is not visible.
+    pub fn main_menu_bar<F: FnOnce()>(&self, f: F) {
+        if let Some(menu_bar) = self.begin_main_menu_bar() {
+            f();
+            menu_bar.end(self);
         }
     }
     /// Creates and starts appending to the menu bar of the current window.
     ///
+    /// Returns `Some(MenuBarToken)` if the menu bar is visible. After content has been
+    /// rendered, the token must be ended by calling `.end()`.
+    ///
     /// Returns `None` if the menu bar is not visible and no content should be rendered.
-    pub fn menu_bar(&self) -> Option<MenuBarToken> {
+    #[must_use]
+    pub fn begin_menu_bar(&self) -> Option<MenuBarToken> {
         if unsafe { sys::igBeginMenuBar() } {
-            Some(MenuBarToken { _ui: PhantomData })
+            Some(MenuBarToken { ctx: self.ctx })
         } else {
             None
         }
     }
+    /// Creates a menu bar in the current window and runs a closure to construct the contents.
+    ///
+    /// Note: the closure is not called if the menu bar is not visible.
+    pub fn menu_bar<F: FnOnce()>(&self, f: F) {
+        if let Some(menu_bar) = self.begin_menu_bar() {
+            f();
+            menu_bar.end(self);
+        }
+    }
     /// Creates and starts appending to a sub-menu entry.
     ///
+    /// Returns `Some(MenuToken)` if the menu is visible. After content has been
+    /// rendered, the token must be ended by calling `.end()`.
+    ///
     /// Returns `None` if the menu is not visible and no content should be rendered.
-    pub fn menu(&self, label: &ImStr, enabled: bool) -> Option<MenuToken> {
+    #[must_use]
+    pub fn begin_menu(&self, label: &ImStr, enabled: bool) -> Option<MenuToken> {
         if unsafe { sys::igBeginMenu(label.as_ptr(), enabled) } {
-            Some(MenuToken { _ui: PhantomData })
+            Some(MenuToken { ctx: self.ctx })
         } else {
             None
+        }
+    }
+    /// Creates a menu and runs a closure to construct the contents.
+    ///
+    /// Note: the closure is not called if the menu is not visible.
+    pub fn menu<F: FnOnce()>(&self, label: &ImStr, enabled: bool, f: F) {
+        if let Some(menu) = self.begin_menu(label, enabled) {
+            f();
+            menu.end(self);
         }
     }
 }
@@ -111,35 +151,68 @@ impl<'a> MenuItem<'a> {
     }
 }
 
-/// Represents a main menu bar
-pub struct MainMenuBarToken<'ui> {
-    _ui: PhantomData<&'ui Ui<'ui>>,
+/// Tracks a main menu bar that must be ended by calling `.end()`
+#[must_use]
+pub struct MainMenuBarToken {
+    ctx: *const Context,
 }
 
-impl<'ui> Drop for MainMenuBarToken<'ui> {
-    fn drop(&mut self) {
+impl MainMenuBarToken {
+    /// Ends a main menu bar
+    pub fn end(mut self, _: &Ui) {
+        self.ctx = ptr::null();
         unsafe { sys::igEndMainMenuBar() };
     }
 }
 
-/// Represents a menu bar
-pub struct MenuBarToken<'ui> {
-    _ui: PhantomData<&'ui Ui<'ui>>,
+impl Drop for MainMenuBarToken {
+    fn drop(&mut self) {
+        if !self.ctx.is_null() && !thread::panicking() {
+            panic!("A MainMenuBarToken was leaked. Did you call .end()?");
+        }
+    }
 }
 
-impl<'ui> Drop for MenuBarToken<'ui> {
-    fn drop(&mut self) {
+/// Tracks a menu bar that must be ended by calling `.end()`
+#[must_use]
+pub struct MenuBarToken {
+    ctx: *const Context,
+}
+
+impl MenuBarToken {
+    /// Ends a menu bar
+    pub fn end(mut self, _: &Ui) {
+        self.ctx = ptr::null();
         unsafe { sys::igEndMenuBar() };
     }
 }
 
-/// Represents a menu
-pub struct MenuToken<'ui> {
-    _ui: PhantomData<&'ui Ui<'ui>>,
+impl Drop for MenuBarToken {
+    fn drop(&mut self) {
+        if !self.ctx.is_null() && !thread::panicking() {
+            panic!("A MenuBarToken was leaked. Did you call .end()?");
+        }
+    }
 }
 
-impl<'ui> Drop for MenuToken<'ui> {
-    fn drop(&mut self) {
+/// Tracks a menu that must be ended by calling `.end()`
+#[must_use]
+pub struct MenuToken {
+    ctx: *const Context,
+}
+
+impl MenuToken {
+    /// Ends a menu
+    pub fn end(mut self, _: &Ui) {
+        self.ctx = ptr::null();
         unsafe { sys::igEndMenu() };
+    }
+}
+
+impl Drop for MenuToken {
+    fn drop(&mut self) {
+        if !self.ctx.is_null() && !thread::panicking() {
+            panic!("A MenuToken was leaked. Did you call .end()?");
+        }
     }
 }
