@@ -43,6 +43,7 @@ pub use self::style::*;
 pub use self::trees::{CollapsingHeader, TreeNode};
 pub use self::utils::*;
 pub use self::widget::color_editors::*;
+pub use self::widget::combo_box::*;
 pub use self::widget::image::*;
 pub use self::widget::progress_bar::*;
 pub use self::window::child_window::*;
@@ -554,31 +555,6 @@ impl<'ui> Ui<'ui> {
     /// [`Ui::popup`] or [`Ui::popup_modal`].
     pub fn close_current_popup(&self) {
         unsafe { sys::igCloseCurrentPopup() };
-    }
-}
-
-// Widgets: Combos
-impl<'ui> Ui<'ui> {
-    pub fn combo<'p, StringType: AsRef<ImStr> + ?Sized>(
-        &self,
-        label: &'p ImStr,
-        current_item: &mut i32,
-        items: &'p [&'p StringType],
-        height_in_items: i32,
-    ) -> bool {
-        let items_inner: Vec<*const c_char> = items
-            .into_iter()
-            .map(|item| item.as_ref().as_ptr())
-            .collect();
-        unsafe {
-            sys::igCombo(
-                label.as_ptr(),
-                current_item,
-                items_inner.as_ptr() as *mut *const c_char,
-                items_inner.len() as i32,
-                height_in_items,
-            )
-        }
     }
 }
 

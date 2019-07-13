@@ -26,8 +26,8 @@ struct State {
     no_close: bool,
     wrap_width: f32,
     buf: ImString,
-    item: i32,
-    item2: i32,
+    item: usize,
+    item2: usize,
     text: ImString,
     text_multiline: ImString,
     i0: i32,
@@ -45,7 +45,7 @@ struct State {
     color_edit: ColorEditState,
     custom_rendering: CustomRenderingState,
     dont_ask_me_next_time: bool,
-    stacked_modals_item: i32,
+    stacked_modals_item: usize,
     stacked_modals_color: [f32; 4],
 }
 
@@ -139,7 +139,7 @@ impl Default for ColorEditState {
 struct FileMenuState {
     enabled: bool,
     f: f32,
-    n: i32,
+    n: usize,
     b: bool,
 }
 
@@ -438,8 +438,7 @@ fn show_test_window(ui: &Ui, state: &mut State, opened: &mut bool) {
 
             ui.separator();
             ui.label_text(im_str!("label"), im_str!("Value"));
-            ui.combo(
-                im_str!("combo"),
+            ComboBox::new(im_str!("combo")).build_simple_string(ui,
                 &mut state.item,
                 &[
                     im_str!("aaaa"),
@@ -447,9 +446,7 @@ fn show_test_window(ui: &Ui, state: &mut State, opened: &mut bool) {
                     im_str!("cccc"),
                     im_str!("dddd"),
                     im_str!("eeee"),
-                ],
-                -1,
-            );
+                ]);
             let items = [
                 im_str!("AAAA"),
                 im_str!("BBBB"),
@@ -463,7 +460,7 @@ fn show_test_window(ui: &Ui, state: &mut State, opened: &mut bool) {
                 im_str!("JJJJ"),
                 im_str!("KKKK"),
             ];
-            ui.combo(im_str!("combo scroll"), &mut state.item2, &items, -1);
+            ComboBox::new(im_str!("combo scroll")).build_simple_string(ui, &mut state.item2, &items);
             ui.input_text(im_str!("input text"), &mut state.text)
                 .build();
             ui.input_int(im_str!("input int"), &mut state.i0).build();
@@ -672,7 +669,7 @@ CTRL+click on individual component to input value.\n",
                     );
 
                     let items = &[im_str!("aaaa"), im_str!("bbbb"), im_str!("cccc"), im_str!("dddd"), im_str!("eeee")];
-                    ui.combo(im_str!("Combo"), &mut state.stacked_modals_item, items, -1);
+                    ComboBox::new(im_str!("Combo")).build_simple_string(ui, &mut state.stacked_modals_item, items);
 
                     ColorEdit::new(im_str!("color"), &mut state.stacked_modals_color).build(ui);
 
@@ -763,7 +760,7 @@ fn show_example_menu_file<'a>(ui: &Ui<'a>, state: &mut FileMenuState) {
             .step(0.1)
             .build();
         let items = [im_str!("Yes"), im_str!("No"), im_str!("Maybe")];
-        ui.combo(im_str!("Combo"), &mut state.n, &items, -1);
+        ComboBox::new(im_str!("Combo")).build_simple_string(ui, &mut state.n, &items);
         ui.checkbox(im_str!("Check"), &mut state.b);
     });
     ui.menu(im_str!("Colors")).build(|| {

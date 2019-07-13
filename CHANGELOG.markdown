@@ -15,6 +15,7 @@
 - Redesigned color editor/picker API
 - Redesigned child window API (previously known as child frame)
 - Redesigned image / image button API
+- Redesigned combo box API
 - Updated layout API
 - Renderer errors implement std::error::Error
 - Glium renderer re-exports imgui and glium

@@ -1,10 +1,11 @@
 #![allow(non_upper_case_globals)]
 use bitflags::bitflags;
-use std::os::raw::c_int;
+use std::os::raw::{c_char, c_int};
 
 use crate::render::renderer::TextureId;
 use crate::string::ImStr;
 use crate::widget::color_editors::*;
+use crate::widget::combo_box::*;
 use crate::widget::image::{Image, ImageButton};
 use crate::widget::progress_bar::ProgressBar;
 use crate::window::{Window, WindowFlags, WindowFocusedFlags};
@@ -13,31 +14,8 @@ use crate::{Id, Ui};
 #[deprecated(since = "0.2.0", note = "use ColorEditFlags instead")]
 pub type ImGuiColorEditFlags = ColorEditFlags;
 
-bitflags!(
-    /// Flags for combo boxes
-    #[repr(C)]
-    pub struct ImGuiComboFlags: c_int {
-        /// Align the popup toward the left by default
-        const PopupAlignLeft = 1;
-        /// Max ~4 items visible.
-        const HeightSmall = 1 << 1;
-        /// Max ~8 items visible (default)
-        const HeightRegular = 1 << 2;
-        /// Max ~20 items visible
-        const HeightLarge = 1 << 3;
-        /// As many fitting items as possible
-        const HeightLargest = 1 << 4;
-        /// Display on the preview box without the square arrow button
-        const NoArrowButton = 1 << 5;
-        /// Display only a square arrow button
-        const NoPreview = 1 << 6;
-
-        const HeightMask     = ImGuiComboFlags::HeightSmall.bits
-            | ImGuiComboFlags::HeightRegular.bits
-            | ImGuiComboFlags::HeightLarge.bits
-            | ImGuiComboFlags::HeightLargest.bits;
-    }
-);
+#[deprecated(since = "0.2.0", note = "use ComboFlags instead")]
+pub type ImGuiComboFlags = ComboBoxFlags;
 
 bitflags!(
     /// Flags for igBeginDragDropSource(), igAcceptDragDropPayload()
@@ -357,5 +335,33 @@ impl<'ui> Ui<'ui> {
     #[deprecated(since = "0.2.0", note = "use imgui::ImageButton::new(...) instead")]
     pub fn image_button(&self, texture: TextureId, size: [f32; 2]) -> ImageButton {
         ImageButton::new(texture, size)
+    }
+}
+
+impl<'ui> Ui<'ui> {
+    #[deprecated(
+        since = "0.2.0",
+        note = "use imgui::ComboBox::new(...), and either build_simple(), build_simple_string(), or custom rendering (e.g. selectables) instead"
+    )]
+    pub fn combo<'p, StringType: AsRef<ImStr> + ?Sized>(
+        &self,
+        label: &'p ImStr,
+        current_item: &mut i32,
+        items: &'p [&'p StringType],
+        height_in_items: i32,
+    ) -> bool {
+        let items_inner: Vec<*const c_char> = items
+            .into_iter()
+            .map(|item| item.as_ref().as_ptr())
+            .collect();
+        unsafe {
+            sys::igCombo(
+                label.as_ptr(),
+                current_item,
+                items_inner.as_ptr() as *mut *const c_char,
+                items_inner.len() as i32,
+                height_in_items,
+            )
+        }
     }
 }
