@@ -169,7 +169,9 @@ impl<'a> Iterator for DrawCmdIterator<'a> {
                 idx_offset: cmd.IdxOffset as usize,
             };
             match cmd.UserCallback {
-                Some(raw_callback) if raw_callback as isize == -1 => DrawCmd::ResetRenderState,
+                Some(raw_callback) if raw_callback as usize == -1isize as usize => {
+                    DrawCmd::ResetRenderState
+                }
                 Some(raw_callback) => DrawCmd::RawCallback {
                     callback: raw_callback,
                     raw_cmd: cmd,

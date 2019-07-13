@@ -78,8 +78,8 @@ pub enum FocusedWidget {
 }
 
 impl FocusedWidget {
-    fn as_offset(&self) -> i32 {
-        match *self {
+    fn as_offset(self) -> i32 {
+        match self {
             FocusedWidget::Previous => -1,
             FocusedWidget::Next => 0,
             FocusedWidget::Offset(offset) => offset as i32,

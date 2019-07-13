@@ -115,7 +115,7 @@ impl ImageButton {
     /// - `= 0`: no framing
     /// - `> 0`: set framing size
     pub fn frame_padding(mut self, frame_padding: i32) -> Self {
-        self.frame_padding = frame_padding.into();
+        self.frame_padding = frame_padding;
         self
     }
     /// Sets the background color (default: no background color)

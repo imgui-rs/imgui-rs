@@ -98,7 +98,7 @@ impl<'a> Selectable<'a> {
     /// - `= 0.0`: use label height
     #[inline]
     pub fn size(mut self, size: [f32; 2]) -> Self {
-        self.size = size.into();
+        self.size = size;
         self
     }
     /// Builds the selectable.

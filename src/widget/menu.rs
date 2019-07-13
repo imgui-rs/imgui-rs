@@ -10,28 +10,31 @@ impl<'ui> Ui<'ui> {
     /// Creates and starts appending to a full-screen menu bar.
     ///
     /// Returns `None` if the menu bar is not visible and no content should be rendered.
-    pub fn main_menu_bar<'a>(&'a self) -> Option<MainMenuBarToken<'a>> {
-        match unsafe { sys::igBeginMainMenuBar() } {
-            true => Some(MainMenuBarToken { _ui: PhantomData }),
-            false => None,
+    pub fn main_menu_bar(&self) -> Option<MainMenuBarToken> {
+        if unsafe { sys::igBeginMainMenuBar() } {
+            Some(MainMenuBarToken { _ui: PhantomData })
+        } else {
+            None
         }
     }
     /// Creates and starts appending to the menu bar of the current window.
     ///
     /// Returns `None` if the menu bar is not visible and no content should be rendered.
-    pub fn menu_bar<'a>(&'a self) -> Option<MenuBarToken<'a>> {
-        match unsafe { sys::igBeginMenuBar() } {
-            true => Some(MenuBarToken { _ui: PhantomData }),
-            false => None,
+    pub fn menu_bar(&self) -> Option<MenuBarToken> {
+        if unsafe { sys::igBeginMenuBar() } {
+            Some(MenuBarToken { _ui: PhantomData })
+        } else {
+            None
         }
     }
     /// Creates and starts appending to a sub-menu entry.
     ///
     /// Returns `None` if the menu is not visible and no content should be rendered.
-    pub fn menu<'a>(&'a self, label: &ImStr, enabled: bool) -> Option<MenuToken<'a>> {
-        match unsafe { sys::igBeginMenu(label.as_ptr(), enabled) } {
-            true => Some(MenuToken { _ui: PhantomData }),
-            false => None,
+    pub fn menu(&self, label: &ImStr, enabled: bool) -> Option<MenuToken> {
+        if unsafe { sys::igBeginMenu(label.as_ptr(), enabled) } {
+            Some(MenuToken { _ui: PhantomData })
+        } else {
+            None
         }
     }
 }

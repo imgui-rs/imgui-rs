@@ -51,7 +51,7 @@ impl<'a> ProgressBar<'a> {
     /// bar choose a size, and positive values will use the given size.
     #[inline]
     pub fn size(mut self, size: [f32; 2]) -> Self {
-        self.size = size.into();
+        self.size = size;
         self
     }
     /// Builds the progress bar
