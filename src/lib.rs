@@ -33,10 +33,6 @@ pub use self::plotlines::PlotLines;
 pub use self::popup_modal::PopupModal;
 pub use self::render::draw_data::*;
 pub use self::render::renderer::*;
-pub use self::sliders::{
-    SliderFloat, SliderFloat2, SliderFloat3, SliderFloat4, SliderInt, SliderInt2, SliderInt3,
-    SliderInt4,
-};
 pub use self::stacks::*;
 pub use self::string::*;
 pub use self::style::*;
@@ -47,6 +43,7 @@ pub use self::widget::combo_box::*;
 pub use self::widget::image::*;
 pub use self::widget::progress_bar::*;
 pub use self::widget::selectable::*;
+pub use self::widget::slider::*;
 pub use self::window::child_window::*;
 pub use self::window::*;
 pub use self::window_draw_list::{ChannelsSplit, ImColor, WindowDrawList};
@@ -68,7 +65,6 @@ mod plothistogram;
 mod plotlines;
 mod popup_modal;
 mod render;
-mod sliders;
 mod stacks;
 mod string;
 mod style;
@@ -336,82 +332,6 @@ impl<'ui> Ui<'ui> {
         current_max: &'p mut i32,
     ) -> DragIntRange2<'ui, 'p> {
         DragIntRange2::new(self, label, current_min, current_max)
-    }
-}
-
-// Widgets: Sliders
-impl<'ui> Ui<'ui> {
-    pub fn slider_float<'p>(
-        &self,
-        label: &'p ImStr,
-        value: &'p mut f32,
-        min: f32,
-        max: f32,
-    ) -> SliderFloat<'ui, 'p> {
-        SliderFloat::new(self, label, value, min, max)
-    }
-    pub fn slider_float2<'p>(
-        &self,
-        label: &'p ImStr,
-        value: &'p mut [f32; 2],
-        min: f32,
-        max: f32,
-    ) -> SliderFloat2<'ui, 'p> {
-        SliderFloat2::new(self, label, value, min, max)
-    }
-    pub fn slider_float3<'p>(
-        &self,
-        label: &'p ImStr,
-        value: &'p mut [f32; 3],
-        min: f32,
-        max: f32,
-    ) -> SliderFloat3<'ui, 'p> {
-        SliderFloat3::new(self, label, value, min, max)
-    }
-    pub fn slider_float4<'p>(
-        &self,
-        label: &'p ImStr,
-        value: &'p mut [f32; 4],
-        min: f32,
-        max: f32,
-    ) -> SliderFloat4<'ui, 'p> {
-        SliderFloat4::new(self, label, value, min, max)
-    }
-    pub fn slider_int<'p>(
-        &self,
-        label: &'p ImStr,
-        value: &'p mut i32,
-        min: i32,
-        max: i32,
-    ) -> SliderInt<'ui, 'p> {
-        SliderInt::new(self, label, value, min, max)
-    }
-    pub fn slider_int2<'p>(
-        &self,
-        label: &'p ImStr,
-        value: &'p mut [i32; 2],
-        min: i32,
-        max: i32,
-    ) -> SliderInt2<'ui, 'p> {
-        SliderInt2::new(self, label, value, min, max)
-    }
-    pub fn slider_int3<'p>(
-        &self,
-        label: &'p ImStr,
-        value: &'p mut [i32; 3],
-        min: i32,
-        max: i32,
-    ) -> SliderInt3<'ui, 'p> {
-        SliderInt3::new(self, label, value, min, max)
-    }
-    pub fn slider_int4<'p>(
-        &self,
-        label: &'p ImStr,
-        value: &'p mut [i32; 4],
-        min: i32,
-        max: i32,
-    ) -> SliderInt4<'ui, 'p> {
-        SliderInt4::new(self, label, value, min, max)
     }
 }
 

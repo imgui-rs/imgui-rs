@@ -4,4 +4,5 @@ pub mod image;
 pub mod misc;
 pub mod progress_bar;
 pub mod selectable;
+pub mod slider;
 pub mod text;
