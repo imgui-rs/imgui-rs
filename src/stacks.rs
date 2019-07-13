@@ -228,6 +228,19 @@ impl<'ui> Ui<'ui> {
         unsafe { sys::igPushItemWidth(item_width) };
         ItemWidthStackToken { _ui: PhantomData }
     }
+    /// Sets the width of the next item.
+    ///
+    /// - `> 0.0`: width is `item_width` pixels
+    /// - `= 0.0`: default to ~2/3 of window width
+    /// - `< 0.0`: `item_width` pixels relative to the right of window (-1.0 always aligns width to
+    /// the right side)
+    pub fn set_next_item_width(&self, item_width: f32) {
+        unsafe { sys::igSetNextItemWidth(item_width) };
+    }
+    /// Returns the width of the item given the pushed settings and the current cursor position
+    pub fn calc_item_width(&self) -> f32 {
+        unsafe { sys::igCalcItemWidth() }
+    }
     /// Changes the text wrapping position by pushing a change to the text wrapping position stack.
     ///
     /// - `> 0.0`: wrap at `wrap_pos_x` position in window local space
