@@ -27,7 +27,6 @@ pub use self::input_widget::{
 };
 pub use self::io::*;
 pub use self::legacy::*;
-pub use self::menus::{Menu, MenuItem};
 pub use self::plothistogram::PlotHistogram;
 pub use self::plotlines::PlotLines;
 pub use self::popup_modal::PopupModal;
@@ -41,6 +40,7 @@ pub use self::utils::*;
 pub use self::widget::color_editors::*;
 pub use self::widget::combo_box::*;
 pub use self::widget::image::*;
+pub use self::widget::menu::*;
 pub use self::widget::progress_bar::*;
 pub use self::widget::selectable::*;
 pub use self::widget::slider::*;
@@ -60,7 +60,6 @@ pub mod internal;
 mod io;
 mod layout;
 mod legacy;
-mod menus;
 mod plothistogram;
 mod plotlines;
 mod popup_modal;
@@ -390,36 +389,6 @@ impl<'ui> Ui<'ui> {
     /// ```
     pub fn tooltip_text<T: AsRef<str>>(&self, text: T) {
         self.tooltip(|| self.text(text));
-    }
-}
-
-// Widgets: Menus
-impl<'ui> Ui<'ui> {
-    pub fn main_menu_bar<F>(&self, f: F)
-    where
-        F: FnOnce(),
-    {
-        let render = unsafe { sys::igBeginMainMenuBar() };
-        if render {
-            f();
-            unsafe { sys::igEndMainMenuBar() };
-        }
-    }
-    pub fn menu_bar<F>(&self, f: F)
-    where
-        F: FnOnce(),
-    {
-        let render = unsafe { sys::igBeginMenuBar() };
-        if render {
-            f();
-            unsafe { sys::igEndMenuBar() };
-        }
-    }
-    pub fn menu<'p>(&self, label: &'p ImStr) -> Menu<'ui, 'p> {
-        Menu::new(self, label)
-    }
-    pub fn menu_item<'p>(&self, label: &'p ImStr) -> MenuItem<'ui, 'p> {
-        MenuItem::new(self, label)
     }
 }
 

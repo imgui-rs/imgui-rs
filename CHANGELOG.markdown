@@ -19,6 +19,7 @@
 - Redesigned selectable API
 - Redesigned slider API. Generic scalar sliders support all main data types and replace
   previous individual sliders (int, int2, int3, int4, etc...)
+- Redesigned menu API
 - Updated layout API
 - Renderer errors implement std::error::Error
 - Glium renderer re-exports imgui and glium

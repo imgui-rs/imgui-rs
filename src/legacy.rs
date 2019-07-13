@@ -7,6 +7,7 @@ use crate::string::ImStr;
 use crate::widget::color_editors::*;
 use crate::widget::combo_box::*;
 use crate::widget::image::{Image, ImageButton};
+use crate::widget::menu::*;
 use crate::widget::progress_bar::ProgressBar;
 use crate::widget::selectable::*;
 use crate::window::{Window, WindowFlags, WindowFocusedFlags};
@@ -365,5 +366,12 @@ impl<'ui> Ui<'ui> {
         size: [f32; 2],
     ) -> bool {
         unsafe { sys::igSelectable(label.as_ptr(), selected, flags.bits() as i32, size.into()) }
+    }
+}
+
+impl<'ui> Ui<'ui> {
+    #[deprecated(since = "0.2.0", note = "use imgui::MenuItem::new(...) instead")]
+    pub fn menu_item<'a>(&self, label: &'a ImStr) -> MenuItem<'a> {
+        MenuItem::new(label)
     }
 }

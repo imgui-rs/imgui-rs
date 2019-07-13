@@ -285,57 +285,43 @@ fn show_test_window(ui: &Ui, state: &mut State, opened: &mut bool) {
     window.build(ui, || {
         let _token = ui.push_item_width(-140.0);
         ui.text(format!("dear imgui says hello. ({})", imgui::dear_imgui_version()));
-        ui.menu_bar(|| {
-            ui.menu(im_str!("Menu")).build(|| {
+        if let Some(_) = ui.menu_bar() {
+            if let Some(_) = ui.menu(im_str!("Menu"), true) {
                 show_example_menu_file(ui, &mut state.file_menu);
-            });
-            ui.menu(im_str!("Examples")).build(|| {
-                ui.menu_item(im_str!("Main menu bar"))
-                    .selected(&mut state.show_app_main_menu_bar)
-                    .build();
-                ui.menu_item(im_str!("Console"))
-                    .selected(&mut state.show_app_console)
-                    .build();
-                ui.menu_item(im_str!("Log"))
-                    .selected(&mut state.show_app_log)
-                    .build();
-                ui.menu_item(im_str!("Simple layout"))
-                    .selected(&mut state.show_app_layout)
-                    .build();
-                ui.menu_item(im_str!("Property editor"))
-                    .selected(&mut state.show_app_property_editor)
-                    .build();
-                ui.menu_item(im_str!("Long text display"))
-                    .selected(&mut state.show_app_long_text)
-                    .build();
-                ui.menu_item(im_str!("Auto-resizing window"))
-                    .selected(&mut state.show_app_auto_resize)
-                    .build();
-                ui.menu_item(im_str!("Constrained-resizing window"))
-                    .selected(&mut state.show_app_constrained_resize)
-                    .build();
-                ui.menu_item(im_str!("Simple overlay"))
-                    .selected(&mut state.show_app_fixed_overlay)
-                    .build();
-                ui.menu_item(im_str!("Manipulating window title"))
-                    .selected(&mut state.show_app_manipulating_window_title)
-                    .build();
-                ui.menu_item(im_str!("Custom rendering"))
-                    .selected(&mut state.show_app_custom_rendering)
-                    .build();
-            });
-            ui.menu(im_str!("Help")).build(|| {
-                ui.menu_item(im_str!("Metrics"))
-                    .selected(&mut state.show_app_metrics)
-                    .build();
-                ui.menu_item(im_str!("Style Editor"))
-                    .selected(&mut state.show_app_style_editor)
-                    .build();
-                ui.menu_item(im_str!("About ImGui"))
-                    .selected(&mut state.show_app_about)
-                    .build();
-            });
-        });
+            }
+            if let Some(_) = ui.menu(im_str!("Examples"), true) {
+                MenuItem::new(im_str!("Main menu bar"))
+                    .build_with_ref(ui, &mut state.show_app_main_menu_bar);
+                MenuItem::new(im_str!("Console"))
+                    .build_with_ref(ui, &mut state.show_app_console);
+                MenuItem::new(im_str!("Log"))
+                    .build_with_ref(ui, &mut state.show_app_log);
+                MenuItem::new(im_str!("Simple layout"))
+                    .build_with_ref(ui, &mut state.show_app_layout);
+                MenuItem::new(im_str!("Property editor"))
+                    .build_with_ref(ui, &mut state.show_app_property_editor);
+                MenuItem::new(im_str!("Long text display"))
+                    .build_with_ref(ui, &mut state.show_app_long_text);
+                MenuItem::new(im_str!("Auto-resizing window"))
+                    .build_with_ref(ui, &mut state.show_app_auto_resize);
+                MenuItem::new(im_str!("Constrained-resizing window"))
+                    .build_with_ref(ui, &mut state.show_app_constrained_resize);
+                MenuItem::new(im_str!("Simple overlay"))
+                    .build_with_ref(ui, &mut state.show_app_fixed_overlay);
+                MenuItem::new(im_str!("Manipulating window title"))
+                    .build_with_ref(ui, &mut state.show_app_manipulating_window_title);
+                MenuItem::new(im_str!("Custom rendering"))
+                    .build_with_ref(ui, &mut state.show_app_custom_rendering);
+            }
+            if let Some(_) = ui.menu(im_str!("Help"), true) {
+                MenuItem::new(im_str!("Metrics"))
+                    .build_with_ref(ui, &mut state.show_app_metrics);
+                MenuItem::new(im_str!("Style Editor"))
+                    .build_with_ref(ui, &mut state.show_app_style_editor);
+                MenuItem::new(im_str!("About ImGui"))
+                    .build_with_ref(ui, &mut state.show_app_about);
+            }
+        }
         ui.spacing();
         if ui.collapsing_header(im_str!("Help")).build() {
             ui.text_wrapped(im_str!(
@@ -688,59 +674,59 @@ CTRL+click on individual component to input value.\n",
 }
 
 fn show_example_app_main_menu_bar<'a>(ui: &Ui<'a>, state: &mut State) {
-    ui.main_menu_bar(|| {
-        ui.menu(im_str!("File")).build(|| {
+    if let Some(_) = ui.main_menu_bar() {
+        if let Some(_) = ui.menu(im_str!("File"), true) {
             show_example_menu_file(ui, &mut state.file_menu);
-        });
-        ui.menu(im_str!("Edit")).build(|| {
-            ui.menu_item(im_str!("Undo"))
+        }
+        if let Some(_) = ui.menu(im_str!("Edit"), true) {
+            MenuItem::new(im_str!("Undo"))
                 .shortcut(im_str!("CTRL+Z"))
-                .build();
-            ui.menu_item(im_str!("Redo"))
+                .build(ui);
+            MenuItem::new(im_str!("Redo"))
                 .shortcut(im_str!("CTRL+Y"))
                 .enabled(false)
-                .build();
+                .build(ui);
             ui.separator();
-            ui.menu_item(im_str!("Cut"))
+            MenuItem::new(im_str!("Cut"))
                 .shortcut(im_str!("CTRL+X"))
-                .build();
-            ui.menu_item(im_str!("Copy"))
+                .build(ui);
+            MenuItem::new(im_str!("Copy"))
                 .shortcut(im_str!("CTRL+C"))
-                .build();
-            ui.menu_item(im_str!("Paste"))
+                .build(ui);
+            MenuItem::new(im_str!("Paste"))
                 .shortcut(im_str!("CTRL+V"))
-                .build();
-        });
-    });
+                .build(ui);
+        }
+    }
 }
 
 fn show_example_menu_file<'a>(ui: &Ui<'a>, state: &mut FileMenuState) {
-    ui.menu_item(im_str!("(dummy menu)")).enabled(false).build();
-    ui.menu_item(im_str!("New")).build();
-    ui.menu_item(im_str!("Open"))
+    MenuItem::new(im_str!("(dummy menu)"))
+        .enabled(false)
+        .build(ui);
+    MenuItem::new(im_str!("New")).build(ui);
+    MenuItem::new(im_str!("Open"))
         .shortcut(im_str!("Ctrl+O"))
-        .build();
-    ui.menu(im_str!("Open Recent")).build(|| {
-        ui.menu_item(im_str!("fish_hat.c")).build();
-        ui.menu_item(im_str!("fish_hat.inl")).build();
-        ui.menu_item(im_str!("fish_hat.h")).build();
-        ui.menu(im_str!("More..")).build(|| {
-            ui.menu_item(im_str!("Hello")).build();
-            ui.menu_item(im_str!("Sailor")).build();
-            ui.menu(im_str!("Recurse..")).build(|| {
+        .build(ui);
+    if let Some(_) = ui.menu(im_str!("Open Recent"), true) {
+        MenuItem::new(im_str!("fish_hat.c")).build(ui);
+        MenuItem::new(im_str!("fish_hat.inl")).build(ui);
+        MenuItem::new(im_str!("fish_hat.h")).build(ui);
+        if let Some(_) = ui.menu(im_str!("More.."), true) {
+            MenuItem::new(im_str!("Hello")).build(ui);
+            MenuItem::new(im_str!("Sailor")).build(ui);
+            if let Some(_) = ui.menu(im_str!("Recurse.."), true) {
                 show_example_menu_file(ui, state);
-            });
-        });
-    });
-    ui.menu_item(im_str!("Save"))
+            }
+        }
+    }
+    MenuItem::new(im_str!("Save"))
         .shortcut(im_str!("Ctrl+S"))
-        .build();
-    ui.menu_item(im_str!("Save As..")).build();
+        .build(ui);
+    MenuItem::new(im_str!("Save As..")).build(ui);
     ui.separator();
-    ui.menu(im_str!("Options")).build(|| {
-        ui.menu_item(im_str!("Enabled"))
-            .selected(&mut state.enabled)
-            .build();
+    if let Some(_) = ui.menu(im_str!("Options"), true) {
+        MenuItem::new(im_str!("Enabled")).build_with_ref(ui, &mut state.enabled);
         ChildWindow::new("child")
             .size([0.0, 60.0])
             .border(true)
@@ -757,19 +743,19 @@ fn show_example_menu_file<'a>(ui: &Ui<'a>, state: &mut FileMenuState) {
         let items = [im_str!("Yes"), im_str!("No"), im_str!("Maybe")];
         ComboBox::new(im_str!("Combo")).build_simple_string(ui, &mut state.n, &items);
         ui.checkbox(im_str!("Check"), &mut state.b);
-    });
-    ui.menu(im_str!("Colors")).build(|| {
+    }
+    if let Some(_) = ui.menu(im_str!("Colors"), true) {
         for &col in StyleColor::VARIANTS.iter() {
-            ui.menu_item(&im_str!("{:?}", col)).build();
+            MenuItem::new(&im_str!("{:?}", col)).build(ui);
         }
-    });
-    ui.menu(im_str!("Disabled")).enabled(false).build(|| {
+    }
+    if let Some(_) = ui.menu(im_str!("Disabled"), false) {
         unreachable!();
-    });
-    ui.menu_item(im_str!("Checked")).selected(&mut true).build();
-    ui.menu_item(im_str!("Quit"))
+    }
+    MenuItem::new(im_str!("Checked")).selected(true).build(ui);
+    MenuItem::new(im_str!("Quit"))
         .shortcut(im_str!("Alt+F4"))
-        .build();
+        .build(ui);
 }
 
 fn show_example_app_auto_resize(ui: &Ui, state: &mut AutoResizeState, opened: &mut bool) {
