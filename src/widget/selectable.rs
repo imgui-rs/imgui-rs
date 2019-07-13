@@ -20,7 +20,7 @@ bitflags!(
 );
 
 /// Builder for a selectable widget.
-#[derive(Clone, Debug)]
+#[derive(Copy, Clone, Debug)]
 #[must_use]
 pub struct Selectable<'a> {
     label: &'a ImStr,

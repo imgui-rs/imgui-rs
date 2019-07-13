@@ -510,7 +510,7 @@ impl<'a> ColorPicker<'a> {
 /// ColorButton::new(im_str!("color_button"), [1.0, 0.0, 0.0, 1.0])
 ///     .build(&ui);
 /// ```
-#[derive(Debug, Clone)]
+#[derive(Copy, Clone, Debug)]
 #[must_use]
 pub struct ColorButton<'a> {
     desc_id: &'a ImStr,

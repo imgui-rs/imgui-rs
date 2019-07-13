@@ -7,7 +7,7 @@ use crate::window::WindowFlags;
 use crate::{Id, Ui};
 
 /// Builder for a child window
-#[derive(Clone, Debug)]
+#[derive(Copy, Clone, Debug)]
 #[must_use]
 pub struct ChildWindow<'a> {
     id: Id<'a>,

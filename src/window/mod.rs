@@ -148,6 +148,7 @@ impl<'ui> Ui<'ui> {
 }
 
 /// Builder for a window
+#[derive(Debug)]
 #[must_use]
 pub struct Window<'a> {
     name: &'a ImStr,

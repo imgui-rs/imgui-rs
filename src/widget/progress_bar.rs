@@ -17,7 +17,7 @@ use crate::Ui;
 ///     .overlay_text(im_str!("Progress!"))
 ///     .build(&ui);
 /// ```
-#[derive(Debug, Clone)]
+#[derive(Copy, Clone, Debug)]
 #[must_use]
 pub struct ProgressBar<'a> {
     fraction: f32,

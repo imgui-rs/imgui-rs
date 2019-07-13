@@ -55,7 +55,7 @@ bitflags!(
 );
 
 /// Builder for a combo box widget
-#[derive(Clone, Debug)]
+#[derive(Copy, Clone, Debug)]
 #[must_use]
 pub struct ComboBox<'a> {
     label: &'a ImStr,
