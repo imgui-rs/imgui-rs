@@ -68,12 +68,12 @@ impl<'ui> DrawData<'ui> {
 }
 
 /// Iterator over draw lists
-pub struct DrawListIterator<'a> {
-    iter: std::slice::Iter<'a, DrawList<'a>>,
+pub struct DrawListIterator<'ui, 'a> {
+    iter: std::slice::Iter<'a, DrawList<'ui>>,
 }
 
-impl<'a> Iterator for DrawListIterator<'a> {
-    type Item = &'a DrawList<'a>;
+impl<'ui, 'a> Iterator for DrawListIterator<'ui, 'a> {
+    type Item = &'a DrawList<'ui>;
 
     fn next(&mut self) -> Option<Self::Item> {
         self.iter.next()
