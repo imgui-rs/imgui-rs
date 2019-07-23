@@ -1,14 +1,15 @@
 use std::slice;
 
-use crate::internal::{RawCast, RawWrapper};
+use crate::internal::RawCast;
 use crate::render::renderer::TextureId;
 use crate::sys;
+use crate::window_draw_list::DrawList;
 
 /// All draw data required to render a frame.
 #[repr(C)]
-pub struct DrawData {
+pub struct DrawData<'ui> {
     valid: bool,
-    cmd_lists: *mut *mut DrawList,
+    cmd_lists: *mut *mut DrawList<'ui>,
     cmd_lists_count: i32,
     /// For convenience, sum of all draw list index buffer sizes
     pub total_idx_count: i32,
@@ -29,9 +30,9 @@ pub struct DrawData {
     pub framebuffer_scale: [f32; 2],
 }
 
-unsafe impl RawCast<sys::ImDrawData> for DrawData {}
+unsafe impl RawCast<sys::ImDrawData> for DrawData<'_> {}
 
-impl DrawData {
+impl<'ui> DrawData<'ui> {
     /// Returns an iterator over the draw lists included in the draw data
     pub fn draw_lists(&self) -> DrawListIterator {
         unsafe {
@@ -40,9 +41,9 @@ impl DrawData {
             }
         }
     }
-    pub(crate) unsafe fn cmd_lists(&self) -> &[*const DrawList] {
+    pub(crate) unsafe fn cmd_lists(&self) -> &[DrawList] {
         slice::from_raw_parts(
-            self.cmd_lists as *const *const DrawList,
+            self.cmd_lists as *const DrawList,
             self.cmd_lists_count as usize,
         )
     }
@@ -68,14 +69,14 @@ impl DrawData {
 
 /// Iterator over draw lists
 pub struct DrawListIterator<'a> {
-    iter: std::slice::Iter<'a, *const DrawList>,
+    iter: std::slice::Iter<'a, DrawList<'a>>,
 }
 
 impl<'a> Iterator for DrawListIterator<'a> {
-    type Item = &'a DrawList;
+    type Item = &'a DrawList<'a>;
 
     fn next(&mut self) -> Option<Self::Item> {
-        self.iter.next().map(|&ptr| unsafe { &*ptr })
+        self.iter.next()
     }
 }
 
@@ -107,54 +108,8 @@ fn test_drawdata_memory_layout() {
     assert_field_offset!(framebuffer_scale, FramebufferScale);
 }
 
-/// Draw command list
-#[repr(transparent)]
-pub struct DrawList(sys::ImDrawList);
-
-impl RawWrapper for DrawList {
-    type Raw = sys::ImDrawList;
-    unsafe fn raw(&self) -> &sys::ImDrawList {
-        &self.0
-    }
-    unsafe fn raw_mut(&mut self) -> &mut sys::ImDrawList {
-        &mut self.0
-    }
-}
-
-impl DrawList {
-    pub(crate) unsafe fn cmd_buffer(&self) -> &[sys::ImDrawCmd] {
-        slice::from_raw_parts(
-            self.0.CmdBuffer.Data as *const sys::ImDrawCmd,
-            self.0.CmdBuffer.Size as usize,
-        )
-    }
-    pub fn idx_buffer(&self) -> &[DrawIdx] {
-        unsafe {
-            slice::from_raw_parts(
-                self.0.IdxBuffer.Data as *const DrawIdx,
-                self.0.IdxBuffer.Size as usize,
-            )
-        }
-    }
-    pub fn vtx_buffer(&self) -> &[DrawVert] {
-        unsafe {
-            slice::from_raw_parts(
-                self.0.VtxBuffer.Data as *const DrawVert,
-                self.0.VtxBuffer.Size as usize,
-            )
-        }
-    }
-    pub fn commands(&self) -> DrawCmdIterator {
-        unsafe {
-            DrawCmdIterator {
-                iter: self.cmd_buffer().iter(),
-            }
-        }
-    }
-}
-
 pub struct DrawCmdIterator<'a> {
-    iter: std::slice::Iter<'a, sys::ImDrawCmd>,
+    pub(crate) iter: std::slice::Iter<'a, sys::ImDrawCmd>,
 }
 
 impl<'a> Iterator for DrawCmdIterator<'a> {
@@ -225,8 +180,8 @@ implement_vertex!(DrawVert, pos, uv, col);
 
 #[cfg(feature = "gfx")]
 mod gfx_support {
-    use gfx::*;
     use super::DrawVert;
+    use gfx::*;
 
     // gfx doesn't provide a macro to implement vertex structure for an existing struct, so we
     // create a dummy vertex with the same memory layout using gfx macros, and delegate query(name)
@@ -249,14 +204,8 @@ mod gfx_support {
     #[test]
     fn test_dummy_memory_layout() {
         use std::mem;
-        assert_eq!(
-            mem::size_of::<DrawVert>(),
-            mem::size_of::<Dummy>()
-        );
-        assert_eq!(
-            mem::align_of::<DrawVert>(),
-            mem::align_of::<Dummy>()
-        );
+        assert_eq!(mem::size_of::<DrawVert>(), mem::size_of::<Dummy>());
+        assert_eq!(mem::align_of::<DrawVert>(), mem::align_of::<Dummy>());
         use memoffset::offset_of;
         macro_rules! assert_field_offset {
             ($l:ident, $r:ident) => {

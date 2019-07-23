@@ -46,7 +46,7 @@ pub use self::widget::selectable::*;
 pub use self::widget::slider::*;
 pub use self::window::child_window::*;
 pub use self::window::*;
-pub use self::window_draw_list::{ChannelsSplit, ImColor, WindowDrawList};
+pub use self::window_draw_list::{BackgroundDrawList, ForegroundDrawList, WindowDrawList};
 use internal::RawCast;
 
 mod clipboard;
@@ -135,7 +135,7 @@ impl<'ui> Ui<'ui> {
         *self.ctx.style()
     }
     /// Renders the frame and returns a reference to the resulting draw data
-    pub fn render(self) -> &'ui DrawData {
+    pub fn render(self) -> &'ui DrawData<'ui> {
         unsafe {
             sys::igRender();
             &*(sys::igGetDrawData() as *mut DrawData)
@@ -503,14 +503,14 @@ impl<'ui> Ui<'ui> {
 
 /// # Draw list for custom drawing
 impl<'ui> Ui<'ui> {
-    /// Get access to drawing API
+    /// Get access to window drawing API
     ///
     /// # Examples
     ///
     /// ```rust,no_run
     /// # use imgui::*;
     /// fn custom_draw(ui: &Ui) {
-    ///     let draw_list = ui.get_window_draw_list();
+    ///     let mut draw_list = ui.get_window_draw_list();
     ///     // Draw a line
     ///     const WHITE: [f32; 3] = [1.0, 1.0, 1.0];
     ///     draw_list.add_line([100.0, 100.0], [200.0, 200.0], WHITE).build();
@@ -534,6 +534,20 @@ impl<'ui> Ui<'ui> {
     /// ```
     pub fn get_window_draw_list(&'ui self) -> WindowDrawList<'ui> {
         WindowDrawList::new(self)
+    }
+
+    /// Get access to foreground drawing API. See [`Self::get_window_draw_list`].
+    ///
+    /// This draw list appears in front of all ImGui windows.
+    pub fn get_foreground_draw_list(&'ui self) -> ForegroundDrawList<'ui> {
+        ForegroundDrawList::new(self)
+    }
+
+    /// Get access to background drawing API. See [`Self::get_window_draw_list`].
+    ///
+    /// This draw list appears behind all ImGui windows.
+    pub fn get_background_draw_list(&'ui self) -> BackgroundDrawList<'ui> {
+        BackgroundDrawList::new(self)
     }
 }
 

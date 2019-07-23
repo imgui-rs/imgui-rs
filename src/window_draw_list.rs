@@ -1,10 +1,82 @@
-use sys;
-use sys::{ImDrawList, ImU32};
-
-use super::Ui;
-use crate::legacy::ImDrawCornerFlags;
-
 use std::marker::PhantomData;
+use std::slice;
+use sys;
+
+use crate::internal::RawWrapper;
+use crate::legacy::ImDrawCornerFlags;
+use crate::render::draw_data::{DrawCmdIterator, DrawIdx, DrawVert};
+use crate::Ui;
+
+#[macro_use]
+macro_rules! draw_list_def {
+    ($type_name:ident, $static_name:ident, $ui_fn_name:literal, $sys_fn_name:path) => {
+        #[doc = "Object implementing the custom draw API.\n"]
+        #[doc = "\n"]
+        #[doc = "Called from [`"]
+        #[doc = $ui_fn_name]
+        #[doc ="`]. No more than one instance of this structure can live in a program at the same time.\n"]
+        #[doc = "The program will panic on creating a second instance."]
+        pub struct $type_name<'ui> {
+            draw_list: DrawList<'ui>,
+        }
+
+        impl<'ui> std::ops::Deref for $type_name<'ui> {
+            type Target = DrawList<'ui>;
+            fn deref(&self) -> &Self::Target {
+                &self.draw_list
+            }
+        }
+
+        impl<'ui> std::ops::DerefMut for $type_name<'ui> {
+            fn deref_mut(&mut self) -> &mut Self::Target {
+                &mut self.draw_list
+            }
+        }
+
+        static $static_name: std::sync::atomic::AtomicBool = std::sync::atomic::AtomicBool::new(false);
+
+        impl<'ui> Drop for $type_name<'ui> {
+            fn drop(&mut self) {
+                $static_name.store(false, std::sync::atomic::Ordering::SeqCst);
+            }
+        }
+
+        impl<'ui> $type_name<'ui> {
+            pub(crate) fn new(_: &Ui<'ui>) -> Self {
+                if $static_name.load(std::sync::atomic::Ordering::SeqCst) {
+                    panic!(concat!(
+                        stringify!($type_name),
+                        " is already loaded! You can only load one instance of it!"
+                    ))
+                }
+                $static_name.store(true, std::sync::atomic::Ordering::SeqCst);
+
+                Self {
+                    draw_list: DrawList::new(unsafe { $sys_fn_name() }),
+                }
+            }
+        }
+    };
+}
+
+draw_list_def!(
+    WindowDrawList,
+    WINDOW_DRAW_LIST_LOADED,
+    "Ui::get_window_draw_list",
+    sys::igGetWindowDrawList
+);
+draw_list_def!(
+    ForegroundDrawList,
+    FOREGROUND_DRAW_LIST_LOADED,
+    "Ui::get_foreground_draw_list",
+    sys::igGetForegroundDrawList
+);
+draw_list_def!(
+    BackgroundDrawList,
+    BACKGROUND_DRAW_LIST_LOADED,
+    "Ui::get_background_draw_list",
+    sys::igGetBackgroundDrawList
+);
 
 /// Wrap `ImU32` (a type typically used by ImGui to store packed colors)
 /// This type is used to represent the color of drawing primitives in ImGui's
@@ -14,16 +86,16 @@ use std::marker::PhantomData;
 /// `From<[f32; 3]>`, `From<(f32, f32, f32, f32)>` and `From<(f32, f32, f32)>`
 /// for convenience. If alpha is not provided, it is assumed to be 1.0 (255).
 #[derive(Copy, Clone, Eq, PartialEq, Debug)]
-pub struct ImColor(ImU32);
+pub struct ImColor(sys::ImU32);
 
-impl From<ImColor> for ImU32 {
+impl From<ImColor> for sys::ImU32 {
     fn from(color: ImColor) -> Self {
         color.0
     }
 }
 
-impl From<ImU32> for ImColor {
-    fn from(color: ImU32) -> Self {
+impl From<sys::ImU32> for ImColor {
+    fn from(color: sys::ImU32) -> Self {
         ImColor(color)
     }
 }
@@ -52,32 +124,59 @@ impl From<(f32, f32, f32)> for ImColor {
     }
 }
 
-/// Object implementing the custom draw API.
-///
-/// Called from [`Ui::get_window_draw_list`]. No more than one instance of this
-/// structure can live in a program at the same time.
-/// The program will panic on creating a second instance.
-pub struct WindowDrawList<'ui> {
-    draw_list: *mut ImDrawList,
+/// Draw command list
+#[repr(transparent)]
+pub struct DrawList<'ui> {
+    inner: *mut sys::ImDrawList,
     _phantom: PhantomData<&'ui Ui<'ui>>,
 }
 
-static WINDOW_DRAW_LIST_LOADED: std::sync::atomic::AtomicBool = std::sync::atomic::AtomicBool::new(false);
-
-impl<'ui> Drop for WindowDrawList<'ui> {
-    fn drop(&mut self) {
-        WINDOW_DRAW_LIST_LOADED.store(false, std::sync::atomic::Ordering::SeqCst);
+impl RawWrapper for DrawList<'_> {
+    type Raw = sys::ImDrawList;
+    unsafe fn raw(&self) -> &Self::Raw {
+        &*self.inner
+    }
+    unsafe fn raw_mut(&mut self) -> &mut Self::Raw {
+        &mut *self.inner
     }
 }
 
-impl<'ui> WindowDrawList<'ui> {
-    pub(crate) fn new(_: &Ui<'ui>) -> Self {
-        if WINDOW_DRAW_LIST_LOADED.load(std::sync::atomic::Ordering::SeqCst) {
-            panic!("WindowDrawList is already loaded! You can only load one instance of it!")
+impl<'ui> DrawList<'ui> {
+    pub(crate) unsafe fn cmd_buffer(&self) -> &[sys::ImDrawCmd] {
+        slice::from_raw_parts(
+            self.raw().CmdBuffer.Data as *const sys::ImDrawCmd,
+            self.raw().CmdBuffer.Size as usize,
+        )
+    }
+    pub fn idx_buffer(&self) -> &[DrawIdx] {
+        unsafe {
+            slice::from_raw_parts(
+                self.raw().IdxBuffer.Data as *const DrawIdx,
+                self.raw().IdxBuffer.Size as usize,
+            )
         }
-        WINDOW_DRAW_LIST_LOADED.store(true, std::sync::atomic::Ordering::SeqCst);
+    }
+    pub fn vtx_buffer(&self) -> &[DrawVert] {
+        unsafe {
+            slice::from_raw_parts(
+                self.raw().VtxBuffer.Data as *const DrawVert,
+                self.raw().VtxBuffer.Size as usize,
+            )
+        }
+    }
+    pub fn commands(&self) -> DrawCmdIterator {
+        unsafe {
+            DrawCmdIterator {
+                iter: self.cmd_buffer().iter(),
+            }
+        }
+    }
+}
+
+impl<'ui> DrawList<'ui> {
+    pub(crate) fn new(draw_list: *mut sys::ImDrawList) -> Self {
         Self {
-            draw_list: unsafe { sys::igGetWindowDrawList() },
+            inner: draw_list,
             _phantom: PhantomData,
         }
     }
@@ -92,7 +191,7 @@ impl<'ui> WindowDrawList<'ui> {
     /// ```rust,no_run
     /// # use imgui::*;
     /// fn custom_drawing(ui: &Ui) {
-    ///     let draw_list = ui.get_window_draw_list();
+    ///     let mut draw_list = ui.get_window_draw_list();
     ///     draw_list.channels_split(2, |channels| {
     ///         channels.set_current(1);
     ///         // ... Draw channel 1
@@ -101,29 +200,29 @@ impl<'ui> WindowDrawList<'ui> {
     ///     });
     /// }
     /// ```
-    pub fn channels_split<F: FnOnce(&ChannelsSplit)>(&self, channels_count: u32, f: F) {
-        unsafe { sys::ImDrawList_ChannelsSplit(self.draw_list, channels_count as i32) };
-        f(&ChannelsSplit {
+    pub fn channels_split<F: FnOnce(&mut ChannelsSplit)>(&mut self, channels_count: u32, f: F) {
+        unsafe { sys::ImDrawList_ChannelsSplit(self.raw_mut(), channels_count as i32) };
+        f(&mut ChannelsSplit {
             draw_list: self,
             channels_count,
         });
-        unsafe { sys::ImDrawList_ChannelsMerge(self.draw_list) };
+        unsafe { sys::ImDrawList_ChannelsMerge(self.raw_mut()) };
     }
 }
 
 /// Represent the drawing interface within a call to [`channels_split`].
 ///
-/// [`channels_split`]: WindowDrawList::channels_split
-pub struct ChannelsSplit<'ui> {
-    draw_list: &'ui WindowDrawList<'ui>,
+/// [`channels_split`]: DrawList::channels_split
+pub struct ChannelsSplit<'ui, 'a> {
+    draw_list: &'a mut DrawList<'ui>,
     channels_count: u32,
 }
 
-impl<'ui> ChannelsSplit<'ui> {
+impl<'ui, 'a> ChannelsSplit<'ui, 'a> {
     /// Change current channel.
     ///
     /// Panic if channel_index overflows the number of channels.
-    pub fn set_current(&self, channel_index: u32) {
+    pub fn set_current(&mut self, channel_index: u32) {
         assert!(
             channel_index < self.channels_count,
             "Channel cannot be set! Provided channel index ({}) is higher than channel count ({}).",
@@ -131,15 +230,15 @@ impl<'ui> ChannelsSplit<'ui> {
             self.channels_count
         );
         unsafe {
-            sys::ImDrawList_ChannelsSetCurrent(self.draw_list.draw_list, channel_index as i32)
+            sys::ImDrawList_ChannelsSetCurrent(self.draw_list.raw_mut(), channel_index as i32)
         };
     }
 }
 
 /// Drawing functions
-impl<'ui> WindowDrawList<'ui> {
+impl<'ui> DrawList<'ui> {
     /// Returns a line from point `p1` to `p2` with color `c`.
-    pub fn add_line<C>(&'ui self, p1: [f32; 2], p2: [f32; 2], c: C) -> Line<'ui>
+    pub fn add_line<'a, C>(&'a mut self, p1: [f32; 2], p2: [f32; 2], c: C) -> Line<'ui, 'a>
     where
         C: Into<ImColor>,
     {
@@ -148,7 +247,7 @@ impl<'ui> WindowDrawList<'ui> {
 
     /// Returns a rectangle whose upper-left corner is at point `p1`
     /// and lower-right corner is at point `p2`, with color `c`.
-    pub fn add_rect<C>(&'ui self, p1: [f32; 2], p2: [f32; 2], c: C) -> Rect<'ui>
+    pub fn add_rect<'a, C>(&'a mut self, p1: [f32; 2], p2: [f32; 2], c: C) -> Rect<'ui, 'a>
     where
         C: Into<ImColor>,
     {
@@ -161,7 +260,7 @@ impl<'ui> WindowDrawList<'ui> {
     /// in the counter-clockwise starting from the upper-left corner
     /// first.
     pub fn add_rect_filled_multicolor<C1, C2, C3, C4>(
-        &self,
+        &mut self,
         p1: [f32; 2],
         p2: [f32; 2],
         col_upr_left: C1,
@@ -176,7 +275,7 @@ impl<'ui> WindowDrawList<'ui> {
     {
         unsafe {
             sys::ImDrawList_AddRectFilledMultiColor(
-                self.draw_list,
+                self.raw_mut(),
                 p1.into(),
                 p2.into(),
                 col_upr_left.into().into(),
@@ -189,13 +288,13 @@ impl<'ui> WindowDrawList<'ui> {
 
     /// Returns a triangle with the given 3 vertices `p1`, `p2` and `p3`
     /// and color `c`.
-    pub fn add_triangle<C>(
-        &'ui self,
+    pub fn add_triangle<'a, C>(
+        &'a mut self,
         p1: [f32; 2],
         p2: [f32; 2],
         p3: [f32; 2],
         c: C,
-    ) -> Triangle<'ui>
+    ) -> Triangle<'ui, 'a>
     where
         C: Into<ImColor>,
     {
@@ -203,7 +302,12 @@ impl<'ui> WindowDrawList<'ui> {
     }
 
     /// Returns a circle with the given `center`, `radius` and `color`.
-    pub fn add_circle<C>(&'ui self, center: [f32; 2], radius: f32, color: C) -> Circle<'ui>
+    pub fn add_circle<'a, C>(
+        &'a mut self,
+        center: [f32; 2],
+        radius: f32,
+        color: C,
+    ) -> Circle<'ui, 'a>
     where
         C: Into<ImColor>,
     {
@@ -211,7 +315,7 @@ impl<'ui> WindowDrawList<'ui> {
     }
 
     /// Draw a text whose upper-left corner is at point `pos`.
-    pub fn add_text<C, T>(&self, pos: [f32; 2], col: C, text: T)
+    pub fn add_text<C, T>(&mut self, pos: [f32; 2], col: C, text: T)
     where
         C: Into<ImColor>,
         T: AsRef<str>,
@@ -222,20 +326,20 @@ impl<'ui> WindowDrawList<'ui> {
         unsafe {
             let start = text.as_ptr() as *const c_char;
             let end = (start as usize + text.len()) as *const c_char;
-            sys::ImDrawList_AddText(self.draw_list, pos.into(), col.into().into(), start, end)
+            sys::ImDrawList_AddText(self.raw_mut(), pos.into(), col.into().into(), start, end)
         }
     }
 
     /// Returns a Bezier curve stretching from `pos0` to `pos1`, whose
     /// curvature is defined by `cp0` and `cp1`.
-    pub fn add_bezier_curve<C>(
-        &'ui self,
+    pub fn add_bezier_curve<'a, C>(
+        &'a mut self,
         pos0: [f32; 2],
         cp0: [f32; 2],
         cp1: [f32; 2],
         pos1: [f32; 2],
         color: C,
-    ) -> BezierCurve<'ui>
+    ) -> BezierCurve<'ui, 'a>
     where
         C: Into<ImColor>,
     {
@@ -246,13 +350,13 @@ impl<'ui> WindowDrawList<'ui> {
     ///
     /// Clip all drawings done within the closure `f` in the given
     /// rectangle.
-    pub fn with_clip_rect<F>(&self, min: [f32; 2], max: [f32; 2], f: F)
+    pub fn with_clip_rect<F>(&mut self, min: [f32; 2], max: [f32; 2], f: F)
     where
         F: FnOnce(),
     {
-        unsafe { sys::ImDrawList_PushClipRect(self.draw_list, min.into(), max.into(), false) }
+        unsafe { sys::ImDrawList_PushClipRect(self.raw_mut(), min.into(), max.into(), false) }
         f();
-        unsafe { sys::ImDrawList_PopClipRect(self.draw_list) }
+        unsafe { sys::ImDrawList_PopClipRect(self.raw_mut()) }
     }
 
     /// Push a clipping rectangle on the stack, run `f` and pop it.
@@ -260,28 +364,28 @@ impl<'ui> WindowDrawList<'ui> {
     /// Clip all drawings done within the closure `f` in the given
     /// rectangle. Intersect with all clipping rectangle previously on
     /// the stack.
-    pub fn with_clip_rect_intersect<F>(&self, min: [f32; 2], max: [f32; 2], f: F)
+    pub fn with_clip_rect_intersect<F>(&mut self, min: [f32; 2], max: [f32; 2], f: F)
     where
         F: FnOnce(),
     {
-        unsafe { sys::ImDrawList_PushClipRect(self.draw_list, min.into(), max.into(), true) }
+        unsafe { sys::ImDrawList_PushClipRect(self.raw_mut(), min.into(), max.into(), true) }
         f();
-        unsafe { sys::ImDrawList_PopClipRect(self.draw_list) }
+        unsafe { sys::ImDrawList_PopClipRect(self.raw_mut()) }
     }
 }
 
 /// Represents a line about to be drawn
 #[must_use = "should call .build() to draw the object"]
-pub struct Line<'ui> {
+pub struct Line<'ui, 'a> {
     p1: [f32; 2],
     p2: [f32; 2],
     color: ImColor,
     thickness: f32,
-    draw_list: &'ui WindowDrawList<'ui>,
+    draw_list: &'a mut DrawList<'ui>,
 }
 
-impl<'ui> Line<'ui> {
-    fn new<C>(draw_list: &'ui WindowDrawList, p1: [f32; 2], p2: [f32; 2], c: C) -> Self
+impl<'ui, 'a> Line<'ui, 'a> {
+    fn new<C>(draw_list: &'a mut DrawList<'ui>, p1: [f32; 2], p2: [f32; 2], c: C) -> Self
     where
         C: Into<ImColor>,
     {
@@ -304,7 +408,7 @@ impl<'ui> Line<'ui> {
     pub fn build(self) {
         unsafe {
             sys::ImDrawList_AddLine(
-                self.draw_list.draw_list,
+                self.draw_list.raw_mut(),
                 self.p1.into(),
                 self.p2.into(),
                 self.color.into(),
@@ -316,7 +420,7 @@ impl<'ui> Line<'ui> {
 
 /// Represents a rectangle about to be drawn
 #[must_use = "should call .build() to draw the object"]
-pub struct Rect<'ui> {
+pub struct Rect<'ui, 'a> {
     p1: [f32; 2],
     p2: [f32; 2],
     color: ImColor,
@@ -324,11 +428,11 @@ pub struct Rect<'ui> {
     flags: ImDrawCornerFlags,
     thickness: f32,
     filled: bool,
-    draw_list: &'ui WindowDrawList<'ui>,
+    draw_list: &'a mut DrawList<'ui>,
 }
 
-impl<'ui> Rect<'ui> {
-    fn new<C>(draw_list: &'ui WindowDrawList, p1: [f32; 2], p2: [f32; 2], c: C) -> Self
+impl<'ui, 'a> Rect<'ui, 'a> {
+    fn new<C>(draw_list: &'a mut DrawList<'ui>, p1: [f32; 2], p2: [f32; 2], c: C) -> Self
     where
         C: Into<ImColor>,
     {
@@ -392,7 +496,7 @@ impl<'ui> Rect<'ui> {
         if self.filled {
             unsafe {
                 sys::ImDrawList_AddRectFilled(
-                    self.draw_list.draw_list,
+                    self.draw_list.raw_mut(),
                     self.p1.into(),
                     self.p2.into(),
                     self.color.into(),
@@ -403,7 +507,7 @@ impl<'ui> Rect<'ui> {
         } else {
             unsafe {
                 sys::ImDrawList_AddRect(
-                    self.draw_list.draw_list,
+                    self.draw_list.raw_mut(),
                     self.p1.into(),
                     self.p2.into(),
                     self.color.into(),
@@ -418,19 +522,19 @@ impl<'ui> Rect<'ui> {
 
 /// Represents a triangle about to be drawn on the window
 #[must_use = "should call .build() to draw the object"]
-pub struct Triangle<'ui> {
+pub struct Triangle<'ui, 'a> {
     p1: [f32; 2],
     p2: [f32; 2],
     p3: [f32; 2],
     color: ImColor,
     thickness: f32,
     filled: bool,
-    draw_list: &'ui WindowDrawList<'ui>,
+    draw_list: &'a mut DrawList<'ui>,
 }
 
-impl<'ui> Triangle<'ui> {
+impl<'ui, 'a> Triangle<'ui, 'a> {
     fn new<C>(
-        draw_list: &'ui WindowDrawList,
+        draw_list: &'a mut DrawList<'ui>,
         p1: [f32; 2],
         p2: [f32; 2],
         p3: [f32; 2],
@@ -467,7 +571,7 @@ impl<'ui> Triangle<'ui> {
         if self.filled {
             unsafe {
                 sys::ImDrawList_AddTriangleFilled(
-                    self.draw_list.draw_list,
+                    self.draw_list.raw_mut(),
                     self.p1.into(),
                     self.p2.into(),
                     self.p3.into(),
@@ -477,7 +581,7 @@ impl<'ui> Triangle<'ui> {
         } else {
             unsafe {
                 sys::ImDrawList_AddTriangle(
-                    self.draw_list.draw_list,
+                    self.draw_list.raw_mut(),
                     self.p1.into(),
                     self.p2.into(),
                     self.p3.into(),
@@ -491,18 +595,18 @@ impl<'ui> Triangle<'ui> {
 
 /// Represents a circle about to be drawn
 #[must_use = "should call .build() to draw the object"]
-pub struct Circle<'ui> {
+pub struct Circle<'ui, 'a> {
     center: [f32; 2],
     radius: f32,
     color: ImColor,
     num_segments: u32,
     thickness: f32,
     filled: bool,
-    draw_list: &'ui WindowDrawList<'ui>,
+    draw_list: &'a mut DrawList<'ui>,
 }
 
-impl<'ui> Circle<'ui> {
-    pub fn new<C>(draw_list: &'ui WindowDrawList, center: [f32; 2], radius: f32, color: C) -> Self
+impl<'ui, 'a> Circle<'ui, 'a> {
+    pub fn new<C>(draw_list: &'a mut DrawList<'ui>, center: [f32; 2], radius: f32, color: C) -> Self
     where
         C: Into<ImColor>,
     {
@@ -541,7 +645,7 @@ impl<'ui> Circle<'ui> {
         if self.filled {
             unsafe {
                 sys::ImDrawList_AddCircleFilled(
-                    self.draw_list.draw_list,
+                    self.draw_list.raw_mut(),
                     self.center.into(),
                     self.radius,
                     self.color.into(),
@@ -551,7 +655,7 @@ impl<'ui> Circle<'ui> {
         } else {
             unsafe {
                 sys::ImDrawList_AddCircle(
-                    self.draw_list.draw_list,
+                    self.draw_list.raw_mut(),
                     self.center.into(),
                     self.radius,
                     self.color.into(),
@@ -565,7 +669,7 @@ impl<'ui> Circle<'ui> {
 
 /// Represents a Bezier curve about to be drawn
 #[must_use = "should call .build() to draw the object"]
-pub struct BezierCurve<'ui> {
+pub struct BezierCurve<'ui, 'a> {
     pos0: [f32; 2],
     cp0: [f32; 2],
     pos1: [f32; 2],
@@ -574,12 +678,12 @@ pub struct BezierCurve<'ui> {
     thickness: f32,
     /// If num_segments is not set, the bezier curve is auto-tessalated.
     num_segments: Option<u32>,
-    draw_list: &'ui WindowDrawList<'ui>,
+    draw_list: &'a mut DrawList<'ui>,
 }
 
-impl<'ui> BezierCurve<'ui> {
+impl<'ui, 'a> BezierCurve<'ui, 'a> {
     fn new<C>(
-        draw_list: &'ui WindowDrawList,
+        draw_list: &'a mut DrawList<'ui>,
         pos0: [f32; 2],
         cp0: [f32; 2],
         cp1: [f32; 2],
@@ -618,7 +722,7 @@ impl<'ui> BezierCurve<'ui> {
     pub fn build(self) {
         unsafe {
             sys::ImDrawList_AddBezierCurve(
-                self.draw_list.draw_list,
+                self.draw_list.raw_mut(),
                 self.pos0.into(),
                 self.cp0.into(),
                 self.cp1.into(),
