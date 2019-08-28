@@ -31,7 +31,7 @@ fn main() -> io::Result<()> {
         .define("IMGUI_DISABLE_WIN32_FUNCTIONS", None)
         .define("IMGUI_DISABLE_OSX_FUNCTIONS", None);
 
-    build.flag("-Wno-return-type-c-linkage");
+    build.flag_if_supported("-Wno-return-type-c-linkage");
     for path in &CPP_FILES {
         assert_file_exists(path)?;
         build.file(path);
