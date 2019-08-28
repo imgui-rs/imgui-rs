@@ -352,7 +352,7 @@ impl WinitPlatform {
                     MouseButton::Left => io.mouse_down[0] = pressed,
                     MouseButton::Right => io.mouse_down[1] = pressed,
                     MouseButton::Middle => io.mouse_down[2] = pressed,
-                    MouseButton::Other(idx @ 0...4) => io.mouse_down[idx as usize] = pressed,
+                    MouseButton::Other(idx @ 0..=4) => io.mouse_down[idx as usize] = pressed,
                     _ => (),
                 }
             }
