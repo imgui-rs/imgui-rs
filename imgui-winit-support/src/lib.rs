@@ -313,7 +313,13 @@ impl WinitPlatform {
                     _ => (),
                 }
             }
-            WindowEvent::ReceivedCharacter(ch) => io.add_input_character(ch),
+            WindowEvent::ReceivedCharacter(ch) => {
+                // Exclude the backspace key ('\u{7f}'). Otherwise we will insert this char and then
+                // delete it.
+                if ch != '\u{7f}' {
+                    io.add_input_character(ch)
+                }
+            }
             WindowEvent::CursorMoved { position, .. } => {
                 let position = self.scale_pos_from_winit(window, position);
                 io.mouse_pos = [position.x as f32, position.y as f32];
