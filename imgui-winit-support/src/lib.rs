@@ -69,8 +69,15 @@ use imgui::{self, BackendFlags, ConfigFlags, Context, ImString, Io, Key, Ui};
 use std::cmp::Ordering;
 use winit::dpi::{LogicalPosition, LogicalSize};
 use winit::{
-    DeviceEvent, ElementState, Event, KeyboardInput, MouseButton, MouseCursor, MouseScrollDelta,
-    TouchPhase, VirtualKeyCode, Window, WindowEvent,
+    event::{
+        DeviceEvent, ElementState, Event, KeyboardInput, MouseButton, MouseScrollDelta,
+        TouchPhase, VirtualKeyCode, WindowEvent,
+    },
+    window::{
+        Window,
+        CursorIcon,
+    },
+    error::ExternalError,
 };
 
 /// winit backend platform state
@@ -169,14 +176,12 @@ impl WinitPlatform {
     /// * framebuffer scale (= DPI factor) is set
     /// * display size is set
     pub fn attach_window(&mut self, io: &mut Io, window: &Window, hidpi_mode: HiDpiMode) {
-        let (hidpi_mode, hidpi_factor) = hidpi_mode.apply(window.get_hidpi_factor());
+        let (hidpi_mode, hidpi_factor) = hidpi_mode.apply(window.hidpi_factor());
         self.hidpi_mode = hidpi_mode;
         self.hidpi_factor = hidpi_factor;
         io.display_framebuffer_scale = [hidpi_factor as f32, hidpi_factor as f32];
-        if let Some(logical_size) = window.get_inner_size() {
-            let logical_size = self.scale_size_from_winit(window, logical_size);
-            io.display_size = [logical_size.width as f32, logical_size.height as f32];
-        }
+        let logical_size = self.scale_size_from_winit(window, window.inner_size());
+        io.display_size = [logical_size.width as f32, logical_size.height as f32];
     }
     /// Returns the current DPI factor.
     ///
@@ -192,7 +197,7 @@ impl WinitPlatform {
         match self.hidpi_mode {
             ActiveHiDpiMode::Default => logical_size,
             _ => logical_size
-                .to_physical(window.get_hidpi_factor())
+                .to_physical(window.hidpi_factor())
                 .to_logical(self.hidpi_factor),
         }
     }
@@ -208,7 +213,7 @@ impl WinitPlatform {
         match self.hidpi_mode {
             ActiveHiDpiMode::Default => logical_pos,
             _ => logical_pos
-                .to_physical(window.get_hidpi_factor())
+                .to_physical(window.hidpi_factor())
                 .to_logical(self.hidpi_factor),
         }
     }
@@ -225,7 +230,7 @@ impl WinitPlatform {
             ActiveHiDpiMode::Default => logical_pos,
             _ => logical_pos
                 .to_physical(self.hidpi_factor)
-                .to_logical(window.get_hidpi_factor()),
+                .to_logical(window.hidpi_factor()),
         }
     }
     /// Handles a winit event.
@@ -235,7 +240,7 @@ impl WinitPlatform {
     /// * window size / dpi factor changes are applied
     /// * keyboard state is updated
     /// * mouse state is updated
-    pub fn handle_event(&mut self, io: &mut Io, window: &Window, event: &Event) {
+    pub fn handle_event(&mut self, io: &mut Io, window: &Window, event: &Event<()>) {
         match *event {
             Event::WindowEvent {
                 window_id,
@@ -289,10 +294,8 @@ impl WinitPlatform {
                 self.hidpi_factor = hidpi_factor;
                 io.display_framebuffer_scale = [hidpi_factor as f32, hidpi_factor as f32];
                 // Window size might change too if we are using DPI rounding
-                if let Some(logical_size) = window.get_inner_size() {
-                    let logical_size = self.scale_size_from_winit(window, logical_size);
-                    io.display_size = [logical_size.width as f32, logical_size.height as f32];
-                }
+                let logical_size = self.scale_size_from_winit(window, window.inner_size());
+                io.display_size = [logical_size.width as f32, logical_size.height as f32];
             }
             WindowEvent::KeyboardInput {
                 input:
@@ -346,7 +349,7 @@ impl WinitPlatform {
                     MouseButton::Left => io.mouse_down[0] = pressed,
                     MouseButton::Right => io.mouse_down[1] = pressed,
                     MouseButton::Middle => io.mouse_down[2] = pressed,
-                    MouseButton::Other(idx @ 0...4) => io.mouse_down[idx as usize] = pressed,
+                    MouseButton::Other(idx @ 0..=4) => io.mouse_down[idx as usize] = pressed,
                     _ => (),
                 }
             }
@@ -359,7 +362,7 @@ impl WinitPlatform {
     /// This function performs the following actions:
     ///
     /// * mouse cursor is repositioned (if requested by imgui-rs)
-    pub fn prepare_frame(&self, io: &mut Io, window: &Window) -> Result<(), String> {
+    pub fn prepare_frame(&self, io: &mut Io, window: &Window) -> Result<(), ExternalError> {
         if io.want_set_mouse_pos {
             let logical_pos = self.scale_pos_for_winit(
                 window,
@@ -384,19 +387,19 @@ impl WinitPlatform {
         {
             match ui.mouse_cursor() {
                 Some(mouse_cursor) if !io.mouse_draw_cursor => {
-                    window.hide_cursor(false);
-                    window.set_cursor(match mouse_cursor {
-                        imgui::MouseCursor::Arrow => MouseCursor::Arrow,
-                        imgui::MouseCursor::TextInput => MouseCursor::Text,
-                        imgui::MouseCursor::ResizeAll => MouseCursor::Move,
-                        imgui::MouseCursor::ResizeNS => MouseCursor::NsResize,
-                        imgui::MouseCursor::ResizeEW => MouseCursor::EwResize,
-                        imgui::MouseCursor::ResizeNESW => MouseCursor::NeswResize,
-                        imgui::MouseCursor::ResizeNWSE => MouseCursor::NwseResize,
-                        imgui::MouseCursor::Hand => MouseCursor::Hand,
+                    window.set_cursor_visible(false);
+                    window.set_cursor_icon(match mouse_cursor {
+                        imgui::MouseCursor::Arrow => CursorIcon::Arrow,
+                        imgui::MouseCursor::TextInput => CursorIcon::Text,
+                        imgui::MouseCursor::ResizeAll => CursorIcon::Move,
+                        imgui::MouseCursor::ResizeNS => CursorIcon::NsResize,
+                        imgui::MouseCursor::ResizeEW => CursorIcon::EwResize,
+                        imgui::MouseCursor::ResizeNESW => CursorIcon::NeswResize,
+                        imgui::MouseCursor::ResizeNWSE => CursorIcon::NwseResize,
+                        imgui::MouseCursor::Hand => CursorIcon::Hand,
                     });
                 }
-                _ => window.hide_cursor(true),
+                _ => window.set_cursor_visible(true),
             }
         }
     }
