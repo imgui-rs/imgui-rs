@@ -387,7 +387,7 @@ impl WinitPlatform {
         {
             match ui.mouse_cursor() {
                 Some(mouse_cursor) if !io.mouse_draw_cursor => {
-                    window.set_cursor_visible(false);
+                    window.set_cursor_visible(true);
                     window.set_cursor_icon(match mouse_cursor {
                         imgui::MouseCursor::Arrow => CursorIcon::Arrow,
                         imgui::MouseCursor::TextInput => CursorIcon::Text,
@@ -399,7 +399,7 @@ impl WinitPlatform {
                         imgui::MouseCursor::Hand => CursorIcon::Hand,
                     });
                 }
-                _ => window.set_cursor_visible(true),
+                _ => window.set_cursor_visible(false),
             }
         }
     }
