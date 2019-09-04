@@ -1,95 +1,23 @@
 #![allow(non_upper_case_globals)]
 use bitflags::bitflags;
-use std::ffi::CStr;
-use std::os::raw::c_int;
-use std::str;
+use std::os::raw::{c_char, c_int};
 
-use crate::input::keyboard::Key;
-use crate::input::mouse::MouseButton;
-use crate::internal::RawCast;
-use crate::{Context, Ui};
+use crate::render::renderer::TextureId;
+use crate::string::ImStr;
+use crate::widget::color_editors::*;
+use crate::widget::combo_box::*;
+use crate::widget::image::{Image, ImageButton};
+use crate::widget::menu::*;
+use crate::widget::progress_bar::ProgressBar;
+use crate::widget::selectable::*;
+use crate::window::{Window, WindowFlags, WindowFocusedFlags};
+use crate::{Id, Ui};
 
-bitflags!(
-    /// Color edit flags
-    #[repr(C)]
-    pub struct ImGuiColorEditFlags: c_int {
-        /// ColorEdit, ColorPicker, ColorButton: ignore Alpha component (read 3 components from the
-        /// input pointer).
-        const NoAlpha = 1;
-        /// ColorEdit: disable picker when clicking on colored square.
-        const NoPicker = 1 << 2;
-        /// ColorEdit: disable toggling options menu when right-clicking on inputs/small preview.
-        const NoOptions = 1 << 3;
-        /// ColorEdit, ColorPicker: disable colored square preview next to the inputs. (e.g. to
-        /// show only the inputs)
-        const NoSmallPreview = 1 << 4;
-        /// ColorEdit, ColorPicker: disable inputs sliders/text widgets (e.g. to show only the
-        /// small preview colored square).
-        const NoInputs = 1 << 5;
-        /// ColorEdit, ColorPicker, ColorButton: disable tooltip when hovering the preview.
-        const NoTooltip = 1 << 6;
-        /// ColorEdit, ColorPicker: disable display of inline text label (the label is still
-        /// forwarded to the tooltip and picker).
-        const NoLabel = 1 << 7;
-        /// ColorPicker: disable bigger color preview on right side of the picker, use small
-        /// colored square preview instead.
-        const NoSidePreview = 1 << 8;
-        /// ColorEdit: disable drag and drop target. ColorButton: disable drag and drop source.
-        const NoDragDrop = 1 << 9;
+#[deprecated(since = "0.2.0", note = "use ColorEditFlags instead")]
+pub type ImGuiColorEditFlags = ColorEditFlags;
 
-        /// ColorEdit, ColorPicker: show vertical alpha bar/gradient in picker.
-        const AlphaBar = 1 << 16;
-        /// ColorEdit, ColorPicker, ColorButton: display preview as a transparent color over a
-        /// checkerboard, instead of opaque.
-        const AlphaPreview = 1 << 17;
-        /// ColorEdit, ColorPicker, ColorButton: display half opaque / half checkerboard, instead
-        /// of opaque.
-        const AlphaPreviewHalf= 1 << 18;
-        /// (WIP) ColorEdit: Currently only disable 0.0f..1.0f limits in RGBA edition (note: you
-        /// probably want to use ImGuiColorEditFlags::Float flag as well).
-        const HDR = 1 << 19;
-        /// ColorEdit: choose one among RGB/HSV/HEX. ColorPicker: choose any combination using
-        /// RGB/HSV/HEX.
-        const RGB = 1 << 20;
-        const HSV = 1 << 21;
-        const HEX = 1 << 22;
-        /// ColorEdit, ColorPicker, ColorButton: _display_ values formatted as 0..255.
-        const Uint8 = 1 << 23;
-        /// ColorEdit, ColorPicker, ColorButton: _display_ values formatted as 0.0f..1.0f floats
-        /// instead of 0..255 integers. No round-trip of value via integers.
-        const Float = 1 << 24;
-        /// ColorPicker: bar for Hue, rectangle for Sat/Value.
-        const PickerHueBar = 1 << 25;
-        /// ColorPicker: wheel for Hue, triangle for Sat/Value.
-        const PickerHueWheel = 1 << 26;
-    }
-);
-
-bitflags!(
-    /// Flags for combo boxes
-    #[repr(C)]
-    pub struct ImGuiComboFlags: c_int {
-        /// Align the popup toward the left by default
-        const PopupAlignLeft = 1;
-        /// Max ~4 items visible.
-        const HeightSmall = 1 << 1;
-        /// Max ~8 items visible (default)
-        const HeightRegular = 1 << 2;
-        /// Max ~20 items visible
-        const HeightLarge = 1 << 3;
-        /// As many fitting items as possible
-        const HeightLargest = 1 << 4;
-        /// Display on the preview box without the square arrow button
-        const NoArrowButton = 1 << 5;
-        /// Display only a square arrow button
-        const NoPreview = 1 << 6;
-
-        const HeightMask     = ImGuiComboFlags::HeightSmall.bits
-            | ImGuiComboFlags::HeightRegular.bits
-            | ImGuiComboFlags::HeightLarge.bits
-            | ImGuiComboFlags::HeightLargest.bits;
-    }
-);
+#[deprecated(since = "0.2.0", note = "use ComboFlags instead")]
+pub type ImGuiComboFlags = ComboBoxFlags;
 
 bitflags!(
     /// Flags for igBeginDragDropSource(), igAcceptDragDropPayload()
@@ -160,50 +88,6 @@ bitflags!(
 );
 
 bitflags!(
-    /// Flags for window focus checks
-    #[repr(C)]
-    pub struct ImGuiFocusedFlags: c_int {
-        /// Return true if any children of the window is focused
-        const ChildWindows = 1;
-        /// Test from root window (top most parent of the current hierarchy)
-        const RootWindow = 1 << 1;
-        /// Return true if any window is focused
-        const AnyWindow = 1 << 2;
-
-        const RootAndChildWindows =
-            ImGuiFocusedFlags::RootWindow.bits | ImGuiFocusedFlags::ChildWindows.bits;
-    }
-);
-
-bitflags!(
-    /// Flags for hover checks
-    #[repr(C)]
-    pub struct ImGuiHoveredFlags: c_int {
-        /// Window hover checks only: Return true if any children of the window is hovered
-        const ChildWindows = 1;
-        /// Window hover checks only: Test from root window (top most parent of the current hierarchy)
-        const RootWindow = 1 << 1;
-        /// Window hover checks only: Return true if any window is hovered
-        const AnyWindow = 1 << 2;
-        /// Return true even if a popup window is normally blocking access to this item/window
-        const AllowWhenBlockedByPopup = 1 << 3;
-        /// Return true even if an active item is blocking access to this item/window. Useful for
-        /// Drag and Drop patterns.
-        const AllowWhenBlockedByActiveItem = 1 << 5;
-        /// Return true even if the position is overlapped by another window
-        const AllowWhenOverlapped = 1 << 6;
-        /// Return true even if the item is disabled
-        const AllowWhenDisabled = 1 << 7;
-
-        const RectOnly = ImGuiHoveredFlags::AllowWhenBlockedByPopup.bits
-            | ImGuiHoveredFlags::AllowWhenBlockedByActiveItem.bits
-            | ImGuiHoveredFlags::AllowWhenOverlapped.bits;
-        const RootAndChildWindows = ImGuiFocusedFlags::RootWindow.bits
-            | ImGuiFocusedFlags::ChildWindows.bits;
-    }
-);
-
-bitflags!(
     /// Flags for text inputs
     #[repr(C)]
     pub struct ImGuiInputTextFlags: c_int {
@@ -249,20 +133,8 @@ bitflags!(
     }
 );
 
-bitflags!(
-    /// Flags for selectables
-    #[repr(C)]
-    pub struct ImGuiSelectableFlags: c_int {
-        /// Clicking this don't close parent popup window
-        const DontClosePopups = 1;
-        /// Selectable frame can span all columns (text will still fit in current column)
-        const SpanAllColumns = 1 << 1;
-        /// Generate press events on double clicks too
-        const AllowDoubleClick = 1 << 2;
-        /// Cannot be selected, display greyed out text
-        const Disabled = 1 << 3;
-    }
-);
+#[deprecated(since = "0.2.0", note = "use SelectableFlags instead")]
+pub type ImGuiSelectableFlags = SelectableFlags;
 
 bitflags!(
     /// Flags for trees and collapsing headers
@@ -302,367 +174,204 @@ bitflags!(
     }
 );
 
-bitflags!(
-    /// Window flags
-    #[repr(C)]
-    pub struct ImGuiWindowFlags: c_int {
-        /// Disable title-bar.
-        const NoTitleBar = 1;
-        /// Disable user resizing with the lower-right grip.
-        const NoResize = 1 << 1;
-        /// Disable user moving the window.
-        const NoMove = 1 << 2;
-        /// Disable scrollbars (window can still scroll with mouse or programatically).
-        const NoScrollbar = 1 << 3;
-        /// Disable user vertically scrolling with mouse wheel. On child window, mouse wheel will
-        /// be forwarded to the parent unless NoScrollbar is also set.
-        const NoScrollWithMouse = 1 << 4;
-        /// Disable user collapsing window by double-clicking on it.
-        const NoCollapse = 1 << 5;
-        /// Resize every window to its content every frame.
-        const AlwaysAutoResize = 1 << 6;
-        /// Disable drawing background color (WindowBg, etc.) and outside border
-        const NoBackground = 1 << 7;
-        /// Never load/save settings in .ini file.
-        const NoSavedSettings = 1 << 8;
-        /// Disable catching mouse, hovering test with pass through.
-        const NoMouseInputs = 1 << 9;
-        /// Has a menu-bar.
-        const MenuBar = 1 << 10;
-        /// Allow horizontal scrollbar to appear (off by default).
-        const HorizontalScrollbar = 1 << 11;
-        /// Disable taking focus when transitioning from hidden to visible state.
-        const NoFocusOnAppearing = 1 << 12;
-        /// Disable bringing window to front when taking focus (e.g. clicking on it or
-        /// programmatically giving it focus).
-        const NoBringToFrontOnFocus = 1 << 13;
-        /// Always show vertical scrollbar.
-        const AlwaysVerticalScrollbar = 1 << 14;
-        /// Always show horizontal scrollbar.
-        const AlwaysHorizontalScrollbar = 1<< 15;
-        /// Ensure child windows without border use window padding (ignored by default for
-        /// non-bordered child windows, because more convenient).
-        const AlwaysUseWindowPadding = 1 << 16;
-        /// No gamepad/keyboard navigation within the window.
-        const NoNavInputs = 1 << 18;
-        /// No focusing toward this window with gamepad/keyboard navigation (e.g. skipped by
-        /// CTRL+TAB).
-        const NoNavFocus = 1 << 19;
+#[deprecated(since = "0.2.0", note = "use WindowFlags instead")]
+pub type ImGuiWindowFlags = WindowFlags;
 
-        const NoNav = ImGuiWindowFlags::NoNavInputs.bits | ImGuiWindowFlags::NoNavFocus.bits;
-        const NoDecoration = ImGuiWindowFlags::NoTitleBar.bits | ImGuiWindowFlags::NoResize.bits
-            | ImGuiWindowFlags::NoScrollbar.bits | ImGuiWindowFlags::NoCollapse.bits;
-        const NoInputs = ImGuiWindowFlags::NoMouseInputs.bits | ImGuiWindowFlags::NoNavInputs.bits
-            | ImGuiWindowFlags::NoNavFocus.bits;
+impl<'ui> Ui<'ui> {
+    #[deprecated(since = "0.2.0", note = "use imgui::Window::new(...) instead")]
+    pub fn window<'p>(&self, name: &'p ImStr) -> Window<'p> {
+        Window::new(name)
     }
-);
+    #[deprecated(since = "0.2.0", note = "use Ui::window_size instead")]
+    pub fn get_window_size(&self) -> [f32; 2] {
+        let size = unsafe { sys::igGetWindowSize_nonUDT2() };
+        size.into()
+    }
+    #[deprecated(since = "0.2.0", note = "use Ui::window_pos instead")]
+    pub fn get_window_pos(&self) -> [f32; 2] {
+        let size = unsafe { sys::igGetWindowPos_nonUDT2() };
+        size.into()
+    }
+    #[deprecated(since = "0.2.0", note = "use Ui::content_region_max instead")]
+    pub fn get_content_region_max(&self) -> [f32; 2] {
+        let size = unsafe { sys::igGetContentRegionMax_nonUDT2() };
+        size.into()
+    }
+    #[deprecated(since = "0.2.0", note = "use Ui::content_region_avail instead")]
+    pub fn get_content_region_avail(&self) -> [f32; 2] {
+        let size = unsafe { sys::igGetContentRegionAvail_nonUDT2() };
+        size.into()
+    }
+    #[deprecated(since = "0.2.0", note = "use Ui::window_content_region_min instead")]
+    pub fn get_window_content_region_min(&self) -> [f32; 2] {
+        let size = unsafe { sys::igGetWindowContentRegionMin_nonUDT2() };
+        size.into()
+    }
+    #[deprecated(since = "0.2.0", note = "use Ui::window_content_region_max instead")]
+    pub fn get_window_content_region_max(&self) -> [f32; 2] {
+        let size = unsafe { sys::igGetWindowContentRegionMax_nonUDT2() };
+        size.into()
+    }
+    #[deprecated(
+        since = "0.2.0",
+        note = "use Ui::is_window_focused(WindowFlags::RootWindow) instead"
+    )]
+    pub fn is_root_window_focused(&self) -> bool {
+        unsafe { sys::igIsWindowFocused(WindowFocusedFlags::ROOT_WINDOW.bits() as i32) }
+    }
+    #[deprecated(
+        since = "0.2.0",
+        note = "use Ui::is_window_focused(WindowFlags::ChildWindows) instead"
+    )]
+    pub fn is_child_window_focused(&self) -> bool {
+        unsafe { sys::igIsWindowFocused(WindowFocusedFlags::CHILD_WINDOWS.bits() as i32) }
+    }
+}
 
-impl Context {
-    #[deprecated(since = "0.1.0", note = "Access Io::ini_saving_rate directly instead")]
-    pub fn set_ini_saving_rate(&mut self, value: f32) {
-        let io = self.io_mut();
-        io.ini_saving_rate = value;
+impl<'ui> Ui<'ui> {
+    #[deprecated(since = "0.2.0", note = "use imgui::ProgressBar::new(...) instead")]
+    pub fn progress_bar<'p>(&self, fraction: f32) -> ProgressBar<'p> {
+        ProgressBar::new(fraction)
+    }
+}
+
+impl<'ui> Ui<'ui> {
+    #[deprecated(since = "0.2.0", note = "use imgui::ColorEdit::new(...) instead")]
+    pub fn color_edit<'p, V: Into<EditableColor<'p>>>(
+        &self,
+        label: &'p ImStr,
+        value: V,
+    ) -> ColorEdit<'p> {
+        ColorEdit::new(label, value.into())
+    }
+    #[deprecated(since = "0.2.0", note = "use imgui::ColorPicker::new(...) instead")]
+    pub fn color_picker<'p, V: Into<EditableColor<'p>>>(
+        &self,
+        label: &'p ImStr,
+        value: V,
+    ) -> ColorPicker<'p> {
+        ColorPicker::new(label, value.into())
+    }
+    #[deprecated(since = "0.2.0", note = "use imgui::ColorButton::new(...) instead")]
+    pub fn color_button<'p>(&self, desc_id: &'p ImStr, color: [f32; 4]) -> ColorButton<'p> {
+        ColorButton::new(desc_id, color.into())
+    }
+}
+
+impl<'ui> Ui<'ui> {
+    #[deprecated(since = "0.2.0", note = "use Ui::cursor_screen_pos instead")]
+    pub fn get_cursor_screen_pos(&self) -> [f32; 2] {
+        let size = unsafe { sys::igGetCursorScreenPos_nonUDT2() };
+        size.into()
+    }
+    #[deprecated(since = "0.2.0", note = "use Ui::cursor_pos instead")]
+    pub fn get_cursor_pos(&self) -> [f32; 2] {
+        let size = unsafe { sys::igGetCursorPos_nonUDT2() };
+        size.into()
     }
     #[deprecated(
-        since = "0.1.0",
-        note = "Access Io::font_global_scale directly instead"
+        since = "0.2.0",
+        note = "use Ui::text_line_height_with_spacing instead"
     )]
-    pub fn set_font_global_scale(&mut self, value: f32) {
-        let io = self.io_mut();
-        io.font_global_scale = value;
+    pub fn get_text_line_height_with_spacing(&self) -> f32 {
+        unsafe { sys::igGetTextLineHeightWithSpacing() }
     }
-    #[deprecated(
-        since = "0.1.0",
-        note = "Access Io::mouse_double_click_time directly instead"
-    )]
-    pub fn set_mouse_double_click_time(&mut self, value: f32) {
-        let io = self.io_mut();
-        io.mouse_double_click_time = value;
+}
+
+impl<'ui> Ui<'ui> {
+    #[deprecated(since = "0.2.0", note = "use Ui::current_column_index instead")]
+    pub fn get_column_index(&self) -> i32 {
+        unsafe { sys::igGetColumnIndex() }
     }
-    #[deprecated(
-        since = "0.1.0",
-        note = "Access Io::mouse_double_click_max_dist directly instead"
-    )]
-    pub fn set_mouse_double_click_max_dist(&mut self, value: f32) {
-        let io = self.io_mut();
-        io.mouse_double_click_max_dist = value;
+    #[deprecated(since = "0.2.0", note = "use Ui::column_offset instead")]
+    pub fn get_column_offset(&self, column_index: i32) -> f32 {
+        unsafe { sys::igGetColumnOffset(column_index) }
     }
-    #[deprecated(
-        since = "0.1.0",
-        note = "Access Io::mouse_drag_threshold directly instead"
-    )]
-    pub fn set_mouse_drag_threshold(&mut self, value: f32) {
-        let io = self.io_mut();
-        io.mouse_drag_threshold = value;
+    #[deprecated(since = "0.2.0", note = "use Ui::column_width instead")]
+    pub fn get_column_width(&self, column_index: i32) -> f32 {
+        unsafe { sys::igGetColumnWidth(column_index) }
     }
-    #[deprecated(since = "0.1.0", note = "Access Io::key_repeat_delay directly instead")]
-    pub fn set_key_repeat_delay(&mut self, value: f32) {
-        let io = self.io_mut();
-        io.key_repeat_delay = value;
+    #[deprecated(since = "0.2.0", note = "use Ui::column_count instead")]
+    pub fn get_columns_count(&self) -> i32 {
+        unsafe { sys::igGetColumnsCount() }
     }
-    #[deprecated(since = "0.1.0", note = "Access Io::key_repeat_rate directly instead")]
-    pub fn set_key_repeat_rate(&mut self, value: f32) {
-        let io = self.io_mut();
-        io.key_repeat_rate = value;
+}
+
+impl<'ui> Ui<'ui> {
+    #[deprecated(since = "0.2.0", note = "use Ui::push_id instead")]
+    pub fn with_id<'a, F, I>(&self, id: I, f: F)
+    where
+        F: FnOnce(),
+        I: Into<Id<'a>>,
+    {
+        let _token = self.push_id(id);
+        f();
     }
-    #[deprecated(since = "0.1.0", note = "Access Io::display_size directly instead")]
-    pub fn display_size(&self) -> (f32, f32) {
-        let io = self.io();
-        (io.display_size[0], io.display_size[1])
+}
+
+impl<'ui> Ui<'ui> {
+    #[deprecated(since = "0.2.0", note = "use Ui::item_rect_size instead")]
+    pub fn get_item_rect_size(&self) -> [f32; 2] {
+        let size = unsafe { sys::igGetItemRectSize_nonUDT2() };
+        size.into()
     }
-    #[deprecated(
-        since = "0.1.0",
-        note = "Access Io::display_framebuffer_scale directly instead"
-    )]
-    pub fn display_framebuffer_scale(&self) -> (f32, f32) {
-        let io = self.io();
-        (
-            io.display_framebuffer_scale[0],
-            io.display_framebuffer_scale[1],
-        )
+}
+
+impl<'ui> Ui<'ui> {
+    #[deprecated(since = "0.2.0", note = "use imgui::Image::new(...) instead")]
+    pub fn image(&self, texture: TextureId, size: [f32; 2]) -> Image {
+        Image::new(texture, size)
     }
-    #[deprecated(since = "0.1.0", note = "Access Io::mouse_pos directly instead")]
-    pub fn mouse_pos(&self) -> (f32, f32) {
-        let io = self.io();
-        (io.mouse_pos[0], io.mouse_pos[1])
-    }
-    #[deprecated(since = "0.1.0", note = "Access Io::mouse_pos directly instead")]
-    pub fn set_mouse_pos(&mut self, x: f32, y: f32) {
-        let io = self.io_mut();
-        io.mouse_pos = [x, y];
-    }
-    /// Get mouse's position's delta between the current and the last frame.
-    #[deprecated(since = "0.1.0", note = "Access Io::mouse_delta directly instead")]
-    pub fn mouse_delta(&self) -> (f32, f32) {
-        let io = self.io();
-        (io.mouse_delta[0], io.mouse_delta[1])
-    }
-    #[deprecated(since = "0.1.0", note = "Access Io::mouse_down directly instead")]
-    pub fn mouse_down(&self) -> [bool; 5] {
-        let io = self.io();
-        io.mouse_down
-    }
-    #[deprecated(since = "0.1.0", note = "Access Io::mouse_down directly instead")]
-    pub fn set_mouse_down(&mut self, states: [bool; 5]) {
-        let io = self.io_mut();
-        io.mouse_down = states;
-    }
-    #[deprecated(since = "0.1.0", note = "Access Io::mouse_wheel directly instead")]
-    pub fn set_mouse_wheel(&mut self, value: f32) {
-        let io = self.io_mut();
-        io.mouse_wheel = value;
-    }
-    /// Get mouse wheel delta
-    #[deprecated(since = "0.1.0", note = "Access Io::mouse_wheel directly instead")]
-    pub fn mouse_wheel(&self) -> f32 {
-        let io = self.io();
-        io.mouse_wheel
-    }
-    #[deprecated(since = "0.1.0", note = "Use Ui::mouse_drag_delta instead")]
-    pub fn mouse_drag_delta(&self, button: MouseButton) -> (f32, f32) {
-        let delta = unsafe { sys::igGetMouseDragDelta_nonUDT2(button as c_int, -1.0) };
-        delta.into()
-    }
-    /// Set to `true` to have ImGui draw the cursor in software.
-    /// If `false`, the OS cursor is used (default to `false`).
-    #[deprecated(
-        since = "0.1.0",
-        note = "Access Io::mouse_draw_cursor directly instead"
-    )]
-    pub fn set_mouse_draw_cursor(&mut self, value: bool) {
-        let io = self.io_mut();
-        io.mouse_draw_cursor = value;
-    }
-    #[deprecated(
-        since = "0.1.0",
-        note = "Access Io::mouse_draw_cursor directly instead"
-    )]
-    pub fn mouse_draw_cursor(&self) -> bool {
-        let io = self.io();
-        io.mouse_draw_cursor
-    }
-    /// Returns `true` if mouse is currently dragging with the `button` provided
-    /// as argument.
-    #[deprecated(since = "0.1.0", note = "Use Ui::is_mouse_dragging instead")]
-    pub fn is_mouse_dragging(&self, button: MouseButton) -> bool {
-        unsafe { sys::igIsMouseDragging(button as c_int, -1.0) }
-    }
-    /// Returns `true` if the `button` provided as argument is currently down.
-    #[deprecated(since = "0.1.0", note = "Use Ui::is_mouse_down instead")]
-    pub fn is_mouse_down(&self, button: MouseButton) -> bool {
-        unsafe { sys::igIsMouseDown(button as c_int) }
-    }
-    /// Returns `true` if the `button` provided as argument is being clicked.
-    #[deprecated(since = "0.1.0", note = "Use Ui::is_mouse_clicked instead")]
-    pub fn is_mouse_clicked(&self, button: MouseButton) -> bool {
-        unsafe { sys::igIsMouseClicked(button as c_int, false) }
-    }
-    /// Returns `true` if the `button` provided as argument is being double-clicked.
-    #[deprecated(since = "0.1.0", note = "Use Ui::is_mouse_double_clicked instead")]
-    pub fn is_mouse_double_clicked(&self, button: MouseButton) -> bool {
-        unsafe { sys::igIsMouseDoubleClicked(button as c_int) }
-    }
-    /// Returns `true` if the `button` provided as argument was released
-    #[deprecated(since = "0.1.0", note = "Use Ui::is_mouse_released instead")]
-    pub fn is_mouse_released(&self, button: MouseButton) -> bool {
-        unsafe { sys::igIsMouseReleased(button as c_int) }
-    }
-    #[deprecated(since = "0.1.0", note = "Access Io::key_ctrl directly instead")]
-    pub fn key_ctrl(&self) -> bool {
-        let io = self.io();
-        io.key_ctrl
-    }
-    #[deprecated(since = "0.1.0", note = "Access Io::key_ctrl directly instead")]
-    pub fn set_key_ctrl(&mut self, value: bool) {
-        let io = self.io_mut();
-        io.key_ctrl = value;
-    }
-    #[deprecated(since = "0.1.0", note = "Access Io::key_shift directly instead")]
-    pub fn key_shift(&self) -> bool {
-        let io = self.io();
-        io.key_shift
-    }
-    #[deprecated(since = "0.1.0", note = "Access Io::key_shift directly instead")]
-    pub fn set_key_shift(&mut self, value: bool) {
-        let io = self.io_mut();
-        io.key_shift = value;
-    }
-    #[deprecated(since = "0.1.0", note = "Access Io::key_alt directly instead")]
-    pub fn key_alt(&self) -> bool {
-        let io = self.io();
-        io.key_alt
-    }
-    #[deprecated(since = "0.1.0", note = "Access Io::key_alt directly instead")]
-    pub fn set_key_alt(&mut self, value: bool) {
-        let io = self.io_mut();
-        io.key_alt = value;
-    }
-    #[deprecated(since = "0.1.0", note = "Access Io::key_super directly instead")]
-    pub fn key_super(&self) -> bool {
-        let io = self.io();
-        io.key_super
-    }
-    #[deprecated(since = "0.1.0", note = "Access Io::key_super directly instead")]
-    pub fn set_key_super(&mut self, value: bool) {
-        let io = self.io_mut();
-        io.key_super = value;
-    }
-    #[deprecated(since = "0.1.0", note = "Access Io::keys_down directly instead")]
-    pub fn set_key(&mut self, key: u8, pressed: bool) {
-        let io = self.io_mut();
-        io.keys_down[key as usize] = pressed;
-    }
-    #[deprecated(since = "0.1.0", note = "Index Io::key_map with the key instead")]
-    pub fn set_imgui_key(&mut self, key: Key, mapping: u8) {
-        let io = self.io_mut();
-        io.key_map[key as usize] = u32::from(mapping);
-    }
-    /// Map [`Key`] values into user's key index
-    #[deprecated(since = "0.1.0", note = "Index Io::key_map with the key instead")]
-    pub fn get_key_index(&self, key: Key) -> usize {
-        unsafe { sys::igGetKeyIndex(key as i32) as usize }
-    }
-    /// Return whether specific key is being held
-    ///
-    /// # Example
-    ///
-    /// ```rust
-    /// use imgui::{Key, Ui};
-    ///
-    /// fn test(ui: &Ui) {
-    ///     let delete_key_index = ui.imgui().get_key_index(Key::Delete);
-    ///     if ui.imgui().is_key_down(delete_key_index) {
-    ///         println!("Delete is being held!");
-    ///     }
-    /// }
-    /// ```
-    #[deprecated(since = "0.1.0", note = "Use Ui::is_key_down instead")]
-    pub fn is_key_down(&self, user_key_index: usize) -> bool {
-        unsafe { sys::igIsKeyDown(user_key_index as c_int) }
-    }
-    /// Return whether specific key was pressed
-    #[deprecated(since = "0.1.0", note = "Use Ui::is_key_pressed instead")]
-    pub fn is_key_pressed(&self, user_key_index: usize) -> bool {
-        unsafe { sys::igIsKeyPressed(user_key_index as c_int, true) }
-    }
-    /// Return whether specific key was released
-    #[deprecated(since = "0.1.0", note = "Use Ui::is_key_released instead")]
-    pub fn is_key_released(&self, user_key_index: usize) -> bool {
-        unsafe { sys::igIsKeyReleased(user_key_index as c_int) }
-    }
-    #[deprecated(since = "0.1.0", note = "Use Io::add_input_character instead")]
-    pub fn add_input_character(&mut self, character: char) {
-        let mut buf = [0; 5];
-        character.encode_utf8(&mut buf);
-        unsafe {
-            sys::ImGuiIO_AddInputCharactersUTF8(self.io_mut().raw_mut(), buf.as_ptr() as *const _);
-        }
-    }
-    #[deprecated(since = "0.1.0", note = "Access Io::framerate directly instead")]
-    pub fn get_frame_rate(&self) -> f32 {
-        self.io().framerate
+    #[deprecated(since = "0.2.0", note = "use imgui::ImageButton::new(...) instead")]
+    pub fn image_button(&self, texture: TextureId, size: [f32; 2]) -> ImageButton {
+        ImageButton::new(texture, size)
     }
 }
 
 impl<'ui> Ui<'ui> {
     #[deprecated(
-        since = "0.1.0",
-        note = "This function is potentially unsafe and will be removed"
+        since = "0.2.0",
+        note = "use imgui::ComboBox::new(...), and either build_simple(), build_simple_string(), or custom rendering (e.g. selectables) instead"
     )]
-    pub fn imgui(&self) -> &Context {
-        self.ctx
-    }
-    #[deprecated(
-        since = "0.1.0",
-        note = "Access Io::want_capture_mouse directly instead"
-    )]
-    pub fn want_capture_mouse(&self) -> bool {
-        let io = self.io();
-        io.want_capture_mouse
-    }
-    #[deprecated(
-        since = "0.1.0",
-        note = "Access Io::want_capture_keyboard directly instead"
-    )]
-    pub fn want_capture_keyboard(&self) -> bool {
-        let io = self.io();
-        io.want_capture_keyboard
-    }
-    #[deprecated(since = "0.1.0", note = "Access Io::framerate directly instead")]
-    pub fn framerate(&self) -> f32 {
-        let io = self.io();
-        io.framerate
-    }
-    #[deprecated(
-        since = "0.1.0",
-        note = "Access Io::metrics_render_vertices directly instead"
-    )]
-    pub fn metrics_render_vertices(&self) -> i32 {
-        let io = self.io();
-        io.metrics_render_vertices
-    }
-    #[deprecated(
-        since = "0.1.0",
-        note = "Access Io::metrics_render_indices directly instead"
-    )]
-    pub fn metrics_render_indices(&self) -> i32 {
-        let io = self.io();
-        io.metrics_render_indices
-    }
-    #[deprecated(
-        since = "0.1.0",
-        note = "Access Io::metrics_active_windows directly instead"
-    )]
-    pub fn metrics_active_windows(&self) -> i32 {
-        let io = self.io();
-        io.metrics_active_windows
+    pub fn combo<'p, StringType: AsRef<ImStr> + ?Sized>(
+        &self,
+        label: &'p ImStr,
+        current_item: &mut i32,
+        items: &'p [&'p StringType],
+        height_in_items: i32,
+    ) -> bool {
+        let items_inner: Vec<*const c_char> = items
+            .into_iter()
+            .map(|item| item.as_ref().as_ptr())
+            .collect();
+        unsafe {
+            sys::igCombo(
+                label.as_ptr(),
+                current_item,
+                items_inner.as_ptr() as *mut *const c_char,
+                items_inner.len() as i32,
+                height_in_items,
+            )
+        }
     }
 }
 
-#[deprecated(since = "0.1.0", note = "Use dear_imgui_version instead")]
-pub fn get_version() -> &'static str {
-    unsafe {
-        let bytes = CStr::from_ptr(sys::igGetVersion()).to_bytes();
-        str::from_utf8_unchecked(bytes)
+impl<'ui> Ui<'ui> {
+    #[deprecated(since = "0.2.0", note = "use imgui::Selectable::new(...) instead")]
+    pub fn selectable(
+        &self,
+        label: &ImStr,
+        selected: bool,
+        flags: SelectableFlags,
+        size: [f32; 2],
+    ) -> bool {
+        unsafe { sys::igSelectable(label.as_ptr(), selected, flags.bits() as i32, size.into()) }
+    }
+}
+
+impl<'ui> Ui<'ui> {
+    #[deprecated(since = "0.2.0", note = "use imgui::MenuItem::new(...) instead")]
+    pub fn menu_item<'a>(&self, label: &'a ImStr) -> MenuItem<'a> {
+        MenuItem::new(label)
     }
 }

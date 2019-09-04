@@ -1,16 +1,18 @@
 use glium::glutin::{self, Event, WindowEvent};
 use glium::{Display, Surface};
 use imgui::{Context, FontConfig, FontGlyphRanges, FontSource, Ui};
-use imgui_glium_renderer::GliumRenderer;
+use imgui_glium_renderer::Renderer;
 use imgui_winit_support::{HiDpiMode, WinitPlatform};
 use std::time::Instant;
+
+mod clipboard;
 
 pub struct System {
     pub events_loop: glutin::EventsLoop,
     pub display: glium::Display,
     pub imgui: Context,
     pub platform: WinitPlatform,
-    pub renderer: GliumRenderer,
+    pub renderer: Renderer,
     pub font_size: f32,
 }
 
@@ -29,6 +31,12 @@ pub fn init(title: &str) -> System {
 
     let mut imgui = Context::create();
     imgui.set_ini_filename(None);
+
+    if let Some(backend) = clipboard::init() {
+        imgui.set_clipboard_backend(Box::new(backend));
+    } else {
+        eprintln!("Failed to initialize clipboard");
+    }
 
     let mut platform = WinitPlatform::init(&mut imgui);
     {
@@ -59,8 +67,7 @@ pub fn init(title: &str) -> System {
 
     imgui.io_mut().font_global_scale = (1.0 / hidpi_factor) as f32;
 
-    let renderer =
-        GliumRenderer::init(&mut imgui, &display).expect("Failed to initialize renderer");
+    let renderer = Renderer::init(&mut imgui, &display).expect("Failed to initialize renderer");
 
     System {
         events_loop,

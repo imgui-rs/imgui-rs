@@ -36,3 +36,5 @@ script:
   - cargo test --all --verbose --manifest-path imgui-examples/Cargo.toml
   - cargo build --all --verbose --manifest-path imgui-gfx-examples/Cargo.toml
   - cargo test --all --verbose --manifest-path imgui-gfx-examples/Cargo.toml
+  - if [ "${TRAVIS_OS_NAME}" = "windows" ]; then cargo build --all --verbose --no-default-features --features directx --manifest-path imgui-gfx-examples/Cargo.toml; fi
+  - if [ "${TRAVIS_OS_NAME}" = "windows" ]; then cargo test --all --verbose --no-default-features --features directx --manifest-path imgui-gfx-examples/Cargo.toml; fi

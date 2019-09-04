@@ -27,6 +27,7 @@ fn main() -> io::Result<()> {
     build.cpp(true);
     // Disabled due to linking issues
     build
+        .define("CIMGUI_NO_EXPORT", None)
         .define("IMGUI_DISABLE_WIN32_FUNCTIONS", None)
         .define("IMGUI_DISABLE_OSX_FUNCTIONS", None);
     for path in &CPP_FILES {

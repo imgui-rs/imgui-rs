@@ -2,9 +2,11 @@ use parking_lot::ReentrantMutex;
 use std::cell::RefCell;
 use std::ffi::CStr;
 use std::ops::Drop;
+use std::path::PathBuf;
 use std::ptr;
 use std::rc::Rc;
 
+use crate::clipboard::{ClipboardBackend, ClipboardContext};
 use crate::fonts::atlas::{FontAtlas, FontAtlasRefMut, FontId, SharedFontAtlas};
 use crate::io::Io;
 use crate::string::{ImStr, ImString};
@@ -54,6 +56,7 @@ pub struct Context {
     log_filename: Option<ImString>,
     platform_name: Option<ImString>,
     renderer_name: Option<ImString>,
+    clipboard_ctx: Option<Box<ClipboardContext>>,
 }
 
 lazy_static! {
@@ -99,38 +102,53 @@ impl Context {
         clear_current_context();
         SuspendedContext(self)
     }
-    pub fn ini_filename(&self) -> Option<&ImStr> {
+    /// Returns the path to the ini file, or None if not set
+    pub fn ini_filename(&self) -> Option<PathBuf> {
         let io = self.io();
         if io.ini_filename.is_null() {
             None
         } else {
-            unsafe { Some(ImStr::from_ptr_unchecked(io.ini_filename)) }
+            let s = unsafe { ImStr::from_ptr_unchecked(io.ini_filename) };
+            Some(PathBuf::from(s.to_str().to_owned()))
         }
     }
-    pub fn set_ini_filename<T: Into<Option<ImString>>>(&mut self, ini_filename: T) {
-        let ini_filename = ini_filename.into();
+    /// Sets the path to the ini file (default is "imgui.ini")
+    ///
+    /// Pass None to disable automatic .Ini saving.
+    pub fn set_ini_filename<T: Into<Option<PathBuf>>>(&mut self, ini_filename: T) {
+        let ini_filename = ini_filename
+            .into()
+            .and_then(|path| path.to_str().map(str::to_owned))
+            .map(ImString::from);
         self.io_mut().ini_filename = ini_filename
             .as_ref()
             .map(|x| x.as_ptr())
             .unwrap_or(ptr::null());
         self.ini_filename = ini_filename;
     }
-    pub fn log_filename(&self) -> Option<&ImStr> {
+    /// Returns the path to the log file, or None if not set
+    pub fn log_filename(&self) -> Option<PathBuf> {
         let io = self.io();
         if io.log_filename.is_null() {
             None
         } else {
-            unsafe { Some(ImStr::from_ptr_unchecked(io.log_filename)) }
+            let s = unsafe { ImStr::from_ptr_unchecked(io.log_filename) };
+            Some(PathBuf::from(s.to_str().to_owned()))
         }
     }
-    pub fn set_log_filename<T: Into<Option<ImString>>>(&mut self, log_filename: T) {
-        let log_filename = log_filename.into();
+    /// Sets the log filename (default is "imgui_log.txt").
+    pub fn set_log_filename<T: Into<Option<PathBuf>>>(&mut self, log_filename: T) {
+        let log_filename = log_filename
+            .into()
+            .and_then(|path| path.to_str().map(str::to_owned))
+            .map(ImString::from);
         self.io_mut().log_filename = log_filename
             .as_ref()
             .map(|x| x.as_ptr())
             .unwrap_or(ptr::null());
         self.log_filename = log_filename;
     }
+    /// Returns the backend platform name, or None if not set
     pub fn platform_name(&self) -> Option<&ImStr> {
         let io = self.io();
         if io.backend_platform_name.is_null() {
@@ -139,6 +157,7 @@ impl Context {
             unsafe { Some(ImStr::from_ptr_unchecked(io.backend_platform_name)) }
         }
     }
+    /// Sets the backend platform name
     pub fn set_platform_name<T: Into<Option<ImString>>>(&mut self, platform_name: T) {
         let platform_name = platform_name.into();
         self.io_mut().backend_platform_name = platform_name
@@ -147,6 +166,7 @@ impl Context {
             .unwrap_or(ptr::null());
         self.platform_name = platform_name;
     }
+    /// Returns the backend renderer name, or None if not set
     pub fn renderer_name(&self) -> Option<&ImStr> {
         let io = self.io();
         if io.backend_renderer_name.is_null() {
@@ -155,6 +175,7 @@ impl Context {
             unsafe { Some(ImStr::from_ptr_unchecked(io.backend_renderer_name)) }
         }
     }
+    /// Sets the backend renderer name
     pub fn set_renderer_name<T: Into<Option<ImString>>>(&mut self, renderer_name: T) {
         let renderer_name = renderer_name.into();
         self.io_mut().backend_renderer_name = renderer_name
@@ -163,12 +184,24 @@ impl Context {
             .unwrap_or(ptr::null());
         self.renderer_name = renderer_name;
     }
+    /// Loads settings from a string slice containing settings in .Ini file format
     pub fn load_ini_settings(&mut self, data: &str) {
         unsafe { sys::igLoadIniSettingsFromMemory(data.as_ptr() as *const _, data.len()) }
     }
+    /// Saves settings to a mutable string buffer in .Ini file format
     pub fn save_ini_settings(&mut self, buf: &mut String) {
         let data = unsafe { CStr::from_ptr(sys::igSaveIniSettingsToMemory(ptr::null_mut())) };
         buf.push_str(&data.to_string_lossy());
+    }
+    /// Sets the clipboard backend used for clipboard operations
+    pub fn set_clipboard_backend(&mut self, backend: Box<dyn ClipboardBackend>) {
+        use std::borrow::BorrowMut;
+        let mut clipboard_ctx = Box::new(ClipboardContext::new(backend));
+        let io = self.io_mut();
+        io.set_clipboard_text_fn = Some(crate::clipboard::set_clipboard_text);
+        io.get_clipboard_text_fn = Some(crate::clipboard::get_clipboard_text);
+        io.clipboard_user_data = clipboard_ctx.borrow_mut() as *mut ClipboardContext as *mut _;
+        self.clipboard_ctx.replace(clipboard_ctx);
     }
     fn create_internal(shared_font_atlas: Option<Rc<RefCell<SharedFontAtlas>>>) -> Self {
         let _guard = CTX_MUTEX.lock();
@@ -186,6 +219,7 @@ impl Context {
             log_filename: None,
             platform_name: None,
             renderer_name: None,
+            clipboard_ctx: None,
         }
     }
     fn is_current_context(&self) -> bool {
@@ -263,6 +297,7 @@ impl SuspendedContext {
             log_filename: None,
             platform_name: None,
             renderer_name: None,
+            clipboard_ctx: None,
         };
         if ctx.is_current_context() {
             // Oops, the context was activated -> deactivate
@@ -379,6 +414,34 @@ Collapsed=0";
     assert_eq!(data.trim(), buf.trim());
 }
 
+#[test]
+fn test_default_ini_filename() {
+    let _guard = crate::test::TEST_MUTEX.lock();
+    let ctx = Context::create();
+    assert_eq!(ctx.ini_filename(), Some(PathBuf::from("imgui.ini")));
+}
+
+#[test]
+fn test_set_ini_filename() {
+    let (_guard, mut ctx) = crate::test::test_ctx();
+    ctx.set_ini_filename(Some(PathBuf::from("test.ini")));
+    assert_eq!(ctx.ini_filename(), Some(PathBuf::from("test.ini")));
+}
+
+#[test]
+fn test_default_log_filename() {
+    let _guard = crate::test::TEST_MUTEX.lock();
+    let ctx = Context::create();
+    assert_eq!(ctx.log_filename(), Some(PathBuf::from("imgui_log.txt")));
+}
+
+#[test]
+fn test_set_log_filename() {
+    let (_guard, mut ctx) = crate::test::test_ctx();
+    ctx.set_log_filename(Some(PathBuf::from("test.log")));
+    assert_eq!(ctx.log_filename(), Some(PathBuf::from("test.log")));
+}
+
 impl Context {
     /// Returns an immutable reference to the inputs/outputs object
     pub fn io(&self) -> &Io {
@@ -423,10 +486,12 @@ impl Context {
             },
         }
     }
+    /// Starts a new frame and returns an `Ui` instance for constructing a user interface.
+    ///
     /// # Panics
     ///
     /// Panics if the context uses a shared font atlas that is already borrowed
-    pub fn frame<'ui, 'a: 'ui>(&'a mut self) -> Ui<'ui> {
+    pub fn frame(&mut self) -> Ui {
         // Clear default font if it no longer exists. This could be an error in the future
         let default_font = self.io().font_default;
         if !default_font.is_null() && self.fonts().get_font(FontId(default_font)).is_none() {

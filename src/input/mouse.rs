@@ -75,6 +75,7 @@ fn test_mouse_cursor_variants() {
     }
 }
 
+/// # Input: Mouse
 impl<'ui> Ui<'ui> {
     /// Returns true if the given mouse button is held down.
     ///
@@ -113,7 +114,7 @@ impl<'ui> Ui<'ui> {
     ///
     /// Clipped by current clipping settings, but disregards other factors like focus, window
     /// ordering, modal popup blocking.
-    pub fn is_mouse_hovering_rect(r_min: [f32; 2], r_max: [f32; 2]) -> bool {
+    pub fn is_mouse_hovering_rect(&self, r_min: [f32; 2], r_max: [f32; 2]) -> bool {
         unsafe { sys::igIsMouseHoveringRect(r_min.into(), r_max.into(), true) }
     }
     /// Returns the mouse position backed up at the time of opening a popup
@@ -141,7 +142,7 @@ impl<'ui> Ui<'ui> {
         // references to it
         unsafe { sys::igResetMouseDragDelta(button as i32) }
     }
-    /// Get the currently desired mouse cursor type.
+    /// Returns the currently desired mouse cursor type.
     ///
     /// Returns `None` if no cursor should be displayed
     pub fn mouse_cursor(&self) -> Option<MouseCursor> {
@@ -157,7 +158,7 @@ impl<'ui> Ui<'ui> {
             _ => None,
         }
     }
-    /// Set the desired mouse cursor type.
+    /// Sets the desired mouse cursor type.
     ///
     /// Passing `None` hides the mouse cursor.
     pub fn set_mouse_cursor(&self, cursor_type: Option<MouseCursor>) {

@@ -26,8 +26,8 @@ struct State {
     no_close: bool,
     wrap_width: f32,
     buf: ImString,
-    item: i32,
-    item2: i32,
+    item: usize,
+    item2: usize,
     text: ImString,
     text_multiline: ImString,
     i0: i32,
@@ -45,7 +45,7 @@ struct State {
     color_edit: ColorEditState,
     custom_rendering: CustomRenderingState,
     dont_ask_me_next_time: bool,
-    stacked_modals_item: i32,
+    stacked_modals_item: usize,
     stacked_modals_color: [f32; 4],
 }
 
@@ -139,7 +139,7 @@ impl Default for ColorEditState {
 struct FileMenuState {
     enabled: bool,
     f: f32,
-    n: i32,
+    n: usize,
     b: bool,
 }
 
@@ -244,15 +244,15 @@ fn show_test_window(ui: &Ui, state: &mut State, opened: &mut bool) {
         ui.show_metrics_window(&mut state.show_app_metrics);
     }
     if state.show_app_style_editor {
-        ui.window(im_str!("Style Editor"))
+        Window::new(im_str!("Style Editor"))
             .opened(&mut state.show_app_style_editor)
-            .build(|| ui.show_default_style_editor());
+            .build(ui, || ui.show_default_style_editor());
     }
     if state.show_app_about {
-        ui.window(im_str!("About ImGui"))
+        Window::new(im_str!("About ImGui"))
             .always_auto_resize(true)
             .opened(&mut state.show_app_about)
-            .build(|| {
+            .build(ui, || {
                 ui.text(format!("dear imgui, {}", imgui::dear_imgui_version()));
                 ui.separator();
                 ui.text("By Omar Cornut and all github contributors.");
@@ -271,8 +271,7 @@ fn show_test_window(ui: &Ui, state: &mut State, opened: &mut bool) {
         );
     }
 
-    let mut window = ui
-        .window(im_str!("ImGui Demo"))
+    let mut window = Window::new(im_str!("ImGui Demo"))
         .title_bar(!state.no_titlebar)
         .resizable(!state.no_resize)
         .movable(!state.no_move)
@@ -283,60 +282,50 @@ fn show_test_window(ui: &Ui, state: &mut State, opened: &mut bool) {
     if !state.no_close {
         window = window.opened(opened)
     }
-    window.build(|| {
+    window.build(ui, || {
         ui.push_item_width(-140.0);
         ui.text(format!("dear imgui says hello. ({})", imgui::dear_imgui_version()));
-        ui.menu_bar(|| {
-            ui.menu(im_str!("Menu")).build(|| {
+        if let Some(menu_bar) = ui.begin_menu_bar() {
+            if let Some(menu) = ui.begin_menu(im_str!("Menu"), true) {
                 show_example_menu_file(ui, &mut state.file_menu);
-            });
-            ui.menu(im_str!("Examples")).build(|| {
-                ui.menu_item(im_str!("Main menu bar"))
-                    .selected(&mut state.show_app_main_menu_bar)
-                    .build();
-                ui.menu_item(im_str!("Console"))
-                    .selected(&mut state.show_app_console)
-                    .build();
-                ui.menu_item(im_str!("Log"))
-                    .selected(&mut state.show_app_log)
-                    .build();
-                ui.menu_item(im_str!("Simple layout"))
-                    .selected(&mut state.show_app_layout)
-                    .build();
-                ui.menu_item(im_str!("Property editor"))
-                    .selected(&mut state.show_app_property_editor)
-                    .build();
-                ui.menu_item(im_str!("Long text display"))
-                    .selected(&mut state.show_app_long_text)
-                    .build();
-                ui.menu_item(im_str!("Auto-resizing window"))
-                    .selected(&mut state.show_app_auto_resize)
-                    .build();
-                ui.menu_item(im_str!("Constrained-resizing window"))
-                    .selected(&mut state.show_app_constrained_resize)
-                    .build();
-                ui.menu_item(im_str!("Simple overlay"))
-                    .selected(&mut state.show_app_fixed_overlay)
-                    .build();
-                ui.menu_item(im_str!("Manipulating window title"))
-                    .selected(&mut state.show_app_manipulating_window_title)
-                    .build();
-                ui.menu_item(im_str!("Custom rendering"))
-                    .selected(&mut state.show_app_custom_rendering)
-                    .build();
-            });
-            ui.menu(im_str!("Help")).build(|| {
-                ui.menu_item(im_str!("Metrics"))
-                    .selected(&mut state.show_app_metrics)
-                    .build();
-                ui.menu_item(im_str!("Style Editor"))
-                    .selected(&mut state.show_app_style_editor)
-                    .build();
-                ui.menu_item(im_str!("About ImGui"))
-                    .selected(&mut state.show_app_about)
-                    .build();
-            });
-        });
+                menu.end(ui);
+            }
+            if let Some(menu) = ui.begin_menu(im_str!("Examples"), true) {
+                MenuItem::new(im_str!("Main menu bar"))
+                    .build_with_ref(ui, &mut state.show_app_main_menu_bar);
+                MenuItem::new(im_str!("Console"))
+                    .build_with_ref(ui, &mut state.show_app_console);
+                MenuItem::new(im_str!("Log"))
+                    .build_with_ref(ui, &mut state.show_app_log);
+                MenuItem::new(im_str!("Simple layout"))
+                    .build_with_ref(ui, &mut state.show_app_layout);
+                MenuItem::new(im_str!("Property editor"))
+                    .build_with_ref(ui, &mut state.show_app_property_editor);
+                MenuItem::new(im_str!("Long text display"))
+                    .build_with_ref(ui, &mut state.show_app_long_text);
+                MenuItem::new(im_str!("Auto-resizing window"))
+                    .build_with_ref(ui, &mut state.show_app_auto_resize);
+                MenuItem::new(im_str!("Constrained-resizing window"))
+                    .build_with_ref(ui, &mut state.show_app_constrained_resize);
+                MenuItem::new(im_str!("Simple overlay"))
+                    .build_with_ref(ui, &mut state.show_app_fixed_overlay);
+                MenuItem::new(im_str!("Manipulating window title"))
+                    .build_with_ref(ui, &mut state.show_app_manipulating_window_title);
+                MenuItem::new(im_str!("Custom rendering"))
+                    .build_with_ref(ui, &mut state.show_app_custom_rendering);
+                menu.end(ui);
+            }
+            if let Some(menu) = ui.begin_menu(im_str!("Help"), true) {
+                MenuItem::new(im_str!("Metrics"))
+                    .build_with_ref(ui, &mut state.show_app_metrics);
+                MenuItem::new(im_str!("Style Editor"))
+                    .build_with_ref(ui, &mut state.show_app_style_editor);
+                MenuItem::new(im_str!("About ImGui"))
+                    .build_with_ref(ui, &mut state.show_app_about);
+                menu.end(ui);
+            }
+            menu_bar.end(ui);
+        }
         ui.spacing();
         if ui.collapsing_header(im_str!("Help")).build() {
             ui.text_wrapped(im_str!(
@@ -407,9 +396,9 @@ fn show_test_window(ui: &Ui, state: &mut State, opened: &mut bool) {
                 ));
                 ui.spacing();
 
-                ui.slider_float(im_str!("Wrap width"), &mut state.wrap_width, -20.0, 600.0)
+                Slider::new(im_str!("Wrap width"), -20.0 ..= 600.0)
                     .display_format(im_str!("%.0f"))
-                    .build();
+                    .build(ui, &mut state.wrap_width);
 
                 ui.text(im_str!("Test paragraph 1:"));
                 // TODO
@@ -439,8 +428,7 @@ fn show_test_window(ui: &Ui, state: &mut State, opened: &mut bool) {
 
             ui.separator();
             ui.label_text(im_str!("label"), im_str!("Value"));
-            ui.combo(
-                im_str!("combo"),
+            ComboBox::new(im_str!("combo")).build_simple_string(ui,
                 &mut state.item,
                 &[
                     im_str!("aaaa"),
@@ -448,9 +436,7 @@ fn show_test_window(ui: &Ui, state: &mut State, opened: &mut bool) {
                     im_str!("cccc"),
                     im_str!("dddd"),
                     im_str!("eeee"),
-                ],
-                -1,
-            );
+                ]);
             let items = [
                 im_str!("AAAA"),
                 im_str!("BBBB"),
@@ -464,7 +450,7 @@ fn show_test_window(ui: &Ui, state: &mut State, opened: &mut bool) {
                 im_str!("JJJJ"),
                 im_str!("KKKK"),
             ];
-            ui.combo(im_str!("combo scroll"), &mut state.item2, &items, -1);
+            ComboBox::new(im_str!("combo scroll")).build_simple_string(ui, &mut state.item2, &items);
             ui.input_text(im_str!("input text"), &mut state.text)
                 .build();
             ui.input_int(im_str!("input int"), &mut state.i0).build();
@@ -480,8 +466,8 @@ fn show_test_window(ui: &Ui, state: &mut State, opened: &mut bool) {
                 .build();
             ui.input_float3(im_str!("input float3"), &mut state.vec3f)
                 .build();
-            ui.color_edit(im_str!("color 1"), &mut state.col1).build();
-            ui.color_edit(im_str!("color 2"), &mut state.col2).build();
+            ColorEdit::new(im_str!("color 1"), &mut state.col1).build(ui);
+            ColorEdit::new(im_str!("color 2"), &mut state.col2).build(ui);
 
             ui.tree_node(im_str!("Multi-component Widgets")).build(|| {
                 ui.input_float2(im_str!("input float2"), &mut state.vec2f)
@@ -520,13 +506,13 @@ fn show_test_window(ui: &Ui, state: &mut State, opened: &mut bool) {
                      show options.",
                 );
                 let misc_flags = {
-                    let mut f = ImGuiColorEditFlags::empty();
-                    f.set(ImGuiColorEditFlags::HDR, s.hdr);
-                    f.set(ImGuiColorEditFlags::AlphaPreviewHalf, s.alpha_half_preview);
+                    let mut f = ColorEditFlags::empty();
+                    f.set(ColorEditFlags::HDR, s.hdr);
+                    f.set(ColorEditFlags::ALPHA_PREVIEW_HALF, s.alpha_half_preview);
                     if !s.alpha_half_preview {
-                        f.set(ImGuiColorEditFlags::AlphaPreview, s.alpha_preview);
+                        f.set(ColorEditFlags::ALPHA_PREVIEW, s.alpha_preview);
                     }
-                    f.set(ImGuiColorEditFlags::NoOptions, !s.options_menu);
+                    f.set(ColorEditFlags::NO_OPTIONS, !s.options_menu);
                     f
                 };
 
@@ -537,22 +523,22 @@ fn show_test_window(ui: &Ui, state: &mut State, opened: &mut bool) {
                     "Click on the colored square to open a color picker.
 CTRL+click on individual component to input value.\n",
                 );
-                ui.color_edit(im_str!("MyColor##1"), &mut s.color)
+                ColorEdit::new(im_str!("MyColor##1"), &mut s.color)
                     .flags(misc_flags)
                     .alpha(false)
-                    .build();
+                    .build(ui);
 
                 ui.text(im_str!("Color widget HSV with Alpha:"));
-                ui.color_edit(im_str!("MyColor##2"), &mut s.color)
+                ColorEdit::new(im_str!("MyColor##2"), &mut s.color)
                     .flags(misc_flags)
-                    .mode(ColorEditMode::HSV)
-                    .build();
+                    .input_mode(ColorEditInputMode::HSV)
+                    .build(ui);
 
                 ui.text(im_str!("Color widget with Float Display:"));
-                ui.color_edit(im_str!("MyColor##2f"), &mut s.color)
+                ColorEdit::new(im_str!("MyColor##2f"), &mut s.color)
                     .flags(misc_flags)
                     .format(ColorFormat::Float)
-                    .build();
+                    .build(ui);
 
                 ui.text(im_str!("Color button with Picker:"));
                 ui.same_line(0.0);
@@ -563,11 +549,11 @@ CTRL+click on individual component to input value.\n",
                      With the label(false) function you can pass a non-empty label which \
                      will only be used for the tooltip and picker popup.",
                 );
-                ui.color_edit(im_str!("MyColor##3"), &mut s.color)
+                ColorEdit::new(im_str!("MyColor##3"), &mut s.color)
                     .flags(misc_flags)
                     .inputs(false)
                     .label(false)
-                    .build();
+                    .build(ui);
 
                 ui.text(im_str!("Color picker:"));
                 ui.checkbox(im_str!("With Alpha"), &mut s.alpha);
@@ -578,24 +564,24 @@ CTRL+click on individual component to input value.\n",
                     ui.checkbox(im_str!("With Ref Color"), &mut s.ref_color);
                     if s.ref_color {
                         ui.same_line(0.0);
-                        ui.color_edit(im_str!("##RefColor"), &mut s.ref_color_v)
+                        ColorEdit::new(im_str!("##RefColor"), &mut s.ref_color_v)
                             .flags(misc_flags)
                             .inputs(false)
-                            .build();
+                            .build(ui);
                     }
                 }
-                let mut b = ui
-                    .color_picker(im_str!("MyColor##4"), &mut s.color)
+                let mut b = ColorPicker::new
+                    (im_str!("MyColor##4"), &mut s.color)
                     .flags(misc_flags)
                     .alpha(s.alpha)
                     .alpha_bar(s.alpha_bar)
                     .side_preview(s.side_preview)
-                    .rgb(true);
+                    .display_rgb(true);
 
                 if s.ref_color {
                     b = b.reference_color(&s.ref_color_v)
                 }
-                b.build();
+                b.build(ui);
             });
         }
         if ui
@@ -627,12 +613,7 @@ CTRL+click on individual component to input value.\n",
                     ui.text(im_str!("Aquarium"));
                     ui.separator();
                     for (index, name) in names.iter().enumerate() {
-                        if ui.selectable(
-                            name,
-                            false,
-                            ImGuiSelectableFlags::empty(),
-                            [0.0, 0.0]
-                        ) {
+                        if Selectable::new(name).build(ui) {
                             state.selected_fish = Some(index);
                         }
                     }
@@ -651,17 +632,17 @@ CTRL+click on individual component to input value.\n",
                 ui.popup_modal(im_str!("Delete?")).always_auto_resize(true).build(|| {
                     ui.text("All those beautiful files will be deleted.\nThis operation cannot be undone!\n\n");
                     ui.separator();
-                    ui.with_style_var(StyleVar::FramePadding([0.0, 0.0]), || {
-                        ui.checkbox(im_str!("Don't ask me next time"), &mut state.dont_ask_me_next_time);
+                    let style = ui.push_style_var(StyleVar::FramePadding([0.0, 0.0]));
+                    ui.checkbox(im_str!("Don't ask me next time"), &mut state.dont_ask_me_next_time);
 
-                        if ui.button(im_str!("OK"), [120.0, 0.0]) {
-                            ui.close_current_popup();
-                        }
-                        ui.same_line(0.0);
-                        if ui.button(im_str!("Cancel"), [120.0, 0.0]) {
-                            ui.close_current_popup();
-                        }
-                    });
+                    if ui.button(im_str!("OK"), [120.0, 0.0]) {
+                        ui.close_current_popup();
+                    }
+                    ui.same_line(0.0);
+                    if ui.button(im_str!("Cancel"), [120.0, 0.0]) {
+                        ui.close_current_popup();
+                    }
+                    style.pop(ui);
                 });
 
                 if ui.button(im_str!("Stacked modals.."), [0.0, 0.0]) {
@@ -674,9 +655,9 @@ CTRL+click on individual component to input value.\n",
                     );
 
                     let items = &[im_str!("aaaa"), im_str!("bbbb"), im_str!("cccc"), im_str!("dddd"), im_str!("eeee")];
-                    ui.combo(im_str!("Combo"), &mut state.stacked_modals_item, items, -1);
+                    ComboBox::new(im_str!("Combo")).build_simple_string(ui, &mut state.stacked_modals_item, items);
 
-                    ui.color_edit(im_str!("color"), &mut state.stacked_modals_color).build();
+                    ColorEdit::new(im_str!("color"), &mut state.stacked_modals_color).build(ui);
 
                     if ui.button(im_str!("Add another modal.."), [0.0, 0.0]) {
                         ui.open_popup(im_str!("Stacked 2"))   ;
@@ -698,101 +679,109 @@ CTRL+click on individual component to input value.\n",
 }
 
 fn show_example_app_main_menu_bar<'a>(ui: &Ui<'a>, state: &mut State) {
-    ui.main_menu_bar(|| {
-        ui.menu(im_str!("File")).build(|| {
+    if let Some(menu_bar) = ui.begin_main_menu_bar() {
+        if let Some(menu) = ui.begin_menu(im_str!("File"), true) {
             show_example_menu_file(ui, &mut state.file_menu);
-        });
-        ui.menu(im_str!("Edit")).build(|| {
-            ui.menu_item(im_str!("Undo"))
+            menu.end(ui);
+        }
+        if let Some(menu) = ui.begin_menu(im_str!("Edit"), true) {
+            MenuItem::new(im_str!("Undo"))
                 .shortcut(im_str!("CTRL+Z"))
-                .build();
-            ui.menu_item(im_str!("Redo"))
+                .build(ui);
+            MenuItem::new(im_str!("Redo"))
                 .shortcut(im_str!("CTRL+Y"))
                 .enabled(false)
-                .build();
+                .build(ui);
             ui.separator();
-            ui.menu_item(im_str!("Cut"))
+            MenuItem::new(im_str!("Cut"))
                 .shortcut(im_str!("CTRL+X"))
-                .build();
-            ui.menu_item(im_str!("Copy"))
+                .build(ui);
+            MenuItem::new(im_str!("Copy"))
                 .shortcut(im_str!("CTRL+C"))
-                .build();
-            ui.menu_item(im_str!("Paste"))
+                .build(ui);
+            MenuItem::new(im_str!("Paste"))
                 .shortcut(im_str!("CTRL+V"))
-                .build();
-        });
-    });
+                .build(ui);
+            menu.end(ui);
+        }
+        menu_bar.end(ui);
+    }
 }
 
 fn show_example_menu_file<'a>(ui: &Ui<'a>, state: &mut FileMenuState) {
-    ui.menu_item(im_str!("(dummy menu)")).enabled(false).build();
-    ui.menu_item(im_str!("New")).build();
-    ui.menu_item(im_str!("Open"))
+    MenuItem::new(im_str!("(dummy menu)"))
+        .enabled(false)
+        .build(ui);
+    MenuItem::new(im_str!("New")).build(ui);
+    MenuItem::new(im_str!("Open"))
         .shortcut(im_str!("Ctrl+O"))
-        .build();
-    ui.menu(im_str!("Open Recent")).build(|| {
-        ui.menu_item(im_str!("fish_hat.c")).build();
-        ui.menu_item(im_str!("fish_hat.inl")).build();
-        ui.menu_item(im_str!("fish_hat.h")).build();
-        ui.menu(im_str!("More..")).build(|| {
-            ui.menu_item(im_str!("Hello")).build();
-            ui.menu_item(im_str!("Sailor")).build();
-            ui.menu(im_str!("Recurse..")).build(|| {
+        .build(ui);
+    if let Some(menu) = ui.begin_menu(im_str!("Open Recent"), true) {
+        MenuItem::new(im_str!("fish_hat.c")).build(ui);
+        MenuItem::new(im_str!("fish_hat.inl")).build(ui);
+        MenuItem::new(im_str!("fish_hat.h")).build(ui);
+        if let Some(menu) = ui.begin_menu(im_str!("More.."), true) {
+            MenuItem::new(im_str!("Hello")).build(ui);
+            MenuItem::new(im_str!("Sailor")).build(ui);
+            if let Some(menu) = ui.begin_menu(im_str!("Recurse.."), true) {
                 show_example_menu_file(ui, state);
-            });
-        });
-    });
-    ui.menu_item(im_str!("Save"))
+                menu.end(ui);
+            }
+            menu.end(ui);
+        }
+        menu.end(ui);
+    }
+    MenuItem::new(im_str!("Save"))
         .shortcut(im_str!("Ctrl+S"))
-        .build();
-    ui.menu_item(im_str!("Save As..")).build();
+        .build(ui);
+    MenuItem::new(im_str!("Save As..")).build(ui);
     ui.separator();
-    ui.menu(im_str!("Options")).build(|| {
-        ui.menu_item(im_str!("Enabled"))
-            .selected(&mut state.enabled)
-            .build();
-        ui.child_frame(im_str!("child"), [0.0, 60.0])
-            .show_borders(true)
-            .build(|| {
+    if let Some(menu) = ui.begin_menu(im_str!("Options"), true) {
+        MenuItem::new(im_str!("Enabled")).build_with_ref(ui, &mut state.enabled);
+        ChildWindow::new("child")
+            .size([0.0, 60.0])
+            .border(true)
+            .build(ui, || {
                 for i in 0..10 {
                     ui.text(format!("Scrolling Text {}", i));
                 }
             });
-        ui.slider_float(im_str!("Value"), &mut state.f, 0.0, 1.0)
-            .build();
+        Slider::new(im_str!("Value"), 0.0..=1.0).build(ui, &mut state.f);
+
         ui.input_float(im_str!("Input"), &mut state.f)
             .step(0.1)
             .build();
         let items = [im_str!("Yes"), im_str!("No"), im_str!("Maybe")];
-        ui.combo(im_str!("Combo"), &mut state.n, &items, -1);
+        ComboBox::new(im_str!("Combo")).build_simple_string(ui, &mut state.n, &items);
         ui.checkbox(im_str!("Check"), &mut state.b);
-    });
-    ui.menu(im_str!("Colors")).build(|| {
+        menu.end(ui);
+    }
+    if let Some(menu) = ui.begin_menu(im_str!("Colors"), true) {
         for &col in StyleColor::VARIANTS.iter() {
-            ui.menu_item(&im_str!("{:?}", col)).build();
+            MenuItem::new(&im_str!("{:?}", col)).build(ui);
         }
-    });
-    ui.menu(im_str!("Disabled")).enabled(false).build(|| {
+        menu.end(ui);
+    }
+    if let Some(_) = ui.begin_menu(im_str!("Disabled"), false) {
         unreachable!();
-    });
-    ui.menu_item(im_str!("Checked")).selected(&mut true).build();
-    ui.menu_item(im_str!("Quit"))
+    }
+    MenuItem::new(im_str!("Checked")).selected(true).build(ui);
+    MenuItem::new(im_str!("Quit"))
         .shortcut(im_str!("Alt+F4"))
-        .build();
+        .build(ui);
 }
 
 fn show_example_app_auto_resize(ui: &Ui, state: &mut AutoResizeState, opened: &mut bool) {
-    ui.window(im_str!("Example: Auto-resizing window"))
+    Window::new(im_str!("Example: Auto-resizing window"))
         .opened(opened)
         .always_auto_resize(true)
-        .build(|| {
+        .build(ui, || {
             ui.text(
                 "Window will resize every-ui to the size of its content.
 Note that you probably don't want to query the window size to
 output your content because that would create a feedback loop.",
             );
-            ui.slider_int(im_str!("Number of lines"), &mut state.lines, 1, 20)
-                .build();
+            Slider::new(im_str!("Number of lines"), 1..=20).build(ui, &mut state.lines);
             for i in 0..state.lines {
                 ui.text(format!("{:2$}This is line {}", "", i, i as usize * 4));
             }
@@ -802,63 +791,65 @@ output your content because that would create a feedback loop.",
 fn show_example_app_fixed_overlay(ui: &Ui, opened: &mut bool) {
     const DISTANCE: f32 = 10.0;
     let window_pos = [DISTANCE, DISTANCE];
-    ui.with_color_var(StyleColor::WindowBg, [0.0, 0.0, 0.0, 0.3], || {
-        ui.window(im_str!("Example: Fixed Overlay"))
-            .opened(opened)
-            .position(window_pos, Condition::Always)
-            .title_bar(false)
-            .resizable(false)
-            .always_auto_resize(true)
-            .movable(false)
-            .save_settings(false)
-            .build(|| {
-                ui.text("Simple overlay\nin the corner of the screen.\n(right-click to change position)");
-                ui.separator();
-                let mouse_pos = ui.io().mouse_pos;
-                ui.text(format!(
-                    "Mouse Position: ({:.1},{:.1})",
-                    mouse_pos[0], mouse_pos[1]
-                ));
-            })
-    })
+    let style = ui.push_style_color(StyleColor::WindowBg, [0.0, 0.0, 0.0, 0.3]);
+    Window::new(im_str!("Example: Fixed Overlay"))
+        .opened(opened)
+        .position(window_pos, Condition::Always)
+        .title_bar(false)
+        .resizable(false)
+        .always_auto_resize(true)
+        .movable(false)
+        .save_settings(false)
+        .build(ui, || {
+            ui.text(
+                "Simple overlay\nin the corner of the screen.\n(right-click to change position)",
+            );
+            ui.separator();
+            let mouse_pos = ui.io().mouse_pos;
+            ui.text(format!(
+                "Mouse Position: ({:.1},{:.1})",
+                mouse_pos[0], mouse_pos[1]
+            ));
+        });
+    style.pop(ui);
 }
 
 fn show_example_app_manipulating_window_title(ui: &Ui) {
-    ui.window(im_str!("Same title as another window##1"))
+    Window::new(im_str!("Same title as another window##1"))
         .position([100.0, 100.0], Condition::FirstUseEver)
-        .build(|| {
+        .build(ui, || {
             ui.text(
                 "This is window 1.
 My title is the same as window 2, but my identifier is unique.",
             );
         });
-    ui.window(im_str!("Same title as another window##2"))
+    Window::new(im_str!("Same title as another window##2"))
         .position([100.0, 200.0], Condition::FirstUseEver)
-        .build(|| {
+        .build(ui, || {
             ui.text(
                 "This is window 2.
 My title is the same as window 1, but my identifier is unique.",
             );
         });
     let chars = ['|', '/', '-', '\\'];
-    let ch_idx = (ui.get_time() / 0.25) as usize & 3;
-    let num = ui.get_frame_count(); // The C++ version uses rand() here
+    let ch_idx = (ui.time() / 0.25) as usize & 3;
+    let num = ui.frame_count(); // The C++ version uses rand() here
     let title = im_str!("Animated title {} {}###AnimatedTitle", chars[ch_idx], num);
-    ui.window(&title)
+    Window::new(&title)
         .position([100.0, 300.0], Condition::FirstUseEver)
-        .build(|| ui.text("This window has a changing title"));
+        .build(ui, || ui.text("This window has a changing title"));
 }
 
 fn show_example_app_custom_rendering(ui: &Ui, state: &mut CustomRenderingState, opened: &mut bool) {
-    ui.window(im_str!("Example: Custom rendering"))
+    Window::new(im_str!("Example: Custom rendering"))
         .size([350.0, 560.0], Condition::FirstUseEver)
         .opened(opened)
-        .build(|| {
+        .build(ui, || {
             ui.text("Primitives");
             // TODO: Add DragFloat to change value of sz
-            ui.color_edit(im_str!("Color"), &mut state.col).build();
+            ColorEdit::new(im_str!("Color"), &mut state.col).build(ui);
             let draw_list = ui.get_window_draw_list();
-            let p = ui.get_cursor_screen_pos();
+            let p = ui.cursor_screen_pos();
             let spacing = 8.0;
             let mut y = p[1] + 4.0;
             for n in 0..2 {
@@ -1009,9 +1000,9 @@ fn show_example_app_custom_rendering(ui: &Ui, state: &mut CustomRenderingState, 
             // SetCursorPos(max).
 
             // ImDrawList API uses screen coordinates!
-            let canvas_pos = ui.get_cursor_screen_pos();
+            let canvas_pos = ui.cursor_screen_pos();
             // Resize canvas to what's available
-            let mut canvas_size = ui.get_content_region_avail();
+            let mut canvas_size = ui.content_region_avail();
             if canvas_size[0] < 50.0 {
                 canvas_size[0] = 50.0;
             }

@@ -2,9 +2,71 @@
 
 ## [Unreleased]
 
+### Added
+
+- Window scrolling API
+- Full support for the column API
+- Almost all small utility functions from upstream API
+
 ### Changed
 
-- Upgrade to glium 0.24
+- Redesigned window API
+- Redesigned progress bar API
+- Redesigned color editor/picker API
+- Redesigned child window API (previously known as child frame)
+- Redesigned image / image button API
+- Redesigned combo box API
+- Redesigned selectable API
+- Redesigned slider API. Generic scalar sliders support all main data types and replace
+  previous individual sliders (int, int2, int3, int4, etc...)
+- Redesigned menu API
+- Updated layout API
+- Renderer errors implement std::error::Error
+- Glium renderer re-exports imgui and glium
+- Gfx renderer re-exports imgui and gfx
+- These functions now take/return PathBuf: log_filename, set_log_filename, ini_filename, set_logfilename
+- ID stack manipulation now uses stack tokens
+- Parameter stack pushes *must almost always be paired by a manual call to stack pop*
+- Container widget tokens *must be ended manually by calling end*.
+  Closure-based function (e.g. build()) are unaffected and do this
+  automatically
+
+### Removed
+
+- Various things that were deprecated in imgui-rs 0.1.0
+
+## [0.1.0] - 2019-07-12
+
+### Added
+
+- Support for font atlas sharing
+- Support for using multiple fonts
+- Support for suspended contexts (useful for having multiple independent
+  operating system windows)
+- Support for DX11 in imgui-gfx-renderer
+- Support for navigation input system
+- Support for backend/renderer name strings
+- Support for saving/loading INI settings manually
+- Pluggable clipboard support
+
+### Changed
+
+- imgui-sys is now almost completely automatically generated. **This is a big
+  breaking change in imgui-sys API**
+- ImGui/Context API is now safer
+- The library context (known as Context, previously known as ImGui) is no longer Send or Sync
+- Many getter/setter APIs have been replaced with direct access to struct fields
+- [f32; 2] and [f32; 4] are now the main vector types. ImVec/ImVec4 and
+  corresponding tuples are no longer used in the main API
+- imgui-gfx-renderer is parameterized over the color format, so Rgba8 and
+  Srgba8 are both supported
+- imgui-winit-support has been rewritten to provide a more robust abstraction
+  that is easier to use correctly
+- Parameter stack (e.g. StyleVar) manipulation is now done using push functions
+  and automatically or manually droppable stack tokens
+- Upgrade to glium 0.25
+- Upgrade to cimgui / imgui 1.71
+- Bump minimum Rust version to 1.33
 
 ## [0.0.23] - 2019-04-10
 
@@ -433,7 +495,8 @@ by setting the environment variable `WINIT_HIDPI_FACTOR=1` if you use X11.
 
 - Initial release with cimgui/imgui 1.44, glium 0.9
 
-[Unreleased]: https://github.com/Gekkio/imgui-rs/compare/v0.0.23...HEAD
+[Unreleased]: https://github.com/Gekkio/imgui-rs/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/Gekkio/imgui-rs/compare/v0.0.23...v0.1.0
 [0.0.23]: https://github.com/Gekkio/imgui-rs/compare/v0.0.22...v0.0.23
 [0.0.22]: https://github.com/Gekkio/imgui-rs/compare/v0.0.21...v0.0.22
 [0.0.21]: https://github.com/Gekkio/imgui-rs/compare/v0.0.20...v0.0.21
