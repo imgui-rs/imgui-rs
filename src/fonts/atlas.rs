@@ -294,6 +294,7 @@ pub struct FontConfig {
     pub rasterizer_flags: u32,
     /// Brighten (>1.0) or darken (<1.0) font output
     pub rasterizer_multiply: f32,
+    pub name: Option<String>,
 }
 
 impl Default for FontConfig {
@@ -310,6 +311,7 @@ impl Default for FontConfig {
             glyph_max_advance_x: f32::MAX,
             rasterizer_flags: 0,
             rasterizer_multiply: 1.0,
+            name: None,
         }
     }
 }
@@ -327,6 +329,17 @@ impl FontConfig {
         raw.GlyphMaxAdvanceX = self.glyph_max_advance_x;
         raw.RasterizerFlags = self.rasterizer_flags;
         raw.RasterizerMultiply = self.rasterizer_multiply;
+        if let Some(name) = self.name.as_ref() {
+            let bytes = name.as_bytes();
+            let mut len = bytes.len().max(raw.Name.len() - 1);
+            while !name.is_char_boundary(len) {
+                len -= 1;
+            }
+            unsafe {
+                bytes.as_ptr().copy_to(raw.Name.as_mut_ptr() as _, len);
+                raw.Name[len] = 0;
+            }
+        }
     }
 }
 
