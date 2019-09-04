@@ -14,4 +14,8 @@ travis-ci = { repository = "Gekkio/imgui-rs" }
 
 [dependencies]
 imgui = { version = "0.2.0-pre", path = "../" }
-winit = ">= 0.16, <= 0.19"
+winit-19 = { version = ">= 0.16, <= 0.19", package = "winit", optional = true }
+winit-20 = { version = "0.20.0-alpha3", package = "winit", optional = true }
+
+[features]
+default = ["winit-19"]
