@@ -288,7 +288,9 @@ impl<'ui> Ui<'ui> {
     pub fn set_next_item_width(&self, item_width: f32) {
         unsafe { sys::igSetNextItemWidth(item_width) };
     }
-    /// Returns the width of the item given the pushed settings and the current cursor position
+    /// Returns the width of the item given the pushed settings and the current cursor position.
+    ///
+    /// This is NOT necessarily the width of last item.
     pub fn calc_item_width(&self) -> f32 {
         unsafe { sys::igCalcItemWidth() }
     }

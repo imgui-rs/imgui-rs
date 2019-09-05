@@ -13,7 +13,7 @@ bitflags! {
         const ALLOW_WHEN_BLOCKED_BY_POPUP = sys::ImGuiHoveredFlags_AllowWhenBlockedByPopup;
         /// Return true even if an active item is blocking access to this item
         const ALLOW_WHEN_BLOCKED_BY_ACTIVE_ITEM = sys::ImGuiHoveredFlags_AllowWhenBlockedByActiveItem;
-        /// Return true even if the position is overlapped by another window
+        /// Return true even if the position is obstructed or overlapped by another window
         const ALLOW_WHEN_OVERLAPPED = sys::ImGuiHoveredFlags_AllowWhenOverlapped;
         /// Return true even if the item is disabled
         const ALLOW_WHEN_DISABLED = sys::ImGuiHoveredFlags_AllowWhenDisabled;

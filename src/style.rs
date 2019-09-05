@@ -87,8 +87,10 @@ pub struct Style {
     ///
     /// Set to 0.0 to have rectangular tabs.
     pub tab_rounding: f32,
-    /// Thichkness of border around tabs
+    /// Thickness of border around tabs
     pub tab_border_size: f32,
+    /// Side of the color buttonton pubin color editor widgets (left/right).
+    pub color_button_position: Direction,
     /// Alignment of button text when button is larger than text.
     ///
     /// Defaults to [0.5, 0.5] (centered).
@@ -435,6 +437,7 @@ fn test_style_memory_layout() {
     assert_field_offset!(grab_rounding, GrabRounding);
     assert_field_offset!(tab_rounding, TabRounding);
     assert_field_offset!(tab_border_size, TabBorderSize);
+    assert_field_offset!(color_button_position, ColorButtonPosition);
     assert_field_offset!(button_text_align, ButtonTextAlign);
     assert_field_offset!(selectable_text_align, SelectableTextAlign);
     assert_field_offset!(display_window_padding, DisplayWindowPadding);

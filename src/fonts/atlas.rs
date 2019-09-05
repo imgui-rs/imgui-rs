@@ -51,7 +51,7 @@ pub struct FontAtlas {
     tex_uv_scale: [f32; 2],
     tex_uv_white_pixel: [f32; 2],
     fonts: ImVector<*mut Font>,
-    custom_rects: sys::ImVector_CustomRect,
+    custom_rects: sys::ImVector_ImFontAtlasCustomRect,
     config_data: sys::ImVector_ImFontConfig,
     custom_rect_ids: [i32; 1],
 }
