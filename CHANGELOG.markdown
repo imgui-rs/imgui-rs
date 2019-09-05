@@ -30,6 +30,7 @@
 - Container widget tokens *must be ended manually by calling end*.
   Closure-based function (e.g. build()) are unaffected and do this
   automatically
+- Bump minimum Rust version to 1.36 (some dependencies, including winit, require MaybeUninit)
 
 ### Removed
 
