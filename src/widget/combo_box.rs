@@ -213,6 +213,7 @@ impl<'a> ComboBox<'a> {
                     result = true;
                 }
             }
+            _cb.end(ui);
         }
         result
     }
