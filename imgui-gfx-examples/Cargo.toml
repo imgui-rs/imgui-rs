@@ -20,9 +20,9 @@ gfx_device_gl = "0.16"
 gfx_window_glutin = "0.31"
 glutin = "0.21"
 image = "0.22"
-imgui = { version = "0.2.0", path = "../" }
-imgui-gfx-renderer = { version = "0.2.0", path = "../imgui-gfx-renderer" }
-imgui-winit-support = { version = "0.2.0", path = "../imgui-winit-support" }
+imgui = { version = "0.3.0-pre", path = "../" }
+imgui-gfx-renderer = { version = "0.3.0-pre", path = "../imgui-gfx-renderer" }
+imgui-winit-support = { version = "0.3.0-pre", path = "../imgui-winit-support" }
 
 [target.'cfg(windows)'.dev-dependencies]
 gfx_device_dx11 = "0.8"

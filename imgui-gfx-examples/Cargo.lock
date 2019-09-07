@@ -449,11 +449,11 @@ dependencies = [
 
 [[package]]
 name = "imgui"
-version = "0.2.0"
+version = "0.3.0-pre"
 dependencies = [
  "bitflags 1.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "gfx 0.18.1 (registry+https://github.com/rust-lang/crates.io-index)",
- "imgui-sys 0.2.0",
+ "imgui-sys 0.3.0-pre",
  "lazy_static 1.4.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "parking_lot 0.9.0 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
@@ -469,32 +469,32 @@ dependencies = [
  "gfx_window_glutin 0.31.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "glutin 0.21.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "image 0.22.1 (registry+https://github.com/rust-lang/crates.io-index)",
- "imgui 0.2.0",
- "imgui-gfx-renderer 0.2.0",
- "imgui-winit-support 0.2.0",
+ "imgui 0.3.0-pre",
+ "imgui-gfx-renderer 0.3.0-pre",
+ "imgui-winit-support 0.3.0-pre",
 ]
 
 [[package]]
 name = "imgui-gfx-renderer"
-version = "0.2.0"
+version = "0.3.0-pre"
 dependencies = [
  "gfx 0.18.1 (registry+https://github.com/rust-lang/crates.io-index)",
- "imgui 0.2.0",
+ "imgui 0.3.0-pre",
  "winapi 0.3.8 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
 name = "imgui-sys"
-version = "0.2.0"
+version = "0.3.0-pre"
 dependencies = [
  "cc 1.0.41 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
 name = "imgui-winit-support"
-version = "0.2.0"
+version = "0.3.0-pre"
 dependencies = [
- "imgui 0.2.0",
+ "imgui 0.3.0-pre",
  "winit 0.19.3 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
