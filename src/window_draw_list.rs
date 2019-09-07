@@ -62,7 +62,8 @@ pub struct WindowDrawList<'ui> {
     _phantom: PhantomData<&'ui Ui<'ui>>,
 }
 
-static WINDOW_DRAW_LIST_LOADED: std::sync::atomic::AtomicBool = std::sync::atomic::AtomicBool::new(false);
+static WINDOW_DRAW_LIST_LOADED: std::sync::atomic::AtomicBool =
+    std::sync::atomic::AtomicBool::new(false);
 
 impl<'ui> Drop for WindowDrawList<'ui> {
     fn drop(&mut self) {

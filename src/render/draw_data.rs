@@ -225,8 +225,8 @@ implement_vertex!(DrawVert, pos, uv, col);
 
 #[cfg(feature = "gfx")]
 mod gfx_support {
-    use gfx::*;
     use super::DrawVert;
+    use gfx::*;
 
     // gfx doesn't provide a macro to implement vertex structure for an existing struct, so we
     // create a dummy vertex with the same memory layout using gfx macros, and delegate query(name)
@@ -249,14 +249,8 @@ mod gfx_support {
     #[test]
     fn test_dummy_memory_layout() {
         use std::mem;
-        assert_eq!(
-            mem::size_of::<DrawVert>(),
-            mem::size_of::<Dummy>()
-        );
-        assert_eq!(
-            mem::align_of::<DrawVert>(),
-            mem::align_of::<Dummy>()
-        );
+        assert_eq!(mem::size_of::<DrawVert>(), mem::size_of::<Dummy>());
+        assert_eq!(mem::align_of::<DrawVert>(), mem::align_of::<Dummy>());
         use memoffset::offset_of;
         macro_rules! assert_field_offset {
             ($l:ident, $r:ident) => {
