@@ -166,6 +166,7 @@ impl WinitPlatform {
         io[Key::Space] = VirtualKeyCode::Space as _;
         io[Key::Enter] = VirtualKeyCode::Return as _;
         io[Key::Escape] = VirtualKeyCode::Escape as _;
+        io[Key::KeyPadEnter] = VirtualKeyCode::NumpadEnter as _;
         io[Key::A] = VirtualKeyCode::A as _;
         io[Key::C] = VirtualKeyCode::C as _;
         io[Key::V] = VirtualKeyCode::V as _;
