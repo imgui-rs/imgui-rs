@@ -408,11 +408,11 @@ dependencies = [
 
 [[package]]
 name = "imgui"
-version = "0.2.0-pre"
+version = "0.2.0"
 dependencies = [
  "bitflags 1.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "glium 0.25.1 (registry+https://github.com/rust-lang/crates.io-index)",
- "imgui-sys 0.2.0-pre",
+ "imgui-sys 0.2.0",
  "lazy_static 1.4.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "parking_lot 0.9.0 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
@@ -424,31 +424,31 @@ dependencies = [
  "clipboard 0.5.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "glium 0.25.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "image 0.22.1 (registry+https://github.com/rust-lang/crates.io-index)",
- "imgui 0.2.0-pre",
- "imgui-glium-renderer 0.2.0-pre",
- "imgui-winit-support 0.2.0-pre",
+ "imgui 0.2.0",
+ "imgui-glium-renderer 0.2.0",
+ "imgui-winit-support 0.2.0",
 ]
 
 [[package]]
 name = "imgui-glium-renderer"
-version = "0.2.0-pre"
+version = "0.2.0"
 dependencies = [
  "glium 0.25.1 (registry+https://github.com/rust-lang/crates.io-index)",
- "imgui 0.2.0-pre",
+ "imgui 0.2.0",
 ]
 
 [[package]]
 name = "imgui-sys"
-version = "0.2.0-pre"
+version = "0.2.0"
 dependencies = [
  "cc 1.0.41 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
 name = "imgui-winit-support"
-version = "0.2.0-pre"
+version = "0.2.0"
 dependencies = [
- "imgui 0.2.0-pre",
+ "imgui 0.2.0",
  "winit 0.19.3 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
