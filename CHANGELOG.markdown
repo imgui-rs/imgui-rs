@@ -7,6 +7,7 @@
 - Window scrolling API
 - Full support for the column API
 - Almost all small utility functions from upstream API
+- Support for winit 0.20 alpha via `winit-20` feature
 
 ### Changed
 
