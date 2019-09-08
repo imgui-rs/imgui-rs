@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Changed
+
+- Fix backspace handling on macOS
+
 ## [0.2.0] - 2019-09-07
 
 ### Added
