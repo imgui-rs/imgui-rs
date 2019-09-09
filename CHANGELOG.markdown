@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [0.2.1] - 2019-09-09
+
 ### Changed
 
 - Fix backspace handling on macOS
@@ -505,7 +507,8 @@ by setting the environment variable `WINIT_HIDPI_FACTOR=1` if you use X11.
 
 - Initial release with cimgui/imgui 1.44, glium 0.9
 
-[Unreleased]: https://github.com/Gekkio/imgui-rs/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/Gekkio/imgui-rs/compare/v0.2.1...HEAD
+[0.2.1]: https://github.com/Gekkio/imgui-rs/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/Gekkio/imgui-rs/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/Gekkio/imgui-rs/compare/v0.0.23...v0.1.0
 [0.0.23]: https://github.com/Gekkio/imgui-rs/compare/v0.0.22...v0.0.23
