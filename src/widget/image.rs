@@ -129,7 +129,7 @@ impl ImageButton {
         self
     }
     /// Builds the image button
-    pub fn build(self, _: &Ui) {
+    pub fn build(self, _: &Ui) -> bool {
         unsafe {
             sys::igImageButton(
                 self.texture_id.id() as *mut c_void,
@@ -139,7 +139,7 @@ impl ImageButton {
                 self.frame_padding,
                 self.bg_col.into(),
                 self.tint_col.into(),
-            );
+            )
         }
     }
 }
