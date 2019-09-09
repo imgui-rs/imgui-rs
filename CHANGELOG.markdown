@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Fix ImageButton bool return value
+
 ### Changed
 
 - Fix backspace handling on macOS
