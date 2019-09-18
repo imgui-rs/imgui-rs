@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Removed
+
+- Various things that were deprecated in imgui-rs 0.2.0
+
 ## [0.2.1] - 2019-09-09
 
 ### Fixed
