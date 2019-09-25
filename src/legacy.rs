@@ -146,6 +146,14 @@ bitflags!(
         /// Use FramePadding (even for an unframed text node) to vertically align text baseline to
         /// regular widget height.
         const FramePadding = 1 << 10;
+        /// Extend hit box to the right-most edge, even if not framed.
+        ///
+        /// This is not the default in order to allow adding other items on the same line. In the
+        /// future we may refactor the hit system to be front-to-back, allowing natural overlaps
+        /// and then this can become the default.
+        const SpanAvailWidth = 1 << 11;
+        /// Extend hit box to the left-most and right-most edges (bypass the indented area)
+        const SpanFullWidth = 1 << 12;
         const NavLeftJumpsBackHere = 1 << 13;
 
         const CollapsingHeader  =

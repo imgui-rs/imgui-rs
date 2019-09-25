@@ -85,7 +85,7 @@ pub fn dear_imgui_version() -> &'static str {
 
 #[test]
 fn test_version() {
-    assert_eq!(dear_imgui_version(), "1.72b");
+    assert_eq!(dear_imgui_version(), "1.73");
 }
 
 impl Context {
@@ -583,6 +583,7 @@ pub enum Condition {
 #[repr(i32)]
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
 pub enum Direction {
+    None = sys::ImGuiDir_None,
     Left = sys::ImGuiDir_Left,
     Right = sys::ImGuiDir_Right,
     Up = sys::ImGuiDir_Up,

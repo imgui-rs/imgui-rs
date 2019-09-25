@@ -294,6 +294,10 @@ pub struct FontConfig {
     pub rasterizer_flags: u32,
     /// Brighten (>1.0) or darken (<1.0) font output
     pub rasterizer_multiply: f32,
+    /// Explicitly specify the ellipsis character.
+    ///
+    /// With multiple font sources the first specified ellipsis is used.
+    pub ellipsis_char: Option<char>,
     pub name: Option<String>,
 }
 
@@ -311,6 +315,7 @@ impl Default for FontConfig {
             glyph_max_advance_x: f32::MAX,
             rasterizer_flags: 0,
             rasterizer_multiply: 1.0,
+            ellipsis_char: None,
             name: None,
         }
     }
@@ -329,6 +334,7 @@ impl FontConfig {
         raw.GlyphMaxAdvanceX = self.glyph_max_advance_x;
         raw.RasterizerFlags = self.rasterizer_flags;
         raw.RasterizerMultiply = self.rasterizer_multiply;
+        raw.EllipsisChar = self.ellipsis_char.map(|x| x as u16).unwrap_or(0xffff);
         if let Some(name) = self.name.as_ref() {
             let bytes = name.as_bytes();
             let mut len = bytes.len().max(raw.Name.len() - 1);

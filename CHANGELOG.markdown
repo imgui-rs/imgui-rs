@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Changed
+
+- Upgrade to cimgui / imgui 1.73
+-
 ### Removed
 
 - Various things that were deprecated in imgui-rs 0.2.0
