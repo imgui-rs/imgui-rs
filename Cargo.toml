@@ -23,7 +23,7 @@ glium = { version = "0.25", default-features = false, optional = true }
 gfx = { version = "0.18", optional = true }
 imgui-sys = { version = "0.3.0-pre", path = "imgui-sys" }
 lazy_static = "1.1"
-parking_lot = "0.9"
+parking_lot = "0.10"
 
 [dev-dependencies]
 memoffset = "0.5"
