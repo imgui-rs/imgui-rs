@@ -1,7 +1,7 @@
 use bitflags::bitflags;
 use std::f32;
 use std::ops::{Index, IndexMut};
-use std::os::raw::{c_char, c_int, c_void};
+use std::os::raw::{c_char, c_void};
 use std::time::Instant;
 
 use crate::fonts::atlas::FontAtlas;
@@ -44,6 +44,24 @@ bitflags! {
         /// `set_mouse_cursor` to change the mouse cursor. You may want to honor requests from
         /// imgui-rs by reading `get_mouse_cursor` yourself instead.
         const NO_MOUSE_CURSOR_CHANGE = sys::ImGuiConfigFlags_NoMouseCursorChange;
+        /// [BETA] Enable docking of windows
+        const DOCKING_ENABLE = sys::ImGuiConfigFlags_DockingEnable;
+        /// [BETA] Enable support for viewports
+        ///
+        /// When using viewports it is recommended that your default value for ImGuiCol_WindowBg
+        /// is opaque (Alpha=1.0) so transition to a viewport won't be noticeable.
+        const VIEWPORTS_ENABLE = sys::ImGuiConfigFlags_ViewportsEnable;
+        /// [BETA Don't use] FIXME-DPI: Reposition and resize imgui windows when the DpiScale
+        /// of a viewport changed (mostly useful for the main viewport hosting other window).
+        ///
+        /// Note that resizing the main window itself is up to your application.
+        const DPI_ENABLE_SCALE_VIEWPORTS = sys::ImGuiConfigFlags_DpiEnableScaleViewports;
+        /// [BETA: Don't use] FIXME-DPI: Request bitmap-scaled fonts to match DpiScale.
+        ///
+        /// This is a very low-quality workaround. The correct way to handle DPI is _currently_
+        /// to replace the atlas and/or fonts in the Platform_OnChangedViewport callback, but
+        /// this is all early work in progress.
+        const DPI_ENABLE_SCALE_FONTS = sys::ImGuiConfigFlags_DpiEnableScaleFonts;
         /// Application is SRGB-aware.
         ///
         /// Not used by core imgui-rs.
@@ -117,7 +135,7 @@ impl NavInput {
         NavInput::TweakFast,
     ];
     /// Amount of internal/hidden variants (not exposed by imgui-rs)
-    const INTERNAL_COUNT: usize = 6;
+    const INTERNAL_COUNT: usize = 5;
     /// Total count of `NavInput` variants
     pub const COUNT: usize = sys::ImGuiNavInput_COUNT as usize - NavInput::INTERNAL_COUNT;
 }
@@ -174,6 +192,43 @@ pub struct Io {
     /// framebuffer coordinates
     pub display_framebuffer_scale: [f32; 2],
 
+    /// Simplified docking mode: disable window splitting, so docking is limited to merging
+    /// multiple windows together into tab-bars.
+    pub docking_no_split: bool,
+
+    /// Enable docking with holding Shift key (reduce visual noise, allows dropping in wider space)
+    pub docking_with_shift: bool,
+
+    /// [BETA] [FIXME: This currently creates regression with auto-sizing and general overhead]
+    /// Make every single floating window display within a docking node.
+    pub docking_always_tabbar: bool,
+
+    /// [BETA] Make window or viewport transparent when docking and only display docking boxes on
+    /// the target viewport. Useful if rendering of multiple viewport cannot be synced. Best
+    /// used with viewports auto merging.
+    pub docking_transparent_payload: bool,
+
+    /// Set to make all floating imgui windows always create their own viewport. Otherwise,
+    /// they are merged into the main host viewports when overlapping it. May also set
+    /// ImGuiViewportFlags_NoAutoMerge on individual viewport.
+    pub viewports_no_auto_merge: bool,
+
+    /// Disable default OS task bar icon flag for secondary viewports. When a viewport
+    /// doesn't want a task bar icon, ImGuiViewportFlags_NoTaskBarIcon will be set on it.
+    pub viewports_no_taskbar_icon: bool,
+
+    /// [BETA] Disable default OS window decoration flag for secondary viewports. When a viewport
+    /// doesn't want window decorations, ImGuiViewportFlags_NoDecoration will be set on it.
+    /// Enabling decoration can create subsequent issues at OS levels (e.g. minimum window size).
+    pub viewports_no_decoration: bool,
+
+    /// Disable default OS parenting to main viewport for secondary viewports. By default,
+    /// viewports are marked with ParentViewportId = <main_viewport>, expecting the platform
+    /// back-end to setup a parent/child relationship between the OS windows (some back-end
+    /// may ignore this). Set to true if you want the default to be 0, then all viewports
+    /// will be top-level OS windows.
+    pub viewports_no_default_parent: bool,
+
     /// Request imgui-rs to draw a mouse cursor for you
     pub mouse_draw_cursor: bool,
     /// macOS-style input behavior.
@@ -196,6 +251,8 @@ pub struct Io {
     ///
     /// Windows without a title bar are not affected.
     pub config_windows_move_from_title_bar_only: bool,
+    /// // [BETA] Compact window memory usage when unused. Set to -1.0f to disable.
+    pub config_windows_memory_compact_timer: f32,
 
     pub(crate) backend_platform_name: *const c_char,
     pub(crate) backend_renderer_name: *const c_char,
@@ -207,8 +264,6 @@ pub struct Io {
     pub(crate) set_clipboard_text_fn:
         Option<unsafe extern "C" fn(user_data: *mut c_void, text: *const c_char)>,
     pub(crate) clipboard_user_data: *mut c_void,
-    ime_set_input_screen_pos_fn: Option<unsafe extern "C" fn(x: c_int, y: c_int)>,
-    ime_window_handle: *mut c_void,
     render_draw_lists_fn_unused: *mut c_void,
 
     /// Mouse position, in pixels.
@@ -226,6 +281,12 @@ pub struct Io {
     /// Most users don't have a mouse with a horizontal wheel, and may not be filled by all
     /// backends.
     pub mouse_wheel_h: f32,
+    /// (Optional) When using multiple viewports: viewport the OS mouse cursor is hovering
+    /// _IGNORING_ viewports with the ImGuiViewportFlags_NoInputs flag, and _REGARDLESS_ of
+    /// whether another viewport is focused. Set io.BackendFlags |= ImGuiBackendFlags_HasMouseHoveredViewport
+    /// if you can provide this info. If you don't imgui will infer the value using the
+    /// rectangles and last focused time of the viewports it knows about (ignoring other OS windows).
+    pub mouse_hovered_viewport: sys::ImGuiID,
     /// Keyboard modifier pressed: Control
     pub key_ctrl: bool,
     /// Keyboard modifier pressed: Shift
@@ -405,6 +466,14 @@ fn test_io_memory_layout() {
     assert_field_offset!(font_allow_user_scaling, FontAllowUserScaling);
     assert_field_offset!(font_default, FontDefault);
     assert_field_offset!(display_framebuffer_scale, DisplayFramebufferScale);
+    assert_field_offset!(docking_no_split, ConfigDockingNoSplit);
+    assert_field_offset!(docking_with_shift, ConfigDockingWithShift);
+    assert_field_offset!(docking_always_tabbar, ConfigDockingAlwaysTabBar);
+    assert_field_offset!(docking_transparent_payload, ConfigDockingTransparentPayload);
+    assert_field_offset!(viewports_no_auto_merge, ConfigViewportsNoAutoMerge);
+    assert_field_offset!(viewports_no_taskbar_icon, ConfigViewportsNoTaskBarIcon);
+    assert_field_offset!(viewports_no_decoration, ConfigViewportsNoDecoration);
+    assert_field_offset!(viewports_no_default_parent, ConfigViewportsNoDefaultParent);
     assert_field_offset!(mouse_draw_cursor, MouseDrawCursor);
     assert_field_offset!(config_mac_os_behaviors, ConfigMacOSXBehaviors);
     assert_field_offset!(config_input_text_cursor_blink, ConfigInputTextCursorBlink);
@@ -416,6 +485,10 @@ fn test_io_memory_layout() {
         config_windows_move_from_title_bar_only,
         ConfigWindowsMoveFromTitleBarOnly
     );
+    assert_field_offset!(
+        config_windows_memory_compact_timer,
+        ConfigWindowsMemoryCompactTimer
+    );
     assert_field_offset!(backend_platform_name, BackendPlatformName);
     assert_field_offset!(backend_renderer_name, BackendRendererName);
     assert_field_offset!(backend_platform_user_data, BackendPlatformUserData);
@@ -424,13 +497,12 @@ fn test_io_memory_layout() {
     assert_field_offset!(get_clipboard_text_fn, GetClipboardTextFn);
     assert_field_offset!(set_clipboard_text_fn, SetClipboardTextFn);
     assert_field_offset!(clipboard_user_data, ClipboardUserData);
-    assert_field_offset!(ime_set_input_screen_pos_fn, ImeSetInputScreenPosFn);
-    assert_field_offset!(ime_window_handle, ImeWindowHandle);
     assert_field_offset!(render_draw_lists_fn_unused, RenderDrawListsFnUnused);
     assert_field_offset!(mouse_pos, MousePos);
     assert_field_offset!(mouse_down, MouseDown);
     assert_field_offset!(mouse_wheel, MouseWheel);
     assert_field_offset!(mouse_wheel_h, MouseWheelH);
+    assert_field_offset!(mouse_hovered_viewport, MouseHoveredViewport);
     assert_field_offset!(key_ctrl, KeyCtrl);
     assert_field_offset!(key_shift, KeyShift);
     assert_field_offset!(key_alt, KeyAlt);

@@ -27,6 +27,8 @@ pub struct DrawData {
     /// Based on io.display_frame_buffer_scale. Typically [1.0, 1.0] on normal displays, and
     /// [2.0, 2.0] on Retina displays, but fractional values are also possible.
     pub framebuffer_scale: [f32; 2],
+    /// Viewport carrying the ImDrawData instance, might be of use to the renderer (generally not).
+    pub owner_viewport: *mut sys::ImGuiViewport,
 }
 
 unsafe impl RawCast<sys::ImDrawData> for DrawData {}
@@ -105,6 +107,7 @@ fn test_drawdata_memory_layout() {
     assert_field_offset!(display_pos, DisplayPos);
     assert_field_offset!(display_size, DisplaySize);
     assert_field_offset!(framebuffer_scale, FramebufferScale);
+    assert_field_offset!(owner_viewport, OwnerViewport);
 }
 
 /// Draw command list

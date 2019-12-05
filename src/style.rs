@@ -124,7 +124,7 @@ pub struct Style {
     /// quality.
     pub curve_tessellation_tol: f32,
     /// Style colors.
-    pub colors: [[f32; 4]; 48],
+    pub colors: [[f32; 4]; 50],
 }
 
 unsafe impl RawCast<sys::ImGuiStyle> for Style {}
@@ -219,6 +219,8 @@ pub enum StyleColor {
     TabActive = sys::ImGuiCol_TabActive,
     TabUnfocused = sys::ImGuiCol_TabUnfocused,
     TabUnfocusedActive = sys::ImGuiCol_TabUnfocusedActive,
+    DockingPreview = sys::ImGuiCol_DockingPreview,
+    DockingEmptyBg = sys::ImGuiCol_DockingEmptyBg,
     PlotLines = sys::ImGuiCol_PlotLines,
     PlotLinesHovered = sys::ImGuiCol_PlotLinesHovered,
     PlotHistogram = sys::ImGuiCol_PlotHistogram,
@@ -276,6 +278,8 @@ impl StyleColor {
         StyleColor::TabActive,
         StyleColor::TabUnfocused,
         StyleColor::TabUnfocusedActive,
+        StyleColor::DockingPreview,
+        StyleColor::DockingEmptyBg,
         StyleColor::PlotLines,
         StyleColor::PlotLinesHovered,
         StyleColor::PlotHistogram,
