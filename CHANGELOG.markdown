@@ -14,6 +14,11 @@
 
 - Various things that were deprecated in imgui-rs 0.2.0
 
+### Fixed
+
+- Fix toggling behavior on using `MenuItem::build_with_ref` and
+  `Selectable::build_with_ref`.
+
 ## [0.2.1] - 2019-09-09
 
 ### Fixed

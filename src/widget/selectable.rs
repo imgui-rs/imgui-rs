@@ -123,7 +123,7 @@ impl<'a> Selectable<'a> {
     /// Builds the selectable using a mutable reference to selected state.
     pub fn build_with_ref(self, ui: &Ui, selected: &mut bool) -> bool {
         if self.selected(*selected).build(ui) {
-            *selected = true;
+            *selected = !*selected;
             true
         } else {
             false
