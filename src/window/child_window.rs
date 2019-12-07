@@ -83,6 +83,14 @@ impl<'a> ChildWindow<'a> {
         self.border = border;
         self
     }
+    /// Enables/disables moving the window when child window is dragged.
+    ///
+    /// Enabled by default.
+    #[inline]
+    pub fn movable(mut self, value: bool) -> Self {
+        self.flags.set(WindowFlags::NO_MOVE, !value);
+        self
+    }
     /// Enables/disables scrollbars (scrolling is still possible with the mouse or
     /// programmatically).
     ///

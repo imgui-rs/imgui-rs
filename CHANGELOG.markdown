@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Added
+
+- Add `ChildWindow::movable`
+
 ### Changed
 
 - Upgrade to cimgui / imgui 1.73
