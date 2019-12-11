@@ -10,11 +10,20 @@ fn main() {
         .join("imgui-sys")
         .canonicalize()
         .expect("Failed to find imgui-sys directory");
-    let bindings = generate_bindings(&sys_path.join("third-party").join("cimgui"))
+
+    let bindings = generate_bindings(&sys_path.join("third-party").join("cimgui"), None)
         .expect("Failed to generate bindings");
     let output_path = sys_path.join("src").join("bindings.rs");
     bindings
         .write_to_file(&output_path)
         .expect("Failed to write bindings");
+        
+    let wasm_bindings = generate_bindings(&sys_path.join("third-party").join("cimgui"), Some("imgui-sys-v0".into()))
+        .expect("Failed to generate bindings");
+    let output_path = sys_path.join("src").join("wasm_bindings.rs");
+    wasm_bindings
+        .write_to_file(&output_path)
+        .expect("Failed to write wasm bindings");
+
     println!("Wrote bindings to {}", output_path.to_string_lossy());
 }

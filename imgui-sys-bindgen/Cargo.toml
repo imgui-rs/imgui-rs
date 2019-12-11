@@ -9,8 +9,11 @@ license = "MIT/Apache-2.0"
 publish = false
 
 [dependencies]
-bindgen = "0.51"
+bindgen = "0.52"
 failure = "0.1"
 serde = "1.0"
 serde_derive = "1.0"
 serde_json = "1.0"
+
+[patch.crates-io]
+bindgen = { git = "https://github.com/rust-lang/rust-bindgen.git", rev = "b3c3980d23f4031a72bdc52e299f2009fba7e0d5" }
