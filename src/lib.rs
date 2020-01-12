@@ -109,7 +109,7 @@ pub struct Ui<'ui> {
     font_atlas: Option<cell::RefMut<'ui, SharedFontAtlas>>,
 }
 
-static FMT: &'static [u8] = b"%s\0";
+static FMT: &[u8] = b"%s\0";
 
 fn fmt_ptr() -> *const c_char {
     FMT.as_ptr() as *const c_char
@@ -240,7 +240,7 @@ impl<'ui> Ui<'ui> {
         buf: &'p mut ImString,
         size: [f32; 2],
     ) -> InputTextMultiline<'ui, 'p> {
-        InputTextMultiline::new(self, label, buf, size.into())
+        InputTextMultiline::new(self, label, buf, size)
     }
     #[must_use]
     pub fn input_float<'p>(&self, label: &'p ImStr, value: &'p mut f32) -> InputFloat<'ui, 'p> {
@@ -382,8 +382,6 @@ impl<'ui> Ui<'ui> {
     ///         });
     ///     }
     /// }
-    /// # fn main() {
-    /// # }
     /// ```
     pub fn tooltip<F: FnOnce()>(&self, f: F) {
         unsafe { sys::igBeginTooltip() };
@@ -404,8 +402,6 @@ impl<'ui> Ui<'ui> {
     ///         ui.tooltip_text("I'm a tooltip!");
     ///     }
     /// }
-    /// # fn main() {
-    /// # }
     /// ```
     pub fn tooltip_text<T: AsRef<str>>(&self, text: T) {
         self.tooltip(|| self.text(text));
@@ -465,10 +461,8 @@ impl<'ui> Ui<'ui> {
         items: &'p [&'p StringType],
         height_in_items: i32,
     ) -> bool {
-        let items_inner: Vec<*const c_char> = items
-            .into_iter()
-            .map(|item| item.as_ref().as_ptr())
-            .collect();
+        let items_inner: Vec<*const c_char> =
+            items.iter().map(|item| item.as_ref().as_ptr()).collect();
         unsafe {
             sys::igListBoxStr_arr(
                 label.as_ptr(),

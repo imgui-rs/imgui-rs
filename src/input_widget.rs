@@ -151,7 +151,7 @@ extern "C" fn resize_callback(data: *mut sys::ImGuiInputTextCallbackData) -> c_i
                 }
             }
         }
-        return 0;
+        0
     }
 }
 

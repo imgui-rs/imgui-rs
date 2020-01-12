@@ -190,7 +190,7 @@ pub struct ImStr(CStr);
 
 impl<'a> Default for &'a ImStr {
     fn default() -> &'a ImStr {
-        static SLICE: &'static [u8] = &[0];
+        static SLICE: &[u8] = &[0];
         unsafe { ImStr::from_utf8_with_nul_unchecked(SLICE) }
     }
 }

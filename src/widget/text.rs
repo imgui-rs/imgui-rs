@@ -4,7 +4,7 @@ use crate::string::ImStr;
 use crate::style::StyleColor;
 use crate::Ui;
 
-static FMT: &'static [u8] = b"%s\0";
+static FMT: &[u8] = b"%s\0";
 
 #[inline]
 fn fmt_ptr() -> *const c_char {
