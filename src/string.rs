@@ -195,6 +195,20 @@ impl Deref for ImString {
     }
 }
 
+impl fmt::Write for ImString {
+    #[inline]
+    fn write_str(&mut self, s: &str) -> fmt::Result {
+        self.push_str(s);
+        Ok(())
+    }
+
+    #[inline]
+    fn write_char(&mut self, c: char) -> fmt::Result {
+        self.push(c);
+        Ok(())
+    }
+}
+
 /// A UTF-8 encoded, implicitly null-terminated string slice.
 #[derive(Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub struct ImStr(CStr);
@@ -307,6 +321,14 @@ fn test_imstring_operations() {
     assert_eq!(s.0, b"imgui-rs\0");
     s.push_str("öä");
     assert_eq!(s.0, b"imgui-rs\xc3\xb6\xc3\xa4\0");
+}
+
+#[test]
+fn test_imstring_fmt_write() {
+    use std::fmt::Write;
+    let mut s = ImString::default();
+    let _ = write!(s, "format {:02x}", 0x42);
+    assert_eq!(s.0, b"format 42\0");
 }
 
 #[test]
