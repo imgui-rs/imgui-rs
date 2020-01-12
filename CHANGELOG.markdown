@@ -8,8 +8,8 @@
 
 ### Changed
 
-- Upgrade to cimgui / imgui 1.73
--
+- Upgrade to cimgui / imgui 1.74
+
 ### Removed
 
 - Various things that were deprecated in imgui-rs 0.2.0

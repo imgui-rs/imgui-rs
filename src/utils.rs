@@ -64,6 +64,10 @@ impl<'ui> Ui<'ui> {
     pub fn is_item_deactivated_after_edit(&self) -> bool {
         unsafe { sys::igIsItemDeactivatedAfterEdit() }
     }
+    /// Returns `true` if the last item open state was toggled
+    pub fn is_item_toggled_open(&self) -> bool {
+        unsafe { sys::igIsItemToggledOpen() }
+    }
     /// Returns `true` if any item is hovered
     pub fn is_any_item_hovered(&self) -> bool {
         unsafe { sys::igIsAnyItemHovered() }
