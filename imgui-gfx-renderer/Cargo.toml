@@ -14,9 +14,6 @@ opengl = []
 directx = []
 default = ["opengl"]
 
-[badges]
-travis-ci = { repository = "Gekkio/imgui-rs" }
-
 [dependencies]
 gfx = "0.18"
 imgui = { version = "0.3.0-pre", path = "../", features = ["gfx"] }

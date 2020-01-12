@@ -9,9 +9,6 @@ repository = "https://github.com/Gekkio/imgui-rs"
 license = "MIT/Apache-2.0"
 categories = ["gui"]
 
-[badges]
-travis-ci = { repository = "Gekkio/imgui-rs" }
-
 [dependencies]
 imgui = { version = "0.3.0-pre", path = "../" }
 winit-19 = { version = ">= 0.16, <= 0.19", package = "winit", optional = true }

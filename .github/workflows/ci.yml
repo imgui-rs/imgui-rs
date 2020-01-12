@@ -1,0 +1,194 @@
+name: ci
+on:
+  pull_request:
+  push:
+    branches:
+    - master
+  schedule:
+    - cron: "0 0 * * 1"
+
+jobs:
+  check:
+    name: Run checks
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Checkout submodules
+        shell: bash
+        run: |
+          auth_header="$(git config --local --get http.https://github.com/.extraheader)"
+          git submodule sync --recursive
+          git -c "http.extraheader=$auth_header" -c protocol.version=2 submodule update --init --force --recursive --depth=1
+      - name: Install stable toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+          override: true
+          components: rustfmt, clippy
+      - name: Cache cargo registry
+        uses: actions/cache@v1
+        with:
+          path: ~/.cargo/registry
+          key: ${{ runner.os }}-cargo-registry
+      - name: Cache cargo index
+        uses: actions/cache@v1
+        with:
+          path: ~/.cargo/git
+          key: ${{ runner.os }}-cargo-index
+      - name: Run cargo check
+        uses: actions-rs/cargo@v1
+        with:
+          command: check
+      - name: Run cargo check (imgui-examples)
+        uses: actions-rs/cargo@v1
+        with:
+          command: check
+          args: --manifest-path imgui-examples/Cargo.toml
+      - name: Run cargo check (imgui-gfx-examples)
+        uses: actions-rs/cargo@v1
+        with:
+          command: check
+          args: --manifest-path imgui-gfx-examples/Cargo.toml
+      - name: Run cargo check (imgui-sys-bindgen)
+        uses: actions-rs/cargo@v1
+        with:
+          command: check
+          args: --manifest-path imgui-sys-bindgen/Cargo.toml
+      - name: Run cargo check (imgui-winit-support with winit-19)
+        uses: actions-rs/cargo@v1
+        with:
+          command: check
+          args: --manifest-path imgui-winit-support/Cargo.toml --no-default-features --features winit-19
+      - name: Run cargo check (imgui-winit-support with winit-20)
+        uses: actions-rs/cargo@v1
+        with:
+          command: check
+          args: --manifest-path imgui-winit-support/Cargo.toml --no-default-features --features winit-20
+      - name: Run cargo fmt
+        uses: actions-rs/cargo@v1
+        with:
+          command: fmt
+          args: --all -- --check
+      - name: Run cargo fmt (imgui-examples)
+        uses: actions-rs/cargo@v1
+        with:
+          command: fmt
+          args: --manifest-path imgui-examples/Cargo.toml -- --check
+      - name: Run cargo fmt (imgui-gfx-examples)
+        uses: actions-rs/cargo@v1
+        with:
+          command: fmt
+          args: --manifest-path imgui-gfx-examples/Cargo.toml -- --check
+      - name: Run cargo fmt (imgui-sys-bindgen)
+        uses: actions-rs/cargo@v1
+        with:
+          command: fmt
+          args: --manifest-path imgui-sys-bindgen/Cargo.toml -- --check
+      - name: Run cargo clippy
+        uses: actions-rs/cargo@v1
+        with:
+          command: clippy
+          args: --all
+      - name: Run cargo clippy (imgui-examples)
+        uses: actions-rs/cargo@v1
+        with:
+          command: clippy
+          args: --manifest-path imgui-examples/Cargo.toml
+      - name: Run cargo clippy (imgui-gfx-examples)
+        uses: actions-rs/cargo@v1
+        with:
+          command: clippy
+          args: --manifest-path imgui-gfx-examples/Cargo.toml
+      - name: Run cargo clippy (imgui-sys-bindgen)
+        uses: actions-rs/cargo@v1
+        with:
+          command: clippy
+          args: --manifest-path imgui-sys-bindgen/Cargo.toml
+      - name: Clean cache
+        run: |
+          cargo install --no-default-features --features ci-autoclean cargo-cache
+          cargo-cache
+  test:
+    name: Run tests
+    needs: [check]
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        rust:
+          - stable
+          - beta
+          - 1.36.0
+        os:
+          - ubuntu-latest
+          - macos-latest
+          - windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Checkout submodules
+        shell: bash
+        run: |
+          auth_header="$(git config --local --get http.https://github.com/.extraheader)"
+          git submodule sync --recursive
+          git -c "http.extraheader=$auth_header" -c protocol.version=2 submodule update --init --force --recursive --depth=1
+      - name: Install toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: ${{ matrix.rust }}
+          override: true
+      - name: Install Ubuntu packages
+        run: sudo apt install libxcb-shape0-dev libxcb-xfixes0-dev
+        if: runner.os == 'Linux'
+      - name: Cache cargo registry
+        uses: actions/cache@v1
+        with:
+          path: ~/.cargo/registry
+          key: ${{ runner.os }}-cargo-registry
+      - name: Cache cargo index
+        uses: actions/cache@v1
+        with:
+          path: ~/.cargo/git
+          key: ${{ runner.os }}-cargo-index
+      - name: Run cargo test
+        uses: actions-rs/cargo@v1
+        with:
+          command: test
+          args: --all
+      - name: Run cargo test (imgui-examples)
+        uses: actions-rs/cargo@v1
+        with:
+          command: test
+          args: --manifest-path imgui-examples/Cargo.toml
+      - name: Run cargo test (imgui-gfx-examples)
+        uses: actions-rs/cargo@v1
+        with:
+          command: test
+          args: --manifest-path imgui-gfx-examples/Cargo.toml
+      - name: Run cargo test (imgui-sys-bindgen)
+        uses: actions-rs/cargo@v1
+        with:
+          command: test
+          args: --manifest-path imgui-sys-bindgen/Cargo.toml
+      - name: Run cargo test (imgui-gfx-examples with directx)
+        uses: actions-rs/cargo@v1
+        if: runner.os == 'Windows'
+        with:
+          command: test
+          args: --manifest-path imgui-gfx-examples/Cargo.toml --no-default-features --features directx
+      - name: Run cargo test (imgui-winit-support with winit-19)
+        uses: actions-rs/cargo@v1
+        with:
+          command: test
+          args: --manifest-path imgui-winit-support/Cargo.toml --no-default-features --features winit-19
+      - name: Run cargo test (imgui-winit-support with winit-20)
+        uses: actions-rs/cargo@v1
+        with:
+          command: test
+          args: --manifest-path imgui-winit-support/Cargo.toml --no-default-features --features winit-20
+      - name: Clean cache
+        run: |
+          cargo install --no-default-features --features ci-autoclean cargo-cache
+          cargo-cache

@@ -14,9 +14,6 @@ exclude = [
     "/resources"
 ]
 
-[badges]
-travis-ci = { repository = "Gekkio/imgui-rs" }
-
 [dependencies]
 bitflags = "1.0"
 glium = { version = "0.25", default-features = false, optional = true }
