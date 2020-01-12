@@ -266,3 +266,61 @@ impl ToOwned for ImStr {
         ImString(self.0.to_owned().into_bytes())
     }
 }
+
+#[test]
+fn test_imstring_constructors() {
+    let s = ImString::new("test");
+    assert_eq!(s.0, b"test\0");
+
+    let s = ImString::with_capacity(100);
+    assert_eq!(s.0, b"\0");
+
+    let s = unsafe { ImString::from_utf8_unchecked(vec![b't', b'e', b's', b't']) };
+    assert_eq!(s.0, b"test\0");
+
+    let s = unsafe { ImString::from_utf8_with_nul_unchecked(vec![b't', b'e', b's', b't', b'\0']) };
+    assert_eq!(s.0, b"test\0");
+}
+
+#[test]
+fn test_imstring_operations() {
+    let mut s = ImString::new("test");
+    s.clear();
+    assert_eq!(s.0, b"\0");
+    s.push('z');
+    assert_eq!(s.0, b"z\0");
+    s.push('ä');
+    assert_eq!(s.0, b"z\xc3\xa4\0");
+    s.clear();
+    s.push_str("imgui-rs");
+    assert_eq!(s.0, b"imgui-rs\0");
+    s.push_str("öä");
+    assert_eq!(s.0, b"imgui-rs\xc3\xb6\xc3\xa4\0");
+}
+
+#[test]
+fn test_imstring_refresh_len() {
+    let mut s = ImString::new("testing");
+    unsafe {
+        let mut ptr = s.as_mut_ptr() as *mut u8;
+        ptr = ptr.wrapping_add(2);
+        *ptr = b'z';
+        ptr = ptr.wrapping_add(1);
+        *ptr = b'\0';
+    }
+    assert_eq!(s.0, b"tez\0ing\0");
+    unsafe {  s.refresh_len() };
+    assert_eq!(s.0, b"tez\0");
+}
+
+#[test]
+fn test_imstring_interior_nul() {
+    let s = ImString::new("test\0ohno");
+    assert_eq!(s.0, b"test\0ohno\0");
+    assert_eq!(s.to_str(), "test");
+    assert!(!s.is_empty());
+
+    let s = ImString::new("\0ohno");
+    assert_eq!(s.to_str(), "");
+    assert!(s.is_empty());
+}
