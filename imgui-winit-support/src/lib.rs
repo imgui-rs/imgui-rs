@@ -66,7 +66,7 @@
 //! }
 //! ```
 
-#[cfg(feature = "winit-19")]
+#[cfg(all(feature = "winit-19", not(feature = "winit-20")))]
 use winit_19 as winit;
 
 #[cfg(feature = "winit-20")]
@@ -76,7 +76,7 @@ use imgui::{self, BackendFlags, ConfigFlags, Context, ImString, Io, Key, Ui};
 use std::cmp::Ordering;
 use winit::dpi::{LogicalPosition, LogicalSize};
 
-#[cfg(feature = "winit-19")]
+#[cfg(all(feature = "winit-19", not(feature = "winit-20")))]
 use winit::{
     DeviceEvent, ElementState, Event, KeyboardInput, MouseButton, MouseCursor, MouseScrollDelta,
     TouchPhase, VirtualKeyCode, Window, WindowEvent,
@@ -188,7 +188,7 @@ impl WinitPlatform {
     ///
     /// * framebuffer scale (= DPI factor) is set
     /// * display size is set
-    #[cfg(feature = "winit-19")]
+    #[cfg(all(feature = "winit-19", not(feature = "winit-20")))]
     pub fn attach_window(&mut self, io: &mut Io, window: &Window, hidpi_mode: HiDpiMode) {
         let (hidpi_mode, hidpi_factor) = hidpi_mode.apply(window.get_hidpi_factor());
         self.hidpi_mode = hidpi_mode;
@@ -225,7 +225,7 @@ impl WinitPlatform {
     ///
     /// This utility function is useful if you are using a DPI mode other than default, and want
     /// your application to use the same logical coordinates as imgui-rs.
-    #[cfg(feature = "winit-19")]
+    #[cfg(all(feature = "winit-19", not(feature = "winit-20")))]
     pub fn scale_size_from_winit(&self, window: &Window, logical_size: LogicalSize) -> LogicalSize {
         match self.hidpi_mode {
             ActiveHiDpiMode::Default => logical_size,
@@ -255,7 +255,7 @@ impl WinitPlatform {
     ///
     /// This utility function is useful if you are using a DPI mode other than default, and want
     /// your application to use the same logical coordinates as imgui-rs.
-    #[cfg(feature = "winit-19")]
+    #[cfg(all(feature = "winit-19", not(feature = "winit-20")))]
     pub fn scale_pos_from_winit(
         &self,
         window: &Window,
@@ -289,7 +289,7 @@ impl WinitPlatform {
     ///
     /// This utility function is useful if you are using a DPI mode other than default, and want
     /// your application to use the same logical coordinates as imgui-rs.
-    #[cfg(feature = "winit-19")]
+    #[cfg(all(feature = "winit-19", not(feature = "winit-20")))]
     pub fn scale_pos_for_winit(
         &self,
         window: &Window,
@@ -326,7 +326,7 @@ impl WinitPlatform {
     /// * window size / dpi factor changes are applied
     /// * keyboard state is updated
     /// * mouse state is updated
-    #[cfg(feature = "winit-19")]
+    #[cfg(all(feature = "winit-19", not(feature = "winit-20")))]
     pub fn handle_event(&mut self, io: &mut Io, window: &Window, event: &Event) {
         match *event {
             Event::WindowEvent {
@@ -397,7 +397,7 @@ impl WinitPlatform {
             _ => (),
         }
     }
-    #[cfg(feature = "winit-19")]
+    #[cfg(all(feature = "winit-19", not(feature = "winit-20")))]
     fn handle_window_event(&mut self, io: &mut Io, window: &Window, event: &WindowEvent) {
         match *event {
             WindowEvent::Resized(logical_size) => {
@@ -592,7 +592,7 @@ impl WinitPlatform {
     /// This function performs the following actions:
     ///
     /// * mouse cursor is repositioned (if requested by imgui-rs)
-    #[cfg(feature = "winit-19")]
+    #[cfg(all(feature = "winit-19", not(feature = "winit-20")))]
     pub fn prepare_frame(&self, io: &mut Io, window: &Window) -> Result<(), String> {
         if io.want_set_mouse_pos {
             let logical_pos = self.scale_pos_for_winit(
@@ -628,7 +628,7 @@ impl WinitPlatform {
     /// This function performs the following actions:
     ///
     /// * mouse cursor is changed and/or hidden (if requested by imgui-rs)
-    #[cfg(feature = "winit-19")]
+    #[cfg(all(feature = "winit-19", not(feature = "winit-20")))]
     pub fn prepare_render(&self, ui: &Ui, window: &Window) {
         let io = ui.io();
         if !io
