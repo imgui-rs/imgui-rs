@@ -27,16 +27,6 @@ jobs:
           toolchain: stable
           override: true
           components: rustfmt, clippy
-      - name: Cache cargo registry
-        uses: actions/cache@v1
-        with:
-          path: ~/.cargo/registry
-          key: ${{ runner.os }}-cargo-registry
-      - name: Cache cargo index
-        uses: actions/cache@v1
-        with:
-          path: ~/.cargo/git
-          key: ${{ runner.os }}-cargo-index
       - name: Run cargo check
         uses: actions-rs/cargo@v1
         with:
@@ -106,10 +96,6 @@ jobs:
         with:
           command: clippy
           args: --manifest-path imgui-sys-bindgen/Cargo.toml
-      - name: Clean cache
-        run: |
-          cargo install --no-default-features --features ci-autoclean cargo-cache
-          cargo-cache
   test:
     name: Run tests
     needs: [check]
@@ -142,16 +128,6 @@ jobs:
       - name: Install Ubuntu packages
         run: sudo apt install libxcb-shape0-dev libxcb-xfixes0-dev
         if: runner.os == 'Linux'
-      - name: Cache cargo registry
-        uses: actions/cache@v1
-        with:
-          path: ~/.cargo/registry
-          key: ${{ runner.os }}-cargo-registry
-      - name: Cache cargo index
-        uses: actions/cache@v1
-        with:
-          path: ~/.cargo/git
-          key: ${{ runner.os }}-cargo-index
       - name: Run cargo test
         uses: actions-rs/cargo@v1
         with:
@@ -188,7 +164,3 @@ jobs:
         with:
           command: test
           args: --manifest-path imgui-winit-support/Cargo.toml --no-default-features --features winit-20
-      - name: Clean cache
-        run: |
-          cargo install --no-default-features --features ci-autoclean cargo-cache
-          cargo-cache
