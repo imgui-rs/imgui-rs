@@ -119,7 +119,7 @@ jobs:
         rust:
           - stable
           - beta
-          - 1.36.0
+          - 1.38.0
         os:
           - ubuntu-latest
           - macos-latest

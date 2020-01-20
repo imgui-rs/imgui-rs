@@ -9,6 +9,7 @@
 ### Changed
 
 - Upgrade to cimgui / imgui 1.74
+- Bump minimum Rust version to 1.38 (at least backtrace crate requires it)
 
 ### Removed
 
