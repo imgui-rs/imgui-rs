@@ -40,12 +40,20 @@ impl ImString {
     }
     /// Converts a vector of bytes to a `ImString` without checking that the string contains valid
     /// UTF-8
+    ///
+    /// # Safety
+    ///
+    /// It is up to the caller to guarantee the vector contains valid UTF-8 and no null terminator.
     pub unsafe fn from_utf8_unchecked(mut v: Vec<u8>) -> ImString {
         v.push(b'\0');
         ImString(v)
     }
     /// Converts a vector of bytes to a `ImString` without checking that the string contains valid
     /// UTF-8
+    ///
+    /// # Safety
+    ///
+    /// It is up to the caller to guarantee the vector contains valid UTF-8 and a null terminator.
     pub unsafe fn from_utf8_with_nul_unchecked(v: Vec<u8>) -> ImString {
         ImString(v)
     }
@@ -102,6 +110,11 @@ impl ImString {
     ///
     /// This function *must* be called if the underlying data is modified via a pointer
     /// obtained by `as_mut_ptr`.
+    ///
+    /// # Safety
+    ///
+    /// It is up to the caller to guarantee the this ImString contains valid UTF-8 and a null
+    /// terminator.
     pub unsafe fn refresh_len(&mut self) {
         let len = CStr::from_ptr(self.0.as_ptr() as *const c_char)
             .to_bytes_with_nul()
@@ -234,15 +247,28 @@ impl fmt::Display for ImStr {
 
 impl ImStr {
     /// Wraps a raw UTF-8 encoded C string
+    ///
+    /// # Safety
+    ///
+    /// It is up to the caller to guarantee the pointer is not null and it points to a
+    /// null-terminated UTF-8 string valid for the duration of the arbitrary lifetime 'a.
     pub unsafe fn from_ptr_unchecked<'a>(ptr: *const c_char) -> &'a ImStr {
         ImStr::from_cstr_unchecked(CStr::from_ptr(ptr))
     }
     /// Converts a slice of bytes to an imgui-rs string slice without checking for valid UTF-8 or
     /// null termination.
+    ///
+    /// # Safety
+    ///
+    /// It is up to the caller to guarantee the slice contains valid UTF-8 and a null terminator.
     pub unsafe fn from_utf8_with_nul_unchecked(bytes: &[u8]) -> &ImStr {
         &*(bytes as *const [u8] as *const ImStr)
     }
     /// Converts a CStr reference to an imgui-rs string slice without checking for valid UTF-8.
+    ///
+    /// # Safety
+    ///
+    /// It is up to the caller to guarantee the CStr reference contains valid UTF-8.
     pub unsafe fn from_cstr_unchecked(value: &CStr) -> &ImStr {
         &*(value as *const CStr as *const ImStr)
     }

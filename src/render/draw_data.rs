@@ -219,10 +219,12 @@ pub struct DrawVert {
 }
 
 #[cfg(feature = "glium")]
-use glium::implement_vertex;
-#[allow(clippy::unneeded_field_pattern)]
-#[cfg(feature = "glium")]
-implement_vertex!(DrawVert, pos, uv, col);
+mod glium_support {
+    #![allow(clippy::unneeded_field_pattern)]
+    use super::DrawVert;
+    use glium::implement_vertex;
+    implement_vertex!(DrawVert, pos, uv, col);
+}
 
 #[cfg(feature = "gfx")]
 mod gfx_support {

@@ -11,8 +11,8 @@ pub struct ImVector<T> {
 }
 
 impl<T> ImVector<T> {
-    pub unsafe fn as_slice(&self) -> &[T] {
-        slice::from_raw_parts(self.data, self.size as usize)
+    pub fn as_slice(&self) -> &[T] {
+        unsafe { slice::from_raw_parts(self.data, self.size as usize) }
     }
 }
 
@@ -45,26 +45,52 @@ pub trait RawWrapper {
     /// Wrapped raw type
     type Raw;
     /// Returns an immutable reference to the wrapped raw value
+    ///
+    /// # Safety
+    ///
+    /// It is up to the caller to use the returned raw reference without causing undefined
+    /// behaviour or breaking safety rules.
     unsafe fn raw(&self) -> &Self::Raw;
     /// Returns a mutable reference to the wrapped raw value
+    ///
+    /// # Safety
+    ///
+    /// It is up to the caller to use the returned mutable raw reference without causing undefined
+    /// behaviour or breaking safety rules.
     unsafe fn raw_mut(&mut self) -> &mut Self::Raw;
 }
 
 /// Casting from/to a raw type that has the same layout and alignment as the target type
 pub unsafe trait RawCast<T>: Sized {
     /// Casts an immutable reference from the raw type
+    ///
+    /// # Safety
+    ///
+    /// It is up to the caller to guarantee the cast is valid.
     unsafe fn from_raw(raw: &T) -> &Self {
         &*(raw as *const _ as *const Self)
     }
     /// Casts a mutable reference from the raw type
+    ///
+    /// # Safety
+    ///
+    /// It is up to the caller to guarantee the cast is valid.
     unsafe fn from_raw_mut(raw: &mut T) -> &mut Self {
         &mut *(raw as *mut _ as *mut Self)
     }
     /// Casts an immutable reference to the raw type
+    ///
+    /// # Safety
+    ///
+    /// It is up to the caller to guarantee the cast is valid.
     unsafe fn raw(&self) -> &T {
         &*(self as *const _ as *const T)
     }
     /// Casts a mutable reference to the raw type
+    ///
+    /// # Safety
+    ///
+    /// It is up to the caller to guarantee the cast is valid.
     unsafe fn raw_mut(&mut self) -> &mut T {
         &mut *(self as *mut _ as *mut T)
     }
