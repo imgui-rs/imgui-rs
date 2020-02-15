@@ -13,6 +13,6 @@ publish = false
 clipboard = "0.5"
 glium = { version = "0.26", default-features = true }
 image = "0.23"
-imgui = { version = "0.3.0-pre", path = "../" }
-imgui-glium-renderer = { version = "0.3.0-pre", path = "../imgui-glium-renderer" }
-imgui-winit-support = { version = "0.3.0-pre", path = "../imgui-winit-support" }
+imgui = { path = "../" }
+imgui-glium-renderer = { path = "../imgui-glium-renderer" }
+imgui-winit-support = { path = "../imgui-winit-support" }
