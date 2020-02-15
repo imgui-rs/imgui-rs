@@ -186,7 +186,7 @@ impl Context {
     }
     /// Loads settings from a string slice containing settings in .Ini file format
     pub fn load_ini_settings(&mut self, data: &str) {
-        unsafe { sys::igLoadIniSettingsFromMemory(data.as_ptr() as *const _, data.len()) }
+        unsafe { sys::igLoadIniSettingsFromMemory(data.as_ptr() as *const _, data.len() as u64) }
     }
     /// Saves settings to a mutable string buffer in .Ini file format
     pub fn save_ini_settings(&mut self, buf: &mut String) {

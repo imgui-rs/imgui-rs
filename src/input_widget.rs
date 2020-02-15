@@ -190,7 +190,7 @@ impl<'ui, 'p> InputText<'ui, 'p> {
             let result = sys::igInputText(
                 self.label.as_ptr(),
                 ptr,
-                capacity,
+                capacity as u64,
                 self.flags.bits(),
                 callback,
                 data,
@@ -240,7 +240,7 @@ impl<'ui, 'p> InputTextMultiline<'ui, 'p> {
             let result = sys::igInputTextMultiline(
                 self.label.as_ptr(),
                 ptr,
-                capacity,
+                capacity as u64,
                 self.size.into(),
                 self.flags.bits(),
                 callback,

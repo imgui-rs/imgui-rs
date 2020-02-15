@@ -5,6 +5,7 @@
 #![allow(non_snake_case)]
 #![allow(clippy::all)]
 
+pub type size_t = ::std::os::raw::c_ulong;
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone, PartialEq)]
 pub struct ImVec2_Simple {
@@ -5134,12 +5135,12 @@ extern "C" {
 extern "C" {
     pub fn igDebugCheckVersionAndDataLayout(
         version_str: *const ::std::os::raw::c_char,
-        sz_io: usize,
-        sz_style: usize,
-        sz_vec2: usize,
-        sz_vec4: usize,
-        sz_drawvert: usize,
-        sz_drawidx: usize,
+        sz_io: size_t,
+        sz_style: size_t,
+        sz_vec2: size_t,
+        sz_vec4: size_t,
+        sz_drawvert: size_t,
+        sz_drawidx: size_t,
     ) -> bool;
 }
 extern "C" {
@@ -5900,7 +5901,7 @@ extern "C" {
     pub fn igInputText(
         label: *const ::std::os::raw::c_char,
         buf: *mut ::std::os::raw::c_char,
-        buf_size: usize,
+        buf_size: size_t,
         flags: ImGuiInputTextFlags,
         callback: ImGuiInputTextCallback,
         user_data: *mut ::std::os::raw::c_void,
@@ -5910,7 +5911,7 @@ extern "C" {
     pub fn igInputTextMultiline(
         label: *const ::std::os::raw::c_char,
         buf: *mut ::std::os::raw::c_char,
-        buf_size: usize,
+        buf_size: size_t,
         size: ImVec2,
         flags: ImGuiInputTextFlags,
         callback: ImGuiInputTextCallback,
@@ -5922,7 +5923,7 @@ extern "C" {
         label: *const ::std::os::raw::c_char,
         hint: *const ::std::os::raw::c_char,
         buf: *mut ::std::os::raw::c_char,
-        buf_size: usize,
+        buf_size: size_t,
         flags: ImGuiInputTextFlags,
         callback: ImGuiInputTextCallback,
         user_data: *mut ::std::os::raw::c_void,
@@ -6420,7 +6421,7 @@ extern "C" {
     pub fn igSetDragDropPayload(
         type_: *const ::std::os::raw::c_char,
         data: *const ::std::os::raw::c_void,
-        sz: usize,
+        sz: size_t,
         cond: ImGuiCond,
     ) -> bool;
 }
@@ -6615,19 +6616,19 @@ extern "C" {
     pub fn igLoadIniSettingsFromDisk(ini_filename: *const ::std::os::raw::c_char);
 }
 extern "C" {
-    pub fn igLoadIniSettingsFromMemory(ini_data: *const ::std::os::raw::c_char, ini_size: usize);
+    pub fn igLoadIniSettingsFromMemory(ini_data: *const ::std::os::raw::c_char, ini_size: size_t);
 }
 extern "C" {
     pub fn igSaveIniSettingsToDisk(ini_filename: *const ::std::os::raw::c_char);
 }
 extern "C" {
-    pub fn igSaveIniSettingsToMemory(out_ini_size: *mut usize) -> *const ::std::os::raw::c_char;
+    pub fn igSaveIniSettingsToMemory(out_ini_size: *mut size_t) -> *const ::std::os::raw::c_char;
 }
 extern "C" {
     pub fn igSetAllocatorFunctions(
         alloc_func: ::std::option::Option<
             unsafe extern "C" fn(
-                sz: usize,
+                sz: size_t,
                 user_data: *mut ::std::os::raw::c_void,
             ) -> *mut ::std::os::raw::c_void,
         >,
@@ -6641,7 +6642,7 @@ extern "C" {
     );
 }
 extern "C" {
-    pub fn igMemAlloc(size: usize) -> *mut ::std::os::raw::c_void;
+    pub fn igMemAlloc(size: size_t) -> *mut ::std::os::raw::c_void;
 }
 extern "C" {
     pub fn igMemFree(ptr: *mut ::std::os::raw::c_void);
