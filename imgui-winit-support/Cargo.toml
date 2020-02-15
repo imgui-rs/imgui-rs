@@ -15,4 +15,4 @@ winit-19 = { version = ">= 0.16, <= 0.19", package = "winit", optional = true }
 winit-20 = { version = ">= 0.20", package = "winit", optional = true }
 
 [features]
-default = ["winit-19"]
+default = ["winit-20"]
