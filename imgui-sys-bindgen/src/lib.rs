@@ -92,6 +92,7 @@ pub fn generate_bindings<P: AsRef<Path>>(cimgui_path: &P) -> Result<Bindings, Er
         .header_contents("cimgui.h", &header)
         .rust_target(RustTarget::Stable_1_36)
         .default_enum_style(EnumVariation::Consts)
+        .size_t_is_usize(true)
         .prepend_enum_name(false)
         .generate_comments(false)
         .layout_tests(true)
