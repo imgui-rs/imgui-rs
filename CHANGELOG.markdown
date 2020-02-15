@@ -5,6 +5,7 @@
 ### Added
 
 - Add `ChildWindow::movable`
+- ImString now implements fmt::Write
 
 ### Changed
 
@@ -13,6 +14,7 @@
 - Upgrade to glium 0.26 / winit 0.21
 - Switch imgui-winit-support to 0.20+ by default. Winit 0.19 support is still
   available via the `winit-19` feature flag
+- Resources used by examples are no longer included in the published crate
 
 ### Removed
 
@@ -22,6 +24,7 @@
 
 - Fix toggling behavior on using `MenuItem::build_with_ref` and
   `Selectable::build_with_ref`.
+- ImString nul terminator handling
 
 ## [0.2.1] - 2019-09-09
 
