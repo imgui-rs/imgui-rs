@@ -90,7 +90,7 @@ impl Lenna {
     {
         let lenna_bytes = include_bytes!("../../resources/Lenna.jpg");
 
-        let image = image::load_from_memory_with_format(lenna_bytes, ImageFormat::JPEG)?;
+        let image = image::load_from_memory_with_format(lenna_bytes, ImageFormat::Jpeg)?;
         // gfx doesn't support easily RGB8 without alpha, so we need to convert
         let image = image.to_rgba();
         let (width, height) = image.dimensions();

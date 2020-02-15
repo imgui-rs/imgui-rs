@@ -8,7 +8,7 @@ use glium::{
     texture::{ClientFormat, RawImage2d},
     Texture2d,
 };
-use image::{jpeg::JPEGDecoder, ImageDecoder};
+use image::{jpeg::JpegDecoder, ImageDecoder};
 use imgui::*;
 
 mod support;
@@ -92,10 +92,11 @@ impl Lenna {
     {
         let lenna_bytes = include_bytes!("../../resources/Lenna.jpg");
         let byte_stream = Cursor::new(lenna_bytes.as_ref());
-        let decoder = JPEGDecoder::new(byte_stream)?;
+        let decoder = JpegDecoder::new(byte_stream)?;
 
         let (width, height) = decoder.dimensions();
-        let image = decoder.read_image()?;
+        let mut image = vec![0; decoder.total_bytes() as usize];
+        decoder.read_image(&mut image)?;
         let raw = RawImage2d {
             data: Cow::Owned(image),
             width: width as u32,
