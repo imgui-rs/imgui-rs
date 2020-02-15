@@ -11,7 +11,7 @@ publish = false
 
 [dev-dependencies]
 clipboard = "0.5"
-glium = { version = "0.25", default-features = true }
+glium = { version = "0.26", default-features = true }
 image = "0.22"
 imgui = { version = "0.3.0-pre", path = "../" }
 imgui-glium-renderer = { version = "0.3.0-pre", path = "../imgui-glium-renderer" }

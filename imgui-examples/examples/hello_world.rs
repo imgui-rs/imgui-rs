@@ -4,7 +4,7 @@ mod support;
 
 fn main() {
     let system = support::init(file!());
-    system.main_loop(|_, ui| {
+    system.main_loop(move |_, ui| {
         Window::new(im_str!("Hello world"))
             .size([300.0, 100.0], Condition::FirstUseEver)
             .build(ui, || {

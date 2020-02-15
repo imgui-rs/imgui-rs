@@ -5,7 +5,7 @@ mod support;
 fn main() {
     let mut state = State::default();
     let system = support::init(file!());
-    system.main_loop(|run, ui| {
+    system.main_loop(move |run, ui| {
         example_selector(run, ui, &mut state);
         match state.example {
             1 => example_1(ui, &mut state),

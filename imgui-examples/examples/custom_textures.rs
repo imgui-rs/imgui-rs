@@ -122,5 +122,5 @@ fn main() {
     my_app
         .register_textures(system.display.get_context(), system.renderer.textures())
         .expect("Failed to register textures");
-    system.main_loop(|_, ui| my_app.show_textures(ui));
+    system.main_loop(move |_, ui| my_app.show_textures(ui));
 }

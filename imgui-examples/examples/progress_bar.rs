@@ -4,7 +4,7 @@ mod support;
 
 fn main() {
     let system = support::init(file!());
-    system.main_loop(|run, ui| {
+    system.main_loop(move |run, ui| {
         let w = Window::new(im_str!("Progress bar"))
             .opened(run)
             .position([20.0, 20.0], Condition::Appearing)

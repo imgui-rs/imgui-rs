@@ -18,7 +18,7 @@ fn main() {
         .renderer
         .reload_font_texture(&mut system.imgui)
         .expect("Failed to reload fonts");
-    system.main_loop(|run, ui| {
+    system.main_loop(move |run, ui| {
         Window::new(im_str!("Hello world"))
             .opened(run)
             .build(ui, || {

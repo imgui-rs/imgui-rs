@@ -16,7 +16,7 @@ exclude = [
 
 [dependencies]
 bitflags = "1.0"
-glium = { version = "0.25", default-features = false, optional = true }
+glium = { version = "0.26", default-features = false, optional = true }
 gfx = { version = "0.18", optional = true }
 imgui-sys = { version = "0.3.0-pre", path = "imgui-sys" }
 lazy_static = "1.1"

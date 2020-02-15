@@ -10,6 +10,9 @@
 
 - Upgrade to cimgui / imgui 1.74
 - Bump minimum Rust version to 1.38 (at least backtrace crate requires it)
+- Upgrade to glium 0.26 / winit 0.21
+- Switch imgui-winit-support to 0.20+ by default. Winit 0.19 support is still
+  available via the `winit-19` feature flag
 
 ### Removed
 

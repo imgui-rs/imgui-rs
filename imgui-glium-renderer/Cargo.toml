@@ -10,5 +10,5 @@ license = "MIT/Apache-2.0"
 categories = ["gui", "rendering"]
 
 [dependencies]
-glium = { version = "0.25", default-features = false }
+glium = { version = "0.26", default-features = false }
 imgui = { version = "0.3.0-pre", path = "../", features = ["glium"] }
