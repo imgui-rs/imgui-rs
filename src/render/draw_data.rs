@@ -220,6 +220,7 @@ pub struct DrawVert {
 
 #[cfg(feature = "glium")]
 use glium::implement_vertex;
+#[allow(clippy::unneeded_field_pattern)]
 #[cfg(feature = "glium")]
 implement_vertex!(DrawVert, pos, uv, col);
 
