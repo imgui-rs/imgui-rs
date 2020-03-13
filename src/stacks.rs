@@ -34,7 +34,6 @@ impl<'ui> Ui<'ui> {
     /// ui.text("I use the custom font!");
     /// font.pop(&ui);
     /// ```
-    #[must_use]
     pub fn push_font(&self, id: FontId) -> FontStackToken {
         let fonts = self.fonts();
         let font = fonts
@@ -58,7 +57,6 @@ impl<'ui> Ui<'ui> {
     /// ui.text("I'm red!");
     /// color.pop(&ui);
     /// ```
-    #[must_use]
     pub fn push_style_color(&self, style_color: StyleColor, color: [f32; 4]) -> ColorStackToken {
         unsafe { sys::igPushStyleColor(style_color as i32, color.into()) };
         ColorStackToken {
@@ -86,7 +84,6 @@ impl<'ui> Ui<'ui> {
     /// ui.text_disabled("I'm green!");
     /// colors.pop(&ui);
     /// ```
-    #[must_use]
     pub fn push_style_colors<'a, I>(&self, style_colors: I) -> ColorStackToken
     where
         I: IntoIterator<Item = &'a (StyleColor, [f32; 4])>,
@@ -115,7 +112,6 @@ impl<'ui> Ui<'ui> {
     /// ui.text("I'm transparent!");
     /// style.pop(&ui);
     /// ```
-    #[must_use]
     pub fn push_style_var(&self, style_var: StyleVar) -> StyleStackToken {
         unsafe { push_style_var(style_var) };
         StyleStackToken {
@@ -141,7 +137,6 @@ impl<'ui> Ui<'ui> {
     /// ui.text("...with large spacing as well");
     /// styles.pop(&ui);
     /// ```
-    #[must_use]
     pub fn push_style_vars<'a, I>(&self, style_vars: I) -> StyleStackToken
     where
         I: IntoIterator<Item = &'a StyleVar>,
@@ -383,7 +378,6 @@ impl<'ui> Ui<'ui> {
     ///
     /// Returns an `IdStackToken` that must be popped by calling `.pop()`
     ///
-    #[must_use]
     pub fn push_id<'a, I: Into<Id<'a>>>(&self, id: I) -> IdStackToken {
         let id = id.into();
 

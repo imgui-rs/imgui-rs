@@ -2,11 +2,11 @@
 
 **Still fairly experimental!**
 
-Minimum Rust version: 1.36
+Minimum Rust version: 1.38
 
-Wrapped Dear ImGui version: 1.73
+Wrapped Dear ImGui version: 1.75
 
-[![Build Status](https://travis-ci.org/Gekkio/imgui-rs.svg?branch=master)](https://travis-ci.org/Gekkio/imgui-rs)
+[![Build Status](https://github.com/Gekkio/imgui-rs/workflows/ci/badge.svg)](https://github.com/Gekkio/imgui-rs/actions)
 [![Latest release on crates.io](https://meritbadge.herokuapp.com/imgui)](https://crates.io/crates/imgui)
 [![Documentation on docs.rs](https://docs.rs/imgui/badge.svg)](https://docs.rs/imgui)
 

@@ -12,58 +12,63 @@
 //! 4. Call frame preparation callback (every frame)
 //! 5. Call render preparation callback (every frame)
 //!
-//! ## Complete example (without a renderer)
+//! ## Complete example for winit 0.20+ (without a renderer)
 //!
 //! ```rust,no_run,ignore
-//! # // TODO: Remove ignore when updated to winit 0.20
+//! # // TODO: Remove ignore when only one winit version is used
 //! use imgui::Context;
 //! use imgui_winit_support::{HiDpiMode, WinitPlatform};
 //! use std::time::Instant;
-//! use winit::{Event, EventsLoop, Window, WindowEvent};
+//! use winit::event::{Event, WindowEvent};
+//! use winit::event_loop::{ControlFlow, EventLoop};
+//! use winit::window::{Window};
 //!
-//! fn main() {
-//!     let mut events_loop = EventsLoop::new();
-//!     let mut window = Window::new(&events_loop).unwrap();
+//! let mut event_loop = EventLoop::new();
+//! let mut window = Window::new(&event_loop).unwrap();
 //!
-//!     let mut imgui = Context::create();
-//!     // configure imgui-rs Context if necessary
+//! let mut imgui = Context::create();
+//! // configure imgui-rs Context if necessary
 //!
-//!     let mut platform = WinitPlatform::init(&mut imgui); // step 1
-//!     platform.attach_window(imgui.io_mut(), &window, HiDpiMode::Default); // step 2
+//! let mut platform = WinitPlatform::init(&mut imgui); // step 1
+//! platform.attach_window(imgui.io_mut(), &window, HiDpiMode::Default); // step 2
 //!
-//!     let mut last_frame = Instant::now();
-//!     let mut run = true;
-//!     while run {
-//!         events_loop.poll_events(|event| {
+//! let mut last_frame = Instant::now();
+//! let mut run = true;
+//! event_loop.run(move |event, _, control_flow| {
+//!     match event {
+//!         Event::NewEvents(_) => {
+//!             // other application-specific logic
+//!             last_frame = imgui.io_mut().update_delta_time(last_frame);
+//!         },
+//!         Event::MainEventsCleared => {
+//!             // other application-specific logic
+//!             platform.prepare_frame(imgui.io_mut(), &window) // step 4
+//!                 .expect("Failed to prepare frame");
+//!             window.request_redraw();
+//!         }
+//!         Event::RedrawRequested(_) => {
+//!             let ui = imgui.frame();
+//!             // application-specific rendering *under the UI*
+//!
+//!             // construct the UI
+//!
+//!             platform.prepare_render(&ui, &window); // step 5
+//!             // render the UI with a renderer
+//!             let draw_data = ui.render();
+//!             // renderer.render(..., draw_data).expect("UI rendering failed");
+//!
+//!             // application-specific rendering *over the UI*
+//!         },
+//!         Event::WindowEvent { event: WindowEvent::CloseRequested, .. } => {
+//!             *control_flow = ControlFlow::Exit;
+//!         }
+//!         // other application-specific event handling
+//!         event => {
 //!             platform.handle_event(imgui.io_mut(), &window, &event); // step 3
-//!
-//!             // application-specific event handling
-//!             // for example:
-//!             if let Event::WindowEvent { event, .. } = event {
-//!                 match event {
-//!                     WindowEvent::CloseRequested => run = false,
-//!                     _ => (),
-//!                 }
-//!             }
-//!         });
-//!
-//!         platform.prepare_frame(imgui.io_mut(), &window) // step 4
-//!             .expect("Failed to prepare frame");
-//!         last_frame = imgui.io_mut().update_delta_time(last_frame);
-//!         let ui = imgui.frame();
-//!
-//!         // application-specific rendering *under the UI*
-//!
-//!         // construct the UI
-//!
-//!         platform.prepare_render(&ui, &window); // step 5
-//!         // render the UI with a renderer
-//!         let draw_data = ui.render();
-//!         // renderer.render(..., draw_data).expect("UI rendering failed");
-//!
-//!         // application-specific rendering *over the UI*
+//!             // other application-specific event handling
+//!         }
 //!     }
-//! }
+//! })
 //! ```
 
 #[cfg(feature = "winit-19")]
@@ -207,11 +212,11 @@ impl WinitPlatform {
     /// * display size is set
     #[cfg(feature = "winit-20")]
     pub fn attach_window(&mut self, io: &mut Io, window: &Window, hidpi_mode: HiDpiMode) {
-        let (hidpi_mode, hidpi_factor) = hidpi_mode.apply(window.hidpi_factor());
+        let (hidpi_mode, hidpi_factor) = hidpi_mode.apply(window.scale_factor());
         self.hidpi_mode = hidpi_mode;
         self.hidpi_factor = hidpi_factor;
         io.display_framebuffer_scale = [hidpi_factor as f32, hidpi_factor as f32];
-        let logical_size = window.inner_size();
+        let logical_size = window.inner_size().to_logical(hidpi_factor);
         let logical_size = self.scale_size_from_winit(window, logical_size);
         io.display_size = [logical_size.width as f32, logical_size.height as f32];
     }
@@ -239,11 +244,15 @@ impl WinitPlatform {
     /// This utility function is useful if you are using a DPI mode other than default, and want
     /// your application to use the same logical coordinates as imgui-rs.
     #[cfg(feature = "winit-20")]
-    pub fn scale_size_from_winit(&self, window: &Window, logical_size: LogicalSize) -> LogicalSize {
+    pub fn scale_size_from_winit(
+        &self,
+        window: &Window,
+        logical_size: LogicalSize<f64>,
+    ) -> LogicalSize<f64> {
         match self.hidpi_mode {
             ActiveHiDpiMode::Default => logical_size,
             _ => logical_size
-                .to_physical(window.hidpi_factor())
+                .to_physical::<f64>(window.scale_factor())
                 .to_logical(self.hidpi_factor),
         }
     }
@@ -272,12 +281,12 @@ impl WinitPlatform {
     pub fn scale_pos_from_winit(
         &self,
         window: &Window,
-        logical_pos: LogicalPosition,
-    ) -> LogicalPosition {
+        logical_pos: LogicalPosition<f64>,
+    ) -> LogicalPosition<f64> {
         match self.hidpi_mode {
             ActiveHiDpiMode::Default => logical_pos,
             _ => logical_pos
-                .to_physical(window.hidpi_factor())
+                .to_physical::<f64>(window.scale_factor())
                 .to_logical(self.hidpi_factor),
         }
     }
@@ -306,13 +315,13 @@ impl WinitPlatform {
     pub fn scale_pos_for_winit(
         &self,
         window: &Window,
-        logical_pos: LogicalPosition,
-    ) -> LogicalPosition {
+        logical_pos: LogicalPosition<f64>,
+    ) -> LogicalPosition<f64> {
         match self.hidpi_mode {
             ActiveHiDpiMode::Default => logical_pos,
             _ => logical_pos
-                .to_physical(self.hidpi_factor)
-                .to_logical(window.hidpi_factor()),
+                .to_physical::<f64>(self.hidpi_factor)
+                .to_logical(window.scale_factor()),
         }
     }
     /// Handles a winit event.
@@ -490,14 +499,15 @@ impl WinitPlatform {
     #[cfg(feature = "winit-20")]
     fn handle_window_event(&mut self, io: &mut Io, window: &Window, event: &WindowEvent) {
         match *event {
-            WindowEvent::Resized(logical_size) => {
+            WindowEvent::Resized(physical_size) => {
+                let logical_size = physical_size.to_logical(window.scale_factor());
                 let logical_size = self.scale_size_from_winit(window, logical_size);
                 io.display_size = [logical_size.width as f32, logical_size.height as f32];
             }
-            WindowEvent::HiDpiFactorChanged(scale) => {
+            WindowEvent::ScaleFactorChanged { scale_factor, .. } => {
                 let hidpi_factor = match self.hidpi_mode {
-                    ActiveHiDpiMode::Default => scale,
-                    ActiveHiDpiMode::Rounded => scale.round(),
+                    ActiveHiDpiMode::Default => scale_factor,
+                    ActiveHiDpiMode::Rounded => scale_factor.round(),
                     _ => return,
                 };
                 // Mouse position needs to be changed while we still have both the old and the new
@@ -511,7 +521,7 @@ impl WinitPlatform {
                 self.hidpi_factor = hidpi_factor;
                 io.display_framebuffer_scale = [hidpi_factor as f32, hidpi_factor as f32];
                 // Window size might change too if we are using DPI rounding
-                let logical_size = window.inner_size();
+                let logical_size = window.inner_size().to_logical(scale_factor);
                 let logical_size = self.scale_size_from_winit(window, logical_size);
                 io.display_size = [logical_size.width as f32, logical_size.height as f32];
             }
@@ -542,6 +552,7 @@ impl WinitPlatform {
                 }
             }
             WindowEvent::CursorMoved { position, .. } => {
+                let position = position.to_logical(window.scale_factor());
                 let position = self.scale_pos_from_winit(window, position);
                 io.mouse_pos = [position.x as f32, position.y as f32];
             }
@@ -641,6 +652,7 @@ impl WinitPlatform {
                         imgui::MouseCursor::ResizeNESW => MouseCursor::NeswResize,
                         imgui::MouseCursor::ResizeNWSE => MouseCursor::NwseResize,
                         imgui::MouseCursor::Hand => MouseCursor::Hand,
+                        imgui::MouseCursor::NotAllowed => MouseCursor::NotAllowed,
                     });
                 }
                 _ => window.hide_cursor(true),
@@ -672,6 +684,7 @@ impl WinitPlatform {
                         imgui::MouseCursor::ResizeNESW => MouseCursor::NeswResize,
                         imgui::MouseCursor::ResizeNWSE => MouseCursor::NwseResize,
                         imgui::MouseCursor::Hand => MouseCursor::Hand,
+                        imgui::MouseCursor::NotAllowed => MouseCursor::NotAllowed,
                     });
                 }
                 _ => window.set_cursor_visible(false),

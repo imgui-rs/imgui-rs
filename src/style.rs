@@ -123,6 +123,11 @@ pub struct Style {
     /// Decrease for highly tessellated curves (higher quality, more polygons), increase to reduce
     /// quality.
     pub curve_tessellation_tol: f32,
+    /// Maximum error (in pixels) allowed when drawing circles or rounded corner rectangles with no
+    /// explicit segment count specified.
+    ///
+    /// Decrease for higher quality but more geometry.
+    pub circle_segment_max_error: f32,
     /// Style colors.
     pub colors: [[f32; 4]; 48],
 }
@@ -446,6 +451,7 @@ fn test_style_memory_layout() {
     assert_field_offset!(anti_aliased_lines, AntiAliasedLines);
     assert_field_offset!(anti_aliased_fill, AntiAliasedFill);
     assert_field_offset!(curve_tessellation_tol, CurveTessellationTol);
+    assert_field_offset!(circle_segment_max_error, CircleSegmentMaxError);
     assert_field_offset!(colors, Colors);
 }
 

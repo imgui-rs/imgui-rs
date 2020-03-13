@@ -1,6 +1,6 @@
 [package]
 name = "imgui-glium-renderer"
-version = "0.3.0-pre"
+version = "0.3.0"
 edition = "2018"
 authors = ["Joonas Javanainen <joonas.javanainen@gmail.com>", "imgui-rs contributors"]
 description = "Glium renderer for the imgui crate"
@@ -9,9 +9,6 @@ repository = "https://github.com/Gekkio/imgui-rs"
 license = "MIT/Apache-2.0"
 categories = ["gui", "rendering"]
 
-[badges]
-travis-ci = { repository = "Gekkio/imgui-rs" }
-
 [dependencies]
-glium = { version = "0.25", default-features = false }
-imgui = { version = "0.3.0-pre", path = "../", features = ["glium"] }
+glium = { version = "0.26", default-features = false }
+imgui = { version = "0.3.0", path = "../", features = ["glium"] }

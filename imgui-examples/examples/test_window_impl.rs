@@ -186,7 +186,7 @@ fn main() {
     let mut state = State::default();
 
     let system = support::init(file!());
-    system.main_loop(|run, ui| show_test_window(ui, &mut state, run));
+    system.main_loop(move |run, ui| show_test_window(ui, &mut state, run));
 }
 
 fn show_help_marker(ui: &Ui, desc: &str) {

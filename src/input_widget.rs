@@ -142,16 +142,14 @@ extern "C" fn resize_callback(data: *mut sys::ImGuiInputTextCallbackData) -> c_i
                 if requested_size > buffer.capacity_with_nul() {
                     // Refresh the buffer's length to take into account changes made by dear imgui.
                     buffer.refresh_len();
-                    // Add 1 to include the null terminator, so that reserve sees the right length.
-                    // After we're done we'll call refresh_len, so this won't be visible to the user.
-                    buffer.0.set_len(buffer.0.len() + 1);
                     buffer.reserve(requested_size - buffer.0.len());
+                    debug_assert!(buffer.capacity_with_nul() >= requested_size);
                     (*data).Buf = buffer.as_mut_ptr();
                     (*data).BufDirty = true;
                 }
             }
         }
-        return 0;
+        0
     }
 }
 

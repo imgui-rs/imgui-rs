@@ -1,3 +1,5 @@
+use std::ptr;
+
 use crate::sys;
 use crate::Ui;
 
@@ -50,6 +52,10 @@ pub enum MouseCursor {
     ResizeNWSE = sys::ImGuiMouseCursor_ResizeNWSE,
     /// Not used automatically, use for e.g. hyperlinks
     Hand = sys::ImGuiMouseCursor_Hand,
+    /// When hovering something with disallowed interactions.
+    ///
+    /// Usually a crossed circle.
+    NotAllowed = sys::ImGuiMouseCursor_NotAllowed,
 }
 
 impl MouseCursor {
@@ -63,6 +69,7 @@ impl MouseCursor {
         MouseCursor::ResizeNESW,
         MouseCursor::ResizeNWSE,
         MouseCursor::Hand,
+        MouseCursor::NotAllowed,
     ];
     /// Total count of `MouseCursor` variants
     pub const COUNT: usize = sys::ImGuiMouseCursor_COUNT as usize;
@@ -155,6 +162,7 @@ impl<'ui> Ui<'ui> {
             sys::ImGuiMouseCursor_ResizeNESW => Some(MouseCursor::ResizeNESW),
             sys::ImGuiMouseCursor_ResizeNWSE => Some(MouseCursor::ResizeNWSE),
             sys::ImGuiMouseCursor_Hand => Some(MouseCursor::Hand),
+            sys::ImGuiMouseCursor_NotAllowed => Some(MouseCursor::NotAllowed),
             _ => None,
         }
     }
@@ -169,6 +177,12 @@ impl<'ui> Ui<'ui> {
                     .unwrap_or(sys::ImGuiMouseCursor_None),
             );
         }
+    }
+    pub fn is_current_mouse_pos_valid(&self) -> bool {
+        unsafe { sys::igIsMousePosValid(ptr::null()) }
+    }
+    pub fn is_mouse_pos_valid(&self, mouse_pos: [f32; 2]) -> bool {
+        unsafe { sys::igIsMousePosValid(&mouse_pos.into()) }
     }
 }
 

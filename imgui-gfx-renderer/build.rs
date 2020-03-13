@@ -120,5 +120,4 @@ mod hlsl_build {
             }
         }
     }
-
 }

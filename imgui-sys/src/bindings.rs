@@ -151,6 +151,7 @@ pub type ImGuiCond = ::std::os::raw::c_int;
 pub type ImGuiDataType = ::std::os::raw::c_int;
 pub type ImGuiDir = ::std::os::raw::c_int;
 pub type ImGuiKey = ::std::os::raw::c_int;
+pub type ImGuiMouseButton = ::std::os::raw::c_int;
 pub type ImGuiMouseCursor = ::std::os::raw::c_int;
 pub type ImGuiStyleVar = ::std::os::raw::c_int;
 pub type ImDrawCornerFlags = ::std::os::raw::c_int;
@@ -1389,12 +1390,11 @@ pub const ImGuiNavInput_FocusNext: ImGuiNavInput_ = 13;
 pub const ImGuiNavInput_TweakSlow: ImGuiNavInput_ = 14;
 pub const ImGuiNavInput_TweakFast: ImGuiNavInput_ = 15;
 pub const ImGuiNavInput_KeyMenu_: ImGuiNavInput_ = 16;
-pub const ImGuiNavInput_KeyTab_: ImGuiNavInput_ = 17;
-pub const ImGuiNavInput_KeyLeft_: ImGuiNavInput_ = 18;
-pub const ImGuiNavInput_KeyRight_: ImGuiNavInput_ = 19;
-pub const ImGuiNavInput_KeyUp_: ImGuiNavInput_ = 20;
-pub const ImGuiNavInput_KeyDown_: ImGuiNavInput_ = 21;
-pub const ImGuiNavInput_COUNT: ImGuiNavInput_ = 22;
+pub const ImGuiNavInput_KeyLeft_: ImGuiNavInput_ = 17;
+pub const ImGuiNavInput_KeyRight_: ImGuiNavInput_ = 18;
+pub const ImGuiNavInput_KeyUp_: ImGuiNavInput_ = 19;
+pub const ImGuiNavInput_KeyDown_: ImGuiNavInput_ = 20;
+pub const ImGuiNavInput_COUNT: ImGuiNavInput_ = 21;
 pub const ImGuiNavInput_InternalStart_: ImGuiNavInput_ = 16;
 pub type ImGuiNavInput_ = u32;
 pub const ImGuiConfigFlags_None: ImGuiConfigFlags_ = 0;
@@ -1517,6 +1517,11 @@ pub const ImGuiColorEditFlags__DataTypeMask: ImGuiColorEditFlags_ = 25165824;
 pub const ImGuiColorEditFlags__PickerMask: ImGuiColorEditFlags_ = 100663296;
 pub const ImGuiColorEditFlags__InputMask: ImGuiColorEditFlags_ = 402653184;
 pub type ImGuiColorEditFlags_ = u32;
+pub const ImGuiMouseButton_Left: ImGuiMouseButton_ = 0;
+pub const ImGuiMouseButton_Right: ImGuiMouseButton_ = 1;
+pub const ImGuiMouseButton_Middle: ImGuiMouseButton_ = 2;
+pub const ImGuiMouseButton_COUNT: ImGuiMouseButton_ = 5;
+pub type ImGuiMouseButton_ = u32;
 pub const ImGuiMouseCursor_None: ImGuiMouseCursor_ = -1;
 pub const ImGuiMouseCursor_Arrow: ImGuiMouseCursor_ = 0;
 pub const ImGuiMouseCursor_TextInput: ImGuiMouseCursor_ = 1;
@@ -1526,7 +1531,8 @@ pub const ImGuiMouseCursor_ResizeEW: ImGuiMouseCursor_ = 4;
 pub const ImGuiMouseCursor_ResizeNESW: ImGuiMouseCursor_ = 5;
 pub const ImGuiMouseCursor_ResizeNWSE: ImGuiMouseCursor_ = 6;
 pub const ImGuiMouseCursor_Hand: ImGuiMouseCursor_ = 7;
-pub const ImGuiMouseCursor_COUNT: ImGuiMouseCursor_ = 8;
+pub const ImGuiMouseCursor_NotAllowed: ImGuiMouseCursor_ = 8;
+pub const ImGuiMouseCursor_COUNT: ImGuiMouseCursor_ = 9;
 pub type ImGuiMouseCursor_ = i32;
 pub const ImGuiCond_Always: ImGuiCond_ = 1;
 pub const ImGuiCond_Once: ImGuiCond_ = 2;
@@ -1570,13 +1576,14 @@ pub struct ImGuiStyle {
     pub AntiAliasedLines: bool,
     pub AntiAliasedFill: bool,
     pub CurveTessellationTol: f32,
+    pub CircleSegmentMaxError: f32,
     pub Colors: [ImVec4; 48usize],
 }
 #[test]
 fn bindgen_test_layout_ImGuiStyle() {
     assert_eq!(
         ::std::mem::size_of::<ImGuiStyle>(),
-        944usize,
+        948usize,
         concat!("Size of: ", stringify!(ImGuiStyle))
     );
     assert_eq!(
@@ -1929,8 +1936,20 @@ fn bindgen_test_layout_ImGuiStyle() {
         )
     );
     assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiStyle>())).Colors as *const _ as usize },
+        unsafe {
+            &(*(::std::ptr::null::<ImGuiStyle>())).CircleSegmentMaxError as *const _ as usize
+        },
         176usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(ImGuiStyle),
+            "::",
+            stringify!(CircleSegmentMaxError)
+        )
+    );
+    assert_eq!(
+        unsafe { &(*(::std::ptr::null::<ImGuiStyle>())).Colors as *const _ as usize },
+        180usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiStyle),
@@ -1946,7 +1965,7 @@ impl Default for ImGuiStyle {
 }
 impl ::std::fmt::Debug for ImGuiStyle {
     fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        write ! ( f , "ImGuiStyle {{ Alpha: {:?}, WindowPadding: {:?}, WindowRounding: {:?}, WindowBorderSize: {:?}, WindowMinSize: {:?}, WindowTitleAlign: {:?}, WindowMenuButtonPosition: {:?}, ChildRounding: {:?}, ChildBorderSize: {:?}, PopupRounding: {:?}, PopupBorderSize: {:?}, FramePadding: {:?}, FrameRounding: {:?}, FrameBorderSize: {:?}, ItemSpacing: {:?}, ItemInnerSpacing: {:?}, TouchExtraPadding: {:?}, IndentSpacing: {:?}, ColumnsMinSpacing: {:?}, ScrollbarSize: {:?}, ScrollbarRounding: {:?}, GrabMinSize: {:?}, GrabRounding: {:?}, TabRounding: {:?}, TabBorderSize: {:?}, ColorButtonPosition: {:?}, ButtonTextAlign: {:?}, SelectableTextAlign: {:?}, DisplayWindowPadding: {:?}, DisplaySafeAreaPadding: {:?}, MouseCursorScale: {:?}, AntiAliasedLines: {:?}, AntiAliasedFill: {:?}, CurveTessellationTol: {:?}, Colors: [{}] }}" , self . Alpha , self . WindowPadding , self . WindowRounding , self . WindowBorderSize , self . WindowMinSize , self . WindowTitleAlign , self . WindowMenuButtonPosition , self . ChildRounding , self . ChildBorderSize , self . PopupRounding , self . PopupBorderSize , self . FramePadding , self . FrameRounding , self . FrameBorderSize , self . ItemSpacing , self . ItemInnerSpacing , self . TouchExtraPadding , self . IndentSpacing , self . ColumnsMinSpacing , self . ScrollbarSize , self . ScrollbarRounding , self . GrabMinSize , self . GrabRounding , self . TabRounding , self . TabBorderSize , self . ColorButtonPosition , self . ButtonTextAlign , self . SelectableTextAlign , self . DisplayWindowPadding , self . DisplaySafeAreaPadding , self . MouseCursorScale , self . AntiAliasedLines , self . AntiAliasedFill , self . CurveTessellationTol , self . Colors . iter ( ) . enumerate ( ) . map ( | ( i , v ) | format ! ( "{}{:?}" , if i > 0 { ", " } else { "" } , v ) ) . collect :: < String > ( ) )
+        write ! ( f , "ImGuiStyle {{ Alpha: {:?}, WindowPadding: {:?}, WindowRounding: {:?}, WindowBorderSize: {:?}, WindowMinSize: {:?}, WindowTitleAlign: {:?}, WindowMenuButtonPosition: {:?}, ChildRounding: {:?}, ChildBorderSize: {:?}, PopupRounding: {:?}, PopupBorderSize: {:?}, FramePadding: {:?}, FrameRounding: {:?}, FrameBorderSize: {:?}, ItemSpacing: {:?}, ItemInnerSpacing: {:?}, TouchExtraPadding: {:?}, IndentSpacing: {:?}, ColumnsMinSpacing: {:?}, ScrollbarSize: {:?}, ScrollbarRounding: {:?}, GrabMinSize: {:?}, GrabRounding: {:?}, TabRounding: {:?}, TabBorderSize: {:?}, ColorButtonPosition: {:?}, ButtonTextAlign: {:?}, SelectableTextAlign: {:?}, DisplayWindowPadding: {:?}, DisplaySafeAreaPadding: {:?}, MouseCursorScale: {:?}, AntiAliasedLines: {:?}, AntiAliasedFill: {:?}, CurveTessellationTol: {:?}, CircleSegmentMaxError: {:?}, Colors: [{}] }}" , self . Alpha , self . WindowPadding , self . WindowRounding , self . WindowBorderSize , self . WindowMinSize , self . WindowTitleAlign , self . WindowMenuButtonPosition , self . ChildRounding , self . ChildBorderSize , self . PopupRounding , self . PopupBorderSize , self . FramePadding , self . FrameRounding , self . FrameBorderSize , self . ItemSpacing , self . ItemInnerSpacing , self . TouchExtraPadding , self . IndentSpacing , self . ColumnsMinSpacing , self . ScrollbarSize , self . ScrollbarRounding , self . GrabMinSize , self . GrabRounding , self . TabRounding , self . TabBorderSize , self . ColorButtonPosition , self . ButtonTextAlign , self . SelectableTextAlign , self . DisplayWindowPadding , self . DisplaySafeAreaPadding , self . MouseCursorScale , self . AntiAliasedLines , self . AntiAliasedFill , self . CurveTessellationTol , self . CircleSegmentMaxError , self . Colors . iter ( ) . enumerate ( ) . map ( | ( i , v ) | format ! ( "{}{:?}" , if i > 0 { ", " } else { "" } , v ) ) . collect :: < String > ( ) )
     }
 }
 #[repr(C)]
@@ -2008,7 +2027,7 @@ pub struct ImGuiIO {
     pub KeyAlt: bool,
     pub KeySuper: bool,
     pub KeysDown: [bool; 512usize],
-    pub NavInputs: [f32; 22usize],
+    pub NavInputs: [f32; 21usize],
     pub WantCaptureMouse: bool,
     pub WantCaptureKeyboard: bool,
     pub WantTextInput: bool,
@@ -2037,15 +2056,15 @@ pub struct ImGuiIO {
     pub MouseDragMaxDistanceSqr: [f32; 5usize],
     pub KeysDownDuration: [f32; 512usize],
     pub KeysDownDurationPrev: [f32; 512usize],
-    pub NavInputsDownDuration: [f32; 22usize],
-    pub NavInputsDownDurationPrev: [f32; 22usize],
+    pub NavInputsDownDuration: [f32; 21usize],
+    pub NavInputsDownDurationPrev: [f32; 21usize],
     pub InputQueueCharacters: ImVector_ImWchar,
 }
 #[test]
 fn bindgen_test_layout_ImGuiIO() {
     assert_eq!(
         ::std::mem::size_of::<ImGuiIO>(),
-        5472usize,
+        5456usize,
         concat!("Size of: ", stringify!(ImGuiIO))
     );
     assert_eq!(
@@ -2524,7 +2543,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).WantCaptureMouse as *const _ as usize },
-        924usize,
+        920usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2534,7 +2553,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).WantCaptureKeyboard as *const _ as usize },
-        925usize,
+        921usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2544,7 +2563,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).WantTextInput as *const _ as usize },
-        926usize,
+        922usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2554,7 +2573,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).WantSetMousePos as *const _ as usize },
-        927usize,
+        923usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2564,7 +2583,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).WantSaveIniSettings as *const _ as usize },
-        928usize,
+        924usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2574,7 +2593,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).NavActive as *const _ as usize },
-        929usize,
+        925usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2584,7 +2603,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).NavVisible as *const _ as usize },
-        930usize,
+        926usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2594,7 +2613,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).Framerate as *const _ as usize },
-        932usize,
+        928usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2604,7 +2623,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).MetricsRenderVertices as *const _ as usize },
-        936usize,
+        932usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2614,7 +2633,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).MetricsRenderIndices as *const _ as usize },
-        940usize,
+        936usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2624,7 +2643,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).MetricsRenderWindows as *const _ as usize },
-        944usize,
+        940usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2634,7 +2653,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).MetricsActiveWindows as *const _ as usize },
-        948usize,
+        944usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2646,7 +2665,7 @@ fn bindgen_test_layout_ImGuiIO() {
         unsafe {
             &(*(::std::ptr::null::<ImGuiIO>())).MetricsActiveAllocations as *const _ as usize
         },
-        952usize,
+        948usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2656,7 +2675,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).MouseDelta as *const _ as usize },
-        956usize,
+        952usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2666,7 +2685,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).MousePosPrev as *const _ as usize },
-        964usize,
+        960usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2676,7 +2695,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).MouseClickedPos as *const _ as usize },
-        972usize,
+        968usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2686,7 +2705,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).MouseClickedTime as *const _ as usize },
-        1016usize,
+        1008usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2696,7 +2715,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).MouseClicked as *const _ as usize },
-        1056usize,
+        1048usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2706,7 +2725,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).MouseDoubleClicked as *const _ as usize },
-        1061usize,
+        1053usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2716,7 +2735,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).MouseReleased as *const _ as usize },
-        1066usize,
+        1058usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2726,7 +2745,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).MouseDownOwned as *const _ as usize },
-        1071usize,
+        1063usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2736,7 +2755,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).MouseDownWasDoubleClick as *const _ as usize },
-        1076usize,
+        1068usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2746,7 +2765,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).MouseDownDuration as *const _ as usize },
-        1084usize,
+        1076usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2756,7 +2775,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).MouseDownDurationPrev as *const _ as usize },
-        1104usize,
+        1096usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2766,7 +2785,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).MouseDragMaxDistanceAbs as *const _ as usize },
-        1124usize,
+        1116usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2776,7 +2795,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).MouseDragMaxDistanceSqr as *const _ as usize },
-        1164usize,
+        1156usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2786,7 +2805,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).KeysDownDuration as *const _ as usize },
-        1184usize,
+        1176usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2796,7 +2815,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).KeysDownDurationPrev as *const _ as usize },
-        3232usize,
+        3224usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2806,7 +2825,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).NavInputsDownDuration as *const _ as usize },
-        5280usize,
+        5272usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2818,7 +2837,7 @@ fn bindgen_test_layout_ImGuiIO() {
         unsafe {
             &(*(::std::ptr::null::<ImGuiIO>())).NavInputsDownDurationPrev as *const _ as usize
         },
-        5368usize,
+        5356usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2828,7 +2847,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).InputQueueCharacters as *const _ as usize },
-        5456usize,
+        5440usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -3376,12 +3395,12 @@ impl Default for ImGuiStorage {
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone, PartialEq)]
 pub struct ImGuiListClipper {
-    pub StartPosY: f32,
-    pub ItemsHeight: f32,
-    pub ItemsCount: ::std::os::raw::c_int,
-    pub StepNo: ::std::os::raw::c_int,
     pub DisplayStart: ::std::os::raw::c_int,
     pub DisplayEnd: ::std::os::raw::c_int,
+    pub ItemsCount: ::std::os::raw::c_int,
+    pub StepNo: ::std::os::raw::c_int,
+    pub ItemsHeight: f32,
+    pub StartPosY: f32,
 }
 #[test]
 fn bindgen_test_layout_ImGuiListClipper() {
@@ -3396,23 +3415,23 @@ fn bindgen_test_layout_ImGuiListClipper() {
         concat!("Alignment of ", stringify!(ImGuiListClipper))
     );
     assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiListClipper>())).StartPosY as *const _ as usize },
+        unsafe { &(*(::std::ptr::null::<ImGuiListClipper>())).DisplayStart as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiListClipper),
             "::",
-            stringify!(StartPosY)
+            stringify!(DisplayStart)
         )
     );
     assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiListClipper>())).ItemsHeight as *const _ as usize },
+        unsafe { &(*(::std::ptr::null::<ImGuiListClipper>())).DisplayEnd as *const _ as usize },
         4usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiListClipper),
             "::",
-            stringify!(ItemsHeight)
+            stringify!(DisplayEnd)
         )
     );
     assert_eq!(
@@ -3436,23 +3455,23 @@ fn bindgen_test_layout_ImGuiListClipper() {
         )
     );
     assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiListClipper>())).DisplayStart as *const _ as usize },
+        unsafe { &(*(::std::ptr::null::<ImGuiListClipper>())).ItemsHeight as *const _ as usize },
         16usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiListClipper),
             "::",
-            stringify!(DisplayStart)
+            stringify!(ItemsHeight)
         )
     );
     assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiListClipper>())).DisplayEnd as *const _ as usize },
+        unsafe { &(*(::std::ptr::null::<ImGuiListClipper>())).StartPosY as *const _ as usize },
         20usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiListClipper),
             "::",
-            stringify!(DisplayEnd)
+            stringify!(StartPosY)
         )
     );
 }
@@ -4754,17 +4773,17 @@ pub struct ImFont {
     pub ConfigDataCount: ::std::os::raw::c_short,
     pub FallbackChar: ImWchar,
     pub EllipsisChar: ImWchar,
+    pub DirtyLookupTables: bool,
     pub Scale: f32,
     pub Ascent: f32,
     pub Descent: f32,
     pub MetricsTotalSurface: ::std::os::raw::c_int,
-    pub DirtyLookupTables: bool,
 }
 #[test]
 fn bindgen_test_layout_ImFont() {
     assert_eq!(
         ::std::mem::size_of::<ImFont>(),
-        120usize,
+        112usize,
         concat!("Size of: ", stringify!(ImFont))
     );
     assert_eq!(
@@ -4893,6 +4912,16 @@ fn bindgen_test_layout_ImFont() {
         )
     );
     assert_eq!(
+        unsafe { &(*(::std::ptr::null::<ImFont>())).DirtyLookupTables as *const _ as usize },
+        94usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(ImFont),
+            "::",
+            stringify!(DirtyLookupTables)
+        )
+    );
+    assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImFont>())).Scale as *const _ as usize },
         96usize,
         concat!(
@@ -4930,16 +4959,6 @@ fn bindgen_test_layout_ImFont() {
             stringify!(ImFont),
             "::",
             stringify!(MetricsTotalSurface)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImFont>())).DirtyLookupTables as *const _ as usize },
-        112usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImFont),
-            "::",
-            stringify!(DirtyLookupTables)
         )
     );
 }
@@ -5735,10 +5754,10 @@ extern "C" {
     pub fn igDragScalar(
         label: *const ::std::os::raw::c_char,
         data_type: ImGuiDataType,
-        v: *mut ::std::os::raw::c_void,
+        p_data: *mut ::std::os::raw::c_void,
         v_speed: f32,
-        v_min: *const ::std::os::raw::c_void,
-        v_max: *const ::std::os::raw::c_void,
+        p_min: *const ::std::os::raw::c_void,
+        p_max: *const ::std::os::raw::c_void,
         format: *const ::std::os::raw::c_char,
         power: f32,
     ) -> bool;
@@ -5747,11 +5766,11 @@ extern "C" {
     pub fn igDragScalarN(
         label: *const ::std::os::raw::c_char,
         data_type: ImGuiDataType,
-        v: *mut ::std::os::raw::c_void,
+        p_data: *mut ::std::os::raw::c_void,
         components: ::std::os::raw::c_int,
         v_speed: f32,
-        v_min: *const ::std::os::raw::c_void,
-        v_max: *const ::std::os::raw::c_void,
+        p_min: *const ::std::os::raw::c_void,
+        p_max: *const ::std::os::raw::c_void,
         format: *const ::std::os::raw::c_char,
         power: f32,
     ) -> bool;
@@ -5845,9 +5864,9 @@ extern "C" {
     pub fn igSliderScalar(
         label: *const ::std::os::raw::c_char,
         data_type: ImGuiDataType,
-        v: *mut ::std::os::raw::c_void,
-        v_min: *const ::std::os::raw::c_void,
-        v_max: *const ::std::os::raw::c_void,
+        p_data: *mut ::std::os::raw::c_void,
+        p_min: *const ::std::os::raw::c_void,
+        p_max: *const ::std::os::raw::c_void,
         format: *const ::std::os::raw::c_char,
         power: f32,
     ) -> bool;
@@ -5856,10 +5875,10 @@ extern "C" {
     pub fn igSliderScalarN(
         label: *const ::std::os::raw::c_char,
         data_type: ImGuiDataType,
-        v: *mut ::std::os::raw::c_void,
+        p_data: *mut ::std::os::raw::c_void,
         components: ::std::os::raw::c_int,
-        v_min: *const ::std::os::raw::c_void,
-        v_max: *const ::std::os::raw::c_void,
+        p_min: *const ::std::os::raw::c_void,
+        p_max: *const ::std::os::raw::c_void,
         format: *const ::std::os::raw::c_char,
         power: f32,
     ) -> bool;
@@ -5890,9 +5909,9 @@ extern "C" {
         label: *const ::std::os::raw::c_char,
         size: ImVec2,
         data_type: ImGuiDataType,
-        v: *mut ::std::os::raw::c_void,
-        v_min: *const ::std::os::raw::c_void,
-        v_max: *const ::std::os::raw::c_void,
+        p_data: *mut ::std::os::raw::c_void,
+        p_min: *const ::std::os::raw::c_void,
+        p_max: *const ::std::os::raw::c_void,
         format: *const ::std::os::raw::c_char,
         power: f32,
     ) -> bool;
@@ -6007,9 +6026,9 @@ extern "C" {
     pub fn igInputScalar(
         label: *const ::std::os::raw::c_char,
         data_type: ImGuiDataType,
-        v: *mut ::std::os::raw::c_void,
-        step: *const ::std::os::raw::c_void,
-        step_fast: *const ::std::os::raw::c_void,
+        p_data: *mut ::std::os::raw::c_void,
+        p_step: *const ::std::os::raw::c_void,
+        p_step_fast: *const ::std::os::raw::c_void,
         format: *const ::std::os::raw::c_char,
         flags: ImGuiInputTextFlags,
     ) -> bool;
@@ -6018,10 +6037,10 @@ extern "C" {
     pub fn igInputScalarN(
         label: *const ::std::os::raw::c_char,
         data_type: ImGuiDataType,
-        v: *mut ::std::os::raw::c_void,
+        p_data: *mut ::std::os::raw::c_void,
         components: ::std::os::raw::c_int,
-        step: *const ::std::os::raw::c_void,
-        step_fast: *const ::std::os::raw::c_void,
+        p_step: *const ::std::os::raw::c_void,
+        p_step_fast: *const ::std::os::raw::c_void,
         format: *const ::std::os::raw::c_char,
         flags: ImGuiInputTextFlags,
     ) -> bool;
@@ -6264,16 +6283,16 @@ extern "C" {
     );
 }
 extern "C" {
-    pub fn igBeginMainMenuBar() -> bool;
-}
-extern "C" {
-    pub fn igEndMainMenuBar();
-}
-extern "C" {
     pub fn igBeginMenuBar() -> bool;
 }
 extern "C" {
     pub fn igEndMenuBar();
+}
+extern "C" {
+    pub fn igBeginMainMenuBar() -> bool;
+}
+extern "C" {
+    pub fn igEndMainMenuBar();
 }
 extern "C" {
     pub fn igBeginMenu(label: *const ::std::os::raw::c_char, enabled: bool) -> bool;
@@ -6315,20 +6334,20 @@ extern "C" {
 extern "C" {
     pub fn igBeginPopupContextItem(
         str_id: *const ::std::os::raw::c_char,
-        mouse_button: ::std::os::raw::c_int,
+        mouse_button: ImGuiMouseButton,
     ) -> bool;
 }
 extern "C" {
     pub fn igBeginPopupContextWindow(
         str_id: *const ::std::os::raw::c_char,
-        mouse_button: ::std::os::raw::c_int,
+        mouse_button: ImGuiMouseButton,
         also_over_items: bool,
     ) -> bool;
 }
 extern "C" {
     pub fn igBeginPopupContextVoid(
         str_id: *const ::std::os::raw::c_char,
-        mouse_button: ::std::os::raw::c_int,
+        mouse_button: ImGuiMouseButton,
     ) -> bool;
 }
 extern "C" {
@@ -6344,7 +6363,7 @@ extern "C" {
 extern "C" {
     pub fn igOpenPopupOnItemClick(
         str_id: *const ::std::os::raw::c_char,
-        mouse_button: ::std::os::raw::c_int,
+        mouse_button: ImGuiMouseButton,
     ) -> bool;
 }
 extern "C" {
@@ -6469,7 +6488,7 @@ extern "C" {
     pub fn igIsItemFocused() -> bool;
 }
 extern "C" {
-    pub fn igIsItemClicked(mouse_button: ::std::os::raw::c_int) -> bool;
+    pub fn igIsItemClicked(mouse_button: ImGuiMouseButton) -> bool;
 }
 extern "C" {
     pub fn igIsItemVisible() -> bool;
@@ -6485,6 +6504,9 @@ extern "C" {
 }
 extern "C" {
     pub fn igIsItemDeactivatedAfterEdit() -> bool;
+}
+extern "C" {
+    pub fn igIsItemToggledOpen() -> bool;
 }
 extern "C" {
     pub fn igIsAnyItemHovered() -> bool;
@@ -6565,22 +6587,19 @@ extern "C" {
     ) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    pub fn igIsMouseDown(button: ::std::os::raw::c_int) -> bool;
+    pub fn igCaptureKeyboardFromApp(want_capture_keyboard_value: bool);
 }
 extern "C" {
-    pub fn igIsAnyMouseDown() -> bool;
+    pub fn igIsMouseDown(button: ImGuiMouseButton) -> bool;
 }
 extern "C" {
-    pub fn igIsMouseClicked(button: ::std::os::raw::c_int, repeat: bool) -> bool;
+    pub fn igIsMouseClicked(button: ImGuiMouseButton, repeat: bool) -> bool;
 }
 extern "C" {
-    pub fn igIsMouseDoubleClicked(button: ::std::os::raw::c_int) -> bool;
+    pub fn igIsMouseReleased(button: ImGuiMouseButton) -> bool;
 }
 extern "C" {
-    pub fn igIsMouseReleased(button: ::std::os::raw::c_int) -> bool;
-}
-extern "C" {
-    pub fn igIsMouseDragging(button: ::std::os::raw::c_int, lock_threshold: f32) -> bool;
+    pub fn igIsMouseDoubleClicked(button: ImGuiMouseButton) -> bool;
 }
 extern "C" {
     pub fn igIsMouseHoveringRect(r_min: ImVec2, r_max: ImVec2, clip: bool) -> bool;
@@ -6589,16 +6608,19 @@ extern "C" {
     pub fn igIsMousePosValid(mouse_pos: *const ImVec2) -> bool;
 }
 extern "C" {
-    pub fn igResetMouseDragDelta(button: ::std::os::raw::c_int);
+    pub fn igIsAnyMouseDown() -> bool;
+}
+extern "C" {
+    pub fn igIsMouseDragging(button: ImGuiMouseButton, lock_threshold: f32) -> bool;
+}
+extern "C" {
+    pub fn igResetMouseDragDelta(button: ImGuiMouseButton);
 }
 extern "C" {
     pub fn igGetMouseCursor() -> ImGuiMouseCursor;
 }
 extern "C" {
-    pub fn igSetMouseCursor(type_: ImGuiMouseCursor);
-}
-extern "C" {
-    pub fn igCaptureKeyboardFromApp(want_capture_keyboard_value: bool);
+    pub fn igSetMouseCursor(cursor_type: ImGuiMouseCursor);
 }
 extern "C" {
     pub fn igCaptureMouseFromApp(want_capture_mouse_value: bool);
@@ -7109,6 +7131,25 @@ extern "C" {
     );
 }
 extern "C" {
+    pub fn ImDrawList_AddNgon(
+        self_: *mut ImDrawList,
+        center: ImVec2,
+        radius: f32,
+        col: ImU32,
+        num_segments: ::std::os::raw::c_int,
+        thickness: f32,
+    );
+}
+extern "C" {
+    pub fn ImDrawList_AddNgonFilled(
+        self_: *mut ImDrawList,
+        center: ImVec2,
+        radius: f32,
+        col: ImU32,
+        num_segments: ::std::os::raw::c_int,
+    );
+}
+extern "C" {
     pub fn ImDrawList_AddText(
         self_: *mut ImDrawList,
         pos: ImVec2,
@@ -7151,10 +7192,10 @@ extern "C" {
 extern "C" {
     pub fn ImDrawList_AddBezierCurve(
         self_: *mut ImDrawList,
-        pos0: ImVec2,
-        cp0: ImVec2,
-        cp1: ImVec2,
-        pos1: ImVec2,
+        p1: ImVec2,
+        p2: ImVec2,
+        p3: ImVec2,
+        p4: ImVec2,
         col: ImU32,
         thickness: f32,
         num_segments: ::std::os::raw::c_int,
@@ -7236,9 +7277,9 @@ extern "C" {
 extern "C" {
     pub fn ImDrawList_PathBezierCurveTo(
         self_: *mut ImDrawList,
-        p1: ImVec2,
         p2: ImVec2,
         p3: ImVec2,
+        p4: ImVec2,
         num_segments: ::std::os::raw::c_int,
     );
 }
@@ -7281,6 +7322,13 @@ extern "C" {
 }
 extern "C" {
     pub fn ImDrawList_PrimReserve(
+        self_: *mut ImDrawList,
+        idx_count: ::std::os::raw::c_int,
+        vtx_count: ::std::os::raw::c_int,
+    );
+}
+extern "C" {
+    pub fn ImDrawList_PrimUnreserve(
         self_: *mut ImDrawList,
         idx_count: ::std::os::raw::c_int,
         vtx_count: ::std::os::raw::c_int,
@@ -7765,13 +7813,13 @@ extern "C" {
 extern "C" {
     pub fn igGetMouseDragDelta_nonUDT(
         pOut: *mut ImVec2,
-        button: ::std::os::raw::c_int,
+        button: ImGuiMouseButton,
         lock_threshold: f32,
     );
 }
 extern "C" {
     pub fn igGetMouseDragDelta_nonUDT2(
-        button: ::std::os::raw::c_int,
+        button: ImGuiMouseButton,
         lock_threshold: f32,
     ) -> ImVec2_Simple;
 }

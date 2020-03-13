@@ -2,14 +2,22 @@
 
 ## [Unreleased]
 
+## [0.3.0] - 2020-02-15
+
 ### Added
 
 - Add `ChildWindow::movable`
+- ImString now implements fmt::Write
 
 ### Changed
 
-- Upgrade to cimgui / imgui 1.73
--
+- Upgrade to cimgui / imgui 1.75
+- Bump minimum Rust version to 1.38 (at least backtrace crate requires it)
+- Upgrade to glium 0.26 / winit 0.21
+- Switch imgui-winit-support to 0.20+ by default. Winit 0.19 support is still
+  available via the `winit-19` feature flag
+- Resources used by examples are no longer included in the published crate
+
 ### Removed
 
 - Various things that were deprecated in imgui-rs 0.2.0
@@ -18,6 +26,7 @@
 
 - Fix toggling behavior on using `MenuItem::build_with_ref` and
   `Selectable::build_with_ref`.
+- ImString nul terminator handling
 
 ## [0.2.1] - 2019-09-09
 
@@ -524,7 +533,8 @@ by setting the environment variable `WINIT_HIDPI_FACTOR=1` if you use X11.
 
 - Initial release with cimgui/imgui 1.44, glium 0.9
 
-[Unreleased]: https://github.com/Gekkio/imgui-rs/compare/v0.2.1...HEAD
+[Unreleased]: https://github.com/Gekkio/imgui-rs/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/Gekkio/imgui-rs/compare/v0.2.0...v0.3.0
 [0.2.1]: https://github.com/Gekkio/imgui-rs/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/Gekkio/imgui-rs/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/Gekkio/imgui-rs/compare/v0.0.23...v0.1.0

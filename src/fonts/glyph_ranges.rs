@@ -114,6 +114,10 @@ impl FontGlyphRanges {
     /// Creates a glyph range from a static slice without checking its validity.
     ///
     /// See [`FontRangeGlyph::from_slice`] for more information.
+    ///
+    /// # Safety
+    ///
+    /// It is up to the caller to guarantee the slice contents are valid.
     pub unsafe fn from_slice_unchecked(slice: &'static [u16]) -> FontGlyphRanges {
         FontGlyphRanges::from_ptr(slice.as_ptr())
     }
@@ -121,6 +125,11 @@ impl FontGlyphRanges {
     /// Creates a glyph range from a pointer, without checking its validity or enforcing its
     /// lifetime. The memory the pointer points to must be valid for as long as the font is
     /// in use.
+    ///
+    /// # Safety
+    ///
+    /// It is up to the caller to guarantee the pointer is not null, remains valid forever, and
+    /// points to valid data.
     pub unsafe fn from_ptr(ptr: *const u16) -> FontGlyphRanges {
         FontGlyphRanges(FontGlyphRangeData::Custom(ptr))
     }

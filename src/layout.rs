@@ -82,7 +82,6 @@ impl<'ui> Ui<'ui> {
     /// May be useful to handle the same mouse event on a group of items, for example.
     ///
     /// Returns a `GroupToken` that must be ended by calling `.end()`
-    #[must_use]
     pub fn begin_group(&self) -> GroupToken {
         unsafe { sys::igBeginGroup() };
         GroupToken { ctx: self.ctx }
