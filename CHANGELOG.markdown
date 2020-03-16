@@ -2,7 +2,9 @@
 
 ## [Unreleased]
 
-### Changed
+## [0.3.1] - 2020-03-16
+
+### Fixed
 
 - Narrowed support winit version range in imgui-winit-support
 
