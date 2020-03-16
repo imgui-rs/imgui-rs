@@ -12,7 +12,7 @@ categories = ["gui"]
 [dependencies]
 imgui = { version = "0.3.0", path = "../" }
 winit-19 = { version = ">= 0.16, <= 0.19", package = "winit", optional = true }
-winit-20 = { version = ">= 0.20", package = "winit", optional = true }
+winit-20 = { version = ">= 0.20, <= 0.21", package = "winit", optional = true }
 
 [features]
 default = ["winit-20"]
