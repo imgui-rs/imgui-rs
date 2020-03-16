@@ -5,6 +5,7 @@
 ### Changed
 
 - Redesigned tree / collapsing header API
+- Narrowed support winit version range in imgui-winit-support
 
 ## [0.3.0] - 2020-02-15
 
