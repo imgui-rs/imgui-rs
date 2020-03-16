@@ -2,6 +2,10 @@
 use bitflags::bitflags;
 use std::os::raw::c_int;
 
+use crate::string::ImStr;
+use crate::widget::tree::{CollapsingHeader, TreeNode, TreeNodeFlags};
+use crate::Ui;
+
 bitflags!(
     /// Flags for igBeginDragDropSource(), igAcceptDragDropPayload()
     #[repr(C)]
@@ -116,48 +120,21 @@ bitflags!(
     }
 );
 
-bitflags!(
-    /// Flags for trees and collapsing headers
-    #[repr(C)]
-    pub struct ImGuiTreeNodeFlags: c_int {
-        /// Draw as selected
-        const Selected = 1;
-        /// Full colored frame (e.g. for collapsing header)
-        const Framed = 1 << 1;
-        /// Hit testing to allow subsequent widgets to overlap this one
-        const AllowItemOverlap = 1 << 2;
-        /// Don't do a tree push when open (e.g. for collapsing header) = no extra indent nor
-        /// pushing on ID stack
-        const NoTreePushOnOpen = 1 << 3;
-        /// Don't automatically and temporarily open node when Logging is active (by default
-        /// logging will automatically open tree nodes)
-        const NoAutoOpenOnLog = 1 << 4;
-        /// Default node to be open
-        const DefaultOpen = 1 << 5;
-        /// Need double-click to open node
-        const OpenOnDoubleClick = 1 << 6;
-        /// Only open when clicking on the arrow part. If OpenOnDoubleClick is also set,
-        /// single-click arrow or double-click all box to open.
-        const OpenOnArrow = 1 << 7;
-        /// No collapsing, no arrow (use as a convenience for leaf nodes).
-        const Leaf = 1 << 8;
-        /// Display a bullet instead of arrow
-        const Bullet = 1 << 9;
-        /// Use FramePadding (even for an unframed text node) to vertically align text baseline to
-        /// regular widget height.
-        const FramePadding = 1 << 10;
-        /// Extend hit box to the right-most edge, even if not framed.
-        ///
-        /// This is not the default in order to allow adding other items on the same line. In the
-        /// future we may refactor the hit system to be front-to-back, allowing natural overlaps
-        /// and then this can become the default.
-        const SpanAvailWidth = 1 << 11;
-        /// Extend hit box to the left-most and right-most edges (bypass the indented area)
-        const SpanFullWidth = 1 << 12;
-        const NavLeftJumpsBackHere = 1 << 13;
+pub type ImGuiTreeNodeFlags = TreeNodeFlags;
 
-        const CollapsingHeader  =
-            ImGuiTreeNodeFlags::Framed.bits | ImGuiTreeNodeFlags::NoTreePushOnOpen.bits |
-            ImGuiTreeNodeFlags::NoAutoOpenOnLog.bits;
+impl<'ui> Ui<'ui> {
+    #[deprecated(
+        since = "0.4.0",
+        note = "use imgui::TreeNode::new(...), and build() instead"
+    )]
+    pub fn tree_node<'a>(&self, id: &'a ImStr) -> TreeNode<'a> {
+        TreeNode::new(id)
     }
-);
+    #[deprecated(
+        since = "0.4.0",
+        note = "use imgui::CollapsingHeader::new(...), and build() instead"
+    )]
+    pub fn collapsing_header<'a>(&self, label: &'a ImStr) -> CollapsingHeader<'a> {
+        CollapsingHeader::new(label)
+    }
+}

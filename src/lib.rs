@@ -35,7 +35,6 @@ pub use self::render::renderer::*;
 pub use self::stacks::*;
 pub use self::string::*;
 pub use self::style::*;
-pub use self::trees::{CollapsingHeader, TreeNode};
 pub use self::utils::*;
 pub use self::widget::color_editors::*;
 pub use self::widget::combo_box::*;
@@ -44,6 +43,7 @@ pub use self::widget::menu::*;
 pub use self::widget::progress_bar::*;
 pub use self::widget::selectable::*;
 pub use self::widget::slider::*;
+pub use self::widget::tree::*;
 pub use self::window::child_window::*;
 pub use self::window::*;
 pub use self::window_draw_list::{ChannelsSplit, ImColor, WindowDrawList};
@@ -69,7 +69,6 @@ mod string;
 mod style;
 #[cfg(test)]
 mod test;
-mod trees;
 mod utils;
 mod widget;
 mod window;
@@ -107,12 +106,6 @@ impl Context {
 pub struct Ui<'ui> {
     ctx: &'ui Context,
     font_atlas: Option<cell::RefMut<'ui, SharedFontAtlas>>,
-}
-
-static FMT: &[u8] = b"%s\0";
-
-fn fmt_ptr() -> *const c_char {
-    FMT.as_ptr() as *const c_char
 }
 
 impl<'ui> Ui<'ui> {
@@ -331,16 +324,6 @@ impl<'ui> Ui<'ui> {
         current_max: &'p mut i32,
     ) -> DragIntRange2<'ui, 'p> {
         DragIntRange2::new(self, label, current_min, current_max)
-    }
-}
-
-// Widgets: Trees
-impl<'ui> Ui<'ui> {
-    pub fn tree_node<'p>(&self, id: &'p ImStr) -> TreeNode<'ui, 'p> {
-        TreeNode::new(self, id)
-    }
-    pub fn collapsing_header<'p>(&self, label: &'p ImStr) -> CollapsingHeader<'ui, 'p> {
-        CollapsingHeader::new(self, label)
     }
 }
 
