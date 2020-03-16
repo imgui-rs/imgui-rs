@@ -55,7 +55,7 @@ bitflags!(
     }
 );
 
-static FMT: &'static [u8] = b"%s\0";
+static FMT: &[u8] = b"%s\0";
 
 #[inline]
 fn fmt_ptr() -> *const c_char {
