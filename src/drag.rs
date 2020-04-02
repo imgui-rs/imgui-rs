@@ -1,6 +1,5 @@
 use std::marker::PhantomData;
 use std::ptr;
-use sys;
 
 use super::{ImStr, Ui};
 
