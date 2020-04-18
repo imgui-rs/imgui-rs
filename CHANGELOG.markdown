@@ -5,6 +5,7 @@
 ### Changed
 
 - Redesigned tree / collapsing header API
+- Bump minimum Rust version to 1.40 (at least xml-rs crate requires it)
 
 ## [0.3.1] - 2020-03-16
 
