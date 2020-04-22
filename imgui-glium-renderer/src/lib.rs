@@ -5,7 +5,7 @@ use glium::backend::{Context, Facade};
 use glium::index::{self, PrimitiveType};
 use glium::program::ProgramChooserCreationError;
 use glium::texture::{ClientFormat, MipmapsOption, RawImage2d, TextureCreationError};
-use glium::uniforms::{MagnifySamplerFilter, MinifySamplerFilter};
+use glium::uniforms::{MagnifySamplerFilter, MinifySamplerFilter, SamplerWrapFunction};
 use glium::{
     program, uniform, vertex, Blend, DrawError, DrawParameters, IndexBuffer, Program, Rect,
     Surface, Texture2d, VertexBuffer,
@@ -198,6 +198,7 @@ impl Renderer {
                                     tex: self.lookup_texture(texture_id)?.sampled()
                                         .minify_filter(MinifySamplerFilter::Linear)
                                         .magnify_filter(MagnifySamplerFilter::Linear)
+                                        .wrap_function(SamplerWrapFunction::BorderClamp)
                                 },
                                 &DrawParameters {
                                     blend: Blend::alpha_blending(),
