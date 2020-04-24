@@ -58,7 +58,7 @@ impl<'ui> Ui<'ui> {
     /// color.pop(&ui);
     /// ```
     pub fn push_style_color(&self, style_color: StyleColor, color: [f32; 4]) -> ColorStackToken {
-        unsafe { sys::igPushStyleColor(style_color as i32, color.into()) };
+        unsafe { sys::igPushStyleColorVec4(style_color as i32, color.into()) };
         ColorStackToken {
             count: 1,
             ctx: self.ctx,
@@ -90,7 +90,7 @@ impl<'ui> Ui<'ui> {
     {
         let mut count = 0;
         for &(style_color, color) in style_colors {
-            unsafe { sys::igPushStyleColor(style_color as i32, color.into()) };
+            unsafe { sys::igPushStyleColorVec4(style_color as i32, color.into()) };
             count += 1;
         }
         ColorStackToken {
@@ -387,7 +387,7 @@ impl<'ui> Ui<'ui> {
                 Id::Str(s) => {
                     let start = s.as_ptr() as *const c_char;
                     let end = start.add(s.len());
-                    sys::igPushIDRange(start, end)
+                    sys::igPushIDStrStr(start, end)
                 }
                 Id::Ptr(p) => sys::igPushIDPtr(p as *const c_void),
             }

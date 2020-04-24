@@ -114,7 +114,7 @@ impl<'ui> Ui<'ui> {
 impl<'ui> Ui<'ui> {
     /// Returns `true` if the rectangle (of given size, starting from cursor position) is visible
     pub fn is_cursor_rect_visible(&self, size: [f32; 2]) -> bool {
-        unsafe { sys::igIsRectVisible(size.into()) }
+        unsafe { sys::igIsRectVisibleNil(size.into()) }
     }
     /// Returns `true` if the rectangle (in screen coordinates) is visible
     pub fn is_rect_visible(&self, rect_min: [f32; 2], rect_max: [f32; 2]) -> bool {

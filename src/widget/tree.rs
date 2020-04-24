@@ -388,7 +388,9 @@ impl<'a> CollapsingHeader<'a> {
     /// Returns true if the collapsing header is open and content should be rendered.
     #[must_use]
     pub fn build(self, _: &Ui) -> bool {
-        unsafe { sys::igCollapsingHeader(self.label.as_ptr(), self.flags.bits() as i32) }
+        unsafe {
+            sys::igCollapsingHeaderTreeNodeFlags(self.label.as_ptr(), self.flags.bits() as i32)
+        }
     }
     /// Builds the collapsing header, and adds an additional close button that changes the value of
     /// the given mutable reference when clicked.

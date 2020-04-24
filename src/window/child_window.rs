@@ -261,7 +261,7 @@ impl<'a> ChildWindow<'a> {
                 Id::Str(s) => {
                     let start = s.as_ptr() as *const c_char;
                     let end = start.add(s.len());
-                    sys::igGetIDRange(start, end)
+                    sys::igGetIDStrStr(start, end)
                 }
             }
         };
