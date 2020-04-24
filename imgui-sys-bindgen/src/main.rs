@@ -10,8 +10,7 @@ fn main() {
         .join("imgui-sys")
         .canonicalize()
         .expect("Failed to find imgui-sys directory");
-
-    let bindings = generate_bindings(&sys_path.join("third-party").join("cimgui"), None)
+    let bindings = generate_bindings(&sys_path.join("third-party"), None)
         .expect("Failed to generate bindings");
     let output_path = sys_path.join("src").join("bindings.rs");
     bindings

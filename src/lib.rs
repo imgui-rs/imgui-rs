@@ -84,7 +84,7 @@ pub fn dear_imgui_version() -> &'static str {
 
 #[test]
 fn test_version() {
-    assert_eq!(dear_imgui_version(), "1.75");
+    assert_eq!(dear_imgui_version(), "1.76");
 }
 
 impl Context {

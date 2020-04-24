@@ -6,132 +6,85 @@
 #![allow(clippy::all)]
 
 #[repr(C)]
-#[derive(Debug, Default, Copy, Clone, PartialEq)]
-pub struct ImVec2_Simple {
-    pub x: f32,
-    pub y: f32,
+#[derive(Copy, Clone, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd)]
+pub struct __BindgenBitfieldUnit<Storage, Align> {
+    storage: Storage,
+    align: [Align; 0],
 }
-#[test]
-fn bindgen_test_layout_ImVec2_Simple() {
-    assert_eq!(
-        ::std::mem::size_of::<ImVec2_Simple>(),
-        8usize,
-        concat!("Size of: ", stringify!(ImVec2_Simple))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<ImVec2_Simple>(),
-        4usize,
-        concat!("Alignment of ", stringify!(ImVec2_Simple))
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImVec2_Simple>())).x as *const _ as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImVec2_Simple),
-            "::",
-            stringify!(x)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImVec2_Simple>())).y as *const _ as usize },
-        4usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImVec2_Simple),
-            "::",
-            stringify!(y)
-        )
-    );
+impl<Storage, Align> __BindgenBitfieldUnit<Storage, Align> {
+    #[inline]
+    pub const fn new(storage: Storage) -> Self {
+        Self { storage, align: [] }
+    }
 }
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone, PartialEq)]
-pub struct ImVec4_Simple {
-    pub x: f32,
-    pub y: f32,
-    pub z: f32,
-    pub w: f32,
-}
-#[test]
-fn bindgen_test_layout_ImVec4_Simple() {
-    assert_eq!(
-        ::std::mem::size_of::<ImVec4_Simple>(),
-        16usize,
-        concat!("Size of: ", stringify!(ImVec4_Simple))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<ImVec4_Simple>(),
-        4usize,
-        concat!("Alignment of ", stringify!(ImVec4_Simple))
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImVec4_Simple>())).x as *const _ as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImVec4_Simple),
-            "::",
-            stringify!(x)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImVec4_Simple>())).y as *const _ as usize },
-        4usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImVec4_Simple),
-            "::",
-            stringify!(y)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImVec4_Simple>())).z as *const _ as usize },
-        8usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImVec4_Simple),
-            "::",
-            stringify!(z)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImVec4_Simple>())).w as *const _ as usize },
-        12usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImVec4_Simple),
-            "::",
-            stringify!(w)
-        )
-    );
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone, PartialEq)]
-pub struct ImColor_Simple {
-    pub Value: ImVec4_Simple,
-}
-#[test]
-fn bindgen_test_layout_ImColor_Simple() {
-    assert_eq!(
-        ::std::mem::size_of::<ImColor_Simple>(),
-        16usize,
-        concat!("Size of: ", stringify!(ImColor_Simple))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<ImColor_Simple>(),
-        4usize,
-        concat!("Alignment of ", stringify!(ImColor_Simple))
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImColor_Simple>())).Value as *const _ as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImColor_Simple),
-            "::",
-            stringify!(Value)
-        )
-    );
+impl<Storage, Align> __BindgenBitfieldUnit<Storage, Align>
+where
+    Storage: AsRef<[u8]> + AsMut<[u8]>,
+{
+    #[inline]
+    pub fn get_bit(&self, index: usize) -> bool {
+        debug_assert!(index / 8 < self.storage.as_ref().len());
+        let byte_index = index / 8;
+        let byte = self.storage.as_ref()[byte_index];
+        let bit_index = if cfg!(target_endian = "big") {
+            7 - (index % 8)
+        } else {
+            index % 8
+        };
+        let mask = 1 << bit_index;
+        byte & mask == mask
+    }
+    #[inline]
+    pub fn set_bit(&mut self, index: usize, val: bool) {
+        debug_assert!(index / 8 < self.storage.as_ref().len());
+        let byte_index = index / 8;
+        let byte = &mut self.storage.as_mut()[byte_index];
+        let bit_index = if cfg!(target_endian = "big") {
+            7 - (index % 8)
+        } else {
+            index % 8
+        };
+        let mask = 1 << bit_index;
+        if val {
+            *byte |= mask;
+        } else {
+            *byte &= !mask;
+        }
+    }
+    #[inline]
+    pub fn get(&self, bit_offset: usize, bit_width: u8) -> u64 {
+        debug_assert!(bit_width <= 64);
+        debug_assert!(bit_offset / 8 < self.storage.as_ref().len());
+        debug_assert!((bit_offset + (bit_width as usize)) / 8 <= self.storage.as_ref().len());
+        let mut val = 0;
+        for i in 0..(bit_width as usize) {
+            if self.get_bit(i + bit_offset) {
+                let index = if cfg!(target_endian = "big") {
+                    bit_width as usize - 1 - i
+                } else {
+                    i
+                };
+                val |= 1 << index;
+            }
+        }
+        val
+    }
+    #[inline]
+    pub fn set(&mut self, bit_offset: usize, bit_width: u8, val: u64) {
+        debug_assert!(bit_width <= 64);
+        debug_assert!(bit_offset / 8 < self.storage.as_ref().len());
+        debug_assert!((bit_offset + (bit_width as usize)) / 8 <= self.storage.as_ref().len());
+        for i in 0..(bit_width as usize) {
+            let mask = 1 << i;
+            let val_bit_is_set = val & mask == mask;
+            let index = if cfg!(target_endian = "big") {
+                bit_width as usize - 1 - i
+            } else {
+                i
+            };
+            self.set_bit(index + bit_offset, val_bit_is_set);
+        }
+    }
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -143,9 +96,6 @@ pub struct ImGuiContext {
 pub struct ImDrawListSharedData {
     _unused: [u8; 0],
 }
-pub type ImTextureID = *mut ::std::os::raw::c_void;
-pub type ImGuiID = ::std::os::raw::c_uint;
-pub type ImWchar = ::std::os::raw::c_ushort;
 pub type ImGuiCol = ::std::os::raw::c_int;
 pub type ImGuiCond = ::std::os::raw::c_int;
 pub type ImGuiDataType = ::std::os::raw::c_int;
@@ -165,16 +115,22 @@ pub type ImGuiDragDropFlags = ::std::os::raw::c_int;
 pub type ImGuiFocusedFlags = ::std::os::raw::c_int;
 pub type ImGuiHoveredFlags = ::std::os::raw::c_int;
 pub type ImGuiInputTextFlags = ::std::os::raw::c_int;
+pub type ImGuiKeyModFlags = ::std::os::raw::c_int;
 pub type ImGuiSelectableFlags = ::std::os::raw::c_int;
 pub type ImGuiTabBarFlags = ::std::os::raw::c_int;
 pub type ImGuiTabItemFlags = ::std::os::raw::c_int;
 pub type ImGuiTreeNodeFlags = ::std::os::raw::c_int;
 pub type ImGuiWindowFlags = ::std::os::raw::c_int;
+pub type ImTextureID = *mut ::std::os::raw::c_void;
+pub type ImGuiID = ::std::os::raw::c_uint;
 pub type ImGuiInputTextCallback = ::std::option::Option<
     unsafe extern "C" fn(data: *mut ImGuiInputTextCallbackData) -> ::std::os::raw::c_int,
 >;
 pub type ImGuiSizeCallback =
     ::std::option::Option<unsafe extern "C" fn(data: *mut ImGuiSizeCallbackData)>;
+pub type ImWchar16 = ::std::os::raw::c_ushort;
+pub type ImWchar = ImWchar16;
+pub type ImU8 = ::std::os::raw::c_uchar;
 pub type ImU32 = ::std::os::raw::c_uint;
 pub type ImDrawCallback = ::std::option::Option<
     unsafe extern "C" fn(parent_list: *const ImDrawList, cmd: *const ImDrawCmd),
@@ -1373,6 +1329,12 @@ pub const ImGuiKey_Y: ImGuiKey_ = 20;
 pub const ImGuiKey_Z: ImGuiKey_ = 21;
 pub const ImGuiKey_COUNT: ImGuiKey_ = 22;
 pub type ImGuiKey_ = u32;
+pub const ImGuiKeyModFlags_None: ImGuiKeyModFlags_ = 0;
+pub const ImGuiKeyModFlags_Ctrl: ImGuiKeyModFlags_ = 1;
+pub const ImGuiKeyModFlags_Shift: ImGuiKeyModFlags_ = 2;
+pub const ImGuiKeyModFlags_Alt: ImGuiKeyModFlags_ = 4;
+pub const ImGuiKeyModFlags_Super: ImGuiKeyModFlags_ = 8;
+pub type ImGuiKeyModFlags_ = u32;
 pub const ImGuiNavInput_Activate: ImGuiNavInput_ = 0;
 pub const ImGuiNavInput_Cancel: ImGuiNavInput_ = 1;
 pub const ImGuiNavInput_Input: ImGuiNavInput_ = 2;
@@ -1498,6 +1460,7 @@ pub const ImGuiColorEditFlags_NoTooltip: ImGuiColorEditFlags_ = 64;
 pub const ImGuiColorEditFlags_NoLabel: ImGuiColorEditFlags_ = 128;
 pub const ImGuiColorEditFlags_NoSidePreview: ImGuiColorEditFlags_ = 256;
 pub const ImGuiColorEditFlags_NoDragDrop: ImGuiColorEditFlags_ = 512;
+pub const ImGuiColorEditFlags_NoBorder: ImGuiColorEditFlags_ = 1024;
 pub const ImGuiColorEditFlags_AlphaBar: ImGuiColorEditFlags_ = 65536;
 pub const ImGuiColorEditFlags_AlphaPreview: ImGuiColorEditFlags_ = 131072;
 pub const ImGuiColorEditFlags_AlphaPreviewHalf: ImGuiColorEditFlags_ = 262144;
@@ -2042,6 +2005,7 @@ pub struct ImGuiIO {
     pub MetricsActiveWindows: ::std::os::raw::c_int,
     pub MetricsActiveAllocations: ::std::os::raw::c_int,
     pub MouseDelta: ImVec2,
+    pub KeyMods: ImGuiKeyModFlags,
     pub MousePosPrev: ImVec2,
     pub MouseClickedPos: [ImVec2; 5usize],
     pub MouseClickedTime: [f64; 5usize],
@@ -2058,13 +2022,14 @@ pub struct ImGuiIO {
     pub KeysDownDurationPrev: [f32; 512usize],
     pub NavInputsDownDuration: [f32; 21usize],
     pub NavInputsDownDurationPrev: [f32; 21usize],
+    pub InputQueueSurrogate: ImWchar16,
     pub InputQueueCharacters: ImVector_ImWchar,
 }
 #[test]
 fn bindgen_test_layout_ImGuiIO() {
     assert_eq!(
         ::std::mem::size_of::<ImGuiIO>(),
-        5456usize,
+        5472usize,
         concat!("Size of: ", stringify!(ImGuiIO))
     );
     assert_eq!(
@@ -2684,8 +2649,18 @@ fn bindgen_test_layout_ImGuiIO() {
         )
     );
     assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiIO>())).MousePosPrev as *const _ as usize },
+        unsafe { &(*(::std::ptr::null::<ImGuiIO>())).KeyMods as *const _ as usize },
         960usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(ImGuiIO),
+            "::",
+            stringify!(KeyMods)
+        )
+    );
+    assert_eq!(
+        unsafe { &(*(::std::ptr::null::<ImGuiIO>())).MousePosPrev as *const _ as usize },
+        964usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2695,7 +2670,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).MouseClickedPos as *const _ as usize },
-        968usize,
+        972usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2705,7 +2680,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).MouseClickedTime as *const _ as usize },
-        1008usize,
+        1016usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2715,7 +2690,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).MouseClicked as *const _ as usize },
-        1048usize,
+        1056usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2725,7 +2700,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).MouseDoubleClicked as *const _ as usize },
-        1053usize,
+        1061usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2735,7 +2710,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).MouseReleased as *const _ as usize },
-        1058usize,
+        1066usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2745,7 +2720,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).MouseDownOwned as *const _ as usize },
-        1063usize,
+        1071usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2755,7 +2730,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).MouseDownWasDoubleClick as *const _ as usize },
-        1068usize,
+        1076usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2765,7 +2740,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).MouseDownDuration as *const _ as usize },
-        1076usize,
+        1084usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2775,7 +2750,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).MouseDownDurationPrev as *const _ as usize },
-        1096usize,
+        1104usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2785,7 +2760,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).MouseDragMaxDistanceAbs as *const _ as usize },
-        1116usize,
+        1124usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2795,7 +2770,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).MouseDragMaxDistanceSqr as *const _ as usize },
-        1156usize,
+        1164usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2805,7 +2780,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).KeysDownDuration as *const _ as usize },
-        1176usize,
+        1184usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2815,7 +2790,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).KeysDownDurationPrev as *const _ as usize },
-        3224usize,
+        3232usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2825,7 +2800,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).NavInputsDownDuration as *const _ as usize },
-        5272usize,
+        5280usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2837,7 +2812,7 @@ fn bindgen_test_layout_ImGuiIO() {
         unsafe {
             &(*(::std::ptr::null::<ImGuiIO>())).NavInputsDownDurationPrev as *const _ as usize
         },
-        5356usize,
+        5364usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2846,8 +2821,18 @@ fn bindgen_test_layout_ImGuiIO() {
         )
     );
     assert_eq!(
+        unsafe { &(*(::std::ptr::null::<ImGuiIO>())).InputQueueSurrogate as *const _ as usize },
+        5448usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(ImGuiIO),
+            "::",
+            stringify!(InputQueueSurrogate)
+        )
+    );
+    assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).InputQueueCharacters as *const _ as usize },
-        5440usize,
+        5456usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2863,7 +2848,7 @@ impl Default for ImGuiIO {
 }
 impl ::std::fmt::Debug for ImGuiIO {
     fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        write ! ( f , "ImGuiIO {{ ConfigFlags: {:?}, BackendFlags: {:?}, DisplaySize: {:?}, DeltaTime: {:?}, IniSavingRate: {:?}, IniFilename: {:?}, LogFilename: {:?}, MouseDoubleClickTime: {:?}, MouseDoubleClickMaxDist: {:?}, MouseDragThreshold: {:?}, KeyMap: {:?}, KeyRepeatDelay: {:?}, KeyRepeatRate: {:?}, UserData: {:?}, Fonts: {:?}, FontGlobalScale: {:?}, FontAllowUserScaling: {:?}, FontDefault: {:?}, DisplayFramebufferScale: {:?}, MouseDrawCursor: {:?}, ConfigMacOSXBehaviors: {:?}, ConfigInputTextCursorBlink: {:?}, ConfigWindowsResizeFromEdges: {:?}, ConfigWindowsMoveFromTitleBarOnly: {:?}, ConfigWindowsMemoryCompactTimer: {:?}, BackendPlatformName: {:?}, BackendRendererName: {:?}, BackendPlatformUserData: {:?}, BackendRendererUserData: {:?}, BackendLanguageUserData: {:?}, GetClipboardTextFn: {:?}, SetClipboardTextFn: {:?}, ClipboardUserData: {:?}, ImeSetInputScreenPosFn: {:?}, ImeWindowHandle: {:?}, RenderDrawListsFnUnused: {:?}, MousePos: {:?}, MouseDown: {:?}, MouseWheel: {:?}, MouseWheelH: {:?}, KeyCtrl: {:?}, KeyShift: {:?}, KeyAlt: {:?}, KeySuper: {:?}, KeysDown: [{}], NavInputs: {:?}, WantCaptureMouse: {:?}, WantCaptureKeyboard: {:?}, WantTextInput: {:?}, WantSetMousePos: {:?}, WantSaveIniSettings: {:?}, NavActive: {:?}, NavVisible: {:?}, Framerate: {:?}, MetricsRenderVertices: {:?}, MetricsRenderIndices: {:?}, MetricsRenderWindows: {:?}, MetricsActiveWindows: {:?}, MetricsActiveAllocations: {:?}, MouseDelta: {:?}, MousePosPrev: {:?}, MouseClickedPos: {:?}, MouseClickedTime: {:?}, MouseClicked: {:?}, MouseDoubleClicked: {:?}, MouseReleased: {:?}, MouseDownOwned: {:?}, MouseDownWasDoubleClick: {:?}, MouseDownDuration: {:?}, MouseDownDurationPrev: {:?}, MouseDragMaxDistanceAbs: {:?}, MouseDragMaxDistanceSqr: {:?}, KeysDownDuration: [{}], KeysDownDurationPrev: [{}], NavInputsDownDuration: {:?}, NavInputsDownDurationPrev: {:?}, InputQueueCharacters: {:?} }}" , self . ConfigFlags , self . BackendFlags , self . DisplaySize , self . DeltaTime , self . IniSavingRate , self . IniFilename , self . LogFilename , self . MouseDoubleClickTime , self . MouseDoubleClickMaxDist , self . MouseDragThreshold , self . KeyMap , self . KeyRepeatDelay , self . KeyRepeatRate , self . UserData , self . Fonts , self . FontGlobalScale , self . FontAllowUserScaling , self . FontDefault , self . DisplayFramebufferScale , self . MouseDrawCursor , self . ConfigMacOSXBehaviors , self . ConfigInputTextCursorBlink , self . ConfigWindowsResizeFromEdges , self . ConfigWindowsMoveFromTitleBarOnly , self . ConfigWindowsMemoryCompactTimer , self . BackendPlatformName , self . BackendRendererName , self . BackendPlatformUserData , self . BackendRendererUserData , self . BackendLanguageUserData , self . GetClipboardTextFn , self . SetClipboardTextFn , self . ClipboardUserData , self . ImeSetInputScreenPosFn , self . ImeWindowHandle , self . RenderDrawListsFnUnused , self . MousePos , self . MouseDown , self . MouseWheel , self . MouseWheelH , self . KeyCtrl , self . KeyShift , self . KeyAlt , self . KeySuper , self . KeysDown . iter ( ) . enumerate ( ) . map ( | ( i , v ) | format ! ( "{}{:?}" , if i > 0 { ", " } else { "" } , v ) ) . collect :: < String > ( ) , self . NavInputs , self . WantCaptureMouse , self . WantCaptureKeyboard , self . WantTextInput , self . WantSetMousePos , self . WantSaveIniSettings , self . NavActive , self . NavVisible , self . Framerate , self . MetricsRenderVertices , self . MetricsRenderIndices , self . MetricsRenderWindows , self . MetricsActiveWindows , self . MetricsActiveAllocations , self . MouseDelta , self . MousePosPrev , self . MouseClickedPos , self . MouseClickedTime , self . MouseClicked , self . MouseDoubleClicked , self . MouseReleased , self . MouseDownOwned , self . MouseDownWasDoubleClick , self . MouseDownDuration , self . MouseDownDurationPrev , self . MouseDragMaxDistanceAbs , self . MouseDragMaxDistanceSqr , self . KeysDownDuration . iter ( ) . enumerate ( ) . map ( | ( i , v ) | format ! ( "{}{:?}" , if i > 0 { ", " } else { "" } , v ) ) . collect :: < String > ( ) , self . KeysDownDurationPrev . iter ( ) . enumerate ( ) . map ( | ( i , v ) | format ! ( "{}{:?}" , if i > 0 { ", " } else { "" } , v ) ) . collect :: < String > ( ) , self . NavInputsDownDuration , self . NavInputsDownDurationPrev , self . InputQueueCharacters )
+        write ! ( f , "ImGuiIO {{ ConfigFlags: {:?}, BackendFlags: {:?}, DisplaySize: {:?}, DeltaTime: {:?}, IniSavingRate: {:?}, IniFilename: {:?}, LogFilename: {:?}, MouseDoubleClickTime: {:?}, MouseDoubleClickMaxDist: {:?}, MouseDragThreshold: {:?}, KeyMap: {:?}, KeyRepeatDelay: {:?}, KeyRepeatRate: {:?}, UserData: {:?}, Fonts: {:?}, FontGlobalScale: {:?}, FontAllowUserScaling: {:?}, FontDefault: {:?}, DisplayFramebufferScale: {:?}, MouseDrawCursor: {:?}, ConfigMacOSXBehaviors: {:?}, ConfigInputTextCursorBlink: {:?}, ConfigWindowsResizeFromEdges: {:?}, ConfigWindowsMoveFromTitleBarOnly: {:?}, ConfigWindowsMemoryCompactTimer: {:?}, BackendPlatformName: {:?}, BackendRendererName: {:?}, BackendPlatformUserData: {:?}, BackendRendererUserData: {:?}, BackendLanguageUserData: {:?}, GetClipboardTextFn: {:?}, SetClipboardTextFn: {:?}, ClipboardUserData: {:?}, ImeSetInputScreenPosFn: {:?}, ImeWindowHandle: {:?}, RenderDrawListsFnUnused: {:?}, MousePos: {:?}, MouseDown: {:?}, MouseWheel: {:?}, MouseWheelH: {:?}, KeyCtrl: {:?}, KeyShift: {:?}, KeyAlt: {:?}, KeySuper: {:?}, KeysDown: [{}], NavInputs: {:?}, WantCaptureMouse: {:?}, WantCaptureKeyboard: {:?}, WantTextInput: {:?}, WantSetMousePos: {:?}, WantSaveIniSettings: {:?}, NavActive: {:?}, NavVisible: {:?}, Framerate: {:?}, MetricsRenderVertices: {:?}, MetricsRenderIndices: {:?}, MetricsRenderWindows: {:?}, MetricsActiveWindows: {:?}, MetricsActiveAllocations: {:?}, MouseDelta: {:?}, KeyMods: {:?}, MousePosPrev: {:?}, MouseClickedPos: {:?}, MouseClickedTime: {:?}, MouseClicked: {:?}, MouseDoubleClicked: {:?}, MouseReleased: {:?}, MouseDownOwned: {:?}, MouseDownWasDoubleClick: {:?}, MouseDownDuration: {:?}, MouseDownDurationPrev: {:?}, MouseDragMaxDistanceAbs: {:?}, MouseDragMaxDistanceSqr: {:?}, KeysDownDuration: [{}], KeysDownDurationPrev: [{}], NavInputsDownDuration: {:?}, NavInputsDownDurationPrev: {:?}, InputQueueSurrogate: {:?}, InputQueueCharacters: {:?} }}" , self . ConfigFlags , self . BackendFlags , self . DisplaySize , self . DeltaTime , self . IniSavingRate , self . IniFilename , self . LogFilename , self . MouseDoubleClickTime , self . MouseDoubleClickMaxDist , self . MouseDragThreshold , self . KeyMap , self . KeyRepeatDelay , self . KeyRepeatRate , self . UserData , self . Fonts , self . FontGlobalScale , self . FontAllowUserScaling , self . FontDefault , self . DisplayFramebufferScale , self . MouseDrawCursor , self . ConfigMacOSXBehaviors , self . ConfigInputTextCursorBlink , self . ConfigWindowsResizeFromEdges , self . ConfigWindowsMoveFromTitleBarOnly , self . ConfigWindowsMemoryCompactTimer , self . BackendPlatformName , self . BackendRendererName , self . BackendPlatformUserData , self . BackendRendererUserData , self . BackendLanguageUserData , self . GetClipboardTextFn , self . SetClipboardTextFn , self . ClipboardUserData , self . ImeSetInputScreenPosFn , self . ImeWindowHandle , self . RenderDrawListsFnUnused , self . MousePos , self . MouseDown , self . MouseWheel , self . MouseWheelH , self . KeyCtrl , self . KeyShift , self . KeyAlt , self . KeySuper , self . KeysDown . iter ( ) . enumerate ( ) . map ( | ( i , v ) | format ! ( "{}{:?}" , if i > 0 { ", " } else { "" } , v ) ) . collect :: < String > ( ) , self . NavInputs , self . WantCaptureMouse , self . WantCaptureKeyboard , self . WantTextInput , self . WantSetMousePos , self . WantSaveIniSettings , self . NavActive , self . NavVisible , self . Framerate , self . MetricsRenderVertices , self . MetricsRenderIndices , self . MetricsRenderWindows , self . MetricsActiveWindows , self . MetricsActiveAllocations , self . MouseDelta , self . KeyMods , self . MousePosPrev , self . MouseClickedPos , self . MouseClickedTime , self . MouseClicked , self . MouseDoubleClicked , self . MouseReleased , self . MouseDownOwned , self . MouseDownWasDoubleClick , self . MouseDownDuration , self . MouseDownDurationPrev , self . MouseDragMaxDistanceAbs , self . MouseDragMaxDistanceSqr , self . KeysDownDuration . iter ( ) . enumerate ( ) . map ( | ( i , v ) | format ! ( "{}{:?}" , if i > 0 { ", " } else { "" } , v ) ) . collect :: < String > ( ) , self . KeysDownDurationPrev . iter ( ) . enumerate ( ) . map ( | ( i , v ) | format ! ( "{}{:?}" , if i > 0 { ", " } else { "" } , v ) ) . collect :: < String > ( ) , self . NavInputsDownDuration , self . NavInputsDownDurationPrev , self . InputQueueSurrogate , self . InputQueueCharacters )
     }
 }
 #[repr(C)]
@@ -4294,7 +4279,7 @@ impl ::std::fmt::Debug for ImFontConfig {
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone, PartialEq)]
 pub struct ImFontGlyph {
-    pub Codepoint: ImWchar,
+    pub _bitfield_1: __BindgenBitfieldUnit<[u8; 4usize], u32>,
     pub AdvanceX: f32,
     pub X0: f32,
     pub Y0: f32,
@@ -4316,16 +4301,6 @@ fn bindgen_test_layout_ImFontGlyph() {
         ::std::mem::align_of::<ImFontGlyph>(),
         4usize,
         concat!("Alignment of ", stringify!(ImFontGlyph))
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImFontGlyph>())).Codepoint as *const _ as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImFontGlyph),
-            "::",
-            stringify!(Codepoint)
-        )
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImFontGlyph>())).AdvanceX as *const _ as usize },
@@ -4417,6 +4392,47 @@ fn bindgen_test_layout_ImFontGlyph() {
             stringify!(V1)
         )
     );
+}
+impl ImFontGlyph {
+    #[inline]
+    pub fn Codepoint(&self) -> ::std::os::raw::c_uint {
+        unsafe { ::std::mem::transmute(self._bitfield_1.get(0usize, 31u8) as u32) }
+    }
+    #[inline]
+    pub fn set_Codepoint(&mut self, val: ::std::os::raw::c_uint) {
+        unsafe {
+            let val: u32 = ::std::mem::transmute(val);
+            self._bitfield_1.set(0usize, 31u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn Visible(&self) -> ::std::os::raw::c_uint {
+        unsafe { ::std::mem::transmute(self._bitfield_1.get(31usize, 1u8) as u32) }
+    }
+    #[inline]
+    pub fn set_Visible(&mut self, val: ::std::os::raw::c_uint) {
+        unsafe {
+            let val: u32 = ::std::mem::transmute(val);
+            self._bitfield_1.set(31usize, 1u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn new_bitfield_1(
+        Codepoint: ::std::os::raw::c_uint,
+        Visible: ::std::os::raw::c_uint,
+    ) -> __BindgenBitfieldUnit<[u8; 4usize], u32> {
+        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 4usize], u32> =
+            Default::default();
+        __bindgen_bitfield_unit.set(0usize, 31u8, {
+            let Codepoint: u32 = unsafe { ::std::mem::transmute(Codepoint) };
+            Codepoint as u64
+        });
+        __bindgen_bitfield_unit.set(31usize, 1u8, {
+            let Visible: u32 = unsafe { ::std::mem::transmute(Visible) };
+            Visible as u64
+        });
+        __bindgen_bitfield_unit
+    }
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
@@ -4778,12 +4794,13 @@ pub struct ImFont {
     pub Ascent: f32,
     pub Descent: f32,
     pub MetricsTotalSurface: ::std::os::raw::c_int,
+    pub Used4kPagesMap: [ImU8; 2usize],
 }
 #[test]
 fn bindgen_test_layout_ImFont() {
     assert_eq!(
         ::std::mem::size_of::<ImFont>(),
-        112usize,
+        120usize,
         concat!("Size of: ", stringify!(ImFont))
     );
     assert_eq!(
@@ -4961,6 +4978,16 @@ fn bindgen_test_layout_ImFont() {
             stringify!(MetricsTotalSurface)
         )
     );
+    assert_eq!(
+        unsafe { &(*(::std::ptr::null::<ImFont>())).Used4kPagesMap as *const _ as usize },
+        112usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(ImFont),
+            "::",
+            stringify!(Used4kPagesMap)
+        )
+    );
 }
 impl Default for ImFont {
     fn default() -> Self {
@@ -5122,7 +5149,7 @@ impl ::std::fmt::Debug for ImGuiStoragePair {
     }
 }
 extern "C" {
-    pub fn ImVec2_ImVec2() -> *mut ImVec2;
+    pub fn ImVec2_ImVec2Nil() -> *mut ImVec2;
 }
 extern "C" {
     pub fn ImVec2_destroy(self_: *mut ImVec2);
@@ -5131,7 +5158,7 @@ extern "C" {
     pub fn ImVec2_ImVec2Float(_x: f32, _y: f32) -> *mut ImVec2;
 }
 extern "C" {
-    pub fn ImVec4_ImVec4() -> *mut ImVec4;
+    pub fn ImVec4_ImVec4Nil() -> *mut ImVec4;
 }
 extern "C" {
     pub fn ImVec4_destroy(self_: *mut ImVec4);
@@ -5150,17 +5177,6 @@ extern "C" {
 }
 extern "C" {
     pub fn igSetCurrentContext(ctx: *mut ImGuiContext);
-}
-extern "C" {
-    pub fn igDebugCheckVersionAndDataLayout(
-        version_str: *const ::std::os::raw::c_char,
-        sz_io: usize,
-        sz_style: usize,
-        sz_vec2: usize,
-        sz_vec4: usize,
-        sz_drawvert: usize,
-        sz_drawidx: usize,
-    ) -> bool;
 }
 extern "C" {
     pub fn igGetIO() -> *mut ImGuiIO;
@@ -5224,7 +5240,7 @@ extern "C" {
     pub fn igEnd();
 }
 extern "C" {
-    pub fn igBeginChild(
+    pub fn igBeginChildStr(
         str_id: *const ::std::os::raw::c_char,
         size: ImVec2,
         border: bool,
@@ -5252,6 +5268,12 @@ extern "C" {
 }
 extern "C" {
     pub fn igGetWindowDrawList() -> *mut ImDrawList;
+}
+extern "C" {
+    pub fn igGetWindowPos(pOut: *mut ImVec2);
+}
+extern "C" {
+    pub fn igGetWindowSize(pOut: *mut ImVec2);
 }
 extern "C" {
     pub fn igGetWindowWidth() -> f32;
@@ -5295,7 +5317,7 @@ extern "C" {
     pub fn igSetWindowCollapsedBool(collapsed: bool, cond: ImGuiCond);
 }
 extern "C" {
-    pub fn igSetWindowFocus();
+    pub fn igSetWindowFocusNil();
 }
 extern "C" {
     pub fn igSetWindowFontScale(scale: f32);
@@ -5315,6 +5337,18 @@ extern "C" {
 }
 extern "C" {
     pub fn igSetWindowFocusStr(name: *const ::std::os::raw::c_char);
+}
+extern "C" {
+    pub fn igGetContentRegionMax(pOut: *mut ImVec2);
+}
+extern "C" {
+    pub fn igGetContentRegionAvail(pOut: *mut ImVec2);
+}
+extern "C" {
+    pub fn igGetWindowContentRegionMin(pOut: *mut ImVec2);
+}
+extern "C" {
+    pub fn igGetWindowContentRegionMax(pOut: *mut ImVec2);
 }
 extern "C" {
     pub fn igGetWindowContentRegionWidth() -> f32;
@@ -5359,7 +5393,7 @@ extern "C" {
     pub fn igPushStyleColorU32(idx: ImGuiCol, col: ImU32);
 }
 extern "C" {
-    pub fn igPushStyleColor(idx: ImGuiCol, col: ImVec4);
+    pub fn igPushStyleColorVec4(idx: ImGuiCol, col: ImVec4);
 }
 extern "C" {
     pub fn igPopStyleColor(count: ::std::os::raw::c_int);
@@ -5383,7 +5417,10 @@ extern "C" {
     pub fn igGetFontSize() -> f32;
 }
 extern "C" {
-    pub fn igGetColorU32(idx: ImGuiCol, alpha_mul: f32) -> ImU32;
+    pub fn igGetFontTexUvWhitePixel(pOut: *mut ImVec2);
+}
+extern "C" {
+    pub fn igGetColorU32Col(idx: ImGuiCol, alpha_mul: f32) -> ImU32;
 }
 extern "C" {
     pub fn igGetColorU32Vec4(col: ImVec4) -> ImU32;
@@ -5449,6 +5486,9 @@ extern "C" {
     pub fn igEndGroup();
 }
 extern "C" {
+    pub fn igGetCursorPos(pOut: *mut ImVec2);
+}
+extern "C" {
     pub fn igGetCursorPosX() -> f32;
 }
 extern "C" {
@@ -5462,6 +5502,12 @@ extern "C" {
 }
 extern "C" {
     pub fn igSetCursorPosY(local_y: f32);
+}
+extern "C" {
+    pub fn igGetCursorStartPos(pOut: *mut ImVec2);
+}
+extern "C" {
+    pub fn igGetCursorScreenPos(pOut: *mut ImVec2);
 }
 extern "C" {
     pub fn igSetCursorScreenPos(pos: ImVec2);
@@ -5485,7 +5531,7 @@ extern "C" {
     pub fn igPushIDStr(str_id: *const ::std::os::raw::c_char);
 }
 extern "C" {
-    pub fn igPushIDRange(
+    pub fn igPushIDStrStr(
         str_id_begin: *const ::std::os::raw::c_char,
         str_id_end: *const ::std::os::raw::c_char,
     );
@@ -5503,7 +5549,7 @@ extern "C" {
     pub fn igGetIDStr(str_id: *const ::std::os::raw::c_char) -> ImGuiID;
 }
 extern "C" {
-    pub fn igGetIDRange(
+    pub fn igGetIDStrStr(
         str_id_begin: *const ::std::os::raw::c_char,
         str_id_end: *const ::std::os::raw::c_char,
     ) -> ImGuiID;
@@ -5609,7 +5655,7 @@ extern "C" {
     pub fn igEndCombo();
 }
 extern "C" {
-    pub fn igCombo(
+    pub fn igComboStr_arr(
         label: *const ::std::os::raw::c_char,
         current_item: *mut ::std::os::raw::c_int,
         items: *const *const ::std::os::raw::c_char,
@@ -6135,7 +6181,7 @@ extern "C" {
     pub fn igGetTreeNodeToLabelSpacing() -> f32;
 }
 extern "C" {
-    pub fn igCollapsingHeader(
+    pub fn igCollapsingHeaderTreeNodeFlags(
         label: *const ::std::os::raw::c_char,
         flags: ImGuiTreeNodeFlags,
     ) -> bool;
@@ -6151,7 +6197,7 @@ extern "C" {
     pub fn igSetNextItemOpen(is_open: bool, cond: ImGuiCond);
 }
 extern "C" {
-    pub fn igSelectable(
+    pub fn igSelectableBool(
         label: *const ::std::os::raw::c_char,
         selected: bool,
         flags: ImGuiSelectableFlags,
@@ -6205,7 +6251,7 @@ extern "C" {
     pub fn igListBoxFooter();
 }
 extern "C" {
-    pub fn igPlotLines(
+    pub fn igPlotLinesFloatPtr(
         label: *const ::std::os::raw::c_char,
         values: *const f32,
         values_count: ::std::os::raw::c_int,
@@ -6518,10 +6564,19 @@ extern "C" {
     pub fn igIsAnyItemFocused() -> bool;
 }
 extern "C" {
+    pub fn igGetItemRectMin(pOut: *mut ImVec2);
+}
+extern "C" {
+    pub fn igGetItemRectMax(pOut: *mut ImVec2);
+}
+extern "C" {
+    pub fn igGetItemRectSize(pOut: *mut ImVec2);
+}
+extern "C" {
     pub fn igSetItemAllowOverlap();
 }
 extern "C" {
-    pub fn igIsRectVisible(size: ImVec2) -> bool;
+    pub fn igIsRectVisibleNil(size: ImVec2) -> bool;
 }
 extern "C" {
     pub fn igIsRectVisibleVec2(rect_min: ImVec2, rect_max: ImVec2) -> bool;
@@ -6563,6 +6618,18 @@ extern "C" {
 }
 extern "C" {
     pub fn igEndChildFrame();
+}
+extern "C" {
+    pub fn igCalcTextSize(
+        pOut: *mut ImVec2,
+        text: *const ::std::os::raw::c_char,
+        text_end: *const ::std::os::raw::c_char,
+        hide_text_after_double_hash: bool,
+        wrap_width: f32,
+    );
+}
+extern "C" {
+    pub fn igColorConvertU32ToFloat4(pOut: *mut ImVec4, in_: ImU32);
 }
 extern "C" {
     pub fn igColorConvertFloat4ToU32(in_: ImVec4) -> ImU32;
@@ -6611,7 +6678,16 @@ extern "C" {
     pub fn igIsAnyMouseDown() -> bool;
 }
 extern "C" {
+    pub fn igGetMousePos(pOut: *mut ImVec2);
+}
+extern "C" {
+    pub fn igGetMousePosOnOpeningCurrentPopup(pOut: *mut ImVec2);
+}
+extern "C" {
     pub fn igIsMouseDragging(button: ImGuiMouseButton, lock_threshold: f32) -> bool;
+}
+extern "C" {
+    pub fn igGetMouseDragDelta(pOut: *mut ImVec2, button: ImGuiMouseButton, lock_threshold: f32);
 }
 extern "C" {
     pub fn igResetMouseDragDelta(button: ImGuiMouseButton);
@@ -6642,6 +6718,17 @@ extern "C" {
 }
 extern "C" {
     pub fn igSaveIniSettingsToMemory(out_ini_size: *mut usize) -> *const ::std::os::raw::c_char;
+}
+extern "C" {
+    pub fn igDebugCheckVersionAndDataLayout(
+        version_str: *const ::std::os::raw::c_char,
+        sz_io: usize,
+        sz_style: usize,
+        sz_vec2: usize,
+        sz_vec4: usize,
+        sz_drawvert: usize,
+        sz_drawidx: usize,
+    ) -> bool;
 }
 extern "C" {
     pub fn igSetAllocatorFunctions(
@@ -6677,6 +6764,9 @@ extern "C" {
 }
 extern "C" {
     pub fn ImGuiIO_AddInputCharacter(self_: *mut ImGuiIO, c: ::std::os::raw::c_uint);
+}
+extern "C" {
+    pub fn ImGuiIO_AddInputCharacterUTF16(self_: *mut ImGuiIO, c: ImWchar16);
 }
 extern "C" {
     pub fn ImGuiIO_AddInputCharactersUTF8(self_: *mut ImGuiIO, str: *const ::std::os::raw::c_char);
@@ -6773,7 +6863,7 @@ extern "C" {
     pub fn ImGuiTextFilter_IsActive(self_: *mut ImGuiTextFilter) -> bool;
 }
 extern "C" {
-    pub fn ImGuiTextRange_ImGuiTextRange() -> *mut ImGuiTextRange;
+    pub fn ImGuiTextRange_ImGuiTextRangeNil() -> *mut ImGuiTextRange;
 }
 extern "C" {
     pub fn ImGuiTextRange_destroy(self_: *mut ImGuiTextRange);
@@ -6944,7 +7034,7 @@ extern "C" {
     pub fn ImGuiListClipper_End(self_: *mut ImGuiListClipper);
 }
 extern "C" {
-    pub fn ImColor_ImColor() -> *mut ImColor;
+    pub fn ImColor_ImColorNil() -> *mut ImColor;
 }
 extern "C" {
     pub fn ImColor_destroy(self_: *mut ImColor);
@@ -6968,6 +7058,9 @@ extern "C" {
 }
 extern "C" {
     pub fn ImColor_SetHSV(self_: *mut ImColor, h: f32, s: f32, v: f32, a: f32);
+}
+extern "C" {
+    pub fn ImColor_HSV(pOut: *mut ImColor, self_: *mut ImColor, h: f32, s: f32, v: f32, a: f32);
 }
 extern "C" {
     pub fn ImDrawCmd_ImDrawCmd() -> *mut ImDrawCmd;
@@ -7029,6 +7122,12 @@ extern "C" {
 }
 extern "C" {
     pub fn ImDrawList_PopTextureID(self_: *mut ImDrawList);
+}
+extern "C" {
+    pub fn ImDrawList_GetClipRectMin(pOut: *mut ImVec2, self_: *mut ImDrawList);
+}
+extern "C" {
+    pub fn ImDrawList_GetClipRectMax(pOut: *mut ImVec2, self_: *mut ImDrawList);
 }
 extern "C" {
     pub fn ImDrawList_AddLine(
@@ -7150,7 +7249,7 @@ extern "C" {
     );
 }
 extern "C" {
-    pub fn ImDrawList_AddText(
+    pub fn ImDrawList_AddTextVec2(
         self_: *mut ImDrawList,
         pos: ImVec2,
         col: ImU32,
@@ -7407,16 +7506,10 @@ extern "C" {
     pub fn ImFontGlyphRangesBuilder_Clear(self_: *mut ImFontGlyphRangesBuilder);
 }
 extern "C" {
-    pub fn ImFontGlyphRangesBuilder_GetBit(
-        self_: *mut ImFontGlyphRangesBuilder,
-        n: ::std::os::raw::c_int,
-    ) -> bool;
+    pub fn ImFontGlyphRangesBuilder_GetBit(self_: *mut ImFontGlyphRangesBuilder, n: usize) -> bool;
 }
 extern "C" {
-    pub fn ImFontGlyphRangesBuilder_SetBit(
-        self_: *mut ImFontGlyphRangesBuilder,
-        n: ::std::os::raw::c_int,
-    );
+    pub fn ImFontGlyphRangesBuilder_SetBit(self_: *mut ImFontGlyphRangesBuilder, n: usize);
 }
 extern "C" {
     pub fn ImFontGlyphRangesBuilder_AddChar(self_: *mut ImFontGlyphRangesBuilder, c: ImWchar);
@@ -7635,6 +7728,18 @@ extern "C" {
     pub fn ImFont_GetDebugName(self_: *mut ImFont) -> *const ::std::os::raw::c_char;
 }
 extern "C" {
+    pub fn ImFont_CalcTextSizeA(
+        pOut: *mut ImVec2,
+        self_: *mut ImFont,
+        size: f32,
+        max_width: f32,
+        wrap_width: f32,
+        text_begin: *const ::std::os::raw::c_char,
+        text_end: *const ::std::os::raw::c_char,
+        remaining: *mut *const ::std::os::raw::c_char,
+    );
+}
+extern "C" {
     pub fn ImFont_CalcWordWrapPositionA(
         self_: *mut ImFont,
         scale: f32,
@@ -7695,187 +7800,17 @@ extern "C" {
     pub fn ImFont_AddRemapChar(self_: *mut ImFont, dst: ImWchar, src: ImWchar, overwrite_dst: bool);
 }
 extern "C" {
+    pub fn ImFont_SetGlyphVisible(self_: *mut ImFont, c: ImWchar, visible: bool);
+}
+extern "C" {
     pub fn ImFont_SetFallbackChar(self_: *mut ImFont, c: ImWchar);
 }
 extern "C" {
-    pub fn igGetWindowPos_nonUDT(pOut: *mut ImVec2);
-}
-extern "C" {
-    pub fn igGetWindowPos_nonUDT2() -> ImVec2_Simple;
-}
-extern "C" {
-    pub fn igGetWindowSize_nonUDT(pOut: *mut ImVec2);
-}
-extern "C" {
-    pub fn igGetWindowSize_nonUDT2() -> ImVec2_Simple;
-}
-extern "C" {
-    pub fn igGetContentRegionMax_nonUDT(pOut: *mut ImVec2);
-}
-extern "C" {
-    pub fn igGetContentRegionMax_nonUDT2() -> ImVec2_Simple;
-}
-extern "C" {
-    pub fn igGetContentRegionAvail_nonUDT(pOut: *mut ImVec2);
-}
-extern "C" {
-    pub fn igGetContentRegionAvail_nonUDT2() -> ImVec2_Simple;
-}
-extern "C" {
-    pub fn igGetWindowContentRegionMin_nonUDT(pOut: *mut ImVec2);
-}
-extern "C" {
-    pub fn igGetWindowContentRegionMin_nonUDT2() -> ImVec2_Simple;
-}
-extern "C" {
-    pub fn igGetWindowContentRegionMax_nonUDT(pOut: *mut ImVec2);
-}
-extern "C" {
-    pub fn igGetWindowContentRegionMax_nonUDT2() -> ImVec2_Simple;
-}
-extern "C" {
-    pub fn igGetFontTexUvWhitePixel_nonUDT(pOut: *mut ImVec2);
-}
-extern "C" {
-    pub fn igGetFontTexUvWhitePixel_nonUDT2() -> ImVec2_Simple;
-}
-extern "C" {
-    pub fn igGetCursorPos_nonUDT(pOut: *mut ImVec2);
-}
-extern "C" {
-    pub fn igGetCursorPos_nonUDT2() -> ImVec2_Simple;
-}
-extern "C" {
-    pub fn igGetCursorStartPos_nonUDT(pOut: *mut ImVec2);
-}
-extern "C" {
-    pub fn igGetCursorStartPos_nonUDT2() -> ImVec2_Simple;
-}
-extern "C" {
-    pub fn igGetCursorScreenPos_nonUDT(pOut: *mut ImVec2);
-}
-extern "C" {
-    pub fn igGetCursorScreenPos_nonUDT2() -> ImVec2_Simple;
-}
-extern "C" {
-    pub fn igGetItemRectMin_nonUDT(pOut: *mut ImVec2);
-}
-extern "C" {
-    pub fn igGetItemRectMin_nonUDT2() -> ImVec2_Simple;
-}
-extern "C" {
-    pub fn igGetItemRectMax_nonUDT(pOut: *mut ImVec2);
-}
-extern "C" {
-    pub fn igGetItemRectMax_nonUDT2() -> ImVec2_Simple;
-}
-extern "C" {
-    pub fn igGetItemRectSize_nonUDT(pOut: *mut ImVec2);
-}
-extern "C" {
-    pub fn igGetItemRectSize_nonUDT2() -> ImVec2_Simple;
-}
-extern "C" {
-    pub fn igCalcTextSize_nonUDT(
-        pOut: *mut ImVec2,
-        text: *const ::std::os::raw::c_char,
-        text_end: *const ::std::os::raw::c_char,
-        hide_text_after_double_hash: bool,
-        wrap_width: f32,
-    );
-}
-extern "C" {
-    pub fn igCalcTextSize_nonUDT2(
-        text: *const ::std::os::raw::c_char,
-        text_end: *const ::std::os::raw::c_char,
-        hide_text_after_double_hash: bool,
-        wrap_width: f32,
-    ) -> ImVec2_Simple;
-}
-extern "C" {
-    pub fn igColorConvertU32ToFloat4_nonUDT(pOut: *mut ImVec4, in_: ImU32);
-}
-extern "C" {
-    pub fn igColorConvertU32ToFloat4_nonUDT2(in_: ImU32) -> ImVec4_Simple;
-}
-extern "C" {
-    pub fn igGetMousePos_nonUDT(pOut: *mut ImVec2);
-}
-extern "C" {
-    pub fn igGetMousePos_nonUDT2() -> ImVec2_Simple;
-}
-extern "C" {
-    pub fn igGetMousePosOnOpeningCurrentPopup_nonUDT(pOut: *mut ImVec2);
-}
-extern "C" {
-    pub fn igGetMousePosOnOpeningCurrentPopup_nonUDT2() -> ImVec2_Simple;
-}
-extern "C" {
-    pub fn igGetMouseDragDelta_nonUDT(
-        pOut: *mut ImVec2,
-        button: ImGuiMouseButton,
-        lock_threshold: f32,
-    );
-}
-extern "C" {
-    pub fn igGetMouseDragDelta_nonUDT2(
-        button: ImGuiMouseButton,
-        lock_threshold: f32,
-    ) -> ImVec2_Simple;
-}
-extern "C" {
-    pub fn ImColor_HSV_nonUDT(
-        pOut: *mut ImColor,
-        self_: *mut ImColor,
-        h: f32,
-        s: f32,
-        v: f32,
-        a: f32,
-    );
-}
-extern "C" {
-    pub fn ImColor_HSV_nonUDT2(
-        self_: *mut ImColor,
-        h: f32,
-        s: f32,
-        v: f32,
-        a: f32,
-    ) -> ImColor_Simple;
-}
-extern "C" {
-    pub fn ImDrawList_GetClipRectMin_nonUDT(pOut: *mut ImVec2, self_: *mut ImDrawList);
-}
-extern "C" {
-    pub fn ImDrawList_GetClipRectMin_nonUDT2(self_: *mut ImDrawList) -> ImVec2_Simple;
-}
-extern "C" {
-    pub fn ImDrawList_GetClipRectMax_nonUDT(pOut: *mut ImVec2, self_: *mut ImDrawList);
-}
-extern "C" {
-    pub fn ImDrawList_GetClipRectMax_nonUDT2(self_: *mut ImDrawList) -> ImVec2_Simple;
-}
-extern "C" {
-    pub fn ImFont_CalcTextSizeA_nonUDT(
-        pOut: *mut ImVec2,
+    pub fn ImFont_IsGlyphRangeUnused(
         self_: *mut ImFont,
-        size: f32,
-        max_width: f32,
-        wrap_width: f32,
-        text_begin: *const ::std::os::raw::c_char,
-        text_end: *const ::std::os::raw::c_char,
-        remaining: *mut *const ::std::os::raw::c_char,
-    );
-}
-extern "C" {
-    pub fn ImFont_CalcTextSizeA_nonUDT2(
-        self_: *mut ImFont,
-        size: f32,
-        max_width: f32,
-        wrap_width: f32,
-        text_begin: *const ::std::os::raw::c_char,
-        text_end: *const ::std::os::raw::c_char,
-        remaining: *mut *const ::std::os::raw::c_char,
-    ) -> ImVec2_Simple;
+        c_begin: ::std::os::raw::c_uint,
+        c_last: ::std::os::raw::c_uint,
+    ) -> bool;
 }
 extern "C" {
     pub fn igLogText(fmt: *const ::std::os::raw::c_char, ...);

@@ -4,11 +4,11 @@ use std::fs;
 use std::io;
 
 const CPP_FILES: [&str; 5] = [
-    "third-party/cimgui/cimgui.cpp",
-    "third-party/cimgui/imgui/imgui.cpp",
-    "third-party/cimgui/imgui/imgui_demo.cpp",
-    "third-party/cimgui/imgui/imgui_draw.cpp",
-    "third-party/cimgui/imgui/imgui_widgets.cpp",
+    "third-party/cimgui.cpp",
+    "third-party/imgui/imgui.cpp",
+    "third-party/imgui/imgui_demo.cpp",
+    "third-party/imgui/imgui_draw.cpp",
+    "third-party/imgui/imgui_widgets.cpp",
 ];
 
 fn assert_file_exists(path: &str) -> io::Result<()> {
