@@ -97,7 +97,9 @@ impl<'ui> Ui<'ui> {
     }
     /// Returns the cursor position (in window coordinates)
     pub fn cursor_pos(&self) -> [f32; 2] {
-        unsafe { sys::igGetCursorPos_nonUDT2().into() }
+        let mut out = sys::ImVec2::zero();
+        unsafe { sys::igGetCursorPos(&mut out) };
+        out.into()
     }
     /// Sets the cursor position (in window coordinates).
     ///
@@ -107,13 +109,17 @@ impl<'ui> Ui<'ui> {
     }
     /// Returns the initial cursor position (in window coordinates)
     pub fn cursor_start_pos(&self) -> [f32; 2] {
-        unsafe { sys::igGetCursorStartPos_nonUDT2().into() }
+        let mut out = sys::ImVec2::zero();
+        unsafe { sys::igGetCursorStartPos(&mut out) };
+        out.into()
     }
     /// Returns the cursor position (in absolute screen coordinates).
     ///
     /// This is especially useful for drawing, as the drawing API uses screen coordinates.
     pub fn cursor_screen_pos(&self) -> [f32; 2] {
-        unsafe { sys::igGetCursorScreenPos_nonUDT2().into() }
+        let mut out = sys::ImVec2::zero();
+        unsafe { sys::igGetCursorScreenPos(&mut out) };
+        out.into()
     }
     /// Sets the cursor position (in absolute screen coordinates)
     pub fn set_cursor_screen_pos(&self, pos: [f32; 2]) {

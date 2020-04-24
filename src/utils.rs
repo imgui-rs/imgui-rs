@@ -82,15 +82,21 @@ impl<'ui> Ui<'ui> {
     }
     /// Returns the upper-left bounding rectangle of the last item (in screen coordinates)
     pub fn item_rect_min(&self) -> [f32; 2] {
-        unsafe { sys::igGetItemRectMin_nonUDT2().into() }
+        let mut out = sys::ImVec2::zero();
+        unsafe { sys::igGetItemRectMin(&mut out) }
+        out.into()
     }
     /// Returns the lower-right bounding rectangle of the last item (in screen coordinates)
     pub fn item_rect_max(&self) -> [f32; 2] {
-        unsafe { sys::igGetItemRectMax_nonUDT2().into() }
+        let mut out = sys::ImVec2::zero();
+        unsafe { sys::igGetItemRectMax(&mut out) }
+        out.into()
     }
     /// Returns the size of the last item
     pub fn item_rect_size(&self) -> [f32; 2] {
-        unsafe { sys::igGetItemRectSize_nonUDT2().into() }
+        let mut out = sys::ImVec2::zero();
+        unsafe { sys::igGetItemRectSize(&mut out) }
+        out.into()
     }
     /// Allows the last item to be overlapped by a subsequent item.
     ///
