@@ -289,6 +289,7 @@ pub struct Io {
     /// f32::MAX]), so a disappearing/reappearing mouse won't have a huge delta.
     pub mouse_delta: [f32; 2],
 
+    key_mods: sys::ImGuiKeyModFlags,
     mouse_pos_prev: [f32; 2],
     mouse_clicked_pos: [[f32; 2]; 5],
     mouse_clicked_time: [f64; 5],
@@ -305,6 +306,7 @@ pub struct Io {
     keys_down_duration_prev: [f32; 512],
     nav_inputs_down_duration: [f32; NavInput::COUNT + NavInput::INTERNAL_COUNT],
     nav_inputs_down_duration_prev: [f32; NavInput::COUNT + NavInput::INTERNAL_COUNT],
+    input_queue_surrogate: sys::ImWchar16,
     input_queue_characters: ImVector<sys::ImWchar>,
 }
 
@@ -455,6 +457,7 @@ fn test_io_memory_layout() {
     assert_field_offset!(metrics_active_windows, MetricsActiveWindows);
     assert_field_offset!(metrics_active_allocations, MetricsActiveAllocations);
     assert_field_offset!(mouse_delta, MouseDelta);
+    assert_field_offset!(key_mods, KeyMods);
     assert_field_offset!(mouse_pos_prev, MousePosPrev);
     assert_field_offset!(mouse_clicked_pos, MouseClickedPos);
     assert_field_offset!(mouse_clicked_time, MouseClickedTime);
@@ -471,5 +474,6 @@ fn test_io_memory_layout() {
     assert_field_offset!(keys_down_duration_prev, KeysDownDurationPrev);
     assert_field_offset!(nav_inputs_down_duration, NavInputsDownDuration);
     assert_field_offset!(nav_inputs_down_duration_prev, NavInputsDownDurationPrev);
+    assert_field_offset!(input_queue_surrogate, InputQueueSurrogate);
     assert_field_offset!(input_queue_characters, InputQueueCharacters);
 }
