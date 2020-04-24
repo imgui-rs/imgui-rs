@@ -1,5 +1,3 @@
-extern crate imgui_sys_bindgen;
-
 use imgui_sys_bindgen::generate_bindings;
 use std::env;
 

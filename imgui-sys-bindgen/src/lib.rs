@@ -1,16 +1,22 @@
-extern crate bindgen;
-#[macro_use]
-extern crate failure;
-#[macro_use]
-extern crate serde_derive;
-extern crate serde_json;
-
 use bindgen::{Bindings, EnumVariation, RustTarget};
-use failure::Error;
+use serde_derive::Deserialize;
 use std::collections::HashMap;
+use std::error::Error;
+use std::fmt;
 use std::fs::{read_to_string, File};
 use std::io::Read;
 use std::path::Path;
+
+#[derive(Debug)]
+struct BindgenError;
+
+impl fmt::Display for BindgenError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "Failed to generate bindings")
+    }
+}
+
+impl Error for BindgenError {}
 
 #[derive(Deserialize)]
 struct StructsAndEnums {
@@ -38,17 +44,13 @@ struct Whitelist {
     definitions: Vec<String>,
 }
 
-fn only_key<K, V>((key, _): (K, V)) -> K {
-    key
-}
-
 fn parse_whitelist<R: Read>(
     structs_and_enums: R,
     definitions: R,
 ) -> Result<Whitelist, serde_json::Error> {
     let StructsAndEnums { enums, structs } = serde_json::from_reader(structs_and_enums)?;
-    let enums = enums.into_iter().map(only_key).collect();
-    let structs = structs.into_iter().map(only_key).collect();
+    let enums = enums.keys().cloned().collect();
+    let structs = structs.keys().cloned().collect();
 
     let definitions: HashMap<String, Vec<Definition>> = serde_json::from_reader(definitions)?;
     let definitions = definitions
@@ -74,7 +76,7 @@ fn parse_whitelist<R: Read>(
 pub fn generate_bindings<P: AsRef<Path>>(
     path: &P,
     wasm_import_name: Option<String>,
-) -> Result<Bindings, Error> {
+) -> Result<Bindings, Box<dyn Error>> {
     let path = path.as_ref();
     let structs_and_enums = File::open(path.join("structs_and_enums.json"))?;
     let definitions = File::open(path.join("definitions.json"))?;
@@ -116,8 +118,6 @@ pub fn generate_bindings<P: AsRef<Path>>(
     for e in whitelist.definitions {
         builder = builder.whitelist_function(format!("^{}", e));
     }
-    let bindings = builder
-        .generate()
-        .map_err(|_| format_err!("Failed to generate bindings"))?;
+    let bindings = builder.generate().map_err(|_| BindgenError)?;
     Ok(bindings)
 }

@@ -2,6 +2,7 @@
 name = "imgui-sys-bindgen"
 version = "0.0.0"
 authors = ["Joonas Javanainen <joonas.javanainen@gmail.com>", "imgui-rs contributors"]
+edition = "2018"
 description = "imgui-sys bindings updater"
 homepage = "https://github.com/Gekkio/imgui-rs"
 repository = "https://github.com/Gekkio/imgui-rs"
@@ -10,7 +11,6 @@ publish = false
 
 [dependencies]
 bindgen = "0.53"
-failure = "0.1"
 serde = "1.0"
 serde_derive = "1.0"
 serde_json = "1.0"
