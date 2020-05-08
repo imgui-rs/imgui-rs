@@ -47,6 +47,10 @@ struct State {
     dont_ask_me_next_time: bool,
     stacked_modals_item: usize,
     stacked_modals_color: [f32; 4],
+
+    tabs_reorderable: bool,
+    tab_1_opened: bool,
+    tab_2_opened: bool,
 }
 
 impl Default for State {
@@ -102,6 +106,9 @@ impl Default for State {
             dont_ask_me_next_time: false,
             stacked_modals_item: 0,
             stacked_modals_color: [0.4, 0.7, 0.0, 0.5],
+            tabs_reorderable: true,
+            tab_1_opened: true,
+            tab_2_opened: true,
         }
     }
 }
@@ -365,6 +372,28 @@ fn show_test_window(ui: &Ui, state: &mut State, opened: &mut bool) {
                     });
                 }
             });
+
+            TreeNode::new(im_str!("Tabs")).build(&ui, || {
+                ui.separator();
+                let style = ui.push_style_var(StyleVar::FramePadding([0.0, 0.0]));
+                ui.checkbox(im_str!("Tab 1 opened"), &mut state.tab_1_opened);
+                ui.same_line(0.0);
+                ui.checkbox(im_str!("Tab 2 opened"), &mut state.tab_2_opened);
+                ui.same_line(0.0);
+                ui.checkbox(im_str!("Tabs reorderable"), &mut state.tabs_reorderable);
+
+                style.pop(ui);
+
+                TabBar::new(im_str!("tabbar")).reorderable(state.tabs_reorderable).build(&ui, || {
+                    TabItem::new(im_str!("a tab")).opened(&mut state.tab_1_opened).build(&ui, || {
+                        ui.text(im_str!("tab content 1"));
+                    });
+                    TabItem::new(im_str!("2tab")).opened(&mut state.tab_2_opened).build(&ui, || {
+                        ui.text(im_str!("tab content 2"));
+                    });
+                });
+            });
+
             TreeNode::new(im_str!("Bullets")).build(&ui, || {
                 ui.bullet_text(im_str!("Bullet point 1"));
                 ui.bullet_text(im_str!("Bullet point 2\nOn multiple lines"));

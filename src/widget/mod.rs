@@ -8,3 +8,4 @@ pub mod selectable;
 pub mod slider;
 pub mod text;
 pub mod tree;
+pub mod tab;
