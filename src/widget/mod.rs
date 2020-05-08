@@ -6,6 +6,6 @@ pub mod misc;
 pub mod progress_bar;
 pub mod selectable;
 pub mod slider;
+pub mod tab;
 pub mod text;
 pub mod tree;
-pub mod tab;
