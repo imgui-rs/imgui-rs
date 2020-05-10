@@ -90,7 +90,7 @@ use winit::{
     TouchPhase, VirtualKeyCode, Window, WindowEvent,
 };
 
-#[cfg(any(feature = "winit-20", feature ="winit-22"))]
+#[cfg(any(feature = "winit-20", feature = "winit-22"))]
 use winit::{
     error::ExternalError,
     event::{
@@ -213,7 +213,7 @@ impl WinitPlatform {
     ///
     /// * framebuffer scale (= DPI factor) is set
     /// * display size is set
-    #[cfg(any(feature = "winit-20", feature ="winit-22"))]
+    #[cfg(any(feature = "winit-20", feature = "winit-22"))]
     pub fn attach_window(&mut self, io: &mut Io, window: &Window, hidpi_mode: HiDpiMode) {
         let (hidpi_mode, hidpi_factor) = hidpi_mode.apply(window.scale_factor());
         self.hidpi_mode = hidpi_mode;
@@ -246,7 +246,7 @@ impl WinitPlatform {
     ///
     /// This utility function is useful if you are using a DPI mode other than default, and want
     /// your application to use the same logical coordinates as imgui-rs.
-    #[cfg(any(feature = "winit-20", feature ="winit-22"))]
+    #[cfg(any(feature = "winit-20", feature = "winit-22"))]
     pub fn scale_size_from_winit(
         &self,
         window: &Window,
@@ -280,7 +280,7 @@ impl WinitPlatform {
     ///
     /// This utility function is useful if you are using a DPI mode other than default, and want
     /// your application to use the same logical coordinates as imgui-rs.
-    #[cfg(any(feature = "winit-20", feature ="winit-22"))]
+    #[cfg(any(feature = "winit-20", feature = "winit-22"))]
     pub fn scale_pos_from_winit(
         &self,
         window: &Window,
@@ -314,7 +314,7 @@ impl WinitPlatform {
     ///
     /// This utility function is useful if you are using a DPI mode other than default, and want
     /// your application to use the same logical coordinates as imgui-rs.
-    #[cfg(any(feature = "winit-20", feature ="winit-22"))]
+    #[cfg(any(feature = "winit-20", feature = "winit-22"))]
     pub fn scale_pos_for_winit(
         &self,
         window: &Window,
@@ -441,11 +441,11 @@ impl WinitPlatform {
             // we might never see the release event if some other window gets focus.
             Event::DeviceEvent {
                 event:
-                DeviceEvent::Key(KeyboardInput {
-                                     state: ElementState::Released,
-                                     virtual_keycode: Some(key),
-                                     ..
-                                 }),
+                    DeviceEvent::Key(KeyboardInput {
+                        state: ElementState::Released,
+                        virtual_keycode: Some(key),
+                        ..
+                    }),
                 ..
             } => {
                 io.keys_down[key as usize] = false;
@@ -663,7 +663,7 @@ impl WinitPlatform {
     /// This function performs the following actions:
     ///
     /// * mouse cursor is repositioned (if requested by imgui-rs)
-    #[cfg(any(feature = "winit-20", feature ="winit-22"))]
+    #[cfg(any(feature = "winit-20", feature = "winit-22"))]
     pub fn prepare_frame(&self, io: &mut Io, window: &Window) -> Result<(), ExternalError> {
         if io.want_set_mouse_pos {
             let logical_pos = self.scale_pos_for_winit(
@@ -713,7 +713,7 @@ impl WinitPlatform {
     /// This function performs the following actions:
     ///
     /// * mouse cursor is changed and/or hidden (if requested by imgui-rs)
-    #[cfg(any(feature = "winit-20", feature ="winit-22"))]
+    #[cfg(any(feature = "winit-20", feature = "winit-22"))]
     pub fn prepare_render(&self, ui: &Ui, window: &Window) {
         let io = ui.io();
         if !io
