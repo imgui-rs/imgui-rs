@@ -17,9 +17,16 @@ fn main() {
     bindings
         .write_to_file(&output_path)
         .expect("Failed to write bindings");
-        
-    let wasm_bindings = generate_bindings(&sys_path.join("third-party").join("cimgui"), Some("imgui-sys-v0".into()))
-        .expect("Failed to generate bindings");
+
+    let wasm_ffi_import_name = option_env!("IMGUI_RS_WASM_IMPORT_NAME")
+        .map(|s| s.to_string())
+        .or(Some("imgui-sys".to_string()));
+
+    let wasm_bindings = generate_bindings(
+        &sys_path.join("third-party").join("cimgui"),
+        wasm_ffi_import_name,
+    )
+    .expect("Failed to generate bindings");
     let output_path = sys_path.join("src").join("wasm_bindings.rs");
     wasm_bindings
         .write_to_file(&output_path)

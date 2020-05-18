@@ -5121,47 +5121,47 @@ impl ::std::fmt::Debug for ImGuiStoragePair {
         )
     }
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImVec2_ImVec2() -> *mut ImVec2;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImVec2_destroy(self_: *mut ImVec2);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImVec2_ImVec2Float(_x: f32, _y: f32) -> *mut ImVec2;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImVec4_ImVec4() -> *mut ImVec4;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImVec4_destroy(self_: *mut ImVec4);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImVec4_ImVec4Float(_x: f32, _y: f32, _z: f32, _w: f32) -> *mut ImVec4;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igCreateContext(shared_font_atlas: *mut ImFontAtlas) -> *mut ImGuiContext;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igDestroyContext(ctx: *mut ImGuiContext);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igGetCurrentContext() -> *mut ImGuiContext;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igSetCurrentContext(ctx: *mut ImGuiContext);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igDebugCheckVersionAndDataLayout(
         version_str: *const ::std::os::raw::c_char,
@@ -5173,75 +5173,75 @@ extern "C" {
         sz_drawidx: usize,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igGetIO() -> *mut ImGuiIO;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igGetStyle() -> *mut ImGuiStyle;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igNewFrame();
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igEndFrame();
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igRender();
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igGetDrawData() -> *mut ImDrawData;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igShowDemoWindow(p_open: *mut bool);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igShowAboutWindow(p_open: *mut bool);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igShowMetricsWindow(p_open: *mut bool);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igShowStyleEditor(ref_: *mut ImGuiStyle);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igShowStyleSelector(label: *const ::std::os::raw::c_char) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igShowFontSelector(label: *const ::std::os::raw::c_char);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igShowUserGuide();
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igGetVersion() -> *const ::std::os::raw::c_char;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igStyleColorsDark(dst: *mut ImGuiStyle);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igStyleColorsClassic(dst: *mut ImGuiStyle);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igStyleColorsLight(dst: *mut ImGuiStyle);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igBegin(
         name: *const ::std::os::raw::c_char,
@@ -5249,11 +5249,11 @@ extern "C" {
         flags: ImGuiWindowFlags,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igEnd();
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igBeginChild(
         str_id: *const ::std::os::raw::c_char,
@@ -5262,52 +5262,52 @@ extern "C" {
         flags: ImGuiWindowFlags,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igBeginChildID(id: ImGuiID, size: ImVec2, border: bool, flags: ImGuiWindowFlags)
         -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igEndChild();
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igIsWindowAppearing() -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igIsWindowCollapsed() -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igIsWindowFocused(flags: ImGuiFocusedFlags) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igIsWindowHovered(flags: ImGuiHoveredFlags) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igGetWindowDrawList() -> *mut ImDrawList;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igGetWindowWidth() -> f32;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igGetWindowHeight() -> f32;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igSetNextWindowPos(pos: ImVec2, cond: ImGuiCond, pivot: ImVec2);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igSetNextWindowSize(size: ImVec2, cond: ImGuiCond);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igSetNextWindowSizeConstraints(
         size_min: ImVec2,
@@ -5316,51 +5316,51 @@ extern "C" {
         custom_callback_data: *mut ::std::os::raw::c_void,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igSetNextWindowContentSize(size: ImVec2);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igSetNextWindowCollapsed(collapsed: bool, cond: ImGuiCond);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igSetNextWindowFocus();
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igSetNextWindowBgAlpha(alpha: f32);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igSetWindowPosVec2(pos: ImVec2, cond: ImGuiCond);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igSetWindowSizeVec2(size: ImVec2, cond: ImGuiCond);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igSetWindowCollapsedBool(collapsed: bool, cond: ImGuiCond);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igSetWindowFocus();
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igSetWindowFontScale(scale: f32);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igSetWindowPosStr(name: *const ::std::os::raw::c_char, pos: ImVec2, cond: ImGuiCond);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igSetWindowSizeStr(name: *const ::std::os::raw::c_char, size: ImVec2, cond: ImGuiCond);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igSetWindowCollapsedStr(
         name: *const ::std::os::raw::c_char,
@@ -5368,292 +5368,292 @@ extern "C" {
         cond: ImGuiCond,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igSetWindowFocusStr(name: *const ::std::os::raw::c_char);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igGetWindowContentRegionWidth() -> f32;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igGetScrollX() -> f32;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igGetScrollY() -> f32;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igGetScrollMaxX() -> f32;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igGetScrollMaxY() -> f32;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igSetScrollX(scroll_x: f32);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igSetScrollY(scroll_y: f32);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igSetScrollHereX(center_x_ratio: f32);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igSetScrollHereY(center_y_ratio: f32);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igSetScrollFromPosX(local_x: f32, center_x_ratio: f32);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igSetScrollFromPosY(local_y: f32, center_y_ratio: f32);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igPushFont(font: *mut ImFont);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igPopFont();
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igPushStyleColorU32(idx: ImGuiCol, col: ImU32);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igPushStyleColor(idx: ImGuiCol, col: ImVec4);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igPopStyleColor(count: ::std::os::raw::c_int);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igPushStyleVarFloat(idx: ImGuiStyleVar, val: f32);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igPushStyleVarVec2(idx: ImGuiStyleVar, val: ImVec2);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igPopStyleVar(count: ::std::os::raw::c_int);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igGetStyleColorVec4(idx: ImGuiCol) -> *const ImVec4;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igGetFont() -> *mut ImFont;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igGetFontSize() -> f32;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igGetColorU32(idx: ImGuiCol, alpha_mul: f32) -> ImU32;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igGetColorU32Vec4(col: ImVec4) -> ImU32;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igGetColorU32U32(col: ImU32) -> ImU32;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igPushItemWidth(item_width: f32);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igPopItemWidth();
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igSetNextItemWidth(item_width: f32);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igCalcItemWidth() -> f32;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igPushTextWrapPos(wrap_local_pos_x: f32);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igPopTextWrapPos();
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igPushAllowKeyboardFocus(allow_keyboard_focus: bool);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igPopAllowKeyboardFocus();
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igPushButtonRepeat(repeat: bool);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igPopButtonRepeat();
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igSeparator();
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igSameLine(offset_from_start_x: f32, spacing: f32);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igNewLine();
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igSpacing();
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igDummy(size: ImVec2);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igIndent(indent_w: f32);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igUnindent(indent_w: f32);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igBeginGroup();
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igEndGroup();
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igGetCursorPosX() -> f32;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igGetCursorPosY() -> f32;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igSetCursorPos(local_pos: ImVec2);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igSetCursorPosX(local_x: f32);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igSetCursorPosY(local_y: f32);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igSetCursorScreenPos(pos: ImVec2);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igAlignTextToFramePadding();
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igGetTextLineHeight() -> f32;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igGetTextLineHeightWithSpacing() -> f32;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igGetFrameHeight() -> f32;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igGetFrameHeightWithSpacing() -> f32;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igPushIDStr(str_id: *const ::std::os::raw::c_char);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igPushIDRange(
         str_id_begin: *const ::std::os::raw::c_char,
         str_id_end: *const ::std::os::raw::c_char,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igPushIDPtr(ptr_id: *const ::std::os::raw::c_void);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igPushIDInt(int_id: ::std::os::raw::c_int);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igPopID();
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igGetIDStr(str_id: *const ::std::os::raw::c_char) -> ImGuiID;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igGetIDRange(
         str_id_begin: *const ::std::os::raw::c_char,
         str_id_end: *const ::std::os::raw::c_char,
     ) -> ImGuiID;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igGetIDPtr(ptr_id: *const ::std::os::raw::c_void) -> ImGuiID;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igTextUnformatted(
         text: *const ::std::os::raw::c_char,
         text_end: *const ::std::os::raw::c_char,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igText(fmt: *const ::std::os::raw::c_char, ...);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igTextColored(col: ImVec4, fmt: *const ::std::os::raw::c_char, ...);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igTextDisabled(fmt: *const ::std::os::raw::c_char, ...);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igTextWrapped(fmt: *const ::std::os::raw::c_char, ...);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igLabelText(
         label: *const ::std::os::raw::c_char,
@@ -5661,27 +5661,27 @@ extern "C" {
         ...
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igBulletText(fmt: *const ::std::os::raw::c_char, ...);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igButton(label: *const ::std::os::raw::c_char, size: ImVec2) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igSmallButton(label: *const ::std::os::raw::c_char) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igInvisibleButton(str_id: *const ::std::os::raw::c_char, size: ImVec2) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igArrowButton(str_id: *const ::std::os::raw::c_char, dir: ImGuiDir) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igImage(
         user_texture_id: ImTextureID,
@@ -5692,7 +5692,7 @@ extern "C" {
         border_col: ImVec4,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igImageButton(
         user_texture_id: ImTextureID,
@@ -5704,11 +5704,11 @@ extern "C" {
         tint_col: ImVec4,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igCheckbox(label: *const ::std::os::raw::c_char, v: *mut bool) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igCheckboxFlags(
         label: *const ::std::os::raw::c_char,
@@ -5716,11 +5716,11 @@ extern "C" {
         flags_value: ::std::os::raw::c_uint,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igRadioButtonBool(label: *const ::std::os::raw::c_char, active: bool) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igRadioButtonIntPtr(
         label: *const ::std::os::raw::c_char,
@@ -5728,15 +5728,15 @@ extern "C" {
         v_button: ::std::os::raw::c_int,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igProgressBar(fraction: f32, size_arg: ImVec2, overlay: *const ::std::os::raw::c_char);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igBullet();
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igBeginCombo(
         label: *const ::std::os::raw::c_char,
@@ -5744,11 +5744,11 @@ extern "C" {
         flags: ImGuiComboFlags,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igEndCombo();
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igCombo(
         label: *const ::std::os::raw::c_char,
@@ -5758,7 +5758,7 @@ extern "C" {
         popup_max_height_in_items: ::std::os::raw::c_int,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igComboStr(
         label: *const ::std::os::raw::c_char,
@@ -5767,7 +5767,7 @@ extern "C" {
         popup_max_height_in_items: ::std::os::raw::c_int,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igComboFnPtr(
         label: *const ::std::os::raw::c_char,
@@ -5784,7 +5784,7 @@ extern "C" {
         popup_max_height_in_items: ::std::os::raw::c_int,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igDragFloat(
         label: *const ::std::os::raw::c_char,
@@ -5796,7 +5796,7 @@ extern "C" {
         power: f32,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igDragFloat2(
         label: *const ::std::os::raw::c_char,
@@ -5808,7 +5808,7 @@ extern "C" {
         power: f32,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igDragFloat3(
         label: *const ::std::os::raw::c_char,
@@ -5820,7 +5820,7 @@ extern "C" {
         power: f32,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igDragFloat4(
         label: *const ::std::os::raw::c_char,
@@ -5832,7 +5832,7 @@ extern "C" {
         power: f32,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igDragFloatRange2(
         label: *const ::std::os::raw::c_char,
@@ -5846,7 +5846,7 @@ extern "C" {
         power: f32,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igDragInt(
         label: *const ::std::os::raw::c_char,
@@ -5857,7 +5857,7 @@ extern "C" {
         format: *const ::std::os::raw::c_char,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igDragInt2(
         label: *const ::std::os::raw::c_char,
@@ -5868,7 +5868,7 @@ extern "C" {
         format: *const ::std::os::raw::c_char,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igDragInt3(
         label: *const ::std::os::raw::c_char,
@@ -5879,7 +5879,7 @@ extern "C" {
         format: *const ::std::os::raw::c_char,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igDragInt4(
         label: *const ::std::os::raw::c_char,
@@ -5890,7 +5890,7 @@ extern "C" {
         format: *const ::std::os::raw::c_char,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igDragIntRange2(
         label: *const ::std::os::raw::c_char,
@@ -5903,7 +5903,7 @@ extern "C" {
         format_max: *const ::std::os::raw::c_char,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igDragScalar(
         label: *const ::std::os::raw::c_char,
@@ -5916,7 +5916,7 @@ extern "C" {
         power: f32,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igDragScalarN(
         label: *const ::std::os::raw::c_char,
@@ -5930,7 +5930,7 @@ extern "C" {
         power: f32,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igSliderFloat(
         label: *const ::std::os::raw::c_char,
@@ -5941,7 +5941,7 @@ extern "C" {
         power: f32,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igSliderFloat2(
         label: *const ::std::os::raw::c_char,
@@ -5952,7 +5952,7 @@ extern "C" {
         power: f32,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igSliderFloat3(
         label: *const ::std::os::raw::c_char,
@@ -5963,7 +5963,7 @@ extern "C" {
         power: f32,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igSliderFloat4(
         label: *const ::std::os::raw::c_char,
@@ -5974,7 +5974,7 @@ extern "C" {
         power: f32,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igSliderAngle(
         label: *const ::std::os::raw::c_char,
@@ -5984,7 +5984,7 @@ extern "C" {
         format: *const ::std::os::raw::c_char,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igSliderInt(
         label: *const ::std::os::raw::c_char,
@@ -5994,7 +5994,7 @@ extern "C" {
         format: *const ::std::os::raw::c_char,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igSliderInt2(
         label: *const ::std::os::raw::c_char,
@@ -6004,7 +6004,7 @@ extern "C" {
         format: *const ::std::os::raw::c_char,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igSliderInt3(
         label: *const ::std::os::raw::c_char,
@@ -6014,7 +6014,7 @@ extern "C" {
         format: *const ::std::os::raw::c_char,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igSliderInt4(
         label: *const ::std::os::raw::c_char,
@@ -6024,7 +6024,7 @@ extern "C" {
         format: *const ::std::os::raw::c_char,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igSliderScalar(
         label: *const ::std::os::raw::c_char,
@@ -6036,7 +6036,7 @@ extern "C" {
         power: f32,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igSliderScalarN(
         label: *const ::std::os::raw::c_char,
@@ -6049,7 +6049,7 @@ extern "C" {
         power: f32,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igVSliderFloat(
         label: *const ::std::os::raw::c_char,
@@ -6061,7 +6061,7 @@ extern "C" {
         power: f32,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igVSliderInt(
         label: *const ::std::os::raw::c_char,
@@ -6072,7 +6072,7 @@ extern "C" {
         format: *const ::std::os::raw::c_char,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igVSliderScalar(
         label: *const ::std::os::raw::c_char,
@@ -6085,7 +6085,7 @@ extern "C" {
         power: f32,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igInputText(
         label: *const ::std::os::raw::c_char,
@@ -6096,7 +6096,7 @@ extern "C" {
         user_data: *mut ::std::os::raw::c_void,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igInputTextMultiline(
         label: *const ::std::os::raw::c_char,
@@ -6108,7 +6108,7 @@ extern "C" {
         user_data: *mut ::std::os::raw::c_void,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igInputTextWithHint(
         label: *const ::std::os::raw::c_char,
@@ -6120,7 +6120,7 @@ extern "C" {
         user_data: *mut ::std::os::raw::c_void,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igInputFloat(
         label: *const ::std::os::raw::c_char,
@@ -6131,7 +6131,7 @@ extern "C" {
         flags: ImGuiInputTextFlags,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igInputFloat2(
         label: *const ::std::os::raw::c_char,
@@ -6140,7 +6140,7 @@ extern "C" {
         flags: ImGuiInputTextFlags,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igInputFloat3(
         label: *const ::std::os::raw::c_char,
@@ -6149,7 +6149,7 @@ extern "C" {
         flags: ImGuiInputTextFlags,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igInputFloat4(
         label: *const ::std::os::raw::c_char,
@@ -6158,7 +6158,7 @@ extern "C" {
         flags: ImGuiInputTextFlags,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igInputInt(
         label: *const ::std::os::raw::c_char,
@@ -6168,7 +6168,7 @@ extern "C" {
         flags: ImGuiInputTextFlags,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igInputInt2(
         label: *const ::std::os::raw::c_char,
@@ -6176,7 +6176,7 @@ extern "C" {
         flags: ImGuiInputTextFlags,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igInputInt3(
         label: *const ::std::os::raw::c_char,
@@ -6184,7 +6184,7 @@ extern "C" {
         flags: ImGuiInputTextFlags,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igInputInt4(
         label: *const ::std::os::raw::c_char,
@@ -6192,7 +6192,7 @@ extern "C" {
         flags: ImGuiInputTextFlags,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igInputDouble(
         label: *const ::std::os::raw::c_char,
@@ -6203,7 +6203,7 @@ extern "C" {
         flags: ImGuiInputTextFlags,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igInputScalar(
         label: *const ::std::os::raw::c_char,
@@ -6215,7 +6215,7 @@ extern "C" {
         flags: ImGuiInputTextFlags,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igInputScalarN(
         label: *const ::std::os::raw::c_char,
@@ -6228,7 +6228,7 @@ extern "C" {
         flags: ImGuiInputTextFlags,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igColorEdit3(
         label: *const ::std::os::raw::c_char,
@@ -6236,7 +6236,7 @@ extern "C" {
         flags: ImGuiColorEditFlags,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igColorEdit4(
         label: *const ::std::os::raw::c_char,
@@ -6244,7 +6244,7 @@ extern "C" {
         flags: ImGuiColorEditFlags,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igColorPicker3(
         label: *const ::std::os::raw::c_char,
@@ -6252,7 +6252,7 @@ extern "C" {
         flags: ImGuiColorEditFlags,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igColorPicker4(
         label: *const ::std::os::raw::c_char,
@@ -6261,7 +6261,7 @@ extern "C" {
         ref_col: *const f32,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igColorButton(
         desc_id: *const ::std::os::raw::c_char,
@@ -6270,15 +6270,15 @@ extern "C" {
         size: ImVec2,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igSetColorEditOptions(flags: ImGuiColorEditFlags);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igTreeNodeStr(label: *const ::std::os::raw::c_char) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igTreeNodeStrStr(
         str_id: *const ::std::os::raw::c_char,
@@ -6286,7 +6286,7 @@ extern "C" {
         ...
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igTreeNodePtr(
         ptr_id: *const ::std::os::raw::c_void,
@@ -6294,12 +6294,12 @@ extern "C" {
         ...
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igTreeNodeExStr(label: *const ::std::os::raw::c_char, flags: ImGuiTreeNodeFlags)
         -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igTreeNodeExStrStr(
         str_id: *const ::std::os::raw::c_char,
@@ -6308,7 +6308,7 @@ extern "C" {
         ...
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igTreeNodeExPtr(
         ptr_id: *const ::std::os::raw::c_void,
@@ -6317,30 +6317,30 @@ extern "C" {
         ...
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igTreePushStr(str_id: *const ::std::os::raw::c_char);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igTreePushPtr(ptr_id: *const ::std::os::raw::c_void);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igTreePop();
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igGetTreeNodeToLabelSpacing() -> f32;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igCollapsingHeader(
         label: *const ::std::os::raw::c_char,
         flags: ImGuiTreeNodeFlags,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igCollapsingHeaderBoolPtr(
         label: *const ::std::os::raw::c_char,
@@ -6348,11 +6348,11 @@ extern "C" {
         flags: ImGuiTreeNodeFlags,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igSetNextItemOpen(is_open: bool, cond: ImGuiCond);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igSelectable(
         label: *const ::std::os::raw::c_char,
@@ -6361,7 +6361,7 @@ extern "C" {
         size: ImVec2,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igSelectableBoolPtr(
         label: *const ::std::os::raw::c_char,
@@ -6370,7 +6370,7 @@ extern "C" {
         size: ImVec2,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igListBoxStr_arr(
         label: *const ::std::os::raw::c_char,
@@ -6380,7 +6380,7 @@ extern "C" {
         height_in_items: ::std::os::raw::c_int,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igListBoxFnPtr(
         label: *const ::std::os::raw::c_char,
@@ -6397,11 +6397,11 @@ extern "C" {
         height_in_items: ::std::os::raw::c_int,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igListBoxHeaderVec2(label: *const ::std::os::raw::c_char, size: ImVec2) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igListBoxHeaderInt(
         label: *const ::std::os::raw::c_char,
@@ -6409,11 +6409,11 @@ extern "C" {
         height_in_items: ::std::os::raw::c_int,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igListBoxFooter();
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igPlotLines(
         label: *const ::std::os::raw::c_char,
@@ -6427,7 +6427,7 @@ extern "C" {
         stride: ::std::os::raw::c_int,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igPlotLinesFnPtr(
         label: *const ::std::os::raw::c_char,
@@ -6446,7 +6446,7 @@ extern "C" {
         graph_size: ImVec2,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igPlotHistogramFloatPtr(
         label: *const ::std::os::raw::c_char,
@@ -6460,7 +6460,7 @@ extern "C" {
         stride: ::std::os::raw::c_int,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igPlotHistogramFnPtr(
         label: *const ::std::os::raw::c_char,
@@ -6479,19 +6479,19 @@ extern "C" {
         graph_size: ImVec2,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igValueBool(prefix: *const ::std::os::raw::c_char, b: bool);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igValueInt(prefix: *const ::std::os::raw::c_char, v: ::std::os::raw::c_int);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igValueUint(prefix: *const ::std::os::raw::c_char, v: ::std::os::raw::c_uint);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igValueFloat(
         prefix: *const ::std::os::raw::c_char,
@@ -6499,31 +6499,31 @@ extern "C" {
         float_format: *const ::std::os::raw::c_char,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igBeginMenuBar() -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igEndMenuBar();
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igBeginMainMenuBar() -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igEndMainMenuBar();
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igBeginMenu(label: *const ::std::os::raw::c_char, enabled: bool) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igEndMenu();
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igMenuItemBool(
         label: *const ::std::os::raw::c_char,
@@ -6532,7 +6532,7 @@ extern "C" {
         enabled: bool,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igMenuItemBoolPtr(
         label: *const ::std::os::raw::c_char,
@@ -6541,34 +6541,34 @@ extern "C" {
         enabled: bool,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igBeginTooltip();
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igEndTooltip();
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igSetTooltip(fmt: *const ::std::os::raw::c_char, ...);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igOpenPopup(str_id: *const ::std::os::raw::c_char);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igBeginPopup(str_id: *const ::std::os::raw::c_char, flags: ImGuiWindowFlags) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igBeginPopupContextItem(
         str_id: *const ::std::os::raw::c_char,
         mouse_button: ImGuiMouseButton,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igBeginPopupContextWindow(
         str_id: *const ::std::os::raw::c_char,
@@ -6576,14 +6576,14 @@ extern "C" {
         also_over_items: bool,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igBeginPopupContextVoid(
         str_id: *const ::std::os::raw::c_char,
         mouse_button: ImGuiMouseButton,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igBeginPopupModal(
         name: *const ::std::os::raw::c_char,
@@ -6591,66 +6591,66 @@ extern "C" {
         flags: ImGuiWindowFlags,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igEndPopup();
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igOpenPopupOnItemClick(
         str_id: *const ::std::os::raw::c_char,
         mouse_button: ImGuiMouseButton,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igIsPopupOpen(str_id: *const ::std::os::raw::c_char) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igCloseCurrentPopup();
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igColumns(count: ::std::os::raw::c_int, id: *const ::std::os::raw::c_char, border: bool);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igNextColumn();
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igGetColumnIndex() -> ::std::os::raw::c_int;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igGetColumnWidth(column_index: ::std::os::raw::c_int) -> f32;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igSetColumnWidth(column_index: ::std::os::raw::c_int, width: f32);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igGetColumnOffset(column_index: ::std::os::raw::c_int) -> f32;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igSetColumnOffset(column_index: ::std::os::raw::c_int, offset_x: f32);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igGetColumnsCount() -> ::std::os::raw::c_int;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igBeginTabBar(str_id: *const ::std::os::raw::c_char, flags: ImGuiTabBarFlags) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igEndTabBar();
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igBeginTabItem(
         label: *const ::std::os::raw::c_char,
@@ -6658,42 +6658,42 @@ extern "C" {
         flags: ImGuiTabItemFlags,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igEndTabItem();
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igSetTabItemClosed(tab_or_docked_window_label: *const ::std::os::raw::c_char);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igLogToTTY(auto_open_depth: ::std::os::raw::c_int);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igLogToFile(
         auto_open_depth: ::std::os::raw::c_int,
         filename: *const ::std::os::raw::c_char,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igLogToClipboard(auto_open_depth: ::std::os::raw::c_int);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igLogFinish();
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igLogButtons();
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igBeginDragDropSource(flags: ImGuiDragDropFlags) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igSetDragDropPayload(
         type_: *const ::std::os::raw::c_char,
@@ -6702,30 +6702,30 @@ extern "C" {
         cond: ImGuiCond,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igEndDragDropSource();
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igBeginDragDropTarget() -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igAcceptDragDropPayload(
         type_: *const ::std::os::raw::c_char,
         flags: ImGuiDragDropFlags,
     ) -> *const ImGuiPayload;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igEndDragDropTarget();
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igGetDragDropPayload() -> *const ImGuiPayload;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igPushClipRect(
         clip_rect_min: ImVec2,
@@ -6733,115 +6733,115 @@ extern "C" {
         intersect_with_current_clip_rect: bool,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igPopClipRect();
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igSetItemDefaultFocus();
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igSetKeyboardFocusHere(offset: ::std::os::raw::c_int);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igIsItemHovered(flags: ImGuiHoveredFlags) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igIsItemActive() -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igIsItemFocused() -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igIsItemClicked(mouse_button: ImGuiMouseButton) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igIsItemVisible() -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igIsItemEdited() -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igIsItemActivated() -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igIsItemDeactivated() -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igIsItemDeactivatedAfterEdit() -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igIsItemToggledOpen() -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igIsAnyItemHovered() -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igIsAnyItemActive() -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igIsAnyItemFocused() -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igSetItemAllowOverlap();
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igIsRectVisible(size: ImVec2) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igIsRectVisibleVec2(rect_min: ImVec2, rect_max: ImVec2) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igGetTime() -> f64;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igGetFrameCount() -> ::std::os::raw::c_int;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igGetBackgroundDrawList() -> *mut ImDrawList;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igGetForegroundDrawList() -> *mut ImDrawList;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igGetDrawListSharedData() -> *mut ImDrawListSharedData;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igGetStyleColorName(idx: ImGuiCol) -> *const ::std::os::raw::c_char;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igSetStateStorage(storage: *mut ImGuiStorage);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igGetStateStorage() -> *mut ImGuiStorage;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igCalcListClipping(
         items_count: ::std::os::raw::c_int,
@@ -6850,35 +6850,35 @@ extern "C" {
         out_items_display_end: *mut ::std::os::raw::c_int,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igBeginChildFrame(id: ImGuiID, size: ImVec2, flags: ImGuiWindowFlags) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igEndChildFrame();
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igColorConvertFloat4ToU32(in_: ImVec4) -> ImU32;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igGetKeyIndex(imgui_key: ImGuiKey) -> ::std::os::raw::c_int;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igIsKeyDown(user_key_index: ::std::os::raw::c_int) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igIsKeyPressed(user_key_index: ::std::os::raw::c_int, repeat: bool) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igIsKeyReleased(user_key_index: ::std::os::raw::c_int) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igGetKeyPressedAmount(
         key_index: ::std::os::raw::c_int,
@@ -6886,83 +6886,83 @@ extern "C" {
         rate: f32,
     ) -> ::std::os::raw::c_int;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igCaptureKeyboardFromApp(want_capture_keyboard_value: bool);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igIsMouseDown(button: ImGuiMouseButton) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igIsMouseClicked(button: ImGuiMouseButton, repeat: bool) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igIsMouseReleased(button: ImGuiMouseButton) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igIsMouseDoubleClicked(button: ImGuiMouseButton) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igIsMouseHoveringRect(r_min: ImVec2, r_max: ImVec2, clip: bool) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igIsMousePosValid(mouse_pos: *const ImVec2) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igIsAnyMouseDown() -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igIsMouseDragging(button: ImGuiMouseButton, lock_threshold: f32) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igResetMouseDragDelta(button: ImGuiMouseButton);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igGetMouseCursor() -> ImGuiMouseCursor;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igSetMouseCursor(cursor_type: ImGuiMouseCursor);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igCaptureMouseFromApp(want_capture_mouse_value: bool);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igGetClipboardText() -> *const ::std::os::raw::c_char;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igSetClipboardText(text: *const ::std::os::raw::c_char);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igLoadIniSettingsFromDisk(ini_filename: *const ::std::os::raw::c_char);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igLoadIniSettingsFromMemory(ini_data: *const ::std::os::raw::c_char, ini_size: usize);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igSaveIniSettingsToDisk(ini_filename: *const ::std::os::raw::c_char);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igSaveIniSettingsToMemory(out_ini_size: *mut usize) -> *const ::std::os::raw::c_char;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igSetAllocatorFunctions(
         alloc_func: ::std::option::Option<
@@ -6980,55 +6980,55 @@ extern "C" {
         user_data: *mut ::std::os::raw::c_void,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igMemAlloc(size: usize) -> *mut ::std::os::raw::c_void;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igMemFree(ptr: *mut ::std::os::raw::c_void);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImGuiStyle_ImGuiStyle() -> *mut ImGuiStyle;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImGuiStyle_destroy(self_: *mut ImGuiStyle);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImGuiStyle_ScaleAllSizes(self_: *mut ImGuiStyle, scale_factor: f32);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImGuiIO_AddInputCharacter(self_: *mut ImGuiIO, c: ::std::os::raw::c_uint);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImGuiIO_AddInputCharactersUTF8(self_: *mut ImGuiIO, str: *const ::std::os::raw::c_char);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImGuiIO_ClearInputCharacters(self_: *mut ImGuiIO);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImGuiIO_ImGuiIO() -> *mut ImGuiIO;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImGuiIO_destroy(self_: *mut ImGuiIO);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImGuiInputTextCallbackData_ImGuiInputTextCallbackData() -> *mut ImGuiInputTextCallbackData;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImGuiInputTextCallbackData_destroy(self_: *mut ImGuiInputTextCallbackData);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImGuiInputTextCallbackData_DeleteChars(
         self_: *mut ImGuiInputTextCallbackData,
@@ -7036,7 +7036,7 @@ extern "C" {
         bytes_count: ::std::os::raw::c_int,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImGuiInputTextCallbackData_InsertChars(
         self_: *mut ImGuiInputTextCallbackData,
@@ -7045,56 +7045,56 @@ extern "C" {
         text_end: *const ::std::os::raw::c_char,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImGuiInputTextCallbackData_HasSelection(self_: *mut ImGuiInputTextCallbackData) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImGuiPayload_ImGuiPayload() -> *mut ImGuiPayload;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImGuiPayload_destroy(self_: *mut ImGuiPayload);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImGuiPayload_Clear(self_: *mut ImGuiPayload);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImGuiPayload_IsDataType(
         self_: *mut ImGuiPayload,
         type_: *const ::std::os::raw::c_char,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImGuiPayload_IsPreview(self_: *mut ImGuiPayload) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImGuiPayload_IsDelivery(self_: *mut ImGuiPayload) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImGuiOnceUponAFrame_ImGuiOnceUponAFrame() -> *mut ImGuiOnceUponAFrame;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImGuiOnceUponAFrame_destroy(self_: *mut ImGuiOnceUponAFrame);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImGuiTextFilter_ImGuiTextFilter(
         default_filter: *const ::std::os::raw::c_char,
     ) -> *mut ImGuiTextFilter;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImGuiTextFilter_destroy(self_: *mut ImGuiTextFilter);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImGuiTextFilter_Draw(
         self_: *mut ImGuiTextFilter,
@@ -7102,7 +7102,7 @@ extern "C" {
         width: f32,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImGuiTextFilter_PassFilter(
         self_: *mut ImGuiTextFilter,
@@ -7110,38 +7110,38 @@ extern "C" {
         text_end: *const ::std::os::raw::c_char,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImGuiTextFilter_Build(self_: *mut ImGuiTextFilter);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImGuiTextFilter_Clear(self_: *mut ImGuiTextFilter);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImGuiTextFilter_IsActive(self_: *mut ImGuiTextFilter) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImGuiTextRange_ImGuiTextRange() -> *mut ImGuiTextRange;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImGuiTextRange_destroy(self_: *mut ImGuiTextRange);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImGuiTextRange_ImGuiTextRangeStr(
         _b: *const ::std::os::raw::c_char,
         _e: *const ::std::os::raw::c_char,
     ) -> *mut ImGuiTextRange;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImGuiTextRange_empty(self_: *mut ImGuiTextRange) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImGuiTextRange_split(
         self_: *mut ImGuiTextRange,
@@ -7149,43 +7149,43 @@ extern "C" {
         out: *mut ImVector_ImGuiTextRange,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImGuiTextBuffer_ImGuiTextBuffer() -> *mut ImGuiTextBuffer;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImGuiTextBuffer_destroy(self_: *mut ImGuiTextBuffer);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImGuiTextBuffer_begin(self_: *mut ImGuiTextBuffer) -> *const ::std::os::raw::c_char;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImGuiTextBuffer_end(self_: *mut ImGuiTextBuffer) -> *const ::std::os::raw::c_char;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImGuiTextBuffer_size(self_: *mut ImGuiTextBuffer) -> ::std::os::raw::c_int;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImGuiTextBuffer_empty(self_: *mut ImGuiTextBuffer) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImGuiTextBuffer_clear(self_: *mut ImGuiTextBuffer);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImGuiTextBuffer_reserve(self_: *mut ImGuiTextBuffer, capacity: ::std::os::raw::c_int);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImGuiTextBuffer_c_str(self_: *mut ImGuiTextBuffer) -> *const ::std::os::raw::c_char;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImGuiTextBuffer_append(
         self_: *mut ImGuiTextBuffer,
@@ -7193,36 +7193,36 @@ extern "C" {
         str_end: *const ::std::os::raw::c_char,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImGuiStoragePair_ImGuiStoragePairInt(
         _key: ImGuiID,
         _val_i: ::std::os::raw::c_int,
     ) -> *mut ImGuiStoragePair;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImGuiStoragePair_destroy(self_: *mut ImGuiStoragePair);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImGuiStoragePair_ImGuiStoragePairFloat(
         _key: ImGuiID,
         _val_f: f32,
     ) -> *mut ImGuiStoragePair;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImGuiStoragePair_ImGuiStoragePairPtr(
         _key: ImGuiID,
         _val_p: *mut ::std::os::raw::c_void,
     ) -> *mut ImGuiStoragePair;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImGuiStorage_Clear(self_: *mut ImGuiStorage);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImGuiStorage_GetInt(
         self_: *mut ImGuiStorage,
@@ -7230,34 +7230,34 @@ extern "C" {
         default_val: ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImGuiStorage_SetInt(self_: *mut ImGuiStorage, key: ImGuiID, val: ::std::os::raw::c_int);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImGuiStorage_GetBool(self_: *mut ImGuiStorage, key: ImGuiID, default_val: bool) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImGuiStorage_SetBool(self_: *mut ImGuiStorage, key: ImGuiID, val: bool);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImGuiStorage_GetFloat(self_: *mut ImGuiStorage, key: ImGuiID, default_val: f32) -> f32;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImGuiStorage_SetFloat(self_: *mut ImGuiStorage, key: ImGuiID, val: f32);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImGuiStorage_GetVoidPtr(
         self_: *mut ImGuiStorage,
         key: ImGuiID,
     ) -> *mut ::std::os::raw::c_void;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImGuiStorage_SetVoidPtr(
         self_: *mut ImGuiStorage,
@@ -7265,7 +7265,7 @@ extern "C" {
         val: *mut ::std::os::raw::c_void,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImGuiStorage_GetIntRef(
         self_: *mut ImGuiStorage,
@@ -7273,7 +7273,7 @@ extern "C" {
         default_val: ::std::os::raw::c_int,
     ) -> *mut ::std::os::raw::c_int;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImGuiStorage_GetBoolRef(
         self_: *mut ImGuiStorage,
@@ -7281,7 +7281,7 @@ extern "C" {
         default_val: bool,
     ) -> *mut bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImGuiStorage_GetFloatRef(
         self_: *mut ImGuiStorage,
@@ -7289,7 +7289,7 @@ extern "C" {
         default_val: f32,
     ) -> *mut f32;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImGuiStorage_GetVoidPtrRef(
         self_: *mut ImGuiStorage,
@@ -7297,30 +7297,30 @@ extern "C" {
         default_val: *mut ::std::os::raw::c_void,
     ) -> *mut *mut ::std::os::raw::c_void;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImGuiStorage_SetAllInt(self_: *mut ImGuiStorage, val: ::std::os::raw::c_int);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImGuiStorage_BuildSortByKey(self_: *mut ImGuiStorage);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImGuiListClipper_ImGuiListClipper(
         items_count: ::std::os::raw::c_int,
         items_height: f32,
     ) -> *mut ImGuiListClipper;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImGuiListClipper_destroy(self_: *mut ImGuiListClipper);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImGuiListClipper_Step(self_: *mut ImGuiListClipper) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImGuiListClipper_Begin(
         self_: *mut ImGuiListClipper,
@@ -7328,19 +7328,19 @@ extern "C" {
         items_height: f32,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImGuiListClipper_End(self_: *mut ImGuiListClipper);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImColor_ImColor() -> *mut ImColor;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImColor_destroy(self_: *mut ImColor);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImColor_ImColorInt(
         r: ::std::os::raw::c_int,
@@ -7349,47 +7349,47 @@ extern "C" {
         a: ::std::os::raw::c_int,
     ) -> *mut ImColor;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImColor_ImColorU32(rgba: ImU32) -> *mut ImColor;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImColor_ImColorFloat(r: f32, g: f32, b: f32, a: f32) -> *mut ImColor;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImColor_ImColorVec4(col: ImVec4) -> *mut ImColor;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImColor_SetHSV(self_: *mut ImColor, h: f32, s: f32, v: f32, a: f32);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImDrawCmd_ImDrawCmd() -> *mut ImDrawCmd;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImDrawCmd_destroy(self_: *mut ImDrawCmd);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImDrawListSplitter_ImDrawListSplitter() -> *mut ImDrawListSplitter;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImDrawListSplitter_destroy(self_: *mut ImDrawListSplitter);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImDrawListSplitter_Clear(self_: *mut ImDrawListSplitter);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImDrawListSplitter_ClearFreeMemory(self_: *mut ImDrawListSplitter);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImDrawListSplitter_Split(
         self_: *mut ImDrawListSplitter,
@@ -7397,11 +7397,11 @@ extern "C" {
         count: ::std::os::raw::c_int,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImDrawListSplitter_Merge(self_: *mut ImDrawListSplitter, draw_list: *mut ImDrawList);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImDrawListSplitter_SetCurrentChannel(
         self_: *mut ImDrawListSplitter,
@@ -7409,15 +7409,15 @@ extern "C" {
         channel_idx: ::std::os::raw::c_int,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImDrawList_ImDrawList(shared_data: *const ImDrawListSharedData) -> *mut ImDrawList;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImDrawList_destroy(self_: *mut ImDrawList);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImDrawList_PushClipRect(
         self_: *mut ImDrawList,
@@ -7426,23 +7426,23 @@ extern "C" {
         intersect_with_current_clip_rect: bool,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImDrawList_PushClipRectFullScreen(self_: *mut ImDrawList);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImDrawList_PopClipRect(self_: *mut ImDrawList);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImDrawList_PushTextureID(self_: *mut ImDrawList, texture_id: ImTextureID);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImDrawList_PopTextureID(self_: *mut ImDrawList);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImDrawList_AddLine(
         self_: *mut ImDrawList,
@@ -7452,7 +7452,7 @@ extern "C" {
         thickness: f32,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImDrawList_AddRect(
         self_: *mut ImDrawList,
@@ -7464,7 +7464,7 @@ extern "C" {
         thickness: f32,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImDrawList_AddRectFilled(
         self_: *mut ImDrawList,
@@ -7475,7 +7475,7 @@ extern "C" {
         rounding_corners: ImDrawCornerFlags,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImDrawList_AddRectFilledMultiColor(
         self_: *mut ImDrawList,
@@ -7487,7 +7487,7 @@ extern "C" {
         col_bot_left: ImU32,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImDrawList_AddQuad(
         self_: *mut ImDrawList,
@@ -7499,7 +7499,7 @@ extern "C" {
         thickness: f32,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImDrawList_AddQuadFilled(
         self_: *mut ImDrawList,
@@ -7510,7 +7510,7 @@ extern "C" {
         col: ImU32,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImDrawList_AddTriangle(
         self_: *mut ImDrawList,
@@ -7521,7 +7521,7 @@ extern "C" {
         thickness: f32,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImDrawList_AddTriangleFilled(
         self_: *mut ImDrawList,
@@ -7531,7 +7531,7 @@ extern "C" {
         col: ImU32,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImDrawList_AddCircle(
         self_: *mut ImDrawList,
@@ -7542,7 +7542,7 @@ extern "C" {
         thickness: f32,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImDrawList_AddCircleFilled(
         self_: *mut ImDrawList,
@@ -7552,7 +7552,7 @@ extern "C" {
         num_segments: ::std::os::raw::c_int,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImDrawList_AddNgon(
         self_: *mut ImDrawList,
@@ -7563,7 +7563,7 @@ extern "C" {
         thickness: f32,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImDrawList_AddNgonFilled(
         self_: *mut ImDrawList,
@@ -7573,7 +7573,7 @@ extern "C" {
         num_segments: ::std::os::raw::c_int,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImDrawList_AddText(
         self_: *mut ImDrawList,
@@ -7583,7 +7583,7 @@ extern "C" {
         text_end: *const ::std::os::raw::c_char,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImDrawList_AddTextFontPtr(
         self_: *mut ImDrawList,
@@ -7597,7 +7597,7 @@ extern "C" {
         cpu_fine_clip_rect: *const ImVec4,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImDrawList_AddPolyline(
         self_: *mut ImDrawList,
@@ -7608,7 +7608,7 @@ extern "C" {
         thickness: f32,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImDrawList_AddConvexPolyFilled(
         self_: *mut ImDrawList,
@@ -7617,7 +7617,7 @@ extern "C" {
         col: ImU32,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImDrawList_AddBezierCurve(
         self_: *mut ImDrawList,
@@ -7630,7 +7630,7 @@ extern "C" {
         num_segments: ::std::os::raw::c_int,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImDrawList_AddImage(
         self_: *mut ImDrawList,
@@ -7642,7 +7642,7 @@ extern "C" {
         col: ImU32,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImDrawList_AddImageQuad(
         self_: *mut ImDrawList,
@@ -7658,7 +7658,7 @@ extern "C" {
         col: ImU32,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImDrawList_AddImageRounded(
         self_: *mut ImDrawList,
@@ -7672,27 +7672,27 @@ extern "C" {
         rounding_corners: ImDrawCornerFlags,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImDrawList_PathClear(self_: *mut ImDrawList);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImDrawList_PathLineTo(self_: *mut ImDrawList, pos: ImVec2);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImDrawList_PathLineToMergeDuplicate(self_: *mut ImDrawList, pos: ImVec2);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImDrawList_PathFillConvex(self_: *mut ImDrawList, col: ImU32);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImDrawList_PathStroke(self_: *mut ImDrawList, col: ImU32, closed: bool, thickness: f32);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImDrawList_PathArcTo(
         self_: *mut ImDrawList,
@@ -7703,7 +7703,7 @@ extern "C" {
         num_segments: ::std::os::raw::c_int,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImDrawList_PathArcToFast(
         self_: *mut ImDrawList,
@@ -7713,7 +7713,7 @@ extern "C" {
         a_max_of_12: ::std::os::raw::c_int,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImDrawList_PathBezierCurveTo(
         self_: *mut ImDrawList,
@@ -7723,7 +7723,7 @@ extern "C" {
         num_segments: ::std::os::raw::c_int,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImDrawList_PathRect(
         self_: *mut ImDrawList,
@@ -7733,7 +7733,7 @@ extern "C" {
         rounding_corners: ImDrawCornerFlags,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImDrawList_AddCallback(
         self_: *mut ImDrawList,
@@ -7741,35 +7741,35 @@ extern "C" {
         callback_data: *mut ::std::os::raw::c_void,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImDrawList_AddDrawCmd(self_: *mut ImDrawList);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImDrawList_CloneOutput(self_: *mut ImDrawList) -> *mut ImDrawList;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImDrawList_ChannelsSplit(self_: *mut ImDrawList, count: ::std::os::raw::c_int);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImDrawList_ChannelsMerge(self_: *mut ImDrawList);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImDrawList_ChannelsSetCurrent(self_: *mut ImDrawList, n: ::std::os::raw::c_int);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImDrawList_Clear(self_: *mut ImDrawList);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImDrawList_ClearFreeMemory(self_: *mut ImDrawList);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImDrawList_PrimReserve(
         self_: *mut ImDrawList,
@@ -7777,7 +7777,7 @@ extern "C" {
         vtx_count: ::std::os::raw::c_int,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImDrawList_PrimUnreserve(
         self_: *mut ImDrawList,
@@ -7785,11 +7785,11 @@ extern "C" {
         vtx_count: ::std::os::raw::c_int,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImDrawList_PrimRect(self_: *mut ImDrawList, a: ImVec2, b: ImVec2, col: ImU32);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImDrawList_PrimRectUV(
         self_: *mut ImDrawList,
@@ -7800,7 +7800,7 @@ extern "C" {
         col: ImU32,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImDrawList_PrimQuadUV(
         self_: *mut ImDrawList,
@@ -7815,85 +7815,85 @@ extern "C" {
         col: ImU32,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImDrawList_PrimWriteVtx(self_: *mut ImDrawList, pos: ImVec2, uv: ImVec2, col: ImU32);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImDrawList_PrimWriteIdx(self_: *mut ImDrawList, idx: ImDrawIdx);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImDrawList_PrimVtx(self_: *mut ImDrawList, pos: ImVec2, uv: ImVec2, col: ImU32);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImDrawList_UpdateClipRect(self_: *mut ImDrawList);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImDrawList_UpdateTextureID(self_: *mut ImDrawList);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImDrawData_ImDrawData() -> *mut ImDrawData;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImDrawData_destroy(self_: *mut ImDrawData);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImDrawData_Clear(self_: *mut ImDrawData);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImDrawData_DeIndexAllBuffers(self_: *mut ImDrawData);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImDrawData_ScaleClipRects(self_: *mut ImDrawData, fb_scale: ImVec2);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImFontConfig_ImFontConfig() -> *mut ImFontConfig;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImFontConfig_destroy(self_: *mut ImFontConfig);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImFontGlyphRangesBuilder_ImFontGlyphRangesBuilder() -> *mut ImFontGlyphRangesBuilder;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImFontGlyphRangesBuilder_destroy(self_: *mut ImFontGlyphRangesBuilder);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImFontGlyphRangesBuilder_Clear(self_: *mut ImFontGlyphRangesBuilder);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImFontGlyphRangesBuilder_GetBit(
         self_: *mut ImFontGlyphRangesBuilder,
         n: ::std::os::raw::c_int,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImFontGlyphRangesBuilder_SetBit(
         self_: *mut ImFontGlyphRangesBuilder,
         n: ::std::os::raw::c_int,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImFontGlyphRangesBuilder_AddChar(self_: *mut ImFontGlyphRangesBuilder, c: ImWchar);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImFontGlyphRangesBuilder_AddText(
         self_: *mut ImFontGlyphRangesBuilder,
@@ -7901,55 +7901,55 @@ extern "C" {
         text_end: *const ::std::os::raw::c_char,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImFontGlyphRangesBuilder_AddRanges(
         self_: *mut ImFontGlyphRangesBuilder,
         ranges: *const ImWchar,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImFontGlyphRangesBuilder_BuildRanges(
         self_: *mut ImFontGlyphRangesBuilder,
         out_ranges: *mut ImVector_ImWchar,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImFontAtlasCustomRect_ImFontAtlasCustomRect() -> *mut ImFontAtlasCustomRect;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImFontAtlasCustomRect_destroy(self_: *mut ImFontAtlasCustomRect);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImFontAtlasCustomRect_IsPacked(self_: *mut ImFontAtlasCustomRect) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImFontAtlas_ImFontAtlas() -> *mut ImFontAtlas;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImFontAtlas_destroy(self_: *mut ImFontAtlas);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImFontAtlas_AddFont(
         self_: *mut ImFontAtlas,
         font_cfg: *const ImFontConfig,
     ) -> *mut ImFont;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImFontAtlas_AddFontDefault(
         self_: *mut ImFontAtlas,
         font_cfg: *const ImFontConfig,
     ) -> *mut ImFont;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImFontAtlas_AddFontFromFileTTF(
         self_: *mut ImFontAtlas,
@@ -7959,7 +7959,7 @@ extern "C" {
         glyph_ranges: *const ImWchar,
     ) -> *mut ImFont;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImFontAtlas_AddFontFromMemoryTTF(
         self_: *mut ImFontAtlas,
@@ -7970,7 +7970,7 @@ extern "C" {
         glyph_ranges: *const ImWchar,
     ) -> *mut ImFont;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImFontAtlas_AddFontFromMemoryCompressedTTF(
         self_: *mut ImFontAtlas,
@@ -7981,7 +7981,7 @@ extern "C" {
         glyph_ranges: *const ImWchar,
     ) -> *mut ImFont;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImFontAtlas_AddFontFromMemoryCompressedBase85TTF(
         self_: *mut ImFontAtlas,
@@ -7991,27 +7991,27 @@ extern "C" {
         glyph_ranges: *const ImWchar,
     ) -> *mut ImFont;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImFontAtlas_ClearInputData(self_: *mut ImFontAtlas);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImFontAtlas_ClearTexData(self_: *mut ImFontAtlas);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImFontAtlas_ClearFonts(self_: *mut ImFontAtlas);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImFontAtlas_Clear(self_: *mut ImFontAtlas);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImFontAtlas_Build(self_: *mut ImFontAtlas) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImFontAtlas_GetTexDataAsAlpha8(
         self_: *mut ImFontAtlas,
@@ -8021,7 +8021,7 @@ extern "C" {
         out_bytes_per_pixel: *mut ::std::os::raw::c_int,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImFontAtlas_GetTexDataAsRGBA32(
         self_: *mut ImFontAtlas,
@@ -8031,49 +8031,49 @@ extern "C" {
         out_bytes_per_pixel: *mut ::std::os::raw::c_int,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImFontAtlas_IsBuilt(self_: *mut ImFontAtlas) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImFontAtlas_SetTexID(self_: *mut ImFontAtlas, id: ImTextureID);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImFontAtlas_GetGlyphRangesDefault(self_: *mut ImFontAtlas) -> *const ImWchar;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImFontAtlas_GetGlyphRangesKorean(self_: *mut ImFontAtlas) -> *const ImWchar;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImFontAtlas_GetGlyphRangesJapanese(self_: *mut ImFontAtlas) -> *const ImWchar;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImFontAtlas_GetGlyphRangesChineseFull(self_: *mut ImFontAtlas) -> *const ImWchar;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImFontAtlas_GetGlyphRangesChineseSimplifiedCommon(
         self_: *mut ImFontAtlas,
     ) -> *const ImWchar;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImFontAtlas_GetGlyphRangesCyrillic(self_: *mut ImFontAtlas) -> *const ImWchar;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImFontAtlas_GetGlyphRangesThai(self_: *mut ImFontAtlas) -> *const ImWchar;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImFontAtlas_GetGlyphRangesVietnamese(self_: *mut ImFontAtlas) -> *const ImWchar;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImFontAtlas_AddCustomRectRegular(
         self_: *mut ImFontAtlas,
@@ -8082,7 +8082,7 @@ extern "C" {
         height: ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImFontAtlas_AddCustomRectFontGlyph(
         self_: *mut ImFontAtlas,
@@ -8094,14 +8094,14 @@ extern "C" {
         offset: ImVec2,
     ) -> ::std::os::raw::c_int;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImFontAtlas_GetCustomRectByIndex(
         self_: *mut ImFontAtlas,
         index: ::std::os::raw::c_int,
     ) -> *const ImFontAtlasCustomRect;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImFontAtlas_CalcCustomRectUV(
         self_: *mut ImFontAtlas,
@@ -8110,7 +8110,7 @@ extern "C" {
         out_uv_max: *mut ImVec2,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImFontAtlas_GetMouseCursorTexData(
         self_: *mut ImFontAtlas,
@@ -8121,35 +8121,35 @@ extern "C" {
         out_uv_fill: *mut ImVec2,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImFont_ImFont() -> *mut ImFont;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImFont_destroy(self_: *mut ImFont);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImFont_FindGlyph(self_: *mut ImFont, c: ImWchar) -> *const ImFontGlyph;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImFont_FindGlyphNoFallback(self_: *mut ImFont, c: ImWchar) -> *const ImFontGlyph;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImFont_GetCharAdvance(self_: *mut ImFont, c: ImWchar) -> f32;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImFont_IsLoaded(self_: *mut ImFont) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImFont_GetDebugName(self_: *mut ImFont) -> *const ::std::os::raw::c_char;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImFont_CalcWordWrapPositionA(
         self_: *mut ImFont,
@@ -8159,7 +8159,7 @@ extern "C" {
         wrap_width: f32,
     ) -> *const ::std::os::raw::c_char;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImFont_RenderChar(
         self_: *mut ImFont,
@@ -8170,7 +8170,7 @@ extern "C" {
         c: ImWchar,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImFont_RenderText(
         self_: *mut ImFont,
@@ -8185,19 +8185,19 @@ extern "C" {
         cpu_fine_clip: bool,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImFont_BuildLookupTable(self_: *mut ImFont);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImFont_ClearOutputData(self_: *mut ImFont);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImFont_GrowIndex(self_: *mut ImFont, new_size: ::std::os::raw::c_int);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImFont_AddGlyph(
         self_: *mut ImFont,
@@ -8213,119 +8213,119 @@ extern "C" {
         advance_x: f32,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImFont_AddRemapChar(self_: *mut ImFont, dst: ImWchar, src: ImWchar, overwrite_dst: bool);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImFont_SetFallbackChar(self_: *mut ImFont, c: ImWchar);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igGetWindowPos_nonUDT(pOut: *mut ImVec2);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igGetWindowPos_nonUDT2() -> ImVec2_Simple;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igGetWindowSize_nonUDT(pOut: *mut ImVec2);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igGetWindowSize_nonUDT2() -> ImVec2_Simple;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igGetContentRegionMax_nonUDT(pOut: *mut ImVec2);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igGetContentRegionMax_nonUDT2() -> ImVec2_Simple;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igGetContentRegionAvail_nonUDT(pOut: *mut ImVec2);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igGetContentRegionAvail_nonUDT2() -> ImVec2_Simple;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igGetWindowContentRegionMin_nonUDT(pOut: *mut ImVec2);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igGetWindowContentRegionMin_nonUDT2() -> ImVec2_Simple;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igGetWindowContentRegionMax_nonUDT(pOut: *mut ImVec2);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igGetWindowContentRegionMax_nonUDT2() -> ImVec2_Simple;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igGetFontTexUvWhitePixel_nonUDT(pOut: *mut ImVec2);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igGetFontTexUvWhitePixel_nonUDT2() -> ImVec2_Simple;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igGetCursorPos_nonUDT(pOut: *mut ImVec2);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igGetCursorPos_nonUDT2() -> ImVec2_Simple;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igGetCursorStartPos_nonUDT(pOut: *mut ImVec2);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igGetCursorStartPos_nonUDT2() -> ImVec2_Simple;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igGetCursorScreenPos_nonUDT(pOut: *mut ImVec2);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igGetCursorScreenPos_nonUDT2() -> ImVec2_Simple;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igGetItemRectMin_nonUDT(pOut: *mut ImVec2);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igGetItemRectMin_nonUDT2() -> ImVec2_Simple;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igGetItemRectMax_nonUDT(pOut: *mut ImVec2);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igGetItemRectMax_nonUDT2() -> ImVec2_Simple;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igGetItemRectSize_nonUDT(pOut: *mut ImVec2);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igGetItemRectSize_nonUDT2() -> ImVec2_Simple;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igCalcTextSize_nonUDT(
         pOut: *mut ImVec2,
@@ -8335,7 +8335,7 @@ extern "C" {
         wrap_width: f32,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igCalcTextSize_nonUDT2(
         text: *const ::std::os::raw::c_char,
@@ -8344,31 +8344,31 @@ extern "C" {
         wrap_width: f32,
     ) -> ImVec2_Simple;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igColorConvertU32ToFloat4_nonUDT(pOut: *mut ImVec4, in_: ImU32);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igColorConvertU32ToFloat4_nonUDT2(in_: ImU32) -> ImVec4_Simple;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igGetMousePos_nonUDT(pOut: *mut ImVec2);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igGetMousePos_nonUDT2() -> ImVec2_Simple;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igGetMousePosOnOpeningCurrentPopup_nonUDT(pOut: *mut ImVec2);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igGetMousePosOnOpeningCurrentPopup_nonUDT2() -> ImVec2_Simple;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igGetMouseDragDelta_nonUDT(
         pOut: *mut ImVec2,
@@ -8376,14 +8376,14 @@ extern "C" {
         lock_threshold: f32,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igGetMouseDragDelta_nonUDT2(
         button: ImGuiMouseButton,
         lock_threshold: f32,
     ) -> ImVec2_Simple;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImColor_HSV_nonUDT(
         pOut: *mut ImColor,
@@ -8394,7 +8394,7 @@ extern "C" {
         a: f32,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImColor_HSV_nonUDT2(
         self_: *mut ImColor,
@@ -8404,23 +8404,23 @@ extern "C" {
         a: f32,
     ) -> ImColor_Simple;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImDrawList_GetClipRectMin_nonUDT(pOut: *mut ImVec2, self_: *mut ImDrawList);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImDrawList_GetClipRectMin_nonUDT2(self_: *mut ImDrawList) -> ImVec2_Simple;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImDrawList_GetClipRectMax_nonUDT(pOut: *mut ImVec2, self_: *mut ImDrawList);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImDrawList_GetClipRectMax_nonUDT2(self_: *mut ImDrawList) -> ImVec2_Simple;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImFont_CalcTextSizeA_nonUDT(
         pOut: *mut ImVec2,
@@ -8433,7 +8433,7 @@ extern "C" {
         remaining: *mut *const ::std::os::raw::c_char,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImFont_CalcTextSizeA_nonUDT2(
         self_: *mut ImFont,
@@ -8445,11 +8445,11 @@ extern "C" {
         remaining: *mut *const ::std::os::raw::c_char,
     ) -> ImVec2_Simple;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igLogText(fmt: *const ::std::os::raw::c_char, ...);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn ImGuiTextBuffer_appendf(
         buffer: *mut ImGuiTextBuffer,
@@ -8457,7 +8457,7 @@ extern "C" {
         ...
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igColorConvertRGBtoHSV(
         r: f32,
@@ -8468,7 +8468,7 @@ extern "C" {
         out_v: *mut f32,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[link(wasm_import_module = "imgui-sys")]
 extern "C" {
     pub fn igColorConvertHSVtoRGB(
         h: f32,

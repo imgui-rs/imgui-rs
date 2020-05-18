@@ -77,7 +77,10 @@ fn parse_whitelist<R: Read>(
     })
 }
 
-pub fn generate_bindings<P: AsRef<Path>>(cimgui_path: &P, wasm_import_name: Option<String>) -> Result<Bindings, Error> {
+pub fn generate_bindings<P: AsRef<Path>>(
+    cimgui_path: &P,
+    wasm_import_name: Option<String>,
+) -> Result<Bindings, Error> {
     let cimgui_output_path = cimgui_path.as_ref().join("generator").join("output");
     let structs_and_enums = File::open(cimgui_output_path.join("structs_and_enums.json"))?;
     let definitions = File::open(cimgui_output_path.join("definitions.json"))?;
@@ -109,7 +112,7 @@ pub fn generate_bindings<P: AsRef<Path>>(cimgui_path: &P, wasm_import_name: Opti
     if let Some(name) = wasm_import_name {
         builder = builder.wasm_import_module_name(name);
     }
-    
+
     for e in whitelist.structs {
         builder = builder.whitelist_type(format!("^{}", e));
     }
