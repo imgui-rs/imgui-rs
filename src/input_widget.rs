@@ -52,7 +52,8 @@ macro_rules! impl_text_flags {
 
         #[inline]
         pub fn callback_completion(mut self, value: bool) -> Self {
-            self.flags.set(ImGuiInputTextFlags::CallbackCompletion, value);
+            self.flags
+                .set(ImGuiInputTextFlags::CallbackCompletion, value);
             self
         }
 
@@ -70,7 +71,8 @@ macro_rules! impl_text_flags {
 
         #[inline]
         pub fn callback_char_filter(mut self, value: bool) -> Self {
-            self.flags.set(ImGuiInputTextFlags::CallbackCharFilter, value);
+            self.flags
+                .set(ImGuiInputTextFlags::CallbackCharFilter, value);
             self
         }
 
@@ -88,7 +90,8 @@ macro_rules! impl_text_flags {
 
         #[inline]
         pub fn no_horizontal_scroll(mut self, value: bool) -> Self {
-            self.flags.set(ImGuiInputTextFlags::NoHorizontalScroll, value);
+            self.flags
+                .set(ImGuiInputTextFlags::NoHorizontalScroll, value);
             self
         }
 
@@ -115,7 +118,7 @@ macro_rules! impl_text_flags {
             self.flags.set(ImGuiInputTextFlags::NoUndoRedo, value);
             self
         }
-    }
+    };
 }
 
 macro_rules! impl_step_params {
@@ -131,7 +134,7 @@ macro_rules! impl_step_params {
             self.step_fast = value;
             self
         }
-    }
+    };
 }
 
 extern "C" fn resize_callback(data: *mut sys::ImGuiInputTextCallbackData) -> c_int {
