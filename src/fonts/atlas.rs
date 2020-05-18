@@ -337,7 +337,7 @@ impl FontConfig {
         raw.EllipsisChar = self.ellipsis_char.map(|x| x as u16).unwrap_or(0xffff);
         if let Some(name) = self.name.as_ref() {
             let bytes = name.as_bytes();
-            let mut len = bytes.len().max(raw.Name.len() - 1);
+            let mut len = bytes.len().min(raw.Name.len() - 1);
             while !name.is_char_boundary(len) {
                 len -= 1;
             }

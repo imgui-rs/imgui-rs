@@ -391,13 +391,19 @@ impl WinitPlatform {
                 ..
             } => {
                 io.keys_down[key as usize] = false;
-                match key {
-                    VirtualKeyCode::LShift | VirtualKeyCode::RShift => io.key_shift = false,
-                    VirtualKeyCode::LControl | VirtualKeyCode::RControl => io.key_ctrl = false,
-                    VirtualKeyCode::LAlt | VirtualKeyCode::RAlt => io.key_alt = false,
-                    VirtualKeyCode::LWin | VirtualKeyCode::RWin => io.key_super = false,
-                    _ => (),
-                }
+            }
+
+            // We need to track modifiers separately because some system like macOS, will
+            // not reliably send modifier states during certain events like ScreenCapture.
+            // Gotta let the people show off their pretty imgui widgets!
+            Event::DeviceEvent {
+                event: DeviceEvent::ModifiersChanged(modifiers),
+                ..
+            } => {
+                io.key_shift = modifiers.shift();
+                io.key_ctrl = modifiers.ctrl();
+                io.key_alt = modifiers.alt();
+                io.key_super = modifiers.logo();
             }
             _ => (),
         }
@@ -440,15 +446,7 @@ impl WinitPlatform {
                     },
                 ..
             } => {
-                let pressed = state == ElementState::Pressed;
-                io.keys_down[key as usize] = pressed;
-                match key {
-                    VirtualKeyCode::LShift | VirtualKeyCode::RShift => io.key_shift = pressed,
-                    VirtualKeyCode::LControl | VirtualKeyCode::RControl => io.key_ctrl = pressed,
-                    VirtualKeyCode::LAlt | VirtualKeyCode::RAlt => io.key_alt = pressed,
-                    VirtualKeyCode::LWin | VirtualKeyCode::RWin => io.key_super = pressed,
-                    _ => (),
-                }
+                io.keys_down[key as usize] = state == ElementState::Pressed;
             }
             WindowEvent::ReceivedCharacter(ch) => {
                 // Exclude the backspace key ('\u{7f}'). Otherwise we will insert this char and then
@@ -536,6 +534,11 @@ impl WinitPlatform {
             } => {
                 let pressed = state == ElementState::Pressed;
                 io.keys_down[key as usize] = pressed;
+
+                // This is a bit redundant here, but we'll leave it in. The OS occasionally
+                // fails to send modifiers keys, but it doesn't seem to send false-positives,
+                // so double checking isn't terrible in case some system *doesn't* send
+                // device events sometimes.
                 match key {
                     VirtualKeyCode::LShift | VirtualKeyCode::RShift => io.key_shift = pressed,
                     VirtualKeyCode::LControl | VirtualKeyCode::RControl => io.key_ctrl = pressed,

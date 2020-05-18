@@ -2,6 +2,17 @@
 
 ## [Unreleased]
 
+### Changed
+
+- Redesigned tree / collapsing header API
+- Bump minimum Rust version to 1.40 (at least xml-rs crate requires it)
+
+## [0.3.1] - 2020-03-16
+
+### Fixed
+
+- Narrowed supported winit version range in imgui-winit-support
+
 ## [0.3.0] - 2020-02-15
 
 ### Added
@@ -534,6 +545,7 @@ by setting the environment variable `WINIT_HIDPI_FACTOR=1` if you use X11.
 - Initial release with cimgui/imgui 1.44, glium 0.9
 
 [Unreleased]: https://github.com/Gekkio/imgui-rs/compare/v0.3.0...HEAD
+[0.3.1]: https://github.com/Gekkio/imgui-rs/compare/v0.3.0...v0.3.1
 [0.3.0]: https://github.com/Gekkio/imgui-rs/compare/v0.2.0...v0.3.0
 [0.2.1]: https://github.com/Gekkio/imgui-rs/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/Gekkio/imgui-rs/compare/v0.1.0...v0.2.0

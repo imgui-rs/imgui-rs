@@ -327,7 +327,7 @@ fn show_test_window(ui: &Ui, state: &mut State, opened: &mut bool) {
             menu_bar.end(ui);
         }
         ui.spacing();
-        if ui.collapsing_header(im_str!("Help")).build() {
+        if CollapsingHeader::new(im_str!("Help")).build(&ui) {
             ui.text_wrapped(im_str!(
                 "This window is being created by the show_test_window() \
                  function. Please refer to the code for programming \
@@ -336,7 +336,7 @@ fn show_test_window(ui: &Ui, state: &mut State, opened: &mut bool) {
             show_user_guide(ui);
         }
 
-        if ui.collapsing_header(im_str!("Window options")).build() {
+        if CollapsingHeader::new(im_str!("Window options")).build(&ui) {
             ui.checkbox(im_str!("No titlebar"), &mut state.no_titlebar);
             ui.same_line(150.0);
             ui.checkbox(im_str!("No scrollbar"), &mut state.no_scrollbar);
@@ -349,13 +349,14 @@ fn show_test_window(ui: &Ui, state: &mut State, opened: &mut bool) {
             ui.checkbox(im_str!("No collapse"), &mut state.no_collapse);
             ui.checkbox(im_str!("No close"), &mut state.no_close);
 
-            ui.tree_node(im_str!("Style"))
-                .build(|| ui.show_default_style_editor());
+            TreeNode::new(im_str!("Style")).build(&ui, || {
+                ui.show_default_style_editor();
+            });
         }
-        if ui.collapsing_header(im_str!("Widgets")).build() {
-            ui.tree_node(im_str!("Tree")).build(|| {
+        if CollapsingHeader::new(im_str!("Widgets")).build(&ui) {
+            TreeNode::new(im_str!("Tree")).build(&ui, || {
                 for i in 0..5 {
-                    ui.tree_node(&im_str!("Child {}", i)).build(|| {
+                    TreeNode::new(&im_str!("Child {}", i)).build(&ui, || {
                         ui.text(im_str!("blah blah"));
                         ui.same_line(0.0);
                         if ui.small_button(im_str!("print")) {
@@ -364,7 +365,7 @@ fn show_test_window(ui: &Ui, state: &mut State, opened: &mut bool) {
                     });
                 }
             });
-            ui.tree_node(im_str!("Bullets")).build(|| {
+            TreeNode::new(im_str!("Bullets")).build(&ui, || {
                 ui.bullet_text(im_str!("Bullet point 1"));
                 ui.bullet_text(im_str!("Bullet point 2\nOn multiple lines"));
                 ui.bullet();
@@ -373,13 +374,13 @@ fn show_test_window(ui: &Ui, state: &mut State, opened: &mut bool) {
                 ui.bullet();
                 ui.small_button(im_str!("Button"));
             });
-            ui.tree_node(im_str!("Colored text")).build(|| {
+            TreeNode::new(im_str!("Colored text")).build(&ui, || {
                 ui.text_colored([1.0, 0.0, 1.0, 1.0], im_str!("Pink"));
                 ui.text_colored([1.0, 1.0, 0.0, 1.0], im_str!("Yellow"));
                 ui.text_disabled(im_str!("Disabled"));
             });
 
-            ui.tree_node(im_str!("Multi-line text")).build(|| {
+            TreeNode::new(im_str!("Multi-line text")).build(&ui, || {
                 ui.input_text_multiline(
                     im_str!("multiline"),
                     &mut state.text_multiline,
@@ -387,7 +388,7 @@ fn show_test_window(ui: &Ui, state: &mut State, opened: &mut bool) {
                 ).build();
             });
 
-            ui.tree_node(im_str!("Word Wrapping")).build(|| {
+            TreeNode::new(im_str!("Word wrapping")).build(&ui, || {
                 ui.text_wrapped(im_str!(
                     "This text should automatically wrap on the edge of \
                      the window.The current implementation for text \
@@ -406,7 +407,7 @@ fn show_test_window(ui: &Ui, state: &mut State, opened: &mut bool) {
                 ui.text(im_str!("Test paragraph 2:"));
                 // TODO
             });
-            ui.tree_node(im_str!("UTF-8 Text")).build(|| {
+            TreeNode::new(im_str!("UTF-8 Text")).build(&ui, || {
                 ui.text_wrapped(im_str!(
                     "CJK text will only appear if the font was loaded \
                      with theappropriate CJK character ranges. Call \
@@ -469,7 +470,7 @@ fn show_test_window(ui: &Ui, state: &mut State, opened: &mut bool) {
             ColorEdit::new(im_str!("color 1"), &mut state.col1).build(ui);
             ColorEdit::new(im_str!("color 2"), &mut state.col2).build(ui);
 
-            ui.tree_node(im_str!("Multi-component Widgets")).build(|| {
+            TreeNode::new(im_str!("Multi-component Widgets")).build(&ui, || {
                 ui.input_float2(im_str!("input float2"), &mut state.vec2f)
                     .build();
                 ui.input_int2(im_str!("input int2"), &mut state.vec2i)
@@ -483,7 +484,7 @@ fn show_test_window(ui: &Ui, state: &mut State, opened: &mut bool) {
                 ui.spacing();
             });
 
-            ui.tree_node(im_str!("Color/Picker Widgets")).build(|| {
+            TreeNode::new(im_str!("Color/Picker Widgets")).build(&ui, || {
                 let s = &mut state.color_edit;
                 ui.checkbox(im_str!("With HDR"), &mut s.hdr);
                 ui.same_line(0.0);
@@ -584,11 +585,8 @@ CTRL+click on individual component to input value.\n",
                 b.build(ui);
             });
         }
-        if ui
-            .collapsing_header(im_str!("Popups & Modal windows"))
-            .build()
-        {
-            ui.tree_node(im_str!("Popups")).build(|| {
+        if CollapsingHeader::new(im_str!("Popups & Modal windows")).build(&ui) {
+            TreeNode::new(im_str!("Popups")).build(&ui, || {
                 ui.text_wrapped(im_str!(
                     "When a popup is active, it inhibits interacting \
                      with windows that are behind the popup. Clicking \
@@ -620,7 +618,7 @@ CTRL+click on individual component to input value.\n",
                 });
             });
 
-            ui.tree_node(im_str!("Modals")).build(|| {
+            TreeNode::new(im_str!("Modals")).build(&ui, || {
                 ui.text_wrapped(im_str!(
                     "Modal windows are like popups but the user cannot close \
                      them by clicking outside the window."
