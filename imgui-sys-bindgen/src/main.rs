@@ -31,6 +31,4 @@ fn main() {
     wasm_bindings
         .write_to_file(&output_path)
         .expect("Failed to write wasm bindings");
-
-    println!("Wrote bindings to {}", output_path.to_string_lossy());
 }
