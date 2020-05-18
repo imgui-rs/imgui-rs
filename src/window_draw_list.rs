@@ -1,4 +1,3 @@
-use sys;
 use sys::{ImDrawList, ImU32};
 
 use super::Ui;

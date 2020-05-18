@@ -1,7 +1,6 @@
 use std::marker::PhantomData;
 use std::os::raw::c_float;
 use std::{f32, mem, ptr};
-use sys;
 
 use super::{ImStr, Ui};
 
