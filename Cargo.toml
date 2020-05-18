@@ -22,6 +22,9 @@ imgui-sys = { version = "0.4.0-pre", path = "imgui-sys" }
 lazy_static = "1.1"
 parking_lot = "0.10"
 
+[features]
+wasm = ["imgui-sys/wasm"]
+
 [dev-dependencies]
 memoffset = "0.5"
 

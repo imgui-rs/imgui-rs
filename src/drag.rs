@@ -11,7 +11,7 @@ macro_rules! impl_display_format {
             self.display_format = display_format;
             self
         }
-    }
+    };
 }
 
 macro_rules! impl_speed {
@@ -21,7 +21,7 @@ macro_rules! impl_speed {
             self.speed = value;
             self
         }
-    }
+    };
 }
 
 macro_rules! impl_power {
@@ -31,7 +31,7 @@ macro_rules! impl_power {
             self.power = value;
             self
         }
-    }
+    };
 }
 
 macro_rules! impl_min_max {
@@ -47,7 +47,7 @@ macro_rules! impl_min_max {
             self.max = value;
             self
         }
-    }
+    };
 }
 
 #[must_use]

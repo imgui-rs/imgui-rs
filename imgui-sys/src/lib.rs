@@ -1,5 +1,13 @@
+#[cfg(feature = "wasm")]
+mod wasm_bindings;
+
+#[cfg(feature = "wasm")]
+pub use crate::wasm_bindings::*;
+
+#[cfg(not(feature = "wasm"))]
 mod bindings;
 
+#[cfg(not(feature = "wasm"))]
 pub use crate::bindings::*;
 
 impl ImVec2 {

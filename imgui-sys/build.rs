@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+
 use std::fs;
 use std::io;
 
@@ -23,19 +25,22 @@ fn assert_file_exists(path: &str) -> io::Result<()> {
 }
 
 fn main() -> io::Result<()> {
-    let mut build = cc::Build::new();
-    build.cpp(true);
-    // Disabled due to linking issues
-    build
-        .define("CIMGUI_NO_EXPORT", None)
-        .define("IMGUI_DISABLE_WIN32_FUNCTIONS", None)
-        .define("IMGUI_DISABLE_OSX_FUNCTIONS", None);
+    #[cfg(not(feature = "wasm"))]
+    {
+        let mut build = cc::Build::new();
+        build.cpp(true);
+        // Disabled due to linking issues
+        build
+            .define("CIMGUI_NO_EXPORT", None)
+            .define("IMGUI_DISABLE_WIN32_FUNCTIONS", None)
+            .define("IMGUI_DISABLE_OSX_FUNCTIONS", None);
 
-    build.flag_if_supported("-Wno-return-type-c-linkage");
-    for path in &CPP_FILES {
-        assert_file_exists(path)?;
-        build.file(path);
+        build.flag_if_supported("-Wno-return-type-c-linkage");
+        for path in &CPP_FILES {
+            assert_file_exists(path)?;
+            build.file(path);
+        }
+        build.compile("libcimgui.a");
     }
-    build.compile("libcimgui.a");
     Ok(())
 }
