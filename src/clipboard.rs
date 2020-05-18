@@ -72,6 +72,7 @@ pub(crate) unsafe extern "C" fn set_clipboard_text(user_data: *mut c_void, text:
 }
 
 /// # Clipboard
+#[allow(clippy::fn_address_comparisons)] // This is allowed because although function addresses wont be unique, we just care if its OURS
 impl<'ui> Ui<'ui> {
     /// Returns the current clipboard contents as text, or None if the clipboard is empty or cannot
     /// be accessed
