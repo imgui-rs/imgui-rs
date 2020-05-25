@@ -327,6 +327,28 @@ impl<'ui> Ui<'ui> {
     }
 }
 
+/// Tracks a layout tooltip that must be ended by calling `.end()`
+#[must_use]
+pub struct TooltipToken {
+    ctx: *const Context,
+}
+
+impl TooltipToken {
+    /// Ends a layout tooltip
+    pub fn end(mut self, _: &Ui) {
+        self.ctx = ptr::null();
+        unsafe { sys::igEndTooltip() };
+    }
+}
+
+impl Drop for TooltipToken {
+    fn drop(&mut self) {
+        if !self.ctx.is_null() && !thread::panicking() {
+            panic!("A TooltipToken was leaked. Did you call .end()?");
+        }
+    }
+}
+
 /// # Tooltips
 impl<'ui> Ui<'ui> {
     /// Construct a tooltip window that can have any kind of content.
@@ -350,6 +372,13 @@ impl<'ui> Ui<'ui> {
         unsafe { sys::igBeginTooltip() };
         f();
         unsafe { sys::igEndTooltip() };
+    }
+    /// Construct a tooltip window that can have any kind of content.
+    ///
+    /// Returns a `TooltipToken` that must be ended by calling `.end()`
+    pub fn begin_tooltip(&self) -> TooltipToken {
+        unsafe { sys::igBeginTooltip() };
+        TooltipToken { ctx: self.ctx }
     }
     /// Construct a tooltip window with simple text content.
     ///
