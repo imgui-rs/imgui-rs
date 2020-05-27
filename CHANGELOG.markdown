@@ -2,10 +2,20 @@
 
 ## [Unreleased]
 
+### Added
+
+- WebAssembly FFI shells
+
 ### Changed
 
-- Redesigned tree / collapsing header API
+- Redesign tree / collapsing header API
 - Bump minimum Rust version to 1.40 (at least xml-rs crate requires it)
+- Upgrade to glium 0.27 / winit 0.22
+- Switch Glium renderer to use GL_CLAMP_TO_BORDER
+
+### Fixed
+
+- Bug in font name length checking
 
 ## [0.3.1] - 2020-03-16
 
