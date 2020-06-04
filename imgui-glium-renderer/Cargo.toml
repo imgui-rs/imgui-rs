@@ -1,6 +1,6 @@
 [package]
 name = "imgui-glium-renderer"
-version = "0.4.0-pre"
+version = "0.4.0"
 edition = "2018"
 authors = ["Joonas Javanainen <joonas.javanainen@gmail.com>", "imgui-rs contributors"]
 description = "Glium renderer for the imgui crate"
@@ -11,4 +11,4 @@ categories = ["gui", "rendering"]
 
 [dependencies]
 glium = { version = "0.27", default-features = false }
-imgui = { version = "0.4.0-pre", path = "../", features = ["glium"] }
+imgui = { version = "0.4.0", path = "../", features = ["glium"] }

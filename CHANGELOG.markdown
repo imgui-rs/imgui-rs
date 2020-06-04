@@ -2,10 +2,22 @@
 
 ## [Unreleased]
 
+## [0.4.0] - 2020-05-27
+
+### Added
+
+- WebAssembly FFI shells
+
 ### Changed
 
-- Redesigned tree / collapsing header API
+- Redesign tree / collapsing header API
 - Bump minimum Rust version to 1.40 (at least xml-rs crate requires it)
+- Upgrade to glium 0.27 / winit 0.22
+- Switch Glium renderer to use GL_CLAMP_TO_BORDER
+
+### Fixed
+
+- Bug in font name length checking
 
 ## [0.3.1] - 2020-03-16
 
@@ -544,7 +556,8 @@ by setting the environment variable `WINIT_HIDPI_FACTOR=1` if you use X11.
 
 - Initial release with cimgui/imgui 1.44, glium 0.9
 
-[Unreleased]: https://github.com/Gekkio/imgui-rs/compare/v0.3.0...HEAD
+[Unreleased]: https://github.com/Gekkio/imgui-rs/compare/v0.4.0...HEAD
+[0.4.0]: https://github.com/Gekkio/imgui-rs/compare/v0.3.0...v0.4.0
 [0.3.1]: https://github.com/Gekkio/imgui-rs/compare/v0.3.0...v0.3.1
 [0.3.0]: https://github.com/Gekkio/imgui-rs/compare/v0.2.0...v0.3.0
 [0.2.1]: https://github.com/Gekkio/imgui-rs/compare/v0.2.0...v0.2.1
