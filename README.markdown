@@ -4,7 +4,7 @@
 
 Minimum Rust version: 1.40
 
-Wrapped Dear ImGui version: 1.75
+Wrapped Dear ImGui version: 1.76
 
 [![Build Status](https://github.com/Gekkio/imgui-rs/workflows/ci/badge.svg)](https://github.com/Gekkio/imgui-rs/actions)
 [![Latest release on crates.io](https://meritbadge.herokuapp.com/imgui)](https://crates.io/crates/imgui)
@@ -35,7 +35,7 @@ Window::new(im_str!("Hello world"))
 * imgui-gfx-renderer: Renderer implementation that uses the `gfx` crate (*not
   the new gfx-hal crate*)
 * imgui-winit-support: Backend platform implementation that uses the `winit`
-  crate (0.19 by default, but 0.20 is supported via the `winit-20` feature)
+  crate (0.22 by default, but 0.19-0.21 are supported via feature flags)
 * imgui-sys: Low-level unsafe API (automatically generated)
 
 ## Features
