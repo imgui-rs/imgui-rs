@@ -265,9 +265,9 @@ pub struct Io {
     ///
     /// *Important*: You need to clear this flag yourself
     pub want_save_ini_settings: bool,
-    /// Directional navigation is currently allowed
+    /// Keyboard/Gamepad navigation is currently allowed
     pub nav_active: bool,
-    /// Directional navigation is visible and allowed
+    /// Keyboard/Gamepad navigation is visible and allowed
     pub nav_visible: bool,
     /// Application framerate estimation, in frames per second.
     ///
