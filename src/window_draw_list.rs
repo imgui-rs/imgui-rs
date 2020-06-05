@@ -222,7 +222,7 @@ impl<'ui> WindowDrawList<'ui> {
         unsafe {
             let start = text.as_ptr() as *const c_char;
             let end = (start as usize + text.len()) as *const c_char;
-            sys::ImDrawList_AddText(self.draw_list, pos.into(), col.into().into(), start, end)
+            sys::ImDrawList_AddTextVec2(self.draw_list, pos.into(), col.into().into(), start, end)
         }
     }
 

@@ -25,6 +25,7 @@ pub struct Font {
     pub ascent: f32,
     pub descent: f32,
     pub metrics_total_surface: c_int,
+    pub used_4k_pages_map: [u8; 2],
 }
 
 unsafe impl RawCast<sys::ImFont> for Font {}
@@ -65,4 +66,5 @@ fn test_font_memory_layout() {
     assert_field_offset!(ascent, Ascent);
     assert_field_offset!(descent, Descent);
     assert_field_offset!(metrics_total_surface, MetricsTotalSurface);
+    assert_field_offset!(used_4k_pages_map, Used4kPagesMap);
 }

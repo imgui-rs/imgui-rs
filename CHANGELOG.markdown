@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Changed
+
+- Upgrade to cimgui / imgui 1.76
+
 ## [0.4.0] - 2020-05-27
 
 ### Added

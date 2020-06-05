@@ -84,7 +84,7 @@ pub fn dear_imgui_version() -> &'static str {
 
 #[test]
 fn test_version() {
-    assert_eq!(dear_imgui_version(), "1.75");
+    assert_eq!(dear_imgui_version(), "1.76");
 }
 
 impl Context {
@@ -466,15 +466,17 @@ impl<'ui> Ui<'ui> {
         hide_text_after_double_hash: bool,
         wrap_width: f32,
     ) -> [f32; 2] {
+        let mut out = sys::ImVec2::zero();
         unsafe {
-            sys::igCalcTextSize_nonUDT2(
+            sys::igCalcTextSize(
+                &mut out,
                 text.as_ptr(),
                 std::ptr::null(),
                 hide_text_after_double_hash,
                 wrap_width,
             )
-            .into()
-        }
+        };
+        out.into()
     }
 }
 

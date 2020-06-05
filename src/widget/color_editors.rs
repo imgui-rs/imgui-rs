@@ -112,6 +112,8 @@ bitflags! {
         const NO_SIDE_PREVIEW = sys::ImGuiColorEditFlags_NoSidePreview;
         /// ColorEdit: disable drag and drop target. ColorButton: disable drag and drop source.
         const NO_DRAG_DROP = sys::ImGuiColorEditFlags_NoDragDrop;
+        /// ColorButton: disable border (which is enforced by default).
+        const NO_BORDER = sys::ImGuiColorEditFlags_NoBorder;
 
         /// ColorEdit, ColorPicker: show vertical alpha bar/gradient in picker.
         const ALPHA_BAR = sys::ImGuiColorEditFlags_AlphaBar;
@@ -574,8 +576,17 @@ impl<'a> ColorButton<'a> {
         self
     }
     /// Enables/disables using the button as drag&drop source.
+    ///
+    /// Enabled by default.
     pub fn drag_drop(mut self, value: bool) -> Self {
         self.flags.set(ColorEditFlags::NO_DRAG_DROP, !value);
+        self
+    }
+    /// Enables/disables the button border.
+    ///
+    /// Enabled by default.
+    pub fn border(mut self, value: bool) -> Self {
+        self.flags.set(ColorEditFlags::NO_BORDER, !value);
         self
     }
     /// Sets the button size.
