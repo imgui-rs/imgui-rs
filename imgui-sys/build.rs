@@ -36,8 +36,7 @@ fn main() -> io::Result<()> {
             .define("IMGUI_DISABLE_OSX_FUNCTIONS", None);
 
         #[cfg(feature = "u32_draw_index")]
-        build
-            .define("ImDrawIdx", Some("unsigned int"));
+        build.define("ImDrawIdx", Some("unsigned int"));
 
         build.flag_if_supported("-Wno-return-type-c-linkage");
         for path in &CPP_FILES {
