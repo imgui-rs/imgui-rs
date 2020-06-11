@@ -16,3 +16,4 @@ cc = "1.0"
 [features]
 default = []
 wasm = []
+u32_draw_index = []

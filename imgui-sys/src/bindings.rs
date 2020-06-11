@@ -135,7 +135,13 @@ pub type ImU32 = ::std::os::raw::c_uint;
 pub type ImDrawCallback = ::std::option::Option<
     unsafe extern "C" fn(parent_list: *const ImDrawList, cmd: *const ImDrawCmd),
 >;
+
+#[cfg(not(feature = "u32_draw_index"))]
 pub type ImDrawIdx = ::std::os::raw::c_ushort;
+
+#[cfg(feature = "u32_draw_index")]
+pub type ImDrawIdx = ::std::os::raw::c_uint;
+
 #[repr(C)]
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
 pub struct ImVector_float {

@@ -24,6 +24,7 @@ parking_lot = "0.10"
 
 [features]
 wasm = ["imgui-sys/wasm"]
+u32_draw_index = [ "imgui-sys/u32_draw_index"]
 
 [dev-dependencies]
 memoffset = "0.5"
