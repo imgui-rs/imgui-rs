@@ -82,6 +82,13 @@ impl<'ui> WindowDrawList<'ui> {
         }
     }
 
+    pub(crate) fn background(&mut self) -> Self {
+        Self {
+            draw_list: unsafe { sys::igGetBackgroundDrawList() },
+            _phantom: PhantomData,
+        }
+    }
+
     /// Split into *channels_count* drawing channels.
     /// At the end of the closure, the channels are merged. The objects
     /// are then drawn in the increasing order of their channel number, and not

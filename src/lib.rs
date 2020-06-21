@@ -515,6 +515,11 @@ impl<'ui> Ui<'ui> {
     pub fn get_window_draw_list(&'ui self) -> WindowDrawList<'ui> {
         WindowDrawList::new(self)
     }
+
+    #[must_use]
+    pub fn get_background_draw_list(&'ui self) -> WindowDrawList<'ui> {
+        WindowDrawList::new(self).background()
+    }
 }
 
 /// Condition for applying a setting
