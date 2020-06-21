@@ -82,7 +82,7 @@ impl<'ui> WindowDrawList<'ui> {
         }
     }
 
-    pub(crate) fn background(&mut self) -> Self {
+    pub(crate) fn background(self) -> Self {
         Self {
             draw_list: unsafe { sys::igGetBackgroundDrawList() },
             _phantom: PhantomData,
