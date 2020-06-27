@@ -34,7 +34,10 @@ fn assert_file_exists(path: &str) -> io::Result<()> {
 
 fn main() -> io::Result<()> {
     let manifest_dir = Path::new(env!("CARGO_MANIFEST_DIR"));
-    println!("cargo:THIRD_PARTY={}", manifest_dir.join("third-party").display());
+    println!(
+        "cargo:THIRD_PARTY={}",
+        manifest_dir.join("third-party").display()
+    );
     for (key, value) in DEFINES.iter() {
         println!("cargo:DEFINE_{}={}", key, value.unwrap_or(""));
     }
