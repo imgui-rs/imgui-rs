@@ -13,6 +13,7 @@ use glium::{
 use imgui::internal::RawWrapper;
 use imgui::{DrawCmd, DrawCmdParams, DrawData, ImString, TextureId, Textures};
 use std::borrow::Cow;
+use std::collections::HashMap;
 use std::error::Error;
 use std::fmt;
 use std::rc::Rc;
@@ -91,6 +92,7 @@ pub struct Renderer {
     program: Program,
     font_texture: Texture2d,
     textures: Textures<Rc<Texture2d>>,
+    filters: HashMap<TextureId, (MinifySamplerFilter, MagnifySamplerFilter)>,
 }
 
 impl Renderer {
@@ -109,6 +111,7 @@ impl Renderer {
             program,
             font_texture,
             textures: Textures::new(),
+            filters: HashMap::new(),
         })
     }
     pub fn reload_font_texture(&mut self, ctx: &mut imgui::Context) -> Result<(), RendererError> {
@@ -126,6 +129,14 @@ impl Renderer {
         } else {
             Err(RendererError::BadTexture(texture_id))
         }
+    }
+    pub fn set_texture_filter(
+        &mut self,
+        texture_id: TextureId,
+        min_filter: MinifySamplerFilter,
+        mag_filter: MagnifySamplerFilter,
+    ) {
+        self.filters.insert(texture_id, (min_filter, mag_filter));
     }
     pub fn render<T: Surface>(
         &mut self,
@@ -187,6 +198,16 @@ impl Renderer {
                             && clip_rect[2] >= 0.0
                             && clip_rect[3] >= 0.0
                         {
+                            let (min_filter, mag_filter) = self
+                                .filters
+                                .get(&texture_id)
+                                .cloned()
+                                .or(Some((
+                                    MinifySamplerFilter::Linear,
+                                    MagnifySamplerFilter::Linear,
+                                )))
+                                .expect("Bad texture filter");
+
                             target.draw(
                                 &vtx_buffer,
                                 &idx_buffer
@@ -196,8 +217,8 @@ impl Renderer {
                                 &uniform! {
                                     matrix: matrix,
                                     tex: self.lookup_texture(texture_id)?.sampled()
-                                        .minify_filter(MinifySamplerFilter::Linear)
-                                        .magnify_filter(MagnifySamplerFilter::Linear)
+                                        .minify_filter(min_filter)
+                                        .magnify_filter(mag_filter)
                                         .wrap_function(SamplerWrapFunction::BorderClamp)
                                 },
                                 &DrawParameters {
