@@ -6,10 +6,12 @@ use std::rc::Rc;
 use glium::{
     backend::Facade,
     texture::{ClientFormat, RawImage2d},
+    uniforms::{MagnifySamplerFilter, MinifySamplerFilter},
     Texture2d,
 };
 use image::{jpeg::JpegDecoder, ImageDecoder};
 use imgui::*;
+use imgui_glium_renderer::TextureEntry;
 
 mod support;
 
@@ -28,7 +30,7 @@ impl CustomTexturesApp {
     fn register_textures<F>(
         &mut self,
         gl_ctx: &F,
-        textures: &mut Textures<Rc<Texture2d>>,
+        textures: &mut Textures<TextureEntry>,
     ) -> Result<(), Box<dyn Error>>
     where
         F: Facade,
@@ -55,7 +57,12 @@ impl CustomTexturesApp {
                 format: ClientFormat::U8U8U8,
             };
             let gl_texture = Texture2d::new(gl_ctx, raw)?;
-            let texture_id = textures.insert(Rc::new(gl_texture));
+            let texture = TextureEntry {
+                texture: Rc::new(gl_texture),
+                mag_filter: MagnifySamplerFilter::Linear,
+                min_filter: MinifySamplerFilter::Linear,
+            };
+            let texture_id = textures.insert(texture);
 
             self.my_texture_id = Some(texture_id);
         }
@@ -86,7 +93,7 @@ impl CustomTexturesApp {
 }
 
 impl Lenna {
-    fn new<F>(gl_ctx: &F, textures: &mut Textures<Rc<Texture2d>>) -> Result<Self, Box<dyn Error>>
+    fn new<F>(gl_ctx: &F, textures: &mut Textures<TextureEntry>) -> Result<Self, Box<dyn Error>>
     where
         F: Facade,
     {
@@ -104,7 +111,12 @@ impl Lenna {
             format: ClientFormat::U8U8U8,
         };
         let gl_texture = Texture2d::new(gl_ctx, raw)?;
-        let texture_id = textures.insert(Rc::new(gl_texture));
+        let texture = TextureEntry {
+            texture: Rc::new(gl_texture),
+            mag_filter: MagnifySamplerFilter::Linear,
+            min_filter: MinifySamplerFilter::Linear,
+        };
+        let texture_id = textures.insert(texture);
         Ok(Lenna {
             texture_id,
             size: [width as f32, height as f32],
