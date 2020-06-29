@@ -13,7 +13,6 @@ use glium::{
 use imgui::internal::RawWrapper;
 use imgui::{DrawCmd, DrawCmdParams, DrawData, ImString, TextureId, Textures};
 use std::borrow::Cow;
-use std::collections::HashMap;
 use std::error::Error;
 use std::fmt;
 use std::rc::Rc;
@@ -87,12 +86,17 @@ impl From<DrawError> for RendererError {
     }
 }
 
+pub struct TextureEntry {
+    pub texture: Rc<Texture2d>,
+    pub mag_filter: MagnifySamplerFilter,
+    pub min_filter: MinifySamplerFilter,
+}
+
 pub struct Renderer {
     ctx: Rc<Context>,
     program: Program,
-    font_texture: Texture2d,
-    textures: Textures<Rc<Texture2d>>,
-    filters: HashMap<TextureId, (MinifySamplerFilter, MagnifySamplerFilter)>,
+    font_texture: TextureEntry,
+    textures: Textures<TextureEntry>,
 }
 
 impl Renderer {
@@ -111,17 +115,16 @@ impl Renderer {
             program,
             font_texture,
             textures: Textures::new(),
-            filters: HashMap::new(),
         })
     }
     pub fn reload_font_texture(&mut self, ctx: &mut imgui::Context) -> Result<(), RendererError> {
         self.font_texture = upload_font_texture(ctx.fonts(), &self.ctx)?;
         Ok(())
     }
-    pub fn textures(&mut self) -> &mut Textures<Rc<Texture2d>> {
+    pub fn textures(&mut self) -> &mut Textures<TextureEntry> {
         &mut self.textures
     }
-    fn lookup_texture(&self, texture_id: TextureId) -> Result<&Texture2d, RendererError> {
+    fn lookup_texture(&self, texture_id: TextureId) -> Result<&TextureEntry, RendererError> {
         if texture_id.id() == usize::MAX {
             Ok(&self.font_texture)
         } else if let Some(texture) = self.textures.get(texture_id) {
@@ -129,14 +132,6 @@ impl Renderer {
         } else {
             Err(RendererError::BadTexture(texture_id))
         }
-    }
-    pub fn set_texture_filter(
-        &mut self,
-        texture_id: TextureId,
-        min_filter: MinifySamplerFilter,
-        mag_filter: MagnifySamplerFilter,
-    ) {
-        self.filters.insert(texture_id, (min_filter, mag_filter));
     }
     pub fn render<T: Surface>(
         &mut self,
@@ -198,15 +193,7 @@ impl Renderer {
                             && clip_rect[2] >= 0.0
                             && clip_rect[3] >= 0.0
                         {
-                            let (min_filter, mag_filter) = self
-                                .filters
-                                .get(&texture_id)
-                                .cloned()
-                                .or(Some((
-                                    MinifySamplerFilter::Linear,
-                                    MagnifySamplerFilter::Linear,
-                                )))
-                                .expect("Bad texture filter");
+                            let entry = self.lookup_texture(texture_id)?;
 
                             target.draw(
                                 &vtx_buffer,
@@ -216,9 +203,9 @@ impl Renderer {
                                 &self.program,
                                 &uniform! {
                                     matrix: matrix,
-                                    tex: self.lookup_texture(texture_id)?.sampled()
-                                        .minify_filter(min_filter)
-                                        .magnify_filter(mag_filter)
+                                    tex: entry.texture.sampled()
+                                        .minify_filter(entry.min_filter)
+                                        .magnify_filter(entry.mag_filter)
                                         .wrap_function(SamplerWrapFunction::BorderClamp)
                                 },
                                 &DrawParameters {
@@ -251,7 +238,7 @@ impl Renderer {
 fn upload_font_texture(
     mut fonts: imgui::FontAtlasRefMut,
     ctx: &Rc<Context>,
-) -> Result<Texture2d, RendererError> {
+) -> Result<TextureEntry, RendererError> {
     let texture = fonts.build_rgba32_texture();
     let data = RawImage2d {
         data: Cow::Borrowed(texture.data),
@@ -261,7 +248,11 @@ fn upload_font_texture(
     };
     let font_texture = Texture2d::with_mipmaps(ctx, data, MipmapsOption::NoMipmap)?;
     fonts.tex_id = TextureId::from(usize::MAX);
-    Ok(font_texture)
+    Ok(TextureEntry {
+        texture: Rc::new(font_texture),
+        mag_filter: MagnifySamplerFilter::Linear,
+        min_filter: MinifySamplerFilter::Linear,
+    })
 }
 
 fn compile_default_program<F: Facade>(facade: &F) -> Result<Program, ProgramChooserCreationError> {
