@@ -4,15 +4,18 @@ use crate::internal::{RawCast, RawWrapper};
 use crate::render::renderer::TextureId;
 use crate::sys;
 
-/// All draw data required to render a frame.
+/// All draw data to render a Dear ImGui frame.
 #[repr(C)]
 pub struct DrawData {
+    /// Only valid after render() is called and before the next new frame() is called.
     valid: bool,
+    // Array of DrawList.
     cmd_lists: *mut *mut DrawList,
+    /// Number of DrawList to render.
     cmd_lists_count: i32,
-    /// For convenience, sum of all draw list index buffer sizes
+    /// For convenience, sum of all draw list index buffer sizes.
     pub total_idx_count: i32,
-    /// For convenience, sum of all draw list vertex buffer sizes
+    /// For convenience, sum of all draw list vertex buffer sizes.
     pub total_vtx_count: i32,
     /// Upper-left position of the viewport to render.
     ///
@@ -32,13 +35,18 @@ pub struct DrawData {
 unsafe impl RawCast<sys::ImDrawData> for DrawData {}
 
 impl DrawData {
-    /// Returns an iterator over the draw lists included in the draw data
+    /// Returns an iterator over the draw lists included in the draw data.
     pub fn draw_lists(&self) -> DrawListIterator {
         unsafe {
             DrawListIterator {
                 iter: self.cmd_lists().iter(),
             }
         }
+    }
+    /// Returns the number of draw lists included in the draw data.
+    pub fn draw_lists_count(&self) -> usize {
+        use std::convert::TryInto;
+        self.cmd_lists_count.try_into().unwrap()
     }
     pub(crate) unsafe fn cmd_lists(&self) -> &[*const DrawList] {
         slice::from_raw_parts(
