@@ -20,7 +20,7 @@ fn main() {
         .or(Some("imgui-sys-v0".to_string()));
 
     let wasm_bindings = generate_bindings(
-        &sys_path.join("third-party").join("cimgui"),
+        &sys_path.join("third-party"),
         wasm_ffi_import_name,
     )
     .expect("Failed to generate bindings");
