@@ -306,6 +306,7 @@ pub struct Io {
     keys_down_duration_prev: [f32; 512],
     nav_inputs_down_duration: [f32; NavInput::COUNT + NavInput::INTERNAL_COUNT],
     nav_inputs_down_duration_prev: [f32; NavInput::COUNT + NavInput::INTERNAL_COUNT],
+    pen_pressure: f32,
     input_queue_surrogate: sys::ImWchar16,
     input_queue_characters: ImVector<sys::ImWchar>,
 }
@@ -471,6 +472,7 @@ fn test_io_memory_layout() {
     assert_field_offset!(keys_down_duration_prev, KeysDownDurationPrev);
     assert_field_offset!(nav_inputs_down_duration, NavInputsDownDuration);
     assert_field_offset!(nav_inputs_down_duration_prev, NavInputsDownDurationPrev);
+    assert_field_offset!(pen_pressure, PenPressure);
     assert_field_offset!(input_queue_surrogate, InputQueueSurrogate);
     assert_field_offset!(input_queue_characters, InputQueueCharacters);
 }
