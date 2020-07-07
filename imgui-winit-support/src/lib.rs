@@ -105,6 +105,50 @@ use winit::{
 pub struct WinitPlatform {
     hidpi_mode: ActiveHiDpiMode,
     hidpi_factor: f64,
+    cursor_cache: Option<CursorSettings>,
+}
+
+#[derive(Debug, Copy, Clone, Eq, PartialEq)]
+struct CursorSettings {
+    cursor: Option<imgui::MouseCursor>,
+    draw_cursor: bool,
+}
+
+fn to_winit_cursor(cursor: imgui::MouseCursor) -> MouseCursor {
+    match cursor {
+        imgui::MouseCursor::Arrow => MouseCursor::Arrow,
+        imgui::MouseCursor::TextInput => MouseCursor::Text,
+        imgui::MouseCursor::ResizeAll => MouseCursor::Move,
+        imgui::MouseCursor::ResizeNS => MouseCursor::NsResize,
+        imgui::MouseCursor::ResizeEW => MouseCursor::EwResize,
+        imgui::MouseCursor::ResizeNESW => MouseCursor::NeswResize,
+        imgui::MouseCursor::ResizeNWSE => MouseCursor::NwseResize,
+        imgui::MouseCursor::Hand => MouseCursor::Hand,
+        imgui::MouseCursor::NotAllowed => MouseCursor::NotAllowed,
+    }
+}
+
+impl CursorSettings {
+    #[cfg(feature = "winit-19")]
+    fn apply(&self, window: &Window) {
+        match self.cursor {
+            Some(mouse_cursor) if !self.draw_cursor => {
+                window.hide_cursor(false);
+                window.set_cursor(to_winit_cursor(mouse_cursor));
+            }
+            _ => window.hide_cursor(true),
+        }
+    }
+    #[cfg(any(feature = "winit-20", feature = "winit-22"))]
+    fn apply(&self, window: &Window) {
+        match self.cursor {
+            Some(mouse_cursor) if !self.draw_cursor => {
+                window.set_cursor_visible(true);
+                window.set_cursor_icon(to_winit_cursor(mouse_cursor));
+            }
+            _ => window.set_cursor_visible(false),
+        }
+    }
 }
 
 #[derive(Copy, Clone, Debug, PartialEq)]
@@ -188,6 +232,7 @@ impl WinitPlatform {
         WinitPlatform {
             hidpi_mode: ActiveHiDpiMode::Default,
             hidpi_factor: 1.0,
+            cursor_cache: None,
         }
     }
     /// Attaches the platform instance to a winit window.
@@ -681,61 +726,19 @@ impl WinitPlatform {
     /// This function performs the following actions:
     ///
     /// * mouse cursor is changed and/or hidden (if requested by imgui-rs)
-    #[cfg(feature = "winit-19")]
-    pub fn prepare_render(&self, ui: &Ui, window: &Window) {
+    pub fn prepare_render(&mut self, ui: &Ui, window: &Window) {
         let io = ui.io();
         if !io
             .config_flags
             .contains(ConfigFlags::NO_MOUSE_CURSOR_CHANGE)
         {
-            match ui.mouse_cursor() {
-                Some(mouse_cursor) if !io.mouse_draw_cursor => {
-                    window.hide_cursor(false);
-                    window.set_cursor(match mouse_cursor {
-                        imgui::MouseCursor::Arrow => MouseCursor::Arrow,
-                        imgui::MouseCursor::TextInput => MouseCursor::Text,
-                        imgui::MouseCursor::ResizeAll => MouseCursor::Move,
-                        imgui::MouseCursor::ResizeNS => MouseCursor::NsResize,
-                        imgui::MouseCursor::ResizeEW => MouseCursor::EwResize,
-                        imgui::MouseCursor::ResizeNESW => MouseCursor::NeswResize,
-                        imgui::MouseCursor::ResizeNWSE => MouseCursor::NwseResize,
-                        imgui::MouseCursor::Hand => MouseCursor::Hand,
-                        imgui::MouseCursor::NotAllowed => MouseCursor::NotAllowed,
-                    });
-                }
-                _ => window.hide_cursor(true),
-            }
-        }
-    }
-    /// Render preparation callback.
-    ///
-    /// Call this before calling the imgui-rs UI `render_with`/`render` function.
-    /// This function performs the following actions:
-    ///
-    /// * mouse cursor is changed and/or hidden (if requested by imgui-rs)
-    #[cfg(any(feature = "winit-20", feature = "winit-22"))]
-    pub fn prepare_render(&self, ui: &Ui, window: &Window) {
-        let io = ui.io();
-        if !io
-            .config_flags
-            .contains(ConfigFlags::NO_MOUSE_CURSOR_CHANGE)
-        {
-            match ui.mouse_cursor() {
-                Some(mouse_cursor) if !io.mouse_draw_cursor => {
-                    window.set_cursor_visible(true);
-                    window.set_cursor_icon(match mouse_cursor {
-                        imgui::MouseCursor::Arrow => MouseCursor::Arrow,
-                        imgui::MouseCursor::TextInput => MouseCursor::Text,
-                        imgui::MouseCursor::ResizeAll => MouseCursor::Move,
-                        imgui::MouseCursor::ResizeNS => MouseCursor::NsResize,
-                        imgui::MouseCursor::ResizeEW => MouseCursor::EwResize,
-                        imgui::MouseCursor::ResizeNESW => MouseCursor::NeswResize,
-                        imgui::MouseCursor::ResizeNWSE => MouseCursor::NwseResize,
-                        imgui::MouseCursor::Hand => MouseCursor::Hand,
-                        imgui::MouseCursor::NotAllowed => MouseCursor::NotAllowed,
-                    });
-                }
-                _ => window.set_cursor_visible(false),
+            let cursor = CursorSettings {
+                cursor: ui.mouse_cursor(),
+                draw_cursor: io.mouse_draw_cursor,
+            };
+            if self.cursor_cache != Some(cursor) {
+                cursor.apply(window);
+                self.cursor_cache = Some(cursor);
             }
         }
     }
