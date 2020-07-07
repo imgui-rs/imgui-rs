@@ -9,7 +9,10 @@ use gfx::texture::{FilterMethod, SamplerInfo, WrapMode};
 use gfx::traits::FactoryExt;
 use gfx::{CommandBuffer, Encoder, Factory, IntoIndexBuffer, Rect, Resources, Slice};
 use imgui::internal::RawWrapper;
-use imgui::{DrawCmd, DrawCmdParams, DrawData, DrawIdx, DrawVert, ImString, TextureId, Textures};
+use imgui::{
+    BackendFlags, DrawCmd, DrawCmdParams, DrawData, DrawIdx, DrawVert, ImString, TextureId,
+    Textures,
+};
 use std::error::Error;
 use std::fmt;
 use std::usize;
@@ -179,6 +182,9 @@ where
             "imgui-gfx-renderer {}",
             env!("CARGO_PKG_VERSION")
         ))));
+        ctx.io_mut()
+            .backend_flags
+            .insert(BackendFlags::RENDERER_HAS_VTX_OFFSET);
         Ok(Renderer {
             vertex_buffer,
             index_buffer,
@@ -242,6 +248,8 @@ where
                             DrawCmdParams {
                                 clip_rect,
                                 texture_id,
+                                vtx_offset,
+                                idx_offset,
                                 ..
                             },
                     } => {
@@ -252,7 +260,9 @@ where
                             (clip_rect[3] - clip_off[1]) * clip_scale[1],
                         ];
 
+                        self.slice.start = idx_offset as u32;
                         self.slice.end = self.slice.start + count as u32;
+                        self.slice.base_vertex = vtx_offset as u32;
 
                         if clip_rect[0] < fb_width
                             && clip_rect[1] < fb_height
@@ -283,7 +293,6 @@ where
                             };
                             encoder.draw(&self.slice, &self.pso, &data);
                         }
-                        self.slice.start = self.slice.end;
                     }
                     DrawCmd::ResetRenderState => (), // TODO
                     DrawCmd::RawCallback { callback, raw_cmd } => unsafe {

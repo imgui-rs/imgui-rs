@@ -11,7 +11,7 @@ use glium::{
     Surface, Texture2d, VertexBuffer,
 };
 use imgui::internal::RawWrapper;
-use imgui::{DrawCmd, DrawCmdParams, DrawData, ImString, TextureId, Textures};
+use imgui::{BackendFlags, DrawCmd, DrawCmdParams, DrawData, ImString, TextureId, Textures};
 use std::borrow::Cow;
 use std::error::Error;
 use std::fmt;
@@ -104,6 +104,9 @@ impl Renderer {
             "imgui-glium-renderer {}",
             env!("CARGO_PKG_VERSION")
         ))));
+        ctx.io_mut()
+            .backend_flags
+            .insert(BackendFlags::RENDERER_HAS_VTX_OFFSET);
         Ok(Renderer {
             ctx: Rc::clone(facade.get_context()),
             program,
@@ -162,7 +165,6 @@ impl Renderer {
                 PrimitiveType::TrianglesList,
                 draw_list.idx_buffer(),
             )?;
-            let mut idx_start = 0;
             for cmd in draw_list.commands() {
                 match cmd {
                     DrawCmd::Elements {
@@ -171,10 +173,11 @@ impl Renderer {
                             DrawCmdParams {
                                 clip_rect,
                                 texture_id,
+                                vtx_offset,
+                                idx_offset,
                                 ..
                             },
                     } => {
-                        let idx_end = idx_start + count;
                         let clip_rect = [
                             (clip_rect[0] - clip_off[0]) * clip_scale[0],
                             (clip_rect[1] - clip_off[1]) * clip_scale[1],
@@ -188,9 +191,11 @@ impl Renderer {
                             && clip_rect[3] >= 0.0
                         {
                             target.draw(
-                                &vtx_buffer,
-                                &idx_buffer
-                                    .slice(idx_start..idx_end)
+                                vtx_buffer
+                                    .slice(vtx_offset..)
+                                    .expect("Invalid vertex buffer range"),
+                                idx_buffer
+                                    .slice(idx_offset..(idx_offset + count))
                                     .expect("Invalid index buffer range"),
                                 &self.program,
                                 &uniform! {
@@ -213,7 +218,6 @@ impl Renderer {
                                 },
                             )?;
                         }
-                        idx_start = idx_end;
                     }
                     DrawCmd::ResetRenderState => (), // TODO
                     DrawCmd::RawCallback { callback, raw_cmd } => unsafe {
