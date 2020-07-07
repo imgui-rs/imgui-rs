@@ -2,7 +2,7 @@ use bitflags::bitflags;
 use std::f32;
 use std::ops::{Index, IndexMut};
 use std::os::raw::{c_char, c_int, c_void};
-use std::time::Instant;
+use std::time::Duration;
 
 use crate::fonts::atlas::FontAtlas;
 use crate::fonts::font::Font;
@@ -327,9 +327,7 @@ impl Io {
             sys::ImGuiIO_ClearInputCharacters(self.raw_mut());
         }
     }
-    pub fn update_delta_time(&mut self, previous: Instant) -> Instant {
-        let now = Instant::now();
-        let delta = now - previous;
+    pub fn update_delta_time(&mut self, delta: Duration) {
         let delta_s = delta.as_secs() as f32 + delta.subsec_nanos() as f32 / 1_000_000_000.0;
         if delta_s > 0.0 {
             self.delta_time = delta_s;
@@ -337,7 +335,6 @@ impl Io {
             self.delta_time = f32::MIN_POSITIVE;
         }
         self.delta_time = delta_s;
-        now
     }
 }
 

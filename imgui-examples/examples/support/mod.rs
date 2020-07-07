@@ -95,7 +95,11 @@ impl System {
         let mut last_frame = Instant::now();
 
         event_loop.run(move |event, _, control_flow| match event {
-            Event::NewEvents(_) => last_frame = imgui.io_mut().update_delta_time(last_frame),
+            Event::NewEvents(_) => {
+                let now = Instant::now();
+                imgui.io_mut().update_delta_time(now - last_frame);
+                last_frame = now;
+            }
             Event::MainEventsCleared => {
                 let gl_window = display.gl_window();
                 platform

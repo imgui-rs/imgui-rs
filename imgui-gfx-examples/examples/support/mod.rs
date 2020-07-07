@@ -94,7 +94,9 @@ impl System {
             platform
                 .prepare_frame(io, render_sys.window())
                 .expect("Failed to start frame");
-            last_frame = io.update_delta_time(last_frame);
+            let now = Instant::now();
+            io.update_delta_time(now - last_frame);
+            last_frame = now;
             let mut ui = imgui.frame();
             run_ui(&mut run, &mut ui);
 
