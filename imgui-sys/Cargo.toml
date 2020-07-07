@@ -9,6 +9,7 @@ repository = "https://github.com/Gekkio/imgui-rs"
 license = "MIT/Apache-2.0"
 categories = ["gui", "external-ffi-bindings"]
 build = "build.rs"
+links = "imgui"
 
 [build-dependencies]
 cc = "1.0"
