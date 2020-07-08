@@ -48,9 +48,7 @@ struct State {
     stacked_modals_item: usize,
     stacked_modals_color: [f32; 4],
 
-    tabs_reorderable: bool,
-    tab_1_opened: bool,
-    tab_2_opened: bool,
+    tabs: TabState,
 }
 
 impl Default for State {
@@ -106,9 +104,41 @@ impl Default for State {
             dont_ask_me_next_time: false,
             stacked_modals_item: 0,
             stacked_modals_color: [0.4, 0.7, 0.0, 0.5],
-            tabs_reorderable: true,
-            tab_1_opened: true,
-            tab_2_opened: true,
+            tabs: TabState::default(),
+        }
+    }
+}
+
+struct TabState {
+    // flags for the advanced tab example
+    reorderable: bool,
+    autoselect: bool,
+    listbutton: bool,
+    noclose_middlebutton: bool,
+    fitting_resizedown: bool,
+    fitting_scroll: bool,
+
+    // opened state for tab items
+    artichoke_tab: bool,
+    beetroot_tab: bool,
+    celery_tab: bool,
+    daikon_tab: bool,
+}
+
+impl Default for TabState {
+    fn default() -> Self {
+        Self {
+            reorderable: true,
+            autoselect: false,
+            listbutton: false,
+            noclose_middlebutton: false,
+            fitting_resizedown: true,
+            fitting_scroll: false,
+
+            artichoke_tab: true,
+            beetroot_tab: true,
+            celery_tab: true,
+            daikon_tab: true,
         }
     }
 }
@@ -373,27 +403,6 @@ fn show_test_window(ui: &Ui, state: &mut State, opened: &mut bool) {
                 }
             });
 
-            TreeNode::new(im_str!("Tabs")).build(&ui, || {
-                ui.separator();
-                let style = ui.push_style_var(StyleVar::FramePadding([0.0, 0.0]));
-                ui.checkbox(im_str!("Tab 1 opened"), &mut state.tab_1_opened);
-                ui.same_line(0.0);
-                ui.checkbox(im_str!("Tab 2 opened"), &mut state.tab_2_opened);
-                ui.same_line(0.0);
-                ui.checkbox(im_str!("Tabs reorderable"), &mut state.tabs_reorderable);
-
-                style.pop(ui);
-
-                TabBar::new(im_str!("tabbar")).reorderable(state.tabs_reorderable).build(&ui, || {
-                    TabItem::new(im_str!("a tab")).opened(&mut state.tab_1_opened).build(&ui, || {
-                        ui.text(im_str!("tab content 1"));
-                    });
-                    TabItem::new(im_str!("2tab")).opened(&mut state.tab_2_opened).build(&ui, || {
-                        ui.text(im_str!("tab content 2"));
-                    });
-                });
-            });
-
             TreeNode::new(im_str!("Bullets")).build(&ui, || {
                 ui.bullet_text(im_str!("Bullet point 1"));
                 ui.bullet_text(im_str!("Bullet point 2\nOn multiple lines"));
@@ -612,6 +621,80 @@ CTRL+click on individual component to input value.\n",
                     b = b.reference_color(&s.ref_color_v)
                 }
                 b.build(ui);
+            });
+        }
+
+        if CollapsingHeader::new(im_str!("Layout")).build(&ui) {
+            TreeNode::new(im_str!("Tabs")).build(&ui, || {
+                TreeNode::new(im_str!("Basic")).build(&ui, || {
+                    TabBar::new(im_str!("basictabbar")).build(&ui, || {
+                        TabItem::new(im_str!("Avocado")).build(&ui, || {
+                            ui.text(im_str!("This is the Avocado tab!"));
+                            ui.text(im_str!("blah blah blah blah blah"));
+                        });
+                        TabItem::new(im_str!("Broccoli")).build(&ui, || {
+                            ui.text(im_str!("This is the Broccoli tab!"));
+                            ui.text(im_str!("blah blah blah blah blah"));
+                        });
+                        TabItem::new(im_str!("Cucumber")).build(&ui, || {
+                            ui.text(im_str!("This is the Cucumber tab!"));
+                            ui.text(im_str!("blah blah blah blah blah"));
+                        });
+                    });
+
+                });
+                TreeNode::new(im_str!("Advanced & Close button")).build(&ui, || {
+
+                    ui.separator();
+                    let s = &mut state.tabs;
+
+                    ui.checkbox(im_str!("ImGuiTabBarFlags_Reorderable"), &mut s.reorderable);
+                    ui.checkbox(im_str!("ImGuiTabBarFlags_AutoSelectNewTabs"), &mut s.autoselect);
+                    ui.checkbox(im_str!("ImGuiTabBarFlags_TabListPopupButton"), &mut s.listbutton);
+                    ui.checkbox(im_str!("ImGuiTabBarFlags_NoCloseWithMiddleMouseButton"), &mut s.noclose_middlebutton);
+                    if ui.checkbox(im_str!("ImGuiTabBarFlags_FittingPolicyResizeDown"), &mut s.fitting_resizedown) {
+                        s.fitting_scroll = !s.fitting_resizedown;
+                    }
+                    if ui.checkbox(im_str!("ImGuiTabBarFlags_FittingPolicyScroll"), &mut s.fitting_scroll) {
+                        s.fitting_resizedown = !s.fitting_scroll;
+                    }
+                    let style = ui.push_style_var(StyleVar::FramePadding([0.0, 0.0]));
+                    ui.checkbox(im_str!("Artichoke"), &mut s.artichoke_tab);
+                    ui.same_line(0.0);
+                    ui.checkbox(im_str!("Beetroot"), &mut s.beetroot_tab);
+                    ui.same_line(0.0);
+                    ui.checkbox(im_str!("Celery"), &mut s.celery_tab);
+                    ui.same_line(0.0);
+                    ui.checkbox(im_str!("Daikon"), &mut s.daikon_tab);
+                    style.pop(ui);
+
+                    let flags = {
+                        let mut f = TabBarFlags::empty();
+                        f.set(TabBarFlags::REORDERABLE, s.reorderable);
+                        f.set(TabBarFlags::AUTO_SELECT_NEW_TABS, s.autoselect);
+                        f.set(TabBarFlags::TAB_LIST_POPUP_BUTTON, s.listbutton);
+                        f.set(TabBarFlags::NO_CLOSE_WITH_MIDDLE_MOUSE_BUTTON, s.noclose_middlebutton);
+                        f.set(TabBarFlags::FITTING_POLICY_RESIZE_DOWN, s.fitting_resizedown);
+                        f.set(TabBarFlags::FITTING_POLICY_SCROLL, s.fitting_scroll);
+                        f
+                    };
+
+                    TabBar::new(im_str!("tabbar")).flags(flags).build(&ui, || {
+                        TabItem::new(im_str!("Artichoke")).opened(&mut s.artichoke_tab).build(&ui, || {
+                            ui.text(im_str!("This is the Artichoke tab!"));
+                        });
+                        TabItem::new(im_str!("Beetroot")).opened(&mut s.beetroot_tab).build(&ui, || {
+                            ui.text(im_str!("This is the Beetroot tab!"));
+                        });
+                        TabItem::new(im_str!("Celery")).opened(&mut s.celery_tab).build(&ui, || {
+                            ui.text(im_str!("This is the Celery tab!"));
+                        });
+                        TabItem::new(im_str!("Daikon")).opened(&mut s.daikon_tab).build(&ui, || {
+                            ui.text(im_str!("This is the Daikon tab!"));
+                        });
+                    });
+
+                });
             });
         }
         if CollapsingHeader::new(im_str!("Popups & Modal windows")).build(&ui) {
