@@ -84,7 +84,7 @@ pub fn dear_imgui_version() -> &'static str {
 
 #[test]
 fn test_version() {
-    assert_eq!(dear_imgui_version(), "1.76");
+    assert_eq!(dear_imgui_version(), "1.77");
 }
 
 impl Context {
@@ -403,7 +403,7 @@ impl<'ui> Ui<'ui> {
 // Widgets: Popups
 impl<'ui> Ui<'ui> {
     pub fn open_popup<'p>(&self, str_id: &'p ImStr) {
-        unsafe { sys::igOpenPopup(str_id.as_ptr()) };
+        unsafe { sys::igOpenPopup(str_id.as_ptr(), 0) };
     }
     pub fn popup<'p, F>(&self, str_id: &'p ImStr, f: F)
     where

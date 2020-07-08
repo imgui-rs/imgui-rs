@@ -15,6 +15,7 @@ pub struct Style {
     /// Rounding radius of window corners.
     ///
     /// Set to 0.0 to have rectangular windows.
+    /// Large values tend to lead to a variety of artifacts and are not recommended.
     pub window_rounding: f32,
     /// Thickness of border around windows.
     ///
@@ -89,6 +90,11 @@ pub struct Style {
     pub tab_rounding: f32,
     /// Thickness of border around tabs
     pub tab_border_size: f32,
+    /// Minimum width for close button to appear on an unselected tab when hovered.
+    ///
+    /// `= 0.0`: always show when hovering
+    /// `= f32::MAX`: never show close button unless selected
+    pub tab_min_width_for_unselected_close_button: f32,
     /// Side of the color buttonton pubin color editor widgets (left/right).
     pub color_button_position: Direction,
     /// Alignment of button text when button is larger than text.
@@ -442,6 +448,10 @@ fn test_style_memory_layout() {
     assert_field_offset!(grab_rounding, GrabRounding);
     assert_field_offset!(tab_rounding, TabRounding);
     assert_field_offset!(tab_border_size, TabBorderSize);
+    assert_field_offset!(
+        tab_min_width_for_unselected_close_button,
+        TabMinWidthForUnselectedCloseButton
+    );
     assert_field_offset!(color_button_position, ColorButtonPosition);
     assert_field_offset!(button_text_align, ButtonTextAlign);
     assert_field_offset!(selectable_text_align, SelectableTextAlign);

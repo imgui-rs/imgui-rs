@@ -43,6 +43,7 @@
   "ImGuiNavInput": "int",
   "ImGuiOnceUponAFrame": "struct ImGuiOnceUponAFrame",
   "ImGuiPayload": "struct ImGuiPayload",
+  "ImGuiPopupFlags": "int",
   "ImGuiSelectableFlags": "int",
   "ImGuiSizeCallback": "void(*)(ImGuiSizeCallbackData* data);",
   "ImGuiSizeCallbackData": "struct ImGuiSizeCallbackData",
