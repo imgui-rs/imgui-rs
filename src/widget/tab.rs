@@ -42,6 +42,17 @@ bitflags! {
     }
 }
 
+bitflags! {
+    #[repr(transparent)]
+    pub struct TabItemFlags: u32 {
+        const UNSAVED_DOCUMENT = sys::ImGuiTabItemFlags_UnsavedDocument;
+        const SET_SELECTED = sys::ImGuiTabItemFlags_SetSelected;
+        const NO_CLOSE_WITH_MIDDLE_MOUSE_BUTTON = sys::ImGuiTabItemFlags_NoCloseWithMiddleMouseButton;
+        const NO_PUSH_ID = sys::ImGuiTabItemFlags_NoPushId;
+        const NO_TOOLTIP = sys::ImGuiTabItemFlags_NoTooltip;
+    }
+}
+
 /// Builder for a tab bar.
 pub struct TabBar<'a> {
     id: &'a ImStr,
@@ -76,10 +87,10 @@ impl<'a> TabBar<'a> {
 
     #[must_use]
     pub fn begin(self, ui: &Ui) -> Option<TabBarToken> {
-        let shoud_render =
+        let should_render =
             unsafe { sys::igBeginTabBar(self.id.as_ptr(), self.flags.bits() as i32) };
 
-        if shoud_render {
+        if should_render {
             Some(TabBarToken { ctx: ui.ctx })
         } else {
             unsafe { sys::igEndTabBar() };
@@ -122,11 +133,16 @@ impl Drop for TabBarToken {
 pub struct TabItem<'a> {
     name: &'a ImStr,
     opened: Option<&'a mut bool>,
+    flags: TabItemFlags,
 }
 
 impl<'a> TabItem<'a> {
     pub fn new(name: &'a ImStr) -> Self {
-        Self { name, opened: None }
+        Self {
+            name,
+            opened: None,
+            flags: TabItemFlags::empty(),
+        }
     }
 
     /// Will open or close the tab.\
@@ -138,19 +154,28 @@ impl<'a> TabItem<'a> {
         self
     }
 
+    /// Set the flags of the tab item.
+    ///
+    /// Flags are empty by default
+    #[inline]
+    pub fn flags(mut self, flags: TabItemFlags) -> Self {
+        self.flags = flags;
+        self
+    }
+
     #[must_use]
     pub fn begin(self, ui: &Ui) -> Option<TabItemToken> {
-        let shoud_render = unsafe {
+        let should_render = unsafe {
             sys::igBeginTabItem(
                 self.name.as_ptr(),
                 self.opened
                     .map(|x| x as *mut bool)
                     .unwrap_or(ptr::null_mut()),
-                0 as ::std::os::raw::c_int,
+                self.flags.bits() as i32,
             )
         };
 
-        if shoud_render {
+        if should_render {
             Some(TabItemToken { ctx: ui.ctx })
         } else {
             None
