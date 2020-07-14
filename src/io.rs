@@ -2,7 +2,7 @@ use bitflags::bitflags;
 use std::f32;
 use std::ops::{Index, IndexMut};
 use std::os::raw::{c_char, c_int, c_void};
-use std::time::Instant;
+use std::time::Duration;
 
 use crate::fonts::atlas::FontAtlas;
 use crate::fonts::font::Font;
@@ -306,6 +306,7 @@ pub struct Io {
     keys_down_duration_prev: [f32; 512],
     nav_inputs_down_duration: [f32; NavInput::COUNT + NavInput::INTERNAL_COUNT],
     nav_inputs_down_duration_prev: [f32; NavInput::COUNT + NavInput::INTERNAL_COUNT],
+    pen_pressure: f32,
     input_queue_surrogate: sys::ImWchar16,
     input_queue_characters: ImVector<sys::ImWchar>,
 }
@@ -327,9 +328,7 @@ impl Io {
             sys::ImGuiIO_ClearInputCharacters(self.raw_mut());
         }
     }
-    pub fn update_delta_time(&mut self, previous: Instant) -> Instant {
-        let now = Instant::now();
-        let delta = now - previous;
+    pub fn update_delta_time(&mut self, delta: Duration) {
         let delta_s = delta.as_secs() as f32 + delta.subsec_nanos() as f32 / 1_000_000_000.0;
         if delta_s > 0.0 {
             self.delta_time = delta_s;
@@ -337,7 +336,6 @@ impl Io {
             self.delta_time = f32::MIN_POSITIVE;
         }
         self.delta_time = delta_s;
-        now
     }
 }
 
@@ -474,6 +472,7 @@ fn test_io_memory_layout() {
     assert_field_offset!(keys_down_duration_prev, KeysDownDurationPrev);
     assert_field_offset!(nav_inputs_down_duration, NavInputsDownDuration);
     assert_field_offset!(nav_inputs_down_duration_prev, NavInputsDownDurationPrev);
+    assert_field_offset!(pen_pressure, PenPressure);
     assert_field_offset!(input_queue_surrogate, InputQueueSurrogate);
     assert_field_offset!(input_queue_characters, InputQueueCharacters);
 }

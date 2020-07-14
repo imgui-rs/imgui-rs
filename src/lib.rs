@@ -43,6 +43,7 @@ pub use self::widget::menu::*;
 pub use self::widget::progress_bar::*;
 pub use self::widget::selectable::*;
 pub use self::widget::slider::*;
+pub use self::widget::tab::*;
 pub use self::widget::tree::*;
 pub use self::window::child_window::*;
 pub use self::window::*;
@@ -84,7 +85,7 @@ pub fn dear_imgui_version() -> &'static str {
 
 #[test]
 fn test_version() {
-    assert_eq!(dear_imgui_version(), "1.76");
+    assert_eq!(dear_imgui_version(), "1.77");
 }
 
 impl Context {
@@ -327,6 +328,28 @@ impl<'ui> Ui<'ui> {
     }
 }
 
+/// Tracks a layout tooltip that must be ended by calling `.end()`
+#[must_use]
+pub struct TooltipToken {
+    ctx: *const Context,
+}
+
+impl TooltipToken {
+    /// Ends a layout tooltip
+    pub fn end(mut self, _: &Ui) {
+        self.ctx = ptr::null();
+        unsafe { sys::igEndTooltip() };
+    }
+}
+
+impl Drop for TooltipToken {
+    fn drop(&mut self) {
+        if !self.ctx.is_null() && !thread::panicking() {
+            panic!("A TooltipToken was leaked. Did you call .end()?");
+        }
+    }
+}
+
 /// # Tooltips
 impl<'ui> Ui<'ui> {
     /// Construct a tooltip window that can have any kind of content.
@@ -351,6 +374,13 @@ impl<'ui> Ui<'ui> {
         f();
         unsafe { sys::igEndTooltip() };
     }
+    /// Construct a tooltip window that can have any kind of content.
+    ///
+    /// Returns a `TooltipToken` that must be ended by calling `.end()`
+    pub fn begin_tooltip(&self) -> TooltipToken {
+        unsafe { sys::igBeginTooltip() };
+        TooltipToken { ctx: self.ctx }
+    }
     /// Construct a tooltip window with simple text content.
     ///
     /// Typically used with `Ui::is_item_hovered()` or some other conditional check.
@@ -374,7 +404,7 @@ impl<'ui> Ui<'ui> {
 // Widgets: Popups
 impl<'ui> Ui<'ui> {
     pub fn open_popup<'p>(&self, str_id: &'p ImStr) {
-        unsafe { sys::igOpenPopup(str_id.as_ptr()) };
+        unsafe { sys::igOpenPopup(str_id.as_ptr(), 0) };
     }
     pub fn popup<'p, F>(&self, str_id: &'p ImStr, f: F)
     where
@@ -514,6 +544,11 @@ impl<'ui> Ui<'ui> {
     #[must_use]
     pub fn get_window_draw_list(&'ui self) -> WindowDrawList<'ui> {
         WindowDrawList::new(self)
+    }
+
+    #[must_use]
+    pub fn get_background_draw_list(&'ui self) -> WindowDrawList<'ui> {
+        WindowDrawList::new(self).background()
     }
 }
 

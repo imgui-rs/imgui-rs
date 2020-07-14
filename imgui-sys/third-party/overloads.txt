@@ -27,7 +27,7 @@ ImVector_back	2
 2	const T*	ImVector_back_const ()const
 igPlotHistogram	2
 1	void	igPlotHistogramFloatPtr (const char*,const float*,int,int,const char*,float,float,ImVec2,int)
-2	void	igPlotHistogramFnPtr (const char*,float(*)(void*,int),void*,int,int,const char*,float,float,ImVec2)
+2	void	igPlotHistogramFnFloatPtr (const char*,float(*)(void*,int),void*,int,int,const char*,float,float,ImVec2)
 igGetID	3
 1	ImGuiID	igGetIDStr (const char*)
 2	ImGuiID	igGetIDStrStr (const char*,const char*)
@@ -54,7 +54,7 @@ igTreeNode	3
 igCombo	3
 1	bool	igComboStr_arr (const char*,int*,const char* const[],int,int)
 2	bool	igComboStr (const char*,int*,const char*,int)
-3	bool	igComboFnPtr (const char*,int*,bool(*)(void*,int,const char**),void*,int,int)
+3	bool	igComboFnBoolPtr (const char*,int*,bool(*)(void*,int,const char**),void*,int,int)
 ImVector_erase	2
 1	T*	ImVector_eraseNil (const T*)
 2	T*	ImVector_eraseTPtr (const T*,const T*)
@@ -81,7 +81,7 @@ igSetWindowCollapsed	2
 2	void	igSetWindowCollapsedStr (const char*,bool,ImGuiCond)
 igPlotLines	2
 1	void	igPlotLinesFloatPtr (const char*,const float*,int,int,const char*,float,float,ImVec2,int)
-2	void	igPlotLinesFnPtr (const char*,float(*)(void*,int),void*,int,int,const char*,float,float,ImVec2)
+2	void	igPlotLinesFnFloatPtr (const char*,float(*)(void*,int),void*,int,int,const char*,float,float,ImVec2)
 igPushStyleColor	2
 1	void	igPushStyleColorU32 (ImGuiCol,ImU32)
 2	void	igPushStyleColorVec4 (ImGuiCol,const ImVec4)
@@ -90,7 +90,7 @@ igTreeNodeExV	2
 2	bool	igTreeNodeExVPtr (const void*,ImGuiTreeNodeFlags,const char*,va_list)
 igListBox	2
 1	bool	igListBoxStr_arr (const char*,int*,const char* const[],int,int)
-2	bool	igListBoxFnPtr (const char*,int*,bool(*)(void*,int,const char**),void*,int,int)
+2	bool	igListBoxFnBoolPtr (const char*,int*,bool(*)(void*,int,const char**),void*,int,int)
 igTreePush	2
 1	void	igTreePushStr (const char*)
 2	void	igTreePushPtr (const void*)
@@ -98,34 +98,34 @@ igTreeNodeEx	3
 1	bool	igTreeNodeExStr (const char*,ImGuiTreeNodeFlags)
 2	bool	igTreeNodeExStrStr (const char*,ImGuiTreeNodeFlags,const char*,...)
 3	bool	igTreeNodeExPtr (const void*,ImGuiTreeNodeFlags,const char*,...)
-igSelectable	2
-1	bool	igSelectableBool (const char*,bool,ImGuiSelectableFlags,const ImVec2)
-2	bool	igSelectableBoolPtr (const char*,bool*,ImGuiSelectableFlags,const ImVec2)
 igGetColorU32	3
 1	ImU32	igGetColorU32Col (ImGuiCol,float)
 2	ImU32	igGetColorU32Vec4 (const ImVec4)
 3	ImU32	igGetColorU32U32 (ImU32)
-ImVector_begin	2
-1	T*	ImVector_beginNil ()
-2	const T*	ImVector_begin_const ()const
+ImVector_find	2
+1	T*	ImVector_findNil (const T)
+2	const T*	ImVector_find_const (const T)const
+ImVector_front	2
+1	T*	ImVector_frontNil ()
+2	const T*	ImVector_front_const ()const
 ImColor_ImColor	5
 1	nil	ImColor_ImColorNil ()
 2	nil	ImColor_ImColorInt (int,int,int,int)
 3	nil	ImColor_ImColorU32 (ImU32)
 4	nil	ImColor_ImColorFloat (float,float,float,float)
 5	nil	ImColor_ImColorVec4 (const ImVec4)
+ImVector_begin	2
+1	T*	ImVector_beginNil ()
+2	const T*	ImVector_begin_const ()const
 igCollapsingHeader	2
 1	bool	igCollapsingHeaderTreeNodeFlags (const char*,ImGuiTreeNodeFlags)
 2	bool	igCollapsingHeaderBoolPtr (const char*,bool*,ImGuiTreeNodeFlags)
-ImVector_front	2
-1	T*	ImVector_frontNil ()
-2	const T*	ImVector_front_const ()const
-ImVector_find	2
-1	T*	ImVector_findNil (const T)
-2	const T*	ImVector_find_const (const T)const
 igListBoxHeader	2
 1	bool	igListBoxHeaderVec2 (const char*,const ImVec2)
 2	bool	igListBoxHeaderInt (const char*,int,int)
+igSelectable	2
+1	bool	igSelectableBool (const char*,bool,ImGuiSelectableFlags,const ImVec2)
+2	bool	igSelectableBoolPtr (const char*,bool*,ImGuiSelectableFlags,const ImVec2)
 igMenuItem	2
 1	bool	igMenuItemBool (const char*,const char*,bool,bool)
 2	bool	igMenuItemBoolPtr (const char*,const char*,bool*,bool)
