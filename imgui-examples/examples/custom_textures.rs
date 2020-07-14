@@ -11,7 +11,7 @@ use glium::{
 };
 use image::{jpeg::JpegDecoder, ImageDecoder};
 use imgui::*;
-use imgui_glium_renderer::TextureEntry;
+use imgui_glium_renderer::Texture;
 
 mod support;
 
@@ -30,7 +30,7 @@ impl CustomTexturesApp {
     fn register_textures<F>(
         &mut self,
         gl_ctx: &F,
-        textures: &mut Textures<TextureEntry>,
+        textures: &mut Textures<Texture>,
     ) -> Result<(), Box<dyn Error>>
     where
         F: Facade,
@@ -57,7 +57,7 @@ impl CustomTexturesApp {
                 format: ClientFormat::U8U8U8,
             };
             let gl_texture = Texture2d::new(gl_ctx, raw)?;
-            let texture = TextureEntry {
+            let texture = Texture {
                 texture: Rc::new(gl_texture),
                 mag_filter: MagnifySamplerFilter::Linear,
                 min_filter: MinifySamplerFilter::Linear,
@@ -93,7 +93,7 @@ impl CustomTexturesApp {
 }
 
 impl Lenna {
-    fn new<F>(gl_ctx: &F, textures: &mut Textures<TextureEntry>) -> Result<Self, Box<dyn Error>>
+    fn new<F>(gl_ctx: &F, textures: &mut Textures<Texture>) -> Result<Self, Box<dyn Error>>
     where
         F: Facade,
     {
@@ -111,7 +111,7 @@ impl Lenna {
             format: ClientFormat::U8U8U8,
         };
         let gl_texture = Texture2d::new(gl_ctx, raw)?;
-        let texture = TextureEntry {
+        let texture = Texture {
             texture: Rc::new(gl_texture),
             mag_filter: MagnifySamplerFilter::Linear,
             min_filter: MinifySamplerFilter::Linear,

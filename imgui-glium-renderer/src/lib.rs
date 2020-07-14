@@ -86,7 +86,7 @@ impl From<DrawError> for RendererError {
     }
 }
 
-pub struct TextureEntry {
+pub struct Texture {
     pub texture: Rc<Texture2d>,
     pub mag_filter: MagnifySamplerFilter,
     pub min_filter: MinifySamplerFilter,
@@ -95,8 +95,8 @@ pub struct TextureEntry {
 pub struct Renderer {
     ctx: Rc<Context>,
     program: Program,
-    font_texture: TextureEntry,
-    textures: Textures<TextureEntry>,
+    font_texture: Texture,
+    textures: Textures<Texture>,
 }
 
 impl Renderer {
@@ -121,10 +121,10 @@ impl Renderer {
         self.font_texture = upload_font_texture(ctx.fonts(), &self.ctx)?;
         Ok(())
     }
-    pub fn textures(&mut self) -> &mut Textures<TextureEntry> {
+    pub fn textures(&mut self) -> &mut Textures<Texture> {
         &mut self.textures
     }
-    fn lookup_texture(&self, texture_id: TextureId) -> Result<&TextureEntry, RendererError> {
+    fn lookup_texture(&self, texture_id: TextureId) -> Result<&Texture, RendererError> {
         if texture_id.id() == usize::MAX {
             Ok(&self.font_texture)
         } else if let Some(texture) = self.textures.get(texture_id) {
@@ -238,7 +238,7 @@ impl Renderer {
 fn upload_font_texture(
     mut fonts: imgui::FontAtlasRefMut,
     ctx: &Rc<Context>,
-) -> Result<TextureEntry, RendererError> {
+) -> Result<Texture, RendererError> {
     let texture = fonts.build_rgba32_texture();
     let data = RawImage2d {
         data: Cow::Borrowed(texture.data),
@@ -248,7 +248,7 @@ fn upload_font_texture(
     };
     let font_texture = Texture2d::with_mipmaps(ctx, data, MipmapsOption::NoMipmap)?;
     fonts.tex_id = TextureId::from(usize::MAX);
-    Ok(TextureEntry {
+    Ok(Texture {
         texture: Rc::new(font_texture),
         mag_filter: MagnifySamplerFilter::Linear,
         min_filter: MinifySamplerFilter::Linear,
