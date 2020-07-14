@@ -5,7 +5,9 @@ use glium::backend::{Context, Facade};
 use glium::index::{self, PrimitiveType};
 use glium::program::ProgramChooserCreationError;
 use glium::texture::{ClientFormat, MipmapsOption, RawImage2d, TextureCreationError};
-use glium::uniforms::{Sampler, SamplerBehavior};
+use glium::uniforms::{
+    MagnifySamplerFilter, MinifySamplerFilter, Sampler, SamplerBehavior, SamplerWrapFunction,
+};
 use glium::{
     program, uniform, vertex, Blend, DrawError, DrawParameters, IndexBuffer, Program, Rect,
     Surface, Texture2d, VertexBuffer,
@@ -246,7 +248,16 @@ fn upload_font_texture(
     fonts.tex_id = TextureId::from(usize::MAX);
     Ok(Texture {
         texture: Rc::new(font_texture),
-        sampler: SamplerBehavior::default(),
+        sampler: SamplerBehavior {
+            minify_filter: MinifySamplerFilter::Linear,
+            magnify_filter: MagnifySamplerFilter::Linear,
+            wrap_function: (
+                SamplerWrapFunction::BorderClamp,
+                SamplerWrapFunction::BorderClamp,
+                SamplerWrapFunction::BorderClamp,
+            ),
+            ..Default::default()
+        },
     })
 }
 
