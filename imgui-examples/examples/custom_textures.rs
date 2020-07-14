@@ -62,7 +62,7 @@ impl CustomTexturesApp {
                 sampler: SamplerBehavior {
                     magnify_filter: MagnifySamplerFilter::Linear,
                     minify_filter: MinifySamplerFilter::Linear,
-                    .. Default::default()
+                    ..Default::default()
                 },
             };
             let texture_id = textures.insert(texture);
@@ -119,7 +119,7 @@ impl Lenna {
             sampler: SamplerBehavior {
                 magnify_filter: MagnifySamplerFilter::Linear,
                 minify_filter: MinifySamplerFilter::Linear,
-                .. Default::default()
+                ..Default::default()
             },
         };
         let texture_id = textures.insert(texture);
