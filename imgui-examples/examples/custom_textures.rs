@@ -6,7 +6,7 @@ use std::rc::Rc;
 use glium::{
     backend::Facade,
     texture::{ClientFormat, RawImage2d},
-    uniforms::{MagnifySamplerFilter, MinifySamplerFilter},
+    uniforms::{MagnifySamplerFilter, MinifySamplerFilter, SamplerBehavior},
     Texture2d,
 };
 use image::{jpeg::JpegDecoder, ImageDecoder};
@@ -59,8 +59,11 @@ impl CustomTexturesApp {
             let gl_texture = Texture2d::new(gl_ctx, raw)?;
             let texture = Texture {
                 texture: Rc::new(gl_texture),
-                mag_filter: MagnifySamplerFilter::Linear,
-                min_filter: MinifySamplerFilter::Linear,
+                sampler: SamplerBehavior {
+                    magnify_filter: MagnifySamplerFilter::Linear,
+                    minify_filter: MinifySamplerFilter::Linear,
+                    .. Default::default()
+                },
             };
             let texture_id = textures.insert(texture);
 
@@ -113,8 +116,11 @@ impl Lenna {
         let gl_texture = Texture2d::new(gl_ctx, raw)?;
         let texture = Texture {
             texture: Rc::new(gl_texture),
-            mag_filter: MagnifySamplerFilter::Linear,
-            min_filter: MinifySamplerFilter::Linear,
+            sampler: SamplerBehavior {
+                magnify_filter: MagnifySamplerFilter::Linear,
+                minify_filter: MinifySamplerFilter::Linear,
+                .. Default::default()
+            },
         };
         let texture_id = textures.insert(texture);
         Ok(Lenna {

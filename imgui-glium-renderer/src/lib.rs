@@ -5,7 +5,7 @@ use glium::backend::{Context, Facade};
 use glium::index::{self, PrimitiveType};
 use glium::program::ProgramChooserCreationError;
 use glium::texture::{ClientFormat, MipmapsOption, RawImage2d, TextureCreationError};
-use glium::uniforms::{MagnifySamplerFilter, MinifySamplerFilter, SamplerWrapFunction};
+use glium::uniforms::{Sampler, SamplerBehavior};
 use glium::{
     program, uniform, vertex, Blend, DrawError, DrawParameters, IndexBuffer, Program, Rect,
     Surface, Texture2d, VertexBuffer,
@@ -88,8 +88,7 @@ impl From<DrawError> for RendererError {
 
 pub struct Texture {
     pub texture: Rc<Texture2d>,
-    pub mag_filter: MagnifySamplerFilter,
-    pub min_filter: MinifySamplerFilter,
+    pub sampler: SamplerBehavior,
 }
 
 pub struct Renderer {
@@ -193,7 +192,7 @@ impl Renderer {
                             && clip_rect[2] >= 0.0
                             && clip_rect[3] >= 0.0
                         {
-                            let entry = self.lookup_texture(texture_id)?;
+                            let texture = self.lookup_texture(texture_id)?;
 
                             target.draw(
                                 &vtx_buffer,
@@ -203,10 +202,7 @@ impl Renderer {
                                 &self.program,
                                 &uniform! {
                                     matrix: matrix,
-                                    tex: entry.texture.sampled()
-                                        .minify_filter(entry.min_filter)
-                                        .magnify_filter(entry.mag_filter)
-                                        .wrap_function(SamplerWrapFunction::BorderClamp)
+                                    tex: Sampler(texture.texture.as_ref(), texture.sampler)
                                 },
                                 &DrawParameters {
                                     blend: Blend::alpha_blending(),
@@ -250,8 +246,7 @@ fn upload_font_texture(
     fonts.tex_id = TextureId::from(usize::MAX);
     Ok(Texture {
         texture: Rc::new(font_texture),
-        mag_filter: MagnifySamplerFilter::Linear,
-        min_filter: MinifySamplerFilter::Linear,
+        sampler: SamplerBehavior::default(),
     })
 }
 
