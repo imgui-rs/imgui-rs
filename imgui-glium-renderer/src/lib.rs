@@ -5,7 +5,9 @@ use glium::backend::{Context, Facade};
 use glium::index::{self, PrimitiveType};
 use glium::program::ProgramChooserCreationError;
 use glium::texture::{ClientFormat, MipmapsOption, RawImage2d, TextureCreationError};
-use glium::uniforms::{MagnifySamplerFilter, MinifySamplerFilter, SamplerWrapFunction};
+use glium::uniforms::{
+    MagnifySamplerFilter, MinifySamplerFilter, Sampler, SamplerBehavior, SamplerWrapFunction,
+};
 use glium::{
     program, uniform, vertex, Blend, DrawError, DrawParameters, IndexBuffer, Program, Rect,
     Surface, Texture2d, VertexBuffer,
@@ -86,11 +88,16 @@ impl From<DrawError> for RendererError {
     }
 }
 
+pub struct Texture {
+    pub texture: Rc<Texture2d>,
+    pub sampler: SamplerBehavior,
+}
+
 pub struct Renderer {
     ctx: Rc<Context>,
     program: Program,
-    font_texture: Texture2d,
-    textures: Textures<Rc<Texture2d>>,
+    font_texture: Texture,
+    textures: Textures<Texture>,
 }
 
 impl Renderer {
@@ -115,10 +122,10 @@ impl Renderer {
         self.font_texture = upload_font_texture(ctx.fonts(), &self.ctx)?;
         Ok(())
     }
-    pub fn textures(&mut self) -> &mut Textures<Rc<Texture2d>> {
+    pub fn textures(&mut self) -> &mut Textures<Texture> {
         &mut self.textures
     }
-    fn lookup_texture(&self, texture_id: TextureId) -> Result<&Texture2d, RendererError> {
+    fn lookup_texture(&self, texture_id: TextureId) -> Result<&Texture, RendererError> {
         if texture_id.id() == usize::MAX {
             Ok(&self.font_texture)
         } else if let Some(texture) = self.textures.get(texture_id) {
@@ -187,6 +194,8 @@ impl Renderer {
                             && clip_rect[2] >= 0.0
                             && clip_rect[3] >= 0.0
                         {
+                            let texture = self.lookup_texture(texture_id)?;
+
                             target.draw(
                                 &vtx_buffer,
                                 &idx_buffer
@@ -195,10 +204,7 @@ impl Renderer {
                                 &self.program,
                                 &uniform! {
                                     matrix: matrix,
-                                    tex: self.lookup_texture(texture_id)?.sampled()
-                                        .minify_filter(MinifySamplerFilter::Linear)
-                                        .magnify_filter(MagnifySamplerFilter::Linear)
-                                        .wrap_function(SamplerWrapFunction::BorderClamp)
+                                    tex: Sampler(texture.texture.as_ref(), texture.sampler)
                                 },
                                 &DrawParameters {
                                     blend: Blend::alpha_blending(),
@@ -230,7 +236,7 @@ impl Renderer {
 fn upload_font_texture(
     mut fonts: imgui::FontAtlasRefMut,
     ctx: &Rc<Context>,
-) -> Result<Texture2d, RendererError> {
+) -> Result<Texture, RendererError> {
     let texture = fonts.build_rgba32_texture();
     let data = RawImage2d {
         data: Cow::Borrowed(texture.data),
@@ -240,7 +246,19 @@ fn upload_font_texture(
     };
     let font_texture = Texture2d::with_mipmaps(ctx, data, MipmapsOption::NoMipmap)?;
     fonts.tex_id = TextureId::from(usize::MAX);
-    Ok(font_texture)
+    Ok(Texture {
+        texture: Rc::new(font_texture),
+        sampler: SamplerBehavior {
+            minify_filter: MinifySamplerFilter::Linear,
+            magnify_filter: MagnifySamplerFilter::Linear,
+            wrap_function: (
+                SamplerWrapFunction::BorderClamp,
+                SamplerWrapFunction::BorderClamp,
+                SamplerWrapFunction::BorderClamp,
+            ),
+            ..Default::default()
+        },
+    })
 }
 
 fn compile_default_program<F: Facade>(facade: &F) -> Result<Program, ProgramChooserCreationError> {
