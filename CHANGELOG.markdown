@@ -2,9 +2,26 @@
 
 ## [Unreleased]
 
+### Added
+
+- Support for ConfigFlags::RENDERER_HAS_VTX_OFFSET in imgui-glium-renderer
+  and imgui-gfx-renderer. This makes it possible to output large meshes (e.g.
+  complex UIs) without problems when using these renderers
+- `Ui::begin_tooltip` to support using tooltips with stack tokens instead
+  of closures
+- API for accessing the background drawlist
+- Tab bar / tab item API
+
 ### Changed
 
-- Upgrade to cimgui / imgui 1.76
+- Upgrade to cimgui / imgui 1.77
+- Store per-texture sampler parameters in imgui-glium-renderer to support
+  customizing them
+
+### Fixed
+
+- Reduce unnecessary winit cursor changes which earlier caused cursor
+  flickering or invalid cursors on some platforms (at least Windows)
 
 ## [0.4.0] - 2020-05-27
 
