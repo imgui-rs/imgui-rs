@@ -80,6 +80,9 @@ use winit_20 as winit;
 #[cfg(feature = "winit-22")]
 use winit_22 as winit;
 
+#[cfg(feature = "glutin-24")]
+use glutin_24 as winit;
+
 use imgui::{self, BackendFlags, ConfigFlags, Context, ImString, Io, Key, Ui};
 use std::cmp::Ordering;
 use winit::dpi::{LogicalPosition, LogicalSize};
@@ -90,7 +93,7 @@ use winit::{
     TouchPhase, VirtualKeyCode, Window, WindowEvent,
 };
 
-#[cfg(any(feature = "winit-20", feature = "winit-22"))]
+#[cfg(any(feature = "winit-20", feature = "winit-22", feature = "glutin-24"))]
 use winit::{
     error::ExternalError,
     event::{
@@ -139,7 +142,7 @@ impl CursorSettings {
             _ => window.hide_cursor(true),
         }
     }
-    #[cfg(any(feature = "winit-20", feature = "winit-22"))]
+    #[cfg(any(feature = "winit-20", feature = "winit-22", feature = "glutin-24"))]
     fn apply(&self, window: &Window) {
         match self.cursor {
             Some(mouse_cursor) if !self.draw_cursor => {
@@ -258,7 +261,7 @@ impl WinitPlatform {
     ///
     /// * framebuffer scale (= DPI factor) is set
     /// * display size is set
-    #[cfg(any(feature = "winit-20", feature = "winit-22"))]
+    #[cfg(any(feature = "winit-20", feature = "winit-22", feature = "glutin-24"))]
     pub fn attach_window(&mut self, io: &mut Io, window: &Window, hidpi_mode: HiDpiMode) {
         let (hidpi_mode, hidpi_factor) = hidpi_mode.apply(window.scale_factor());
         self.hidpi_mode = hidpi_mode;
@@ -291,7 +294,7 @@ impl WinitPlatform {
     ///
     /// This utility function is useful if you are using a DPI mode other than default, and want
     /// your application to use the same logical coordinates as imgui-rs.
-    #[cfg(any(feature = "winit-20", feature = "winit-22"))]
+    #[cfg(any(feature = "winit-20", feature = "winit-22", feature = "glutin-24"))]
     pub fn scale_size_from_winit(
         &self,
         window: &Window,
@@ -325,7 +328,7 @@ impl WinitPlatform {
     ///
     /// This utility function is useful if you are using a DPI mode other than default, and want
     /// your application to use the same logical coordinates as imgui-rs.
-    #[cfg(any(feature = "winit-20", feature = "winit-22"))]
+    #[cfg(any(feature = "winit-20", feature = "winit-22", feature = "glutin-24"))]
     pub fn scale_pos_from_winit(
         &self,
         window: &Window,
@@ -359,7 +362,7 @@ impl WinitPlatform {
     ///
     /// This utility function is useful if you are using a DPI mode other than default, and want
     /// your application to use the same logical coordinates as imgui-rs.
-    #[cfg(any(feature = "winit-20", feature = "winit-22"))]
+    #[cfg(any(feature = "winit-20", feature = "winit-22", feature = "glutin-24"))]
     pub fn scale_pos_for_winit(
         &self,
         window: &Window,
@@ -463,7 +466,7 @@ impl WinitPlatform {
     /// * window size / dpi factor changes are applied
     /// * keyboard state is updated
     /// * mouse state is updated
-    #[cfg(any(feature = "winit-22"))]
+    #[cfg(any(feature = "winit-22", feature = "glutin-24"))]
     pub fn handle_event<T>(&mut self, io: &mut Io, window: &Window, event: &Event<T>) {
         match *event {
             Event::WindowEvent {
@@ -584,7 +587,7 @@ impl WinitPlatform {
             _ => (),
         }
     }
-    #[cfg(any(feature = "winit-20", feature = "winit-22"))]
+    #[cfg(any(feature = "winit-20", feature = "winit-22", feature = "glutin-24"))]
     fn handle_window_event(&mut self, io: &mut Io, window: &Window, event: &WindowEvent) {
         match *event {
             WindowEvent::Resized(physical_size) => {
@@ -708,7 +711,7 @@ impl WinitPlatform {
     /// This function performs the following actions:
     ///
     /// * mouse cursor is repositioned (if requested by imgui-rs)
-    #[cfg(any(feature = "winit-20", feature = "winit-22"))]
+    #[cfg(any(feature = "winit-20", feature = "winit-22", feature = "glutin-24"))]
     pub fn prepare_frame(&self, io: &mut Io, window: &Window) -> Result<(), ExternalError> {
         if io.want_set_mouse_pos {
             let logical_pos = self.scale_pos_for_winit(
