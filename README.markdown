@@ -34,8 +34,9 @@ Window::new(im_str!("Hello world"))
 * imgui-glium-renderer: Renderer implementation that uses the `glium` crate
 * imgui-gfx-renderer: Renderer implementation that uses the `gfx` crate (*not
   the new gfx-hal crate*)
-* imgui-winit-support: Backend platform implementation that uses the `winit`
-  crate (0.22 by default, but 0.19-0.21 are supported via feature flags)
+* imgui-winit-support: Backend platform implementation that uses either:
+  - `winit-0.22` by default (but 0.19-0.21 are supported via feature flags)
+  - `glutin-0.24` via a feature flag
 * imgui-sys: Low-level unsafe API (automatically generated)
 
 ## Features
