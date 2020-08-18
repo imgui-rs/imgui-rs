@@ -409,7 +409,7 @@ pub struct FontAtlasTexture<'a> {
 
 /// A font atlas that can be shared between contexts
 #[derive(Debug)]
-pub struct SharedFontAtlas(*mut sys::ImFontAtlas);
+pub struct SharedFontAtlas(pub(crate) *mut sys::ImFontAtlas);
 
 impl SharedFontAtlas {
     pub fn create() -> SharedFontAtlas {
