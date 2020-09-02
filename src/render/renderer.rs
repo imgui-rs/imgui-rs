@@ -75,4 +75,8 @@ impl<T> Textures<T> {
     pub fn get(&self, id: TextureId) -> Option<&T> {
         self.textures.get(&id.0)
     }
+
+    pub fn get_mut(&mut self, id: TextureId) -> Option<&mut T> {
+        self.textures.get_mut(&id.0)
+    }
 }
