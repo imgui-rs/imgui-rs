@@ -209,9 +209,18 @@ impl Context {
             no_current_context(),
             "A new active context cannot be created, because another one already exists"
         );
+
+        let shared_font_atlas_ptr = match &shared_font_atlas {
+            Some(shared_font_atlas) => {
+                let borrowed_font_atlas = shared_font_atlas.borrow();
+                borrowed_font_atlas.0
+            }
+            None => ptr::null_mut(),
+        };
         // Dear ImGui implicitly sets the current context during igCreateContext if the current
         // context doesn't exist
-        let raw = unsafe { sys::igCreateContext(ptr::null_mut()) };
+        let raw = unsafe { sys::igCreateContext(shared_font_atlas_ptr) };
+
         Context {
             raw,
             shared_font_atlas,
