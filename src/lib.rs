@@ -22,6 +22,7 @@ pub use self::input_widget::{
     InputText, InputTextMultiline,
 };
 pub use self::io::*;
+pub use self::layout::*;
 pub use self::legacy::*;
 pub use self::plothistogram::PlotHistogram;
 pub use self::plotlines::PlotLines;
