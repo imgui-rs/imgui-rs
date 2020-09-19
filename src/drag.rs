@@ -23,16 +23,6 @@ macro_rules! impl_speed {
     };
 }
 
-macro_rules! impl_power {
-    ($InputType:ident) => {
-        #[inline]
-        pub fn power(mut self, value: f32) -> Self {
-            self.power = value;
-            self
-        }
-    };
-}
-
 macro_rules! impl_min_max {
     ($InputType:ident, $Value:ty) => {
         #[inline]
@@ -57,7 +47,6 @@ pub struct DragFloat<'ui, 'p> {
     min: f32,
     max: f32,
     display_format: &'p ImStr,
-    power: f32,
     _phantom: PhantomData<&'ui Ui<'ui>>,
 }
 
@@ -70,7 +59,6 @@ impl<'ui, 'p> DragFloat<'ui, 'p> {
             min: 0.0,
             max: 0.0,
             display_format: unsafe { ImStr::from_utf8_with_nul_unchecked(b"%.3f\0") },
-            power: 1.0,
             _phantom: PhantomData,
         }
     }
@@ -84,7 +72,7 @@ impl<'ui, 'p> DragFloat<'ui, 'p> {
                 self.min,
                 self.max,
                 self.display_format.as_ptr(),
-                self.power,
+                0,
             )
         }
     }
@@ -92,7 +80,6 @@ impl<'ui, 'p> DragFloat<'ui, 'p> {
     impl_display_format!(DragFloat);
     impl_min_max!(DragFloat, f32);
     impl_speed!(DragFloat);
-    impl_power!(DragFloat);
 }
 
 macro_rules! impl_drag_floatn {
@@ -105,7 +92,6 @@ macro_rules! impl_drag_floatn {
             min: f32,
             max: f32,
             display_format: &'p ImStr,
-            power: f32,
             _phantom: PhantomData<&'ui Ui<'ui>>,
         }
 
@@ -118,7 +104,6 @@ macro_rules! impl_drag_floatn {
                     min: 0.0,
                     max: 0.0,
                     display_format: unsafe { ImStr::from_utf8_with_nul_unchecked(b"%.3f\0") },
-                    power: 1.0,
                     _phantom: PhantomData,
                 }
             }
@@ -132,7 +117,7 @@ macro_rules! impl_drag_floatn {
                         self.min,
                         self.max,
                         self.display_format.as_ptr(),
-                        self.power,
+                        0,
                     )
                 }
             }
@@ -140,7 +125,6 @@ macro_rules! impl_drag_floatn {
             impl_display_format!(DragFloat);
             impl_min_max!(DragFloat, f32);
             impl_speed!(DragFloat);
-            impl_power!(DragFloat);
         }
     };
 }
@@ -159,7 +143,6 @@ pub struct DragFloatRange2<'ui, 'p> {
     max: f32,
     display_format: &'p ImStr,
     display_format_max: Option<&'p ImStr>,
-    power: f32,
     _phantom: PhantomData<&'ui Ui<'ui>>,
 }
 
@@ -179,7 +162,6 @@ impl<'ui, 'p> DragFloatRange2<'ui, 'p> {
             max: 0.0,
             display_format: unsafe { ImStr::from_utf8_with_nul_unchecked(b"%.3f\0") },
             display_format_max: None,
-            power: 1.0,
             _phantom: PhantomData,
         }
     }
@@ -195,7 +177,7 @@ impl<'ui, 'p> DragFloatRange2<'ui, 'p> {
                 self.max,
                 self.display_format.as_ptr(),
                 self.display_format_max.map_or(ptr::null(), |f| f.as_ptr()),
-                self.power,
+                0,
             )
         }
     }
@@ -209,7 +191,6 @@ impl<'ui, 'p> DragFloatRange2<'ui, 'p> {
     impl_display_format!(DragFloatRange2);
     impl_min_max!(DragFloatRange2, f32);
     impl_speed!(DragFloatRange2);
-    impl_power!(DragFloatRange2);
 }
 
 #[must_use]
@@ -245,6 +226,7 @@ impl<'ui, 'p> DragInt<'ui, 'p> {
                 self.min,
                 self.max,
                 self.display_format.as_ptr(),
+                0,
             )
         }
     }
@@ -289,6 +271,7 @@ macro_rules! impl_drag_intn {
                         self.min,
                         self.max,
                         self.display_format.as_ptr(),
+                        0,
                     )
                 }
             }
@@ -348,6 +331,7 @@ impl<'ui, 'p> DragIntRange2<'ui, 'p> {
                 self.max,
                 self.display_format.as_ptr(),
                 self.display_format_max.map_or(ptr::null(), |f| f.as_ptr()),
+                0,
             )
         }
     }

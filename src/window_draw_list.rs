@@ -517,14 +517,14 @@ impl<'ui> Circle<'ui> {
             center,
             radius,
             color: color.into(),
-            num_segments: 12,
+            num_segments: 0,
             thickness: 1.0,
             filled: false,
             draw_list,
         }
     }
 
-    /// Set number of segment used to draw the circle, default to 12.
+    /// Set number of segment used to draw the circle, default to 0.
     /// Add more segments if you want a smoother circle.
     pub fn num_segments(mut self, num_segments: u32) -> Self {
         self.num_segments = num_segments;

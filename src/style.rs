@@ -84,6 +84,8 @@ pub struct Style {
     ///
     /// Set to 0.0 to have rectangular slider grabs.
     pub grab_rounding: f32,
+    /// The size in pixels of the dead-zone around zero on logarithmic sliders that cross zero
+    pub log_slider_deadzone: f32,
     /// Rounding radius of upper corners of tabs.
     ///
     /// Set to 0.0 to have rectangular tabs.
@@ -105,7 +107,8 @@ pub struct Style {
     ///
     /// Defaults to [0.5, 0.5] (top-left aligned).
     pub selectable_text_align: [f32; 2],
-    /// Window positions are clamped to be visible within the display area by at least this amount.
+    /// Window positions are clamped to be visible within the display area or monitors by at least
+    /// this amount.
     ///
     /// Only applies to regular windows.
     pub display_window_padding: [f32; 2],
@@ -117,11 +120,17 @@ pub struct Style {
     ///
     /// May be removed later.
     pub mouse_cursor_scale: f32,
-    /// Enable anti-aliasing on lines/borders.
+    /// Enable anti-aliased lines/borders.
     ///
-    /// Disable if you are really tight on CPU/GPU.
+    /// Disable if you are really tight on CPU/GPU. Latched at the beginning of the frame.
     pub anti_aliased_lines: bool,
-    /// Enable anti-aliasing on filled shapes (rounded rectangles, circles, etc.)
+    /// Enable anti-aliased lines/borders using textures where possible.
+    ///
+    /// Require back-end to render with bilinear filtering. Latched at the beginning of the frame.
+    pub anti_aliased_lines_use_tex: bool,
+    /// Enable anti-aliased edges around filled shapes (rounded recatngles, circles, etc.).
+    ///
+    /// Disable if you are really tight on CPU/GPU. Latched at the beginning of the frame.
     pub anti_aliased_fill: bool,
     /// Tessellation tolerance when using path_bezier_curve_to without a specific number of
     /// segments.
@@ -374,6 +383,7 @@ fn test_style_scaling() {
     style.scrollbar_rounding = 20.0;
     style.grab_min_size = 21.0;
     style.grab_rounding = 22.0;
+    style.log_slider_deadzone = 29.0;
     style.tab_rounding = 23.0;
     style.display_window_padding = [24.0, 25.0];
     style.display_safe_area_padding = [26.0, 27.0];
@@ -395,6 +405,7 @@ fn test_style_scaling() {
     assert_eq!(style.scrollbar_rounding, 40.0);
     assert_eq!(style.grab_min_size, 42.0);
     assert_eq!(style.grab_rounding, 44.0);
+    assert_eq!(style.log_slider_deadzone, 58.0);
     assert_eq!(style.tab_rounding, 46.0);
     assert_eq!(style.display_window_padding, [48.0, 50.0]);
     assert_eq!(style.display_safe_area_padding, [52.0, 54.0]);
@@ -446,6 +457,7 @@ fn test_style_memory_layout() {
     assert_field_offset!(scrollbar_rounding, ScrollbarRounding);
     assert_field_offset!(grab_min_size, GrabMinSize);
     assert_field_offset!(grab_rounding, GrabRounding);
+    assert_field_offset!(log_slider_deadzone, LogSliderDeadzone);
     assert_field_offset!(tab_rounding, TabRounding);
     assert_field_offset!(tab_border_size, TabBorderSize);
     assert_field_offset!(
@@ -459,6 +471,7 @@ fn test_style_memory_layout() {
     assert_field_offset!(display_safe_area_padding, DisplaySafeAreaPadding);
     assert_field_offset!(mouse_cursor_scale, MouseCursorScale);
     assert_field_offset!(anti_aliased_lines, AntiAliasedLines);
+    assert_field_offset!(anti_aliased_lines_use_tex, AntiAliasedLinesUseTex);
     assert_field_offset!(anti_aliased_fill, AntiAliasedFill);
     assert_field_offset!(curve_tessellation_tol, CurveTessellationTol);
     assert_field_offset!(circle_segment_max_error, CircleSegmentMaxError);

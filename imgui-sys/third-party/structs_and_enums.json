@@ -65,13 +65,18 @@
       },
       {
         "calc_value": 2,
-        "name": "ImDrawListFlags_AntiAliasedFill",
+        "name": "ImDrawListFlags_AntiAliasedLinesUseTex",
         "value": "1 << 1"
       },
       {
         "calc_value": 4,
-        "name": "ImDrawListFlags_AllowVtxOffset",
+        "name": "ImDrawListFlags_AntiAliasedFill",
         "value": "1 << 2"
+      },
+      {
+        "calc_value": 8,
+        "name": "ImDrawListFlags_AllowVtxOffset",
+        "value": "1 << 3"
       }
     ],
     "ImFontAtlasFlags_": [
@@ -89,6 +94,11 @@
         "calc_value": 2,
         "name": "ImFontAtlasFlags_NoMouseCursors",
         "value": "1 << 1"
+      },
+      {
+        "calc_value": 4,
+        "name": "ImFontAtlasFlags_NoBakedLines",
+        "value": "1 << 2"
       }
     ],
     "ImGuiBackendFlags_": [
@@ -116,6 +126,38 @@
         "calc_value": 8,
         "name": "ImGuiBackendFlags_RendererHasVtxOffset",
         "value": "1 << 3"
+      }
+    ],
+    "ImGuiButtonFlags_": [
+      {
+        "calc_value": 0,
+        "name": "ImGuiButtonFlags_None",
+        "value": "0"
+      },
+      {
+        "calc_value": 1,
+        "name": "ImGuiButtonFlags_MouseButtonLeft",
+        "value": "1 << 0"
+      },
+      {
+        "calc_value": 2,
+        "name": "ImGuiButtonFlags_MouseButtonRight",
+        "value": "1 << 1"
+      },
+      {
+        "calc_value": 4,
+        "name": "ImGuiButtonFlags_MouseButtonMiddle",
+        "value": "1 << 2"
+      },
+      {
+        "calc_value": 7,
+        "name": "ImGuiButtonFlags_MouseButtonMask_",
+        "value": "ImGuiButtonFlags_MouseButtonLeft | ImGuiButtonFlags_MouseButtonRight | ImGuiButtonFlags_MouseButtonMiddle"
+      },
+      {
+        "calc_value": 1,
+        "name": "ImGuiButtonFlags_MouseButtonDefault_",
+        "value": "ImGuiButtonFlags_MouseButtonLeft"
       }
     ],
     "ImGuiCol_": [
@@ -489,27 +531,27 @@
       {
         "calc_value": 177209344,
         "name": "ImGuiColorEditFlags__OptionsDefault",
-        "value": "ImGuiColorEditFlags_Uint8|ImGuiColorEditFlags_DisplayRGB|ImGuiColorEditFlags_InputRGB|ImGuiColorEditFlags_PickerHueBar"
+        "value": "ImGuiColorEditFlags_Uint8 | ImGuiColorEditFlags_DisplayRGB | ImGuiColorEditFlags_InputRGB | ImGuiColorEditFlags_PickerHueBar"
       },
       {
         "calc_value": 7340032,
         "name": "ImGuiColorEditFlags__DisplayMask",
-        "value": "ImGuiColorEditFlags_DisplayRGB|ImGuiColorEditFlags_DisplayHSV|ImGuiColorEditFlags_DisplayHex"
+        "value": "ImGuiColorEditFlags_DisplayRGB | ImGuiColorEditFlags_DisplayHSV | ImGuiColorEditFlags_DisplayHex"
       },
       {
         "calc_value": 25165824,
         "name": "ImGuiColorEditFlags__DataTypeMask",
-        "value": "ImGuiColorEditFlags_Uint8|ImGuiColorEditFlags_Float"
+        "value": "ImGuiColorEditFlags_Uint8 | ImGuiColorEditFlags_Float"
       },
       {
         "calc_value": 100663296,
         "name": "ImGuiColorEditFlags__PickerMask",
-        "value": "ImGuiColorEditFlags_PickerHueWheel|ImGuiColorEditFlags_PickerHueBar"
+        "value": "ImGuiColorEditFlags_PickerHueWheel | ImGuiColorEditFlags_PickerHueBar"
       },
       {
         "calc_value": 402653184,
         "name": "ImGuiColorEditFlags__InputMask",
-        "value": "ImGuiColorEditFlags_InputRGB|ImGuiColorEditFlags_InputHSV"
+        "value": "ImGuiColorEditFlags_InputRGB | ImGuiColorEditFlags_InputHSV"
       }
     ],
     "ImGuiComboFlags_": [
@@ -1399,6 +1441,38 @@
         "value": "1 << 4"
       }
     ],
+    "ImGuiSliderFlags_": [
+      {
+        "calc_value": 0,
+        "name": "ImGuiSliderFlags_None",
+        "value": "0"
+      },
+      {
+        "calc_value": 16,
+        "name": "ImGuiSliderFlags_ClampOnInput",
+        "value": "1 << 4"
+      },
+      {
+        "calc_value": 32,
+        "name": "ImGuiSliderFlags_Logarithmic",
+        "value": "1 << 5"
+      },
+      {
+        "calc_value": 64,
+        "name": "ImGuiSliderFlags_NoRoundToFormat",
+        "value": "1 << 6"
+      },
+      {
+        "calc_value": 128,
+        "name": "ImGuiSliderFlags_NoInput",
+        "value": "1 << 7"
+      },
+      {
+        "calc_value": 1879048207,
+        "name": "ImGuiSliderFlags_InvalidMask_",
+        "value": "0x7000000F"
+      }
+    ],
     "ImGuiStyleVar_": [
       {
         "calc_value": 0,
@@ -1863,6 +1937,7 @@
     "ImFontGlyph": "imgui",
     "ImFontGlyphRangesBuilder": "imgui",
     "ImGuiBackendFlags_": "imgui",
+    "ImGuiButtonFlags_": "imgui",
     "ImGuiCol_": "imgui",
     "ImGuiColorEditFlags_": "imgui",
     "ImGuiComboFlags_": "imgui",
@@ -1887,6 +1962,7 @@
     "ImGuiPopupFlags_": "imgui",
     "ImGuiSelectableFlags_": "imgui",
     "ImGuiSizeCallbackData": "imgui",
+    "ImGuiSliderFlags_": "imgui",
     "ImGuiStorage": "imgui",
     "ImGuiStoragePair": "imgui",
     "ImGuiStyle": "imgui",
@@ -2216,8 +2292,16 @@
         "type": "ImVector_ImFontConfig"
       },
       {
-        "name": "CustomRectIds[1]",
-        "size": 1,
+        "name": "TexUvLines[(63)+1]",
+        "size": 64,
+        "type": "ImVec4"
+      },
+      {
+        "name": "PackIdMouseCursors",
+        "type": "int"
+      },
+      {
+        "name": "PackIdLines",
         "type": "int"
       }
     ],
@@ -2977,6 +3061,10 @@
         "type": "float"
       },
       {
+        "name": "LogSliderDeadzone",
+        "type": "float"
+      },
+      {
         "name": "TabRounding",
         "type": "float"
       },
@@ -3014,6 +3102,10 @@
       },
       {
         "name": "AntiAliasedLines",
+        "type": "bool"
+      },
+      {
+        "name": "AntiAliasedLinesUseTex",
         "type": "bool"
       },
       {

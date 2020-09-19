@@ -70,7 +70,9 @@ bitflags!(
     #[repr(C)]
     pub struct ImDrawListFlags: c_int {
         const AntiAliasedLines = 1;
-        const AntiAliasedFill = 1 << 1;
+        const AntiAliasedLinesUseTex = 1 << 1;
+        const AntiAliasedFill = 1 << 2;
+        const AllowVtxOffset = 1 << 3;
     }
 );
 

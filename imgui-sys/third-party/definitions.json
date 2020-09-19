@@ -627,11 +627,11 @@
           "type": "float"
         }
       ],
-      "argsoriginal": "(const ImVec2& center,float radius,ImU32 col,int num_segments=12,float thickness=1.0f)",
+      "argsoriginal": "(const ImVec2& center,float radius,ImU32 col,int num_segments=0,float thickness=1.0f)",
       "call_args": "(center,radius,col,num_segments,thickness)",
       "cimguiname": "ImDrawList_AddCircle",
       "defaults": {
-        "num_segments": "12",
+        "num_segments": "0",
         "thickness": "1.0f"
       },
       "funcname": "AddCircle",
@@ -667,11 +667,11 @@
           "type": "int"
         }
       ],
-      "argsoriginal": "(const ImVec2& center,float radius,ImU32 col,int num_segments=12)",
+      "argsoriginal": "(const ImVec2& center,float radius,ImU32 col,int num_segments=0)",
       "call_args": "(center,radius,col,num_segments)",
       "cimguiname": "ImDrawList_AddCircleFilled",
       "defaults": {
-        "num_segments": "12"
+        "num_segments": "0"
       },
       "funcname": "AddCircleFilled",
       "location": "imgui",
@@ -2979,8 +2979,8 @@
       "funcname": "GetCustomRectByIndex",
       "location": "imgui",
       "ov_cimguiname": "ImFontAtlas_GetCustomRectByIndex",
-      "ret": "const ImFontAtlasCustomRect*",
-      "signature": "(int)const",
+      "ret": "ImFontAtlasCustomRect*",
+      "signature": "(int)",
       "stname": "ImFontAtlas"
     }
   ],
@@ -3601,11 +3601,15 @@
   ],
   "ImFont_AddGlyph": [
     {
-      "args": "(ImFont* self,ImWchar c,float x0,float y0,float x1,float y1,float u0,float v0,float u1,float v1,float advance_x)",
+      "args": "(ImFont* self,ImFontConfig* src_cfg,ImWchar c,float x0,float y0,float x1,float y1,float u0,float v0,float u1,float v1,float advance_x)",
       "argsT": [
         {
           "name": "self",
           "type": "ImFont*"
+        },
+        {
+          "name": "src_cfg",
+          "type": "ImFontConfig*"
         },
         {
           "name": "c",
@@ -3648,15 +3652,15 @@
           "type": "float"
         }
       ],
-      "argsoriginal": "(ImWchar c,float x0,float y0,float x1,float y1,float u0,float v0,float u1,float v1,float advance_x)",
-      "call_args": "(c,x0,y0,x1,y1,u0,v0,u1,v1,advance_x)",
+      "argsoriginal": "(ImFontConfig* src_cfg,ImWchar c,float x0,float y0,float x1,float y1,float u0,float v0,float u1,float v1,float advance_x)",
+      "call_args": "(src_cfg,c,x0,y0,x1,y1,u0,v0,u1,v1,advance_x)",
       "cimguiname": "ImFont_AddGlyph",
       "defaults": [],
       "funcname": "AddGlyph",
       "location": "imgui",
       "ov_cimguiname": "ImFont_AddGlyph",
       "ret": "void",
-      "signature": "(ImWchar,float,float,float,float,float,float,float,float,float)",
+      "signature": "(ImFontConfig*,ImWchar,float,float,float,float,float,float,float,float,float)",
       "stname": "ImFont"
     }
   ],
@@ -8321,7 +8325,7 @@
   ],
   "igDragFloat": [
     {
-      "args": "(const char* label,float* v,float v_speed,float v_min,float v_max,const char* format,float power)",
+      "args": "(const char* label,float* v,float v_speed,float v_min,float v_max,const char* format,ImGuiSliderFlags flags)",
       "argsT": [
         {
           "name": "label",
@@ -8348,16 +8352,16 @@
           "type": "const char*"
         },
         {
-          "name": "power",
-          "type": "float"
+          "name": "flags",
+          "type": "ImGuiSliderFlags"
         }
       ],
-      "argsoriginal": "(const char* label,float* v,float v_speed=1.0f,float v_min=0.0f,float v_max=0.0f,const char* format=\"%.3f\",float power=1.0f)",
-      "call_args": "(label,v,v_speed,v_min,v_max,format,power)",
+      "argsoriginal": "(const char* label,float* v,float v_speed=1.0f,float v_min=0.0f,float v_max=0.0f,const char* format=\"%.3f\",ImGuiSliderFlags flags=0)",
+      "call_args": "(label,v,v_speed,v_min,v_max,format,flags)",
       "cimguiname": "igDragFloat",
       "defaults": {
+        "flags": "0",
         "format": "\"%.3f\"",
-        "power": "1.0f",
         "v_max": "0.0f",
         "v_min": "0.0f",
         "v_speed": "1.0f"
@@ -8367,13 +8371,13 @@
       "namespace": "ImGui",
       "ov_cimguiname": "igDragFloat",
       "ret": "bool",
-      "signature": "(const char*,float*,float,float,float,const char*,float)",
+      "signature": "(const char*,float*,float,float,float,const char*,ImGuiSliderFlags)",
       "stname": ""
     }
   ],
   "igDragFloat2": [
     {
-      "args": "(const char* label,float v[2],float v_speed,float v_min,float v_max,const char* format,float power)",
+      "args": "(const char* label,float v[2],float v_speed,float v_min,float v_max,const char* format,ImGuiSliderFlags flags)",
       "argsT": [
         {
           "name": "label",
@@ -8400,16 +8404,16 @@
           "type": "const char*"
         },
         {
-          "name": "power",
-          "type": "float"
+          "name": "flags",
+          "type": "ImGuiSliderFlags"
         }
       ],
-      "argsoriginal": "(const char* label,float v[2],float v_speed=1.0f,float v_min=0.0f,float v_max=0.0f,const char* format=\"%.3f\",float power=1.0f)",
-      "call_args": "(label,v,v_speed,v_min,v_max,format,power)",
+      "argsoriginal": "(const char* label,float v[2],float v_speed=1.0f,float v_min=0.0f,float v_max=0.0f,const char* format=\"%.3f\",ImGuiSliderFlags flags=0)",
+      "call_args": "(label,v,v_speed,v_min,v_max,format,flags)",
       "cimguiname": "igDragFloat2",
       "defaults": {
+        "flags": "0",
         "format": "\"%.3f\"",
-        "power": "1.0f",
         "v_max": "0.0f",
         "v_min": "0.0f",
         "v_speed": "1.0f"
@@ -8419,13 +8423,13 @@
       "namespace": "ImGui",
       "ov_cimguiname": "igDragFloat2",
       "ret": "bool",
-      "signature": "(const char*,float[2],float,float,float,const char*,float)",
+      "signature": "(const char*,float[2],float,float,float,const char*,ImGuiSliderFlags)",
       "stname": ""
     }
   ],
   "igDragFloat3": [
     {
-      "args": "(const char* label,float v[3],float v_speed,float v_min,float v_max,const char* format,float power)",
+      "args": "(const char* label,float v[3],float v_speed,float v_min,float v_max,const char* format,ImGuiSliderFlags flags)",
       "argsT": [
         {
           "name": "label",
@@ -8452,16 +8456,16 @@
           "type": "const char*"
         },
         {
-          "name": "power",
-          "type": "float"
+          "name": "flags",
+          "type": "ImGuiSliderFlags"
         }
       ],
-      "argsoriginal": "(const char* label,float v[3],float v_speed=1.0f,float v_min=0.0f,float v_max=0.0f,const char* format=\"%.3f\",float power=1.0f)",
-      "call_args": "(label,v,v_speed,v_min,v_max,format,power)",
+      "argsoriginal": "(const char* label,float v[3],float v_speed=1.0f,float v_min=0.0f,float v_max=0.0f,const char* format=\"%.3f\",ImGuiSliderFlags flags=0)",
+      "call_args": "(label,v,v_speed,v_min,v_max,format,flags)",
       "cimguiname": "igDragFloat3",
       "defaults": {
+        "flags": "0",
         "format": "\"%.3f\"",
-        "power": "1.0f",
         "v_max": "0.0f",
         "v_min": "0.0f",
         "v_speed": "1.0f"
@@ -8471,13 +8475,13 @@
       "namespace": "ImGui",
       "ov_cimguiname": "igDragFloat3",
       "ret": "bool",
-      "signature": "(const char*,float[3],float,float,float,const char*,float)",
+      "signature": "(const char*,float[3],float,float,float,const char*,ImGuiSliderFlags)",
       "stname": ""
     }
   ],
   "igDragFloat4": [
     {
-      "args": "(const char* label,float v[4],float v_speed,float v_min,float v_max,const char* format,float power)",
+      "args": "(const char* label,float v[4],float v_speed,float v_min,float v_max,const char* format,ImGuiSliderFlags flags)",
       "argsT": [
         {
           "name": "label",
@@ -8504,16 +8508,16 @@
           "type": "const char*"
         },
         {
-          "name": "power",
-          "type": "float"
+          "name": "flags",
+          "type": "ImGuiSliderFlags"
         }
       ],
-      "argsoriginal": "(const char* label,float v[4],float v_speed=1.0f,float v_min=0.0f,float v_max=0.0f,const char* format=\"%.3f\",float power=1.0f)",
-      "call_args": "(label,v,v_speed,v_min,v_max,format,power)",
+      "argsoriginal": "(const char* label,float v[4],float v_speed=1.0f,float v_min=0.0f,float v_max=0.0f,const char* format=\"%.3f\",ImGuiSliderFlags flags=0)",
+      "call_args": "(label,v,v_speed,v_min,v_max,format,flags)",
       "cimguiname": "igDragFloat4",
       "defaults": {
+        "flags": "0",
         "format": "\"%.3f\"",
-        "power": "1.0f",
         "v_max": "0.0f",
         "v_min": "0.0f",
         "v_speed": "1.0f"
@@ -8523,13 +8527,13 @@
       "namespace": "ImGui",
       "ov_cimguiname": "igDragFloat4",
       "ret": "bool",
-      "signature": "(const char*,float[4],float,float,float,const char*,float)",
+      "signature": "(const char*,float[4],float,float,float,const char*,ImGuiSliderFlags)",
       "stname": ""
     }
   ],
   "igDragFloatRange2": [
     {
-      "args": "(const char* label,float* v_current_min,float* v_current_max,float v_speed,float v_min,float v_max,const char* format,const char* format_max,float power)",
+      "args": "(const char* label,float* v_current_min,float* v_current_max,float v_speed,float v_min,float v_max,const char* format,const char* format_max,ImGuiSliderFlags flags)",
       "argsT": [
         {
           "name": "label",
@@ -8564,17 +8568,17 @@
           "type": "const char*"
         },
         {
-          "name": "power",
-          "type": "float"
+          "name": "flags",
+          "type": "ImGuiSliderFlags"
         }
       ],
-      "argsoriginal": "(const char* label,float* v_current_min,float* v_current_max,float v_speed=1.0f,float v_min=0.0f,float v_max=0.0f,const char* format=\"%.3f\",const char* format_max=((void*)0),float power=1.0f)",
-      "call_args": "(label,v_current_min,v_current_max,v_speed,v_min,v_max,format,format_max,power)",
+      "argsoriginal": "(const char* label,float* v_current_min,float* v_current_max,float v_speed=1.0f,float v_min=0.0f,float v_max=0.0f,const char* format=\"%.3f\",const char* format_max=((void*)0),ImGuiSliderFlags flags=0)",
+      "call_args": "(label,v_current_min,v_current_max,v_speed,v_min,v_max,format,format_max,flags)",
       "cimguiname": "igDragFloatRange2",
       "defaults": {
+        "flags": "0",
         "format": "\"%.3f\"",
         "format_max": "((void*)0)",
-        "power": "1.0f",
         "v_max": "0.0f",
         "v_min": "0.0f",
         "v_speed": "1.0f"
@@ -8584,13 +8588,13 @@
       "namespace": "ImGui",
       "ov_cimguiname": "igDragFloatRange2",
       "ret": "bool",
-      "signature": "(const char*,float*,float*,float,float,float,const char*,const char*,float)",
+      "signature": "(const char*,float*,float*,float,float,float,const char*,const char*,ImGuiSliderFlags)",
       "stname": ""
     }
   ],
   "igDragInt": [
     {
-      "args": "(const char* label,int* v,float v_speed,int v_min,int v_max,const char* format)",
+      "args": "(const char* label,int* v,float v_speed,int v_min,int v_max,const char* format,ImGuiSliderFlags flags)",
       "argsT": [
         {
           "name": "label",
@@ -8615,12 +8619,17 @@
         {
           "name": "format",
           "type": "const char*"
+        },
+        {
+          "name": "flags",
+          "type": "ImGuiSliderFlags"
         }
       ],
-      "argsoriginal": "(const char* label,int* v,float v_speed=1.0f,int v_min=0,int v_max=0,const char* format=\"%d\")",
-      "call_args": "(label,v,v_speed,v_min,v_max,format)",
+      "argsoriginal": "(const char* label,int* v,float v_speed=1.0f,int v_min=0,int v_max=0,const char* format=\"%d\",ImGuiSliderFlags flags=0)",
+      "call_args": "(label,v,v_speed,v_min,v_max,format,flags)",
       "cimguiname": "igDragInt",
       "defaults": {
+        "flags": "0",
         "format": "\"%d\"",
         "v_max": "0",
         "v_min": "0",
@@ -8631,13 +8640,13 @@
       "namespace": "ImGui",
       "ov_cimguiname": "igDragInt",
       "ret": "bool",
-      "signature": "(const char*,int*,float,int,int,const char*)",
+      "signature": "(const char*,int*,float,int,int,const char*,ImGuiSliderFlags)",
       "stname": ""
     }
   ],
   "igDragInt2": [
     {
-      "args": "(const char* label,int v[2],float v_speed,int v_min,int v_max,const char* format)",
+      "args": "(const char* label,int v[2],float v_speed,int v_min,int v_max,const char* format,ImGuiSliderFlags flags)",
       "argsT": [
         {
           "name": "label",
@@ -8662,12 +8671,17 @@
         {
           "name": "format",
           "type": "const char*"
+        },
+        {
+          "name": "flags",
+          "type": "ImGuiSliderFlags"
         }
       ],
-      "argsoriginal": "(const char* label,int v[2],float v_speed=1.0f,int v_min=0,int v_max=0,const char* format=\"%d\")",
-      "call_args": "(label,v,v_speed,v_min,v_max,format)",
+      "argsoriginal": "(const char* label,int v[2],float v_speed=1.0f,int v_min=0,int v_max=0,const char* format=\"%d\",ImGuiSliderFlags flags=0)",
+      "call_args": "(label,v,v_speed,v_min,v_max,format,flags)",
       "cimguiname": "igDragInt2",
       "defaults": {
+        "flags": "0",
         "format": "\"%d\"",
         "v_max": "0",
         "v_min": "0",
@@ -8678,13 +8692,13 @@
       "namespace": "ImGui",
       "ov_cimguiname": "igDragInt2",
       "ret": "bool",
-      "signature": "(const char*,int[2],float,int,int,const char*)",
+      "signature": "(const char*,int[2],float,int,int,const char*,ImGuiSliderFlags)",
       "stname": ""
     }
   ],
   "igDragInt3": [
     {
-      "args": "(const char* label,int v[3],float v_speed,int v_min,int v_max,const char* format)",
+      "args": "(const char* label,int v[3],float v_speed,int v_min,int v_max,const char* format,ImGuiSliderFlags flags)",
       "argsT": [
         {
           "name": "label",
@@ -8709,12 +8723,17 @@
         {
           "name": "format",
           "type": "const char*"
+        },
+        {
+          "name": "flags",
+          "type": "ImGuiSliderFlags"
         }
       ],
-      "argsoriginal": "(const char* label,int v[3],float v_speed=1.0f,int v_min=0,int v_max=0,const char* format=\"%d\")",
-      "call_args": "(label,v,v_speed,v_min,v_max,format)",
+      "argsoriginal": "(const char* label,int v[3],float v_speed=1.0f,int v_min=0,int v_max=0,const char* format=\"%d\",ImGuiSliderFlags flags=0)",
+      "call_args": "(label,v,v_speed,v_min,v_max,format,flags)",
       "cimguiname": "igDragInt3",
       "defaults": {
+        "flags": "0",
         "format": "\"%d\"",
         "v_max": "0",
         "v_min": "0",
@@ -8725,13 +8744,13 @@
       "namespace": "ImGui",
       "ov_cimguiname": "igDragInt3",
       "ret": "bool",
-      "signature": "(const char*,int[3],float,int,int,const char*)",
+      "signature": "(const char*,int[3],float,int,int,const char*,ImGuiSliderFlags)",
       "stname": ""
     }
   ],
   "igDragInt4": [
     {
-      "args": "(const char* label,int v[4],float v_speed,int v_min,int v_max,const char* format)",
+      "args": "(const char* label,int v[4],float v_speed,int v_min,int v_max,const char* format,ImGuiSliderFlags flags)",
       "argsT": [
         {
           "name": "label",
@@ -8756,12 +8775,17 @@
         {
           "name": "format",
           "type": "const char*"
+        },
+        {
+          "name": "flags",
+          "type": "ImGuiSliderFlags"
         }
       ],
-      "argsoriginal": "(const char* label,int v[4],float v_speed=1.0f,int v_min=0,int v_max=0,const char* format=\"%d\")",
-      "call_args": "(label,v,v_speed,v_min,v_max,format)",
+      "argsoriginal": "(const char* label,int v[4],float v_speed=1.0f,int v_min=0,int v_max=0,const char* format=\"%d\",ImGuiSliderFlags flags=0)",
+      "call_args": "(label,v,v_speed,v_min,v_max,format,flags)",
       "cimguiname": "igDragInt4",
       "defaults": {
+        "flags": "0",
         "format": "\"%d\"",
         "v_max": "0",
         "v_min": "0",
@@ -8772,13 +8796,13 @@
       "namespace": "ImGui",
       "ov_cimguiname": "igDragInt4",
       "ret": "bool",
-      "signature": "(const char*,int[4],float,int,int,const char*)",
+      "signature": "(const char*,int[4],float,int,int,const char*,ImGuiSliderFlags)",
       "stname": ""
     }
   ],
   "igDragIntRange2": [
     {
-      "args": "(const char* label,int* v_current_min,int* v_current_max,float v_speed,int v_min,int v_max,const char* format,const char* format_max)",
+      "args": "(const char* label,int* v_current_min,int* v_current_max,float v_speed,int v_min,int v_max,const char* format,const char* format_max,ImGuiSliderFlags flags)",
       "argsT": [
         {
           "name": "label",
@@ -8811,12 +8835,17 @@
         {
           "name": "format_max",
           "type": "const char*"
+        },
+        {
+          "name": "flags",
+          "type": "ImGuiSliderFlags"
         }
       ],
-      "argsoriginal": "(const char* label,int* v_current_min,int* v_current_max,float v_speed=1.0f,int v_min=0,int v_max=0,const char* format=\"%d\",const char* format_max=((void*)0))",
-      "call_args": "(label,v_current_min,v_current_max,v_speed,v_min,v_max,format,format_max)",
+      "argsoriginal": "(const char* label,int* v_current_min,int* v_current_max,float v_speed=1.0f,int v_min=0,int v_max=0,const char* format=\"%d\",const char* format_max=((void*)0),ImGuiSliderFlags flags=0)",
+      "call_args": "(label,v_current_min,v_current_max,v_speed,v_min,v_max,format,format_max,flags)",
       "cimguiname": "igDragIntRange2",
       "defaults": {
+        "flags": "0",
         "format": "\"%d\"",
         "format_max": "((void*)0)",
         "v_max": "0",
@@ -8828,13 +8857,13 @@
       "namespace": "ImGui",
       "ov_cimguiname": "igDragIntRange2",
       "ret": "bool",
-      "signature": "(const char*,int*,int*,float,int,int,const char*,const char*)",
+      "signature": "(const char*,int*,int*,float,int,int,const char*,const char*,ImGuiSliderFlags)",
       "stname": ""
     }
   ],
   "igDragScalar": [
     {
-      "args": "(const char* label,ImGuiDataType data_type,void* p_data,float v_speed,const void* p_min,const void* p_max,const char* format,float power)",
+      "args": "(const char* label,ImGuiDataType data_type,void* p_data,float v_speed,const void* p_min,const void* p_max,const char* format,ImGuiSliderFlags flags)",
       "argsT": [
         {
           "name": "label",
@@ -8865,31 +8894,31 @@
           "type": "const char*"
         },
         {
-          "name": "power",
-          "type": "float"
+          "name": "flags",
+          "type": "ImGuiSliderFlags"
         }
       ],
-      "argsoriginal": "(const char* label,ImGuiDataType data_type,void* p_data,float v_speed,const void* p_min=((void*)0),const void* p_max=((void*)0),const char* format=((void*)0),float power=1.0f)",
-      "call_args": "(label,data_type,p_data,v_speed,p_min,p_max,format,power)",
+      "argsoriginal": "(const char* label,ImGuiDataType data_type,void* p_data,float v_speed,const void* p_min=((void*)0),const void* p_max=((void*)0),const char* format=((void*)0),ImGuiSliderFlags flags=0)",
+      "call_args": "(label,data_type,p_data,v_speed,p_min,p_max,format,flags)",
       "cimguiname": "igDragScalar",
       "defaults": {
+        "flags": "0",
         "format": "((void*)0)",
         "p_max": "((void*)0)",
-        "p_min": "((void*)0)",
-        "power": "1.0f"
+        "p_min": "((void*)0)"
       },
       "funcname": "DragScalar",
       "location": "imgui",
       "namespace": "ImGui",
       "ov_cimguiname": "igDragScalar",
       "ret": "bool",
-      "signature": "(const char*,ImGuiDataType,void*,float,const void*,const void*,const char*,float)",
+      "signature": "(const char*,ImGuiDataType,void*,float,const void*,const void*,const char*,ImGuiSliderFlags)",
       "stname": ""
     }
   ],
   "igDragScalarN": [
     {
-      "args": "(const char* label,ImGuiDataType data_type,void* p_data,int components,float v_speed,const void* p_min,const void* p_max,const char* format,float power)",
+      "args": "(const char* label,ImGuiDataType data_type,void* p_data,int components,float v_speed,const void* p_min,const void* p_max,const char* format,ImGuiSliderFlags flags)",
       "argsT": [
         {
           "name": "label",
@@ -8924,25 +8953,25 @@
           "type": "const char*"
         },
         {
-          "name": "power",
-          "type": "float"
+          "name": "flags",
+          "type": "ImGuiSliderFlags"
         }
       ],
-      "argsoriginal": "(const char* label,ImGuiDataType data_type,void* p_data,int components,float v_speed,const void* p_min=((void*)0),const void* p_max=((void*)0),const char* format=((void*)0),float power=1.0f)",
-      "call_args": "(label,data_type,p_data,components,v_speed,p_min,p_max,format,power)",
+      "argsoriginal": "(const char* label,ImGuiDataType data_type,void* p_data,int components,float v_speed,const void* p_min=((void*)0),const void* p_max=((void*)0),const char* format=((void*)0),ImGuiSliderFlags flags=0)",
+      "call_args": "(label,data_type,p_data,components,v_speed,p_min,p_max,format,flags)",
       "cimguiname": "igDragScalarN",
       "defaults": {
+        "flags": "0",
         "format": "((void*)0)",
         "p_max": "((void*)0)",
-        "p_min": "((void*)0)",
-        "power": "1.0f"
+        "p_min": "((void*)0)"
       },
       "funcname": "DragScalarN",
       "location": "imgui",
       "namespace": "ImGui",
       "ov_cimguiname": "igDragScalarN",
       "ret": "bool",
-      "signature": "(const char*,ImGuiDataType,void*,int,float,const void*,const void*,const char*,float)",
+      "signature": "(const char*,ImGuiDataType,void*,int,float,const void*,const void*,const char*,ImGuiSliderFlags)",
       "stname": ""
     }
   ],
@@ -11165,7 +11194,7 @@
   ],
   "igInvisibleButton": [
     {
-      "args": "(const char* str_id,const ImVec2 size)",
+      "args": "(const char* str_id,const ImVec2 size,ImGuiButtonFlags flags)",
       "argsT": [
         {
           "name": "str_id",
@@ -11174,18 +11203,24 @@
         {
           "name": "size",
           "type": "const ImVec2"
+        },
+        {
+          "name": "flags",
+          "type": "ImGuiButtonFlags"
         }
       ],
-      "argsoriginal": "(const char* str_id,const ImVec2& size)",
-      "call_args": "(str_id,size)",
+      "argsoriginal": "(const char* str_id,const ImVec2& size,ImGuiButtonFlags flags=0)",
+      "call_args": "(str_id,size,flags)",
       "cimguiname": "igInvisibleButton",
-      "defaults": [],
+      "defaults": {
+        "flags": "0"
+      },
       "funcname": "InvisibleButton",
       "location": "imgui",
       "namespace": "ImGui",
       "ov_cimguiname": "igInvisibleButton",
       "ret": "bool",
-      "signature": "(const char*,const ImVec2)",
+      "signature": "(const char*,const ImVec2,ImGuiButtonFlags)",
       "stname": ""
     }
   ],
@@ -14742,7 +14777,7 @@
   ],
   "igSliderAngle": [
     {
-      "args": "(const char* label,float* v_rad,float v_degrees_min,float v_degrees_max,const char* format)",
+      "args": "(const char* label,float* v_rad,float v_degrees_min,float v_degrees_max,const char* format,ImGuiSliderFlags flags)",
       "argsT": [
         {
           "name": "label",
@@ -14763,12 +14798,17 @@
         {
           "name": "format",
           "type": "const char*"
+        },
+        {
+          "name": "flags",
+          "type": "ImGuiSliderFlags"
         }
       ],
-      "argsoriginal": "(const char* label,float* v_rad,float v_degrees_min=-360.0f,float v_degrees_max=+360.0f,const char* format=\"%.0f deg\")",
-      "call_args": "(label,v_rad,v_degrees_min,v_degrees_max,format)",
+      "argsoriginal": "(const char* label,float* v_rad,float v_degrees_min=-360.0f,float v_degrees_max=+360.0f,const char* format=\"%.0f deg\",ImGuiSliderFlags flags=0)",
+      "call_args": "(label,v_rad,v_degrees_min,v_degrees_max,format,flags)",
       "cimguiname": "igSliderAngle",
       "defaults": {
+        "flags": "0",
         "format": "\"%.0f deg\"",
         "v_degrees_max": "+360.0f",
         "v_degrees_min": "-360.0f"
@@ -14778,13 +14818,13 @@
       "namespace": "ImGui",
       "ov_cimguiname": "igSliderAngle",
       "ret": "bool",
-      "signature": "(const char*,float*,float,float,const char*)",
+      "signature": "(const char*,float*,float,float,const char*,ImGuiSliderFlags)",
       "stname": ""
     }
   ],
   "igSliderFloat": [
     {
-      "args": "(const char* label,float* v,float v_min,float v_max,const char* format,float power)",
+      "args": "(const char* label,float* v,float v_min,float v_max,const char* format,ImGuiSliderFlags flags)",
       "argsT": [
         {
           "name": "label",
@@ -14807,29 +14847,29 @@
           "type": "const char*"
         },
         {
-          "name": "power",
-          "type": "float"
+          "name": "flags",
+          "type": "ImGuiSliderFlags"
         }
       ],
-      "argsoriginal": "(const char* label,float* v,float v_min,float v_max,const char* format=\"%.3f\",float power=1.0f)",
-      "call_args": "(label,v,v_min,v_max,format,power)",
+      "argsoriginal": "(const char* label,float* v,float v_min,float v_max,const char* format=\"%.3f\",ImGuiSliderFlags flags=0)",
+      "call_args": "(label,v,v_min,v_max,format,flags)",
       "cimguiname": "igSliderFloat",
       "defaults": {
-        "format": "\"%.3f\"",
-        "power": "1.0f"
+        "flags": "0",
+        "format": "\"%.3f\""
       },
       "funcname": "SliderFloat",
       "location": "imgui",
       "namespace": "ImGui",
       "ov_cimguiname": "igSliderFloat",
       "ret": "bool",
-      "signature": "(const char*,float*,float,float,const char*,float)",
+      "signature": "(const char*,float*,float,float,const char*,ImGuiSliderFlags)",
       "stname": ""
     }
   ],
   "igSliderFloat2": [
     {
-      "args": "(const char* label,float v[2],float v_min,float v_max,const char* format,float power)",
+      "args": "(const char* label,float v[2],float v_min,float v_max,const char* format,ImGuiSliderFlags flags)",
       "argsT": [
         {
           "name": "label",
@@ -14852,29 +14892,29 @@
           "type": "const char*"
         },
         {
-          "name": "power",
-          "type": "float"
+          "name": "flags",
+          "type": "ImGuiSliderFlags"
         }
       ],
-      "argsoriginal": "(const char* label,float v[2],float v_min,float v_max,const char* format=\"%.3f\",float power=1.0f)",
-      "call_args": "(label,v,v_min,v_max,format,power)",
+      "argsoriginal": "(const char* label,float v[2],float v_min,float v_max,const char* format=\"%.3f\",ImGuiSliderFlags flags=0)",
+      "call_args": "(label,v,v_min,v_max,format,flags)",
       "cimguiname": "igSliderFloat2",
       "defaults": {
-        "format": "\"%.3f\"",
-        "power": "1.0f"
+        "flags": "0",
+        "format": "\"%.3f\""
       },
       "funcname": "SliderFloat2",
       "location": "imgui",
       "namespace": "ImGui",
       "ov_cimguiname": "igSliderFloat2",
       "ret": "bool",
-      "signature": "(const char*,float[2],float,float,const char*,float)",
+      "signature": "(const char*,float[2],float,float,const char*,ImGuiSliderFlags)",
       "stname": ""
     }
   ],
   "igSliderFloat3": [
     {
-      "args": "(const char* label,float v[3],float v_min,float v_max,const char* format,float power)",
+      "args": "(const char* label,float v[3],float v_min,float v_max,const char* format,ImGuiSliderFlags flags)",
       "argsT": [
         {
           "name": "label",
@@ -14897,29 +14937,29 @@
           "type": "const char*"
         },
         {
-          "name": "power",
-          "type": "float"
+          "name": "flags",
+          "type": "ImGuiSliderFlags"
         }
       ],
-      "argsoriginal": "(const char* label,float v[3],float v_min,float v_max,const char* format=\"%.3f\",float power=1.0f)",
-      "call_args": "(label,v,v_min,v_max,format,power)",
+      "argsoriginal": "(const char* label,float v[3],float v_min,float v_max,const char* format=\"%.3f\",ImGuiSliderFlags flags=0)",
+      "call_args": "(label,v,v_min,v_max,format,flags)",
       "cimguiname": "igSliderFloat3",
       "defaults": {
-        "format": "\"%.3f\"",
-        "power": "1.0f"
+        "flags": "0",
+        "format": "\"%.3f\""
       },
       "funcname": "SliderFloat3",
       "location": "imgui",
       "namespace": "ImGui",
       "ov_cimguiname": "igSliderFloat3",
       "ret": "bool",
-      "signature": "(const char*,float[3],float,float,const char*,float)",
+      "signature": "(const char*,float[3],float,float,const char*,ImGuiSliderFlags)",
       "stname": ""
     }
   ],
   "igSliderFloat4": [
     {
-      "args": "(const char* label,float v[4],float v_min,float v_max,const char* format,float power)",
+      "args": "(const char* label,float v[4],float v_min,float v_max,const char* format,ImGuiSliderFlags flags)",
       "argsT": [
         {
           "name": "label",
@@ -14942,29 +14982,29 @@
           "type": "const char*"
         },
         {
-          "name": "power",
-          "type": "float"
+          "name": "flags",
+          "type": "ImGuiSliderFlags"
         }
       ],
-      "argsoriginal": "(const char* label,float v[4],float v_min,float v_max,const char* format=\"%.3f\",float power=1.0f)",
-      "call_args": "(label,v,v_min,v_max,format,power)",
+      "argsoriginal": "(const char* label,float v[4],float v_min,float v_max,const char* format=\"%.3f\",ImGuiSliderFlags flags=0)",
+      "call_args": "(label,v,v_min,v_max,format,flags)",
       "cimguiname": "igSliderFloat4",
       "defaults": {
-        "format": "\"%.3f\"",
-        "power": "1.0f"
+        "flags": "0",
+        "format": "\"%.3f\""
       },
       "funcname": "SliderFloat4",
       "location": "imgui",
       "namespace": "ImGui",
       "ov_cimguiname": "igSliderFloat4",
       "ret": "bool",
-      "signature": "(const char*,float[4],float,float,const char*,float)",
+      "signature": "(const char*,float[4],float,float,const char*,ImGuiSliderFlags)",
       "stname": ""
     }
   ],
   "igSliderInt": [
     {
-      "args": "(const char* label,int* v,int v_min,int v_max,const char* format)",
+      "args": "(const char* label,int* v,int v_min,int v_max,const char* format,ImGuiSliderFlags flags)",
       "argsT": [
         {
           "name": "label",
@@ -14985,12 +15025,17 @@
         {
           "name": "format",
           "type": "const char*"
+        },
+        {
+          "name": "flags",
+          "type": "ImGuiSliderFlags"
         }
       ],
-      "argsoriginal": "(const char* label,int* v,int v_min,int v_max,const char* format=\"%d\")",
-      "call_args": "(label,v,v_min,v_max,format)",
+      "argsoriginal": "(const char* label,int* v,int v_min,int v_max,const char* format=\"%d\",ImGuiSliderFlags flags=0)",
+      "call_args": "(label,v,v_min,v_max,format,flags)",
       "cimguiname": "igSliderInt",
       "defaults": {
+        "flags": "0",
         "format": "\"%d\""
       },
       "funcname": "SliderInt",
@@ -14998,13 +15043,13 @@
       "namespace": "ImGui",
       "ov_cimguiname": "igSliderInt",
       "ret": "bool",
-      "signature": "(const char*,int*,int,int,const char*)",
+      "signature": "(const char*,int*,int,int,const char*,ImGuiSliderFlags)",
       "stname": ""
     }
   ],
   "igSliderInt2": [
     {
-      "args": "(const char* label,int v[2],int v_min,int v_max,const char* format)",
+      "args": "(const char* label,int v[2],int v_min,int v_max,const char* format,ImGuiSliderFlags flags)",
       "argsT": [
         {
           "name": "label",
@@ -15025,12 +15070,17 @@
         {
           "name": "format",
           "type": "const char*"
+        },
+        {
+          "name": "flags",
+          "type": "ImGuiSliderFlags"
         }
       ],
-      "argsoriginal": "(const char* label,int v[2],int v_min,int v_max,const char* format=\"%d\")",
-      "call_args": "(label,v,v_min,v_max,format)",
+      "argsoriginal": "(const char* label,int v[2],int v_min,int v_max,const char* format=\"%d\",ImGuiSliderFlags flags=0)",
+      "call_args": "(label,v,v_min,v_max,format,flags)",
       "cimguiname": "igSliderInt2",
       "defaults": {
+        "flags": "0",
         "format": "\"%d\""
       },
       "funcname": "SliderInt2",
@@ -15038,13 +15088,13 @@
       "namespace": "ImGui",
       "ov_cimguiname": "igSliderInt2",
       "ret": "bool",
-      "signature": "(const char*,int[2],int,int,const char*)",
+      "signature": "(const char*,int[2],int,int,const char*,ImGuiSliderFlags)",
       "stname": ""
     }
   ],
   "igSliderInt3": [
     {
-      "args": "(const char* label,int v[3],int v_min,int v_max,const char* format)",
+      "args": "(const char* label,int v[3],int v_min,int v_max,const char* format,ImGuiSliderFlags flags)",
       "argsT": [
         {
           "name": "label",
@@ -15065,12 +15115,17 @@
         {
           "name": "format",
           "type": "const char*"
+        },
+        {
+          "name": "flags",
+          "type": "ImGuiSliderFlags"
         }
       ],
-      "argsoriginal": "(const char* label,int v[3],int v_min,int v_max,const char* format=\"%d\")",
-      "call_args": "(label,v,v_min,v_max,format)",
+      "argsoriginal": "(const char* label,int v[3],int v_min,int v_max,const char* format=\"%d\",ImGuiSliderFlags flags=0)",
+      "call_args": "(label,v,v_min,v_max,format,flags)",
       "cimguiname": "igSliderInt3",
       "defaults": {
+        "flags": "0",
         "format": "\"%d\""
       },
       "funcname": "SliderInt3",
@@ -15078,13 +15133,13 @@
       "namespace": "ImGui",
       "ov_cimguiname": "igSliderInt3",
       "ret": "bool",
-      "signature": "(const char*,int[3],int,int,const char*)",
+      "signature": "(const char*,int[3],int,int,const char*,ImGuiSliderFlags)",
       "stname": ""
     }
   ],
   "igSliderInt4": [
     {
-      "args": "(const char* label,int v[4],int v_min,int v_max,const char* format)",
+      "args": "(const char* label,int v[4],int v_min,int v_max,const char* format,ImGuiSliderFlags flags)",
       "argsT": [
         {
           "name": "label",
@@ -15105,12 +15160,17 @@
         {
           "name": "format",
           "type": "const char*"
+        },
+        {
+          "name": "flags",
+          "type": "ImGuiSliderFlags"
         }
       ],
-      "argsoriginal": "(const char* label,int v[4],int v_min,int v_max,const char* format=\"%d\")",
-      "call_args": "(label,v,v_min,v_max,format)",
+      "argsoriginal": "(const char* label,int v[4],int v_min,int v_max,const char* format=\"%d\",ImGuiSliderFlags flags=0)",
+      "call_args": "(label,v,v_min,v_max,format,flags)",
       "cimguiname": "igSliderInt4",
       "defaults": {
+        "flags": "0",
         "format": "\"%d\""
       },
       "funcname": "SliderInt4",
@@ -15118,13 +15178,13 @@
       "namespace": "ImGui",
       "ov_cimguiname": "igSliderInt4",
       "ret": "bool",
-      "signature": "(const char*,int[4],int,int,const char*)",
+      "signature": "(const char*,int[4],int,int,const char*,ImGuiSliderFlags)",
       "stname": ""
     }
   ],
   "igSliderScalar": [
     {
-      "args": "(const char* label,ImGuiDataType data_type,void* p_data,const void* p_min,const void* p_max,const char* format,float power)",
+      "args": "(const char* label,ImGuiDataType data_type,void* p_data,const void* p_min,const void* p_max,const char* format,ImGuiSliderFlags flags)",
       "argsT": [
         {
           "name": "label",
@@ -15151,29 +15211,29 @@
           "type": "const char*"
         },
         {
-          "name": "power",
-          "type": "float"
+          "name": "flags",
+          "type": "ImGuiSliderFlags"
         }
       ],
-      "argsoriginal": "(const char* label,ImGuiDataType data_type,void* p_data,const void* p_min,const void* p_max,const char* format=((void*)0),float power=1.0f)",
-      "call_args": "(label,data_type,p_data,p_min,p_max,format,power)",
+      "argsoriginal": "(const char* label,ImGuiDataType data_type,void* p_data,const void* p_min,const void* p_max,const char* format=((void*)0),ImGuiSliderFlags flags=0)",
+      "call_args": "(label,data_type,p_data,p_min,p_max,format,flags)",
       "cimguiname": "igSliderScalar",
       "defaults": {
-        "format": "((void*)0)",
-        "power": "1.0f"
+        "flags": "0",
+        "format": "((void*)0)"
       },
       "funcname": "SliderScalar",
       "location": "imgui",
       "namespace": "ImGui",
       "ov_cimguiname": "igSliderScalar",
       "ret": "bool",
-      "signature": "(const char*,ImGuiDataType,void*,const void*,const void*,const char*,float)",
+      "signature": "(const char*,ImGuiDataType,void*,const void*,const void*,const char*,ImGuiSliderFlags)",
       "stname": ""
     }
   ],
   "igSliderScalarN": [
     {
-      "args": "(const char* label,ImGuiDataType data_type,void* p_data,int components,const void* p_min,const void* p_max,const char* format,float power)",
+      "args": "(const char* label,ImGuiDataType data_type,void* p_data,int components,const void* p_min,const void* p_max,const char* format,ImGuiSliderFlags flags)",
       "argsT": [
         {
           "name": "label",
@@ -15204,23 +15264,23 @@
           "type": "const char*"
         },
         {
-          "name": "power",
-          "type": "float"
+          "name": "flags",
+          "type": "ImGuiSliderFlags"
         }
       ],
-      "argsoriginal": "(const char* label,ImGuiDataType data_type,void* p_data,int components,const void* p_min,const void* p_max,const char* format=((void*)0),float power=1.0f)",
-      "call_args": "(label,data_type,p_data,components,p_min,p_max,format,power)",
+      "argsoriginal": "(const char* label,ImGuiDataType data_type,void* p_data,int components,const void* p_min,const void* p_max,const char* format=((void*)0),ImGuiSliderFlags flags=0)",
+      "call_args": "(label,data_type,p_data,components,p_min,p_max,format,flags)",
       "cimguiname": "igSliderScalarN",
       "defaults": {
-        "format": "((void*)0)",
-        "power": "1.0f"
+        "flags": "0",
+        "format": "((void*)0)"
       },
       "funcname": "SliderScalarN",
       "location": "imgui",
       "namespace": "ImGui",
       "ov_cimguiname": "igSliderScalarN",
       "ret": "bool",
-      "signature": "(const char*,ImGuiDataType,void*,int,const void*,const void*,const char*,float)",
+      "signature": "(const char*,ImGuiDataType,void*,int,const void*,const void*,const char*,ImGuiSliderFlags)",
       "stname": ""
     }
   ],
@@ -15968,7 +16028,7 @@
   ],
   "igVSliderFloat": [
     {
-      "args": "(const char* label,const ImVec2 size,float* v,float v_min,float v_max,const char* format,float power)",
+      "args": "(const char* label,const ImVec2 size,float* v,float v_min,float v_max,const char* format,ImGuiSliderFlags flags)",
       "argsT": [
         {
           "name": "label",
@@ -15995,29 +16055,29 @@
           "type": "const char*"
         },
         {
-          "name": "power",
-          "type": "float"
+          "name": "flags",
+          "type": "ImGuiSliderFlags"
         }
       ],
-      "argsoriginal": "(const char* label,const ImVec2& size,float* v,float v_min,float v_max,const char* format=\"%.3f\",float power=1.0f)",
-      "call_args": "(label,size,v,v_min,v_max,format,power)",
+      "argsoriginal": "(const char* label,const ImVec2& size,float* v,float v_min,float v_max,const char* format=\"%.3f\",ImGuiSliderFlags flags=0)",
+      "call_args": "(label,size,v,v_min,v_max,format,flags)",
       "cimguiname": "igVSliderFloat",
       "defaults": {
-        "format": "\"%.3f\"",
-        "power": "1.0f"
+        "flags": "0",
+        "format": "\"%.3f\""
       },
       "funcname": "VSliderFloat",
       "location": "imgui",
       "namespace": "ImGui",
       "ov_cimguiname": "igVSliderFloat",
       "ret": "bool",
-      "signature": "(const char*,const ImVec2,float*,float,float,const char*,float)",
+      "signature": "(const char*,const ImVec2,float*,float,float,const char*,ImGuiSliderFlags)",
       "stname": ""
     }
   ],
   "igVSliderInt": [
     {
-      "args": "(const char* label,const ImVec2 size,int* v,int v_min,int v_max,const char* format)",
+      "args": "(const char* label,const ImVec2 size,int* v,int v_min,int v_max,const char* format,ImGuiSliderFlags flags)",
       "argsT": [
         {
           "name": "label",
@@ -16042,12 +16102,17 @@
         {
           "name": "format",
           "type": "const char*"
+        },
+        {
+          "name": "flags",
+          "type": "ImGuiSliderFlags"
         }
       ],
-      "argsoriginal": "(const char* label,const ImVec2& size,int* v,int v_min,int v_max,const char* format=\"%d\")",
-      "call_args": "(label,size,v,v_min,v_max,format)",
+      "argsoriginal": "(const char* label,const ImVec2& size,int* v,int v_min,int v_max,const char* format=\"%d\",ImGuiSliderFlags flags=0)",
+      "call_args": "(label,size,v,v_min,v_max,format,flags)",
       "cimguiname": "igVSliderInt",
       "defaults": {
+        "flags": "0",
         "format": "\"%d\""
       },
       "funcname": "VSliderInt",
@@ -16055,13 +16120,13 @@
       "namespace": "ImGui",
       "ov_cimguiname": "igVSliderInt",
       "ret": "bool",
-      "signature": "(const char*,const ImVec2,int*,int,int,const char*)",
+      "signature": "(const char*,const ImVec2,int*,int,int,const char*,ImGuiSliderFlags)",
       "stname": ""
     }
   ],
   "igVSliderScalar": [
     {
-      "args": "(const char* label,const ImVec2 size,ImGuiDataType data_type,void* p_data,const void* p_min,const void* p_max,const char* format,float power)",
+      "args": "(const char* label,const ImVec2 size,ImGuiDataType data_type,void* p_data,const void* p_min,const void* p_max,const char* format,ImGuiSliderFlags flags)",
       "argsT": [
         {
           "name": "label",
@@ -16092,23 +16157,23 @@
           "type": "const char*"
         },
         {
-          "name": "power",
-          "type": "float"
+          "name": "flags",
+          "type": "ImGuiSliderFlags"
         }
       ],
-      "argsoriginal": "(const char* label,const ImVec2& size,ImGuiDataType data_type,void* p_data,const void* p_min,const void* p_max,const char* format=((void*)0),float power=1.0f)",
-      "call_args": "(label,size,data_type,p_data,p_min,p_max,format,power)",
+      "argsoriginal": "(const char* label,const ImVec2& size,ImGuiDataType data_type,void* p_data,const void* p_min,const void* p_max,const char* format=((void*)0),ImGuiSliderFlags flags=0)",
+      "call_args": "(label,size,data_type,p_data,p_min,p_max,format,flags)",
       "cimguiname": "igVSliderScalar",
       "defaults": {
-        "format": "((void*)0)",
-        "power": "1.0f"
+        "flags": "0",
+        "format": "((void*)0)"
       },
       "funcname": "VSliderScalar",
       "location": "imgui",
       "namespace": "ImGui",
       "ov_cimguiname": "igVSliderScalar",
       "ret": "bool",
-      "signature": "(const char*,const ImVec2,ImGuiDataType,void*,const void*,const void*,const char*,float)",
+      "signature": "(const char*,const ImVec2,ImGuiDataType,void*,const void*,const void*,const char*,ImGuiSliderFlags)",
       "stname": ""
     }
   ],
