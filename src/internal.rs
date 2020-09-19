@@ -1,5 +1,6 @@
 //! Internal raw utilities (don't use unless you know what you're doing!)
 
+use std::ops::{RangeFrom, RangeInclusive, RangeToInclusive};
 use std::slice;
 
 /// A generic version of the raw imgui-sys ImVector struct types
@@ -148,4 +149,36 @@ unsafe impl DataTypeKind for f32 {
 }
 unsafe impl DataTypeKind for f64 {
     const KIND: DataType = DataType::F64;
+}
+
+pub trait InclusiveRangeBounds<T: Copy> {
+    fn start_bound(&self) -> Option<&T>;
+    fn end_bound(&self) -> Option<&T>;
+}
+
+impl<T: Copy> InclusiveRangeBounds<T> for RangeFrom<T> {
+    fn start_bound(&self) -> Option<&T> {
+        Some(&self.start)
+    }
+    fn end_bound(&self) -> Option<&T> {
+        None
+    }
+}
+
+impl<T: Copy> InclusiveRangeBounds<T> for RangeInclusive<T> {
+    fn start_bound(&self) -> Option<&T> {
+        Some(self.start())
+    }
+    fn end_bound(&self) -> Option<&T> {
+        Some(self.end())
+    }
+}
+
+impl<T: Copy> InclusiveRangeBounds<T> for RangeToInclusive<T> {
+    fn start_bound(&self) -> Option<&T> {
+        None
+    }
+    fn end_bound(&self) -> Option<&T> {
+        Some(&self.end)
+    }
 }

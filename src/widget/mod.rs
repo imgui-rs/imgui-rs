@@ -1,5 +1,6 @@
 pub mod color_editors;
 pub mod combo_box;
+pub mod drag;
 pub mod image;
 pub mod menu;
 pub mod misc;

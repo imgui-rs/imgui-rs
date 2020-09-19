@@ -11,6 +11,7 @@
   of closures
 - API for accessing the background drawlist
 - Tab bar / tab item API
+- Redesigned drag slider API
 
 ### Changed
 

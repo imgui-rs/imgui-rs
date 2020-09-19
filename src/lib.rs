@@ -11,10 +11,6 @@ use std::thread;
 
 pub use self::clipboard::*;
 pub use self::context::*;
-pub use self::drag::{
-    DragFloat, DragFloat2, DragFloat3, DragFloat4, DragFloatRange2, DragInt, DragInt2, DragInt3,
-    DragInt4, DragIntRange2,
-};
 pub use self::fonts::atlas::*;
 pub use self::fonts::font::*;
 pub use self::fonts::glyph::*;
@@ -38,6 +34,7 @@ pub use self::style::*;
 pub use self::utils::*;
 pub use self::widget::color_editors::*;
 pub use self::widget::combo_box::*;
+pub use self::widget::drag::*;
 pub use self::widget::image::*;
 pub use self::widget::menu::*;
 pub use self::widget::progress_bar::*;
@@ -53,7 +50,6 @@ use internal::RawCast;
 mod clipboard;
 mod columns;
 mod context;
-mod drag;
 mod fonts;
 mod input;
 mod input_widget;
@@ -269,62 +265,6 @@ impl<'ui> Ui<'ui> {
     }
     pub fn input_int4<'p>(&self, label: &'p ImStr, value: &'p mut [i32; 4]) -> InputInt4<'ui, 'p> {
         InputInt4::new(self, label, value)
-    }
-}
-
-// Widgets: Drag
-impl<'ui> Ui<'ui> {
-    pub fn drag_float<'p>(&self, label: &'p ImStr, value: &'p mut f32) -> DragFloat<'ui, 'p> {
-        DragFloat::new(self, label, value)
-    }
-    pub fn drag_float2<'p>(
-        &self,
-        label: &'p ImStr,
-        value: &'p mut [f32; 2],
-    ) -> DragFloat2<'ui, 'p> {
-        DragFloat2::new(self, label, value)
-    }
-    pub fn drag_float3<'p>(
-        &self,
-        label: &'p ImStr,
-        value: &'p mut [f32; 3],
-    ) -> DragFloat3<'ui, 'p> {
-        DragFloat3::new(self, label, value)
-    }
-    pub fn drag_float4<'p>(
-        &self,
-        label: &'p ImStr,
-        value: &'p mut [f32; 4],
-    ) -> DragFloat4<'ui, 'p> {
-        DragFloat4::new(self, label, value)
-    }
-    pub fn drag_float_range2<'p>(
-        &self,
-        label: &'p ImStr,
-        current_min: &'p mut f32,
-        current_max: &'p mut f32,
-    ) -> DragFloatRange2<'ui, 'p> {
-        DragFloatRange2::new(self, label, current_min, current_max)
-    }
-    pub fn drag_int<'p>(&self, label: &'p ImStr, value: &'p mut i32) -> DragInt<'ui, 'p> {
-        DragInt::new(self, label, value)
-    }
-    pub fn drag_int2<'p>(&self, label: &'p ImStr, value: &'p mut [i32; 2]) -> DragInt2<'ui, 'p> {
-        DragInt2::new(self, label, value)
-    }
-    pub fn drag_int3<'p>(&self, label: &'p ImStr, value: &'p mut [i32; 3]) -> DragInt3<'ui, 'p> {
-        DragInt3::new(self, label, value)
-    }
-    pub fn drag_int4<'p>(&self, label: &'p ImStr, value: &'p mut [i32; 4]) -> DragInt4<'ui, 'p> {
-        DragInt4::new(self, label, value)
-    }
-    pub fn drag_int_range2<'p>(
-        &self,
-        label: &'p ImStr,
-        current_min: &'p mut i32,
-        current_max: &'p mut i32,
-    ) -> DragIntRange2<'ui, 'p> {
-        DragIntRange2::new(self, label, current_min, current_max)
     }
 }
 
