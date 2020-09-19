@@ -31,6 +31,7 @@ impl<'a, T: DataTypeKind> Drag<'a, T> {
             flags: SliderFlags::empty(),
         }
     }
+    /// Sets the range (inclusive)
     #[inline]
     pub fn range<R: InclusiveRangeBounds<T>>(mut self, range: R) -> Self {
         self.min = range.start_bound().copied();

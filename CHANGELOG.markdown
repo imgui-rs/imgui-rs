@@ -18,6 +18,8 @@
 - Upgrade to cimgui / imgui 1.78
 - Store per-texture sampler parameters in imgui-glium-renderer to support
   customizing them
+- Slider widget constructors no longer require the range parameter. Call the
+  range function on the builder to set the range.
 
 ### Fixed
 

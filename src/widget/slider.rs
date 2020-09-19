@@ -1,9 +1,8 @@
 use bitflags::bitflags;
-use std::ops::RangeInclusive;
 use std::os::raw::c_void;
 use std::ptr;
 
-use crate::internal::DataTypeKind;
+use crate::internal::{DataTypeKind, InclusiveRangeBounds};
 use crate::string::ImStr;
 use crate::sys;
 use crate::Ui;
@@ -30,22 +29,29 @@ bitflags!(
 #[must_use]
 pub struct Slider<'a, T: DataTypeKind> {
     label: &'a ImStr,
-    min: T,
-    max: T,
+    min: Option<T>,
+    max: Option<T>,
     display_format: Option<&'a ImStr>,
     flags: SliderFlags,
 }
 
 impl<'a, T: DataTypeKind> Slider<'a, T> {
     /// Constructs a new slider builder with the given range.
-    pub fn new(label: &ImStr, range: RangeInclusive<T>) -> Slider<T> {
+    pub fn new(label: &ImStr) -> Slider<T> {
         Slider {
             label,
-            min: *range.start(),
-            max: *range.end(),
+            min: None,
+            max: None,
             display_format: None,
             flags: SliderFlags::empty(),
         }
+    }
+    /// Sets the range (inclusive)
+    #[inline]
+    pub fn range<R: InclusiveRangeBounds<T>>(mut self, range: R) -> Self {
+        self.min = range.start_bound().copied();
+        self.max = range.end_bound().copied();
+        self
     }
     /// Sets the display format using *a C-style printf string*
     #[inline]
@@ -68,8 +74,14 @@ impl<'a, T: DataTypeKind> Slider<'a, T> {
                 self.label.as_ptr(),
                 T::KIND as i32,
                 value as *mut T as *mut c_void,
-                &self.min as *const T as *const c_void,
-                &self.max as *const T as *const c_void,
+                self.min
+                    .as_ref()
+                    .map(|min| min as *const T)
+                    .unwrap_or(ptr::null()) as *const c_void,
+                self.max
+                    .as_ref()
+                    .map(|max| max as *const T)
+                    .unwrap_or(ptr::null()) as *const c_void,
                 self.display_format
                     .map(ImStr::as_ptr)
                     .unwrap_or(ptr::null()),
@@ -87,8 +99,14 @@ impl<'a, T: DataTypeKind> Slider<'a, T> {
                 T::KIND as i32,
                 values.as_mut_ptr() as *mut c_void,
                 values.len() as i32,
-                &self.min as *const T as *const c_void,
-                &self.max as *const T as *const c_void,
+                self.min
+                    .as_ref()
+                    .map(|min| min as *const T)
+                    .unwrap_or(ptr::null()) as *const c_void,
+                self.max
+                    .as_ref()
+                    .map(|max| max as *const T)
+                    .unwrap_or(ptr::null()) as *const c_void,
                 self.display_format
                     .map(ImStr::as_ptr)
                     .unwrap_or(ptr::null()),
@@ -104,23 +122,30 @@ impl<'a, T: DataTypeKind> Slider<'a, T> {
 pub struct VerticalSlider<'a, T: DataTypeKind + Copy> {
     label: &'a ImStr,
     size: [f32; 2],
-    min: T,
-    max: T,
+    min: Option<T>,
+    max: Option<T>,
     display_format: Option<&'a ImStr>,
     flags: SliderFlags,
 }
 
 impl<'a, T: DataTypeKind> VerticalSlider<'a, T> {
     /// Constructs a new vertical slider builder with the given size and range.
-    pub fn new(label: &ImStr, size: [f32; 2], range: RangeInclusive<T>) -> VerticalSlider<T> {
+    pub fn new(label: &ImStr, size: [f32; 2]) -> VerticalSlider<T> {
         VerticalSlider {
             label,
             size,
-            min: *range.start(),
-            max: *range.end(),
+            min: None,
+            max: None,
             display_format: None,
             flags: SliderFlags::empty(),
         }
+    }
+    /// Sets the range (inclusive)
+    #[inline]
+    pub fn range<R: InclusiveRangeBounds<T>>(mut self, range: R) -> Self {
+        self.min = range.start_bound().copied();
+        self.max = range.end_bound().copied();
+        self
     }
     /// Sets the display format using *a C-style printf string*
     #[inline]
@@ -144,8 +169,14 @@ impl<'a, T: DataTypeKind> VerticalSlider<'a, T> {
                 self.size.into(),
                 T::KIND as i32,
                 value as *mut T as *mut c_void,
-                &self.min as *const T as *const c_void,
-                &self.max as *const T as *const c_void,
+                self.min
+                    .as_ref()
+                    .map(|min| min as *const T)
+                    .unwrap_or(ptr::null()) as *const c_void,
+                self.max
+                    .as_ref()
+                    .map(|max| max as *const T)
+                    .unwrap_or(ptr::null()) as *const c_void,
                 self.display_format
                     .map(ImStr::as_ptr)
                     .unwrap_or(ptr::null()),
@@ -177,6 +208,13 @@ impl<'a> AngleSlider<'a> {
             display_format: im_str!("%.0f deg"),
             flags: SliderFlags::empty(),
         }
+    }
+    /// Sets the range (in degrees, inclusive)
+    #[inline]
+    pub fn range_degrees<R: InclusiveRangeBounds<f32>>(mut self, range: R) -> Self {
+        self.min_degrees = range.start_bound().copied().unwrap_or(-360.0);
+        self.max_degrees = range.end_bound().copied().unwrap_or(360.0);
+        self
     }
     /// Sets the minimum value (in degrees)
     #[inline]
