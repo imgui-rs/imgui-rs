@@ -124,53 +124,53 @@ pub unsafe trait DataTypeKind: Copy {
 }
 unsafe impl DataTypeKind for i8 {
     const KIND: DataType = DataType::I8;
-    const SLIDER_MIN: Self = Self::MIN;
-    const SLIDER_MAX: Self = Self::MAX;
+    const SLIDER_MIN: Self = std::i8::MIN;
+    const SLIDER_MAX: Self = std::i8::MAX;
 }
 unsafe impl DataTypeKind for u8 {
     const KIND: DataType = DataType::U8;
-    const SLIDER_MIN: Self = Self::MIN;
-    const SLIDER_MAX: Self = Self::MAX;
+    const SLIDER_MIN: Self = std::u8::MIN;
+    const SLIDER_MAX: Self = std::u8::MAX;
 }
 unsafe impl DataTypeKind for i16 {
     const KIND: DataType = DataType::I16;
-    const SLIDER_MIN: Self = Self::MIN;
-    const SLIDER_MAX: Self = Self::MAX;
+    const SLIDER_MIN: Self = std::i16::MIN;
+    const SLIDER_MAX: Self = std::i16::MAX;
 }
 unsafe impl DataTypeKind for u16 {
     const KIND: DataType = DataType::U16;
-    const SLIDER_MIN: Self = Self::MIN;
-    const SLIDER_MAX: Self = Self::MAX;
+    const SLIDER_MIN: Self = std::u16::MIN;
+    const SLIDER_MAX: Self = std::u16::MAX;
 }
 unsafe impl DataTypeKind for i32 {
     const KIND: DataType = DataType::I32;
-    const SLIDER_MIN: Self = Self::MIN;
-    const SLIDER_MAX: Self = Self::MAX;
+    const SLIDER_MIN: Self = std::i32::MIN / 2;
+    const SLIDER_MAX: Self = std::i32::MAX / 2;
 }
 unsafe impl DataTypeKind for u32 {
     const KIND: DataType = DataType::U32;
-    const SLIDER_MIN: Self = Self::MIN;
-    const SLIDER_MAX: Self = Self::MAX;
+    const SLIDER_MIN: Self = std::u32::MIN / 2;
+    const SLIDER_MAX: Self = std::u32::MAX / 2;
 }
 unsafe impl DataTypeKind for i64 {
     const KIND: DataType = DataType::I64;
-    const SLIDER_MIN: Self = Self::MIN;
-    const SLIDER_MAX: Self = Self::MAX;
+    const SLIDER_MIN: Self = std::i64::MIN / 2;
+    const SLIDER_MAX: Self = std::i64::MAX / 2;
 }
 unsafe impl DataTypeKind for u64 {
     const KIND: DataType = DataType::U64;
-    const SLIDER_MIN: Self = Self::MIN;
-    const SLIDER_MAX: Self = Self::MAX;
+    const SLIDER_MIN: Self = std::u64::MIN / 2;
+    const SLIDER_MAX: Self = std::u64::MAX / 2;
 }
 unsafe impl DataTypeKind for f32 {
     const KIND: DataType = DataType::F32;
-    const SLIDER_MIN: Self = Self::MIN;
-    const SLIDER_MAX: Self = Self::MAX;
+    const SLIDER_MIN: Self = std::f32::MIN / 2.0;
+    const SLIDER_MAX: Self = std::f32::MAX / 2.0;
 }
 unsafe impl DataTypeKind for f64 {
     const KIND: DataType = DataType::F64;
-    const SLIDER_MIN: Self = Self::MIN;
-    const SLIDER_MAX: Self = Self::MAX;
+    const SLIDER_MIN: Self = std::f64::MIN / 2.0;
+    const SLIDER_MAX: Self = std::f64::MAX / 2.0;
 }
 
 pub trait InclusiveRangeBounds<T: Copy> {
