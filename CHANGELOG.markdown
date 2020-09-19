@@ -26,6 +26,10 @@
 - Reduce unnecessary winit cursor changes which earlier caused cursor
   flickering or invalid cursors on some platforms (at least Windows)
 
+### Removed
+
+- Various things that were deprecated in imgui-rs 0.4.0
+
 ## [0.4.0] - 2020-05-27
 
 ### Added

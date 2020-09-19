@@ -2,9 +2,7 @@
 use bitflags::bitflags;
 use std::os::raw::c_int;
 
-use crate::string::ImStr;
-use crate::widget::tree::{CollapsingHeader, TreeNode, TreeNodeFlags};
-use crate::Ui;
+use crate::widget::tree::TreeNodeFlags;
 
 bitflags!(
     /// Flags for igBeginDragDropSource(), igAcceptDragDropPayload()
@@ -123,20 +121,3 @@ bitflags!(
 );
 
 pub type ImGuiTreeNodeFlags = TreeNodeFlags;
-
-impl<'ui> Ui<'ui> {
-    #[deprecated(
-        since = "0.4.0",
-        note = "use imgui::TreeNode::new(...), and build() instead"
-    )]
-    pub fn tree_node<'a>(&self, id: &'a ImStr) -> TreeNode<'a> {
-        TreeNode::new(id)
-    }
-    #[deprecated(
-        since = "0.4.0",
-        note = "use imgui::CollapsingHeader::new(...), and build() instead"
-    )]
-    pub fn collapsing_header<'a>(&self, label: &'a ImStr) -> CollapsingHeader<'a> {
-        CollapsingHeader::new(label)
-    }
-}
