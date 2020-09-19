@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [0.5.0] - 2020-09-20
+
 ### Added
 
 - Support for ConfigFlags::RENDERER_HAS_VTX_OFFSET in imgui-glium-renderer
