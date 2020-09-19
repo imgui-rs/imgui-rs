@@ -29,8 +29,8 @@ bitflags!(
 #[must_use]
 pub struct Slider<'a, T: DataTypeKind> {
     label: &'a ImStr,
-    min: Option<T>,
-    max: Option<T>,
+    min: T,
+    max: T,
     display_format: Option<&'a ImStr>,
     flags: SliderFlags,
 }
@@ -40,8 +40,8 @@ impl<'a, T: DataTypeKind> Slider<'a, T> {
     pub fn new(label: &ImStr) -> Slider<T> {
         Slider {
             label,
-            min: None,
-            max: None,
+            min: *T::SLIDER_RANGE.start(),
+            max: *T::SLIDER_RANGE.end(),
             display_format: None,
             flags: SliderFlags::empty(),
         }
@@ -49,8 +49,8 @@ impl<'a, T: DataTypeKind> Slider<'a, T> {
     /// Sets the range (inclusive)
     #[inline]
     pub fn range<R: InclusiveRangeBounds<T>>(mut self, range: R) -> Self {
-        self.min = range.start_bound().copied();
-        self.max = range.end_bound().copied();
+        self.min = *range.start_bound().unwrap_or(T::SLIDER_RANGE.start());
+        self.max = *range.end_bound().unwrap_or(T::SLIDER_RANGE.end());
         self
     }
     /// Sets the display format using *a C-style printf string*
@@ -74,14 +74,8 @@ impl<'a, T: DataTypeKind> Slider<'a, T> {
                 self.label.as_ptr(),
                 T::KIND as i32,
                 value as *mut T as *mut c_void,
-                self.min
-                    .as_ref()
-                    .map(|min| min as *const T)
-                    .unwrap_or(ptr::null()) as *const c_void,
-                self.max
-                    .as_ref()
-                    .map(|max| max as *const T)
-                    .unwrap_or(ptr::null()) as *const c_void,
+                &self.min as *const T as *const c_void,
+                &self.max as *const T as *const c_void,
                 self.display_format
                     .map(ImStr::as_ptr)
                     .unwrap_or(ptr::null()),
@@ -99,14 +93,8 @@ impl<'a, T: DataTypeKind> Slider<'a, T> {
                 T::KIND as i32,
                 values.as_mut_ptr() as *mut c_void,
                 values.len() as i32,
-                self.min
-                    .as_ref()
-                    .map(|min| min as *const T)
-                    .unwrap_or(ptr::null()) as *const c_void,
-                self.max
-                    .as_ref()
-                    .map(|max| max as *const T)
-                    .unwrap_or(ptr::null()) as *const c_void,
+                &self.min as *const T as *const c_void,
+                &self.max as *const T as *const c_void,
                 self.display_format
                     .map(ImStr::as_ptr)
                     .unwrap_or(ptr::null()),
@@ -122,8 +110,8 @@ impl<'a, T: DataTypeKind> Slider<'a, T> {
 pub struct VerticalSlider<'a, T: DataTypeKind + Copy> {
     label: &'a ImStr,
     size: [f32; 2],
-    min: Option<T>,
-    max: Option<T>,
+    min: T,
+    max: T,
     display_format: Option<&'a ImStr>,
     flags: SliderFlags,
 }
@@ -134,8 +122,8 @@ impl<'a, T: DataTypeKind> VerticalSlider<'a, T> {
         VerticalSlider {
             label,
             size,
-            min: None,
-            max: None,
+            min: *T::SLIDER_RANGE.start(),
+            max: *T::SLIDER_RANGE.end(),
             display_format: None,
             flags: SliderFlags::empty(),
         }
@@ -143,8 +131,8 @@ impl<'a, T: DataTypeKind> VerticalSlider<'a, T> {
     /// Sets the range (inclusive)
     #[inline]
     pub fn range<R: InclusiveRangeBounds<T>>(mut self, range: R) -> Self {
-        self.min = range.start_bound().copied();
-        self.max = range.end_bound().copied();
+        self.min = *range.start_bound().unwrap_or(T::SLIDER_RANGE.start());
+        self.max = *range.end_bound().unwrap_or(T::SLIDER_RANGE.end());
         self
     }
     /// Sets the display format using *a C-style printf string*
@@ -169,14 +157,8 @@ impl<'a, T: DataTypeKind> VerticalSlider<'a, T> {
                 self.size.into(),
                 T::KIND as i32,
                 value as *mut T as *mut c_void,
-                self.min
-                    .as_ref()
-                    .map(|min| min as *const T)
-                    .unwrap_or(ptr::null()) as *const c_void,
-                self.max
-                    .as_ref()
-                    .map(|max| max as *const T)
-                    .unwrap_or(ptr::null()) as *const c_void,
+                &self.min as *const T as *const c_void,
+                &self.max as *const T as *const c_void,
                 self.display_format
                     .map(ImStr::as_ptr)
                     .unwrap_or(ptr::null()),

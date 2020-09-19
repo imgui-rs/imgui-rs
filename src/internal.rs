@@ -119,36 +119,47 @@ pub enum DataType {
 /// representation in memory as the primitive value described by the associated `KIND` constant.
 pub unsafe trait DataTypeKind: Copy {
     const KIND: DataType;
+    const SLIDER_RANGE: RangeInclusive<Self>;
 }
 unsafe impl DataTypeKind for i8 {
     const KIND: DataType = DataType::I8;
+    const SLIDER_RANGE: RangeInclusive<i8> = i8::MIN..=i8::MAX;
 }
 unsafe impl DataTypeKind for u8 {
     const KIND: DataType = DataType::U8;
+    const SLIDER_RANGE: RangeInclusive<u8> = u8::MIN..=u8::MAX;
 }
 unsafe impl DataTypeKind for i16 {
     const KIND: DataType = DataType::I16;
+    const SLIDER_RANGE: RangeInclusive<i16> = i16::MIN..=i16::MAX;
 }
 unsafe impl DataTypeKind for u16 {
     const KIND: DataType = DataType::U16;
+    const SLIDER_RANGE: RangeInclusive<u16> = u16::MIN..=u16::MAX;
 }
 unsafe impl DataTypeKind for i32 {
     const KIND: DataType = DataType::I32;
+    const SLIDER_RANGE: RangeInclusive<i32> = (i32::MIN / 2)..=(i32::MAX / 2);
 }
 unsafe impl DataTypeKind for u32 {
     const KIND: DataType = DataType::U32;
+    const SLIDER_RANGE: RangeInclusive<u32> = (u32::MIN / 2)..=(u32::MAX / 2);
 }
 unsafe impl DataTypeKind for i64 {
     const KIND: DataType = DataType::I64;
+    const SLIDER_RANGE: RangeInclusive<i64> = (i64::MIN / 2)..=(i64::MAX / 2);
 }
 unsafe impl DataTypeKind for u64 {
     const KIND: DataType = DataType::U64;
+    const SLIDER_RANGE: RangeInclusive<u64> = (u64::MIN / 2)..=(u64::MAX / 2);
 }
 unsafe impl DataTypeKind for f32 {
     const KIND: DataType = DataType::F32;
+    const SLIDER_RANGE: RangeInclusive<f32> = (f32::MIN / 2.0)..=(f32::MAX / 2.0);
 }
 unsafe impl DataTypeKind for f64 {
     const KIND: DataType = DataType::F64;
+    const SLIDER_RANGE: RangeInclusive<f64> = (f64::MIN / 2.0)..=(f64::MAX / 2.0);
 }
 
 pub trait InclusiveRangeBounds<T: Copy> {
