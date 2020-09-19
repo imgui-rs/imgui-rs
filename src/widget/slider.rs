@@ -40,8 +40,8 @@ impl<'a, T: DataTypeKind> Slider<'a, T> {
     pub fn new(label: &ImStr) -> Slider<T> {
         Slider {
             label,
-            min: *T::SLIDER_RANGE.start(),
-            max: *T::SLIDER_RANGE.end(),
+            min: T::SLIDER_MIN,
+            max: T::SLIDER_MAX,
             display_format: None,
             flags: SliderFlags::empty(),
         }
@@ -49,8 +49,8 @@ impl<'a, T: DataTypeKind> Slider<'a, T> {
     /// Sets the range (inclusive)
     #[inline]
     pub fn range<R: InclusiveRangeBounds<T>>(mut self, range: R) -> Self {
-        self.min = *range.start_bound().unwrap_or(T::SLIDER_RANGE.start());
-        self.max = *range.end_bound().unwrap_or(T::SLIDER_RANGE.end());
+        self.min = range.start_bound().copied().unwrap_or(T::SLIDER_MIN);
+        self.max = range.end_bound().copied().unwrap_or(T::SLIDER_MAX);
         self
     }
     /// Sets the display format using *a C-style printf string*
@@ -122,8 +122,8 @@ impl<'a, T: DataTypeKind> VerticalSlider<'a, T> {
         VerticalSlider {
             label,
             size,
-            min: *T::SLIDER_RANGE.start(),
-            max: *T::SLIDER_RANGE.end(),
+            min: T::SLIDER_MIN,
+            max: T::SLIDER_MAX,
             display_format: None,
             flags: SliderFlags::empty(),
         }
@@ -131,8 +131,8 @@ impl<'a, T: DataTypeKind> VerticalSlider<'a, T> {
     /// Sets the range (inclusive)
     #[inline]
     pub fn range<R: InclusiveRangeBounds<T>>(mut self, range: R) -> Self {
-        self.min = *range.start_bound().unwrap_or(T::SLIDER_RANGE.start());
-        self.max = *range.end_bound().unwrap_or(T::SLIDER_RANGE.end());
+        self.min = range.start_bound().copied().unwrap_or(T::SLIDER_MIN);
+        self.max = range.end_bound().copied().unwrap_or(T::SLIDER_MAX);
         self
     }
     /// Sets the display format using *a C-style printf string*
