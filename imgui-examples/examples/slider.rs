@@ -74,13 +74,11 @@ fn example_2(ui: &Ui, state: &mut State) {
         .position([20.0, 120.0], Condition::Appearing);
     w.build(&ui, || {
         ui.text("You can easily build a slider group from an array of values:");
-        Slider::new(im_str!("[u8; 4]"))
-            .build_array(&ui, &mut state.array);
+        Slider::new(im_str!("[u8; 4]")).build_array(&ui, &mut state.array);
 
         ui.text("You don't need to use arrays with known length; arbitrary slices can be used:");
         let slice: &mut [u8] = &mut state.array[1..=2];
-        Slider::new(im_str!("subslice"))
-            .build_array(&ui, slice);
+        Slider::new(im_str!("subslice")).build_array(&ui, slice);
     });
 }
 
