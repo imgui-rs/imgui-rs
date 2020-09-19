@@ -16,8 +16,12 @@ bitflags! {
     /// Font atlas configuration flags
     #[repr(transparent)]
     pub struct FontAtlasFlags: u32 {
+        /// Don't round the height to next power of two
         const NO_POWER_OF_TWO_HEIGHT = sys::ImFontAtlasFlags_NoPowerOfTwoHeight;
+        /// Don't build software mouse cursors into the atlas
         const NO_MOUSE_CURSORS = sys::ImFontAtlasFlags_NoMouseCursors;
+        /// Don't build thick line textures into the atlas
+        const NO_BAKED_LINES = sys::ImFontAtlasFlags_NoBakedLines;
     }
 }
 
@@ -53,7 +57,9 @@ pub struct FontAtlas {
     fonts: ImVector<*mut Font>,
     custom_rects: sys::ImVector_ImFontAtlasCustomRect,
     config_data: sys::ImVector_ImFontConfig,
-    custom_rect_ids: [i32; 1],
+    tex_uv_lines: [[f32; 4]; 64],
+    pack_id_mouse_cursors: i32,
+    pack_id_lines: i32,
 }
 
 unsafe impl RawCast<sys::ImFontAtlas> for FontAtlas {}
@@ -253,7 +259,9 @@ fn test_font_atlas_memory_layout() {
     assert_field_offset!(fonts, Fonts);
     assert_field_offset!(custom_rects, CustomRects);
     assert_field_offset!(config_data, ConfigData);
-    assert_field_offset!(custom_rect_ids, CustomRectIds);
+    assert_field_offset!(tex_uv_lines, TexUvLines);
+    assert_field_offset!(pack_id_mouse_cursors, PackIdMouseCursors);
+    assert_field_offset!(pack_id_lines, PackIdLines);
 }
 
 /// A source for binary font data

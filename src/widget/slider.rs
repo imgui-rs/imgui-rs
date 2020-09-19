@@ -1,3 +1,4 @@
+use bitflags::bitflags;
 use std::ops::RangeInclusive;
 use std::os::raw::c_void;
 use std::ptr;
@@ -7,6 +8,23 @@ use crate::string::ImStr;
 use crate::sys;
 use crate::Ui;
 
+bitflags!(
+    /// Flags for sliders
+    #[repr(transparent)]
+    pub struct SliderFlags: u32 {
+        /// Clamp value to min/max bounds when input manually with CTRL+Click.
+        ///
+        /// By default CTRL+click allows going out of bounds.
+        const CLAMP_ON_INPUT = sys::ImGuiSliderFlags_ClampOnInput;
+        /// Make the widget logarithmic instead of linear
+        const LOGARITHMIC = sys::ImGuiSliderFlags_Logarithmic;
+        /// Disable rounding underlying value to match precision of the display format string
+        const NO_ROUND_TO_FORMAT = sys::ImGuiSliderFlags_NoRoundToFormat;
+        /// Disable CTRL+Click or Enter key allowing to input text directly into the widget
+        const NO_INPUT = sys::ImGuiSliderFlags_NoInput;
+    }
+);
+
 /// Builder for a slider widget.
 #[derive(Copy, Clone, Debug)]
 #[must_use]
@@ -15,7 +33,7 @@ pub struct Slider<'a, T: DataTypeKind> {
     min: T,
     max: T,
     display_format: Option<&'a ImStr>,
-    power: f32,
+    flags: SliderFlags,
 }
 
 impl<'a, T: DataTypeKind> Slider<'a, T> {
@@ -26,7 +44,7 @@ impl<'a, T: DataTypeKind> Slider<'a, T> {
             min: *range.start(),
             max: *range.end(),
             display_format: None,
-            power: 1.0,
+            flags: SliderFlags::empty(),
         }
     }
     /// Sets the display format using *a C-style printf string*
@@ -35,10 +53,10 @@ impl<'a, T: DataTypeKind> Slider<'a, T> {
         self.display_format = Some(display_format);
         self
     }
-    /// Sets the power (exponent) of the slider values
+    /// Replaces all current settings with the given flags
     #[inline]
-    pub fn power(mut self, power: f32) -> Self {
-        self.power = power;
+    pub fn flags(mut self, flags: SliderFlags) -> Self {
+        self.flags = flags;
         self
     }
     /// Builds a slider that is bound to the given value.
@@ -55,7 +73,7 @@ impl<'a, T: DataTypeKind> Slider<'a, T> {
                 self.display_format
                     .map(ImStr::as_ptr)
                     .unwrap_or(ptr::null()),
-                self.power,
+                self.flags.bits() as i32,
             )
         }
     }
@@ -74,7 +92,7 @@ impl<'a, T: DataTypeKind> Slider<'a, T> {
                 self.display_format
                     .map(ImStr::as_ptr)
                     .unwrap_or(ptr::null()),
-                self.power,
+                self.flags.bits() as i32,
             )
         }
     }
@@ -89,7 +107,7 @@ pub struct VerticalSlider<'a, T: DataTypeKind + Copy> {
     min: T,
     max: T,
     display_format: Option<&'a ImStr>,
-    power: f32,
+    flags: SliderFlags,
 }
 
 impl<'a, T: DataTypeKind> VerticalSlider<'a, T> {
@@ -101,7 +119,7 @@ impl<'a, T: DataTypeKind> VerticalSlider<'a, T> {
             min: *range.start(),
             max: *range.end(),
             display_format: None,
-            power: 1.0,
+            flags: SliderFlags::empty(),
         }
     }
     /// Sets the display format using *a C-style printf string*
@@ -110,10 +128,10 @@ impl<'a, T: DataTypeKind> VerticalSlider<'a, T> {
         self.display_format = Some(display_format);
         self
     }
-    /// Sets the power (exponent) of the slider values
+    /// Replaces all current settings with the given flags
     #[inline]
-    pub fn power(mut self, power: f32) -> Self {
-        self.power = power;
+    pub fn flags(mut self, flags: SliderFlags) -> Self {
+        self.flags = flags;
         self
     }
     /// Builds a vertical slider that is bound to the given value.
@@ -131,7 +149,7 @@ impl<'a, T: DataTypeKind> VerticalSlider<'a, T> {
                 self.display_format
                     .map(ImStr::as_ptr)
                     .unwrap_or(ptr::null()),
-                self.power,
+                self.flags.bits() as i32,
             )
         }
     }
@@ -145,6 +163,7 @@ pub struct AngleSlider<'a> {
     min_degrees: f32,
     max_degrees: f32,
     display_format: &'a ImStr,
+    flags: SliderFlags,
 }
 
 impl<'a> AngleSlider<'a> {
@@ -156,6 +175,7 @@ impl<'a> AngleSlider<'a> {
             min_degrees: -360.0,
             max_degrees: 360.0,
             display_format: im_str!("%.0f deg"),
+            flags: SliderFlags::empty(),
         }
     }
     /// Sets the minimum value (in degrees)
@@ -176,6 +196,12 @@ impl<'a> AngleSlider<'a> {
         self.display_format = display_format;
         self
     }
+    /// Replaces all current settings with the given flags
+    #[inline]
+    pub fn flags(mut self, flags: SliderFlags) -> Self {
+        self.flags = flags;
+        self
+    }
     /// Builds an angle slider that is bound to the given value (in radians).
     ///
     /// Returns true if the slider value was changed.
@@ -187,6 +213,7 @@ impl<'a> AngleSlider<'a> {
                 self.min_degrees,
                 self.max_degrees,
                 self.display_format.as_ptr(),
+                self.flags.bits() as i32,
             )
         }
     }

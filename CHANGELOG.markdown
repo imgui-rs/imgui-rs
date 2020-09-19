@@ -14,7 +14,7 @@
 
 ### Changed
 
-- Upgrade to cimgui / imgui 1.77
+- Upgrade to cimgui / imgui 1.78
 - Store per-texture sampler parameters in imgui-glium-renderer to support
   customizing them
 

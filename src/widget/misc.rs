@@ -1,8 +1,22 @@
+use bitflags::bitflags;
 use std::ops::{BitAnd, BitAndAssign, BitOrAssign, Not};
 
 use crate::string::ImStr;
 use crate::sys;
 use crate::{Direction, Ui};
+
+bitflags!(
+    /// Flags for invisible buttons
+    #[repr(transparent)]
+    pub struct ButtonFlags: u32 {
+        /// React on left mouse button
+        const MOUSE_BUTTON_LEFT = sys::ImGuiButtonFlags_MouseButtonLeft;
+        /// React on right mouse button
+        const MOUSE_BUTTON_RIGHT = sys::ImGuiButtonFlags_MouseButtonRight;
+        /// React on middle mouse button
+        const MOUSE_BUTTON_MIDDLE = sys::ImGuiButtonFlags_MouseButtonMiddle;
+    }
+);
 
 /// # Widgets: Miscellaneous
 impl<'ui> Ui<'ui> {
@@ -18,11 +32,17 @@ impl<'ui> Ui<'ui> {
     pub fn small_button(&self, label: &ImStr) -> bool {
         unsafe { sys::igSmallButton(label.as_ptr()) }
     }
-    /// Renders a button behaviour without the visual look.
+    /// Renders a widget with button behaviour without the visual look.
     ///
     /// Returns true if this button was clicked.
     pub fn invisible_button(&self, id: &ImStr, size: [f32; 2]) -> bool {
-        unsafe { sys::igInvisibleButton(id.as_ptr(), size.into()) }
+        unsafe { sys::igInvisibleButton(id.as_ptr(), size.into(), 0) }
+    }
+    /// Renders a widget with button behaviour without the visual look.
+    ///
+    /// Returns true if this button was clicked.
+    pub fn invisible_button_flags(&self, id: &ImStr, size: [f32; 2], flags: ButtonFlags) -> bool {
+        unsafe { sys::igInvisibleButton(id.as_ptr(), size.into(), flags.bits() as i32) }
     }
     /// Renders a square button with an arrow shape.
     ///
