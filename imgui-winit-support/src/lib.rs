@@ -80,6 +80,9 @@ use winit_20 as winit;
 #[cfg(feature = "winit-22")]
 use winit_22 as winit;
 
+#[cfg(feature = "winit-23")]
+use winit_23 as winit;
+
 use imgui::{self, BackendFlags, ConfigFlags, Context, ImString, Io, Key, Ui};
 use std::cmp::Ordering;
 use winit::dpi::{LogicalPosition, LogicalSize};
@@ -90,7 +93,7 @@ use winit::{
     TouchPhase, VirtualKeyCode, Window, WindowEvent,
 };
 
-#[cfg(any(feature = "winit-20", feature = "winit-22"))]
+#[cfg(any(feature = "winit-20", feature = "winit-22", feature = "winit-23"))]
 use winit::{
     error::ExternalError,
     event::{
@@ -139,7 +142,7 @@ impl CursorSettings {
             _ => window.hide_cursor(true),
         }
     }
-    #[cfg(any(feature = "winit-20", feature = "winit-22"))]
+    #[cfg(any(feature = "winit-20", feature = "winit-22", feature = "winit-23"))]
     fn apply(&self, window: &Window) {
         match self.cursor {
             Some(mouse_cursor) if !self.draw_cursor => {
@@ -258,7 +261,7 @@ impl WinitPlatform {
     ///
     /// * framebuffer scale (= DPI factor) is set
     /// * display size is set
-    #[cfg(any(feature = "winit-20", feature = "winit-22"))]
+    #[cfg(any(feature = "winit-20", feature = "winit-22", feature = "winit-23"))]
     pub fn attach_window(&mut self, io: &mut Io, window: &Window, hidpi_mode: HiDpiMode) {
         let (hidpi_mode, hidpi_factor) = hidpi_mode.apply(window.scale_factor());
         self.hidpi_mode = hidpi_mode;
@@ -291,7 +294,7 @@ impl WinitPlatform {
     ///
     /// This utility function is useful if you are using a DPI mode other than default, and want
     /// your application to use the same logical coordinates as imgui-rs.
-    #[cfg(any(feature = "winit-20", feature = "winit-22"))]
+    #[cfg(any(feature = "winit-20", feature = "winit-22", feature = "winit-23"))]
     pub fn scale_size_from_winit(
         &self,
         window: &Window,
@@ -325,7 +328,7 @@ impl WinitPlatform {
     ///
     /// This utility function is useful if you are using a DPI mode other than default, and want
     /// your application to use the same logical coordinates as imgui-rs.
-    #[cfg(any(feature = "winit-20", feature = "winit-22"))]
+    #[cfg(any(feature = "winit-20", feature = "winit-22", feature = "winit-23"))]
     pub fn scale_pos_from_winit(
         &self,
         window: &Window,
@@ -359,7 +362,7 @@ impl WinitPlatform {
     ///
     /// This utility function is useful if you are using a DPI mode other than default, and want
     /// your application to use the same logical coordinates as imgui-rs.
-    #[cfg(any(feature = "winit-20", feature = "winit-22"))]
+    #[cfg(any(feature = "winit-20", feature = "winit-22", feature = "winit-23"))]
     pub fn scale_pos_for_winit(
         &self,
         window: &Window,
@@ -463,7 +466,7 @@ impl WinitPlatform {
     /// * window size / dpi factor changes are applied
     /// * keyboard state is updated
     /// * mouse state is updated
-    #[cfg(any(feature = "winit-22"))]
+    #[cfg(any(feature = "winit-22", feature = "winit-23"))]
     pub fn handle_event<T>(&mut self, io: &mut Io, window: &Window, event: &Event<T>) {
         match *event {
             Event::WindowEvent {
@@ -684,6 +687,107 @@ impl WinitPlatform {
             _ => (),
         }
     }
+    #[cfg(feature = "winit-23")]
+    fn handle_window_event(&mut self, io: &mut Io, window: &Window, event: &WindowEvent) {
+        match *event {
+            WindowEvent::Resized(physical_size) => {
+                let logical_size = physical_size.to_logical(window.scale_factor());
+                let logical_size = self.scale_size_from_winit(window, logical_size);
+                io.display_size = [logical_size.width as f32, logical_size.height as f32];
+            }
+            WindowEvent::ScaleFactorChanged { scale_factor, .. } => {
+                let hidpi_factor = match self.hidpi_mode {
+                    ActiveHiDpiMode::Default => scale_factor,
+                    ActiveHiDpiMode::Rounded => scale_factor.round(),
+                    _ => return,
+                };
+                // Mouse position needs to be changed while we still have both the old and the new
+                // values
+                if io.mouse_pos[0].is_finite() && io.mouse_pos[1].is_finite() {
+                    io.mouse_pos = [
+                        io.mouse_pos[0] * (hidpi_factor / self.hidpi_factor) as f32,
+                        io.mouse_pos[1] * (hidpi_factor / self.hidpi_factor) as f32,
+                    ];
+                }
+                self.hidpi_factor = hidpi_factor;
+                io.display_framebuffer_scale = [hidpi_factor as f32, hidpi_factor as f32];
+                // Window size might change too if we are using DPI rounding
+                let logical_size = window.inner_size().to_logical(scale_factor);
+                let logical_size = self.scale_size_from_winit(window, logical_size);
+                io.display_size = [logical_size.width as f32, logical_size.height as f32];
+            }
+            WindowEvent::KeyboardInput {
+                input:
+                    KeyboardInput {
+                        virtual_keycode: Some(key),
+                        state,
+                        ..
+                    },
+                ..
+            } => {
+                let pressed = state == ElementState::Pressed;
+                io.keys_down[key as usize] = pressed;
+
+                // This is a bit redundant here, but we'll leave it in. The OS occasionally
+                // fails to send modifiers keys, but it doesn't seem to send false-positives,
+                // so double checking isn't terrible in case some system *doesn't* send
+                // device events sometimes.
+                match key {
+                    VirtualKeyCode::LShift | VirtualKeyCode::RShift => io.key_shift = pressed,
+                    VirtualKeyCode::LControl | VirtualKeyCode::RControl => io.key_ctrl = pressed,
+                    VirtualKeyCode::LAlt | VirtualKeyCode::RAlt => io.key_alt = pressed,
+                    VirtualKeyCode::LWin | VirtualKeyCode::RWin => io.key_super = pressed,
+                    _ => (),
+                }
+            }
+            WindowEvent::ReceivedCharacter(ch) => {
+                // Exclude the backspace key ('\u{7f}'). Otherwise we will insert this char and then
+                // delete it.
+                if ch != '\u{7f}' {
+                    io.add_input_character(ch)
+                }
+            }
+            WindowEvent::CursorMoved { position, .. } => {
+                let position = position.to_logical(window.scale_factor());
+                let position = self.scale_pos_from_winit(window, position);
+                io.mouse_pos = [position.x as f32, position.y as f32];
+            }
+            WindowEvent::MouseWheel {
+                delta,
+                phase: TouchPhase::Moved,
+                ..
+            } => match delta {
+                MouseScrollDelta::LineDelta(h, v) => {
+                    io.mouse_wheel_h = h;
+                    io.mouse_wheel = v;
+                }
+                MouseScrollDelta::PixelDelta(pos) => {
+                    let pos = pos.to_logical::<f64>(self.hidpi_factor);
+                    match pos.x.partial_cmp(&0.0) {
+                        Some(Ordering::Greater) => io.mouse_wheel_h += 1.0,
+                        Some(Ordering::Less) => io.mouse_wheel_h -= 1.0,
+                        _ => (),
+                    }
+                    match pos.y.partial_cmp(&0.0) {
+                        Some(Ordering::Greater) => io.mouse_wheel += 1.0,
+                        Some(Ordering::Less) => io.mouse_wheel -= 1.0,
+                        _ => (),
+                    }
+                }
+            },
+            WindowEvent::MouseInput { state, button, .. } => {
+                let pressed = state == ElementState::Pressed;
+                match button {
+                    MouseButton::Left => io.mouse_down[0] = pressed,
+                    MouseButton::Right => io.mouse_down[1] = pressed,
+                    MouseButton::Middle => io.mouse_down[2] = pressed,
+                    MouseButton::Other(idx @ 0..=4) => io.mouse_down[idx as usize] = pressed,
+                    _ => (),
+                }
+            }
+            _ => (),
+        }
+    }
     /// Frame preparation callback.
     ///
     /// Call this before calling the imgui-rs context `frame` function.
@@ -708,7 +812,7 @@ impl WinitPlatform {
     /// This function performs the following actions:
     ///
     /// * mouse cursor is repositioned (if requested by imgui-rs)
-    #[cfg(any(feature = "winit-20", feature = "winit-22"))]
+    #[cfg(any(feature = "winit-20", feature = "winit-22", feature = "winit-23"))]
     pub fn prepare_frame(&self, io: &mut Io, window: &Window) -> Result<(), ExternalError> {
         if io.want_set_mouse_pos {
             let logical_pos = self.scale_pos_for_winit(
