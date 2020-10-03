@@ -10,7 +10,7 @@ license = "MIT/Apache-2.0"
 categories = ["gui"]
 
 [dependencies]
-imgui = { version = "0.5.0", path = "../" }
+imgui = "0.5.0"
 winit-19 = { version = ">= 0.16, <= 0.19", package = "winit", optional = true }
 winit-20 = { version = ">= 0.20, <= 0.21", package = "winit", optional = true }
 winit-22 = { version = "0.22", package = "winit", optional = true }
