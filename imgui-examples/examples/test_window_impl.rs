@@ -11,7 +11,7 @@ struct State {
     show_app_long_text: bool,
     show_app_auto_resize: bool,
     show_app_constrained_resize: bool,
-    show_app_fixed_overlay: bool,
+    show_app_simple_overlay: bool,
     show_app_manipulating_window_title: bool,
     show_app_custom_rendering: bool,
     show_app_style_editor: bool,
@@ -51,6 +51,7 @@ struct State {
     stacked_modals_item: usize,
     stacked_modals_color: [f32; 4],
     app_log: Vec<String>,
+    simple_overlay_position: SimpleOverlayPosition,
 
     tabs: TabState,
 }
@@ -72,7 +73,7 @@ impl Default for State {
             show_app_property_editor: false,
             show_app_long_text: false,
             show_app_auto_resize: false,
-            show_app_fixed_overlay: false,
+            show_app_simple_overlay: false,
             show_app_constrained_resize: false,
             show_app_manipulating_window_title: false,
             show_app_custom_rendering: false,
@@ -113,6 +114,7 @@ impl Default for State {
             stacked_modals_item: 0,
             stacked_modals_color: [0.4, 0.7, 0.0, 0.5],
             app_log: Vec::new(),
+            simple_overlay_position: SimpleOverlayPosition::default(),
             tabs: TabState::default(),
         }
     }
@@ -228,6 +230,21 @@ impl Default for CustomRenderingState {
     }
 }
 
+#[derive(PartialEq)]
+enum SimpleOverlayPosition {
+    Custom,
+    TopLeft,
+    TopRight,
+    BottomLeft,
+    BottomRight,
+}
+
+impl Default for SimpleOverlayPosition {
+    fn default() -> Self {
+        SimpleOverlayPosition::TopLeft
+    }
+}
+
 fn main() {
     let mut state = State::default();
 
@@ -280,8 +297,12 @@ fn show_test_window(ui: &Ui, state: &mut State, opened: &mut bool) {
             &mut state.show_app_auto_resize,
         );
     }
-    if state.show_app_fixed_overlay {
-        show_example_app_fixed_overlay(ui, &mut state.show_app_fixed_overlay);
+    if state.show_app_simple_overlay {
+        show_example_app_simple_overlay(
+            ui,
+            &mut state.show_app_simple_overlay,
+            &mut state.simple_overlay_position,
+        );
     }
     if state.show_app_manipulating_window_title {
         show_example_app_manipulating_window_title(ui);
@@ -358,7 +379,7 @@ fn show_test_window(ui: &Ui, state: &mut State, opened: &mut bool) {
                 MenuItem::new(im_str!("Constrained-resizing window"))
                     .build_with_ref(ui, &mut state.show_app_constrained_resize);
                 MenuItem::new(im_str!("Simple overlay"))
-                    .build_with_ref(ui, &mut state.show_app_fixed_overlay);
+                    .build_with_ref(ui, &mut state.show_app_simple_overlay);
                 MenuItem::new(im_str!("Manipulating window title"))
                     .build_with_ref(ui, &mut state.show_app_manipulating_window_title);
                 MenuItem::new(im_str!("Custom rendering"))
@@ -943,17 +964,49 @@ output your content because that would create a feedback loop.",
         })
 }
 
-fn show_example_app_fixed_overlay(ui: &Ui, opened: &mut bool) {
+fn show_example_app_simple_overlay(
+    ui: &Ui,
+    opened: &mut bool,
+    position: &mut SimpleOverlayPosition,
+) {
     const DISTANCE: f32 = 10.0;
-    let window_pos = [DISTANCE, DISTANCE];
+
+    let screen_width = ui.io().display_size[0];
+    let screen_height = ui.io().display_size[1];
+
+    let (window_pos, window_pos_pivot, window_pos_condition, window_movable) = match *position {
+        SimpleOverlayPosition::TopLeft => {
+            ([DISTANCE, DISTANCE], [0.0, 0.0], Condition::Always, false)
+        }
+        SimpleOverlayPosition::TopRight => (
+            [screen_width - DISTANCE, DISTANCE],
+            [1.0, 0.0],
+            Condition::Always,
+            false,
+        ),
+        SimpleOverlayPosition::BottomLeft => (
+            [DISTANCE, screen_height - DISTANCE],
+            [0.0, 1.0],
+            Condition::Always,
+            false,
+        ),
+        SimpleOverlayPosition::BottomRight => (
+            [screen_width - DISTANCE, screen_height - DISTANCE],
+            [1.0, 1.0],
+            Condition::Always,
+            false,
+        ),
+        SimpleOverlayPosition::Custom => ([0.0, 0.0], [0.0, 0.0], Condition::Never, true),
+    };
+
     let style = ui.push_style_color(StyleColor::WindowBg, [0.0, 0.0, 0.0, 0.3]);
-    Window::new(im_str!("Example: Fixed Overlay"))
-        .opened(opened)
-        .position(window_pos, Condition::Always)
+    Window::new(im_str!("Example: Simple Overlay"))
+        .position(window_pos, window_pos_condition)
+        .position_pivot(window_pos_pivot)
+        .movable(window_movable)
         .title_bar(false)
         .resizable(false)
         .always_auto_resize(true)
-        .movable(false)
         .save_settings(false)
         .build(ui, || {
             ui.text(
@@ -965,6 +1018,30 @@ fn show_example_app_fixed_overlay(ui: &Ui, opened: &mut bool) {
                 "Mouse Position: ({:.1},{:.1})",
                 mouse_pos[0], mouse_pos[1]
             ));
+
+            PopupContext::new()
+                .on_right_button(true)
+                .build_window(ui, || {
+                    if MenuItem::new(im_str!("Custom")).build(ui) {
+                        *position = SimpleOverlayPosition::Custom;
+                    }
+                    if MenuItem::new(im_str!("Top-left")).build(ui) {
+                        *position = SimpleOverlayPosition::TopLeft;
+                    }
+                    if MenuItem::new(im_str!("Top-right")).build(ui) {
+                        *position = SimpleOverlayPosition::TopRight;
+                    }
+                    if MenuItem::new(im_str!("Bottom-left")).build(ui) {
+                        *position = SimpleOverlayPosition::BottomLeft;
+                    }
+                    if MenuItem::new(im_str!("Bottom-right")).build(ui) {
+                        *position = SimpleOverlayPosition::BottomRight;
+                    }
+                    if MenuItem::new(im_str!("Close")).build(ui) {
+                        *opened = false;
+                        *position = SimpleOverlayPosition::default();
+                    }
+                });
         });
     style.pop(ui);
 }
