@@ -198,6 +198,7 @@ pub type DrawIdx = sys::ImDrawIdx;
 
 #[derive(Copy, Clone, Debug, PartialEq)]
 pub struct DrawCmdParams {
+    /// left, up, right, down
     pub clip_rect: [f32; 4],
     pub texture_id: TextureId,
     pub vtx_offset: usize,
@@ -207,6 +208,7 @@ pub struct DrawCmdParams {
 /// A draw command
 pub enum DrawCmd {
     Elements {
+        /// The number of indices used for this draw command
         count: usize,
         cmd_params: DrawCmdParams,
     },
