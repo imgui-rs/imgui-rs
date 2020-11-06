@@ -26,7 +26,7 @@ parking_lot = "0.11"
 wasm = ["imgui-sys/wasm"]
 
 [dev-dependencies]
-memoffset = "0.5"
+memoffset = "0.6"
 
 [workspace]
 members = [
