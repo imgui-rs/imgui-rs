@@ -14,7 +14,6 @@ pub struct Font {
     index_lookup: ImVector<sys::ImWchar>,
     glyphs: ImVector<FontGlyph>,
     fallback_glyph: *const FontGlyph,
-    pub display_offset: [f32; 2],
     container_atlas: *mut FontAtlas,
     config_data: *const sys::ImFontConfig,
     pub config_data_count: i16,
@@ -55,7 +54,6 @@ fn test_font_memory_layout() {
     assert_field_offset!(index_lookup, IndexLookup);
     assert_field_offset!(glyphs, Glyphs);
     assert_field_offset!(fallback_glyph, FallbackGlyph);
-    assert_field_offset!(display_offset, DisplayOffset);
     assert_field_offset!(container_atlas, ContainerAtlas);
     assert_field_offset!(config_data, ConfigData);
     assert_field_offset!(config_data_count, ConfigDataCount);

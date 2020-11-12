@@ -14,7 +14,7 @@ bitflags!(
         /// Clamp value to min/max bounds when input manually with CTRL+Click.
         ///
         /// By default CTRL+click allows going out of bounds.
-        const CLAMP_ON_INPUT = sys::ImGuiSliderFlags_ClampOnInput;
+        const ALWAYS_CLAMP = sys::ImGuiSliderFlags_AlwaysClamp;
         /// Make the widget logarithmic instead of linear
         const LOGARITHMIC = sys::ImGuiSliderFlags_Logarithmic;
         /// Disable rounding underlying value to match precision of the display format string

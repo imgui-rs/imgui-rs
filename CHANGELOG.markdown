@@ -4,6 +4,7 @@
 
 ### Changed
 
+- Upgrade to cimgui / imgui 1.79
 - Upgrade to winit 0.23
 - Bump minimum Rust version to 1.41
 
