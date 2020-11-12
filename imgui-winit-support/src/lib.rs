@@ -15,8 +15,30 @@
 //!
 //! ## Complete example for winit 0.20+ (without a renderer)
 //!
-//! ```rust,no_run,ignore
-//! # // TODO: Remove ignore when only one winit version is used
+//! ```no_run
+//! # #[cfg(feature = "winit-19")]
+//! # fn main() {}
+//! #
+//! # #[cfg(not(feature = "winit-19"))]
+//! # fn main() {
+//! # #[cfg(feature = "winit-20")]
+//! # use winit_20 as winit;
+//! #
+//! # #[cfg(feature = "winit-22")]
+//! # use winit_22 as winit;
+//! #
+//! # #[cfg(feature = "winit-23")]
+//! # use winit_23 as winit;
+//! #
+//! # #[cfg(feature = "winit-24")]
+//! # use winit_24 as winit;
+//! #
+//! # #[cfg(feature = "winit-25")]
+//! # use winit_25 as winit;
+//! #
+//! # #[cfg(feature = "winit-26")]
+//! # use winit_26 as winit;
+//! #
 //! use imgui::Context;
 //! use imgui_winit_support::{HiDpiMode, WinitPlatform};
 //! use std::time::Instant;
@@ -70,6 +92,7 @@
 //!         }
 //!     }
 //! })
+//! # }
 //! ```
 //!
 //! ## `winit` versions and features.
