@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+### Changed
+
+- Upgrade to winit 0.23
+- Bump minimum Rust version to 1.41
+
 ## [0.5.0] - 2020-09-20
 
 ### Added

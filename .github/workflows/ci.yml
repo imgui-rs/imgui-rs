@@ -61,6 +61,11 @@ jobs:
         with:
           command: check
           args: --manifest-path imgui-winit-support/Cargo.toml --no-default-features --features winit-22
+      - name: Run cargo check (imgui-winit-support with winit-23)
+        uses: actions-rs/cargo@v1
+        with:
+          command: check
+          args: --manifest-path imgui-winit-support/Cargo.toml --no-default-features --features winit-23
       - name: Run cargo fmt
         uses: actions-rs/cargo@v1
         with:
@@ -110,7 +115,7 @@ jobs:
         rust:
           - stable
           - beta
-          - 1.40.0
+          - 1.41.0
         os:
           - ubuntu-latest
           - macos-latest
@@ -174,3 +179,8 @@ jobs:
         with:
           command: test
           args: --manifest-path imgui-winit-support/Cargo.toml --no-default-features --features winit-22
+      - name: Run cargo test (imgui-winit-support with winit-23)
+        uses: actions-rs/cargo@v1
+        with:
+          command: test
+          args: --manifest-path imgui-winit-support/Cargo.toml --no-default-features --features winit-23
