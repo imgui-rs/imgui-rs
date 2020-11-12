@@ -10,4 +10,5 @@ pushd "${CIMGUI_DIR}"/generator > /dev/null
 luajit generator.lua gcc false
 popd > /dev/null
 
+cp "${CIMGUI_DIR}"/cimgui.{h,cpp} "${SCRIPT_DIR}"/
 cp "${CIMGUI_DIR}"/generator/output/* "${SCRIPT_DIR}"/
