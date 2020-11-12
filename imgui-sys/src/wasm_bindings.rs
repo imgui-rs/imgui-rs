@@ -141,110 +141,165 @@ pub type ImDrawCallback = ::std::option::Option<
 pub type ImDrawIdx = ::std::os::raw::c_ushort;
 #[repr(C)]
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-pub struct ImVector_float {
+pub struct ImVector_ImDrawChannel {
     pub Size: ::std::os::raw::c_int,
     pub Capacity: ::std::os::raw::c_int,
-    pub Data: *mut f32,
+    pub Data: *mut ImDrawChannel,
 }
 #[test]
-fn bindgen_test_layout_ImVector_float() {
+fn bindgen_test_layout_ImVector_ImDrawChannel() {
     assert_eq!(
-        ::std::mem::size_of::<ImVector_float>(),
+        ::std::mem::size_of::<ImVector_ImDrawChannel>(),
         16usize,
-        concat!("Size of: ", stringify!(ImVector_float))
+        concat!("Size of: ", stringify!(ImVector_ImDrawChannel))
     );
     assert_eq!(
-        ::std::mem::align_of::<ImVector_float>(),
+        ::std::mem::align_of::<ImVector_ImDrawChannel>(),
         8usize,
-        concat!("Alignment of ", stringify!(ImVector_float))
+        concat!("Alignment of ", stringify!(ImVector_ImDrawChannel))
     );
     assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImVector_float>())).Size as *const _ as usize },
+        unsafe { &(*(::std::ptr::null::<ImVector_ImDrawChannel>())).Size as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
-            stringify!(ImVector_float),
+            stringify!(ImVector_ImDrawChannel),
             "::",
             stringify!(Size)
         )
     );
     assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImVector_float>())).Capacity as *const _ as usize },
+        unsafe { &(*(::std::ptr::null::<ImVector_ImDrawChannel>())).Capacity as *const _ as usize },
         4usize,
         concat!(
             "Offset of field: ",
-            stringify!(ImVector_float),
+            stringify!(ImVector_ImDrawChannel),
             "::",
             stringify!(Capacity)
         )
     );
     assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImVector_float>())).Data as *const _ as usize },
+        unsafe { &(*(::std::ptr::null::<ImVector_ImDrawChannel>())).Data as *const _ as usize },
         8usize,
         concat!(
             "Offset of field: ",
-            stringify!(ImVector_float),
+            stringify!(ImVector_ImDrawChannel),
             "::",
             stringify!(Data)
         )
     );
 }
-impl Default for ImVector_float {
+impl Default for ImVector_ImDrawChannel {
     fn default() -> Self {
         unsafe { ::std::mem::zeroed() }
     }
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-pub struct ImVector_ImWchar {
+pub struct ImVector_ImDrawCmd {
     pub Size: ::std::os::raw::c_int,
     pub Capacity: ::std::os::raw::c_int,
-    pub Data: *mut ImWchar,
+    pub Data: *mut ImDrawCmd,
 }
 #[test]
-fn bindgen_test_layout_ImVector_ImWchar() {
+fn bindgen_test_layout_ImVector_ImDrawCmd() {
     assert_eq!(
-        ::std::mem::size_of::<ImVector_ImWchar>(),
+        ::std::mem::size_of::<ImVector_ImDrawCmd>(),
         16usize,
-        concat!("Size of: ", stringify!(ImVector_ImWchar))
+        concat!("Size of: ", stringify!(ImVector_ImDrawCmd))
     );
     assert_eq!(
-        ::std::mem::align_of::<ImVector_ImWchar>(),
+        ::std::mem::align_of::<ImVector_ImDrawCmd>(),
         8usize,
-        concat!("Alignment of ", stringify!(ImVector_ImWchar))
+        concat!("Alignment of ", stringify!(ImVector_ImDrawCmd))
     );
     assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImVector_ImWchar>())).Size as *const _ as usize },
+        unsafe { &(*(::std::ptr::null::<ImVector_ImDrawCmd>())).Size as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
-            stringify!(ImVector_ImWchar),
+            stringify!(ImVector_ImDrawCmd),
             "::",
             stringify!(Size)
         )
     );
     assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImVector_ImWchar>())).Capacity as *const _ as usize },
+        unsafe { &(*(::std::ptr::null::<ImVector_ImDrawCmd>())).Capacity as *const _ as usize },
         4usize,
         concat!(
             "Offset of field: ",
-            stringify!(ImVector_ImWchar),
+            stringify!(ImVector_ImDrawCmd),
             "::",
             stringify!(Capacity)
         )
     );
     assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImVector_ImWchar>())).Data as *const _ as usize },
+        unsafe { &(*(::std::ptr::null::<ImVector_ImDrawCmd>())).Data as *const _ as usize },
         8usize,
         concat!(
             "Offset of field: ",
-            stringify!(ImVector_ImWchar),
+            stringify!(ImVector_ImDrawCmd),
             "::",
             stringify!(Data)
         )
     );
 }
-impl Default for ImVector_ImWchar {
+impl Default for ImVector_ImDrawCmd {
+    fn default() -> Self {
+        unsafe { ::std::mem::zeroed() }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub struct ImVector_ImDrawIdx {
+    pub Size: ::std::os::raw::c_int,
+    pub Capacity: ::std::os::raw::c_int,
+    pub Data: *mut ImDrawIdx,
+}
+#[test]
+fn bindgen_test_layout_ImVector_ImDrawIdx() {
+    assert_eq!(
+        ::std::mem::size_of::<ImVector_ImDrawIdx>(),
+        16usize,
+        concat!("Size of: ", stringify!(ImVector_ImDrawIdx))
+    );
+    assert_eq!(
+        ::std::mem::align_of::<ImVector_ImDrawIdx>(),
+        8usize,
+        concat!("Alignment of ", stringify!(ImVector_ImDrawIdx))
+    );
+    assert_eq!(
+        unsafe { &(*(::std::ptr::null::<ImVector_ImDrawIdx>())).Size as *const _ as usize },
+        0usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(ImVector_ImDrawIdx),
+            "::",
+            stringify!(Size)
+        )
+    );
+    assert_eq!(
+        unsafe { &(*(::std::ptr::null::<ImVector_ImDrawIdx>())).Capacity as *const _ as usize },
+        4usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(ImVector_ImDrawIdx),
+            "::",
+            stringify!(Capacity)
+        )
+    );
+    assert_eq!(
+        unsafe { &(*(::std::ptr::null::<ImVector_ImDrawIdx>())).Data as *const _ as usize },
+        8usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(ImVector_ImDrawIdx),
+            "::",
+            stringify!(Data)
+        )
+    );
+}
+impl Default for ImVector_ImDrawIdx {
     fn default() -> Self {
         unsafe { ::std::mem::zeroed() }
     }
@@ -306,334 +361,55 @@ impl Default for ImVector_ImDrawVert {
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-pub struct ImVector_ImFontGlyph {
+pub struct ImVector_ImFontPtr {
     pub Size: ::std::os::raw::c_int,
     pub Capacity: ::std::os::raw::c_int,
-    pub Data: *mut ImFontGlyph,
+    pub Data: *mut *mut ImFont,
 }
 #[test]
-fn bindgen_test_layout_ImVector_ImFontGlyph() {
+fn bindgen_test_layout_ImVector_ImFontPtr() {
     assert_eq!(
-        ::std::mem::size_of::<ImVector_ImFontGlyph>(),
+        ::std::mem::size_of::<ImVector_ImFontPtr>(),
         16usize,
-        concat!("Size of: ", stringify!(ImVector_ImFontGlyph))
+        concat!("Size of: ", stringify!(ImVector_ImFontPtr))
     );
     assert_eq!(
-        ::std::mem::align_of::<ImVector_ImFontGlyph>(),
+        ::std::mem::align_of::<ImVector_ImFontPtr>(),
         8usize,
-        concat!("Alignment of ", stringify!(ImVector_ImFontGlyph))
+        concat!("Alignment of ", stringify!(ImVector_ImFontPtr))
     );
     assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImVector_ImFontGlyph>())).Size as *const _ as usize },
+        unsafe { &(*(::std::ptr::null::<ImVector_ImFontPtr>())).Size as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
-            stringify!(ImVector_ImFontGlyph),
+            stringify!(ImVector_ImFontPtr),
             "::",
             stringify!(Size)
         )
     );
     assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImVector_ImFontGlyph>())).Capacity as *const _ as usize },
+        unsafe { &(*(::std::ptr::null::<ImVector_ImFontPtr>())).Capacity as *const _ as usize },
         4usize,
         concat!(
             "Offset of field: ",
-            stringify!(ImVector_ImFontGlyph),
+            stringify!(ImVector_ImFontPtr),
             "::",
             stringify!(Capacity)
         )
     );
     assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImVector_ImFontGlyph>())).Data as *const _ as usize },
+        unsafe { &(*(::std::ptr::null::<ImVector_ImFontPtr>())).Data as *const _ as usize },
         8usize,
         concat!(
             "Offset of field: ",
-            stringify!(ImVector_ImFontGlyph),
+            stringify!(ImVector_ImFontPtr),
             "::",
             stringify!(Data)
         )
     );
 }
-impl Default for ImVector_ImFontGlyph {
-    fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-pub struct ImVector_ImGuiTextRange {
-    pub Size: ::std::os::raw::c_int,
-    pub Capacity: ::std::os::raw::c_int,
-    pub Data: *mut ImGuiTextRange,
-}
-#[test]
-fn bindgen_test_layout_ImVector_ImGuiTextRange() {
-    assert_eq!(
-        ::std::mem::size_of::<ImVector_ImGuiTextRange>(),
-        16usize,
-        concat!("Size of: ", stringify!(ImVector_ImGuiTextRange))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<ImVector_ImGuiTextRange>(),
-        8usize,
-        concat!("Alignment of ", stringify!(ImVector_ImGuiTextRange))
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImVector_ImGuiTextRange>())).Size as *const _ as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImVector_ImGuiTextRange),
-            "::",
-            stringify!(Size)
-        )
-    );
-    assert_eq!(
-        unsafe {
-            &(*(::std::ptr::null::<ImVector_ImGuiTextRange>())).Capacity as *const _ as usize
-        },
-        4usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImVector_ImGuiTextRange),
-            "::",
-            stringify!(Capacity)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImVector_ImGuiTextRange>())).Data as *const _ as usize },
-        8usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImVector_ImGuiTextRange),
-            "::",
-            stringify!(Data)
-        )
-    );
-}
-impl Default for ImVector_ImGuiTextRange {
-    fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-pub struct ImVector_ImGuiStoragePair {
-    pub Size: ::std::os::raw::c_int,
-    pub Capacity: ::std::os::raw::c_int,
-    pub Data: *mut ImGuiStoragePair,
-}
-#[test]
-fn bindgen_test_layout_ImVector_ImGuiStoragePair() {
-    assert_eq!(
-        ::std::mem::size_of::<ImVector_ImGuiStoragePair>(),
-        16usize,
-        concat!("Size of: ", stringify!(ImVector_ImGuiStoragePair))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<ImVector_ImGuiStoragePair>(),
-        8usize,
-        concat!("Alignment of ", stringify!(ImVector_ImGuiStoragePair))
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImVector_ImGuiStoragePair>())).Size as *const _ as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImVector_ImGuiStoragePair),
-            "::",
-            stringify!(Size)
-        )
-    );
-    assert_eq!(
-        unsafe {
-            &(*(::std::ptr::null::<ImVector_ImGuiStoragePair>())).Capacity as *const _ as usize
-        },
-        4usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImVector_ImGuiStoragePair),
-            "::",
-            stringify!(Capacity)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImVector_ImGuiStoragePair>())).Data as *const _ as usize },
-        8usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImVector_ImGuiStoragePair),
-            "::",
-            stringify!(Data)
-        )
-    );
-}
-impl Default for ImVector_ImGuiStoragePair {
-    fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-pub struct ImVector_ImDrawChannel {
-    pub Size: ::std::os::raw::c_int,
-    pub Capacity: ::std::os::raw::c_int,
-    pub Data: *mut ImDrawChannel,
-}
-#[test]
-fn bindgen_test_layout_ImVector_ImDrawChannel() {
-    assert_eq!(
-        ::std::mem::size_of::<ImVector_ImDrawChannel>(),
-        16usize,
-        concat!("Size of: ", stringify!(ImVector_ImDrawChannel))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<ImVector_ImDrawChannel>(),
-        8usize,
-        concat!("Alignment of ", stringify!(ImVector_ImDrawChannel))
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImVector_ImDrawChannel>())).Size as *const _ as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImVector_ImDrawChannel),
-            "::",
-            stringify!(Size)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImVector_ImDrawChannel>())).Capacity as *const _ as usize },
-        4usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImVector_ImDrawChannel),
-            "::",
-            stringify!(Capacity)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImVector_ImDrawChannel>())).Data as *const _ as usize },
-        8usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImVector_ImDrawChannel),
-            "::",
-            stringify!(Data)
-        )
-    );
-}
-impl Default for ImVector_ImDrawChannel {
-    fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-pub struct ImVector_char {
-    pub Size: ::std::os::raw::c_int,
-    pub Capacity: ::std::os::raw::c_int,
-    pub Data: *mut ::std::os::raw::c_char,
-}
-#[test]
-fn bindgen_test_layout_ImVector_char() {
-    assert_eq!(
-        ::std::mem::size_of::<ImVector_char>(),
-        16usize,
-        concat!("Size of: ", stringify!(ImVector_char))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<ImVector_char>(),
-        8usize,
-        concat!("Alignment of ", stringify!(ImVector_char))
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImVector_char>())).Size as *const _ as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImVector_char),
-            "::",
-            stringify!(Size)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImVector_char>())).Capacity as *const _ as usize },
-        4usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImVector_char),
-            "::",
-            stringify!(Capacity)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImVector_char>())).Data as *const _ as usize },
-        8usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImVector_char),
-            "::",
-            stringify!(Data)
-        )
-    );
-}
-impl Default for ImVector_char {
-    fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-pub struct ImVector_ImU32 {
-    pub Size: ::std::os::raw::c_int,
-    pub Capacity: ::std::os::raw::c_int,
-    pub Data: *mut ImU32,
-}
-#[test]
-fn bindgen_test_layout_ImVector_ImU32() {
-    assert_eq!(
-        ::std::mem::size_of::<ImVector_ImU32>(),
-        16usize,
-        concat!("Size of: ", stringify!(ImVector_ImU32))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<ImVector_ImU32>(),
-        8usize,
-        concat!("Alignment of ", stringify!(ImVector_ImU32))
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImVector_ImU32>())).Size as *const _ as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImVector_ImU32),
-            "::",
-            stringify!(Size)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImVector_ImU32>())).Capacity as *const _ as usize },
-        4usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImVector_ImU32),
-            "::",
-            stringify!(Capacity)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImVector_ImU32>())).Data as *const _ as usize },
-        8usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImVector_ImU32),
-            "::",
-            stringify!(Data)
-        )
-    );
-}
-impl Default for ImVector_ImU32 {
+impl Default for ImVector_ImFontPtr {
     fn default() -> Self {
         unsafe { ::std::mem::zeroed() }
     }
@@ -701,61 +477,6 @@ impl Default for ImVector_ImFontAtlasCustomRect {
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-pub struct ImVector_ImTextureID {
-    pub Size: ::std::os::raw::c_int,
-    pub Capacity: ::std::os::raw::c_int,
-    pub Data: *mut ImTextureID,
-}
-#[test]
-fn bindgen_test_layout_ImVector_ImTextureID() {
-    assert_eq!(
-        ::std::mem::size_of::<ImVector_ImTextureID>(),
-        16usize,
-        concat!("Size of: ", stringify!(ImVector_ImTextureID))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<ImVector_ImTextureID>(),
-        8usize,
-        concat!("Alignment of ", stringify!(ImVector_ImTextureID))
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImVector_ImTextureID>())).Size as *const _ as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImVector_ImTextureID),
-            "::",
-            stringify!(Size)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImVector_ImTextureID>())).Capacity as *const _ as usize },
-        4usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImVector_ImTextureID),
-            "::",
-            stringify!(Capacity)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImVector_ImTextureID>())).Data as *const _ as usize },
-        8usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImVector_ImTextureID),
-            "::",
-            stringify!(Data)
-        )
-    );
-}
-impl Default for ImVector_ImTextureID {
-    fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
 pub struct ImVector_ImFontConfig {
     pub Size: ::std::os::raw::c_int,
     pub Capacity: ::std::os::raw::c_int,
@@ -811,110 +532,334 @@ impl Default for ImVector_ImFontConfig {
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-pub struct ImVector_ImFontPtr {
+pub struct ImVector_ImFontGlyph {
     pub Size: ::std::os::raw::c_int,
     pub Capacity: ::std::os::raw::c_int,
-    pub Data: *mut *mut ImFont,
+    pub Data: *mut ImFontGlyph,
 }
 #[test]
-fn bindgen_test_layout_ImVector_ImFontPtr() {
+fn bindgen_test_layout_ImVector_ImFontGlyph() {
     assert_eq!(
-        ::std::mem::size_of::<ImVector_ImFontPtr>(),
+        ::std::mem::size_of::<ImVector_ImFontGlyph>(),
         16usize,
-        concat!("Size of: ", stringify!(ImVector_ImFontPtr))
+        concat!("Size of: ", stringify!(ImVector_ImFontGlyph))
     );
     assert_eq!(
-        ::std::mem::align_of::<ImVector_ImFontPtr>(),
+        ::std::mem::align_of::<ImVector_ImFontGlyph>(),
         8usize,
-        concat!("Alignment of ", stringify!(ImVector_ImFontPtr))
+        concat!("Alignment of ", stringify!(ImVector_ImFontGlyph))
     );
     assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImVector_ImFontPtr>())).Size as *const _ as usize },
+        unsafe { &(*(::std::ptr::null::<ImVector_ImFontGlyph>())).Size as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
-            stringify!(ImVector_ImFontPtr),
+            stringify!(ImVector_ImFontGlyph),
             "::",
             stringify!(Size)
         )
     );
     assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImVector_ImFontPtr>())).Capacity as *const _ as usize },
+        unsafe { &(*(::std::ptr::null::<ImVector_ImFontGlyph>())).Capacity as *const _ as usize },
         4usize,
         concat!(
             "Offset of field: ",
-            stringify!(ImVector_ImFontPtr),
+            stringify!(ImVector_ImFontGlyph),
             "::",
             stringify!(Capacity)
         )
     );
     assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImVector_ImFontPtr>())).Data as *const _ as usize },
+        unsafe { &(*(::std::ptr::null::<ImVector_ImFontGlyph>())).Data as *const _ as usize },
         8usize,
         concat!(
             "Offset of field: ",
-            stringify!(ImVector_ImFontPtr),
+            stringify!(ImVector_ImFontGlyph),
             "::",
             stringify!(Data)
         )
     );
 }
-impl Default for ImVector_ImFontPtr {
+impl Default for ImVector_ImFontGlyph {
     fn default() -> Self {
         unsafe { ::std::mem::zeroed() }
     }
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-pub struct ImVector_ImDrawCmd {
+pub struct ImVector_ImGuiStoragePair {
     pub Size: ::std::os::raw::c_int,
     pub Capacity: ::std::os::raw::c_int,
-    pub Data: *mut ImDrawCmd,
+    pub Data: *mut ImGuiStoragePair,
 }
 #[test]
-fn bindgen_test_layout_ImVector_ImDrawCmd() {
+fn bindgen_test_layout_ImVector_ImGuiStoragePair() {
     assert_eq!(
-        ::std::mem::size_of::<ImVector_ImDrawCmd>(),
+        ::std::mem::size_of::<ImVector_ImGuiStoragePair>(),
         16usize,
-        concat!("Size of: ", stringify!(ImVector_ImDrawCmd))
+        concat!("Size of: ", stringify!(ImVector_ImGuiStoragePair))
     );
     assert_eq!(
-        ::std::mem::align_of::<ImVector_ImDrawCmd>(),
+        ::std::mem::align_of::<ImVector_ImGuiStoragePair>(),
         8usize,
-        concat!("Alignment of ", stringify!(ImVector_ImDrawCmd))
+        concat!("Alignment of ", stringify!(ImVector_ImGuiStoragePair))
     );
     assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImVector_ImDrawCmd>())).Size as *const _ as usize },
+        unsafe { &(*(::std::ptr::null::<ImVector_ImGuiStoragePair>())).Size as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
-            stringify!(ImVector_ImDrawCmd),
+            stringify!(ImVector_ImGuiStoragePair),
             "::",
             stringify!(Size)
         )
     );
     assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImVector_ImDrawCmd>())).Capacity as *const _ as usize },
+        unsafe {
+            &(*(::std::ptr::null::<ImVector_ImGuiStoragePair>())).Capacity as *const _ as usize
+        },
         4usize,
         concat!(
             "Offset of field: ",
-            stringify!(ImVector_ImDrawCmd),
+            stringify!(ImVector_ImGuiStoragePair),
             "::",
             stringify!(Capacity)
         )
     );
     assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImVector_ImDrawCmd>())).Data as *const _ as usize },
+        unsafe { &(*(::std::ptr::null::<ImVector_ImGuiStoragePair>())).Data as *const _ as usize },
         8usize,
         concat!(
             "Offset of field: ",
-            stringify!(ImVector_ImDrawCmd),
+            stringify!(ImVector_ImGuiStoragePair),
             "::",
             stringify!(Data)
         )
     );
 }
-impl Default for ImVector_ImDrawCmd {
+impl Default for ImVector_ImGuiStoragePair {
+    fn default() -> Self {
+        unsafe { ::std::mem::zeroed() }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub struct ImVector_ImGuiTextRange {
+    pub Size: ::std::os::raw::c_int,
+    pub Capacity: ::std::os::raw::c_int,
+    pub Data: *mut ImGuiTextRange,
+}
+#[test]
+fn bindgen_test_layout_ImVector_ImGuiTextRange() {
+    assert_eq!(
+        ::std::mem::size_of::<ImVector_ImGuiTextRange>(),
+        16usize,
+        concat!("Size of: ", stringify!(ImVector_ImGuiTextRange))
+    );
+    assert_eq!(
+        ::std::mem::align_of::<ImVector_ImGuiTextRange>(),
+        8usize,
+        concat!("Alignment of ", stringify!(ImVector_ImGuiTextRange))
+    );
+    assert_eq!(
+        unsafe { &(*(::std::ptr::null::<ImVector_ImGuiTextRange>())).Size as *const _ as usize },
+        0usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(ImVector_ImGuiTextRange),
+            "::",
+            stringify!(Size)
+        )
+    );
+    assert_eq!(
+        unsafe {
+            &(*(::std::ptr::null::<ImVector_ImGuiTextRange>())).Capacity as *const _ as usize
+        },
+        4usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(ImVector_ImGuiTextRange),
+            "::",
+            stringify!(Capacity)
+        )
+    );
+    assert_eq!(
+        unsafe { &(*(::std::ptr::null::<ImVector_ImGuiTextRange>())).Data as *const _ as usize },
+        8usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(ImVector_ImGuiTextRange),
+            "::",
+            stringify!(Data)
+        )
+    );
+}
+impl Default for ImVector_ImGuiTextRange {
+    fn default() -> Self {
+        unsafe { ::std::mem::zeroed() }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub struct ImVector_ImTextureID {
+    pub Size: ::std::os::raw::c_int,
+    pub Capacity: ::std::os::raw::c_int,
+    pub Data: *mut ImTextureID,
+}
+#[test]
+fn bindgen_test_layout_ImVector_ImTextureID() {
+    assert_eq!(
+        ::std::mem::size_of::<ImVector_ImTextureID>(),
+        16usize,
+        concat!("Size of: ", stringify!(ImVector_ImTextureID))
+    );
+    assert_eq!(
+        ::std::mem::align_of::<ImVector_ImTextureID>(),
+        8usize,
+        concat!("Alignment of ", stringify!(ImVector_ImTextureID))
+    );
+    assert_eq!(
+        unsafe { &(*(::std::ptr::null::<ImVector_ImTextureID>())).Size as *const _ as usize },
+        0usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(ImVector_ImTextureID),
+            "::",
+            stringify!(Size)
+        )
+    );
+    assert_eq!(
+        unsafe { &(*(::std::ptr::null::<ImVector_ImTextureID>())).Capacity as *const _ as usize },
+        4usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(ImVector_ImTextureID),
+            "::",
+            stringify!(Capacity)
+        )
+    );
+    assert_eq!(
+        unsafe { &(*(::std::ptr::null::<ImVector_ImTextureID>())).Data as *const _ as usize },
+        8usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(ImVector_ImTextureID),
+            "::",
+            stringify!(Data)
+        )
+    );
+}
+impl Default for ImVector_ImTextureID {
+    fn default() -> Self {
+        unsafe { ::std::mem::zeroed() }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub struct ImVector_ImU32 {
+    pub Size: ::std::os::raw::c_int,
+    pub Capacity: ::std::os::raw::c_int,
+    pub Data: *mut ImU32,
+}
+#[test]
+fn bindgen_test_layout_ImVector_ImU32() {
+    assert_eq!(
+        ::std::mem::size_of::<ImVector_ImU32>(),
+        16usize,
+        concat!("Size of: ", stringify!(ImVector_ImU32))
+    );
+    assert_eq!(
+        ::std::mem::align_of::<ImVector_ImU32>(),
+        8usize,
+        concat!("Alignment of ", stringify!(ImVector_ImU32))
+    );
+    assert_eq!(
+        unsafe { &(*(::std::ptr::null::<ImVector_ImU32>())).Size as *const _ as usize },
+        0usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(ImVector_ImU32),
+            "::",
+            stringify!(Size)
+        )
+    );
+    assert_eq!(
+        unsafe { &(*(::std::ptr::null::<ImVector_ImU32>())).Capacity as *const _ as usize },
+        4usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(ImVector_ImU32),
+            "::",
+            stringify!(Capacity)
+        )
+    );
+    assert_eq!(
+        unsafe { &(*(::std::ptr::null::<ImVector_ImU32>())).Data as *const _ as usize },
+        8usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(ImVector_ImU32),
+            "::",
+            stringify!(Data)
+        )
+    );
+}
+impl Default for ImVector_ImU32 {
+    fn default() -> Self {
+        unsafe { ::std::mem::zeroed() }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub struct ImVector_ImVec2 {
+    pub Size: ::std::os::raw::c_int,
+    pub Capacity: ::std::os::raw::c_int,
+    pub Data: *mut ImVec2,
+}
+#[test]
+fn bindgen_test_layout_ImVector_ImVec2() {
+    assert_eq!(
+        ::std::mem::size_of::<ImVector_ImVec2>(),
+        16usize,
+        concat!("Size of: ", stringify!(ImVector_ImVec2))
+    );
+    assert_eq!(
+        ::std::mem::align_of::<ImVector_ImVec2>(),
+        8usize,
+        concat!("Alignment of ", stringify!(ImVector_ImVec2))
+    );
+    assert_eq!(
+        unsafe { &(*(::std::ptr::null::<ImVector_ImVec2>())).Size as *const _ as usize },
+        0usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(ImVector_ImVec2),
+            "::",
+            stringify!(Size)
+        )
+    );
+    assert_eq!(
+        unsafe { &(*(::std::ptr::null::<ImVector_ImVec2>())).Capacity as *const _ as usize },
+        4usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(ImVector_ImVec2),
+            "::",
+            stringify!(Capacity)
+        )
+    );
+    assert_eq!(
+        unsafe { &(*(::std::ptr::null::<ImVector_ImVec2>())).Data as *const _ as usize },
+        8usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(ImVector_ImVec2),
+            "::",
+            stringify!(Data)
+        )
+    );
+}
+impl Default for ImVector_ImVec2 {
     fn default() -> Self {
         unsafe { ::std::mem::zeroed() }
     }
@@ -976,110 +921,165 @@ impl Default for ImVector_ImVec4 {
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-pub struct ImVector_ImDrawIdx {
+pub struct ImVector_ImWchar {
     pub Size: ::std::os::raw::c_int,
     pub Capacity: ::std::os::raw::c_int,
-    pub Data: *mut ImDrawIdx,
+    pub Data: *mut ImWchar,
 }
 #[test]
-fn bindgen_test_layout_ImVector_ImDrawIdx() {
+fn bindgen_test_layout_ImVector_ImWchar() {
     assert_eq!(
-        ::std::mem::size_of::<ImVector_ImDrawIdx>(),
+        ::std::mem::size_of::<ImVector_ImWchar>(),
         16usize,
-        concat!("Size of: ", stringify!(ImVector_ImDrawIdx))
+        concat!("Size of: ", stringify!(ImVector_ImWchar))
     );
     assert_eq!(
-        ::std::mem::align_of::<ImVector_ImDrawIdx>(),
+        ::std::mem::align_of::<ImVector_ImWchar>(),
         8usize,
-        concat!("Alignment of ", stringify!(ImVector_ImDrawIdx))
+        concat!("Alignment of ", stringify!(ImVector_ImWchar))
     );
     assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImVector_ImDrawIdx>())).Size as *const _ as usize },
+        unsafe { &(*(::std::ptr::null::<ImVector_ImWchar>())).Size as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
-            stringify!(ImVector_ImDrawIdx),
+            stringify!(ImVector_ImWchar),
             "::",
             stringify!(Size)
         )
     );
     assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImVector_ImDrawIdx>())).Capacity as *const _ as usize },
+        unsafe { &(*(::std::ptr::null::<ImVector_ImWchar>())).Capacity as *const _ as usize },
         4usize,
         concat!(
             "Offset of field: ",
-            stringify!(ImVector_ImDrawIdx),
+            stringify!(ImVector_ImWchar),
             "::",
             stringify!(Capacity)
         )
     );
     assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImVector_ImDrawIdx>())).Data as *const _ as usize },
+        unsafe { &(*(::std::ptr::null::<ImVector_ImWchar>())).Data as *const _ as usize },
         8usize,
         concat!(
             "Offset of field: ",
-            stringify!(ImVector_ImDrawIdx),
+            stringify!(ImVector_ImWchar),
             "::",
             stringify!(Data)
         )
     );
 }
-impl Default for ImVector_ImDrawIdx {
+impl Default for ImVector_ImWchar {
     fn default() -> Self {
         unsafe { ::std::mem::zeroed() }
     }
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-pub struct ImVector_ImVec2 {
+pub struct ImVector_char {
     pub Size: ::std::os::raw::c_int,
     pub Capacity: ::std::os::raw::c_int,
-    pub Data: *mut ImVec2,
+    pub Data: *mut ::std::os::raw::c_char,
 }
 #[test]
-fn bindgen_test_layout_ImVector_ImVec2() {
+fn bindgen_test_layout_ImVector_char() {
     assert_eq!(
-        ::std::mem::size_of::<ImVector_ImVec2>(),
+        ::std::mem::size_of::<ImVector_char>(),
         16usize,
-        concat!("Size of: ", stringify!(ImVector_ImVec2))
+        concat!("Size of: ", stringify!(ImVector_char))
     );
     assert_eq!(
-        ::std::mem::align_of::<ImVector_ImVec2>(),
+        ::std::mem::align_of::<ImVector_char>(),
         8usize,
-        concat!("Alignment of ", stringify!(ImVector_ImVec2))
+        concat!("Alignment of ", stringify!(ImVector_char))
     );
     assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImVector_ImVec2>())).Size as *const _ as usize },
+        unsafe { &(*(::std::ptr::null::<ImVector_char>())).Size as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
-            stringify!(ImVector_ImVec2),
+            stringify!(ImVector_char),
             "::",
             stringify!(Size)
         )
     );
     assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImVector_ImVec2>())).Capacity as *const _ as usize },
+        unsafe { &(*(::std::ptr::null::<ImVector_char>())).Capacity as *const _ as usize },
         4usize,
         concat!(
             "Offset of field: ",
-            stringify!(ImVector_ImVec2),
+            stringify!(ImVector_char),
             "::",
             stringify!(Capacity)
         )
     );
     assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImVector_ImVec2>())).Data as *const _ as usize },
+        unsafe { &(*(::std::ptr::null::<ImVector_char>())).Data as *const _ as usize },
         8usize,
         concat!(
             "Offset of field: ",
-            stringify!(ImVector_ImVec2),
+            stringify!(ImVector_char),
             "::",
             stringify!(Data)
         )
     );
 }
-impl Default for ImVector_ImVec2 {
+impl Default for ImVector_char {
+    fn default() -> Self {
+        unsafe { ::std::mem::zeroed() }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub struct ImVector_float {
+    pub Size: ::std::os::raw::c_int,
+    pub Capacity: ::std::os::raw::c_int,
+    pub Data: *mut f32,
+}
+#[test]
+fn bindgen_test_layout_ImVector_float() {
+    assert_eq!(
+        ::std::mem::size_of::<ImVector_float>(),
+        16usize,
+        concat!("Size of: ", stringify!(ImVector_float))
+    );
+    assert_eq!(
+        ::std::mem::align_of::<ImVector_float>(),
+        8usize,
+        concat!("Alignment of ", stringify!(ImVector_float))
+    );
+    assert_eq!(
+        unsafe { &(*(::std::ptr::null::<ImVector_float>())).Size as *const _ as usize },
+        0usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(ImVector_float),
+            "::",
+            stringify!(Size)
+        )
+    );
+    assert_eq!(
+        unsafe { &(*(::std::ptr::null::<ImVector_float>())).Capacity as *const _ as usize },
+        4usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(ImVector_float),
+            "::",
+            stringify!(Capacity)
+        )
+    );
+    assert_eq!(
+        unsafe { &(*(::std::ptr::null::<ImVector_float>())).Data as *const _ as usize },
+        8usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(ImVector_float),
+            "::",
+            stringify!(Data)
+        )
+    );
+}
+impl Default for ImVector_float {
     fn default() -> Self {
         unsafe { ::std::mem::zeroed() }
     }
@@ -1205,6 +1205,7 @@ pub const ImGuiInputTextFlags_Password: ImGuiInputTextFlags_ = 32768;
 pub const ImGuiInputTextFlags_NoUndoRedo: ImGuiInputTextFlags_ = 65536;
 pub const ImGuiInputTextFlags_CharsScientific: ImGuiInputTextFlags_ = 131072;
 pub const ImGuiInputTextFlags_CallbackResize: ImGuiInputTextFlags_ = 262144;
+pub const ImGuiInputTextFlags_CallbackEdit: ImGuiInputTextFlags_ = 524288;
 pub const ImGuiInputTextFlags_Multiline: ImGuiInputTextFlags_ = 1048576;
 pub const ImGuiInputTextFlags_NoMarkEdited: ImGuiInputTextFlags_ = 2097152;
 pub type ImGuiInputTextFlags_ = ::std::os::raw::c_uint;
@@ -1272,6 +1273,9 @@ pub const ImGuiTabItemFlags_SetSelected: ImGuiTabItemFlags_ = 2;
 pub const ImGuiTabItemFlags_NoCloseWithMiddleMouseButton: ImGuiTabItemFlags_ = 4;
 pub const ImGuiTabItemFlags_NoPushId: ImGuiTabItemFlags_ = 8;
 pub const ImGuiTabItemFlags_NoTooltip: ImGuiTabItemFlags_ = 16;
+pub const ImGuiTabItemFlags_NoReorder: ImGuiTabItemFlags_ = 32;
+pub const ImGuiTabItemFlags_Leading: ImGuiTabItemFlags_ = 64;
+pub const ImGuiTabItemFlags_Trailing: ImGuiTabItemFlags_ = 128;
 pub type ImGuiTabItemFlags_ = ::std::os::raw::c_uint;
 pub const ImGuiFocusedFlags_None: ImGuiFocusedFlags_ = 0;
 pub const ImGuiFocusedFlags_ChildWindows: ImGuiFocusedFlags_ = 1;
@@ -1504,7 +1508,7 @@ pub const ImGuiColorEditFlags__PickerMask: ImGuiColorEditFlags_ = 100663296;
 pub const ImGuiColorEditFlags__InputMask: ImGuiColorEditFlags_ = 402653184;
 pub type ImGuiColorEditFlags_ = ::std::os::raw::c_uint;
 pub const ImGuiSliderFlags_None: ImGuiSliderFlags_ = 0;
-pub const ImGuiSliderFlags_ClampOnInput: ImGuiSliderFlags_ = 16;
+pub const ImGuiSliderFlags_AlwaysClamp: ImGuiSliderFlags_ = 16;
 pub const ImGuiSliderFlags_Logarithmic: ImGuiSliderFlags_ = 32;
 pub const ImGuiSliderFlags_NoRoundToFormat: ImGuiSliderFlags_ = 64;
 pub const ImGuiSliderFlags_NoInput: ImGuiSliderFlags_ = 128;
@@ -1562,7 +1566,7 @@ pub struct ImGuiStyle {
     pub LogSliderDeadzone: f32,
     pub TabRounding: f32,
     pub TabBorderSize: f32,
-    pub TabMinWidthForUnselectedCloseButton: f32,
+    pub TabMinWidthForCloseButton: f32,
     pub ColorButtonPosition: ImGuiDir,
     pub ButtonTextAlign: ImVec2,
     pub SelectableTextAlign: ImVec2,
@@ -1852,15 +1856,14 @@ fn bindgen_test_layout_ImGuiStyle() {
     );
     assert_eq!(
         unsafe {
-            &(*(::std::ptr::null::<ImGuiStyle>())).TabMinWidthForUnselectedCloseButton as *const _
-                as usize
+            &(*(::std::ptr::null::<ImGuiStyle>())).TabMinWidthForCloseButton as *const _ as usize
         },
         132usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiStyle),
             "::",
-            stringify!(TabMinWidthForUnselectedCloseButton)
+            stringify!(TabMinWidthForCloseButton)
         )
     );
     assert_eq!(
@@ -1997,7 +2000,7 @@ impl Default for ImGuiStyle {
 }
 impl ::std::fmt::Debug for ImGuiStyle {
     fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        write ! (f , "ImGuiStyle {{ Alpha: {:?}, WindowPadding: {:?}, WindowRounding: {:?}, WindowBorderSize: {:?}, WindowMinSize: {:?}, WindowTitleAlign: {:?}, WindowMenuButtonPosition: {:?}, ChildRounding: {:?}, ChildBorderSize: {:?}, PopupRounding: {:?}, PopupBorderSize: {:?}, FramePadding: {:?}, FrameRounding: {:?}, FrameBorderSize: {:?}, ItemSpacing: {:?}, ItemInnerSpacing: {:?}, TouchExtraPadding: {:?}, IndentSpacing: {:?}, ColumnsMinSpacing: {:?}, ScrollbarSize: {:?}, ScrollbarRounding: {:?}, GrabMinSize: {:?}, GrabRounding: {:?}, LogSliderDeadzone: {:?}, TabRounding: {:?}, TabBorderSize: {:?}, TabMinWidthForUnselectedCloseButton: {:?}, ColorButtonPosition: {:?}, ButtonTextAlign: {:?}, SelectableTextAlign: {:?}, DisplayWindowPadding: {:?}, DisplaySafeAreaPadding: {:?}, MouseCursorScale: {:?}, AntiAliasedLines: {:?}, AntiAliasedLinesUseTex: {:?}, AntiAliasedFill: {:?}, CurveTessellationTol: {:?}, CircleSegmentMaxError: {:?}, Colors: [{}] }}" , self . Alpha , self . WindowPadding , self . WindowRounding , self . WindowBorderSize , self . WindowMinSize , self . WindowTitleAlign , self . WindowMenuButtonPosition , self . ChildRounding , self . ChildBorderSize , self . PopupRounding , self . PopupBorderSize , self . FramePadding , self . FrameRounding , self . FrameBorderSize , self . ItemSpacing , self . ItemInnerSpacing , self . TouchExtraPadding , self . IndentSpacing , self . ColumnsMinSpacing , self . ScrollbarSize , self . ScrollbarRounding , self . GrabMinSize , self . GrabRounding , self . LogSliderDeadzone , self . TabRounding , self . TabBorderSize , self . TabMinWidthForUnselectedCloseButton , self . ColorButtonPosition , self . ButtonTextAlign , self . SelectableTextAlign , self . DisplayWindowPadding , self . DisplaySafeAreaPadding , self . MouseCursorScale , self . AntiAliasedLines , self . AntiAliasedLinesUseTex , self . AntiAliasedFill , self . CurveTessellationTol , self . CircleSegmentMaxError , self . Colors . iter () . enumerate () . map (| (i , v) | format ! ("{}{:?}" , if i > 0 { ", " } else { "" } , v)) . collect :: < String > ())
+        write ! (f , "ImGuiStyle {{ Alpha: {:?}, WindowPadding: {:?}, WindowRounding: {:?}, WindowBorderSize: {:?}, WindowMinSize: {:?}, WindowTitleAlign: {:?}, WindowMenuButtonPosition: {:?}, ChildRounding: {:?}, ChildBorderSize: {:?}, PopupRounding: {:?}, PopupBorderSize: {:?}, FramePadding: {:?}, FrameRounding: {:?}, FrameBorderSize: {:?}, ItemSpacing: {:?}, ItemInnerSpacing: {:?}, TouchExtraPadding: {:?}, IndentSpacing: {:?}, ColumnsMinSpacing: {:?}, ScrollbarSize: {:?}, ScrollbarRounding: {:?}, GrabMinSize: {:?}, GrabRounding: {:?}, LogSliderDeadzone: {:?}, TabRounding: {:?}, TabBorderSize: {:?}, TabMinWidthForCloseButton: {:?}, ColorButtonPosition: {:?}, ButtonTextAlign: {:?}, SelectableTextAlign: {:?}, DisplayWindowPadding: {:?}, DisplaySafeAreaPadding: {:?}, MouseCursorScale: {:?}, AntiAliasedLines: {:?}, AntiAliasedLinesUseTex: {:?}, AntiAliasedFill: {:?}, CurveTessellationTol: {:?}, CircleSegmentMaxError: {:?}, Colors: [{}] }}" , self . Alpha , self . WindowPadding , self . WindowRounding , self . WindowBorderSize , self . WindowMinSize , self . WindowTitleAlign , self . WindowMenuButtonPosition , self . ChildRounding , self . ChildBorderSize , self . PopupRounding , self . PopupBorderSize , self . FramePadding , self . FrameRounding , self . FrameBorderSize , self . ItemSpacing , self . ItemInnerSpacing , self . TouchExtraPadding , self . IndentSpacing , self . ColumnsMinSpacing , self . ScrollbarSize , self . ScrollbarRounding , self . GrabMinSize , self . GrabRounding , self . LogSliderDeadzone , self . TabRounding , self . TabBorderSize , self . TabMinWidthForCloseButton , self . ColorButtonPosition , self . ButtonTextAlign , self . SelectableTextAlign , self . DisplayWindowPadding , self . DisplaySafeAreaPadding , self . MouseCursorScale , self . AntiAliasedLines , self . AntiAliasedLinesUseTex , self . AntiAliasedFill , self . CurveTessellationTol , self . CircleSegmentMaxError , self . Colors . iter () . enumerate () . map (| (i , v) | format ! ("{}{:?}" , if i > 0 { ", " } else { "" } , v)) . collect :: < String > ())
     }
 }
 #[repr(C)]
@@ -3322,6 +3325,50 @@ fn bindgen_test_layout_ImGuiOnceUponAFrame() {
     );
 }
 #[repr(C)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub struct ImGuiTextRange {
+    pub b: *const ::std::os::raw::c_char,
+    pub e: *const ::std::os::raw::c_char,
+}
+#[test]
+fn bindgen_test_layout_ImGuiTextRange() {
+    assert_eq!(
+        ::std::mem::size_of::<ImGuiTextRange>(),
+        16usize,
+        concat!("Size of: ", stringify!(ImGuiTextRange))
+    );
+    assert_eq!(
+        ::std::mem::align_of::<ImGuiTextRange>(),
+        8usize,
+        concat!("Alignment of ", stringify!(ImGuiTextRange))
+    );
+    assert_eq!(
+        unsafe { &(*(::std::ptr::null::<ImGuiTextRange>())).b as *const _ as usize },
+        0usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(ImGuiTextRange),
+            "::",
+            stringify!(b)
+        )
+    );
+    assert_eq!(
+        unsafe { &(*(::std::ptr::null::<ImGuiTextRange>())).e as *const _ as usize },
+        8usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(ImGuiTextRange),
+            "::",
+            stringify!(e)
+        )
+    );
+}
+impl Default for ImGuiTextRange {
+    fn default() -> Self {
+        unsafe { ::std::mem::zeroed() }
+    }
+}
+#[repr(C)]
 #[derive(Copy, Clone)]
 pub struct ImGuiTextFilter {
     pub InputBuf: [::std::os::raw::c_char; 256usize],
@@ -3422,6 +3469,116 @@ fn bindgen_test_layout_ImGuiTextBuffer() {
 impl Default for ImGuiTextBuffer {
     fn default() -> Self {
         unsafe { ::std::mem::zeroed() }
+    }
+}
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct ImGuiStoragePair {
+    pub key: ImGuiID,
+    pub __bindgen_anon_1: ImGuiStoragePair__bindgen_ty_1,
+}
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub union ImGuiStoragePair__bindgen_ty_1 {
+    pub val_i: ::std::os::raw::c_int,
+    pub val_f: f32,
+    pub val_p: *mut ::std::os::raw::c_void,
+    _bindgen_union_align: u64,
+}
+#[test]
+fn bindgen_test_layout_ImGuiStoragePair__bindgen_ty_1() {
+    assert_eq!(
+        ::std::mem::size_of::<ImGuiStoragePair__bindgen_ty_1>(),
+        8usize,
+        concat!("Size of: ", stringify!(ImGuiStoragePair__bindgen_ty_1))
+    );
+    assert_eq!(
+        ::std::mem::align_of::<ImGuiStoragePair__bindgen_ty_1>(),
+        8usize,
+        concat!("Alignment of ", stringify!(ImGuiStoragePair__bindgen_ty_1))
+    );
+    assert_eq!(
+        unsafe {
+            &(*(::std::ptr::null::<ImGuiStoragePair__bindgen_ty_1>())).val_i as *const _ as usize
+        },
+        0usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(ImGuiStoragePair__bindgen_ty_1),
+            "::",
+            stringify!(val_i)
+        )
+    );
+    assert_eq!(
+        unsafe {
+            &(*(::std::ptr::null::<ImGuiStoragePair__bindgen_ty_1>())).val_f as *const _ as usize
+        },
+        0usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(ImGuiStoragePair__bindgen_ty_1),
+            "::",
+            stringify!(val_f)
+        )
+    );
+    assert_eq!(
+        unsafe {
+            &(*(::std::ptr::null::<ImGuiStoragePair__bindgen_ty_1>())).val_p as *const _ as usize
+        },
+        0usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(ImGuiStoragePair__bindgen_ty_1),
+            "::",
+            stringify!(val_p)
+        )
+    );
+}
+impl Default for ImGuiStoragePair__bindgen_ty_1 {
+    fn default() -> Self {
+        unsafe { ::std::mem::zeroed() }
+    }
+}
+impl ::std::fmt::Debug for ImGuiStoragePair__bindgen_ty_1 {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        write!(f, "ImGuiStoragePair__bindgen_ty_1 {{ union }}")
+    }
+}
+#[test]
+fn bindgen_test_layout_ImGuiStoragePair() {
+    assert_eq!(
+        ::std::mem::size_of::<ImGuiStoragePair>(),
+        16usize,
+        concat!("Size of: ", stringify!(ImGuiStoragePair))
+    );
+    assert_eq!(
+        ::std::mem::align_of::<ImGuiStoragePair>(),
+        8usize,
+        concat!("Alignment of ", stringify!(ImGuiStoragePair))
+    );
+    assert_eq!(
+        unsafe { &(*(::std::ptr::null::<ImGuiStoragePair>())).key as *const _ as usize },
+        0usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(ImGuiStoragePair),
+            "::",
+            stringify!(key)
+        )
+    );
+}
+impl Default for ImGuiStoragePair {
+    fn default() -> Self {
+        unsafe { ::std::mem::zeroed() }
+    }
+}
+impl ::std::fmt::Debug for ImGuiStoragePair {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        write!(
+            f,
+            "ImGuiStoragePair {{ key: {:?}, __bindgen_anon_1: {:?} }}",
+            self.key, self.__bindgen_anon_1
+        )
     }
 }
 #[repr(C)]
@@ -4892,7 +5049,6 @@ pub struct ImFont {
     pub IndexLookup: ImVector_ImWchar,
     pub Glyphs: ImVector_ImFontGlyph,
     pub FallbackGlyph: *const ImFontGlyph,
-    pub DisplayOffset: ImVec2,
     pub ContainerAtlas: *mut ImFontAtlas,
     pub ConfigData: *const ImFontConfig,
     pub ConfigDataCount: ::std::os::raw::c_short,
@@ -4909,7 +5065,7 @@ pub struct ImFont {
 fn bindgen_test_layout_ImFont() {
     assert_eq!(
         ::std::mem::size_of::<ImFont>(),
-        120usize,
+        112usize,
         concat!("Size of: ", stringify!(ImFont))
     );
     assert_eq!(
@@ -4978,18 +5134,8 @@ fn bindgen_test_layout_ImFont() {
         )
     );
     assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImFont>())).DisplayOffset as *const _ as usize },
-        64usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImFont),
-            "::",
-            stringify!(DisplayOffset)
-        )
-    );
-    assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImFont>())).ContainerAtlas as *const _ as usize },
-        72usize,
+        64usize,
         concat!(
             "Offset of field: ",
             stringify!(ImFont),
@@ -4999,7 +5145,7 @@ fn bindgen_test_layout_ImFont() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImFont>())).ConfigData as *const _ as usize },
-        80usize,
+        72usize,
         concat!(
             "Offset of field: ",
             stringify!(ImFont),
@@ -5009,7 +5155,7 @@ fn bindgen_test_layout_ImFont() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImFont>())).ConfigDataCount as *const _ as usize },
-        88usize,
+        80usize,
         concat!(
             "Offset of field: ",
             stringify!(ImFont),
@@ -5019,7 +5165,7 @@ fn bindgen_test_layout_ImFont() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImFont>())).FallbackChar as *const _ as usize },
-        90usize,
+        82usize,
         concat!(
             "Offset of field: ",
             stringify!(ImFont),
@@ -5029,7 +5175,7 @@ fn bindgen_test_layout_ImFont() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImFont>())).EllipsisChar as *const _ as usize },
-        92usize,
+        84usize,
         concat!(
             "Offset of field: ",
             stringify!(ImFont),
@@ -5039,7 +5185,7 @@ fn bindgen_test_layout_ImFont() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImFont>())).DirtyLookupTables as *const _ as usize },
-        94usize,
+        86usize,
         concat!(
             "Offset of field: ",
             stringify!(ImFont),
@@ -5049,7 +5195,7 @@ fn bindgen_test_layout_ImFont() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImFont>())).Scale as *const _ as usize },
-        96usize,
+        88usize,
         concat!(
             "Offset of field: ",
             stringify!(ImFont),
@@ -5059,7 +5205,7 @@ fn bindgen_test_layout_ImFont() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImFont>())).Ascent as *const _ as usize },
-        100usize,
+        92usize,
         concat!(
             "Offset of field: ",
             stringify!(ImFont),
@@ -5069,7 +5215,7 @@ fn bindgen_test_layout_ImFont() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImFont>())).Descent as *const _ as usize },
-        104usize,
+        96usize,
         concat!(
             "Offset of field: ",
             stringify!(ImFont),
@@ -5079,7 +5225,7 @@ fn bindgen_test_layout_ImFont() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImFont>())).MetricsTotalSurface as *const _ as usize },
-        108usize,
+        100usize,
         concat!(
             "Offset of field: ",
             stringify!(ImFont),
@@ -5089,7 +5235,7 @@ fn bindgen_test_layout_ImFont() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImFont>())).Used4kPagesMap as *const _ as usize },
-        112usize,
+        104usize,
         concat!(
             "Offset of field: ",
             stringify!(ImFont),
@@ -5101,160 +5247,6 @@ fn bindgen_test_layout_ImFont() {
 impl Default for ImFont {
     fn default() -> Self {
         unsafe { ::std::mem::zeroed() }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-pub struct ImGuiTextRange {
-    pub b: *const ::std::os::raw::c_char,
-    pub e: *const ::std::os::raw::c_char,
-}
-#[test]
-fn bindgen_test_layout_ImGuiTextRange() {
-    assert_eq!(
-        ::std::mem::size_of::<ImGuiTextRange>(),
-        16usize,
-        concat!("Size of: ", stringify!(ImGuiTextRange))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<ImGuiTextRange>(),
-        8usize,
-        concat!("Alignment of ", stringify!(ImGuiTextRange))
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiTextRange>())).b as *const _ as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiTextRange),
-            "::",
-            stringify!(b)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiTextRange>())).e as *const _ as usize },
-        8usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiTextRange),
-            "::",
-            stringify!(e)
-        )
-    );
-}
-impl Default for ImGuiTextRange {
-    fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
-    }
-}
-#[repr(C)]
-#[derive(Copy, Clone)]
-pub struct ImGuiStoragePair {
-    pub key: ImGuiID,
-    pub __bindgen_anon_1: ImGuiStoragePair__bindgen_ty_1,
-}
-#[repr(C)]
-#[derive(Copy, Clone)]
-pub union ImGuiStoragePair__bindgen_ty_1 {
-    pub val_i: ::std::os::raw::c_int,
-    pub val_f: f32,
-    pub val_p: *mut ::std::os::raw::c_void,
-    _bindgen_union_align: u64,
-}
-#[test]
-fn bindgen_test_layout_ImGuiStoragePair__bindgen_ty_1() {
-    assert_eq!(
-        ::std::mem::size_of::<ImGuiStoragePair__bindgen_ty_1>(),
-        8usize,
-        concat!("Size of: ", stringify!(ImGuiStoragePair__bindgen_ty_1))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<ImGuiStoragePair__bindgen_ty_1>(),
-        8usize,
-        concat!("Alignment of ", stringify!(ImGuiStoragePair__bindgen_ty_1))
-    );
-    assert_eq!(
-        unsafe {
-            &(*(::std::ptr::null::<ImGuiStoragePair__bindgen_ty_1>())).val_i as *const _ as usize
-        },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiStoragePair__bindgen_ty_1),
-            "::",
-            stringify!(val_i)
-        )
-    );
-    assert_eq!(
-        unsafe {
-            &(*(::std::ptr::null::<ImGuiStoragePair__bindgen_ty_1>())).val_f as *const _ as usize
-        },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiStoragePair__bindgen_ty_1),
-            "::",
-            stringify!(val_f)
-        )
-    );
-    assert_eq!(
-        unsafe {
-            &(*(::std::ptr::null::<ImGuiStoragePair__bindgen_ty_1>())).val_p as *const _ as usize
-        },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiStoragePair__bindgen_ty_1),
-            "::",
-            stringify!(val_p)
-        )
-    );
-}
-impl Default for ImGuiStoragePair__bindgen_ty_1 {
-    fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
-    }
-}
-impl ::std::fmt::Debug for ImGuiStoragePair__bindgen_ty_1 {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        write!(f, "ImGuiStoragePair__bindgen_ty_1 {{ union }}")
-    }
-}
-#[test]
-fn bindgen_test_layout_ImGuiStoragePair() {
-    assert_eq!(
-        ::std::mem::size_of::<ImGuiStoragePair>(),
-        16usize,
-        concat!("Size of: ", stringify!(ImGuiStoragePair))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<ImGuiStoragePair>(),
-        8usize,
-        concat!("Alignment of ", stringify!(ImGuiStoragePair))
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiStoragePair>())).key as *const _ as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiStoragePair),
-            "::",
-            stringify!(key)
-        )
-    );
-}
-impl Default for ImGuiStoragePair {
-    fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
-    }
-}
-impl ::std::fmt::Debug for ImGuiStoragePair {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        write!(
-            f,
-            "ImGuiStoragePair {{ key: {:?}, __bindgen_anon_1: {:?} }}",
-            self.key, self.__bindgen_anon_1
-        )
     }
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
@@ -6754,10 +6746,10 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igOpenPopupContextItem(
+    pub fn igOpenPopupOnItemClick(
         str_id: *const ::std::os::raw::c_char,
         popup_flags: ImGuiPopupFlags,
-    ) -> bool;
+    );
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
@@ -6839,6 +6831,10 @@ extern "C" {
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igEndTabItem();
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
+    pub fn igTabItemButton(label: *const ::std::os::raw::c_char, flags: ImGuiTabItemFlags) -> bool;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
@@ -7301,6 +7297,14 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
+    pub fn ImGuiInputTextCallbackData_SelectAll(self_: *mut ImGuiInputTextCallbackData);
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
+    pub fn ImGuiInputTextCallbackData_ClearSelection(self_: *mut ImGuiInputTextCallbackData);
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
     pub fn ImGuiInputTextCallbackData_HasSelection(self_: *mut ImGuiInputTextCallbackData) -> bool;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
@@ -7561,18 +7565,11 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn ImGuiListClipper_ImGuiListClipper(
-        items_count: ::std::os::raw::c_int,
-        items_height: f32,
-    ) -> *mut ImGuiListClipper;
+    pub fn ImGuiListClipper_ImGuiListClipper() -> *mut ImGuiListClipper;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImGuiListClipper_destroy(self_: *mut ImGuiListClipper);
-}
-#[link(wasm_import_module = "imgui-sys-v0")]
-extern "C" {
-    pub fn ImGuiListClipper_Step(self_: *mut ImGuiListClipper) -> bool;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
@@ -7585,6 +7582,10 @@ extern "C" {
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImGuiListClipper_End(self_: *mut ImGuiListClipper);
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
+    pub fn ImGuiListClipper_Step(self_: *mut ImGuiListClipper) -> bool;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
@@ -7621,7 +7622,7 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn ImColor_HSV(pOut: *mut ImColor, self_: *mut ImColor, h: f32, s: f32, v: f32, a: f32);
+    pub fn ImColor_HSV(pOut: *mut ImColor, h: f32, s: f32, v: f32, a: f32);
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
@@ -8481,7 +8482,7 @@ extern "C" {
 extern "C" {
     pub fn ImFont_AddGlyph(
         self_: *mut ImFont,
-        src_cfg: *mut ImFontConfig,
+        src_cfg: *const ImFontConfig,
         c: ImWchar,
         x0: f32,
         y0: f32,

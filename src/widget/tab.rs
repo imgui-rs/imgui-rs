@@ -50,6 +50,9 @@ bitflags! {
         const NO_CLOSE_WITH_MIDDLE_MOUSE_BUTTON = sys::ImGuiTabItemFlags_NoCloseWithMiddleMouseButton;
         const NO_PUSH_ID = sys::ImGuiTabItemFlags_NoPushId;
         const NO_TOOLTIP = sys::ImGuiTabItemFlags_NoTooltip;
+        const NO_REORDER = sys::ImGuiTabItemFlags_NoReorder;
+        const LEADING = sys::ImGuiTabItemFlags_Leading;
+        const TRAILING = sys::ImGuiTabItemFlags_Trailing;
     }
 }
 

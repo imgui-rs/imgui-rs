@@ -96,7 +96,7 @@ pub struct Style {
     ///
     /// `= 0.0`: always show when hovering
     /// `= f32::MAX`: never show close button unless selected
-    pub tab_min_width_for_unselected_close_button: f32,
+    pub tab_min_width_for_close_button: f32,
     /// Side of the color buttonton pubin color editor widgets (left/right).
     pub color_button_position: Direction,
     /// Alignment of button text when button is larger than text.
@@ -460,10 +460,7 @@ fn test_style_memory_layout() {
     assert_field_offset!(log_slider_deadzone, LogSliderDeadzone);
     assert_field_offset!(tab_rounding, TabRounding);
     assert_field_offset!(tab_border_size, TabBorderSize);
-    assert_field_offset!(
-        tab_min_width_for_unselected_close_button,
-        TabMinWidthForUnselectedCloseButton
-    );
+    assert_field_offset!(tab_min_width_for_close_button, TabMinWidthForCloseButton);
     assert_field_offset!(color_button_position, ColorButtonPosition);
     assert_field_offset!(button_text_align, ButtonTextAlign);
     assert_field_offset!(selectable_text_align, SelectableTextAlign);
