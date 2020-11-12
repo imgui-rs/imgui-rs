@@ -61,7 +61,9 @@
 //!     match event {
 //!         Event::NewEvents(_) => {
 //!             // other application-specific logic
-//!             last_frame = imgui.io_mut().update_delta_time(last_frame);
+//!             let now = Instant::now();
+//!             imgui.io_mut().update_delta_time(now - last_frame);
+//!             last_frame = now;
 //!         },
 //!         Event::MainEventsCleared => {
 //!             // other application-specific logic
