@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Added
+
+- `Io::peek_input_characters`
+
 ### Changed
 
 - Upgrade to cimgui / imgui 1.79
