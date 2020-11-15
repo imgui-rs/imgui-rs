@@ -531,7 +531,7 @@ dependencies = [
 
 [[package]]
 name = "imgui"
-version = "0.5.0"
+version = "0.6.0"
 dependencies = [
  "bitflags",
  "gfx",
@@ -558,7 +558,7 @@ dependencies = [
 
 [[package]]
 name = "imgui-gfx-renderer"
-version = "0.5.0"
+version = "0.6.0"
 dependencies = [
  "gfx",
  "imgui",
@@ -567,7 +567,7 @@ dependencies = [
 
 [[package]]
 name = "imgui-sys"
-version = "0.5.0"
+version = "0.6.0"
 dependencies = [
  "cc",
 ]
