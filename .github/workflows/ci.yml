@@ -115,7 +115,7 @@ jobs:
         rust:
           - stable
           - beta
-          - 1.41.0
+          - 1.43.0
         os:
           - ubuntu-latest
           - macos-latest

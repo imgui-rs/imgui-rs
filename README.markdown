@@ -2,7 +2,7 @@
 
 **Still fairly experimental!**
 
-Minimum Rust version: 1.41
+Minimum Rust version: 1.43
 
 Wrapped Dear ImGui version: 1.79
 
