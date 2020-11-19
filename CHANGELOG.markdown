@@ -7,6 +7,8 @@
 ### Added
 
 - `Io::peek_input_characters`
+- `Ui::plot_lines_fn`
+- `Ui::plot_histogram_fn`
 
 ### Changed
 

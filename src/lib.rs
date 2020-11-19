@@ -24,8 +24,8 @@ pub use self::input_widget::{
 pub use self::io::*;
 pub use self::layout::*;
 pub use self::legacy::*;
-pub use self::plothistogram::PlotHistogram;
-pub use self::plotlines::PlotLines;
+pub use self::plothistogram::{PlotHistogram, PlotHistogramFn};
+pub use self::plotlines::{PlotLines, PlotLinesFn};
 pub use self::popup_modal::PopupModal;
 pub use self::render::draw_data::*;
 pub use self::render::renderer::*;
@@ -412,6 +412,16 @@ impl<'ui> Ui<'ui> {
     pub fn plot_lines<'p>(&self, label: &'p ImStr, values: &'p [f32]) -> PlotLines<'ui, 'p> {
         PlotLines::new(self, label, values)
     }
+
+    pub fn plot_lines_fn<'p, T>(
+        &self,
+        label: &'p ImStr,
+        values_getter: fn(&mut T, usize) -> f32,
+        data: &'p mut T,
+        values_count: usize,
+    ) -> PlotLinesFn<'ui, 'p, T> {
+        PlotLinesFn::new(self, label, values_getter, data, values_count)
+    }
 }
 
 impl<'ui> Ui<'ui> {
@@ -421,6 +431,16 @@ impl<'ui> Ui<'ui> {
         values: &'p [f32],
     ) -> PlotHistogram<'ui, 'p> {
         PlotHistogram::new(self, label, values)
+    }
+
+    pub fn plot_histogram_fn<'p, T>(
+        &self,
+        label: &'p ImStr,
+        values_getter: fn(&mut T, usize) -> f32,
+        data: &'p mut T,
+        values_count: usize,
+    ) -> PlotHistogramFn<'ui, 'p, T> {
+        PlotHistogramFn::new(self, label, values_getter, data, values_count)
     }
 }
 
