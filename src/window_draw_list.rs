@@ -84,7 +84,10 @@ impl<'ui> WindowDrawList<'ui> {
 
     pub(crate) fn background(self) -> Self {
         Self {
+            #[cfg(not(feature = "docking"))]
             draw_list: unsafe { sys::igGetBackgroundDrawList() },
+            #[cfg(feature = "docking")]
+            draw_list: unsafe { sys::igGetBackgroundDrawListNil() },
             _phantom: PhantomData,
         }
     }

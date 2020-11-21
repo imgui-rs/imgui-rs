@@ -1,0 +1,6 @@
+imgui-sys/src/bindings.rs linguist-generated=true
+imgui-sys/src/docking_bindings.rs linguist-generated=true
+imgui-sys/src/wasm_bindings.rs linguist-generated=true
+imgui-sys/src/wasm_docking_bindings.rs linguist-generated=true
+imgui-sys/third-party/docking/* linguist-generated=true
+imgui-sys/third-party/main/* linguist-generated=true

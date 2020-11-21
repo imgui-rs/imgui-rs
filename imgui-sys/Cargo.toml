@@ -13,7 +13,10 @@ links = "imgui"
 
 [build-dependencies]
 cc = "1.0"
+git2 = { version = "0.13", default-features = false, features = ["https"] }
+toml = "0.5"
 
 [features]
 default = []
 wasm = []
+docking = []

@@ -80,6 +80,7 @@ pub fn dear_imgui_version() -> &'static str {
     }
 }
 
+#[cfg(not(feature = "docking"))]
 #[test]
 fn test_version() {
     assert_eq!(dear_imgui_version(), "1.79");

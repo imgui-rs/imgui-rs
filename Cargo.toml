@@ -24,6 +24,7 @@ parking_lot = "0.11"
 
 [features]
 wasm = ["imgui-sys/wasm"]
+docking = ["imgui-sys/docking"]
 
 [dev-dependencies]
 memoffset = "0.6"

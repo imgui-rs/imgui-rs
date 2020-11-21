@@ -1,14 +1,6 @@
-#[cfg(feature = "wasm")]
-mod wasm_bindings;
+mod all_bindings;
 
-#[cfg(feature = "wasm")]
-pub use crate::wasm_bindings::*;
-
-#[cfg(not(feature = "wasm"))]
-mod bindings;
-
-#[cfg(not(feature = "wasm"))]
-pub use crate::bindings::*;
+pub use all_bindings::*;
 
 impl ImVec2 {
     #[inline]

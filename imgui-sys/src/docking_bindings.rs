@@ -81,6 +81,7 @@ where
         }
     }
 }
+pub type __uint64_t = ::std::os::raw::c_ulong;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct ImGuiContext {
@@ -107,6 +108,7 @@ pub type ImGuiButtonFlags = ::std::os::raw::c_int;
 pub type ImGuiColorEditFlags = ::std::os::raw::c_int;
 pub type ImGuiConfigFlags = ::std::os::raw::c_int;
 pub type ImGuiComboFlags = ::std::os::raw::c_int;
+pub type ImGuiDockNodeFlags = ::std::os::raw::c_int;
 pub type ImGuiDragDropFlags = ::std::os::raw::c_int;
 pub type ImGuiFocusedFlags = ::std::os::raw::c_int;
 pub type ImGuiHoveredFlags = ::std::os::raw::c_int;
@@ -118,6 +120,7 @@ pub type ImGuiSliderFlags = ::std::os::raw::c_int;
 pub type ImGuiTabBarFlags = ::std::os::raw::c_int;
 pub type ImGuiTabItemFlags = ::std::os::raw::c_int;
 pub type ImGuiTreeNodeFlags = ::std::os::raw::c_int;
+pub type ImGuiViewportFlags = ::std::os::raw::c_int;
 pub type ImGuiWindowFlags = ::std::os::raw::c_int;
 pub type ImTextureID = *mut ::std::os::raw::c_void;
 pub type ImGuiID = ::std::os::raw::c_uint;
@@ -130,6 +133,7 @@ pub type ImWchar16 = ::std::os::raw::c_ushort;
 pub type ImWchar = ImWchar16;
 pub type ImU8 = ::std::os::raw::c_uchar;
 pub type ImU32 = ::std::os::raw::c_uint;
+pub type ImU64 = u64;
 pub type ImDrawCallback = ::std::option::Option<
     unsafe extern "C" fn(parent_list: *const ImDrawList, cmd: *const ImDrawCmd),
 >;
@@ -582,6 +586,67 @@ impl Default for ImVector_ImFontGlyph {
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub struct ImVector_ImGuiPlatformMonitor {
+    pub Size: ::std::os::raw::c_int,
+    pub Capacity: ::std::os::raw::c_int,
+    pub Data: *mut ImGuiPlatformMonitor,
+}
+#[test]
+fn bindgen_test_layout_ImVector_ImGuiPlatformMonitor() {
+    assert_eq!(
+        ::std::mem::size_of::<ImVector_ImGuiPlatformMonitor>(),
+        16usize,
+        concat!("Size of: ", stringify!(ImVector_ImGuiPlatformMonitor))
+    );
+    assert_eq!(
+        ::std::mem::align_of::<ImVector_ImGuiPlatformMonitor>(),
+        8usize,
+        concat!("Alignment of ", stringify!(ImVector_ImGuiPlatformMonitor))
+    );
+    assert_eq!(
+        unsafe {
+            &(*(::std::ptr::null::<ImVector_ImGuiPlatformMonitor>())).Size as *const _ as usize
+        },
+        0usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(ImVector_ImGuiPlatformMonitor),
+            "::",
+            stringify!(Size)
+        )
+    );
+    assert_eq!(
+        unsafe {
+            &(*(::std::ptr::null::<ImVector_ImGuiPlatformMonitor>())).Capacity as *const _ as usize
+        },
+        4usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(ImVector_ImGuiPlatformMonitor),
+            "::",
+            stringify!(Capacity)
+        )
+    );
+    assert_eq!(
+        unsafe {
+            &(*(::std::ptr::null::<ImVector_ImGuiPlatformMonitor>())).Data as *const _ as usize
+        },
+        8usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(ImVector_ImGuiPlatformMonitor),
+            "::",
+            stringify!(Data)
+        )
+    );
+}
+impl Default for ImVector_ImGuiPlatformMonitor {
+    fn default() -> Self {
+        unsafe { ::std::mem::zeroed() }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
 pub struct ImVector_ImGuiStoragePair {
     pub Size: ::std::os::raw::c_int,
     pub Capacity: ::std::os::raw::c_int,
@@ -690,6 +755,63 @@ fn bindgen_test_layout_ImVector_ImGuiTextRange() {
     );
 }
 impl Default for ImVector_ImGuiTextRange {
+    fn default() -> Self {
+        unsafe { ::std::mem::zeroed() }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub struct ImVector_ImGuiViewportPtr {
+    pub Size: ::std::os::raw::c_int,
+    pub Capacity: ::std::os::raw::c_int,
+    pub Data: *mut *mut ImGuiViewport,
+}
+#[test]
+fn bindgen_test_layout_ImVector_ImGuiViewportPtr() {
+    assert_eq!(
+        ::std::mem::size_of::<ImVector_ImGuiViewportPtr>(),
+        16usize,
+        concat!("Size of: ", stringify!(ImVector_ImGuiViewportPtr))
+    );
+    assert_eq!(
+        ::std::mem::align_of::<ImVector_ImGuiViewportPtr>(),
+        8usize,
+        concat!("Alignment of ", stringify!(ImVector_ImGuiViewportPtr))
+    );
+    assert_eq!(
+        unsafe { &(*(::std::ptr::null::<ImVector_ImGuiViewportPtr>())).Size as *const _ as usize },
+        0usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(ImVector_ImGuiViewportPtr),
+            "::",
+            stringify!(Size)
+        )
+    );
+    assert_eq!(
+        unsafe {
+            &(*(::std::ptr::null::<ImVector_ImGuiViewportPtr>())).Capacity as *const _ as usize
+        },
+        4usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(ImVector_ImGuiViewportPtr),
+            "::",
+            stringify!(Capacity)
+        )
+    );
+    assert_eq!(
+        unsafe { &(*(::std::ptr::null::<ImVector_ImGuiViewportPtr>())).Data as *const _ as usize },
+        8usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(ImVector_ImGuiViewportPtr),
+            "::",
+            stringify!(Data)
+        )
+    );
+}
+impl Default for ImVector_ImGuiViewportPtr {
     fn default() -> Self {
         unsafe { ::std::mem::zeroed() }
     }
@@ -1170,6 +1292,7 @@ pub const ImGuiWindowFlags_AlwaysUseWindowPadding: ImGuiWindowFlags_ = 65536;
 pub const ImGuiWindowFlags_NoNavInputs: ImGuiWindowFlags_ = 262144;
 pub const ImGuiWindowFlags_NoNavFocus: ImGuiWindowFlags_ = 524288;
 pub const ImGuiWindowFlags_UnsavedDocument: ImGuiWindowFlags_ = 1048576;
+pub const ImGuiWindowFlags_NoDocking: ImGuiWindowFlags_ = 2097152;
 pub const ImGuiWindowFlags_NoNav: ImGuiWindowFlags_ = 786432;
 pub const ImGuiWindowFlags_NoDecoration: ImGuiWindowFlags_ = 43;
 pub const ImGuiWindowFlags_NoInputs: ImGuiWindowFlags_ = 786944;
@@ -1179,6 +1302,7 @@ pub const ImGuiWindowFlags_Tooltip: ImGuiWindowFlags_ = 33554432;
 pub const ImGuiWindowFlags_Popup: ImGuiWindowFlags_ = 67108864;
 pub const ImGuiWindowFlags_Modal: ImGuiWindowFlags_ = 134217728;
 pub const ImGuiWindowFlags_ChildMenu: ImGuiWindowFlags_ = 268435456;
+pub const ImGuiWindowFlags_DockNodeHost: ImGuiWindowFlags_ = 536870912;
 pub type ImGuiWindowFlags_ = ::std::os::raw::c_uint;
 pub const ImGuiInputTextFlags_None: ImGuiInputTextFlags_ = 0;
 pub const ImGuiInputTextFlags_CharsDecimal: ImGuiInputTextFlags_ = 1;
@@ -1289,6 +1413,14 @@ pub const ImGuiHoveredFlags_AllowWhenDisabled: ImGuiHoveredFlags_ = 128;
 pub const ImGuiHoveredFlags_RectOnly: ImGuiHoveredFlags_ = 104;
 pub const ImGuiHoveredFlags_RootAndChildWindows: ImGuiHoveredFlags_ = 3;
 pub type ImGuiHoveredFlags_ = ::std::os::raw::c_uint;
+pub const ImGuiDockNodeFlags_None: ImGuiDockNodeFlags_ = 0;
+pub const ImGuiDockNodeFlags_KeepAliveOnly: ImGuiDockNodeFlags_ = 1;
+pub const ImGuiDockNodeFlags_NoDockingInCentralNode: ImGuiDockNodeFlags_ = 4;
+pub const ImGuiDockNodeFlags_PassthruCentralNode: ImGuiDockNodeFlags_ = 8;
+pub const ImGuiDockNodeFlags_NoSplit: ImGuiDockNodeFlags_ = 16;
+pub const ImGuiDockNodeFlags_NoResize: ImGuiDockNodeFlags_ = 32;
+pub const ImGuiDockNodeFlags_AutoHideTabBar: ImGuiDockNodeFlags_ = 64;
+pub type ImGuiDockNodeFlags_ = ::std::os::raw::c_uint;
 pub const ImGuiDragDropFlags_None: ImGuiDragDropFlags_ = 0;
 pub const ImGuiDragDropFlags_SourceNoPreviewTooltip: ImGuiDragDropFlags_ = 1;
 pub const ImGuiDragDropFlags_SourceNoDisableHover: ImGuiDragDropFlags_ = 2;
@@ -1381,6 +1513,10 @@ pub const ImGuiConfigFlags_NavEnableSetMousePos: ImGuiConfigFlags_ = 4;
 pub const ImGuiConfigFlags_NavNoCaptureKeyboard: ImGuiConfigFlags_ = 8;
 pub const ImGuiConfigFlags_NoMouse: ImGuiConfigFlags_ = 16;
 pub const ImGuiConfigFlags_NoMouseCursorChange: ImGuiConfigFlags_ = 32;
+pub const ImGuiConfigFlags_DockingEnable: ImGuiConfigFlags_ = 64;
+pub const ImGuiConfigFlags_ViewportsEnable: ImGuiConfigFlags_ = 1024;
+pub const ImGuiConfigFlags_DpiEnableScaleViewports: ImGuiConfigFlags_ = 16384;
+pub const ImGuiConfigFlags_DpiEnableScaleFonts: ImGuiConfigFlags_ = 32768;
 pub const ImGuiConfigFlags_IsSRGB: ImGuiConfigFlags_ = 1048576;
 pub const ImGuiConfigFlags_IsTouchScreen: ImGuiConfigFlags_ = 2097152;
 pub type ImGuiConfigFlags_ = ::std::os::raw::c_uint;
@@ -1389,6 +1525,9 @@ pub const ImGuiBackendFlags_HasGamepad: ImGuiBackendFlags_ = 1;
 pub const ImGuiBackendFlags_HasMouseCursors: ImGuiBackendFlags_ = 2;
 pub const ImGuiBackendFlags_HasSetMousePos: ImGuiBackendFlags_ = 4;
 pub const ImGuiBackendFlags_RendererHasVtxOffset: ImGuiBackendFlags_ = 8;
+pub const ImGuiBackendFlags_PlatformHasViewports: ImGuiBackendFlags_ = 1024;
+pub const ImGuiBackendFlags_HasMouseHoveredViewport: ImGuiBackendFlags_ = 2048;
+pub const ImGuiBackendFlags_RendererHasViewports: ImGuiBackendFlags_ = 4096;
 pub type ImGuiBackendFlags_ = ::std::os::raw::c_uint;
 pub const ImGuiCol_Text: ImGuiCol_ = 0;
 pub const ImGuiCol_TextDisabled: ImGuiCol_ = 1;
@@ -1428,17 +1567,19 @@ pub const ImGuiCol_TabHovered: ImGuiCol_ = 34;
 pub const ImGuiCol_TabActive: ImGuiCol_ = 35;
 pub const ImGuiCol_TabUnfocused: ImGuiCol_ = 36;
 pub const ImGuiCol_TabUnfocusedActive: ImGuiCol_ = 37;
-pub const ImGuiCol_PlotLines: ImGuiCol_ = 38;
-pub const ImGuiCol_PlotLinesHovered: ImGuiCol_ = 39;
-pub const ImGuiCol_PlotHistogram: ImGuiCol_ = 40;
-pub const ImGuiCol_PlotHistogramHovered: ImGuiCol_ = 41;
-pub const ImGuiCol_TextSelectedBg: ImGuiCol_ = 42;
-pub const ImGuiCol_DragDropTarget: ImGuiCol_ = 43;
-pub const ImGuiCol_NavHighlight: ImGuiCol_ = 44;
-pub const ImGuiCol_NavWindowingHighlight: ImGuiCol_ = 45;
-pub const ImGuiCol_NavWindowingDimBg: ImGuiCol_ = 46;
-pub const ImGuiCol_ModalWindowDimBg: ImGuiCol_ = 47;
-pub const ImGuiCol_COUNT: ImGuiCol_ = 48;
+pub const ImGuiCol_DockingPreview: ImGuiCol_ = 38;
+pub const ImGuiCol_DockingEmptyBg: ImGuiCol_ = 39;
+pub const ImGuiCol_PlotLines: ImGuiCol_ = 40;
+pub const ImGuiCol_PlotLinesHovered: ImGuiCol_ = 41;
+pub const ImGuiCol_PlotHistogram: ImGuiCol_ = 42;
+pub const ImGuiCol_PlotHistogramHovered: ImGuiCol_ = 43;
+pub const ImGuiCol_TextSelectedBg: ImGuiCol_ = 44;
+pub const ImGuiCol_DragDropTarget: ImGuiCol_ = 45;
+pub const ImGuiCol_NavHighlight: ImGuiCol_ = 46;
+pub const ImGuiCol_NavWindowingHighlight: ImGuiCol_ = 47;
+pub const ImGuiCol_NavWindowingDimBg: ImGuiCol_ = 48;
+pub const ImGuiCol_ModalWindowDimBg: ImGuiCol_ = 49;
+pub const ImGuiCol_COUNT: ImGuiCol_ = 50;
 pub type ImGuiCol_ = ::std::os::raw::c_uint;
 pub const ImGuiStyleVar_Alpha: ImGuiStyleVar_ = 0;
 pub const ImGuiStyleVar_WindowPadding: ImGuiStyleVar_ = 1;
@@ -1573,13 +1714,13 @@ pub struct ImGuiStyle {
     pub AntiAliasedFill: bool,
     pub CurveTessellationTol: f32,
     pub CircleSegmentMaxError: f32,
-    pub Colors: [ImVec4; 48usize],
+    pub Colors: [ImVec4; 50usize],
 }
 #[test]
 fn bindgen_test_layout_ImGuiStyle() {
     assert_eq!(
         ::std::mem::size_of::<ImGuiStyle>(),
-        956usize,
+        988usize,
         concat!("Size of: ", stringify!(ImGuiStyle))
     );
     assert_eq!(
@@ -2020,12 +2161,20 @@ pub struct ImGuiIO {
     pub FontAllowUserScaling: bool,
     pub FontDefault: *mut ImFont,
     pub DisplayFramebufferScale: ImVec2,
+    pub ConfigDockingNoSplit: bool,
+    pub ConfigDockingWithShift: bool,
+    pub ConfigDockingAlwaysTabBar: bool,
+    pub ConfigDockingTransparentPayload: bool,
+    pub ConfigViewportsNoAutoMerge: bool,
+    pub ConfigViewportsNoTaskBarIcon: bool,
+    pub ConfigViewportsNoDecoration: bool,
+    pub ConfigViewportsNoDefaultParent: bool,
     pub MouseDrawCursor: bool,
     pub ConfigMacOSXBehaviors: bool,
     pub ConfigInputTextCursorBlink: bool,
     pub ConfigWindowsResizeFromEdges: bool,
     pub ConfigWindowsMoveFromTitleBarOnly: bool,
-    pub ConfigWindowsMemoryCompactTimer: f32,
+    pub ConfigMemoryCompactTimer: f32,
     pub BackendPlatformName: *const ::std::os::raw::c_char,
     pub BackendRendererName: *const ::std::os::raw::c_char,
     pub BackendPlatformUserData: *mut ::std::os::raw::c_void,
@@ -2043,15 +2192,11 @@ pub struct ImGuiIO {
         ),
     >,
     pub ClipboardUserData: *mut ::std::os::raw::c_void,
-    pub ImeSetInputScreenPosFn: ::std::option::Option<
-        unsafe extern "C" fn(x: ::std::os::raw::c_int, y: ::std::os::raw::c_int),
-    >,
-    pub ImeWindowHandle: *mut ::std::os::raw::c_void,
-    pub RenderDrawListsFnUnused: *mut ::std::os::raw::c_void,
     pub MousePos: ImVec2,
     pub MouseDown: [bool; 5usize],
     pub MouseWheel: f32,
     pub MouseWheelH: f32,
+    pub MouseHoveredViewport: ImGuiID,
     pub KeyCtrl: bool,
     pub KeyShift: bool,
     pub KeyAlt: bool,
@@ -2097,7 +2242,7 @@ pub struct ImGuiIO {
 fn bindgen_test_layout_ImGuiIO() {
     assert_eq!(
         ::std::mem::size_of::<ImGuiIO>(),
-        5472usize,
+        5456usize,
         concat!("Size of: ", stringify!(ImGuiIO))
     );
     assert_eq!(
@@ -2296,8 +2441,100 @@ fn bindgen_test_layout_ImGuiIO() {
         )
     );
     assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiIO>())).MouseDrawCursor as *const _ as usize },
+        unsafe { &(*(::std::ptr::null::<ImGuiIO>())).ConfigDockingNoSplit as *const _ as usize },
         192usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(ImGuiIO),
+            "::",
+            stringify!(ConfigDockingNoSplit)
+        )
+    );
+    assert_eq!(
+        unsafe { &(*(::std::ptr::null::<ImGuiIO>())).ConfigDockingWithShift as *const _ as usize },
+        193usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(ImGuiIO),
+            "::",
+            stringify!(ConfigDockingWithShift)
+        )
+    );
+    assert_eq!(
+        unsafe {
+            &(*(::std::ptr::null::<ImGuiIO>())).ConfigDockingAlwaysTabBar as *const _ as usize
+        },
+        194usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(ImGuiIO),
+            "::",
+            stringify!(ConfigDockingAlwaysTabBar)
+        )
+    );
+    assert_eq!(
+        unsafe {
+            &(*(::std::ptr::null::<ImGuiIO>())).ConfigDockingTransparentPayload as *const _ as usize
+        },
+        195usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(ImGuiIO),
+            "::",
+            stringify!(ConfigDockingTransparentPayload)
+        )
+    );
+    assert_eq!(
+        unsafe {
+            &(*(::std::ptr::null::<ImGuiIO>())).ConfigViewportsNoAutoMerge as *const _ as usize
+        },
+        196usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(ImGuiIO),
+            "::",
+            stringify!(ConfigViewportsNoAutoMerge)
+        )
+    );
+    assert_eq!(
+        unsafe {
+            &(*(::std::ptr::null::<ImGuiIO>())).ConfigViewportsNoTaskBarIcon as *const _ as usize
+        },
+        197usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(ImGuiIO),
+            "::",
+            stringify!(ConfigViewportsNoTaskBarIcon)
+        )
+    );
+    assert_eq!(
+        unsafe {
+            &(*(::std::ptr::null::<ImGuiIO>())).ConfigViewportsNoDecoration as *const _ as usize
+        },
+        198usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(ImGuiIO),
+            "::",
+            stringify!(ConfigViewportsNoDecoration)
+        )
+    );
+    assert_eq!(
+        unsafe {
+            &(*(::std::ptr::null::<ImGuiIO>())).ConfigViewportsNoDefaultParent as *const _ as usize
+        },
+        199usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(ImGuiIO),
+            "::",
+            stringify!(ConfigViewportsNoDefaultParent)
+        )
+    );
+    assert_eq!(
+        unsafe { &(*(::std::ptr::null::<ImGuiIO>())).MouseDrawCursor as *const _ as usize },
+        200usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2307,7 +2544,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).ConfigMacOSXBehaviors as *const _ as usize },
-        193usize,
+        201usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2319,7 +2556,7 @@ fn bindgen_test_layout_ImGuiIO() {
         unsafe {
             &(*(::std::ptr::null::<ImGuiIO>())).ConfigInputTextCursorBlink as *const _ as usize
         },
-        194usize,
+        202usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2331,7 +2568,7 @@ fn bindgen_test_layout_ImGuiIO() {
         unsafe {
             &(*(::std::ptr::null::<ImGuiIO>())).ConfigWindowsResizeFromEdges as *const _ as usize
         },
-        195usize,
+        203usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2344,7 +2581,7 @@ fn bindgen_test_layout_ImGuiIO() {
             &(*(::std::ptr::null::<ImGuiIO>())).ConfigWindowsMoveFromTitleBarOnly as *const _
                 as usize
         },
-        196usize,
+        204usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2354,19 +2591,19 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe {
-            &(*(::std::ptr::null::<ImGuiIO>())).ConfigWindowsMemoryCompactTimer as *const _ as usize
+            &(*(::std::ptr::null::<ImGuiIO>())).ConfigMemoryCompactTimer as *const _ as usize
         },
-        200usize,
+        208usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
             "::",
-            stringify!(ConfigWindowsMemoryCompactTimer)
+            stringify!(ConfigMemoryCompactTimer)
         )
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).BackendPlatformName as *const _ as usize },
-        208usize,
+        216usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2376,7 +2613,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).BackendRendererName as *const _ as usize },
-        216usize,
+        224usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2386,7 +2623,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).BackendPlatformUserData as *const _ as usize },
-        224usize,
+        232usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2396,7 +2633,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).BackendRendererUserData as *const _ as usize },
-        232usize,
+        240usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2406,7 +2643,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).BackendLanguageUserData as *const _ as usize },
-        240usize,
+        248usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2416,7 +2653,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).GetClipboardTextFn as *const _ as usize },
-        248usize,
+        256usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2426,7 +2663,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).SetClipboardTextFn as *const _ as usize },
-        256usize,
+        264usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2436,7 +2673,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).ClipboardUserData as *const _ as usize },
-        264usize,
+        272usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2445,38 +2682,8 @@ fn bindgen_test_layout_ImGuiIO() {
         )
     );
     assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiIO>())).ImeSetInputScreenPosFn as *const _ as usize },
-        272usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiIO),
-            "::",
-            stringify!(ImeSetInputScreenPosFn)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiIO>())).ImeWindowHandle as *const _ as usize },
-        280usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiIO),
-            "::",
-            stringify!(ImeWindowHandle)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiIO>())).RenderDrawListsFnUnused as *const _ as usize },
-        288usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiIO),
-            "::",
-            stringify!(RenderDrawListsFnUnused)
-        )
-    );
-    assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).MousePos as *const _ as usize },
-        296usize,
+        280usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2486,7 +2693,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).MouseDown as *const _ as usize },
-        304usize,
+        288usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2496,7 +2703,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).MouseWheel as *const _ as usize },
-        312usize,
+        296usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2506,7 +2713,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).MouseWheelH as *const _ as usize },
-        316usize,
+        300usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2515,8 +2722,18 @@ fn bindgen_test_layout_ImGuiIO() {
         )
     );
     assert_eq!(
+        unsafe { &(*(::std::ptr::null::<ImGuiIO>())).MouseHoveredViewport as *const _ as usize },
+        304usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(ImGuiIO),
+            "::",
+            stringify!(MouseHoveredViewport)
+        )
+    );
+    assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).KeyCtrl as *const _ as usize },
-        320usize,
+        308usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2526,7 +2743,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).KeyShift as *const _ as usize },
-        321usize,
+        309usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2536,7 +2753,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).KeyAlt as *const _ as usize },
-        322usize,
+        310usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2546,7 +2763,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).KeySuper as *const _ as usize },
-        323usize,
+        311usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2556,7 +2773,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).KeysDown as *const _ as usize },
-        324usize,
+        312usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2566,7 +2783,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).NavInputs as *const _ as usize },
-        836usize,
+        824usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2576,7 +2793,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).WantCaptureMouse as *const _ as usize },
-        920usize,
+        908usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2586,7 +2803,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).WantCaptureKeyboard as *const _ as usize },
-        921usize,
+        909usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2596,7 +2813,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).WantTextInput as *const _ as usize },
-        922usize,
+        910usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2606,7 +2823,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).WantSetMousePos as *const _ as usize },
-        923usize,
+        911usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2616,7 +2833,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).WantSaveIniSettings as *const _ as usize },
-        924usize,
+        912usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2626,7 +2843,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).NavActive as *const _ as usize },
-        925usize,
+        913usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2636,7 +2853,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).NavVisible as *const _ as usize },
-        926usize,
+        914usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2646,7 +2863,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).Framerate as *const _ as usize },
-        928usize,
+        916usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2656,7 +2873,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).MetricsRenderVertices as *const _ as usize },
-        932usize,
+        920usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2666,7 +2883,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).MetricsRenderIndices as *const _ as usize },
-        936usize,
+        924usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2676,7 +2893,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).MetricsRenderWindows as *const _ as usize },
-        940usize,
+        928usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2686,7 +2903,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).MetricsActiveWindows as *const _ as usize },
-        944usize,
+        932usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2698,7 +2915,7 @@ fn bindgen_test_layout_ImGuiIO() {
         unsafe {
             &(*(::std::ptr::null::<ImGuiIO>())).MetricsActiveAllocations as *const _ as usize
         },
-        948usize,
+        936usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2708,7 +2925,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).MouseDelta as *const _ as usize },
-        952usize,
+        940usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2718,7 +2935,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).KeyMods as *const _ as usize },
-        960usize,
+        948usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2728,7 +2945,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).MousePosPrev as *const _ as usize },
-        964usize,
+        952usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2738,7 +2955,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).MouseClickedPos as *const _ as usize },
-        972usize,
+        960usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2748,7 +2965,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).MouseClickedTime as *const _ as usize },
-        1016usize,
+        1000usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2758,7 +2975,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).MouseClicked as *const _ as usize },
-        1056usize,
+        1040usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2768,7 +2985,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).MouseDoubleClicked as *const _ as usize },
-        1061usize,
+        1045usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2778,7 +2995,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).MouseReleased as *const _ as usize },
-        1066usize,
+        1050usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2788,7 +3005,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).MouseDownOwned as *const _ as usize },
-        1071usize,
+        1055usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2798,7 +3015,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).MouseDownWasDoubleClick as *const _ as usize },
-        1076usize,
+        1060usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2808,7 +3025,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).MouseDownDuration as *const _ as usize },
-        1084usize,
+        1068usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2818,7 +3035,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).MouseDownDurationPrev as *const _ as usize },
-        1104usize,
+        1088usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2828,7 +3045,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).MouseDragMaxDistanceAbs as *const _ as usize },
-        1124usize,
+        1108usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2838,7 +3055,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).MouseDragMaxDistanceSqr as *const _ as usize },
-        1164usize,
+        1148usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2848,7 +3065,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).KeysDownDuration as *const _ as usize },
-        1184usize,
+        1168usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2858,7 +3075,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).KeysDownDurationPrev as *const _ as usize },
-        3232usize,
+        3216usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2868,7 +3085,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).NavInputsDownDuration as *const _ as usize },
-        5280usize,
+        5264usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2880,7 +3097,7 @@ fn bindgen_test_layout_ImGuiIO() {
         unsafe {
             &(*(::std::ptr::null::<ImGuiIO>())).NavInputsDownDurationPrev as *const _ as usize
         },
-        5364usize,
+        5348usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2890,7 +3107,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).PenPressure as *const _ as usize },
-        5448usize,
+        5432usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2900,7 +3117,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).InputQueueSurrogate as *const _ as usize },
-        5452usize,
+        5436usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2910,7 +3127,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).InputQueueCharacters as *const _ as usize },
-        5456usize,
+        5440usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2926,7 +3143,7 @@ impl Default for ImGuiIO {
 }
 impl ::std::fmt::Debug for ImGuiIO {
     fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        write ! (f , "ImGuiIO {{ ConfigFlags: {:?}, BackendFlags: {:?}, DisplaySize: {:?}, DeltaTime: {:?}, IniSavingRate: {:?}, IniFilename: {:?}, LogFilename: {:?}, MouseDoubleClickTime: {:?}, MouseDoubleClickMaxDist: {:?}, MouseDragThreshold: {:?}, KeyMap: {:?}, KeyRepeatDelay: {:?}, KeyRepeatRate: {:?}, UserData: {:?}, Fonts: {:?}, FontGlobalScale: {:?}, FontAllowUserScaling: {:?}, FontDefault: {:?}, DisplayFramebufferScale: {:?}, MouseDrawCursor: {:?}, ConfigMacOSXBehaviors: {:?}, ConfigInputTextCursorBlink: {:?}, ConfigWindowsResizeFromEdges: {:?}, ConfigWindowsMoveFromTitleBarOnly: {:?}, ConfigWindowsMemoryCompactTimer: {:?}, BackendPlatformName: {:?}, BackendRendererName: {:?}, BackendPlatformUserData: {:?}, BackendRendererUserData: {:?}, BackendLanguageUserData: {:?}, GetClipboardTextFn: {:?}, SetClipboardTextFn: {:?}, ClipboardUserData: {:?}, ImeSetInputScreenPosFn: {:?}, ImeWindowHandle: {:?}, RenderDrawListsFnUnused: {:?}, MousePos: {:?}, MouseDown: {:?}, MouseWheel: {:?}, MouseWheelH: {:?}, KeyCtrl: {:?}, KeyShift: {:?}, KeyAlt: {:?}, KeySuper: {:?}, KeysDown: [{}], NavInputs: {:?}, WantCaptureMouse: {:?}, WantCaptureKeyboard: {:?}, WantTextInput: {:?}, WantSetMousePos: {:?}, WantSaveIniSettings: {:?}, NavActive: {:?}, NavVisible: {:?}, Framerate: {:?}, MetricsRenderVertices: {:?}, MetricsRenderIndices: {:?}, MetricsRenderWindows: {:?}, MetricsActiveWindows: {:?}, MetricsActiveAllocations: {:?}, MouseDelta: {:?}, KeyMods: {:?}, MousePosPrev: {:?}, MouseClickedPos: {:?}, MouseClickedTime: {:?}, MouseClicked: {:?}, MouseDoubleClicked: {:?}, MouseReleased: {:?}, MouseDownOwned: {:?}, MouseDownWasDoubleClick: {:?}, MouseDownDuration: {:?}, MouseDownDurationPrev: {:?}, MouseDragMaxDistanceAbs: {:?}, MouseDragMaxDistanceSqr: {:?}, KeysDownDuration: [{}], KeysDownDurationPrev: [{}], NavInputsDownDuration: {:?}, NavInputsDownDurationPrev: {:?}, PenPressure: {:?}, InputQueueSurrogate: {:?}, InputQueueCharacters: {:?} }}" , self . ConfigFlags , self . BackendFlags , self . DisplaySize , self . DeltaTime , self . IniSavingRate , self . IniFilename , self . LogFilename , self . MouseDoubleClickTime , self . MouseDoubleClickMaxDist , self . MouseDragThreshold , self . KeyMap , self . KeyRepeatDelay , self . KeyRepeatRate , self . UserData , self . Fonts , self . FontGlobalScale , self . FontAllowUserScaling , self . FontDefault , self . DisplayFramebufferScale , self . MouseDrawCursor , self . ConfigMacOSXBehaviors , self . ConfigInputTextCursorBlink , self . ConfigWindowsResizeFromEdges , self . ConfigWindowsMoveFromTitleBarOnly , self . ConfigWindowsMemoryCompactTimer , self . BackendPlatformName , self . BackendRendererName , self . BackendPlatformUserData , self . BackendRendererUserData , self . BackendLanguageUserData , self . GetClipboardTextFn , self . SetClipboardTextFn , self . ClipboardUserData , self . ImeSetInputScreenPosFn , self . ImeWindowHandle , self . RenderDrawListsFnUnused , self . MousePos , self . MouseDown , self . MouseWheel , self . MouseWheelH , self . KeyCtrl , self . KeyShift , self . KeyAlt , self . KeySuper , self . KeysDown . iter () . enumerate () . map (| (i , v) | format ! ("{}{:?}" , if i > 0 { ", " } else { "" } , v)) . collect :: < String > () , self . NavInputs , self . WantCaptureMouse , self . WantCaptureKeyboard , self . WantTextInput , self . WantSetMousePos , self . WantSaveIniSettings , self . NavActive , self . NavVisible , self . Framerate , self . MetricsRenderVertices , self . MetricsRenderIndices , self . MetricsRenderWindows , self . MetricsActiveWindows , self . MetricsActiveAllocations , self . MouseDelta , self . KeyMods , self . MousePosPrev , self . MouseClickedPos , self . MouseClickedTime , self . MouseClicked , self . MouseDoubleClicked , self . MouseReleased , self . MouseDownOwned , self . MouseDownWasDoubleClick , self . MouseDownDuration , self . MouseDownDurationPrev , self . MouseDragMaxDistanceAbs , self . MouseDragMaxDistanceSqr , self . KeysDownDuration . iter () . enumerate () . map (| (i , v) | format ! ("{}{:?}" , if i > 0 { ", " } else { "" } , v)) . collect :: < String > () , self . KeysDownDurationPrev . iter () . enumerate () . map (| (i , v) | format ! ("{}{:?}" , if i > 0 { ", " } else { "" } , v)) . collect :: < String > () , self . NavInputsDownDuration , self . NavInputsDownDurationPrev , self . PenPressure , self . InputQueueSurrogate , self . InputQueueCharacters)
+        write ! (f , "ImGuiIO {{ ConfigFlags: {:?}, BackendFlags: {:?}, DisplaySize: {:?}, DeltaTime: {:?}, IniSavingRate: {:?}, IniFilename: {:?}, LogFilename: {:?}, MouseDoubleClickTime: {:?}, MouseDoubleClickMaxDist: {:?}, MouseDragThreshold: {:?}, KeyMap: {:?}, KeyRepeatDelay: {:?}, KeyRepeatRate: {:?}, UserData: {:?}, Fonts: {:?}, FontGlobalScale: {:?}, FontAllowUserScaling: {:?}, FontDefault: {:?}, DisplayFramebufferScale: {:?}, ConfigDockingNoSplit: {:?}, ConfigDockingWithShift: {:?}, ConfigDockingAlwaysTabBar: {:?}, ConfigDockingTransparentPayload: {:?}, ConfigViewportsNoAutoMerge: {:?}, ConfigViewportsNoTaskBarIcon: {:?}, ConfigViewportsNoDecoration: {:?}, ConfigViewportsNoDefaultParent: {:?}, MouseDrawCursor: {:?}, ConfigMacOSXBehaviors: {:?}, ConfigInputTextCursorBlink: {:?}, ConfigWindowsResizeFromEdges: {:?}, ConfigWindowsMoveFromTitleBarOnly: {:?}, ConfigMemoryCompactTimer: {:?}, BackendPlatformName: {:?}, BackendRendererName: {:?}, BackendPlatformUserData: {:?}, BackendRendererUserData: {:?}, BackendLanguageUserData: {:?}, GetClipboardTextFn: {:?}, SetClipboardTextFn: {:?}, ClipboardUserData: {:?}, MousePos: {:?}, MouseDown: {:?}, MouseWheel: {:?}, MouseWheelH: {:?}, MouseHoveredViewport: {:?}, KeyCtrl: {:?}, KeyShift: {:?}, KeyAlt: {:?}, KeySuper: {:?}, KeysDown: [{}], NavInputs: {:?}, WantCaptureMouse: {:?}, WantCaptureKeyboard: {:?}, WantTextInput: {:?}, WantSetMousePos: {:?}, WantSaveIniSettings: {:?}, NavActive: {:?}, NavVisible: {:?}, Framerate: {:?}, MetricsRenderVertices: {:?}, MetricsRenderIndices: {:?}, MetricsRenderWindows: {:?}, MetricsActiveWindows: {:?}, MetricsActiveAllocations: {:?}, MouseDelta: {:?}, KeyMods: {:?}, MousePosPrev: {:?}, MouseClickedPos: {:?}, MouseClickedTime: {:?}, MouseClicked: {:?}, MouseDoubleClicked: {:?}, MouseReleased: {:?}, MouseDownOwned: {:?}, MouseDownWasDoubleClick: {:?}, MouseDownDuration: {:?}, MouseDownDurationPrev: {:?}, MouseDragMaxDistanceAbs: {:?}, MouseDragMaxDistanceSqr: {:?}, KeysDownDuration: [{}], KeysDownDurationPrev: [{}], NavInputsDownDuration: {:?}, NavInputsDownDurationPrev: {:?}, PenPressure: {:?}, InputQueueSurrogate: {:?}, InputQueueCharacters: {:?} }}" , self . ConfigFlags , self . BackendFlags , self . DisplaySize , self . DeltaTime , self . IniSavingRate , self . IniFilename , self . LogFilename , self . MouseDoubleClickTime , self . MouseDoubleClickMaxDist , self . MouseDragThreshold , self . KeyMap , self . KeyRepeatDelay , self . KeyRepeatRate , self . UserData , self . Fonts , self . FontGlobalScale , self . FontAllowUserScaling , self . FontDefault , self . DisplayFramebufferScale , self . ConfigDockingNoSplit , self . ConfigDockingWithShift , self . ConfigDockingAlwaysTabBar , self . ConfigDockingTransparentPayload , self . ConfigViewportsNoAutoMerge , self . ConfigViewportsNoTaskBarIcon , self . ConfigViewportsNoDecoration , self . ConfigViewportsNoDefaultParent , self . MouseDrawCursor , self . ConfigMacOSXBehaviors , self . ConfigInputTextCursorBlink , self . ConfigWindowsResizeFromEdges , self . ConfigWindowsMoveFromTitleBarOnly , self . ConfigMemoryCompactTimer , self . BackendPlatformName , self . BackendRendererName , self . BackendPlatformUserData , self . BackendRendererUserData , self . BackendLanguageUserData , self . GetClipboardTextFn , self . SetClipboardTextFn , self . ClipboardUserData , self . MousePos , self . MouseDown , self . MouseWheel , self . MouseWheelH , self . MouseHoveredViewport , self . KeyCtrl , self . KeyShift , self . KeyAlt , self . KeySuper , self . KeysDown . iter () . enumerate () . map (| (i , v) | format ! ("{}{:?}" , if i > 0 { ", " } else { "" } , v)) . collect :: < String > () , self . NavInputs , self . WantCaptureMouse , self . WantCaptureKeyboard , self . WantTextInput , self . WantSetMousePos , self . WantSaveIniSettings , self . NavActive , self . NavVisible , self . Framerate , self . MetricsRenderVertices , self . MetricsRenderIndices , self . MetricsRenderWindows , self . MetricsActiveWindows , self . MetricsActiveAllocations , self . MouseDelta , self . KeyMods , self . MousePosPrev , self . MouseClickedPos , self . MouseClickedTime , self . MouseClicked , self . MouseDoubleClicked , self . MouseReleased , self . MouseDownOwned , self . MouseDownWasDoubleClick , self . MouseDownDuration , self . MouseDownDurationPrev , self . MouseDragMaxDistanceAbs , self . MouseDragMaxDistanceSqr , self . KeysDownDuration . iter () . enumerate () . map (| (i , v) | format ! ("{}{:?}" , if i > 0 { ", " } else { "" } , v)) . collect :: < String > () , self . KeysDownDurationPrev . iter () . enumerate () . map (| (i , v) | format ! ("{}{:?}" , if i > 0 { ", " } else { "" } , v)) . collect :: < String > () , self . NavInputsDownDuration , self . NavInputsDownDurationPrev , self . PenPressure , self . InputQueueSurrogate , self . InputQueueCharacters)
     }
 }
 #[repr(C)]
@@ -3175,6 +3392,129 @@ impl Default for ImGuiSizeCallbackData {
     fn default() -> Self {
         unsafe { ::std::mem::zeroed() }
     }
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone, Hash, PartialEq, Eq)]
+pub struct ImGuiWindowClass {
+    pub ClassId: ImGuiID,
+    pub ParentViewportId: ImGuiID,
+    pub ViewportFlagsOverrideSet: ImGuiViewportFlags,
+    pub ViewportFlagsOverrideClear: ImGuiViewportFlags,
+    pub DockNodeFlagsOverrideSet: ImGuiDockNodeFlags,
+    pub DockNodeFlagsOverrideClear: ImGuiDockNodeFlags,
+    pub DockingAlwaysTabBar: bool,
+    pub DockingAllowUnclassed: bool,
+}
+#[test]
+fn bindgen_test_layout_ImGuiWindowClass() {
+    assert_eq!(
+        ::std::mem::size_of::<ImGuiWindowClass>(),
+        28usize,
+        concat!("Size of: ", stringify!(ImGuiWindowClass))
+    );
+    assert_eq!(
+        ::std::mem::align_of::<ImGuiWindowClass>(),
+        4usize,
+        concat!("Alignment of ", stringify!(ImGuiWindowClass))
+    );
+    assert_eq!(
+        unsafe { &(*(::std::ptr::null::<ImGuiWindowClass>())).ClassId as *const _ as usize },
+        0usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(ImGuiWindowClass),
+            "::",
+            stringify!(ClassId)
+        )
+    );
+    assert_eq!(
+        unsafe {
+            &(*(::std::ptr::null::<ImGuiWindowClass>())).ParentViewportId as *const _ as usize
+        },
+        4usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(ImGuiWindowClass),
+            "::",
+            stringify!(ParentViewportId)
+        )
+    );
+    assert_eq!(
+        unsafe {
+            &(*(::std::ptr::null::<ImGuiWindowClass>())).ViewportFlagsOverrideSet as *const _
+                as usize
+        },
+        8usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(ImGuiWindowClass),
+            "::",
+            stringify!(ViewportFlagsOverrideSet)
+        )
+    );
+    assert_eq!(
+        unsafe {
+            &(*(::std::ptr::null::<ImGuiWindowClass>())).ViewportFlagsOverrideClear as *const _
+                as usize
+        },
+        12usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(ImGuiWindowClass),
+            "::",
+            stringify!(ViewportFlagsOverrideClear)
+        )
+    );
+    assert_eq!(
+        unsafe {
+            &(*(::std::ptr::null::<ImGuiWindowClass>())).DockNodeFlagsOverrideSet as *const _
+                as usize
+        },
+        16usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(ImGuiWindowClass),
+            "::",
+            stringify!(DockNodeFlagsOverrideSet)
+        )
+    );
+    assert_eq!(
+        unsafe {
+            &(*(::std::ptr::null::<ImGuiWindowClass>())).DockNodeFlagsOverrideClear as *const _
+                as usize
+        },
+        20usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(ImGuiWindowClass),
+            "::",
+            stringify!(DockNodeFlagsOverrideClear)
+        )
+    );
+    assert_eq!(
+        unsafe {
+            &(*(::std::ptr::null::<ImGuiWindowClass>())).DockingAlwaysTabBar as *const _ as usize
+        },
+        24usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(ImGuiWindowClass),
+            "::",
+            stringify!(DockingAlwaysTabBar)
+        )
+    );
+    assert_eq!(
+        unsafe {
+            &(*(::std::ptr::null::<ImGuiWindowClass>())).DockingAllowUnclassed as *const _ as usize
+        },
+        25usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(ImGuiWindowClass),
+            "::",
+            stringify!(DockingAllowUnclassed)
+        )
+    );
 }
 #[repr(C)]
 #[derive(Copy, Clone)]
@@ -3870,6 +4210,61 @@ fn bindgen_test_layout_ImDrawVert() {
     );
 }
 #[repr(C)]
+#[derive(Debug, Copy, Clone, PartialEq)]
+pub struct ImDrawCmdHeader {
+    pub ClipRect: ImVec4,
+    pub TextureId: ImTextureID,
+    pub VtxOffset: ::std::os::raw::c_uint,
+}
+#[test]
+fn bindgen_test_layout_ImDrawCmdHeader() {
+    assert_eq!(
+        ::std::mem::size_of::<ImDrawCmdHeader>(),
+        32usize,
+        concat!("Size of: ", stringify!(ImDrawCmdHeader))
+    );
+    assert_eq!(
+        ::std::mem::align_of::<ImDrawCmdHeader>(),
+        8usize,
+        concat!("Alignment of ", stringify!(ImDrawCmdHeader))
+    );
+    assert_eq!(
+        unsafe { &(*(::std::ptr::null::<ImDrawCmdHeader>())).ClipRect as *const _ as usize },
+        0usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(ImDrawCmdHeader),
+            "::",
+            stringify!(ClipRect)
+        )
+    );
+    assert_eq!(
+        unsafe { &(*(::std::ptr::null::<ImDrawCmdHeader>())).TextureId as *const _ as usize },
+        16usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(ImDrawCmdHeader),
+            "::",
+            stringify!(TextureId)
+        )
+    );
+    assert_eq!(
+        unsafe { &(*(::std::ptr::null::<ImDrawCmdHeader>())).VtxOffset as *const _ as usize },
+        24usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(ImDrawCmdHeader),
+            "::",
+            stringify!(VtxOffset)
+        )
+    );
+}
+impl Default for ImDrawCmdHeader {
+    fn default() -> Self {
+        unsafe { ::std::mem::zeroed() }
+    }
+}
+#[repr(C)]
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
 pub struct ImDrawChannel {
     pub _CmdBuffer: ImVector_ImDrawCmd,
@@ -3992,22 +4387,22 @@ pub struct ImDrawList {
     pub IdxBuffer: ImVector_ImDrawIdx,
     pub VtxBuffer: ImVector_ImDrawVert,
     pub Flags: ImDrawListFlags,
+    pub _VtxCurrentIdx: ::std::os::raw::c_uint,
     pub _Data: *const ImDrawListSharedData,
     pub _OwnerName: *const ::std::os::raw::c_char,
-    pub _VtxCurrentIdx: ::std::os::raw::c_uint,
     pub _VtxWritePtr: *mut ImDrawVert,
     pub _IdxWritePtr: *mut ImDrawIdx,
     pub _ClipRectStack: ImVector_ImVec4,
     pub _TextureIdStack: ImVector_ImTextureID,
     pub _Path: ImVector_ImVec2,
-    pub _CmdHeader: ImDrawCmd,
+    pub _CmdHeader: ImDrawCmdHeader,
     pub _Splitter: ImDrawListSplitter,
 }
 #[test]
 fn bindgen_test_layout_ImDrawList() {
     assert_eq!(
         ::std::mem::size_of::<ImDrawList>(),
-        224usize,
+        192usize,
         concat!("Size of: ", stringify!(ImDrawList))
     );
     assert_eq!(
@@ -4056,6 +4451,16 @@ fn bindgen_test_layout_ImDrawList() {
         )
     );
     assert_eq!(
+        unsafe { &(*(::std::ptr::null::<ImDrawList>()))._VtxCurrentIdx as *const _ as usize },
+        52usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(ImDrawList),
+            "::",
+            stringify!(_VtxCurrentIdx)
+        )
+    );
+    assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImDrawList>()))._Data as *const _ as usize },
         56usize,
         concat!(
@@ -4076,18 +4481,8 @@ fn bindgen_test_layout_ImDrawList() {
         )
     );
     assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImDrawList>()))._VtxCurrentIdx as *const _ as usize },
-        72usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImDrawList),
-            "::",
-            stringify!(_VtxCurrentIdx)
-        )
-    );
-    assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImDrawList>()))._VtxWritePtr as *const _ as usize },
-        80usize,
+        72usize,
         concat!(
             "Offset of field: ",
             stringify!(ImDrawList),
@@ -4097,7 +4492,7 @@ fn bindgen_test_layout_ImDrawList() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImDrawList>()))._IdxWritePtr as *const _ as usize },
-        88usize,
+        80usize,
         concat!(
             "Offset of field: ",
             stringify!(ImDrawList),
@@ -4107,7 +4502,7 @@ fn bindgen_test_layout_ImDrawList() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImDrawList>()))._ClipRectStack as *const _ as usize },
-        96usize,
+        88usize,
         concat!(
             "Offset of field: ",
             stringify!(ImDrawList),
@@ -4117,7 +4512,7 @@ fn bindgen_test_layout_ImDrawList() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImDrawList>()))._TextureIdStack as *const _ as usize },
-        112usize,
+        104usize,
         concat!(
             "Offset of field: ",
             stringify!(ImDrawList),
@@ -4127,7 +4522,7 @@ fn bindgen_test_layout_ImDrawList() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImDrawList>()))._Path as *const _ as usize },
-        128usize,
+        120usize,
         concat!(
             "Offset of field: ",
             stringify!(ImDrawList),
@@ -4137,7 +4532,7 @@ fn bindgen_test_layout_ImDrawList() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImDrawList>()))._CmdHeader as *const _ as usize },
-        144usize,
+        136usize,
         concat!(
             "Offset of field: ",
             stringify!(ImDrawList),
@@ -4147,7 +4542,7 @@ fn bindgen_test_layout_ImDrawList() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImDrawList>()))._Splitter as *const _ as usize },
-        200usize,
+        168usize,
         concat!(
             "Offset of field: ",
             stringify!(ImDrawList),
@@ -4172,12 +4567,13 @@ pub struct ImDrawData {
     pub DisplayPos: ImVec2,
     pub DisplaySize: ImVec2,
     pub FramebufferScale: ImVec2,
+    pub OwnerViewport: *mut ImGuiViewport,
 }
 #[test]
 fn bindgen_test_layout_ImDrawData() {
     assert_eq!(
         ::std::mem::size_of::<ImDrawData>(),
-        56usize,
+        64usize,
         concat!("Size of: ", stringify!(ImDrawData))
     );
     assert_eq!(
@@ -4263,6 +4659,16 @@ fn bindgen_test_layout_ImDrawData() {
             stringify!(ImDrawData),
             "::",
             stringify!(FramebufferScale)
+        )
+    );
+    assert_eq!(
+        unsafe { &(*(::std::ptr::null::<ImDrawData>())).OwnerViewport as *const _ as usize },
+        56usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(ImDrawData),
+            "::",
+            stringify!(OwnerViewport)
         )
     );
 }
@@ -5244,115 +5650,775 @@ impl Default for ImFont {
         unsafe { ::std::mem::zeroed() }
     }
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+#[repr(C)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub struct ImGuiPlatformIO {
+    pub Platform_CreateWindow: ::std::option::Option<unsafe extern "C" fn(vp: *mut ImGuiViewport)>,
+    pub Platform_DestroyWindow: ::std::option::Option<unsafe extern "C" fn(vp: *mut ImGuiViewport)>,
+    pub Platform_ShowWindow: ::std::option::Option<unsafe extern "C" fn(vp: *mut ImGuiViewport)>,
+    pub Platform_SetWindowPos:
+        ::std::option::Option<unsafe extern "C" fn(vp: *mut ImGuiViewport, pos: ImVec2)>,
+    pub Platform_GetWindowPos:
+        ::std::option::Option<unsafe extern "C" fn(vp: *mut ImGuiViewport) -> ImVec2>,
+    pub Platform_SetWindowSize:
+        ::std::option::Option<unsafe extern "C" fn(vp: *mut ImGuiViewport, size: ImVec2)>,
+    pub Platform_GetWindowSize:
+        ::std::option::Option<unsafe extern "C" fn(vp: *mut ImGuiViewport) -> ImVec2>,
+    pub Platform_SetWindowFocus:
+        ::std::option::Option<unsafe extern "C" fn(vp: *mut ImGuiViewport)>,
+    pub Platform_GetWindowFocus:
+        ::std::option::Option<unsafe extern "C" fn(vp: *mut ImGuiViewport) -> bool>,
+    pub Platform_GetWindowMinimized:
+        ::std::option::Option<unsafe extern "C" fn(vp: *mut ImGuiViewport) -> bool>,
+    pub Platform_SetWindowTitle: ::std::option::Option<
+        unsafe extern "C" fn(vp: *mut ImGuiViewport, str_: *const ::std::os::raw::c_char),
+    >,
+    pub Platform_SetWindowAlpha:
+        ::std::option::Option<unsafe extern "C" fn(vp: *mut ImGuiViewport, alpha: f32)>,
+    pub Platform_UpdateWindow: ::std::option::Option<unsafe extern "C" fn(vp: *mut ImGuiViewport)>,
+    pub Platform_RenderWindow: ::std::option::Option<
+        unsafe extern "C" fn(vp: *mut ImGuiViewport, render_arg: *mut ::std::os::raw::c_void),
+    >,
+    pub Platform_SwapBuffers: ::std::option::Option<
+        unsafe extern "C" fn(vp: *mut ImGuiViewport, render_arg: *mut ::std::os::raw::c_void),
+    >,
+    pub Platform_GetWindowDpiScale:
+        ::std::option::Option<unsafe extern "C" fn(vp: *mut ImGuiViewport) -> f32>,
+    pub Platform_OnChangedViewport:
+        ::std::option::Option<unsafe extern "C" fn(vp: *mut ImGuiViewport)>,
+    pub Platform_SetImeInputPos:
+        ::std::option::Option<unsafe extern "C" fn(vp: *mut ImGuiViewport, pos: ImVec2)>,
+    pub Platform_CreateVkSurface: ::std::option::Option<
+        unsafe extern "C" fn(
+            vp: *mut ImGuiViewport,
+            vk_inst: ImU64,
+            vk_allocators: *const ::std::os::raw::c_void,
+            out_vk_surface: *mut ImU64,
+        ) -> ::std::os::raw::c_int,
+    >,
+    pub Renderer_CreateWindow: ::std::option::Option<unsafe extern "C" fn(vp: *mut ImGuiViewport)>,
+    pub Renderer_DestroyWindow: ::std::option::Option<unsafe extern "C" fn(vp: *mut ImGuiViewport)>,
+    pub Renderer_SetWindowSize:
+        ::std::option::Option<unsafe extern "C" fn(vp: *mut ImGuiViewport, size: ImVec2)>,
+    pub Renderer_RenderWindow: ::std::option::Option<
+        unsafe extern "C" fn(vp: *mut ImGuiViewport, render_arg: *mut ::std::os::raw::c_void),
+    >,
+    pub Renderer_SwapBuffers: ::std::option::Option<
+        unsafe extern "C" fn(vp: *mut ImGuiViewport, render_arg: *mut ::std::os::raw::c_void),
+    >,
+    pub Monitors: ImVector_ImGuiPlatformMonitor,
+    pub MainViewport: *mut ImGuiViewport,
+    pub Viewports: ImVector_ImGuiViewportPtr,
+}
+#[test]
+fn bindgen_test_layout_ImGuiPlatformIO() {
+    assert_eq!(
+        ::std::mem::size_of::<ImGuiPlatformIO>(),
+        232usize,
+        concat!("Size of: ", stringify!(ImGuiPlatformIO))
+    );
+    assert_eq!(
+        ::std::mem::align_of::<ImGuiPlatformIO>(),
+        8usize,
+        concat!("Alignment of ", stringify!(ImGuiPlatformIO))
+    );
+    assert_eq!(
+        unsafe {
+            &(*(::std::ptr::null::<ImGuiPlatformIO>())).Platform_CreateWindow as *const _ as usize
+        },
+        0usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(ImGuiPlatformIO),
+            "::",
+            stringify!(Platform_CreateWindow)
+        )
+    );
+    assert_eq!(
+        unsafe {
+            &(*(::std::ptr::null::<ImGuiPlatformIO>())).Platform_DestroyWindow as *const _ as usize
+        },
+        8usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(ImGuiPlatformIO),
+            "::",
+            stringify!(Platform_DestroyWindow)
+        )
+    );
+    assert_eq!(
+        unsafe {
+            &(*(::std::ptr::null::<ImGuiPlatformIO>())).Platform_ShowWindow as *const _ as usize
+        },
+        16usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(ImGuiPlatformIO),
+            "::",
+            stringify!(Platform_ShowWindow)
+        )
+    );
+    assert_eq!(
+        unsafe {
+            &(*(::std::ptr::null::<ImGuiPlatformIO>())).Platform_SetWindowPos as *const _ as usize
+        },
+        24usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(ImGuiPlatformIO),
+            "::",
+            stringify!(Platform_SetWindowPos)
+        )
+    );
+    assert_eq!(
+        unsafe {
+            &(*(::std::ptr::null::<ImGuiPlatformIO>())).Platform_GetWindowPos as *const _ as usize
+        },
+        32usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(ImGuiPlatformIO),
+            "::",
+            stringify!(Platform_GetWindowPos)
+        )
+    );
+    assert_eq!(
+        unsafe {
+            &(*(::std::ptr::null::<ImGuiPlatformIO>())).Platform_SetWindowSize as *const _ as usize
+        },
+        40usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(ImGuiPlatformIO),
+            "::",
+            stringify!(Platform_SetWindowSize)
+        )
+    );
+    assert_eq!(
+        unsafe {
+            &(*(::std::ptr::null::<ImGuiPlatformIO>())).Platform_GetWindowSize as *const _ as usize
+        },
+        48usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(ImGuiPlatformIO),
+            "::",
+            stringify!(Platform_GetWindowSize)
+        )
+    );
+    assert_eq!(
+        unsafe {
+            &(*(::std::ptr::null::<ImGuiPlatformIO>())).Platform_SetWindowFocus as *const _ as usize
+        },
+        56usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(ImGuiPlatformIO),
+            "::",
+            stringify!(Platform_SetWindowFocus)
+        )
+    );
+    assert_eq!(
+        unsafe {
+            &(*(::std::ptr::null::<ImGuiPlatformIO>())).Platform_GetWindowFocus as *const _ as usize
+        },
+        64usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(ImGuiPlatformIO),
+            "::",
+            stringify!(Platform_GetWindowFocus)
+        )
+    );
+    assert_eq!(
+        unsafe {
+            &(*(::std::ptr::null::<ImGuiPlatformIO>())).Platform_GetWindowMinimized as *const _
+                as usize
+        },
+        72usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(ImGuiPlatformIO),
+            "::",
+            stringify!(Platform_GetWindowMinimized)
+        )
+    );
+    assert_eq!(
+        unsafe {
+            &(*(::std::ptr::null::<ImGuiPlatformIO>())).Platform_SetWindowTitle as *const _ as usize
+        },
+        80usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(ImGuiPlatformIO),
+            "::",
+            stringify!(Platform_SetWindowTitle)
+        )
+    );
+    assert_eq!(
+        unsafe {
+            &(*(::std::ptr::null::<ImGuiPlatformIO>())).Platform_SetWindowAlpha as *const _ as usize
+        },
+        88usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(ImGuiPlatformIO),
+            "::",
+            stringify!(Platform_SetWindowAlpha)
+        )
+    );
+    assert_eq!(
+        unsafe {
+            &(*(::std::ptr::null::<ImGuiPlatformIO>())).Platform_UpdateWindow as *const _ as usize
+        },
+        96usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(ImGuiPlatformIO),
+            "::",
+            stringify!(Platform_UpdateWindow)
+        )
+    );
+    assert_eq!(
+        unsafe {
+            &(*(::std::ptr::null::<ImGuiPlatformIO>())).Platform_RenderWindow as *const _ as usize
+        },
+        104usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(ImGuiPlatformIO),
+            "::",
+            stringify!(Platform_RenderWindow)
+        )
+    );
+    assert_eq!(
+        unsafe {
+            &(*(::std::ptr::null::<ImGuiPlatformIO>())).Platform_SwapBuffers as *const _ as usize
+        },
+        112usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(ImGuiPlatformIO),
+            "::",
+            stringify!(Platform_SwapBuffers)
+        )
+    );
+    assert_eq!(
+        unsafe {
+            &(*(::std::ptr::null::<ImGuiPlatformIO>())).Platform_GetWindowDpiScale as *const _
+                as usize
+        },
+        120usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(ImGuiPlatformIO),
+            "::",
+            stringify!(Platform_GetWindowDpiScale)
+        )
+    );
+    assert_eq!(
+        unsafe {
+            &(*(::std::ptr::null::<ImGuiPlatformIO>())).Platform_OnChangedViewport as *const _
+                as usize
+        },
+        128usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(ImGuiPlatformIO),
+            "::",
+            stringify!(Platform_OnChangedViewport)
+        )
+    );
+    assert_eq!(
+        unsafe {
+            &(*(::std::ptr::null::<ImGuiPlatformIO>())).Platform_SetImeInputPos as *const _ as usize
+        },
+        136usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(ImGuiPlatformIO),
+            "::",
+            stringify!(Platform_SetImeInputPos)
+        )
+    );
+    assert_eq!(
+        unsafe {
+            &(*(::std::ptr::null::<ImGuiPlatformIO>())).Platform_CreateVkSurface as *const _
+                as usize
+        },
+        144usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(ImGuiPlatformIO),
+            "::",
+            stringify!(Platform_CreateVkSurface)
+        )
+    );
+    assert_eq!(
+        unsafe {
+            &(*(::std::ptr::null::<ImGuiPlatformIO>())).Renderer_CreateWindow as *const _ as usize
+        },
+        152usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(ImGuiPlatformIO),
+            "::",
+            stringify!(Renderer_CreateWindow)
+        )
+    );
+    assert_eq!(
+        unsafe {
+            &(*(::std::ptr::null::<ImGuiPlatformIO>())).Renderer_DestroyWindow as *const _ as usize
+        },
+        160usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(ImGuiPlatformIO),
+            "::",
+            stringify!(Renderer_DestroyWindow)
+        )
+    );
+    assert_eq!(
+        unsafe {
+            &(*(::std::ptr::null::<ImGuiPlatformIO>())).Renderer_SetWindowSize as *const _ as usize
+        },
+        168usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(ImGuiPlatformIO),
+            "::",
+            stringify!(Renderer_SetWindowSize)
+        )
+    );
+    assert_eq!(
+        unsafe {
+            &(*(::std::ptr::null::<ImGuiPlatformIO>())).Renderer_RenderWindow as *const _ as usize
+        },
+        176usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(ImGuiPlatformIO),
+            "::",
+            stringify!(Renderer_RenderWindow)
+        )
+    );
+    assert_eq!(
+        unsafe {
+            &(*(::std::ptr::null::<ImGuiPlatformIO>())).Renderer_SwapBuffers as *const _ as usize
+        },
+        184usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(ImGuiPlatformIO),
+            "::",
+            stringify!(Renderer_SwapBuffers)
+        )
+    );
+    assert_eq!(
+        unsafe { &(*(::std::ptr::null::<ImGuiPlatformIO>())).Monitors as *const _ as usize },
+        192usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(ImGuiPlatformIO),
+            "::",
+            stringify!(Monitors)
+        )
+    );
+    assert_eq!(
+        unsafe { &(*(::std::ptr::null::<ImGuiPlatformIO>())).MainViewport as *const _ as usize },
+        208usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(ImGuiPlatformIO),
+            "::",
+            stringify!(MainViewport)
+        )
+    );
+    assert_eq!(
+        unsafe { &(*(::std::ptr::null::<ImGuiPlatformIO>())).Viewports as *const _ as usize },
+        216usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(ImGuiPlatformIO),
+            "::",
+            stringify!(Viewports)
+        )
+    );
+}
+impl Default for ImGuiPlatformIO {
+    fn default() -> Self {
+        unsafe { ::std::mem::zeroed() }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone, PartialEq)]
+pub struct ImGuiPlatformMonitor {
+    pub MainPos: ImVec2,
+    pub MainSize: ImVec2,
+    pub WorkPos: ImVec2,
+    pub WorkSize: ImVec2,
+    pub DpiScale: f32,
+}
+#[test]
+fn bindgen_test_layout_ImGuiPlatformMonitor() {
+    assert_eq!(
+        ::std::mem::size_of::<ImGuiPlatformMonitor>(),
+        36usize,
+        concat!("Size of: ", stringify!(ImGuiPlatformMonitor))
+    );
+    assert_eq!(
+        ::std::mem::align_of::<ImGuiPlatformMonitor>(),
+        4usize,
+        concat!("Alignment of ", stringify!(ImGuiPlatformMonitor))
+    );
+    assert_eq!(
+        unsafe { &(*(::std::ptr::null::<ImGuiPlatformMonitor>())).MainPos as *const _ as usize },
+        0usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(ImGuiPlatformMonitor),
+            "::",
+            stringify!(MainPos)
+        )
+    );
+    assert_eq!(
+        unsafe { &(*(::std::ptr::null::<ImGuiPlatformMonitor>())).MainSize as *const _ as usize },
+        8usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(ImGuiPlatformMonitor),
+            "::",
+            stringify!(MainSize)
+        )
+    );
+    assert_eq!(
+        unsafe { &(*(::std::ptr::null::<ImGuiPlatformMonitor>())).WorkPos as *const _ as usize },
+        16usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(ImGuiPlatformMonitor),
+            "::",
+            stringify!(WorkPos)
+        )
+    );
+    assert_eq!(
+        unsafe { &(*(::std::ptr::null::<ImGuiPlatformMonitor>())).WorkSize as *const _ as usize },
+        24usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(ImGuiPlatformMonitor),
+            "::",
+            stringify!(WorkSize)
+        )
+    );
+    assert_eq!(
+        unsafe { &(*(::std::ptr::null::<ImGuiPlatformMonitor>())).DpiScale as *const _ as usize },
+        32usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(ImGuiPlatformMonitor),
+            "::",
+            stringify!(DpiScale)
+        )
+    );
+}
+pub const ImGuiViewportFlags_None: ImGuiViewportFlags_ = 0;
+pub const ImGuiViewportFlags_NoDecoration: ImGuiViewportFlags_ = 1;
+pub const ImGuiViewportFlags_NoTaskBarIcon: ImGuiViewportFlags_ = 2;
+pub const ImGuiViewportFlags_NoFocusOnAppearing: ImGuiViewportFlags_ = 4;
+pub const ImGuiViewportFlags_NoFocusOnClick: ImGuiViewportFlags_ = 8;
+pub const ImGuiViewportFlags_NoInputs: ImGuiViewportFlags_ = 16;
+pub const ImGuiViewportFlags_NoRendererClear: ImGuiViewportFlags_ = 32;
+pub const ImGuiViewportFlags_TopMost: ImGuiViewportFlags_ = 64;
+pub const ImGuiViewportFlags_Minimized: ImGuiViewportFlags_ = 128;
+pub const ImGuiViewportFlags_NoAutoMerge: ImGuiViewportFlags_ = 256;
+pub const ImGuiViewportFlags_CanHostOtherWindows: ImGuiViewportFlags_ = 512;
+pub type ImGuiViewportFlags_ = ::std::os::raw::c_uint;
+#[repr(C)]
+#[derive(Debug, Copy, Clone, PartialEq)]
+pub struct ImGuiViewport {
+    pub ID: ImGuiID,
+    pub Flags: ImGuiViewportFlags,
+    pub Pos: ImVec2,
+    pub Size: ImVec2,
+    pub WorkOffsetMin: ImVec2,
+    pub WorkOffsetMax: ImVec2,
+    pub DpiScale: f32,
+    pub DrawData: *mut ImDrawData,
+    pub ParentViewportId: ImGuiID,
+    pub RendererUserData: *mut ::std::os::raw::c_void,
+    pub PlatformUserData: *mut ::std::os::raw::c_void,
+    pub PlatformHandle: *mut ::std::os::raw::c_void,
+    pub PlatformHandleRaw: *mut ::std::os::raw::c_void,
+    pub PlatformRequestMove: bool,
+    pub PlatformRequestResize: bool,
+    pub PlatformRequestClose: bool,
+}
+#[test]
+fn bindgen_test_layout_ImGuiViewport() {
+    assert_eq!(
+        ::std::mem::size_of::<ImGuiViewport>(),
+        104usize,
+        concat!("Size of: ", stringify!(ImGuiViewport))
+    );
+    assert_eq!(
+        ::std::mem::align_of::<ImGuiViewport>(),
+        8usize,
+        concat!("Alignment of ", stringify!(ImGuiViewport))
+    );
+    assert_eq!(
+        unsafe { &(*(::std::ptr::null::<ImGuiViewport>())).ID as *const _ as usize },
+        0usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(ImGuiViewport),
+            "::",
+            stringify!(ID)
+        )
+    );
+    assert_eq!(
+        unsafe { &(*(::std::ptr::null::<ImGuiViewport>())).Flags as *const _ as usize },
+        4usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(ImGuiViewport),
+            "::",
+            stringify!(Flags)
+        )
+    );
+    assert_eq!(
+        unsafe { &(*(::std::ptr::null::<ImGuiViewport>())).Pos as *const _ as usize },
+        8usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(ImGuiViewport),
+            "::",
+            stringify!(Pos)
+        )
+    );
+    assert_eq!(
+        unsafe { &(*(::std::ptr::null::<ImGuiViewport>())).Size as *const _ as usize },
+        16usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(ImGuiViewport),
+            "::",
+            stringify!(Size)
+        )
+    );
+    assert_eq!(
+        unsafe { &(*(::std::ptr::null::<ImGuiViewport>())).WorkOffsetMin as *const _ as usize },
+        24usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(ImGuiViewport),
+            "::",
+            stringify!(WorkOffsetMin)
+        )
+    );
+    assert_eq!(
+        unsafe { &(*(::std::ptr::null::<ImGuiViewport>())).WorkOffsetMax as *const _ as usize },
+        32usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(ImGuiViewport),
+            "::",
+            stringify!(WorkOffsetMax)
+        )
+    );
+    assert_eq!(
+        unsafe { &(*(::std::ptr::null::<ImGuiViewport>())).DpiScale as *const _ as usize },
+        40usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(ImGuiViewport),
+            "::",
+            stringify!(DpiScale)
+        )
+    );
+    assert_eq!(
+        unsafe { &(*(::std::ptr::null::<ImGuiViewport>())).DrawData as *const _ as usize },
+        48usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(ImGuiViewport),
+            "::",
+            stringify!(DrawData)
+        )
+    );
+    assert_eq!(
+        unsafe { &(*(::std::ptr::null::<ImGuiViewport>())).ParentViewportId as *const _ as usize },
+        56usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(ImGuiViewport),
+            "::",
+            stringify!(ParentViewportId)
+        )
+    );
+    assert_eq!(
+        unsafe { &(*(::std::ptr::null::<ImGuiViewport>())).RendererUserData as *const _ as usize },
+        64usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(ImGuiViewport),
+            "::",
+            stringify!(RendererUserData)
+        )
+    );
+    assert_eq!(
+        unsafe { &(*(::std::ptr::null::<ImGuiViewport>())).PlatformUserData as *const _ as usize },
+        72usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(ImGuiViewport),
+            "::",
+            stringify!(PlatformUserData)
+        )
+    );
+    assert_eq!(
+        unsafe { &(*(::std::ptr::null::<ImGuiViewport>())).PlatformHandle as *const _ as usize },
+        80usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(ImGuiViewport),
+            "::",
+            stringify!(PlatformHandle)
+        )
+    );
+    assert_eq!(
+        unsafe { &(*(::std::ptr::null::<ImGuiViewport>())).PlatformHandleRaw as *const _ as usize },
+        88usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(ImGuiViewport),
+            "::",
+            stringify!(PlatformHandleRaw)
+        )
+    );
+    assert_eq!(
+        unsafe {
+            &(*(::std::ptr::null::<ImGuiViewport>())).PlatformRequestMove as *const _ as usize
+        },
+        96usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(ImGuiViewport),
+            "::",
+            stringify!(PlatformRequestMove)
+        )
+    );
+    assert_eq!(
+        unsafe {
+            &(*(::std::ptr::null::<ImGuiViewport>())).PlatformRequestResize as *const _ as usize
+        },
+        97usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(ImGuiViewport),
+            "::",
+            stringify!(PlatformRequestResize)
+        )
+    );
+    assert_eq!(
+        unsafe {
+            &(*(::std::ptr::null::<ImGuiViewport>())).PlatformRequestClose as *const _ as usize
+        },
+        98usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(ImGuiViewport),
+            "::",
+            stringify!(PlatformRequestClose)
+        )
+    );
+}
+impl Default for ImGuiViewport {
+    fn default() -> Self {
+        unsafe { ::std::mem::zeroed() }
+    }
+}
 extern "C" {
     pub fn ImVec2_ImVec2Nil() -> *mut ImVec2;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImVec2_destroy(self_: *mut ImVec2);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImVec2_ImVec2Float(_x: f32, _y: f32) -> *mut ImVec2;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImVec4_ImVec4Nil() -> *mut ImVec4;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImVec4_destroy(self_: *mut ImVec4);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImVec4_ImVec4Float(_x: f32, _y: f32, _z: f32, _w: f32) -> *mut ImVec4;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igCreateContext(shared_font_atlas: *mut ImFontAtlas) -> *mut ImGuiContext;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igDestroyContext(ctx: *mut ImGuiContext);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igGetCurrentContext() -> *mut ImGuiContext;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igSetCurrentContext(ctx: *mut ImGuiContext);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igGetIO() -> *mut ImGuiIO;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igGetStyle() -> *mut ImGuiStyle;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igNewFrame();
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igEndFrame();
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igRender();
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igGetDrawData() -> *mut ImDrawData;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igShowDemoWindow(p_open: *mut bool);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igShowAboutWindow(p_open: *mut bool);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igShowMetricsWindow(p_open: *mut bool);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igShowStyleEditor(ref_: *mut ImGuiStyle);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igShowStyleSelector(label: *const ::std::os::raw::c_char) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igShowFontSelector(label: *const ::std::os::raw::c_char);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igShowUserGuide();
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igGetVersion() -> *const ::std::os::raw::c_char;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igStyleColorsDark(dst: *mut ImGuiStyle);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igStyleColorsClassic(dst: *mut ImGuiStyle);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igStyleColorsLight(dst: *mut ImGuiStyle);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igBegin(
         name: *const ::std::os::raw::c_char,
@@ -5360,11 +6426,9 @@ extern "C" {
         flags: ImGuiWindowFlags,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igEnd();
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igBeginChildStr(
         str_id: *const ::std::os::raw::c_char,
@@ -5373,60 +6437,52 @@ extern "C" {
         flags: ImGuiWindowFlags,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igBeginChildID(id: ImGuiID, size: ImVec2, border: bool, flags: ImGuiWindowFlags)
         -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igEndChild();
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igIsWindowAppearing() -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igIsWindowCollapsed() -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igIsWindowFocused(flags: ImGuiFocusedFlags) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igIsWindowHovered(flags: ImGuiHoveredFlags) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igGetWindowDrawList() -> *mut ImDrawList;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
+    pub fn igGetWindowDpiScale() -> f32;
+}
+extern "C" {
+    pub fn igGetWindowViewport() -> *mut ImGuiViewport;
+}
 extern "C" {
     pub fn igGetWindowPos(pOut: *mut ImVec2);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igGetWindowSize(pOut: *mut ImVec2);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igGetWindowWidth() -> f32;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igGetWindowHeight() -> f32;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igSetNextWindowPos(pos: ImVec2, cond: ImGuiCond, pivot: ImVec2);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igSetNextWindowSize(size: ImVec2, cond: ImGuiCond);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igSetNextWindowSizeConstraints(
         size_min: ImVec2,
@@ -5435,51 +6491,42 @@ extern "C" {
         custom_callback_data: *mut ::std::os::raw::c_void,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igSetNextWindowContentSize(size: ImVec2);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igSetNextWindowCollapsed(collapsed: bool, cond: ImGuiCond);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igSetNextWindowFocus();
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igSetNextWindowBgAlpha(alpha: f32);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
+    pub fn igSetNextWindowViewport(viewport_id: ImGuiID);
+}
 extern "C" {
     pub fn igSetWindowPosVec2(pos: ImVec2, cond: ImGuiCond);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igSetWindowSizeVec2(size: ImVec2, cond: ImGuiCond);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igSetWindowCollapsedBool(collapsed: bool, cond: ImGuiCond);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igSetWindowFocusNil();
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igSetWindowFontScale(scale: f32);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igSetWindowPosStr(name: *const ::std::os::raw::c_char, pos: ImVec2, cond: ImGuiCond);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igSetWindowSizeStr(name: *const ::std::os::raw::c_char, size: ImVec2, cond: ImGuiCond);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igSetWindowCollapsedStr(
         name: *const ::std::os::raw::c_char,
@@ -5487,324 +6534,246 @@ extern "C" {
         cond: ImGuiCond,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igSetWindowFocusStr(name: *const ::std::os::raw::c_char);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igGetContentRegionMax(pOut: *mut ImVec2);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igGetContentRegionAvail(pOut: *mut ImVec2);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igGetWindowContentRegionMin(pOut: *mut ImVec2);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igGetWindowContentRegionMax(pOut: *mut ImVec2);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igGetWindowContentRegionWidth() -> f32;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igGetScrollX() -> f32;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igGetScrollY() -> f32;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igGetScrollMaxX() -> f32;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igGetScrollMaxY() -> f32;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igSetScrollX(scroll_x: f32);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igSetScrollY(scroll_y: f32);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igSetScrollHereX(center_x_ratio: f32);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igSetScrollHereY(center_y_ratio: f32);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igSetScrollFromPosX(local_x: f32, center_x_ratio: f32);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igSetScrollFromPosY(local_y: f32, center_y_ratio: f32);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igPushFont(font: *mut ImFont);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igPopFont();
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igPushStyleColorU32(idx: ImGuiCol, col: ImU32);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igPushStyleColorVec4(idx: ImGuiCol, col: ImVec4);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igPopStyleColor(count: ::std::os::raw::c_int);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igPushStyleVarFloat(idx: ImGuiStyleVar, val: f32);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igPushStyleVarVec2(idx: ImGuiStyleVar, val: ImVec2);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igPopStyleVar(count: ::std::os::raw::c_int);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igGetStyleColorVec4(idx: ImGuiCol) -> *const ImVec4;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igGetFont() -> *mut ImFont;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igGetFontSize() -> f32;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igGetFontTexUvWhitePixel(pOut: *mut ImVec2);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igGetColorU32Col(idx: ImGuiCol, alpha_mul: f32) -> ImU32;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igGetColorU32Vec4(col: ImVec4) -> ImU32;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igGetColorU32U32(col: ImU32) -> ImU32;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igPushItemWidth(item_width: f32);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igPopItemWidth();
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igSetNextItemWidth(item_width: f32);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igCalcItemWidth() -> f32;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igPushTextWrapPos(wrap_local_pos_x: f32);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igPopTextWrapPos();
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igPushAllowKeyboardFocus(allow_keyboard_focus: bool);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igPopAllowKeyboardFocus();
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igPushButtonRepeat(repeat: bool);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igPopButtonRepeat();
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igSeparator();
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igSameLine(offset_from_start_x: f32, spacing: f32);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igNewLine();
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igSpacing();
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igDummy(size: ImVec2);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igIndent(indent_w: f32);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igUnindent(indent_w: f32);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igBeginGroup();
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igEndGroup();
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igGetCursorPos(pOut: *mut ImVec2);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igGetCursorPosX() -> f32;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igGetCursorPosY() -> f32;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igSetCursorPos(local_pos: ImVec2);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igSetCursorPosX(local_x: f32);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igSetCursorPosY(local_y: f32);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igGetCursorStartPos(pOut: *mut ImVec2);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igGetCursorScreenPos(pOut: *mut ImVec2);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igSetCursorScreenPos(pos: ImVec2);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igAlignTextToFramePadding();
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igGetTextLineHeight() -> f32;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igGetTextLineHeightWithSpacing() -> f32;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igGetFrameHeight() -> f32;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igGetFrameHeightWithSpacing() -> f32;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igPushIDStr(str_id: *const ::std::os::raw::c_char);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igPushIDStrStr(
         str_id_begin: *const ::std::os::raw::c_char,
         str_id_end: *const ::std::os::raw::c_char,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igPushIDPtr(ptr_id: *const ::std::os::raw::c_void);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igPushIDInt(int_id: ::std::os::raw::c_int);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igPopID();
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igGetIDStr(str_id: *const ::std::os::raw::c_char) -> ImGuiID;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igGetIDStrStr(
         str_id_begin: *const ::std::os::raw::c_char,
         str_id_end: *const ::std::os::raw::c_char,
     ) -> ImGuiID;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igGetIDPtr(ptr_id: *const ::std::os::raw::c_void) -> ImGuiID;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igTextUnformatted(
         text: *const ::std::os::raw::c_char,
         text_end: *const ::std::os::raw::c_char,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igText(fmt: *const ::std::os::raw::c_char, ...);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igTextColored(col: ImVec4, fmt: *const ::std::os::raw::c_char, ...);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igTextDisabled(fmt: *const ::std::os::raw::c_char, ...);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igTextWrapped(fmt: *const ::std::os::raw::c_char, ...);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igLabelText(
         label: *const ::std::os::raw::c_char,
@@ -5812,19 +6781,15 @@ extern "C" {
         ...
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igBulletText(fmt: *const ::std::os::raw::c_char, ...);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igButton(label: *const ::std::os::raw::c_char, size: ImVec2) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igSmallButton(label: *const ::std::os::raw::c_char) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igInvisibleButton(
         str_id: *const ::std::os::raw::c_char,
@@ -5832,11 +6797,9 @@ extern "C" {
         flags: ImGuiButtonFlags,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igArrowButton(str_id: *const ::std::os::raw::c_char, dir: ImGuiDir) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igImage(
         user_texture_id: ImTextureID,
@@ -5847,7 +6810,6 @@ extern "C" {
         border_col: ImVec4,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igImageButton(
         user_texture_id: ImTextureID,
@@ -5859,23 +6821,26 @@ extern "C" {
         tint_col: ImVec4,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igCheckbox(label: *const ::std::os::raw::c_char, v: *mut bool) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igCheckboxFlags(
+    pub fn igCheckboxFlagsIntPtr(
+        label: *const ::std::os::raw::c_char,
+        flags: *mut ::std::os::raw::c_int,
+        flags_value: ::std::os::raw::c_int,
+    ) -> bool;
+}
+extern "C" {
+    pub fn igCheckboxFlagsUintPtr(
         label: *const ::std::os::raw::c_char,
         flags: *mut ::std::os::raw::c_uint,
         flags_value: ::std::os::raw::c_uint,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igRadioButtonBool(label: *const ::std::os::raw::c_char, active: bool) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igRadioButtonIntPtr(
         label: *const ::std::os::raw::c_char,
@@ -5883,15 +6848,12 @@ extern "C" {
         v_button: ::std::os::raw::c_int,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igProgressBar(fraction: f32, size_arg: ImVec2, overlay: *const ::std::os::raw::c_char);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igBullet();
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igBeginCombo(
         label: *const ::std::os::raw::c_char,
@@ -5899,11 +6861,9 @@ extern "C" {
         flags: ImGuiComboFlags,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igEndCombo();
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igComboStr_arr(
         label: *const ::std::os::raw::c_char,
@@ -5913,7 +6873,6 @@ extern "C" {
         popup_max_height_in_items: ::std::os::raw::c_int,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igComboStr(
         label: *const ::std::os::raw::c_char,
@@ -5922,7 +6881,6 @@ extern "C" {
         popup_max_height_in_items: ::std::os::raw::c_int,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igComboFnBoolPtr(
         label: *const ::std::os::raw::c_char,
@@ -5939,7 +6897,6 @@ extern "C" {
         popup_max_height_in_items: ::std::os::raw::c_int,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igDragFloat(
         label: *const ::std::os::raw::c_char,
@@ -5951,7 +6908,6 @@ extern "C" {
         flags: ImGuiSliderFlags,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igDragFloat2(
         label: *const ::std::os::raw::c_char,
@@ -5963,7 +6919,6 @@ extern "C" {
         flags: ImGuiSliderFlags,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igDragFloat3(
         label: *const ::std::os::raw::c_char,
@@ -5975,7 +6930,6 @@ extern "C" {
         flags: ImGuiSliderFlags,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igDragFloat4(
         label: *const ::std::os::raw::c_char,
@@ -5987,7 +6941,6 @@ extern "C" {
         flags: ImGuiSliderFlags,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igDragFloatRange2(
         label: *const ::std::os::raw::c_char,
@@ -6001,7 +6954,6 @@ extern "C" {
         flags: ImGuiSliderFlags,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igDragInt(
         label: *const ::std::os::raw::c_char,
@@ -6013,7 +6965,6 @@ extern "C" {
         flags: ImGuiSliderFlags,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igDragInt2(
         label: *const ::std::os::raw::c_char,
@@ -6025,7 +6976,6 @@ extern "C" {
         flags: ImGuiSliderFlags,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igDragInt3(
         label: *const ::std::os::raw::c_char,
@@ -6037,7 +6987,6 @@ extern "C" {
         flags: ImGuiSliderFlags,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igDragInt4(
         label: *const ::std::os::raw::c_char,
@@ -6049,7 +6998,6 @@ extern "C" {
         flags: ImGuiSliderFlags,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igDragIntRange2(
         label: *const ::std::os::raw::c_char,
@@ -6063,7 +7011,6 @@ extern "C" {
         flags: ImGuiSliderFlags,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igDragScalar(
         label: *const ::std::os::raw::c_char,
@@ -6076,7 +7023,6 @@ extern "C" {
         flags: ImGuiSliderFlags,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igDragScalarN(
         label: *const ::std::os::raw::c_char,
@@ -6090,7 +7036,6 @@ extern "C" {
         flags: ImGuiSliderFlags,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igSliderFloat(
         label: *const ::std::os::raw::c_char,
@@ -6101,7 +7046,6 @@ extern "C" {
         flags: ImGuiSliderFlags,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igSliderFloat2(
         label: *const ::std::os::raw::c_char,
@@ -6112,7 +7056,6 @@ extern "C" {
         flags: ImGuiSliderFlags,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igSliderFloat3(
         label: *const ::std::os::raw::c_char,
@@ -6123,7 +7066,6 @@ extern "C" {
         flags: ImGuiSliderFlags,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igSliderFloat4(
         label: *const ::std::os::raw::c_char,
@@ -6134,7 +7076,6 @@ extern "C" {
         flags: ImGuiSliderFlags,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igSliderAngle(
         label: *const ::std::os::raw::c_char,
@@ -6145,7 +7086,6 @@ extern "C" {
         flags: ImGuiSliderFlags,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igSliderInt(
         label: *const ::std::os::raw::c_char,
@@ -6156,7 +7096,6 @@ extern "C" {
         flags: ImGuiSliderFlags,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igSliderInt2(
         label: *const ::std::os::raw::c_char,
@@ -6167,7 +7106,6 @@ extern "C" {
         flags: ImGuiSliderFlags,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igSliderInt3(
         label: *const ::std::os::raw::c_char,
@@ -6178,7 +7116,6 @@ extern "C" {
         flags: ImGuiSliderFlags,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igSliderInt4(
         label: *const ::std::os::raw::c_char,
@@ -6189,7 +7126,6 @@ extern "C" {
         flags: ImGuiSliderFlags,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igSliderScalar(
         label: *const ::std::os::raw::c_char,
@@ -6201,7 +7137,6 @@ extern "C" {
         flags: ImGuiSliderFlags,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igSliderScalarN(
         label: *const ::std::os::raw::c_char,
@@ -6214,7 +7149,6 @@ extern "C" {
         flags: ImGuiSliderFlags,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igVSliderFloat(
         label: *const ::std::os::raw::c_char,
@@ -6226,7 +7160,6 @@ extern "C" {
         flags: ImGuiSliderFlags,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igVSliderInt(
         label: *const ::std::os::raw::c_char,
@@ -6238,7 +7171,6 @@ extern "C" {
         flags: ImGuiSliderFlags,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igVSliderScalar(
         label: *const ::std::os::raw::c_char,
@@ -6251,7 +7183,6 @@ extern "C" {
         flags: ImGuiSliderFlags,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igInputText(
         label: *const ::std::os::raw::c_char,
@@ -6262,7 +7193,6 @@ extern "C" {
         user_data: *mut ::std::os::raw::c_void,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igInputTextMultiline(
         label: *const ::std::os::raw::c_char,
@@ -6274,7 +7204,6 @@ extern "C" {
         user_data: *mut ::std::os::raw::c_void,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igInputTextWithHint(
         label: *const ::std::os::raw::c_char,
@@ -6286,7 +7215,6 @@ extern "C" {
         user_data: *mut ::std::os::raw::c_void,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igInputFloat(
         label: *const ::std::os::raw::c_char,
@@ -6297,7 +7225,6 @@ extern "C" {
         flags: ImGuiInputTextFlags,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igInputFloat2(
         label: *const ::std::os::raw::c_char,
@@ -6306,7 +7233,6 @@ extern "C" {
         flags: ImGuiInputTextFlags,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igInputFloat3(
         label: *const ::std::os::raw::c_char,
@@ -6315,7 +7241,6 @@ extern "C" {
         flags: ImGuiInputTextFlags,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igInputFloat4(
         label: *const ::std::os::raw::c_char,
@@ -6324,7 +7249,6 @@ extern "C" {
         flags: ImGuiInputTextFlags,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igInputInt(
         label: *const ::std::os::raw::c_char,
@@ -6334,7 +7258,6 @@ extern "C" {
         flags: ImGuiInputTextFlags,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igInputInt2(
         label: *const ::std::os::raw::c_char,
@@ -6342,7 +7265,6 @@ extern "C" {
         flags: ImGuiInputTextFlags,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igInputInt3(
         label: *const ::std::os::raw::c_char,
@@ -6350,7 +7272,6 @@ extern "C" {
         flags: ImGuiInputTextFlags,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igInputInt4(
         label: *const ::std::os::raw::c_char,
@@ -6358,7 +7279,6 @@ extern "C" {
         flags: ImGuiInputTextFlags,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igInputDouble(
         label: *const ::std::os::raw::c_char,
@@ -6369,7 +7289,6 @@ extern "C" {
         flags: ImGuiInputTextFlags,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igInputScalar(
         label: *const ::std::os::raw::c_char,
@@ -6381,7 +7300,6 @@ extern "C" {
         flags: ImGuiInputTextFlags,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igInputScalarN(
         label: *const ::std::os::raw::c_char,
@@ -6394,7 +7312,6 @@ extern "C" {
         flags: ImGuiInputTextFlags,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igColorEdit3(
         label: *const ::std::os::raw::c_char,
@@ -6402,7 +7319,6 @@ extern "C" {
         flags: ImGuiColorEditFlags,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igColorEdit4(
         label: *const ::std::os::raw::c_char,
@@ -6410,7 +7326,6 @@ extern "C" {
         flags: ImGuiColorEditFlags,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igColorPicker3(
         label: *const ::std::os::raw::c_char,
@@ -6418,7 +7333,6 @@ extern "C" {
         flags: ImGuiColorEditFlags,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igColorPicker4(
         label: *const ::std::os::raw::c_char,
@@ -6427,7 +7341,6 @@ extern "C" {
         ref_col: *const f32,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igColorButton(
         desc_id: *const ::std::os::raw::c_char,
@@ -6436,15 +7349,12 @@ extern "C" {
         size: ImVec2,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igSetColorEditOptions(flags: ImGuiColorEditFlags);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igTreeNodeStr(label: *const ::std::os::raw::c_char) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igTreeNodeStrStr(
         str_id: *const ::std::os::raw::c_char,
@@ -6452,7 +7362,6 @@ extern "C" {
         ...
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igTreeNodePtr(
         ptr_id: *const ::std::os::raw::c_void,
@@ -6460,12 +7369,10 @@ extern "C" {
         ...
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igTreeNodeExStr(label: *const ::std::os::raw::c_char, flags: ImGuiTreeNodeFlags)
         -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igTreeNodeExStrStr(
         str_id: *const ::std::os::raw::c_char,
@@ -6474,7 +7381,6 @@ extern "C" {
         ...
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igTreeNodeExPtr(
         ptr_id: *const ::std::os::raw::c_void,
@@ -6483,30 +7389,24 @@ extern "C" {
         ...
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igTreePushStr(str_id: *const ::std::os::raw::c_char);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igTreePushPtr(ptr_id: *const ::std::os::raw::c_void);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igTreePop();
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igGetTreeNodeToLabelSpacing() -> f32;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igCollapsingHeaderTreeNodeFlags(
         label: *const ::std::os::raw::c_char,
         flags: ImGuiTreeNodeFlags,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igCollapsingHeaderBoolPtr(
         label: *const ::std::os::raw::c_char,
@@ -6514,11 +7414,9 @@ extern "C" {
         flags: ImGuiTreeNodeFlags,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igSetNextItemOpen(is_open: bool, cond: ImGuiCond);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igSelectableBool(
         label: *const ::std::os::raw::c_char,
@@ -6527,7 +7425,6 @@ extern "C" {
         size: ImVec2,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igSelectableBoolPtr(
         label: *const ::std::os::raw::c_char,
@@ -6536,7 +7433,6 @@ extern "C" {
         size: ImVec2,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igListBoxStr_arr(
         label: *const ::std::os::raw::c_char,
@@ -6546,7 +7442,6 @@ extern "C" {
         height_in_items: ::std::os::raw::c_int,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igListBoxFnBoolPtr(
         label: *const ::std::os::raw::c_char,
@@ -6563,11 +7458,9 @@ extern "C" {
         height_in_items: ::std::os::raw::c_int,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igListBoxHeaderVec2(label: *const ::std::os::raw::c_char, size: ImVec2) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igListBoxHeaderInt(
         label: *const ::std::os::raw::c_char,
@@ -6575,11 +7468,9 @@ extern "C" {
         height_in_items: ::std::os::raw::c_int,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igListBoxFooter();
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igPlotLinesFloatPtr(
         label: *const ::std::os::raw::c_char,
@@ -6593,7 +7484,6 @@ extern "C" {
         stride: ::std::os::raw::c_int,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igPlotLinesFnFloatPtr(
         label: *const ::std::os::raw::c_char,
@@ -6612,7 +7502,6 @@ extern "C" {
         graph_size: ImVec2,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igPlotHistogramFloatPtr(
         label: *const ::std::os::raw::c_char,
@@ -6626,7 +7515,6 @@ extern "C" {
         stride: ::std::os::raw::c_int,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igPlotHistogramFnFloatPtr(
         label: *const ::std::os::raw::c_char,
@@ -6645,19 +7533,15 @@ extern "C" {
         graph_size: ImVec2,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igValueBool(prefix: *const ::std::os::raw::c_char, b: bool);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igValueInt(prefix: *const ::std::os::raw::c_char, v: ::std::os::raw::c_int);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igValueUint(prefix: *const ::std::os::raw::c_char, v: ::std::os::raw::c_uint);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igValueFloat(
         prefix: *const ::std::os::raw::c_char,
@@ -6665,31 +7549,24 @@ extern "C" {
         float_format: *const ::std::os::raw::c_char,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igBeginMenuBar() -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igEndMenuBar();
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igBeginMainMenuBar() -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igEndMainMenuBar();
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igBeginMenu(label: *const ::std::os::raw::c_char, enabled: bool) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igEndMenu();
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igMenuItemBool(
         label: *const ::std::os::raw::c_char,
@@ -6698,7 +7575,6 @@ extern "C" {
         enabled: bool,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igMenuItemBoolPtr(
         label: *const ::std::os::raw::c_char,
@@ -6707,23 +7583,18 @@ extern "C" {
         enabled: bool,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igBeginTooltip();
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igEndTooltip();
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igSetTooltip(fmt: *const ::std::os::raw::c_char, ...);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igBeginPopup(str_id: *const ::std::os::raw::c_char, flags: ImGuiWindowFlags) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igBeginPopupModal(
         name: *const ::std::os::raw::c_char,
@@ -6731,91 +7602,72 @@ extern "C" {
         flags: ImGuiWindowFlags,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igEndPopup();
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igOpenPopup(str_id: *const ::std::os::raw::c_char, popup_flags: ImGuiPopupFlags);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igOpenPopupOnItemClick(
         str_id: *const ::std::os::raw::c_char,
         popup_flags: ImGuiPopupFlags,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igCloseCurrentPopup();
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igBeginPopupContextItem(
         str_id: *const ::std::os::raw::c_char,
         popup_flags: ImGuiPopupFlags,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igBeginPopupContextWindow(
         str_id: *const ::std::os::raw::c_char,
         popup_flags: ImGuiPopupFlags,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igBeginPopupContextVoid(
         str_id: *const ::std::os::raw::c_char,
         popup_flags: ImGuiPopupFlags,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igIsPopupOpen(str_id: *const ::std::os::raw::c_char, flags: ImGuiPopupFlags) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igColumns(count: ::std::os::raw::c_int, id: *const ::std::os::raw::c_char, border: bool);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igNextColumn();
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igGetColumnIndex() -> ::std::os::raw::c_int;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igGetColumnWidth(column_index: ::std::os::raw::c_int) -> f32;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igSetColumnWidth(column_index: ::std::os::raw::c_int, width: f32);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igGetColumnOffset(column_index: ::std::os::raw::c_int) -> f32;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igSetColumnOffset(column_index: ::std::os::raw::c_int, offset_x: f32);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igGetColumnsCount() -> ::std::os::raw::c_int;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igBeginTabBar(str_id: *const ::std::os::raw::c_char, flags: ImGuiTabBarFlags) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igEndTabBar();
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igBeginTabItem(
         label: *const ::std::os::raw::c_char,
@@ -6823,46 +7675,63 @@ extern "C" {
         flags: ImGuiTabItemFlags,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igEndTabItem();
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igTabItemButton(label: *const ::std::os::raw::c_char, flags: ImGuiTabItemFlags) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igSetTabItemClosed(tab_or_docked_window_label: *const ::std::os::raw::c_char);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
+    pub fn igDockSpace(
+        id: ImGuiID,
+        size: ImVec2,
+        flags: ImGuiDockNodeFlags,
+        window_class: *const ImGuiWindowClass,
+    );
+}
+extern "C" {
+    pub fn igDockSpaceOverViewport(
+        viewport: *mut ImGuiViewport,
+        flags: ImGuiDockNodeFlags,
+        window_class: *const ImGuiWindowClass,
+    ) -> ImGuiID;
+}
+extern "C" {
+    pub fn igSetNextWindowDockID(dock_id: ImGuiID, cond: ImGuiCond);
+}
+extern "C" {
+    pub fn igSetNextWindowClass(window_class: *const ImGuiWindowClass);
+}
+extern "C" {
+    pub fn igGetWindowDockID() -> ImGuiID;
+}
+extern "C" {
+    pub fn igIsWindowDocked() -> bool;
+}
 extern "C" {
     pub fn igLogToTTY(auto_open_depth: ::std::os::raw::c_int);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igLogToFile(
         auto_open_depth: ::std::os::raw::c_int,
         filename: *const ::std::os::raw::c_char,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igLogToClipboard(auto_open_depth: ::std::os::raw::c_int);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igLogFinish();
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igLogButtons();
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igBeginDragDropSource(flags: ImGuiDragDropFlags) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igSetDragDropPayload(
         type_: *const ::std::os::raw::c_char,
@@ -6871,30 +7740,24 @@ extern "C" {
         cond: ImGuiCond,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igEndDragDropSource();
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igBeginDragDropTarget() -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igAcceptDragDropPayload(
         type_: *const ::std::os::raw::c_char,
         flags: ImGuiDragDropFlags,
     ) -> *const ImGuiPayload;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igEndDragDropTarget();
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igGetDragDropPayload() -> *const ImGuiPayload;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igPushClipRect(
         clip_rect_min: ImVec2,
@@ -6902,127 +7765,102 @@ extern "C" {
         intersect_with_current_clip_rect: bool,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igPopClipRect();
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igSetItemDefaultFocus();
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igSetKeyboardFocusHere(offset: ::std::os::raw::c_int);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igIsItemHovered(flags: ImGuiHoveredFlags) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igIsItemActive() -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igIsItemFocused() -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igIsItemClicked(mouse_button: ImGuiMouseButton) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igIsItemVisible() -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igIsItemEdited() -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igIsItemActivated() -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igIsItemDeactivated() -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igIsItemDeactivatedAfterEdit() -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igIsItemToggledOpen() -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igIsAnyItemHovered() -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igIsAnyItemActive() -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igIsAnyItemFocused() -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igGetItemRectMin(pOut: *mut ImVec2);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igGetItemRectMax(pOut: *mut ImVec2);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igGetItemRectSize(pOut: *mut ImVec2);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igSetItemAllowOverlap();
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igIsRectVisibleNil(size: ImVec2) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igIsRectVisibleVec2(rect_min: ImVec2, rect_max: ImVec2) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igGetTime() -> f64;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igGetFrameCount() -> ::std::os::raw::c_int;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igGetBackgroundDrawList() -> *mut ImDrawList;
+    pub fn igGetBackgroundDrawListNil() -> *mut ImDrawList;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igGetForegroundDrawList() -> *mut ImDrawList;
+    pub fn igGetForegroundDrawListNil() -> *mut ImDrawList;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
+    pub fn igGetBackgroundDrawListViewportPtr(viewport: *mut ImGuiViewport) -> *mut ImDrawList;
+}
+extern "C" {
+    pub fn igGetForegroundDrawListViewportPtr(viewport: *mut ImGuiViewport) -> *mut ImDrawList;
+}
 extern "C" {
     pub fn igGetDrawListSharedData() -> *mut ImDrawListSharedData;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igGetStyleColorName(idx: ImGuiCol) -> *const ::std::os::raw::c_char;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igSetStateStorage(storage: *mut ImGuiStorage);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igGetStateStorage() -> *mut ImGuiStorage;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igCalcListClipping(
         items_count: ::std::os::raw::c_int,
@@ -7031,15 +7869,12 @@ extern "C" {
         out_items_display_end: *mut ::std::os::raw::c_int,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igBeginChildFrame(id: ImGuiID, size: ImVec2, flags: ImGuiWindowFlags) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igEndChildFrame();
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igCalcTextSize(
         pOut: *mut ImVec2,
@@ -7049,15 +7884,12 @@ extern "C" {
         wrap_width: f32,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igColorConvertU32ToFloat4(pOut: *mut ImVec4, in_: ImU32);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igColorConvertFloat4ToU32(in_: ImVec4) -> ImU32;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igColorConvertRGBtoHSV(
         r: f32,
@@ -7068,7 +7900,6 @@ extern "C" {
         out_v: *mut f32,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igColorConvertHSVtoRGB(
         h: f32,
@@ -7079,23 +7910,18 @@ extern "C" {
         out_b: *mut f32,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igGetKeyIndex(imgui_key: ImGuiKey) -> ::std::os::raw::c_int;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igIsKeyDown(user_key_index: ::std::os::raw::c_int) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igIsKeyPressed(user_key_index: ::std::os::raw::c_int, repeat: bool) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igIsKeyReleased(user_key_index: ::std::os::raw::c_int) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igGetKeyPressedAmount(
         key_index: ::std::os::raw::c_int,
@@ -7103,95 +7929,72 @@ extern "C" {
         rate: f32,
     ) -> ::std::os::raw::c_int;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igCaptureKeyboardFromApp(want_capture_keyboard_value: bool);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igIsMouseDown(button: ImGuiMouseButton) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igIsMouseClicked(button: ImGuiMouseButton, repeat: bool) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igIsMouseReleased(button: ImGuiMouseButton) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igIsMouseDoubleClicked(button: ImGuiMouseButton) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igIsMouseHoveringRect(r_min: ImVec2, r_max: ImVec2, clip: bool) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igIsMousePosValid(mouse_pos: *const ImVec2) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igIsAnyMouseDown() -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igGetMousePos(pOut: *mut ImVec2);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igGetMousePosOnOpeningCurrentPopup(pOut: *mut ImVec2);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igIsMouseDragging(button: ImGuiMouseButton, lock_threshold: f32) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igGetMouseDragDelta(pOut: *mut ImVec2, button: ImGuiMouseButton, lock_threshold: f32);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igResetMouseDragDelta(button: ImGuiMouseButton);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igGetMouseCursor() -> ImGuiMouseCursor;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igSetMouseCursor(cursor_type: ImGuiMouseCursor);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igCaptureMouseFromApp(want_capture_mouse_value: bool);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igGetClipboardText() -> *const ::std::os::raw::c_char;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igSetClipboardText(text: *const ::std::os::raw::c_char);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igLoadIniSettingsFromDisk(ini_filename: *const ::std::os::raw::c_char);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igLoadIniSettingsFromMemory(ini_data: *const ::std::os::raw::c_char, ini_size: usize);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igSaveIniSettingsToDisk(ini_filename: *const ::std::os::raw::c_char);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igSaveIniSettingsToMemory(out_ini_size: *mut usize) -> *const ::std::os::raw::c_char;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igDebugCheckVersionAndDataLayout(
         version_str: *const ::std::os::raw::c_char,
@@ -7203,7 +8006,6 @@ extern "C" {
         sz_drawidx: usize,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igSetAllocatorFunctions(
         alloc_func: ::std::option::Option<
@@ -7221,59 +8023,71 @@ extern "C" {
         user_data: *mut ::std::os::raw::c_void,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igMemAlloc(size: usize) -> *mut ::std::os::raw::c_void;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igMemFree(ptr: *mut ::std::os::raw::c_void);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
+    pub fn igGetPlatformIO() -> *mut ImGuiPlatformIO;
+}
+extern "C" {
+    pub fn igGetMainViewport() -> *mut ImGuiViewport;
+}
+extern "C" {
+    pub fn igUpdatePlatformWindows();
+}
+extern "C" {
+    pub fn igRenderPlatformWindowsDefault(
+        platform_render_arg: *mut ::std::os::raw::c_void,
+        renderer_render_arg: *mut ::std::os::raw::c_void,
+    );
+}
+extern "C" {
+    pub fn igDestroyPlatformWindows();
+}
+extern "C" {
+    pub fn igFindViewportByID(id: ImGuiID) -> *mut ImGuiViewport;
+}
+extern "C" {
+    pub fn igFindViewportByPlatformHandle(
+        platform_handle: *mut ::std::os::raw::c_void,
+    ) -> *mut ImGuiViewport;
+}
 extern "C" {
     pub fn ImGuiStyle_ImGuiStyle() -> *mut ImGuiStyle;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImGuiStyle_destroy(self_: *mut ImGuiStyle);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImGuiStyle_ScaleAllSizes(self_: *mut ImGuiStyle, scale_factor: f32);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImGuiIO_AddInputCharacter(self_: *mut ImGuiIO, c: ::std::os::raw::c_uint);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImGuiIO_AddInputCharacterUTF16(self_: *mut ImGuiIO, c: ImWchar16);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImGuiIO_AddInputCharactersUTF8(self_: *mut ImGuiIO, str_: *const ::std::os::raw::c_char);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImGuiIO_ClearInputCharacters(self_: *mut ImGuiIO);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImGuiIO_ImGuiIO() -> *mut ImGuiIO;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImGuiIO_destroy(self_: *mut ImGuiIO);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImGuiInputTextCallbackData_ImGuiInputTextCallbackData() -> *mut ImGuiInputTextCallbackData;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImGuiInputTextCallbackData_destroy(self_: *mut ImGuiInputTextCallbackData);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImGuiInputTextCallbackData_DeleteChars(
         self_: *mut ImGuiInputTextCallbackData,
@@ -7281,7 +8095,6 @@ extern "C" {
         bytes_count: ::std::os::raw::c_int,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImGuiInputTextCallbackData_InsertChars(
         self_: *mut ImGuiInputTextCallbackData,
@@ -7290,64 +8103,56 @@ extern "C" {
         text_end: *const ::std::os::raw::c_char,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImGuiInputTextCallbackData_SelectAll(self_: *mut ImGuiInputTextCallbackData);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImGuiInputTextCallbackData_ClearSelection(self_: *mut ImGuiInputTextCallbackData);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImGuiInputTextCallbackData_HasSelection(self_: *mut ImGuiInputTextCallbackData) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
+    pub fn ImGuiWindowClass_ImGuiWindowClass() -> *mut ImGuiWindowClass;
+}
+extern "C" {
+    pub fn ImGuiWindowClass_destroy(self_: *mut ImGuiWindowClass);
+}
 extern "C" {
     pub fn ImGuiPayload_ImGuiPayload() -> *mut ImGuiPayload;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImGuiPayload_destroy(self_: *mut ImGuiPayload);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImGuiPayload_Clear(self_: *mut ImGuiPayload);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImGuiPayload_IsDataType(
         self_: *mut ImGuiPayload,
         type_: *const ::std::os::raw::c_char,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImGuiPayload_IsPreview(self_: *mut ImGuiPayload) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImGuiPayload_IsDelivery(self_: *mut ImGuiPayload) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImGuiOnceUponAFrame_ImGuiOnceUponAFrame() -> *mut ImGuiOnceUponAFrame;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImGuiOnceUponAFrame_destroy(self_: *mut ImGuiOnceUponAFrame);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImGuiTextFilter_ImGuiTextFilter(
         default_filter: *const ::std::os::raw::c_char,
     ) -> *mut ImGuiTextFilter;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImGuiTextFilter_destroy(self_: *mut ImGuiTextFilter);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImGuiTextFilter_Draw(
         self_: *mut ImGuiTextFilter,
@@ -7355,7 +8160,6 @@ extern "C" {
         width: f32,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImGuiTextFilter_PassFilter(
         self_: *mut ImGuiTextFilter,
@@ -7363,38 +8167,30 @@ extern "C" {
         text_end: *const ::std::os::raw::c_char,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImGuiTextFilter_Build(self_: *mut ImGuiTextFilter);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImGuiTextFilter_Clear(self_: *mut ImGuiTextFilter);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImGuiTextFilter_IsActive(self_: *mut ImGuiTextFilter) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImGuiTextRange_ImGuiTextRangeNil() -> *mut ImGuiTextRange;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImGuiTextRange_destroy(self_: *mut ImGuiTextRange);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImGuiTextRange_ImGuiTextRangeStr(
         _b: *const ::std::os::raw::c_char,
         _e: *const ::std::os::raw::c_char,
     ) -> *mut ImGuiTextRange;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImGuiTextRange_empty(self_: *mut ImGuiTextRange) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImGuiTextRange_split(
         self_: *mut ImGuiTextRange,
@@ -7402,43 +8198,33 @@ extern "C" {
         out: *mut ImVector_ImGuiTextRange,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImGuiTextBuffer_ImGuiTextBuffer() -> *mut ImGuiTextBuffer;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImGuiTextBuffer_destroy(self_: *mut ImGuiTextBuffer);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImGuiTextBuffer_begin(self_: *mut ImGuiTextBuffer) -> *const ::std::os::raw::c_char;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImGuiTextBuffer_end(self_: *mut ImGuiTextBuffer) -> *const ::std::os::raw::c_char;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImGuiTextBuffer_size(self_: *mut ImGuiTextBuffer) -> ::std::os::raw::c_int;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImGuiTextBuffer_empty(self_: *mut ImGuiTextBuffer) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImGuiTextBuffer_clear(self_: *mut ImGuiTextBuffer);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImGuiTextBuffer_reserve(self_: *mut ImGuiTextBuffer, capacity: ::std::os::raw::c_int);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImGuiTextBuffer_c_str(self_: *mut ImGuiTextBuffer) -> *const ::std::os::raw::c_char;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImGuiTextBuffer_append(
         self_: *mut ImGuiTextBuffer,
@@ -7446,36 +8232,30 @@ extern "C" {
         str_end: *const ::std::os::raw::c_char,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImGuiStoragePair_ImGuiStoragePairInt(
         _key: ImGuiID,
         _val_i: ::std::os::raw::c_int,
     ) -> *mut ImGuiStoragePair;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImGuiStoragePair_destroy(self_: *mut ImGuiStoragePair);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImGuiStoragePair_ImGuiStoragePairFloat(
         _key: ImGuiID,
         _val_f: f32,
     ) -> *mut ImGuiStoragePair;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImGuiStoragePair_ImGuiStoragePairPtr(
         _key: ImGuiID,
         _val_p: *mut ::std::os::raw::c_void,
     ) -> *mut ImGuiStoragePair;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImGuiStorage_Clear(self_: *mut ImGuiStorage);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImGuiStorage_GetInt(
         self_: *mut ImGuiStorage,
@@ -7483,34 +8263,27 @@ extern "C" {
         default_val: ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImGuiStorage_SetInt(self_: *mut ImGuiStorage, key: ImGuiID, val: ::std::os::raw::c_int);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImGuiStorage_GetBool(self_: *mut ImGuiStorage, key: ImGuiID, default_val: bool) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImGuiStorage_SetBool(self_: *mut ImGuiStorage, key: ImGuiID, val: bool);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImGuiStorage_GetFloat(self_: *mut ImGuiStorage, key: ImGuiID, default_val: f32) -> f32;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImGuiStorage_SetFloat(self_: *mut ImGuiStorage, key: ImGuiID, val: f32);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImGuiStorage_GetVoidPtr(
         self_: *mut ImGuiStorage,
         key: ImGuiID,
     ) -> *mut ::std::os::raw::c_void;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImGuiStorage_SetVoidPtr(
         self_: *mut ImGuiStorage,
@@ -7518,7 +8291,6 @@ extern "C" {
         val: *mut ::std::os::raw::c_void,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImGuiStorage_GetIntRef(
         self_: *mut ImGuiStorage,
@@ -7526,7 +8298,6 @@ extern "C" {
         default_val: ::std::os::raw::c_int,
     ) -> *mut ::std::os::raw::c_int;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImGuiStorage_GetBoolRef(
         self_: *mut ImGuiStorage,
@@ -7534,7 +8305,6 @@ extern "C" {
         default_val: bool,
     ) -> *mut bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImGuiStorage_GetFloatRef(
         self_: *mut ImGuiStorage,
@@ -7542,7 +8312,6 @@ extern "C" {
         default_val: f32,
     ) -> *mut f32;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImGuiStorage_GetVoidPtrRef(
         self_: *mut ImGuiStorage,
@@ -7550,23 +8319,18 @@ extern "C" {
         default_val: *mut ::std::os::raw::c_void,
     ) -> *mut *mut ::std::os::raw::c_void;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImGuiStorage_SetAllInt(self_: *mut ImGuiStorage, val: ::std::os::raw::c_int);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImGuiStorage_BuildSortByKey(self_: *mut ImGuiStorage);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImGuiListClipper_ImGuiListClipper() -> *mut ImGuiListClipper;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImGuiListClipper_destroy(self_: *mut ImGuiListClipper);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImGuiListClipper_Begin(
         self_: *mut ImGuiListClipper,
@@ -7574,23 +8338,18 @@ extern "C" {
         items_height: f32,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImGuiListClipper_End(self_: *mut ImGuiListClipper);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImGuiListClipper_Step(self_: *mut ImGuiListClipper) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImColor_ImColorNil() -> *mut ImColor;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImColor_destroy(self_: *mut ImColor);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImColor_ImColorInt(
         r: ::std::os::raw::c_int,
@@ -7599,51 +8358,39 @@ extern "C" {
         a: ::std::os::raw::c_int,
     ) -> *mut ImColor;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImColor_ImColorU32(rgba: ImU32) -> *mut ImColor;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImColor_ImColorFloat(r: f32, g: f32, b: f32, a: f32) -> *mut ImColor;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImColor_ImColorVec4(col: ImVec4) -> *mut ImColor;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImColor_SetHSV(self_: *mut ImColor, h: f32, s: f32, v: f32, a: f32);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImColor_HSV(pOut: *mut ImColor, h: f32, s: f32, v: f32, a: f32);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImDrawCmd_ImDrawCmd() -> *mut ImDrawCmd;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImDrawCmd_destroy(self_: *mut ImDrawCmd);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImDrawListSplitter_ImDrawListSplitter() -> *mut ImDrawListSplitter;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImDrawListSplitter_destroy(self_: *mut ImDrawListSplitter);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImDrawListSplitter_Clear(self_: *mut ImDrawListSplitter);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImDrawListSplitter_ClearFreeMemory(self_: *mut ImDrawListSplitter);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImDrawListSplitter_Split(
         self_: *mut ImDrawListSplitter,
@@ -7651,11 +8398,9 @@ extern "C" {
         count: ::std::os::raw::c_int,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImDrawListSplitter_Merge(self_: *mut ImDrawListSplitter, draw_list: *mut ImDrawList);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImDrawListSplitter_SetCurrentChannel(
         self_: *mut ImDrawListSplitter,
@@ -7663,15 +8408,12 @@ extern "C" {
         channel_idx: ::std::os::raw::c_int,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImDrawList_ImDrawList(shared_data: *const ImDrawListSharedData) -> *mut ImDrawList;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImDrawList_destroy(self_: *mut ImDrawList);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImDrawList_PushClipRect(
         self_: *mut ImDrawList,
@@ -7680,31 +8422,24 @@ extern "C" {
         intersect_with_current_clip_rect: bool,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImDrawList_PushClipRectFullScreen(self_: *mut ImDrawList);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImDrawList_PopClipRect(self_: *mut ImDrawList);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImDrawList_PushTextureID(self_: *mut ImDrawList, texture_id: ImTextureID);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImDrawList_PopTextureID(self_: *mut ImDrawList);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImDrawList_GetClipRectMin(pOut: *mut ImVec2, self_: *mut ImDrawList);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImDrawList_GetClipRectMax(pOut: *mut ImVec2, self_: *mut ImDrawList);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImDrawList_AddLine(
         self_: *mut ImDrawList,
@@ -7714,7 +8449,6 @@ extern "C" {
         thickness: f32,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImDrawList_AddRect(
         self_: *mut ImDrawList,
@@ -7726,7 +8460,6 @@ extern "C" {
         thickness: f32,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImDrawList_AddRectFilled(
         self_: *mut ImDrawList,
@@ -7737,7 +8470,6 @@ extern "C" {
         rounding_corners: ImDrawCornerFlags,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImDrawList_AddRectFilledMultiColor(
         self_: *mut ImDrawList,
@@ -7749,7 +8481,6 @@ extern "C" {
         col_bot_left: ImU32,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImDrawList_AddQuad(
         self_: *mut ImDrawList,
@@ -7761,7 +8492,6 @@ extern "C" {
         thickness: f32,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImDrawList_AddQuadFilled(
         self_: *mut ImDrawList,
@@ -7772,7 +8502,6 @@ extern "C" {
         col: ImU32,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImDrawList_AddTriangle(
         self_: *mut ImDrawList,
@@ -7783,7 +8512,6 @@ extern "C" {
         thickness: f32,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImDrawList_AddTriangleFilled(
         self_: *mut ImDrawList,
@@ -7793,7 +8521,6 @@ extern "C" {
         col: ImU32,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImDrawList_AddCircle(
         self_: *mut ImDrawList,
@@ -7804,7 +8531,6 @@ extern "C" {
         thickness: f32,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImDrawList_AddCircleFilled(
         self_: *mut ImDrawList,
@@ -7814,7 +8540,6 @@ extern "C" {
         num_segments: ::std::os::raw::c_int,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImDrawList_AddNgon(
         self_: *mut ImDrawList,
@@ -7825,7 +8550,6 @@ extern "C" {
         thickness: f32,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImDrawList_AddNgonFilled(
         self_: *mut ImDrawList,
@@ -7835,7 +8559,6 @@ extern "C" {
         num_segments: ::std::os::raw::c_int,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImDrawList_AddTextVec2(
         self_: *mut ImDrawList,
@@ -7845,7 +8568,6 @@ extern "C" {
         text_end: *const ::std::os::raw::c_char,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImDrawList_AddTextFontPtr(
         self_: *mut ImDrawList,
@@ -7859,7 +8581,6 @@ extern "C" {
         cpu_fine_clip_rect: *const ImVec4,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImDrawList_AddPolyline(
         self_: *mut ImDrawList,
@@ -7870,7 +8591,6 @@ extern "C" {
         thickness: f32,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImDrawList_AddConvexPolyFilled(
         self_: *mut ImDrawList,
@@ -7879,7 +8599,6 @@ extern "C" {
         col: ImU32,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImDrawList_AddBezierCurve(
         self_: *mut ImDrawList,
@@ -7892,7 +8611,6 @@ extern "C" {
         num_segments: ::std::os::raw::c_int,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImDrawList_AddImage(
         self_: *mut ImDrawList,
@@ -7904,7 +8622,6 @@ extern "C" {
         col: ImU32,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImDrawList_AddImageQuad(
         self_: *mut ImDrawList,
@@ -7920,7 +8637,6 @@ extern "C" {
         col: ImU32,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImDrawList_AddImageRounded(
         self_: *mut ImDrawList,
@@ -7934,27 +8650,21 @@ extern "C" {
         rounding_corners: ImDrawCornerFlags,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImDrawList_PathClear(self_: *mut ImDrawList);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImDrawList_PathLineTo(self_: *mut ImDrawList, pos: ImVec2);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImDrawList_PathLineToMergeDuplicate(self_: *mut ImDrawList, pos: ImVec2);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImDrawList_PathFillConvex(self_: *mut ImDrawList, col: ImU32);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImDrawList_PathStroke(self_: *mut ImDrawList, col: ImU32, closed: bool, thickness: f32);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImDrawList_PathArcTo(
         self_: *mut ImDrawList,
@@ -7965,7 +8675,6 @@ extern "C" {
         num_segments: ::std::os::raw::c_int,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImDrawList_PathArcToFast(
         self_: *mut ImDrawList,
@@ -7975,7 +8684,6 @@ extern "C" {
         a_max_of_12: ::std::os::raw::c_int,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImDrawList_PathBezierCurveTo(
         self_: *mut ImDrawList,
@@ -7985,7 +8693,6 @@ extern "C" {
         num_segments: ::std::os::raw::c_int,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImDrawList_PathRect(
         self_: *mut ImDrawList,
@@ -7995,7 +8702,6 @@ extern "C" {
         rounding_corners: ImDrawCornerFlags,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImDrawList_AddCallback(
         self_: *mut ImDrawList,
@@ -8003,27 +8709,21 @@ extern "C" {
         callback_data: *mut ::std::os::raw::c_void,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImDrawList_AddDrawCmd(self_: *mut ImDrawList);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImDrawList_CloneOutput(self_: *mut ImDrawList) -> *mut ImDrawList;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImDrawList_ChannelsSplit(self_: *mut ImDrawList, count: ::std::os::raw::c_int);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImDrawList_ChannelsMerge(self_: *mut ImDrawList);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImDrawList_ChannelsSetCurrent(self_: *mut ImDrawList, n: ::std::os::raw::c_int);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImDrawList_PrimReserve(
         self_: *mut ImDrawList,
@@ -8031,7 +8731,6 @@ extern "C" {
         vtx_count: ::std::os::raw::c_int,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImDrawList_PrimUnreserve(
         self_: *mut ImDrawList,
@@ -8039,11 +8738,9 @@ extern "C" {
         vtx_count: ::std::os::raw::c_int,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImDrawList_PrimRect(self_: *mut ImDrawList, a: ImVec2, b: ImVec2, col: ImU32);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImDrawList_PrimRectUV(
         self_: *mut ImDrawList,
@@ -8054,7 +8751,6 @@ extern "C" {
         col: ImU32,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImDrawList_PrimQuadUV(
         self_: *mut ImDrawList,
@@ -8069,95 +8765,72 @@ extern "C" {
         col: ImU32,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImDrawList_PrimWriteVtx(self_: *mut ImDrawList, pos: ImVec2, uv: ImVec2, col: ImU32);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImDrawList_PrimWriteIdx(self_: *mut ImDrawList, idx: ImDrawIdx);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImDrawList_PrimVtx(self_: *mut ImDrawList, pos: ImVec2, uv: ImVec2, col: ImU32);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImDrawList__ResetForNewFrame(self_: *mut ImDrawList);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImDrawList__ClearFreeMemory(self_: *mut ImDrawList);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImDrawList__PopUnusedDrawCmd(self_: *mut ImDrawList);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImDrawList__OnChangedClipRect(self_: *mut ImDrawList);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImDrawList__OnChangedTextureID(self_: *mut ImDrawList);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImDrawList__OnChangedVtxOffset(self_: *mut ImDrawList);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImDrawData_ImDrawData() -> *mut ImDrawData;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImDrawData_destroy(self_: *mut ImDrawData);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImDrawData_Clear(self_: *mut ImDrawData);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImDrawData_DeIndexAllBuffers(self_: *mut ImDrawData);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImDrawData_ScaleClipRects(self_: *mut ImDrawData, fb_scale: ImVec2);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImFontConfig_ImFontConfig() -> *mut ImFontConfig;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImFontConfig_destroy(self_: *mut ImFontConfig);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImFontGlyphRangesBuilder_ImFontGlyphRangesBuilder() -> *mut ImFontGlyphRangesBuilder;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImFontGlyphRangesBuilder_destroy(self_: *mut ImFontGlyphRangesBuilder);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImFontGlyphRangesBuilder_Clear(self_: *mut ImFontGlyphRangesBuilder);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImFontGlyphRangesBuilder_GetBit(self_: *mut ImFontGlyphRangesBuilder, n: usize) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImFontGlyphRangesBuilder_SetBit(self_: *mut ImFontGlyphRangesBuilder, n: usize);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImFontGlyphRangesBuilder_AddChar(self_: *mut ImFontGlyphRangesBuilder, c: ImWchar);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImFontGlyphRangesBuilder_AddText(
         self_: *mut ImFontGlyphRangesBuilder,
@@ -8165,55 +8838,45 @@ extern "C" {
         text_end: *const ::std::os::raw::c_char,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImFontGlyphRangesBuilder_AddRanges(
         self_: *mut ImFontGlyphRangesBuilder,
         ranges: *const ImWchar,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImFontGlyphRangesBuilder_BuildRanges(
         self_: *mut ImFontGlyphRangesBuilder,
         out_ranges: *mut ImVector_ImWchar,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImFontAtlasCustomRect_ImFontAtlasCustomRect() -> *mut ImFontAtlasCustomRect;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImFontAtlasCustomRect_destroy(self_: *mut ImFontAtlasCustomRect);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImFontAtlasCustomRect_IsPacked(self_: *mut ImFontAtlasCustomRect) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImFontAtlas_ImFontAtlas() -> *mut ImFontAtlas;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImFontAtlas_destroy(self_: *mut ImFontAtlas);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImFontAtlas_AddFont(
         self_: *mut ImFontAtlas,
         font_cfg: *const ImFontConfig,
     ) -> *mut ImFont;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImFontAtlas_AddFontDefault(
         self_: *mut ImFontAtlas,
         font_cfg: *const ImFontConfig,
     ) -> *mut ImFont;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImFontAtlas_AddFontFromFileTTF(
         self_: *mut ImFontAtlas,
@@ -8223,7 +8886,6 @@ extern "C" {
         glyph_ranges: *const ImWchar,
     ) -> *mut ImFont;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImFontAtlas_AddFontFromMemoryTTF(
         self_: *mut ImFontAtlas,
@@ -8234,7 +8896,6 @@ extern "C" {
         glyph_ranges: *const ImWchar,
     ) -> *mut ImFont;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImFontAtlas_AddFontFromMemoryCompressedTTF(
         self_: *mut ImFontAtlas,
@@ -8245,7 +8906,6 @@ extern "C" {
         glyph_ranges: *const ImWchar,
     ) -> *mut ImFont;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImFontAtlas_AddFontFromMemoryCompressedBase85TTF(
         self_: *mut ImFontAtlas,
@@ -8255,27 +8915,21 @@ extern "C" {
         glyph_ranges: *const ImWchar,
     ) -> *mut ImFont;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImFontAtlas_ClearInputData(self_: *mut ImFontAtlas);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImFontAtlas_ClearTexData(self_: *mut ImFontAtlas);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImFontAtlas_ClearFonts(self_: *mut ImFontAtlas);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImFontAtlas_Clear(self_: *mut ImFontAtlas);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImFontAtlas_Build(self_: *mut ImFontAtlas) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImFontAtlas_GetTexDataAsAlpha8(
         self_: *mut ImFontAtlas,
@@ -8285,7 +8939,6 @@ extern "C" {
         out_bytes_per_pixel: *mut ::std::os::raw::c_int,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImFontAtlas_GetTexDataAsRGBA32(
         self_: *mut ImFontAtlas,
@@ -8295,49 +8948,38 @@ extern "C" {
         out_bytes_per_pixel: *mut ::std::os::raw::c_int,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImFontAtlas_IsBuilt(self_: *mut ImFontAtlas) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImFontAtlas_SetTexID(self_: *mut ImFontAtlas, id: ImTextureID);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImFontAtlas_GetGlyphRangesDefault(self_: *mut ImFontAtlas) -> *const ImWchar;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImFontAtlas_GetGlyphRangesKorean(self_: *mut ImFontAtlas) -> *const ImWchar;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImFontAtlas_GetGlyphRangesJapanese(self_: *mut ImFontAtlas) -> *const ImWchar;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImFontAtlas_GetGlyphRangesChineseFull(self_: *mut ImFontAtlas) -> *const ImWchar;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImFontAtlas_GetGlyphRangesChineseSimplifiedCommon(
         self_: *mut ImFontAtlas,
     ) -> *const ImWchar;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImFontAtlas_GetGlyphRangesCyrillic(self_: *mut ImFontAtlas) -> *const ImWchar;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImFontAtlas_GetGlyphRangesThai(self_: *mut ImFontAtlas) -> *const ImWchar;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImFontAtlas_GetGlyphRangesVietnamese(self_: *mut ImFontAtlas) -> *const ImWchar;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImFontAtlas_AddCustomRectRegular(
         self_: *mut ImFontAtlas,
@@ -8345,7 +8987,6 @@ extern "C" {
         height: ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImFontAtlas_AddCustomRectFontGlyph(
         self_: *mut ImFontAtlas,
@@ -8357,14 +8998,12 @@ extern "C" {
         offset: ImVec2,
     ) -> ::std::os::raw::c_int;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImFontAtlas_GetCustomRectByIndex(
         self_: *mut ImFontAtlas,
         index: ::std::os::raw::c_int,
     ) -> *mut ImFontAtlasCustomRect;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImFontAtlas_CalcCustomRectUV(
         self_: *mut ImFontAtlas,
@@ -8373,7 +9012,6 @@ extern "C" {
         out_uv_max: *mut ImVec2,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImFontAtlas_GetMouseCursorTexData(
         self_: *mut ImFontAtlas,
@@ -8384,35 +9022,27 @@ extern "C" {
         out_uv_fill: *mut ImVec2,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImFont_ImFont() -> *mut ImFont;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImFont_destroy(self_: *mut ImFont);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImFont_FindGlyph(self_: *mut ImFont, c: ImWchar) -> *const ImFontGlyph;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImFont_FindGlyphNoFallback(self_: *mut ImFont, c: ImWchar) -> *const ImFontGlyph;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImFont_GetCharAdvance(self_: *mut ImFont, c: ImWchar) -> f32;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImFont_IsLoaded(self_: *mut ImFont) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImFont_GetDebugName(self_: *mut ImFont) -> *const ::std::os::raw::c_char;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImFont_CalcTextSizeA(
         pOut: *mut ImVec2,
@@ -8425,7 +9055,6 @@ extern "C" {
         remaining: *mut *const ::std::os::raw::c_char,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImFont_CalcWordWrapPositionA(
         self_: *mut ImFont,
@@ -8435,7 +9064,6 @@ extern "C" {
         wrap_width: f32,
     ) -> *const ::std::os::raw::c_char;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImFont_RenderChar(
         self_: *mut ImFont,
@@ -8446,7 +9074,6 @@ extern "C" {
         c: ImWchar,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImFont_RenderText(
         self_: *mut ImFont,
@@ -8461,19 +9088,15 @@ extern "C" {
         cpu_fine_clip: bool,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImFont_BuildLookupTable(self_: *mut ImFont);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImFont_ClearOutputData(self_: *mut ImFont);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImFont_GrowIndex(self_: *mut ImFont, new_size: ::std::os::raw::c_int);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImFont_AddGlyph(
         self_: *mut ImFont,
@@ -8490,19 +9113,15 @@ extern "C" {
         advance_x: f32,
     );
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImFont_AddRemapChar(self_: *mut ImFont, dst: ImWchar, src: ImWchar, overwrite_dst: bool);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImFont_SetGlyphVisible(self_: *mut ImFont, c: ImWchar, visible: bool);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImFont_SetFallbackChar(self_: *mut ImFont, c: ImWchar);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImFont_IsGlyphRangeUnused(
         self_: *mut ImFont,
@@ -8510,11 +9129,36 @@ extern "C" {
         c_last: ::std::os::raw::c_uint,
     ) -> bool;
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
+    pub fn ImGuiPlatformIO_ImGuiPlatformIO() -> *mut ImGuiPlatformIO;
+}
+extern "C" {
+    pub fn ImGuiPlatformIO_destroy(self_: *mut ImGuiPlatformIO);
+}
+extern "C" {
+    pub fn ImGuiPlatformMonitor_ImGuiPlatformMonitor() -> *mut ImGuiPlatformMonitor;
+}
+extern "C" {
+    pub fn ImGuiPlatformMonitor_destroy(self_: *mut ImGuiPlatformMonitor);
+}
+extern "C" {
+    pub fn ImGuiViewport_ImGuiViewport() -> *mut ImGuiViewport;
+}
+extern "C" {
+    pub fn ImGuiViewport_destroy(self_: *mut ImGuiViewport);
+}
+extern "C" {
+    pub fn ImGuiViewport_GetCenter(pOut: *mut ImVec2, self_: *mut ImGuiViewport);
+}
+extern "C" {
+    pub fn ImGuiViewport_GetWorkPos(pOut: *mut ImVec2, self_: *mut ImGuiViewport);
+}
+extern "C" {
+    pub fn ImGuiViewport_GetWorkSize(pOut: *mut ImVec2, self_: *mut ImGuiViewport);
+}
 extern "C" {
     pub fn igLogText(fmt: *const ::std::os::raw::c_char, ...);
 }
-#[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImGuiTextBuffer_appendf(
         buffer: *mut ImGuiTextBuffer,

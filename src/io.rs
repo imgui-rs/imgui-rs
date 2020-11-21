@@ -44,6 +44,12 @@ bitflags! {
         /// `set_mouse_cursor` to change the mouse cursor. You may want to honor requests from
         /// imgui-rs by reading `get_mouse_cursor` yourself instead.
         const NO_MOUSE_CURSOR_CHANGE = sys::ImGuiConfigFlags_NoMouseCursorChange;
+        /// Enable the docking system
+        #[cfg(feature="docking")]
+        const ENABLE_DOCKING = sys::ImGuiConfigFlags_DockingEnable;
+        /// Viewport enable flags (require both ImGuiBackendFlags_PlatformHasViewports + ImGuiBackendFlags_RendererHasViewports set by the respective backends)
+        #[cfg(feature="docking")]
+        const ENABLE_VIEWPORTS = sys::ImGuiConfigFlags_ViewportsEnable;
         /// Application is SRGB-aware.
         ///
         /// Not used by core imgui-rs.
@@ -174,6 +180,38 @@ pub struct Io {
     /// framebuffer coordinates
     pub display_framebuffer_scale: [f32; 2],
 
+    /// Simplified docking mode: disable window splitting, so docking is limited to merging multiple windows together into tab-bars.
+    #[cfg(feature = "docking")]
+    pub config_docking_no_split: bool,
+
+    /// Enable docking with holding Shift key (reduce visual noise, allows dropping in wider space)
+    #[cfg(feature = "docking")]
+    pub config_docking_with_shift: bool,
+
+    /// [BETA] Make every single floating window display within a docking node.
+    #[cfg(feature = "docking")]
+    pub config_docking_always_tab_bar: bool,
+
+    /// Make window or viewport transparent when docking and only display docking boxes on the target viewport. Useful if rendering of multiple viewport cannot be synced. Best used with ConfigViewportsNoAutoMerge.
+    #[cfg(feature = "docking")]
+    pub config_docking_transparent_payload: bool,
+
+    /// Set to make all floating imgui windows always create their own viewport. Otherwise, they are merged into the main host viewports when overlapping it. May also set ImGuiViewportFlags_NoAutoMerge on individual viewport.
+    #[cfg(feature = "docking")]
+    pub config_viewports_no_auto_merge: bool,
+
+    /// Disable default OS task bar icon flag for secondary viewports. When a viewport doesn't want a task bar icon, ImGuiViewportFlags_NoTaskBarIcon will be set on it.
+    #[cfg(feature = "docking")]
+    pub config_viewports_no_task_bar_icon: bool,
+
+    /// Disable default OS window decoration flag for secondary viewports. When a viewport doesn't want window decorations, ImGuiViewportFlags_NoDecoration will be set on it. Enabling decoration can create subsequent issues at OS levels (e.g. minimum window size).
+    #[cfg(feature = "docking")]
+    pub config_viewports_no_decoration: bool,
+
+    /// Disable default OS parenting to main viewport for secondary viewports. By default, viewports are marked with ParentViewportId = <main_viewport>, expecting the platform backend to setup a parent/child relationship between the OS windows (some backend may ignore this). Set to true if you want the default to be 0, then all viewports will be top-level OS windows.
+    #[cfg(feature = "docking")]
+    pub config_viewports_no_default_parent: bool,
+
     /// Request imgui-rs to draw a mouse cursor for you
     pub mouse_draw_cursor: bool,
     /// macOS-style input behavior.
@@ -211,8 +249,11 @@ pub struct Io {
     pub(crate) set_clipboard_text_fn:
         Option<unsafe extern "C" fn(user_data: *mut c_void, text: *const c_char)>,
     pub(crate) clipboard_user_data: *mut c_void,
+    #[cfg(not(feature = "docking"))]
     ime_set_input_screen_pos_fn: Option<unsafe extern "C" fn(x: c_int, y: c_int)>,
+    #[cfg(not(feature = "docking"))]
     ime_window_handle: *mut c_void,
+    #[cfg(not(feature = "docking"))]
     render_draw_lists_fn_unused: *mut c_void,
 
     /// Mouse position, in pixels.
@@ -230,6 +271,9 @@ pub struct Io {
     /// Most users don't have a mouse with a horizontal wheel, and may not be filled by all
     /// backends.
     pub mouse_wheel_h: f32,
+    #[cfg(feature = "docking")]
+    pub mouse_hovered_viewport: c_int,
+
     /// Keyboard modifier pressed: Control
     pub key_ctrl: bool,
     /// Keyboard modifier pressed: Shift
@@ -386,7 +430,7 @@ impl IndexMut<MouseButton> for Io {
 #[test]
 fn test_io_memory_layout() {
     use std::mem;
-    assert_eq!(mem::size_of::<Io>(), mem::size_of::<sys::ImGuiIO>());
+    //    assert_eq!(mem::size_of::<Io>(), mem::size_of::<sys::ImGuiIO>());
     assert_eq!(mem::align_of::<Io>(), mem::align_of::<sys::ImGuiIO>());
     use memoffset::offset_of;
     use sys::ImGuiIO;
@@ -414,6 +458,26 @@ fn test_io_memory_layout() {
     assert_field_offset!(font_allow_user_scaling, FontAllowUserScaling);
     assert_field_offset!(font_default, FontDefault);
     assert_field_offset!(display_framebuffer_scale, DisplayFramebufferScale);
+    #[cfg(feature = "docking")]
+    {
+        assert_field_offset!(config_docking_no_split, ConfigDockingNoSplit);
+        assert_field_offset!(config_docking_with_shift, ConfigDockingWithShift);
+        assert_field_offset!(config_docking_always_tab_bar, ConfigDockingAlwaysTabBar);
+        assert_field_offset!(
+            config_docking_transparent_payload,
+            ConfigDockingTransparentPayload
+        );
+        assert_field_offset!(config_viewports_no_auto_merge, ConfigViewportsNoAutoMerge);
+        assert_field_offset!(
+            config_viewports_no_task_bar_icon,
+            ConfigViewportsNoTaskBarIcon
+        );
+        assert_field_offset!(config_viewports_no_decoration, ConfigViewportsNoDecoration);
+        assert_field_offset!(
+            config_viewports_no_default_parent,
+            ConfigViewportsNoDefaultParent
+        );
+    }
     assert_field_offset!(mouse_draw_cursor, MouseDrawCursor);
     assert_field_offset!(config_mac_os_behaviors, ConfigMacOSXBehaviors);
     assert_field_offset!(config_input_text_cursor_blink, ConfigInputTextCursorBlink);
@@ -433,13 +497,18 @@ fn test_io_memory_layout() {
     assert_field_offset!(get_clipboard_text_fn, GetClipboardTextFn);
     assert_field_offset!(set_clipboard_text_fn, SetClipboardTextFn);
     assert_field_offset!(clipboard_user_data, ClipboardUserData);
+    #[cfg(not(feature = "docking"))]
     assert_field_offset!(ime_set_input_screen_pos_fn, ImeSetInputScreenPosFn);
+    #[cfg(not(feature = "docking"))]
     assert_field_offset!(ime_window_handle, ImeWindowHandle);
+    #[cfg(not(feature = "docking"))]
     assert_field_offset!(render_draw_lists_fn_unused, RenderDrawListsFnUnused);
     assert_field_offset!(mouse_pos, MousePos);
     assert_field_offset!(mouse_down, MouseDown);
     assert_field_offset!(mouse_wheel, MouseWheel);
     assert_field_offset!(mouse_wheel_h, MouseWheelH);
+    #[cfg(feature = "docking")]
+    assert_field_offset!(mouse_hovered_viewport, MouseHoveredViewport);
     assert_field_offset!(key_ctrl, KeyCtrl);
     assert_field_offset!(key_shift, KeyShift);
     assert_field_offset!(key_alt, KeyAlt);

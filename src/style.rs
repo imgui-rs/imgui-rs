@@ -144,7 +144,10 @@ pub struct Style {
     /// Decrease for higher quality but more geometry.
     pub circle_segment_max_error: f32,
     /// Style colors.
+    #[cfg(not(feature = "docking"))]
     pub colors: [[f32; 4]; 48],
+    #[cfg(feature = "docking")]
+    pub colors: [[f32; 4]; 50],
 }
 
 unsafe impl RawCast<sys::ImGuiStyle> for Style {}
@@ -239,6 +242,10 @@ pub enum StyleColor {
     TabActive = sys::ImGuiCol_TabActive,
     TabUnfocused = sys::ImGuiCol_TabUnfocused,
     TabUnfocusedActive = sys::ImGuiCol_TabUnfocusedActive,
+    #[cfg(feature = "docking")]
+    DockingPreview = sys::ImGuiCol_DockingPreview,
+    #[cfg(feature = "docking")]
+    DockingEmptyBg = sys::ImGuiCol_DockingEmptyBg,
     PlotLines = sys::ImGuiCol_PlotLines,
     PlotLinesHovered = sys::ImGuiCol_PlotLinesHovered,
     PlotHistogram = sys::ImGuiCol_PlotHistogram,
@@ -296,6 +303,10 @@ impl StyleColor {
         StyleColor::TabActive,
         StyleColor::TabUnfocused,
         StyleColor::TabUnfocusedActive,
+        #[cfg(feature = "docking")]
+        StyleColor::DockingPreview,
+        #[cfg(feature = "docking")]
+        StyleColor::DockingEmptyBg,
         StyleColor::PlotLines,
         StyleColor::PlotLinesHovered,
         StyleColor::PlotHistogram,
