@@ -18,3 +18,9 @@ winit-23 = { version = "0.23", package = "winit", optional = true }
 
 [features]
 default = ["winit-23"]
+
+# This is phrased as a negative (unlike most features) so that it needs to be
+# explicitly disabled (and `default-features = false` won't do it). To avoid
+# problems from this we don't expose this in the public API in any way, keeping
+# things additive.
+no-warn-on-multiple = []
