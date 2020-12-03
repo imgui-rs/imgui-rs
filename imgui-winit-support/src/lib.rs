@@ -1,6 +1,7 @@
 //! This crate provides a winit-based backend platform for imgui-rs.
 //!
-//! A backend platform handles window/input device events and manages their state.
+//! A backend platform handles window/input device events and manages their
+//! state.
 //!
 //! # Using the library
 //!
@@ -70,24 +71,92 @@
 //!     }
 //! })
 //! ```
-
-#[cfg(feature = "winit-19")]
-use winit_19 as winit;
-
-#[cfg(feature = "winit-20")]
-use winit_20 as winit;
-
-#[cfg(feature = "winit-22")]
-use winit_22 as winit;
+//!
+//! ## `winit` versions and features.
+//!
+//! This crate has several features which control the version of winit which is
+//! used.
+//!
+//! The following versions are supported, controlled by the listed feature.
+//!
+//! - The `winit-23` feature uses winit versions compatible with `0.23`. This is
+//!   on by default, so to use any other version you need to disable this crates
+//!   default features.
+//! - The `winit-22` feature uses winit versions compatible with `0.22`.
+//! - The `winit-20` feature should support winit either `0.20` or winit `0.21`.
+//! - The `winit-19` feature should support winits older than `0.19` (possibly
+//!   back to winit 0.16.*, but this isn't regularly tested and may not work).
+//!
+//! If multiple `winit-*` features are enabled, and it is a debug build (as
+//! determined by `debug_assertions`), we will log a warning to stderr during
+//! init. This can be disabled by either turning on the `no-warn-on-multiple`
+//! feature, fixing the configuration, or disabling `debug_assertions`.
+//!
+//! Conversely, if no `winit-*` features are enabled, we will fail to compile.
+//! This is not an issue generally, as by default we turn on `winit-23`.
+//!
+//! All of this is in attempt to preserve the additive nature of features (while
+//! still helping users notice project configuration issues), however it's done
+//! fairly weakly as our this crate's API isn't 100% identical across winit
+//! versions.
+//!
+//! ### Using an older `winit` version
+//!
+//! To use an older version, you must configure `default-features = false` in
+//! your `Cargo.toml`:
+//!
+//! ```toml
+//! [dependencies.imgui-winit-support]
+//! version = "0.6"
+//! features = ["winit-$YOUR_VERSION_HERE"]
+//! default-features = false
+//! ```
+//!
+//! ### Old `winit` compatibility
+//!
+//! No guarantee is made on how long this crate will support legacy versions of
+//! `winit`, but we'll try to follow these rules:
+//!
+//! - Versions which are still in widespread use in the ecosystem will be
+//!   supported while that is true (for example, 0.19 at the time of writing is
+//!   quite old, but used by the most recent version of several popular crates).
+//!
+//! - Versions which are not a significant maintenance burden will be supported
+//!   (for example, supporting versions older than winit 0.19 given that we
+//!   support 0.19).
+//!
+//! - Explicitly removing support for a feature-indicated version will be
+//!   considered a breaking change.
+//!
+//! - Changing the default feature to the new latest `winit` version is *not* a
+//!   breaking change.
 
 #[cfg(feature = "winit-23")]
 use winit_23 as winit;
+
+#[cfg(all(not(feature = "winit-23"), feature = "winit-22"))]
+use winit_22 as winit;
+
+#[cfg(all(
+    not(any(feature = "winit-23", feature = "winit-22")),
+    feature = "winit-20",
+))]
+use winit_20 as winit;
+
+#[cfg(all(
+    not(any(feature = "winit-23", feature = "winit-22", feature = "winit-20")),
+    feature = "winit-19",
+))]
+use winit_19 as winit;
 
 use imgui::{self, BackendFlags, ConfigFlags, Context, ImString, Io, Key, Ui};
 use std::cmp::Ordering;
 use winit::dpi::{LogicalPosition, LogicalSize};
 
-#[cfg(feature = "winit-19")]
+#[cfg(all(
+    not(any(feature = "winit-23", feature = "winit-22", feature = "winit-20")),
+    feature = "winit-19",
+))]
 use winit::{
     DeviceEvent, ElementState, Event, KeyboardInput, MouseButton, MouseCursor, MouseScrollDelta,
     TouchPhase, VirtualKeyCode, Window, WindowEvent,
@@ -102,6 +171,69 @@ use winit::{
     },
     window::{CursorIcon as MouseCursor, Window},
 };
+
+// Ensure at least one is enabled
+#[cfg(not(any(
+    feature = "winit-19",
+    feature = "winit-20",
+    feature = "winit-22",
+    feature = "winit-23",
+)))]
+compile_error!("Please enable at least one version of `winit` (see documentation for details).");
+
+fn check_multiple_winits() {
+    use std::io::Write as _;
+    use std::sync::atomic::{AtomicBool, Ordering};
+    // bail out for release builds or if we've been explicitly disabled.
+    if cfg!(any(not(debug_assertions), feature = "no-warn-on-multiple")) {
+        return;
+    }
+    let winits_enabled = cfg!(feature = "winit-23") as usize
+        + cfg!(feature = "winit-22") as usize
+        + cfg!(feature = "winit-20") as usize
+        + cfg!(feature = "winit-19") as usize;
+
+    // Only complain once even if we're called multiple times.
+    static COMPLAINED: AtomicBool = AtomicBool::new(false);
+    // Note that the `Ordering` basically doesn't matter here, but even if it
+    // did, `Relaxed` is still correct because we're only interested in the
+    // effects on a single atomic variable.
+    if winits_enabled <= 1 || COMPLAINED.compare_and_swap(false, true, Ordering::Relaxed) {
+        return;
+    }
+    let mut err = Vec::with_capacity(512);
+
+    // Log the complaint into a buffer first — in practice this is enough to
+    // ensure atomicity.
+    let _ = writeln!(
+        err,
+        "Warning (imgui-winit-support): More than one `winit-*` version feature is enabled \
+        (this likely indicates misconfiguration, see documentation for details)."
+    );
+    let feats = [
+        ("winit-23", cfg!(feature = "winit-23"), " (default)"),
+        ("winit-22", cfg!(feature = "winit-22"), ""),
+        ("winit-20", cfg!(feature = "winit-20"), ""),
+        ("winit-19", cfg!(feature = "winit-19"), ""),
+    ];
+    for &(name, enabled, extra) in &feats {
+        if enabled {
+            let _ = writeln!(err, "    `feature = {:?}` is enabled{}", name, extra);
+        }
+    }
+    if cfg!(feature = "winit-23") && winits_enabled == 2 {
+        let _ = writeln!(
+            err,
+            "    Perhaps you are missing a `default-features = false`?",
+        );
+    }
+    let _ = writeln!(
+        err,
+        "    (Note: This warning is only present in debug builds, and \
+        can be disabled using the \"no-warn-on-multiple\" feature)"
+    );
+    let _ = std::io::stderr().write_all(&err);
+}
 
 /// winit backend platform state
 #[derive(Debug)]
@@ -132,7 +264,10 @@ fn to_winit_cursor(cursor: imgui::MouseCursor) -> MouseCursor {
 }
 
 impl CursorSettings {
-    #[cfg(feature = "winit-19")]
+    #[cfg(all(
+        not(any(feature = "winit-23", feature = "winit-22", feature = "winit-20")),
+        feature = "winit-19",
+    ))]
     fn apply(&self, window: &Window) {
         match self.cursor {
             Some(mouse_cursor) if !self.draw_cursor => {
@@ -203,6 +338,8 @@ impl WinitPlatform {
     /// * keys are configured
     /// * platform name is set
     pub fn init(imgui: &mut Context) -> WinitPlatform {
+        // noop in non-debug builds, if disabled, or if called a second time.
+        check_multiple_winits();
         let io = imgui.io_mut();
         io.backend_flags.insert(BackendFlags::HAS_MOUSE_CURSORS);
         io.backend_flags.insert(BackendFlags::HAS_SET_MOUSE_POS);
@@ -244,7 +381,10 @@ impl WinitPlatform {
     ///
     /// * framebuffer scale (= DPI factor) is set
     /// * display size is set
-    #[cfg(feature = "winit-19")]
+    #[cfg(all(
+        not(any(feature = "winit-23", feature = "winit-22", feature = "winit-20")),
+        feature = "winit-19",
+    ))]
     pub fn attach_window(&mut self, io: &mut Io, window: &Window, hidpi_mode: HiDpiMode) {
         let (hidpi_mode, hidpi_factor) = hidpi_mode.apply(window.get_hidpi_factor());
         self.hidpi_mode = hidpi_mode;
@@ -281,7 +421,10 @@ impl WinitPlatform {
     ///
     /// This utility function is useful if you are using a DPI mode other than default, and want
     /// your application to use the same logical coordinates as imgui-rs.
-    #[cfg(feature = "winit-19")]
+    #[cfg(all(
+        not(any(feature = "winit-23", feature = "winit-22", feature = "winit-20")),
+        feature = "winit-19",
+    ))]
     pub fn scale_size_from_winit(&self, window: &Window, logical_size: LogicalSize) -> LogicalSize {
         match self.hidpi_mode {
             ActiveHiDpiMode::Default => logical_size,
@@ -311,7 +454,10 @@ impl WinitPlatform {
     ///
     /// This utility function is useful if you are using a DPI mode other than default, and want
     /// your application to use the same logical coordinates as imgui-rs.
-    #[cfg(feature = "winit-19")]
+    #[cfg(all(
+        not(any(feature = "winit-23", feature = "winit-22", feature = "winit-20")),
+        feature = "winit-19",
+    ))]
     pub fn scale_pos_from_winit(
         &self,
         window: &Window,
@@ -345,7 +491,10 @@ impl WinitPlatform {
     ///
     /// This utility function is useful if you are using a DPI mode other than default, and want
     /// your application to use the same logical coordinates as imgui-rs.
-    #[cfg(feature = "winit-19")]
+    #[cfg(all(
+        not(any(feature = "winit-23", feature = "winit-22", feature = "winit-20")),
+        feature = "winit-19",
+    ))]
     pub fn scale_pos_for_winit(
         &self,
         window: &Window,
@@ -382,7 +531,10 @@ impl WinitPlatform {
     /// * window size / dpi factor changes are applied
     /// * keyboard state is updated
     /// * mouse state is updated
-    #[cfg(feature = "winit-19")]
+    #[cfg(all(
+        not(any(feature = "winit-23", feature = "winit-22", feature = "winit-20")),
+        feature = "winit-19",
+    ))]
     pub fn handle_event(&mut self, io: &mut Io, window: &Window, event: &Event) {
         match *event {
             Event::WindowEvent {
@@ -421,7 +573,10 @@ impl WinitPlatform {
     /// * window size / dpi factor changes are applied
     /// * keyboard state is updated
     /// * mouse state is updated
-    #[cfg(feature = "winit-20")]
+    #[cfg(all(
+        not(any(feature = "winit-23", feature = "winit-22")),
+        feature = "winit-20",
+    ))]
     pub fn handle_event<T>(&mut self, io: &mut Io, window: &Window, event: &Event<T>) {
         match *event {
             Event::WindowEvent {
@@ -501,7 +656,10 @@ impl WinitPlatform {
             _ => (),
         }
     }
-    #[cfg(feature = "winit-19")]
+    #[cfg(all(
+        not(any(feature = "winit-23", feature = "winit-22", feature = "winit-20")),
+        feature = "winit-19",
+    ))]
     fn handle_window_event(&mut self, io: &mut Io, window: &Window, event: &WindowEvent) {
         match *event {
             WindowEvent::Resized(logical_size) => {
@@ -587,7 +745,10 @@ impl WinitPlatform {
             _ => (),
         }
     }
-    #[cfg(any(feature = "winit-20", feature = "winit-22"))]
+    #[cfg(all(
+        not(feature = "winit-23"),
+        any(feature = "winit-20", feature = "winit-22")
+    ))]
     fn handle_window_event(&mut self, io: &mut Io, window: &Window, event: &WindowEvent) {
         match *event {
             WindowEvent::Resized(physical_size) => {
@@ -687,6 +848,7 @@ impl WinitPlatform {
             _ => (),
         }
     }
+
     #[cfg(feature = "winit-23")]
     fn handle_window_event(&mut self, io: &mut Io, window: &Window, event: &WindowEvent) {
         match *event {
@@ -794,7 +956,10 @@ impl WinitPlatform {
     /// This function performs the following actions:
     ///
     /// * mouse cursor is repositioned (if requested by imgui-rs)
-    #[cfg(feature = "winit-19")]
+    #[cfg(all(
+        not(any(feature = "winit-23", feature = "winit-22", feature = "winit-20")),
+        feature = "winit-19",
+    ))]
     pub fn prepare_frame(&self, io: &mut Io, window: &Window) -> Result<(), String> {
         if io.want_set_mouse_pos {
             let logical_pos = self.scale_pos_for_winit(
