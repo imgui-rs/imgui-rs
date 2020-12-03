@@ -19,7 +19,6 @@ bitflags = "1.0"
 glium = { version = "0.28", default-features = false, optional = true }
 gfx = { version = "0.18", optional = true }
 imgui-sys = { version = "0.6.0", path = "imgui-sys" }
-lazy_static = "1.1"
 parking_lot = "0.11"
 
 [features]

@@ -3,9 +3,7 @@ use std::ptr;
 
 use crate::context::Context;
 
-lazy_static! {
-    pub static ref TEST_MUTEX: ReentrantMutex<()> = ReentrantMutex::new(());
-}
+pub static TEST_MUTEX: ReentrantMutex<()> = parking_lot::const_reentrant_mutex(());
 
 pub fn test_ctx() -> (ReentrantMutexGuard<'static, ()>, Context) {
     let guard = TEST_MUTEX.lock();
