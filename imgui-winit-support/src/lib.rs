@@ -150,6 +150,7 @@ use winit_20 as winit;
 use winit_19 as winit;
 
 use imgui::{self, BackendFlags, ConfigFlags, Context, ImString, Io, Key, Ui};
+use std::cell::Cell;
 use std::cmp::Ordering;
 use winit::dpi::{LogicalPosition, LogicalSize};
 
@@ -235,12 +236,44 @@ fn check_multiple_winits() {
     let _ = std::io::stderr().write_all(&err);
 }
 
+/// State of a single mouse button. Used so that we can detect cases where mouse
+/// press and release occur on the same frame (seems surprisingly frequent on
+/// macOS now...)
+#[derive(Debug, Clone, Default)]
+struct Button {
+    pressed_this_frame: Cell<bool>,
+    state: Cell<bool>,
+}
+
+impl Button {
+    // we can use this in an array initializer, unlike `Default::default()` or a
+    // `const fn new()`.
+    const INIT: Button = Self {
+        pressed_this_frame: Cell::new(false),
+        state: Cell::new(false),
+    };
+    fn set(&self, pressed: bool) {
+        self.state.set(pressed);
+        if pressed {
+            self.pressed_this_frame.set(true);
+        }
+    }
+    fn get(&self) -> bool {
+        // If we got a press this frame, record it even if we got a release
+        // too — this way we don't drop mouse clicks where the release comes
+        // in on the same frame as the press. (This mirrors what Dear ImGUI
+        // seems to do in the `imgui_impl_*`)
+        self.pressed_this_frame.replace(false) || self.state.get()
+    }
+}
+
 /// winit backend platform state
 #[derive(Debug)]
 pub struct WinitPlatform {
     hidpi_mode: ActiveHiDpiMode,
     hidpi_factor: f64,
     cursor_cache: Option<CursorSettings>,
+    mouse_buttons: [Button; 5],
 }
 
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
@@ -373,6 +406,7 @@ impl WinitPlatform {
             hidpi_mode: ActiveHiDpiMode::Default,
             hidpi_factor: 1.0,
             cursor_cache: None,
+            mouse_buttons: [Button::INIT; 5],
         }
     }
     /// Attaches the platform instance to a winit window.
@@ -735,10 +769,12 @@ impl WinitPlatform {
             WindowEvent::MouseInput { state, button, .. } => {
                 let pressed = state == ElementState::Pressed;
                 match button {
-                    MouseButton::Left => io.mouse_down[0] = pressed,
-                    MouseButton::Right => io.mouse_down[1] = pressed,
-                    MouseButton::Middle => io.mouse_down[2] = pressed,
-                    MouseButton::Other(idx @ 0..=4) => io.mouse_down[idx as usize] = pressed,
+                    MouseButton::Left => self.mouse_buttons[0].set(pressed),
+                    MouseButton::Right => self.mouse_buttons[1].set(pressed),
+                    MouseButton::Middle => self.mouse_buttons[2].set(pressed),
+                    MouseButton::Other(idx @ 0..=4) => {
+                        self.mouse_buttons[idx as usize].set(pressed)
+                    }
                     _ => (),
                 }
             }
@@ -838,10 +874,12 @@ impl WinitPlatform {
             WindowEvent::MouseInput { state, button, .. } => {
                 let pressed = state == ElementState::Pressed;
                 match button {
-                    MouseButton::Left => io.mouse_down[0] = pressed,
-                    MouseButton::Right => io.mouse_down[1] = pressed,
-                    MouseButton::Middle => io.mouse_down[2] = pressed,
-                    MouseButton::Other(idx @ 0..=4) => io.mouse_down[idx as usize] = pressed,
+                    MouseButton::Left => self.mouse_buttons[0].set(pressed),
+                    MouseButton::Right => self.mouse_buttons[1].set(pressed),
+                    MouseButton::Middle => self.mouse_buttons[2].set(pressed),
+                    MouseButton::Other(idx @ 0..=4) => {
+                        self.mouse_buttons[idx as usize].set(pressed)
+                    }
                     _ => (),
                 }
             }
@@ -940,10 +978,12 @@ impl WinitPlatform {
             WindowEvent::MouseInput { state, button, .. } => {
                 let pressed = state == ElementState::Pressed;
                 match button {
-                    MouseButton::Left => io.mouse_down[0] = pressed,
-                    MouseButton::Right => io.mouse_down[1] = pressed,
-                    MouseButton::Middle => io.mouse_down[2] = pressed,
-                    MouseButton::Other(idx @ 0..=4) => io.mouse_down[idx as usize] = pressed,
+                    MouseButton::Left => self.mouse_buttons[0].set(pressed),
+                    MouseButton::Right => self.mouse_buttons[1].set(pressed),
+                    MouseButton::Middle => self.mouse_buttons[2].set(pressed),
+                    MouseButton::Other(idx @ 0..=4) => {
+                        self.mouse_buttons[idx as usize].set(pressed)
+                    }
                     _ => (),
                 }
             }
@@ -961,6 +1001,7 @@ impl WinitPlatform {
         feature = "winit-19",
     ))]
     pub fn prepare_frame(&self, io: &mut Io, window: &Window) -> Result<(), String> {
+        self.copy_mouse_to_io(&mut io.mouse_down);
         if io.want_set_mouse_pos {
             let logical_pos = self.scale_pos_for_winit(
                 window,
@@ -979,6 +1020,7 @@ impl WinitPlatform {
     /// * mouse cursor is repositioned (if requested by imgui-rs)
     #[cfg(any(feature = "winit-20", feature = "winit-22", feature = "winit-23"))]
     pub fn prepare_frame(&self, io: &mut Io, window: &Window) -> Result<(), ExternalError> {
+        self.copy_mouse_to_io(&mut io.mouse_down);
         if io.want_set_mouse_pos {
             let logical_pos = self.scale_pos_for_winit(
                 window,
@@ -989,6 +1031,13 @@ impl WinitPlatform {
             Ok(())
         }
     }
+
+    fn copy_mouse_to_io(&self, io_mouse_down: &mut [bool]) {
+        for (io_down, button) in io_mouse_down.iter_mut().zip(&self.mouse_buttons) {
+            *io_down = button.get();
+        }
+    }
+
     /// Render preparation callback.
     ///
     /// Call this before calling the imgui-rs UI `render_with`/`render` function.
