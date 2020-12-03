@@ -615,7 +615,6 @@ dependencies = [
  "bitflags",
  "glium",
  "imgui-sys",
- "lazy_static",
  "parking_lot",
 ]
 
