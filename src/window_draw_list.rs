@@ -66,16 +66,23 @@ static WINDOW_DRAW_LIST_LOADED: std::sync::atomic::AtomicBool =
 
 impl<'ui> Drop for WindowDrawList<'ui> {
     fn drop(&mut self) {
-        WINDOW_DRAW_LIST_LOADED.store(false, std::sync::atomic::Ordering::SeqCst);
+        WINDOW_DRAW_LIST_LOADED.store(false, std::sync::atomic::Ordering::Release);
     }
 }
 
 impl<'ui> WindowDrawList<'ui> {
     pub(crate) fn new(_: &Ui<'ui>) -> Self {
-        if WINDOW_DRAW_LIST_LOADED.load(std::sync::atomic::Ordering::SeqCst) {
+        let already_loaded = WINDOW_DRAW_LIST_LOADED
+            .compare_exchange(
+                false,
+                true,
+                std::sync::atomic::Ordering::Acquire,
+                std::sync::atomic::Ordering::Relaxed,
+            )
+            .is_err();
+        if already_loaded {
             panic!("WindowDrawList is already loaded! You can only load one instance of it!")
         }
-        WINDOW_DRAW_LIST_LOADED.store(true, std::sync::atomic::Ordering::SeqCst);
         Self {
             draw_list: unsafe { sys::igGetWindowDrawList() },
             _phantom: PhantomData,
