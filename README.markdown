@@ -6,7 +6,7 @@ Minimum Rust version: 1.43
 
 Wrapped Dear ImGui version: 1.79
 
-[![Build Status](https://github.com/Gekkio/imgui-rs/workflows/ci/badge.svg)](https://github.com/Gekkio/imgui-rs/actions)
+[![Build Status](https://github.com/imgui-rs/imgui-rs/workflows/ci/badge.svg)](https://github.com/imgui-rs/imgui-rs/actions)
 [![Latest release on crates.io](https://meritbadge.herokuapp.com/imgui)](https://crates.io/crates/imgui)
 [![Documentation on docs.rs](https://docs.rs/imgui/badge.svg)](https://docs.rs/imgui)
 
