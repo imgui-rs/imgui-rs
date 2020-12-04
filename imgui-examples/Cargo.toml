@@ -2,10 +2,10 @@
 name = "imgui-examples"
 version = "0.0.0"
 edition = "2018"
-authors = ["Joonas Javanainen <joonas.javanainen@gmail.com>", "imgui-rs contributors"]
+authors = ["The imgui-rs Developers"]
 description = "imgui crate examples using Glium backend"
-homepage = "https://github.com/Gekkio/imgui-rs"
-repository = "https://github.com/Gekkio/imgui-rs"
+homepage = "https://github.com/imgui-rs/imgui-rs"
+repository = "https://github.com/imgui-rs/imgui-rs"
 license = "MIT/Apache-2.0"
 publish = false
 
