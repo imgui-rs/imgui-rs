@@ -6,6 +6,12 @@ use std::collections::HashMap;
 pub struct TextureId(usize);
 
 impl TextureId {
+    /// Creates a new texture id with the given identifier.
+    pub fn new(id: usize) -> Self {
+        Self(id)
+    }
+
+    /// Returns the id of the TextureId.
     pub fn id(self) -> usize {
         self.0
     }
