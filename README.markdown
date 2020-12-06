@@ -1,14 +1,11 @@
 # imgui-rs: Rust bindings for Dear ImGui
 
-**Still fairly experimental!**
-
-Minimum Rust version: 1.43
-
-Wrapped Dear ImGui version: 1.79
-
 [![Build Status](https://github.com/imgui-rs/imgui-rs/workflows/ci/badge.svg)](https://github.com/imgui-rs/imgui-rs/actions)
 [![Latest release on crates.io](https://meritbadge.herokuapp.com/imgui)](https://crates.io/crates/imgui)
 [![Documentation on docs.rs](https://docs.rs/imgui/badge.svg)](https://docs.rs/imgui)
+[![Wrapped Dear ImGui Version](https://img.shields.io/badge/Dear%20ImGui%20Version-1.79-blue.svg)](https://github.com/ocornut/imgui)
+
+(Recently under new maintenance, things subject to change)
 
 ![Hello world](hello_world.png)
 

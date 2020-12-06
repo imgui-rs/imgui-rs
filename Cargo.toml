@@ -8,4 +8,4 @@ members = [
     "imgui-examples",
     "imgui-gfx-examples",
 ]
-excluded = ["imgui-sys-bindgen"]
+exclude = ["imgui-sys-bindgen"]
