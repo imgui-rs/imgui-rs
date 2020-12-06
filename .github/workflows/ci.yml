@@ -3,13 +3,13 @@ on:
   pull_request:
   push:
     branches:
-    - master
+      - master
   schedule:
     - cron: "0 0 * * 1"
 
 jobs:
-  check:
-    name: Run checks
+  clippy:
+    name: Run clippy / linting
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -20,95 +20,47 @@ jobs:
           auth_header="$(git config --local --get http.https://github.com/.extraheader)"
           git submodule sync --recursive
           git -c "http.extraheader=$auth_header" -c protocol.version=2 submodule update --init --force --recursive --depth=1
-      - name: Install stable toolchain
-        uses: actions-rs/toolchain@v1
+      - uses: hecrj/setup-rust-action@v1
         with:
-          profile: minimal
-          toolchain: stable
-          override: true
-          components: rustfmt, clippy
-      - name: Run cargo check
-        uses: actions-rs/cargo@v1
+          components: clippy
+      - run: cargo clippy --workspace
+      # excluded crates
+      - run: cargo clippy --manifest-path imgui-examples/Cargo.toml
+      - run: cargo clippy --manifest-path imgui-gfx-examples/Cargo.toml
+      - run: cargo clippy --manifest-path imgui-sys-bindgen/Cargo.toml
+      # supported winit versions
+      - run: cargo clippy --manifest-path imgui-winit-support/Cargo.toml --no-default-features --features winit-19
+      - run: cargo clippy --manifest-path imgui-winit-support/Cargo.toml --no-default-features --features winit-20
+      - run: cargo clippy --manifest-path imgui-winit-support/Cargo.toml --no-default-features --features winit-22
+      - run: cargo clippy --manifest-path imgui-winit-support/Cargo.toml --no-default-features --features winit-23
+      # Ensure we compile with all features
+      - run: cargo check --manifest-path imgui-winit-support/Cargo.toml --all-features
+
+  rustfmt:
+    name: Check rustfmt
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      # TODO: why not `with: {submodules: true}`
+      - name: Checkout submodules
+        shell: bash
+        run: |
+          auth_header="$(git config --local --get http.https://github.com/.extraheader)"
+          git submodule sync --recursive
+          git -c "http.extraheader=$auth_header" -c protocol.version=2 submodule update --init --force --recursive --depth=1
+      - uses: hecrj/setup-rust-action@v1
         with:
-          command: check
-      - name: Run cargo check (imgui-examples)
-        uses: actions-rs/cargo@v1
-        with:
-          command: check
-          args: --manifest-path imgui-examples/Cargo.toml
-      - name: Run cargo check (imgui-gfx-examples)
-        uses: actions-rs/cargo@v1
-        with:
-          command: check
-          args: --manifest-path imgui-gfx-examples/Cargo.toml
-      - name: Run cargo check (imgui-sys-bindgen)
-        uses: actions-rs/cargo@v1
-        with:
-          command: check
-          args: --manifest-path imgui-sys-bindgen/Cargo.toml
-      - name: Run cargo check (imgui-winit-support with winit-19)
-        uses: actions-rs/cargo@v1
-        with:
-          command: check
-          args: --manifest-path imgui-winit-support/Cargo.toml --no-default-features --features winit-19
-      - name: Run cargo check (imgui-winit-support with winit-20)
-        uses: actions-rs/cargo@v1
-        with:
-          command: check
-          args: --manifest-path imgui-winit-support/Cargo.toml --no-default-features --features winit-20
-      - name: Run cargo check (imgui-winit-support with winit-22)
-        uses: actions-rs/cargo@v1
-        with:
-          command: check
-          args: --manifest-path imgui-winit-support/Cargo.toml --no-default-features --features winit-22
-      - name: Run cargo check (imgui-winit-support with winit-23)
-        uses: actions-rs/cargo@v1
-        with:
-          command: check
-          args: --manifest-path imgui-winit-support/Cargo.toml --no-default-features --features winit-23
-      - name: Run cargo fmt
-        uses: actions-rs/cargo@v1
-        with:
-          command: fmt
-          args: --all -- --check
-      - name: Run cargo fmt (imgui-examples)
-        uses: actions-rs/cargo@v1
-        with:
-          command: fmt
-          args: --manifest-path imgui-examples/Cargo.toml -- --check
-      - name: Run cargo fmt (imgui-gfx-examples)
-        uses: actions-rs/cargo@v1
-        with:
-          command: fmt
-          args: --manifest-path imgui-gfx-examples/Cargo.toml -- --check
-      - name: Run cargo fmt (imgui-sys-bindgen)
-        uses: actions-rs/cargo@v1
-        with:
-          command: fmt
-          args: --manifest-path imgui-sys-bindgen/Cargo.toml -- --check
-      - name: Run cargo clippy
-        uses: actions-rs/cargo@v1
-        with:
-          command: clippy
-          args: --all
-      - name: Run cargo clippy (imgui-examples)
-        uses: actions-rs/cargo@v1
-        with:
-          command: clippy
-          args: --manifest-path imgui-examples/Cargo.toml
-      - name: Run cargo clippy (imgui-gfx-examples)
-        uses: actions-rs/cargo@v1
-        with:
-          command: clippy
-          args: --manifest-path imgui-gfx-examples/Cargo.toml
-      - name: Run cargo clippy (imgui-sys-bindgen)
-        uses: actions-rs/cargo@v1
-        with:
-          command: clippy
-          args: --manifest-path imgui-sys-bindgen/Cargo.toml
+          components: rustfmt
+      # workspace
+      - run: cargo fmt --all -- --check
+      # excluded crates
+      - run: cargo fmt --manifest-path imgui-examples/Cargo.toml -- --check
+      - run: cargo fmt --manifest-path imgui-gfx-examples/Cargo.toml -- --check
+      - run: cargo fmt --manifest-path imgui-sys-bindgen/Cargo.toml -- --check
+
   test:
     name: Run tests
-    needs: [check]
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -135,52 +87,15 @@ jobs:
           profile: minimal
           toolchain: ${{ matrix.rust }}
           override: true
-      - name: Install Ubuntu packages
-        run: sudo apt install libxcb-shape0-dev libxcb-xfixes0-dev
+      - run: sudo apt install libxcb-shape0-dev libxcb-xfixes0-dev
         if: runner.os == 'Linux'
-      - name: Run cargo test
-        uses: actions-rs/cargo@v1
-        with:
-          command: test
-          args: --all
-      - name: Run cargo test (imgui-examples)
-        uses: actions-rs/cargo@v1
-        with:
-          command: test
-          args: --manifest-path imgui-examples/Cargo.toml
-      - name: Run cargo test (imgui-gfx-examples)
-        uses: actions-rs/cargo@v1
-        with:
-          command: test
-          args: --manifest-path imgui-gfx-examples/Cargo.toml
-      - name: Run cargo test (imgui-sys-bindgen)
-        uses: actions-rs/cargo@v1
-        with:
-          command: test
-          args: --manifest-path imgui-sys-bindgen/Cargo.toml
-      - name: Run cargo test (imgui-gfx-examples with directx)
-        uses: actions-rs/cargo@v1
+      - run: cargo test --all
+      - run: cargo test --manifest-path imgui-examples/Cargo.toml
+      - run: cargo test --manifest-path imgui-gfx-examples/Cargo.toml
+      - run: cargo test --manifest-path imgui-sys-bindgen/Cargo.toml
+      - run: cargo test --manifest-path imgui-gfx-examples/Cargo.toml --no-default-features --features directx
         if: runner.os == 'Windows'
-        with:
-          command: test
-          args: --manifest-path imgui-gfx-examples/Cargo.toml --no-default-features --features directx
-      - name: Run cargo test (imgui-winit-support with winit-19)
-        uses: actions-rs/cargo@v1
-        with:
-          command: test
-          args: --manifest-path imgui-winit-support/Cargo.toml --no-default-features --features winit-19
-      - name: Run cargo test (imgui-winit-support with winit-20)
-        uses: actions-rs/cargo@v1
-        with:
-          command: test
-          args: --manifest-path imgui-winit-support/Cargo.toml --no-default-features --features winit-20
-      - name: Run cargo test (imgui-winit-support with winit-22)
-        uses: actions-rs/cargo@v1
-        with:
-          command: test
-          args: --manifest-path imgui-winit-support/Cargo.toml --no-default-features --features winit-22
-      - name: Run cargo test (imgui-winit-support with winit-23)
-        uses: actions-rs/cargo@v1
-        with:
-          command: test
-          args: --manifest-path imgui-winit-support/Cargo.toml --no-default-features --features winit-23
+      - run: cargo test --manifest-path imgui-winit-support/Cargo.toml --no-default-features --features winit-19
+      - run: cargo test --manifest-path imgui-winit-support/Cargo.toml --no-default-features --features winit-20
+      - run: cargo test --manifest-path imgui-winit-support/Cargo.toml --no-default-features --features winit-22
+      - run: cargo test --manifest-path imgui-winit-support/Cargo.toml --no-default-features --features winit-23
