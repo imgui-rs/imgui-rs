@@ -1,0 +1,26 @@
+[package]
+name = "imgui"
+version = "0.6.0"
+edition = "2018"
+authors = ["The imgui-rs Developers"]
+description = "High-level Rust bindings to dear imgui"
+homepage = "https://github.com/imgui-rs/imgui-rs"
+repository = "https://github.com/imgui-rs/imgui-rs"
+license = "MIT/Apache-2.0"
+categories = ["gui", "api-bindings"]
+readme = "README.markdown"
+
+exclude = ["/resources"]
+
+[dependencies]
+bitflags = "1.0"
+glium = { version = "0.28", default-features = false, optional = true }
+gfx = { version = "0.18", optional = true }
+imgui-sys = { version = "0.6.0", path = "../imgui-sys" }
+parking_lot = "0.11"
+
+[features]
+wasm = ["imgui-sys/wasm"]
+
+[dev-dependencies]
+memoffset = "0.6"

@@ -1,14 +1,25 @@
 use gfx::Device;
-use glutin::{Event, WindowEvent};
+use glutin::{
+    dpi::LogicalSize,
+    event::{Event, WindowEvent},
+    event_loop::{ControlFlow, EventLoop},
+    // XXX for easier porting...
+    platform::desktop::EventLoopExtDesktop,
+    window::WindowBuilder,
+};
 use imgui::{Context, FontConfig, FontGlyphRanges, FontSource, Ui};
 use imgui_gfx_renderer::{Renderer, Shaders};
 use imgui_winit_support::{HiDpiMode, WinitPlatform};
+use old_school_gfx_glutin_ext::*;
 use std::time::Instant;
 
 type ColorFormat = gfx::format::Rgba8;
+type DepthFormat = gfx::format::DepthStencil;
+// hack
+type EventsLoop = EventLoop<()>;
 
 pub struct System {
-    pub events_loop: glutin::EventsLoop,
+    pub events_loop: EventsLoop,
     pub imgui: Context,
     pub platform: WinitPlatform,
     pub render_sys: RenderSystem,
@@ -20,10 +31,10 @@ pub fn init(title: &str) -> System {
         Some(idx) => title.split_at(idx + 1).1,
         None => title,
     };
-    let events_loop = glutin::EventsLoop::new();
-    let builder = glutin::WindowBuilder::new()
+    let events_loop = EventsLoop::new();
+    let builder = WindowBuilder::new()
         .with_title(title.to_owned())
-        .with_dimensions(glutin::dpi::LogicalSize::new(1024f64, 768f64));
+        .with_inner_size(LogicalSize::new(1024f64, 768f64));
 
     let mut imgui = Context::create();
     imgui.set_ini_filename(None);
@@ -78,17 +89,22 @@ impl System {
         let mut run = true;
 
         while run {
-            events_loop.poll_events(|event| {
+            events_loop.run_return(|event, _, control_flow| {
                 platform.handle_event(imgui.io_mut(), render_sys.window(), &event);
-
                 if let Event::WindowEvent { event, .. } = event {
                     match event {
-                        WindowEvent::Resized(size) => render_sys.update_views(size),
-                        WindowEvent::CloseRequested => run = false,
+                        WindowEvent::Resized(_) => render_sys.update_views(),
+                        WindowEvent::CloseRequested => {
+                            run = false;
+                        }
                         _ => (),
                     }
                 }
+                *control_flow = ControlFlow::Exit;
             });
+            if !run {
+                break;
+            }
 
             let io = imgui.io_mut();
             platform
@@ -132,15 +148,15 @@ pub struct RenderSystem {
     pub device: types::Device,
     pub factory: types::Factory,
     pub main_color: Option<gfx::handle::RenderTargetView<types::Resources, ColorFormat>>,
-    pub main_depth: gfx::handle::DepthStencilView<types::Resources, gfx::format::DepthStencil>,
+    pub main_depth: gfx::handle::DepthStencilView<types::Resources, DepthFormat>,
 }
 
 #[cfg(feature = "opengl")]
 impl RenderSystem {
     pub fn init(
         imgui: &mut Context,
-        builder: glutin::WindowBuilder,
-        events_loop: &glutin::EventsLoop,
+        builder: WindowBuilder,
+        events_loop: &EventsLoop,
     ) -> RenderSystem {
         {
             // Fix incorrect colors with sRGB framebuffer
@@ -158,10 +174,14 @@ impl RenderSystem {
             }
         }
 
-        let context = glutin::ContextBuilder::new().with_vsync(true);
         let (windowed_context, device, mut factory, main_color, main_depth) =
-            gfx_window_glutin::init(builder, context, &events_loop)
-                .expect("Failed to initialize graphics");
+            glutin::ContextBuilder::new()
+                .with_vsync(true)
+                .with_gfx_color_depth::<ColorFormat, DepthFormat>()
+                .build_windowed(builder, events_loop)
+                .expect("Failed to initialize graphics")
+                .init_gfx::<ColorFormat, DepthFormat>();
+
         let shaders = {
             let version = device.get_info().shading_language;
             if version.is_embedded {
@@ -193,16 +213,13 @@ impl RenderSystem {
             main_depth,
         }
     }
-    pub fn window(&self) -> &glutin::Window {
+    pub fn window(&self) -> &glutin::window::Window {
         self.windowed_context.window()
     }
-    pub fn update_views(&mut self, _: glutin::dpi::LogicalSize) {
+    pub fn update_views(&mut self) {
         if let Some(main_color) = self.main_color.as_mut() {
-            gfx_window_glutin::update_views(
-                &self.windowed_context,
-                main_color,
-                &mut self.main_depth,
-            );
+            self.windowed_context
+                .update_gfx(main_color, &mut self.main_depth);
         }
     }
     pub fn swap_buffers(&mut self) {
@@ -210,14 +227,14 @@ impl RenderSystem {
     }
 }
 
-#[cfg(feature = "directx")]
+#[cfg(all(feature = "directx", windows))]
 mod types {
     pub type Device = gfx_device_dx11::Device;
     pub type Factory = gfx_device_dx11::Factory;
     pub type Resources = gfx_device_dx11::Resources;
 }
 
-#[cfg(feature = "directx")]
+#[cfg(all(feature = "directx", windows))]
 pub struct RenderSystem {
     pub renderer: Renderer<ColorFormat, types::Resources>,
     pub window: gfx_window_dxgi::Window,
@@ -226,12 +243,12 @@ pub struct RenderSystem {
     pub main_color: Option<gfx::handle::RenderTargetView<types::Resources, ColorFormat>>,
 }
 
-#[cfg(feature = "directx")]
+#[cfg(all(feature = "directx", windows))]
 impl RenderSystem {
     pub fn init(
         imgui: &mut Context,
-        builder: glutin::WindowBuilder,
-        events_loop: &glutin::EventsLoop,
+        builder: WindowBuilder,
+        events_loop: &EventsLoop,
     ) -> RenderSystem {
         let (window, device, mut factory, main_color) =
             gfx_window_dxgi::init(builder, &events_loop).expect("Failed to initialize graphics");
@@ -248,7 +265,7 @@ impl RenderSystem {
     pub fn window(&self) -> &glutin::Window {
         &self.window.inner
     }
-    pub fn update_views(&mut self, size: glutin::dpi::LogicalSize) {
+    pub fn update_views(&mut self, size: LogicalSize) {
         let physical = size.to_physical(self.window().get_hidpi_factor());
         let (width, height): (u32, u32) = physical.into();
         let _ = self.main_color.take(); // we need to drop main_color before calling update_views

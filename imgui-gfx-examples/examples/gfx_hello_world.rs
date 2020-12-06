@@ -5,11 +5,11 @@ mod support;
 fn main() {
     let system = support::init(file!());
 
-    #[cfg(feature = "opengl")]
-    let window_title = im_str!("Hello world (OpenGL)");
-
-    #[cfg(feature = "directx")]
-    let window_title = im_str!("Hello world (DirectX)");
+    let window_title = if cfg!(all(feature = "directx", windows)) {
+        im_str!("Hello world (OpenGL)")
+    } else {
+        im_str!("Hello world (DirectX)")
+    };
 
     system.main_loop(|_, ui| {
         Window::new(window_title)
