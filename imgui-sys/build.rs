@@ -50,16 +50,13 @@ fn main() -> io::Result<()> {
         // Avoid the if-supported flag functions for easy cases, as they're
         // kinda costly.
         if compiler.is_like_gnu() || compiler.is_like_clang() {
-            build
-                .flag("-fno-exceptions")
-                .flag("-fno-rtti");
+            build.flag("-fno-exceptions").flag("-fno-rtti");
         }
         // TODO: disable linking C++ stdlib? Not sure if it's allowed.
         build
             .warnings(false)
             .file("include_all_imgui.cpp")
-            .compile("libcimgui.a")
-        ;
+            .compile("libcimgui.a");
     }
     Ok(())
 }
