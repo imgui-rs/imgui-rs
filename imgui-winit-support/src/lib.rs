@@ -248,6 +248,7 @@ struct Button {
 impl Button {
     // we can use this in an array initializer, unlike `Default::default()` or a
     // `const fn new()`.
+    #[allow(clippy::declare_interior_mutable_const)]
     const INIT: Button = Self {
         pressed_this_frame: Cell::new(false),
         state: Cell::new(false),

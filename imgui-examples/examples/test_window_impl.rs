@@ -82,11 +82,11 @@ impl Default for State {
             no_menu: false,
             no_close: false,
             wrap_width: 200.0,
-            buf: buf,
+            buf,
             item: 0,
             item2: 0,
-            text: text,
-            text_multiline: text_multiline,
+            text,
+            text_multiline,
             i0: 123,
             f0: 0.001,
             vec2f: [0.10, 0.20],
@@ -870,9 +870,7 @@ fn show_example_menu_file<'a>(ui: &Ui<'a>, state: &mut FileMenuState) {
         }
         menu.end(ui);
     }
-    if let Some(_) = ui.begin_menu(im_str!("Disabled"), false) {
-        unreachable!();
-    }
+    assert!(ui.begin_menu(im_str!("Disabled"), false).is_none());
     MenuItem::new(im_str!("Checked")).selected(true).build(ui);
     MenuItem::new(im_str!("Quit"))
         .shortcut(im_str!("Alt+F4"))

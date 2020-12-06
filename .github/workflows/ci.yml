@@ -9,8 +9,10 @@ on:
 
 jobs:
   clippy:
-    name: Run clippy / linting
+    name: Run linter
     runs-on: ubuntu-latest
+    env:
+      RUSTFLAGS: -D warnings
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -23,18 +25,17 @@ jobs:
       - uses: hecrj/setup-rust-action@v1
         with:
           components: clippy
-      - run: cargo clippy --workspace
+      - run: cargo clippy --workspace --all-targets
       # excluded crates
-      - run: cargo clippy --manifest-path imgui-examples/Cargo.toml
-      - run: cargo clippy --manifest-path imgui-gfx-examples/Cargo.toml
-      - run: cargo clippy --manifest-path imgui-sys-bindgen/Cargo.toml
+      - run: cargo clippy --manifest-path imgui-examples/Cargo.toml --all-targets
+      - run: cargo clippy --manifest-path imgui-gfx-examples/Cargo.toml --all-targets
+      - run: cargo clippy --manifest-path imgui-sys-bindgen/Cargo.toml --all-targets
       # supported winit versions
-      - run: cargo clippy --manifest-path imgui-winit-support/Cargo.toml --no-default-features --features winit-19
-      - run: cargo clippy --manifest-path imgui-winit-support/Cargo.toml --no-default-features --features winit-20
-      - run: cargo clippy --manifest-path imgui-winit-support/Cargo.toml --no-default-features --features winit-22
-      - run: cargo clippy --manifest-path imgui-winit-support/Cargo.toml --no-default-features --features winit-23
-      # Ensure we compile with all features
-      - run: cargo check --manifest-path imgui-winit-support/Cargo.toml --all-features
+      - run: cargo clippy --manifest-path imgui-winit-support/Cargo.toml --all-features --all-targets
+      - run: cargo clippy --manifest-path imgui-winit-support/Cargo.toml --no-default-features --features winit-19 --all-targets
+      - run: cargo clippy --manifest-path imgui-winit-support/Cargo.toml --no-default-features --features winit-20 --all-targets
+      - run: cargo clippy --manifest-path imgui-winit-support/Cargo.toml --no-default-features --features winit-22 --all-targets
+      - run: cargo clippy --manifest-path imgui-winit-support/Cargo.toml --no-default-features --features winit-23 --all-targets
 
   rustfmt:
     name: Check rustfmt
@@ -62,6 +63,9 @@ jobs:
   test:
     name: Run tests
     runs-on: ${{ matrix.os }}
+    env:
+      RUSTFLAGS: -D warnings
+      RUST_BACKTRACE: 1
     strategy:
       matrix:
         rust:
