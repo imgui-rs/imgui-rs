@@ -388,7 +388,7 @@ fn test_shared_font_atlas() {
     let _guard = crate::test::TEST_MUTEX.lock();
     let atlas = Rc::new(RefCell::new(SharedFontAtlas::create()));
     let suspended1 = SuspendedContext::create_with_shared_font_atlas(atlas.clone());
-    let mut ctx2 = Context::create_with_shared_font_atlas(atlas.clone());
+    let mut ctx2 = Context::create_with_shared_font_atlas(atlas);
     {
         let _borrow = ctx2.fonts();
     }

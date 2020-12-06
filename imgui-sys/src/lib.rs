@@ -100,7 +100,7 @@ fn test_imvec2_memory_layout() {
     assert_eq!(mem::align_of::<ImVec2>(), mem::align_of::<[f32; 2]>());
     let test = ImVec2::new(1.0, 2.0);
     let ref_a: &ImVec2 = &test;
-    let ref_b: &[f32; 2] = unsafe { mem::transmute(&test) };
+    let ref_b: &[f32; 2] = unsafe { &*(&test as *const _ as *const [f32; 2]) };
     assert_eq!(&ref_a.x as *const _, &ref_b[0] as *const _);
     assert_eq!(&ref_a.y as *const _, &ref_b[1] as *const _);
 }
@@ -112,7 +112,7 @@ fn test_imvec4_memory_layout() {
     assert_eq!(mem::align_of::<ImVec4>(), mem::align_of::<[f32; 4]>());
     let test = ImVec4::new(1.0, 2.0, 3.0, 4.0);
     let ref_a: &ImVec4 = &test;
-    let ref_b: &[f32; 4] = unsafe { mem::transmute(&test) };
+    let ref_b: &[f32; 4] = unsafe { &*(&test as *const _ as *const [f32; 4]) };
     assert_eq!(&ref_a.x as *const _, &ref_b[0] as *const _);
     assert_eq!(&ref_a.y as *const _, &ref_b[1] as *const _);
     assert_eq!(&ref_a.z as *const _, &ref_b[2] as *const _);
