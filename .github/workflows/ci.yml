@@ -25,10 +25,28 @@ jobs:
       - uses: hecrj/setup-rust-action@v1
         with:
           components: clippy
+      - name: Cache cargo directories
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.toml') }}-${{ hashFiles('**/Cargo.lock') }}
+      - name: Cache cargo target dirs
+        uses: actions/cache@v2
+        with:
+          path: |
+            target
+            imgui-examples/target
+            imgui-gfx-examples/target
+            imgui-sys-bindgen/target
+          # ... will the hashFiles ever hit?
+          key: ${{ runner.os }}-stable-target-${{ hashFiles('**/Cargo.toml') }}-${{ hashFiles('**/Cargo.lock') }}
       - run: cargo clippy --workspace --all-targets
       # excluded crates
-      - run: cargo clippy --manifest-path imgui-examples/Cargo.toml --all-targets
-      - run: cargo clippy --manifest-path imgui-gfx-examples/Cargo.toml --all-targets
+      # ... why do only these two have lockfiles? Oh well, keep them up to date if they're in there...
+      - run: cargo clippy --manifest-path imgui-examples/Cargo.toml --all-targets --locked
+      - run: cargo clippy --manifest-path imgui-gfx-examples/Cargo.toml --all-targets --locked
       - run: cargo clippy --manifest-path imgui-sys-bindgen/Cargo.toml --all-targets
       # supported winit versions
       - run: cargo clippy --manifest-path imgui-winit-support/Cargo.toml --all-features --all-targets
@@ -93,6 +111,28 @@ jobs:
           override: true
       - run: sudo apt install libxcb-shape0-dev libxcb-xfixes0-dev
         if: runner.os == 'Linux'
+      # workaround for https://github.com/actions/cache/issues/403
+      - name: Install GNU tar
+        if: matrix.os == 'macos-latest'
+        run: |
+          brew install gnu-tar
+          echo PATH="/usr/local/opt/gnu-tar/libexec/gnubin:$PATH" >> $GITHUB_ENV
+      - name: Cache cargo directories
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+      - name: Cache cargo target dirs
+        uses: actions/cache@v2
+        with:
+          path: |
+            target
+            imgui-examples/target
+            imgui-gfx-examples/target
+            imgui-sys-bindgen/target
+          key: ${{ runner.os }}-${{ matrix.rust }}-target-${{ hashFiles('**/Cargo.toml') }}-${{ hashFiles('**/Cargo.lock') }}
       - run: cargo test --all
       - run: cargo test --manifest-path imgui-examples/Cargo.toml
       - run: cargo test --manifest-path imgui-gfx-examples/Cargo.toml
