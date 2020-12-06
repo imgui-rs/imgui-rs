@@ -17,7 +17,7 @@ fn main() {
 
     let wasm_ffi_import_name = option_env!("IMGUI_RS_WASM_IMPORT_NAME")
         .map(|s| s.to_string())
-        .or(Some("imgui-sys-v0".to_string()));
+        .or_else(|| Some("imgui-sys-v0".to_string()));
 
     let wasm_bindings = generate_bindings(&sys_path.join("third-party"), wasm_ffi_import_name)
         .expect("Failed to generate bindings");

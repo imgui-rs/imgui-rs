@@ -342,10 +342,10 @@ impl<'ui> Ui<'ui> {
 
 // Widgets: Popups
 impl<'ui> Ui<'ui> {
-    pub fn open_popup<'p>(&self, str_id: &'p ImStr) {
+    pub fn open_popup(&self, str_id: &ImStr) {
         unsafe { sys::igOpenPopup(str_id.as_ptr(), 0) };
     }
-    pub fn popup<'p, F>(&self, str_id: &'p ImStr, f: F)
+    pub fn popup<F>(&self, str_id: &ImStr, f: F)
     where
         F: FnOnce(),
     {

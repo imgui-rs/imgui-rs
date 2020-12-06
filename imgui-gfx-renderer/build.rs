@@ -77,16 +77,17 @@ mod hlsl_build {
             let mut code: *mut ID3DBlob = ptr::null_mut();
             let mut error_msgs: *mut ID3DBlob = ptr::null_mut();
 
+            let c_entry_point = CString::new(entry_point).unwrap();
+            let c_target = CString::new(target).unwrap();
+            let c_source_path = CString::new(source_path.to_string_lossy().to_string()).unwrap();
             let hr = d3dcompiler::D3DCompile(
                 src_data.as_bytes().as_ptr() as LPCVOID,
                 src_data.as_bytes().len(),
-                CString::new(source_path.to_string_lossy().to_string())
-                    .unwrap()
-                    .as_ptr(),
+                c_source_path.as_ptr(),
                 ptr::null(),
                 ptr::null_mut(),
-                CString::new(entry_point).unwrap().as_ptr(),
-                CString::new(target).unwrap().as_ptr(),
+                c_entry_point.as_ptr(),
+                c_target.as_ptr(),
                 0,
                 0,
                 &mut code,
