@@ -32,6 +32,9 @@ jobs:
             ~/.cargo/registry
             ~/.cargo/git
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.toml') }}-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.toml') }}-
+            ${{ runner.os }}-cargo-
       - name: Cache cargo target dirs
         uses: actions/cache@v2
         with:
@@ -40,8 +43,11 @@ jobs:
             imgui-examples/target
             imgui-gfx-examples/target
             imgui-sys-bindgen/target
-          # ... will the hashFiles ever hit?
-          key: ${{ runner.os }}-stable-target-${{ hashFiles('**/Cargo.toml') }}-${{ hashFiles('**/Cargo.lock') }}
+          key: ${{ runner.os }}-target-stable-${{ hashFiles('**/Cargo.toml') }}-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-target-stable-${{ hashFiles('**/Cargo.toml') }}-
+            ${{ runner.os }}-target-stable-
+            ${{ runner.os }}-target-
       - run: cargo clippy --workspace --all-targets
       # excluded crates
       # ... why do only these two have lockfiles? Oh well, keep them up to date if they're in there...
@@ -123,7 +129,10 @@ jobs:
           path: |
             ~/.cargo/registry
             ~/.cargo/git
-          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.toml') }}-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.toml') }}-
+            ${{ runner.os }}-cargo-
       - name: Cache cargo target dirs
         uses: actions/cache@v2
         with:
@@ -132,7 +141,11 @@ jobs:
             imgui-examples/target
             imgui-gfx-examples/target
             imgui-sys-bindgen/target
-          key: ${{ runner.os }}-${{ matrix.rust }}-target-${{ hashFiles('**/Cargo.toml') }}-${{ hashFiles('**/Cargo.lock') }}
+          key: ${{ runner.os }}-target-${{ matrix.rust }}-${{ hashFiles('**/Cargo.toml') }}-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-target-${{ matrix.rust }}-${{ hashFiles('**/Cargo.toml') }}-
+            ${{ runner.os }}-target-${{ matrix.rust }}-
+            ${{ runner.os }}-target-
       - run: cargo test --all
       - run: cargo test --manifest-path imgui-examples/Cargo.toml
       - run: cargo test --manifest-path imgui-gfx-examples/Cargo.toml
