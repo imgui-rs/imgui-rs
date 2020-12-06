@@ -4,9 +4,7 @@ use imgui::{ClipboardBackend, ImStr, ImString};
 pub struct ClipboardSupport(ClipboardContext);
 
 pub fn init() -> Option<ClipboardSupport> {
-    ClipboardContext::new()
-        .ok()
-        .map(ClipboardSupport)
+    ClipboardContext::new().ok().map(ClipboardSupport)
 }
 
 impl ClipboardBackend for ClipboardSupport {
