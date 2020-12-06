@@ -33,7 +33,7 @@ fn main() -> io::Result<()> {
     for (key, value) in DEFINES.iter() {
         println!("cargo:DEFINE_{}={}", key, value.unwrap_or(""));
     }
-    if !std::env::var_os("CARGO_FEATURE_WASM").is_some() {
+    if std::env::var_os("CARGO_FEATURE_WASM").is_none() {
         // Check submodule status. (Anything else should be a compile error in
         // the C code).
         assert_file_exists("third-party/cimgui.cpp")?;
