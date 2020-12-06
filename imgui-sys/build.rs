@@ -4,14 +4,6 @@ use std::fs;
 use std::io;
 use std::path::Path;
 
-const CPP_FILES: [&str; 5] = [
-    "third-party/cimgui.cpp",
-    "third-party/imgui/imgui.cpp",
-    "third-party/imgui/imgui_demo.cpp",
-    "third-party/imgui/imgui_draw.cpp",
-    "third-party/imgui/imgui_widgets.cpp",
-];
-
 const DEFINES: &[(&str, Option<&str>)] = &[
     // Disabled due to linking issues
     ("CIMGUI_NO_EXPORT", None),
@@ -41,20 +33,33 @@ fn main() -> io::Result<()> {
     for (key, value) in DEFINES.iter() {
         println!("cargo:DEFINE_{}={}", key, value.unwrap_or(""));
     }
-    #[cfg(not(feature = "wasm"))]
-    {
+    if !std::env::var_os("CARGO_FEATURE_WASM").is_some() {
+        // Check submodule status. (Anything else should be a compile error in
+        // the C code).
+        assert_file_exists("third-party/cimgui.cpp")?;
+        assert_file_exists("third-party/imgui/imgui.cpp")?;
+
         let mut build = cc::Build::new();
+
         build.cpp(true);
         for (key, value) in DEFINES.iter() {
             build.define(key, *value);
         }
 
-        build.flag_if_supported("-Wno-return-type-c-linkage");
-        for path in &CPP_FILES {
-            assert_file_exists(path)?;
-            build.file(path);
+        let compiler = build.get_compiler();
+        // Avoid the if-supported flag functions for easy cases, as they're
+        // kinda costly.
+        if compiler.is_like_gnu() || compiler.is_like_clang() {
+            build
+                .flag("-fno-exceptions")
+                .flag("-fno-rtti");
         }
-        build.compile("libcimgui.a");
+        // TODO: disable linking C++ stdlib? Not sure if it's allowed.
+        build
+            .warnings(false)
+            .file("include_all_imgui.cpp")
+            .compile("libcimgui.a")
+        ;
     }
     Ok(())
 }
