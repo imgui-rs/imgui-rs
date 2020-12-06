@@ -1,3 +1,4 @@
+#![allow(clippy::float_cmp)]
 pub extern crate imgui_sys as sys;
 
 use std::cell;
