@@ -82,7 +82,7 @@ case, because **imgui-rs is not tied to any specific graphics / OS API**.
 ## Compiling and running the demos
 
 ```bash
-git clone https://github.com/Gekkio/imgui-rs
+git clone https://github.com/imgui-rs/imgui-rs
 cd imgui-rs
 git submodule update --init --recursive
 ```
