@@ -43,10 +43,11 @@ jobs:
             imgui-examples/target
             imgui-gfx-examples/target
             imgui-sys-bindgen/target
-          key: ${{ runner.os }}-target-stable-${{ hashFiles('**/Cargo.toml') }}-${{ hashFiles('**/Cargo.lock') }}
+          key: ${{ runner.os }}-target-lint-stable-${{ hashFiles('**/Cargo.toml') }}-${{ hashFiles('**/Cargo.lock') }}
           restore-keys: |
-            ${{ runner.os }}-target-stable-${{ hashFiles('**/Cargo.toml') }}-
-            ${{ runner.os }}-target-stable-
+            ${{ runner.os }}-target-lint-stable-${{ hashFiles('**/Cargo.toml') }}-
+            ${{ runner.os }}-target-lint-stable-
+            ${{ runner.os }}-target-lint-
             ${{ runner.os }}-target-
       - run: cargo clippy --workspace --all-targets
       # excluded crates
@@ -141,10 +142,13 @@ jobs:
             imgui-examples/target
             imgui-gfx-examples/target
             imgui-sys-bindgen/target
-          key: ${{ runner.os }}-target-${{ matrix.rust }}-${{ hashFiles('**/Cargo.toml') }}-${{ hashFiles('**/Cargo.lock') }}
+          # note `cargo test` and `cargo clippy` don't use the same build
+          # artifacts, so this has a different key
+          key: ${{ runner.os }}-target-test-${{ matrix.rust }}-${{ hashFiles('**/Cargo.toml') }}-${{ hashFiles('**/Cargo.lock') }}
           restore-keys: |
-            ${{ runner.os }}-target-${{ matrix.rust }}-${{ hashFiles('**/Cargo.toml') }}-
-            ${{ runner.os }}-target-${{ matrix.rust }}-
+            ${{ runner.os }}-target-test-${{ matrix.rust }}-${{ hashFiles('**/Cargo.toml') }}-
+            ${{ runner.os }}-target-test-${{ matrix.rust }}-
+            ${{ runner.os }}-target-test-
             ${{ runner.os }}-target-
       - run: cargo test --all
       - run: cargo test --manifest-path imgui-examples/Cargo.toml
