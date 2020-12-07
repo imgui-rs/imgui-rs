@@ -1,3 +1,4 @@
+#![no_std]
 #[cfg(feature = "wasm")]
 mod wasm_bindings;
 
@@ -95,7 +96,7 @@ impl Into<(f32, f32, f32, f32)> for ImVec4 {
 
 #[test]
 fn test_imvec2_memory_layout() {
-    use std::mem;
+    use core::mem;
     assert_eq!(mem::size_of::<ImVec2>(), mem::size_of::<[f32; 2]>());
     assert_eq!(mem::align_of::<ImVec2>(), mem::align_of::<[f32; 2]>());
     let test = ImVec2::new(1.0, 2.0);
@@ -107,7 +108,7 @@ fn test_imvec2_memory_layout() {
 
 #[test]
 fn test_imvec4_memory_layout() {
-    use std::mem;
+    use core::mem;
     assert_eq!(mem::size_of::<ImVec4>(), mem::size_of::<[f32; 4]>());
     assert_eq!(mem::align_of::<ImVec4>(), mem::align_of::<[f32; 4]>());
     let test = ImVec4::new(1.0, 2.0, 3.0, 4.0);

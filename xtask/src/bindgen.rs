@@ -107,16 +107,22 @@ fn generate_binding_file(
         "--size_t-is-usize",
         "--no-prepend-enum-name",
         "--no-doc-comments",
+        // Layout tests aren't portable (they hardcode type sizes), and for
+        // our case they just serve to sanity check rustc's implementation of
+        // `#[repr(C)]`. If we bind directly to C++ ever, we should reconsider this.
+        "--no-layout-tests",
         "--with-derive-default",
         "--with-derive-partialeq",
         "--with-derive-eq",
         "--with-derive-hash",
         "--impl-debug",
+        "--use-core",
     ];
     cmd.args(a);
     cmd.args(&["--blacklist-type", "__darwin_size_t"]);
     cmd.args(&["--raw-line", "#![allow(nonstandard_style, clippy::all)]"]);
     cmd.arg("--output").arg(output);
+    cmd.args(&["--ctypes-prefix", "cty"]);
 
     if let Some(name) = wasm_import_mod {
         cmd.args(&["--wasm-import-module-name", &name]);

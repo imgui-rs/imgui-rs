@@ -93,992 +93,251 @@ pub struct ImGuiContext {
 pub struct ImDrawListSharedData {
     _unused: [u8; 0],
 }
-pub type ImGuiCol = ::std::os::raw::c_int;
-pub type ImGuiCond = ::std::os::raw::c_int;
-pub type ImGuiDataType = ::std::os::raw::c_int;
-pub type ImGuiDir = ::std::os::raw::c_int;
-pub type ImGuiKey = ::std::os::raw::c_int;
-pub type ImGuiMouseButton = ::std::os::raw::c_int;
-pub type ImGuiMouseCursor = ::std::os::raw::c_int;
-pub type ImGuiStyleVar = ::std::os::raw::c_int;
-pub type ImDrawCornerFlags = ::std::os::raw::c_int;
-pub type ImDrawListFlags = ::std::os::raw::c_int;
-pub type ImFontAtlasFlags = ::std::os::raw::c_int;
-pub type ImGuiBackendFlags = ::std::os::raw::c_int;
-pub type ImGuiButtonFlags = ::std::os::raw::c_int;
-pub type ImGuiColorEditFlags = ::std::os::raw::c_int;
-pub type ImGuiConfigFlags = ::std::os::raw::c_int;
-pub type ImGuiComboFlags = ::std::os::raw::c_int;
-pub type ImGuiDragDropFlags = ::std::os::raw::c_int;
-pub type ImGuiFocusedFlags = ::std::os::raw::c_int;
-pub type ImGuiHoveredFlags = ::std::os::raw::c_int;
-pub type ImGuiInputTextFlags = ::std::os::raw::c_int;
-pub type ImGuiKeyModFlags = ::std::os::raw::c_int;
-pub type ImGuiPopupFlags = ::std::os::raw::c_int;
-pub type ImGuiSelectableFlags = ::std::os::raw::c_int;
-pub type ImGuiSliderFlags = ::std::os::raw::c_int;
-pub type ImGuiTabBarFlags = ::std::os::raw::c_int;
-pub type ImGuiTabItemFlags = ::std::os::raw::c_int;
-pub type ImGuiTreeNodeFlags = ::std::os::raw::c_int;
-pub type ImGuiWindowFlags = ::std::os::raw::c_int;
-pub type ImTextureID = *mut ::std::os::raw::c_void;
-pub type ImGuiID = ::std::os::raw::c_uint;
-pub type ImGuiInputTextCallback = ::std::option::Option<
-    unsafe extern "C" fn(data: *mut ImGuiInputTextCallbackData) -> ::std::os::raw::c_int,
+pub type ImGuiCol = cty::c_int;
+pub type ImGuiCond = cty::c_int;
+pub type ImGuiDataType = cty::c_int;
+pub type ImGuiDir = cty::c_int;
+pub type ImGuiKey = cty::c_int;
+pub type ImGuiMouseButton = cty::c_int;
+pub type ImGuiMouseCursor = cty::c_int;
+pub type ImGuiStyleVar = cty::c_int;
+pub type ImDrawCornerFlags = cty::c_int;
+pub type ImDrawListFlags = cty::c_int;
+pub type ImFontAtlasFlags = cty::c_int;
+pub type ImGuiBackendFlags = cty::c_int;
+pub type ImGuiButtonFlags = cty::c_int;
+pub type ImGuiColorEditFlags = cty::c_int;
+pub type ImGuiConfigFlags = cty::c_int;
+pub type ImGuiComboFlags = cty::c_int;
+pub type ImGuiDragDropFlags = cty::c_int;
+pub type ImGuiFocusedFlags = cty::c_int;
+pub type ImGuiHoveredFlags = cty::c_int;
+pub type ImGuiInputTextFlags = cty::c_int;
+pub type ImGuiKeyModFlags = cty::c_int;
+pub type ImGuiPopupFlags = cty::c_int;
+pub type ImGuiSelectableFlags = cty::c_int;
+pub type ImGuiSliderFlags = cty::c_int;
+pub type ImGuiTabBarFlags = cty::c_int;
+pub type ImGuiTabItemFlags = cty::c_int;
+pub type ImGuiTreeNodeFlags = cty::c_int;
+pub type ImGuiWindowFlags = cty::c_int;
+pub type ImTextureID = *mut cty::c_void;
+pub type ImGuiID = cty::c_uint;
+pub type ImGuiInputTextCallback = ::core::option::Option<
+    unsafe extern "C" fn(data: *mut ImGuiInputTextCallbackData) -> cty::c_int,
 >;
 pub type ImGuiSizeCallback =
-    ::std::option::Option<unsafe extern "C" fn(data: *mut ImGuiSizeCallbackData)>;
-pub type ImWchar16 = ::std::os::raw::c_ushort;
+    ::core::option::Option<unsafe extern "C" fn(data: *mut ImGuiSizeCallbackData)>;
+pub type ImWchar16 = cty::c_ushort;
 pub type ImWchar = ImWchar16;
-pub type ImU8 = ::std::os::raw::c_uchar;
-pub type ImU32 = ::std::os::raw::c_uint;
-pub type ImDrawCallback = ::std::option::Option<
+pub type ImU8 = cty::c_uchar;
+pub type ImU32 = cty::c_uint;
+pub type ImDrawCallback = ::core::option::Option<
     unsafe extern "C" fn(parent_list: *const ImDrawList, cmd: *const ImDrawCmd),
 >;
-pub type ImDrawIdx = ::std::os::raw::c_ushort;
+pub type ImDrawIdx = cty::c_ushort;
 #[repr(C)]
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
 pub struct ImVector_ImDrawChannel {
-    pub Size: ::std::os::raw::c_int,
-    pub Capacity: ::std::os::raw::c_int,
+    pub Size: cty::c_int,
+    pub Capacity: cty::c_int,
     pub Data: *mut ImDrawChannel,
-}
-#[test]
-fn bindgen_test_layout_ImVector_ImDrawChannel() {
-    assert_eq!(
-        ::std::mem::size_of::<ImVector_ImDrawChannel>(),
-        16usize,
-        concat!("Size of: ", stringify!(ImVector_ImDrawChannel))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<ImVector_ImDrawChannel>(),
-        8usize,
-        concat!("Alignment of ", stringify!(ImVector_ImDrawChannel))
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImVector_ImDrawChannel>())).Size as *const _ as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImVector_ImDrawChannel),
-            "::",
-            stringify!(Size)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImVector_ImDrawChannel>())).Capacity as *const _ as usize },
-        4usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImVector_ImDrawChannel),
-            "::",
-            stringify!(Capacity)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImVector_ImDrawChannel>())).Data as *const _ as usize },
-        8usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImVector_ImDrawChannel),
-            "::",
-            stringify!(Data)
-        )
-    );
 }
 impl Default for ImVector_ImDrawChannel {
     fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
+        unsafe { ::core::mem::zeroed() }
     }
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
 pub struct ImVector_ImDrawCmd {
-    pub Size: ::std::os::raw::c_int,
-    pub Capacity: ::std::os::raw::c_int,
+    pub Size: cty::c_int,
+    pub Capacity: cty::c_int,
     pub Data: *mut ImDrawCmd,
-}
-#[test]
-fn bindgen_test_layout_ImVector_ImDrawCmd() {
-    assert_eq!(
-        ::std::mem::size_of::<ImVector_ImDrawCmd>(),
-        16usize,
-        concat!("Size of: ", stringify!(ImVector_ImDrawCmd))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<ImVector_ImDrawCmd>(),
-        8usize,
-        concat!("Alignment of ", stringify!(ImVector_ImDrawCmd))
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImVector_ImDrawCmd>())).Size as *const _ as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImVector_ImDrawCmd),
-            "::",
-            stringify!(Size)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImVector_ImDrawCmd>())).Capacity as *const _ as usize },
-        4usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImVector_ImDrawCmd),
-            "::",
-            stringify!(Capacity)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImVector_ImDrawCmd>())).Data as *const _ as usize },
-        8usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImVector_ImDrawCmd),
-            "::",
-            stringify!(Data)
-        )
-    );
 }
 impl Default for ImVector_ImDrawCmd {
     fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
+        unsafe { ::core::mem::zeroed() }
     }
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
 pub struct ImVector_ImDrawIdx {
-    pub Size: ::std::os::raw::c_int,
-    pub Capacity: ::std::os::raw::c_int,
+    pub Size: cty::c_int,
+    pub Capacity: cty::c_int,
     pub Data: *mut ImDrawIdx,
-}
-#[test]
-fn bindgen_test_layout_ImVector_ImDrawIdx() {
-    assert_eq!(
-        ::std::mem::size_of::<ImVector_ImDrawIdx>(),
-        16usize,
-        concat!("Size of: ", stringify!(ImVector_ImDrawIdx))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<ImVector_ImDrawIdx>(),
-        8usize,
-        concat!("Alignment of ", stringify!(ImVector_ImDrawIdx))
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImVector_ImDrawIdx>())).Size as *const _ as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImVector_ImDrawIdx),
-            "::",
-            stringify!(Size)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImVector_ImDrawIdx>())).Capacity as *const _ as usize },
-        4usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImVector_ImDrawIdx),
-            "::",
-            stringify!(Capacity)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImVector_ImDrawIdx>())).Data as *const _ as usize },
-        8usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImVector_ImDrawIdx),
-            "::",
-            stringify!(Data)
-        )
-    );
 }
 impl Default for ImVector_ImDrawIdx {
     fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
+        unsafe { ::core::mem::zeroed() }
     }
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
 pub struct ImVector_ImDrawVert {
-    pub Size: ::std::os::raw::c_int,
-    pub Capacity: ::std::os::raw::c_int,
+    pub Size: cty::c_int,
+    pub Capacity: cty::c_int,
     pub Data: *mut ImDrawVert,
-}
-#[test]
-fn bindgen_test_layout_ImVector_ImDrawVert() {
-    assert_eq!(
-        ::std::mem::size_of::<ImVector_ImDrawVert>(),
-        16usize,
-        concat!("Size of: ", stringify!(ImVector_ImDrawVert))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<ImVector_ImDrawVert>(),
-        8usize,
-        concat!("Alignment of ", stringify!(ImVector_ImDrawVert))
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImVector_ImDrawVert>())).Size as *const _ as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImVector_ImDrawVert),
-            "::",
-            stringify!(Size)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImVector_ImDrawVert>())).Capacity as *const _ as usize },
-        4usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImVector_ImDrawVert),
-            "::",
-            stringify!(Capacity)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImVector_ImDrawVert>())).Data as *const _ as usize },
-        8usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImVector_ImDrawVert),
-            "::",
-            stringify!(Data)
-        )
-    );
 }
 impl Default for ImVector_ImDrawVert {
     fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
+        unsafe { ::core::mem::zeroed() }
     }
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
 pub struct ImVector_ImFontPtr {
-    pub Size: ::std::os::raw::c_int,
-    pub Capacity: ::std::os::raw::c_int,
+    pub Size: cty::c_int,
+    pub Capacity: cty::c_int,
     pub Data: *mut *mut ImFont,
-}
-#[test]
-fn bindgen_test_layout_ImVector_ImFontPtr() {
-    assert_eq!(
-        ::std::mem::size_of::<ImVector_ImFontPtr>(),
-        16usize,
-        concat!("Size of: ", stringify!(ImVector_ImFontPtr))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<ImVector_ImFontPtr>(),
-        8usize,
-        concat!("Alignment of ", stringify!(ImVector_ImFontPtr))
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImVector_ImFontPtr>())).Size as *const _ as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImVector_ImFontPtr),
-            "::",
-            stringify!(Size)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImVector_ImFontPtr>())).Capacity as *const _ as usize },
-        4usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImVector_ImFontPtr),
-            "::",
-            stringify!(Capacity)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImVector_ImFontPtr>())).Data as *const _ as usize },
-        8usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImVector_ImFontPtr),
-            "::",
-            stringify!(Data)
-        )
-    );
 }
 impl Default for ImVector_ImFontPtr {
     fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
+        unsafe { ::core::mem::zeroed() }
     }
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
 pub struct ImVector_ImFontAtlasCustomRect {
-    pub Size: ::std::os::raw::c_int,
-    pub Capacity: ::std::os::raw::c_int,
+    pub Size: cty::c_int,
+    pub Capacity: cty::c_int,
     pub Data: *mut ImFontAtlasCustomRect,
-}
-#[test]
-fn bindgen_test_layout_ImVector_ImFontAtlasCustomRect() {
-    assert_eq!(
-        ::std::mem::size_of::<ImVector_ImFontAtlasCustomRect>(),
-        16usize,
-        concat!("Size of: ", stringify!(ImVector_ImFontAtlasCustomRect))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<ImVector_ImFontAtlasCustomRect>(),
-        8usize,
-        concat!("Alignment of ", stringify!(ImVector_ImFontAtlasCustomRect))
-    );
-    assert_eq!(
-        unsafe {
-            &(*(::std::ptr::null::<ImVector_ImFontAtlasCustomRect>())).Size as *const _ as usize
-        },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImVector_ImFontAtlasCustomRect),
-            "::",
-            stringify!(Size)
-        )
-    );
-    assert_eq!(
-        unsafe {
-            &(*(::std::ptr::null::<ImVector_ImFontAtlasCustomRect>())).Capacity as *const _ as usize
-        },
-        4usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImVector_ImFontAtlasCustomRect),
-            "::",
-            stringify!(Capacity)
-        )
-    );
-    assert_eq!(
-        unsafe {
-            &(*(::std::ptr::null::<ImVector_ImFontAtlasCustomRect>())).Data as *const _ as usize
-        },
-        8usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImVector_ImFontAtlasCustomRect),
-            "::",
-            stringify!(Data)
-        )
-    );
 }
 impl Default for ImVector_ImFontAtlasCustomRect {
     fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
+        unsafe { ::core::mem::zeroed() }
     }
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
 pub struct ImVector_ImFontConfig {
-    pub Size: ::std::os::raw::c_int,
-    pub Capacity: ::std::os::raw::c_int,
+    pub Size: cty::c_int,
+    pub Capacity: cty::c_int,
     pub Data: *mut ImFontConfig,
-}
-#[test]
-fn bindgen_test_layout_ImVector_ImFontConfig() {
-    assert_eq!(
-        ::std::mem::size_of::<ImVector_ImFontConfig>(),
-        16usize,
-        concat!("Size of: ", stringify!(ImVector_ImFontConfig))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<ImVector_ImFontConfig>(),
-        8usize,
-        concat!("Alignment of ", stringify!(ImVector_ImFontConfig))
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImVector_ImFontConfig>())).Size as *const _ as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImVector_ImFontConfig),
-            "::",
-            stringify!(Size)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImVector_ImFontConfig>())).Capacity as *const _ as usize },
-        4usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImVector_ImFontConfig),
-            "::",
-            stringify!(Capacity)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImVector_ImFontConfig>())).Data as *const _ as usize },
-        8usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImVector_ImFontConfig),
-            "::",
-            stringify!(Data)
-        )
-    );
 }
 impl Default for ImVector_ImFontConfig {
     fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
+        unsafe { ::core::mem::zeroed() }
     }
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
 pub struct ImVector_ImFontGlyph {
-    pub Size: ::std::os::raw::c_int,
-    pub Capacity: ::std::os::raw::c_int,
+    pub Size: cty::c_int,
+    pub Capacity: cty::c_int,
     pub Data: *mut ImFontGlyph,
-}
-#[test]
-fn bindgen_test_layout_ImVector_ImFontGlyph() {
-    assert_eq!(
-        ::std::mem::size_of::<ImVector_ImFontGlyph>(),
-        16usize,
-        concat!("Size of: ", stringify!(ImVector_ImFontGlyph))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<ImVector_ImFontGlyph>(),
-        8usize,
-        concat!("Alignment of ", stringify!(ImVector_ImFontGlyph))
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImVector_ImFontGlyph>())).Size as *const _ as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImVector_ImFontGlyph),
-            "::",
-            stringify!(Size)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImVector_ImFontGlyph>())).Capacity as *const _ as usize },
-        4usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImVector_ImFontGlyph),
-            "::",
-            stringify!(Capacity)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImVector_ImFontGlyph>())).Data as *const _ as usize },
-        8usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImVector_ImFontGlyph),
-            "::",
-            stringify!(Data)
-        )
-    );
 }
 impl Default for ImVector_ImFontGlyph {
     fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
+        unsafe { ::core::mem::zeroed() }
     }
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
 pub struct ImVector_ImGuiStoragePair {
-    pub Size: ::std::os::raw::c_int,
-    pub Capacity: ::std::os::raw::c_int,
+    pub Size: cty::c_int,
+    pub Capacity: cty::c_int,
     pub Data: *mut ImGuiStoragePair,
-}
-#[test]
-fn bindgen_test_layout_ImVector_ImGuiStoragePair() {
-    assert_eq!(
-        ::std::mem::size_of::<ImVector_ImGuiStoragePair>(),
-        16usize,
-        concat!("Size of: ", stringify!(ImVector_ImGuiStoragePair))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<ImVector_ImGuiStoragePair>(),
-        8usize,
-        concat!("Alignment of ", stringify!(ImVector_ImGuiStoragePair))
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImVector_ImGuiStoragePair>())).Size as *const _ as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImVector_ImGuiStoragePair),
-            "::",
-            stringify!(Size)
-        )
-    );
-    assert_eq!(
-        unsafe {
-            &(*(::std::ptr::null::<ImVector_ImGuiStoragePair>())).Capacity as *const _ as usize
-        },
-        4usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImVector_ImGuiStoragePair),
-            "::",
-            stringify!(Capacity)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImVector_ImGuiStoragePair>())).Data as *const _ as usize },
-        8usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImVector_ImGuiStoragePair),
-            "::",
-            stringify!(Data)
-        )
-    );
 }
 impl Default for ImVector_ImGuiStoragePair {
     fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
+        unsafe { ::core::mem::zeroed() }
     }
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
 pub struct ImVector_ImGuiTextRange {
-    pub Size: ::std::os::raw::c_int,
-    pub Capacity: ::std::os::raw::c_int,
+    pub Size: cty::c_int,
+    pub Capacity: cty::c_int,
     pub Data: *mut ImGuiTextRange,
-}
-#[test]
-fn bindgen_test_layout_ImVector_ImGuiTextRange() {
-    assert_eq!(
-        ::std::mem::size_of::<ImVector_ImGuiTextRange>(),
-        16usize,
-        concat!("Size of: ", stringify!(ImVector_ImGuiTextRange))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<ImVector_ImGuiTextRange>(),
-        8usize,
-        concat!("Alignment of ", stringify!(ImVector_ImGuiTextRange))
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImVector_ImGuiTextRange>())).Size as *const _ as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImVector_ImGuiTextRange),
-            "::",
-            stringify!(Size)
-        )
-    );
-    assert_eq!(
-        unsafe {
-            &(*(::std::ptr::null::<ImVector_ImGuiTextRange>())).Capacity as *const _ as usize
-        },
-        4usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImVector_ImGuiTextRange),
-            "::",
-            stringify!(Capacity)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImVector_ImGuiTextRange>())).Data as *const _ as usize },
-        8usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImVector_ImGuiTextRange),
-            "::",
-            stringify!(Data)
-        )
-    );
 }
 impl Default for ImVector_ImGuiTextRange {
     fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
+        unsafe { ::core::mem::zeroed() }
     }
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
 pub struct ImVector_ImTextureID {
-    pub Size: ::std::os::raw::c_int,
-    pub Capacity: ::std::os::raw::c_int,
+    pub Size: cty::c_int,
+    pub Capacity: cty::c_int,
     pub Data: *mut ImTextureID,
-}
-#[test]
-fn bindgen_test_layout_ImVector_ImTextureID() {
-    assert_eq!(
-        ::std::mem::size_of::<ImVector_ImTextureID>(),
-        16usize,
-        concat!("Size of: ", stringify!(ImVector_ImTextureID))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<ImVector_ImTextureID>(),
-        8usize,
-        concat!("Alignment of ", stringify!(ImVector_ImTextureID))
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImVector_ImTextureID>())).Size as *const _ as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImVector_ImTextureID),
-            "::",
-            stringify!(Size)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImVector_ImTextureID>())).Capacity as *const _ as usize },
-        4usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImVector_ImTextureID),
-            "::",
-            stringify!(Capacity)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImVector_ImTextureID>())).Data as *const _ as usize },
-        8usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImVector_ImTextureID),
-            "::",
-            stringify!(Data)
-        )
-    );
 }
 impl Default for ImVector_ImTextureID {
     fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
+        unsafe { ::core::mem::zeroed() }
     }
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
 pub struct ImVector_ImU32 {
-    pub Size: ::std::os::raw::c_int,
-    pub Capacity: ::std::os::raw::c_int,
+    pub Size: cty::c_int,
+    pub Capacity: cty::c_int,
     pub Data: *mut ImU32,
-}
-#[test]
-fn bindgen_test_layout_ImVector_ImU32() {
-    assert_eq!(
-        ::std::mem::size_of::<ImVector_ImU32>(),
-        16usize,
-        concat!("Size of: ", stringify!(ImVector_ImU32))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<ImVector_ImU32>(),
-        8usize,
-        concat!("Alignment of ", stringify!(ImVector_ImU32))
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImVector_ImU32>())).Size as *const _ as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImVector_ImU32),
-            "::",
-            stringify!(Size)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImVector_ImU32>())).Capacity as *const _ as usize },
-        4usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImVector_ImU32),
-            "::",
-            stringify!(Capacity)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImVector_ImU32>())).Data as *const _ as usize },
-        8usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImVector_ImU32),
-            "::",
-            stringify!(Data)
-        )
-    );
 }
 impl Default for ImVector_ImU32 {
     fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
+        unsafe { ::core::mem::zeroed() }
     }
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
 pub struct ImVector_ImVec2 {
-    pub Size: ::std::os::raw::c_int,
-    pub Capacity: ::std::os::raw::c_int,
+    pub Size: cty::c_int,
+    pub Capacity: cty::c_int,
     pub Data: *mut ImVec2,
-}
-#[test]
-fn bindgen_test_layout_ImVector_ImVec2() {
-    assert_eq!(
-        ::std::mem::size_of::<ImVector_ImVec2>(),
-        16usize,
-        concat!("Size of: ", stringify!(ImVector_ImVec2))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<ImVector_ImVec2>(),
-        8usize,
-        concat!("Alignment of ", stringify!(ImVector_ImVec2))
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImVector_ImVec2>())).Size as *const _ as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImVector_ImVec2),
-            "::",
-            stringify!(Size)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImVector_ImVec2>())).Capacity as *const _ as usize },
-        4usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImVector_ImVec2),
-            "::",
-            stringify!(Capacity)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImVector_ImVec2>())).Data as *const _ as usize },
-        8usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImVector_ImVec2),
-            "::",
-            stringify!(Data)
-        )
-    );
 }
 impl Default for ImVector_ImVec2 {
     fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
+        unsafe { ::core::mem::zeroed() }
     }
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
 pub struct ImVector_ImVec4 {
-    pub Size: ::std::os::raw::c_int,
-    pub Capacity: ::std::os::raw::c_int,
+    pub Size: cty::c_int,
+    pub Capacity: cty::c_int,
     pub Data: *mut ImVec4,
-}
-#[test]
-fn bindgen_test_layout_ImVector_ImVec4() {
-    assert_eq!(
-        ::std::mem::size_of::<ImVector_ImVec4>(),
-        16usize,
-        concat!("Size of: ", stringify!(ImVector_ImVec4))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<ImVector_ImVec4>(),
-        8usize,
-        concat!("Alignment of ", stringify!(ImVector_ImVec4))
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImVector_ImVec4>())).Size as *const _ as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImVector_ImVec4),
-            "::",
-            stringify!(Size)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImVector_ImVec4>())).Capacity as *const _ as usize },
-        4usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImVector_ImVec4),
-            "::",
-            stringify!(Capacity)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImVector_ImVec4>())).Data as *const _ as usize },
-        8usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImVector_ImVec4),
-            "::",
-            stringify!(Data)
-        )
-    );
 }
 impl Default for ImVector_ImVec4 {
     fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
+        unsafe { ::core::mem::zeroed() }
     }
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
 pub struct ImVector_ImWchar {
-    pub Size: ::std::os::raw::c_int,
-    pub Capacity: ::std::os::raw::c_int,
+    pub Size: cty::c_int,
+    pub Capacity: cty::c_int,
     pub Data: *mut ImWchar,
-}
-#[test]
-fn bindgen_test_layout_ImVector_ImWchar() {
-    assert_eq!(
-        ::std::mem::size_of::<ImVector_ImWchar>(),
-        16usize,
-        concat!("Size of: ", stringify!(ImVector_ImWchar))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<ImVector_ImWchar>(),
-        8usize,
-        concat!("Alignment of ", stringify!(ImVector_ImWchar))
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImVector_ImWchar>())).Size as *const _ as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImVector_ImWchar),
-            "::",
-            stringify!(Size)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImVector_ImWchar>())).Capacity as *const _ as usize },
-        4usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImVector_ImWchar),
-            "::",
-            stringify!(Capacity)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImVector_ImWchar>())).Data as *const _ as usize },
-        8usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImVector_ImWchar),
-            "::",
-            stringify!(Data)
-        )
-    );
 }
 impl Default for ImVector_ImWchar {
     fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
+        unsafe { ::core::mem::zeroed() }
     }
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
 pub struct ImVector_char {
-    pub Size: ::std::os::raw::c_int,
-    pub Capacity: ::std::os::raw::c_int,
-    pub Data: *mut ::std::os::raw::c_char,
-}
-#[test]
-fn bindgen_test_layout_ImVector_char() {
-    assert_eq!(
-        ::std::mem::size_of::<ImVector_char>(),
-        16usize,
-        concat!("Size of: ", stringify!(ImVector_char))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<ImVector_char>(),
-        8usize,
-        concat!("Alignment of ", stringify!(ImVector_char))
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImVector_char>())).Size as *const _ as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImVector_char),
-            "::",
-            stringify!(Size)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImVector_char>())).Capacity as *const _ as usize },
-        4usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImVector_char),
-            "::",
-            stringify!(Capacity)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImVector_char>())).Data as *const _ as usize },
-        8usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImVector_char),
-            "::",
-            stringify!(Data)
-        )
-    );
+    pub Size: cty::c_int,
+    pub Capacity: cty::c_int,
+    pub Data: *mut cty::c_char,
 }
 impl Default for ImVector_char {
     fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
+        unsafe { ::core::mem::zeroed() }
     }
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
 pub struct ImVector_float {
-    pub Size: ::std::os::raw::c_int,
-    pub Capacity: ::std::os::raw::c_int,
+    pub Size: cty::c_int,
+    pub Capacity: cty::c_int,
     pub Data: *mut f32,
-}
-#[test]
-fn bindgen_test_layout_ImVector_float() {
-    assert_eq!(
-        ::std::mem::size_of::<ImVector_float>(),
-        16usize,
-        concat!("Size of: ", stringify!(ImVector_float))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<ImVector_float>(),
-        8usize,
-        concat!("Alignment of ", stringify!(ImVector_float))
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImVector_float>())).Size as *const _ as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImVector_float),
-            "::",
-            stringify!(Size)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImVector_float>())).Capacity as *const _ as usize },
-        4usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImVector_float),
-            "::",
-            stringify!(Capacity)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImVector_float>())).Data as *const _ as usize },
-        8usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImVector_float),
-            "::",
-            stringify!(Data)
-        )
-    );
 }
 impl Default for ImVector_float {
     fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
+        unsafe { ::core::mem::zeroed() }
     }
 }
 #[repr(C)]
@@ -1087,29 +346,6 @@ pub struct ImVec2 {
     pub x: f32,
     pub y: f32,
 }
-#[test]
-fn bindgen_test_layout_ImVec2() {
-    assert_eq!(
-        ::std::mem::size_of::<ImVec2>(),
-        8usize,
-        concat!("Size of: ", stringify!(ImVec2))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<ImVec2>(),
-        4usize,
-        concat!("Alignment of ", stringify!(ImVec2))
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImVec2>())).x as *const _ as usize },
-        0usize,
-        concat!("Offset of field: ", stringify!(ImVec2), "::", stringify!(x))
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImVec2>())).y as *const _ as usize },
-        4usize,
-        concat!("Offset of field: ", stringify!(ImVec2), "::", stringify!(y))
-    );
-}
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone, PartialEq)]
 pub struct ImVec4 {
@@ -1117,39 +353,6 @@ pub struct ImVec4 {
     pub y: f32,
     pub z: f32,
     pub w: f32,
-}
-#[test]
-fn bindgen_test_layout_ImVec4() {
-    assert_eq!(
-        ::std::mem::size_of::<ImVec4>(),
-        16usize,
-        concat!("Size of: ", stringify!(ImVec4))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<ImVec4>(),
-        4usize,
-        concat!("Alignment of ", stringify!(ImVec4))
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImVec4>())).x as *const _ as usize },
-        0usize,
-        concat!("Offset of field: ", stringify!(ImVec4), "::", stringify!(x))
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImVec4>())).y as *const _ as usize },
-        4usize,
-        concat!("Offset of field: ", stringify!(ImVec4), "::", stringify!(y))
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImVec4>())).z as *const _ as usize },
-        8usize,
-        concat!("Offset of field: ", stringify!(ImVec4), "::", stringify!(z))
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImVec4>())).w as *const _ as usize },
-        12usize,
-        concat!("Offset of field: ", stringify!(ImVec4), "::", stringify!(w))
-    );
 }
 pub const ImGuiWindowFlags_None: ImGuiWindowFlags_ = 0;
 pub const ImGuiWindowFlags_NoTitleBar: ImGuiWindowFlags_ = 1;
@@ -1181,7 +384,7 @@ pub const ImGuiWindowFlags_Tooltip: ImGuiWindowFlags_ = 33554432;
 pub const ImGuiWindowFlags_Popup: ImGuiWindowFlags_ = 67108864;
 pub const ImGuiWindowFlags_Modal: ImGuiWindowFlags_ = 134217728;
 pub const ImGuiWindowFlags_ChildMenu: ImGuiWindowFlags_ = 268435456;
-pub type ImGuiWindowFlags_ = ::std::os::raw::c_uint;
+pub type ImGuiWindowFlags_ = cty::c_uint;
 pub const ImGuiInputTextFlags_None: ImGuiInputTextFlags_ = 0;
 pub const ImGuiInputTextFlags_CharsDecimal: ImGuiInputTextFlags_ = 1;
 pub const ImGuiInputTextFlags_CharsHexadecimal: ImGuiInputTextFlags_ = 2;
@@ -1205,7 +408,7 @@ pub const ImGuiInputTextFlags_CallbackResize: ImGuiInputTextFlags_ = 262144;
 pub const ImGuiInputTextFlags_CallbackEdit: ImGuiInputTextFlags_ = 524288;
 pub const ImGuiInputTextFlags_Multiline: ImGuiInputTextFlags_ = 1048576;
 pub const ImGuiInputTextFlags_NoMarkEdited: ImGuiInputTextFlags_ = 2097152;
-pub type ImGuiInputTextFlags_ = ::std::os::raw::c_uint;
+pub type ImGuiInputTextFlags_ = cty::c_uint;
 pub const ImGuiTreeNodeFlags_None: ImGuiTreeNodeFlags_ = 0;
 pub const ImGuiTreeNodeFlags_Selected: ImGuiTreeNodeFlags_ = 1;
 pub const ImGuiTreeNodeFlags_Framed: ImGuiTreeNodeFlags_ = 2;
@@ -1222,7 +425,7 @@ pub const ImGuiTreeNodeFlags_SpanAvailWidth: ImGuiTreeNodeFlags_ = 2048;
 pub const ImGuiTreeNodeFlags_SpanFullWidth: ImGuiTreeNodeFlags_ = 4096;
 pub const ImGuiTreeNodeFlags_NavLeftJumpsBackHere: ImGuiTreeNodeFlags_ = 8192;
 pub const ImGuiTreeNodeFlags_CollapsingHeader: ImGuiTreeNodeFlags_ = 26;
-pub type ImGuiTreeNodeFlags_ = ::std::os::raw::c_uint;
+pub type ImGuiTreeNodeFlags_ = cty::c_uint;
 pub const ImGuiPopupFlags_None: ImGuiPopupFlags_ = 0;
 pub const ImGuiPopupFlags_MouseButtonLeft: ImGuiPopupFlags_ = 0;
 pub const ImGuiPopupFlags_MouseButtonRight: ImGuiPopupFlags_ = 1;
@@ -1234,14 +437,14 @@ pub const ImGuiPopupFlags_NoOpenOverItems: ImGuiPopupFlags_ = 64;
 pub const ImGuiPopupFlags_AnyPopupId: ImGuiPopupFlags_ = 128;
 pub const ImGuiPopupFlags_AnyPopupLevel: ImGuiPopupFlags_ = 256;
 pub const ImGuiPopupFlags_AnyPopup: ImGuiPopupFlags_ = 384;
-pub type ImGuiPopupFlags_ = ::std::os::raw::c_uint;
+pub type ImGuiPopupFlags_ = cty::c_uint;
 pub const ImGuiSelectableFlags_None: ImGuiSelectableFlags_ = 0;
 pub const ImGuiSelectableFlags_DontClosePopups: ImGuiSelectableFlags_ = 1;
 pub const ImGuiSelectableFlags_SpanAllColumns: ImGuiSelectableFlags_ = 2;
 pub const ImGuiSelectableFlags_AllowDoubleClick: ImGuiSelectableFlags_ = 4;
 pub const ImGuiSelectableFlags_Disabled: ImGuiSelectableFlags_ = 8;
 pub const ImGuiSelectableFlags_AllowItemOverlap: ImGuiSelectableFlags_ = 16;
-pub type ImGuiSelectableFlags_ = ::std::os::raw::c_uint;
+pub type ImGuiSelectableFlags_ = cty::c_uint;
 pub const ImGuiComboFlags_None: ImGuiComboFlags_ = 0;
 pub const ImGuiComboFlags_PopupAlignLeft: ImGuiComboFlags_ = 1;
 pub const ImGuiComboFlags_HeightSmall: ImGuiComboFlags_ = 2;
@@ -1251,7 +454,7 @@ pub const ImGuiComboFlags_HeightLargest: ImGuiComboFlags_ = 16;
 pub const ImGuiComboFlags_NoArrowButton: ImGuiComboFlags_ = 32;
 pub const ImGuiComboFlags_NoPreview: ImGuiComboFlags_ = 64;
 pub const ImGuiComboFlags_HeightMask_: ImGuiComboFlags_ = 30;
-pub type ImGuiComboFlags_ = ::std::os::raw::c_uint;
+pub type ImGuiComboFlags_ = cty::c_uint;
 pub const ImGuiTabBarFlags_None: ImGuiTabBarFlags_ = 0;
 pub const ImGuiTabBarFlags_Reorderable: ImGuiTabBarFlags_ = 1;
 pub const ImGuiTabBarFlags_AutoSelectNewTabs: ImGuiTabBarFlags_ = 2;
@@ -1263,7 +466,7 @@ pub const ImGuiTabBarFlags_FittingPolicyResizeDown: ImGuiTabBarFlags_ = 64;
 pub const ImGuiTabBarFlags_FittingPolicyScroll: ImGuiTabBarFlags_ = 128;
 pub const ImGuiTabBarFlags_FittingPolicyMask_: ImGuiTabBarFlags_ = 192;
 pub const ImGuiTabBarFlags_FittingPolicyDefault_: ImGuiTabBarFlags_ = 64;
-pub type ImGuiTabBarFlags_ = ::std::os::raw::c_uint;
+pub type ImGuiTabBarFlags_ = cty::c_uint;
 pub const ImGuiTabItemFlags_None: ImGuiTabItemFlags_ = 0;
 pub const ImGuiTabItemFlags_UnsavedDocument: ImGuiTabItemFlags_ = 1;
 pub const ImGuiTabItemFlags_SetSelected: ImGuiTabItemFlags_ = 2;
@@ -1273,13 +476,13 @@ pub const ImGuiTabItemFlags_NoTooltip: ImGuiTabItemFlags_ = 16;
 pub const ImGuiTabItemFlags_NoReorder: ImGuiTabItemFlags_ = 32;
 pub const ImGuiTabItemFlags_Leading: ImGuiTabItemFlags_ = 64;
 pub const ImGuiTabItemFlags_Trailing: ImGuiTabItemFlags_ = 128;
-pub type ImGuiTabItemFlags_ = ::std::os::raw::c_uint;
+pub type ImGuiTabItemFlags_ = cty::c_uint;
 pub const ImGuiFocusedFlags_None: ImGuiFocusedFlags_ = 0;
 pub const ImGuiFocusedFlags_ChildWindows: ImGuiFocusedFlags_ = 1;
 pub const ImGuiFocusedFlags_RootWindow: ImGuiFocusedFlags_ = 2;
 pub const ImGuiFocusedFlags_AnyWindow: ImGuiFocusedFlags_ = 4;
 pub const ImGuiFocusedFlags_RootAndChildWindows: ImGuiFocusedFlags_ = 3;
-pub type ImGuiFocusedFlags_ = ::std::os::raw::c_uint;
+pub type ImGuiFocusedFlags_ = cty::c_uint;
 pub const ImGuiHoveredFlags_None: ImGuiHoveredFlags_ = 0;
 pub const ImGuiHoveredFlags_ChildWindows: ImGuiHoveredFlags_ = 1;
 pub const ImGuiHoveredFlags_RootWindow: ImGuiHoveredFlags_ = 2;
@@ -1290,7 +493,7 @@ pub const ImGuiHoveredFlags_AllowWhenOverlapped: ImGuiHoveredFlags_ = 64;
 pub const ImGuiHoveredFlags_AllowWhenDisabled: ImGuiHoveredFlags_ = 128;
 pub const ImGuiHoveredFlags_RectOnly: ImGuiHoveredFlags_ = 104;
 pub const ImGuiHoveredFlags_RootAndChildWindows: ImGuiHoveredFlags_ = 3;
-pub type ImGuiHoveredFlags_ = ::std::os::raw::c_uint;
+pub type ImGuiHoveredFlags_ = cty::c_uint;
 pub const ImGuiDragDropFlags_None: ImGuiDragDropFlags_ = 0;
 pub const ImGuiDragDropFlags_SourceNoPreviewTooltip: ImGuiDragDropFlags_ = 1;
 pub const ImGuiDragDropFlags_SourceNoDisableHover: ImGuiDragDropFlags_ = 2;
@@ -1302,7 +505,7 @@ pub const ImGuiDragDropFlags_AcceptBeforeDelivery: ImGuiDragDropFlags_ = 1024;
 pub const ImGuiDragDropFlags_AcceptNoDrawDefaultRect: ImGuiDragDropFlags_ = 2048;
 pub const ImGuiDragDropFlags_AcceptNoPreviewTooltip: ImGuiDragDropFlags_ = 4096;
 pub const ImGuiDragDropFlags_AcceptPeekOnly: ImGuiDragDropFlags_ = 3072;
-pub type ImGuiDragDropFlags_ = ::std::os::raw::c_uint;
+pub type ImGuiDragDropFlags_ = cty::c_uint;
 pub const ImGuiDataType_S8: ImGuiDataType_ = 0;
 pub const ImGuiDataType_U8: ImGuiDataType_ = 1;
 pub const ImGuiDataType_S16: ImGuiDataType_ = 2;
@@ -1314,14 +517,14 @@ pub const ImGuiDataType_U64: ImGuiDataType_ = 7;
 pub const ImGuiDataType_Float: ImGuiDataType_ = 8;
 pub const ImGuiDataType_Double: ImGuiDataType_ = 9;
 pub const ImGuiDataType_COUNT: ImGuiDataType_ = 10;
-pub type ImGuiDataType_ = ::std::os::raw::c_uint;
+pub type ImGuiDataType_ = cty::c_uint;
 pub const ImGuiDir_None: ImGuiDir_ = -1;
 pub const ImGuiDir_Left: ImGuiDir_ = 0;
 pub const ImGuiDir_Right: ImGuiDir_ = 1;
 pub const ImGuiDir_Up: ImGuiDir_ = 2;
 pub const ImGuiDir_Down: ImGuiDir_ = 3;
 pub const ImGuiDir_COUNT: ImGuiDir_ = 4;
-pub type ImGuiDir_ = ::std::os::raw::c_int;
+pub type ImGuiDir_ = cty::c_int;
 pub const ImGuiKey_Tab: ImGuiKey_ = 0;
 pub const ImGuiKey_LeftArrow: ImGuiKey_ = 1;
 pub const ImGuiKey_RightArrow: ImGuiKey_ = 2;
@@ -1345,13 +548,13 @@ pub const ImGuiKey_X: ImGuiKey_ = 19;
 pub const ImGuiKey_Y: ImGuiKey_ = 20;
 pub const ImGuiKey_Z: ImGuiKey_ = 21;
 pub const ImGuiKey_COUNT: ImGuiKey_ = 22;
-pub type ImGuiKey_ = ::std::os::raw::c_uint;
+pub type ImGuiKey_ = cty::c_uint;
 pub const ImGuiKeyModFlags_None: ImGuiKeyModFlags_ = 0;
 pub const ImGuiKeyModFlags_Ctrl: ImGuiKeyModFlags_ = 1;
 pub const ImGuiKeyModFlags_Shift: ImGuiKeyModFlags_ = 2;
 pub const ImGuiKeyModFlags_Alt: ImGuiKeyModFlags_ = 4;
 pub const ImGuiKeyModFlags_Super: ImGuiKeyModFlags_ = 8;
-pub type ImGuiKeyModFlags_ = ::std::os::raw::c_uint;
+pub type ImGuiKeyModFlags_ = cty::c_uint;
 pub const ImGuiNavInput_Activate: ImGuiNavInput_ = 0;
 pub const ImGuiNavInput_Cancel: ImGuiNavInput_ = 1;
 pub const ImGuiNavInput_Input: ImGuiNavInput_ = 2;
@@ -1375,7 +578,7 @@ pub const ImGuiNavInput_KeyUp_: ImGuiNavInput_ = 19;
 pub const ImGuiNavInput_KeyDown_: ImGuiNavInput_ = 20;
 pub const ImGuiNavInput_COUNT: ImGuiNavInput_ = 21;
 pub const ImGuiNavInput_InternalStart_: ImGuiNavInput_ = 16;
-pub type ImGuiNavInput_ = ::std::os::raw::c_uint;
+pub type ImGuiNavInput_ = cty::c_uint;
 pub const ImGuiConfigFlags_None: ImGuiConfigFlags_ = 0;
 pub const ImGuiConfigFlags_NavEnableKeyboard: ImGuiConfigFlags_ = 1;
 pub const ImGuiConfigFlags_NavEnableGamepad: ImGuiConfigFlags_ = 2;
@@ -1385,13 +588,13 @@ pub const ImGuiConfigFlags_NoMouse: ImGuiConfigFlags_ = 16;
 pub const ImGuiConfigFlags_NoMouseCursorChange: ImGuiConfigFlags_ = 32;
 pub const ImGuiConfigFlags_IsSRGB: ImGuiConfigFlags_ = 1048576;
 pub const ImGuiConfigFlags_IsTouchScreen: ImGuiConfigFlags_ = 2097152;
-pub type ImGuiConfigFlags_ = ::std::os::raw::c_uint;
+pub type ImGuiConfigFlags_ = cty::c_uint;
 pub const ImGuiBackendFlags_None: ImGuiBackendFlags_ = 0;
 pub const ImGuiBackendFlags_HasGamepad: ImGuiBackendFlags_ = 1;
 pub const ImGuiBackendFlags_HasMouseCursors: ImGuiBackendFlags_ = 2;
 pub const ImGuiBackendFlags_HasSetMousePos: ImGuiBackendFlags_ = 4;
 pub const ImGuiBackendFlags_RendererHasVtxOffset: ImGuiBackendFlags_ = 8;
-pub type ImGuiBackendFlags_ = ::std::os::raw::c_uint;
+pub type ImGuiBackendFlags_ = cty::c_uint;
 pub const ImGuiCol_Text: ImGuiCol_ = 0;
 pub const ImGuiCol_TextDisabled: ImGuiCol_ = 1;
 pub const ImGuiCol_WindowBg: ImGuiCol_ = 2;
@@ -1441,7 +644,7 @@ pub const ImGuiCol_NavWindowingHighlight: ImGuiCol_ = 45;
 pub const ImGuiCol_NavWindowingDimBg: ImGuiCol_ = 46;
 pub const ImGuiCol_ModalWindowDimBg: ImGuiCol_ = 47;
 pub const ImGuiCol_COUNT: ImGuiCol_ = 48;
-pub type ImGuiCol_ = ::std::os::raw::c_uint;
+pub type ImGuiCol_ = cty::c_uint;
 pub const ImGuiStyleVar_Alpha: ImGuiStyleVar_ = 0;
 pub const ImGuiStyleVar_WindowPadding: ImGuiStyleVar_ = 1;
 pub const ImGuiStyleVar_WindowRounding: ImGuiStyleVar_ = 2;
@@ -1466,14 +669,14 @@ pub const ImGuiStyleVar_TabRounding: ImGuiStyleVar_ = 20;
 pub const ImGuiStyleVar_ButtonTextAlign: ImGuiStyleVar_ = 21;
 pub const ImGuiStyleVar_SelectableTextAlign: ImGuiStyleVar_ = 22;
 pub const ImGuiStyleVar_COUNT: ImGuiStyleVar_ = 23;
-pub type ImGuiStyleVar_ = ::std::os::raw::c_uint;
+pub type ImGuiStyleVar_ = cty::c_uint;
 pub const ImGuiButtonFlags_None: ImGuiButtonFlags_ = 0;
 pub const ImGuiButtonFlags_MouseButtonLeft: ImGuiButtonFlags_ = 1;
 pub const ImGuiButtonFlags_MouseButtonRight: ImGuiButtonFlags_ = 2;
 pub const ImGuiButtonFlags_MouseButtonMiddle: ImGuiButtonFlags_ = 4;
 pub const ImGuiButtonFlags_MouseButtonMask_: ImGuiButtonFlags_ = 7;
 pub const ImGuiButtonFlags_MouseButtonDefault_: ImGuiButtonFlags_ = 1;
-pub type ImGuiButtonFlags_ = ::std::os::raw::c_uint;
+pub type ImGuiButtonFlags_ = cty::c_uint;
 pub const ImGuiColorEditFlags_None: ImGuiColorEditFlags_ = 0;
 pub const ImGuiColorEditFlags_NoAlpha: ImGuiColorEditFlags_ = 2;
 pub const ImGuiColorEditFlags_NoPicker: ImGuiColorEditFlags_ = 4;
@@ -1503,19 +706,19 @@ pub const ImGuiColorEditFlags__DisplayMask: ImGuiColorEditFlags_ = 7340032;
 pub const ImGuiColorEditFlags__DataTypeMask: ImGuiColorEditFlags_ = 25165824;
 pub const ImGuiColorEditFlags__PickerMask: ImGuiColorEditFlags_ = 100663296;
 pub const ImGuiColorEditFlags__InputMask: ImGuiColorEditFlags_ = 402653184;
-pub type ImGuiColorEditFlags_ = ::std::os::raw::c_uint;
+pub type ImGuiColorEditFlags_ = cty::c_uint;
 pub const ImGuiSliderFlags_None: ImGuiSliderFlags_ = 0;
 pub const ImGuiSliderFlags_AlwaysClamp: ImGuiSliderFlags_ = 16;
 pub const ImGuiSliderFlags_Logarithmic: ImGuiSliderFlags_ = 32;
 pub const ImGuiSliderFlags_NoRoundToFormat: ImGuiSliderFlags_ = 64;
 pub const ImGuiSliderFlags_NoInput: ImGuiSliderFlags_ = 128;
 pub const ImGuiSliderFlags_InvalidMask_: ImGuiSliderFlags_ = 1879048207;
-pub type ImGuiSliderFlags_ = ::std::os::raw::c_uint;
+pub type ImGuiSliderFlags_ = cty::c_uint;
 pub const ImGuiMouseButton_Left: ImGuiMouseButton_ = 0;
 pub const ImGuiMouseButton_Right: ImGuiMouseButton_ = 1;
 pub const ImGuiMouseButton_Middle: ImGuiMouseButton_ = 2;
 pub const ImGuiMouseButton_COUNT: ImGuiMouseButton_ = 5;
-pub type ImGuiMouseButton_ = ::std::os::raw::c_uint;
+pub type ImGuiMouseButton_ = cty::c_uint;
 pub const ImGuiMouseCursor_None: ImGuiMouseCursor_ = -1;
 pub const ImGuiMouseCursor_Arrow: ImGuiMouseCursor_ = 0;
 pub const ImGuiMouseCursor_TextInput: ImGuiMouseCursor_ = 1;
@@ -1527,13 +730,13 @@ pub const ImGuiMouseCursor_ResizeNWSE: ImGuiMouseCursor_ = 6;
 pub const ImGuiMouseCursor_Hand: ImGuiMouseCursor_ = 7;
 pub const ImGuiMouseCursor_NotAllowed: ImGuiMouseCursor_ = 8;
 pub const ImGuiMouseCursor_COUNT: ImGuiMouseCursor_ = 9;
-pub type ImGuiMouseCursor_ = ::std::os::raw::c_int;
+pub type ImGuiMouseCursor_ = cty::c_int;
 pub const ImGuiCond_None: ImGuiCond_ = 0;
 pub const ImGuiCond_Always: ImGuiCond_ = 1;
 pub const ImGuiCond_Once: ImGuiCond_ = 2;
 pub const ImGuiCond_FirstUseEver: ImGuiCond_ = 4;
 pub const ImGuiCond_Appearing: ImGuiCond_ = 8;
-pub type ImGuiCond_ = ::std::os::raw::c_uint;
+pub type ImGuiCond_ = cty::c_uint;
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub struct ImGuiStyle {
@@ -1577,427 +780,14 @@ pub struct ImGuiStyle {
     pub CircleSegmentMaxError: f32,
     pub Colors: [ImVec4; 48usize],
 }
-#[test]
-fn bindgen_test_layout_ImGuiStyle() {
-    assert_eq!(
-        ::std::mem::size_of::<ImGuiStyle>(),
-        956usize,
-        concat!("Size of: ", stringify!(ImGuiStyle))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<ImGuiStyle>(),
-        4usize,
-        concat!("Alignment of ", stringify!(ImGuiStyle))
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiStyle>())).Alpha as *const _ as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiStyle),
-            "::",
-            stringify!(Alpha)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiStyle>())).WindowPadding as *const _ as usize },
-        4usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiStyle),
-            "::",
-            stringify!(WindowPadding)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiStyle>())).WindowRounding as *const _ as usize },
-        12usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiStyle),
-            "::",
-            stringify!(WindowRounding)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiStyle>())).WindowBorderSize as *const _ as usize },
-        16usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiStyle),
-            "::",
-            stringify!(WindowBorderSize)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiStyle>())).WindowMinSize as *const _ as usize },
-        20usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiStyle),
-            "::",
-            stringify!(WindowMinSize)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiStyle>())).WindowTitleAlign as *const _ as usize },
-        28usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiStyle),
-            "::",
-            stringify!(WindowTitleAlign)
-        )
-    );
-    assert_eq!(
-        unsafe {
-            &(*(::std::ptr::null::<ImGuiStyle>())).WindowMenuButtonPosition as *const _ as usize
-        },
-        36usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiStyle),
-            "::",
-            stringify!(WindowMenuButtonPosition)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiStyle>())).ChildRounding as *const _ as usize },
-        40usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiStyle),
-            "::",
-            stringify!(ChildRounding)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiStyle>())).ChildBorderSize as *const _ as usize },
-        44usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiStyle),
-            "::",
-            stringify!(ChildBorderSize)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiStyle>())).PopupRounding as *const _ as usize },
-        48usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiStyle),
-            "::",
-            stringify!(PopupRounding)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiStyle>())).PopupBorderSize as *const _ as usize },
-        52usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiStyle),
-            "::",
-            stringify!(PopupBorderSize)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiStyle>())).FramePadding as *const _ as usize },
-        56usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiStyle),
-            "::",
-            stringify!(FramePadding)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiStyle>())).FrameRounding as *const _ as usize },
-        64usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiStyle),
-            "::",
-            stringify!(FrameRounding)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiStyle>())).FrameBorderSize as *const _ as usize },
-        68usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiStyle),
-            "::",
-            stringify!(FrameBorderSize)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiStyle>())).ItemSpacing as *const _ as usize },
-        72usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiStyle),
-            "::",
-            stringify!(ItemSpacing)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiStyle>())).ItemInnerSpacing as *const _ as usize },
-        80usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiStyle),
-            "::",
-            stringify!(ItemInnerSpacing)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiStyle>())).TouchExtraPadding as *const _ as usize },
-        88usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiStyle),
-            "::",
-            stringify!(TouchExtraPadding)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiStyle>())).IndentSpacing as *const _ as usize },
-        96usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiStyle),
-            "::",
-            stringify!(IndentSpacing)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiStyle>())).ColumnsMinSpacing as *const _ as usize },
-        100usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiStyle),
-            "::",
-            stringify!(ColumnsMinSpacing)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiStyle>())).ScrollbarSize as *const _ as usize },
-        104usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiStyle),
-            "::",
-            stringify!(ScrollbarSize)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiStyle>())).ScrollbarRounding as *const _ as usize },
-        108usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiStyle),
-            "::",
-            stringify!(ScrollbarRounding)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiStyle>())).GrabMinSize as *const _ as usize },
-        112usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiStyle),
-            "::",
-            stringify!(GrabMinSize)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiStyle>())).GrabRounding as *const _ as usize },
-        116usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiStyle),
-            "::",
-            stringify!(GrabRounding)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiStyle>())).LogSliderDeadzone as *const _ as usize },
-        120usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiStyle),
-            "::",
-            stringify!(LogSliderDeadzone)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiStyle>())).TabRounding as *const _ as usize },
-        124usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiStyle),
-            "::",
-            stringify!(TabRounding)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiStyle>())).TabBorderSize as *const _ as usize },
-        128usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiStyle),
-            "::",
-            stringify!(TabBorderSize)
-        )
-    );
-    assert_eq!(
-        unsafe {
-            &(*(::std::ptr::null::<ImGuiStyle>())).TabMinWidthForCloseButton as *const _ as usize
-        },
-        132usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiStyle),
-            "::",
-            stringify!(TabMinWidthForCloseButton)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiStyle>())).ColorButtonPosition as *const _ as usize },
-        136usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiStyle),
-            "::",
-            stringify!(ColorButtonPosition)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiStyle>())).ButtonTextAlign as *const _ as usize },
-        140usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiStyle),
-            "::",
-            stringify!(ButtonTextAlign)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiStyle>())).SelectableTextAlign as *const _ as usize },
-        148usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiStyle),
-            "::",
-            stringify!(SelectableTextAlign)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiStyle>())).DisplayWindowPadding as *const _ as usize },
-        156usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiStyle),
-            "::",
-            stringify!(DisplayWindowPadding)
-        )
-    );
-    assert_eq!(
-        unsafe {
-            &(*(::std::ptr::null::<ImGuiStyle>())).DisplaySafeAreaPadding as *const _ as usize
-        },
-        164usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiStyle),
-            "::",
-            stringify!(DisplaySafeAreaPadding)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiStyle>())).MouseCursorScale as *const _ as usize },
-        172usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiStyle),
-            "::",
-            stringify!(MouseCursorScale)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiStyle>())).AntiAliasedLines as *const _ as usize },
-        176usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiStyle),
-            "::",
-            stringify!(AntiAliasedLines)
-        )
-    );
-    assert_eq!(
-        unsafe {
-            &(*(::std::ptr::null::<ImGuiStyle>())).AntiAliasedLinesUseTex as *const _ as usize
-        },
-        177usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiStyle),
-            "::",
-            stringify!(AntiAliasedLinesUseTex)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiStyle>())).AntiAliasedFill as *const _ as usize },
-        178usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiStyle),
-            "::",
-            stringify!(AntiAliasedFill)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiStyle>())).CurveTessellationTol as *const _ as usize },
-        180usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiStyle),
-            "::",
-            stringify!(CurveTessellationTol)
-        )
-    );
-    assert_eq!(
-        unsafe {
-            &(*(::std::ptr::null::<ImGuiStyle>())).CircleSegmentMaxError as *const _ as usize
-        },
-        184usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiStyle),
-            "::",
-            stringify!(CircleSegmentMaxError)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiStyle>())).Colors as *const _ as usize },
-        188usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiStyle),
-            "::",
-            stringify!(Colors)
-        )
-    );
-}
 impl Default for ImGuiStyle {
     fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
+        unsafe { ::core::mem::zeroed() }
     }
 }
-impl ::std::fmt::Debug for ImGuiStyle {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        write ! (f , "ImGuiStyle {{ Alpha: {:?}, WindowPadding: {:?}, WindowRounding: {:?}, WindowBorderSize: {:?}, WindowMinSize: {:?}, WindowTitleAlign: {:?}, WindowMenuButtonPosition: {:?}, ChildRounding: {:?}, ChildBorderSize: {:?}, PopupRounding: {:?}, PopupBorderSize: {:?}, FramePadding: {:?}, FrameRounding: {:?}, FrameBorderSize: {:?}, ItemSpacing: {:?}, ItemInnerSpacing: {:?}, TouchExtraPadding: {:?}, IndentSpacing: {:?}, ColumnsMinSpacing: {:?}, ScrollbarSize: {:?}, ScrollbarRounding: {:?}, GrabMinSize: {:?}, GrabRounding: {:?}, LogSliderDeadzone: {:?}, TabRounding: {:?}, TabBorderSize: {:?}, TabMinWidthForCloseButton: {:?}, ColorButtonPosition: {:?}, ButtonTextAlign: {:?}, SelectableTextAlign: {:?}, DisplayWindowPadding: {:?}, DisplaySafeAreaPadding: {:?}, MouseCursorScale: {:?}, AntiAliasedLines: {:?}, AntiAliasedLinesUseTex: {:?}, AntiAliasedFill: {:?}, CurveTessellationTol: {:?}, CircleSegmentMaxError: {:?}, Colors: [{}] }}" , self . Alpha , self . WindowPadding , self . WindowRounding , self . WindowBorderSize , self . WindowMinSize , self . WindowTitleAlign , self . WindowMenuButtonPosition , self . ChildRounding , self . ChildBorderSize , self . PopupRounding , self . PopupBorderSize , self . FramePadding , self . FrameRounding , self . FrameBorderSize , self . ItemSpacing , self . ItemInnerSpacing , self . TouchExtraPadding , self . IndentSpacing , self . ColumnsMinSpacing , self . ScrollbarSize , self . ScrollbarRounding , self . GrabMinSize , self . GrabRounding , self . LogSliderDeadzone , self . TabRounding , self . TabBorderSize , self . TabMinWidthForCloseButton , self . ColorButtonPosition , self . ButtonTextAlign , self . SelectableTextAlign , self . DisplayWindowPadding , self . DisplaySafeAreaPadding , self . MouseCursorScale , self . AntiAliasedLines , self . AntiAliasedLinesUseTex , self . AntiAliasedFill , self . CurveTessellationTol , self . CircleSegmentMaxError , self . Colors . iter () . enumerate () . map (| (i , v) | format ! ("{}{:?}" , if i > 0 { ", " } else { "" } , v)) . collect :: < String > ())
+impl ::core::fmt::Debug for ImGuiStyle {
+    fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
+        write ! (f , "ImGuiStyle {{ Alpha: {:?}, WindowPadding: {:?}, WindowRounding: {:?}, WindowBorderSize: {:?}, WindowMinSize: {:?}, WindowTitleAlign: {:?}, WindowMenuButtonPosition: {:?}, ChildRounding: {:?}, ChildBorderSize: {:?}, PopupRounding: {:?}, PopupBorderSize: {:?}, FramePadding: {:?}, FrameRounding: {:?}, FrameBorderSize: {:?}, ItemSpacing: {:?}, ItemInnerSpacing: {:?}, TouchExtraPadding: {:?}, IndentSpacing: {:?}, ColumnsMinSpacing: {:?}, ScrollbarSize: {:?}, ScrollbarRounding: {:?}, GrabMinSize: {:?}, GrabRounding: {:?}, LogSliderDeadzone: {:?}, TabRounding: {:?}, TabBorderSize: {:?}, TabMinWidthForCloseButton: {:?}, ColorButtonPosition: {:?}, ButtonTextAlign: {:?}, SelectableTextAlign: {:?}, DisplayWindowPadding: {:?}, DisplaySafeAreaPadding: {:?}, MouseCursorScale: {:?}, AntiAliasedLines: {:?}, AntiAliasedLinesUseTex: {:?}, AntiAliasedFill: {:?}, CurveTessellationTol: {:?}, CircleSegmentMaxError: {:?}, Colors: [...] }}" , self . Alpha , self . WindowPadding , self . WindowRounding , self . WindowBorderSize , self . WindowMinSize , self . WindowTitleAlign , self . WindowMenuButtonPosition , self . ChildRounding , self . ChildBorderSize , self . PopupRounding , self . PopupBorderSize , self . FramePadding , self . FrameRounding , self . FrameBorderSize , self . ItemSpacing , self . ItemInnerSpacing , self . TouchExtraPadding , self . IndentSpacing , self . ColumnsMinSpacing , self . ScrollbarSize , self . ScrollbarRounding , self . GrabMinSize , self . GrabRounding , self . LogSliderDeadzone , self . TabRounding , self . TabBorderSize , self . TabMinWidthForCloseButton , self . ColorButtonPosition , self . ButtonTextAlign , self . SelectableTextAlign , self . DisplayWindowPadding , self . DisplaySafeAreaPadding , self . MouseCursorScale , self . AntiAliasedLines , self . AntiAliasedLinesUseTex , self . AntiAliasedFill , self . CurveTessellationTol , self . CircleSegmentMaxError)
     }
 }
 #[repr(C)]
@@ -2008,15 +798,15 @@ pub struct ImGuiIO {
     pub DisplaySize: ImVec2,
     pub DeltaTime: f32,
     pub IniSavingRate: f32,
-    pub IniFilename: *const ::std::os::raw::c_char,
-    pub LogFilename: *const ::std::os::raw::c_char,
+    pub IniFilename: *const cty::c_char,
+    pub LogFilename: *const cty::c_char,
     pub MouseDoubleClickTime: f32,
     pub MouseDoubleClickMaxDist: f32,
     pub MouseDragThreshold: f32,
-    pub KeyMap: [::std::os::raw::c_int; 22usize],
+    pub KeyMap: [cty::c_int; 22usize],
     pub KeyRepeatDelay: f32,
     pub KeyRepeatRate: f32,
-    pub UserData: *mut ::std::os::raw::c_void,
+    pub UserData: *mut cty::c_void,
     pub Fonts: *mut ImFontAtlas,
     pub FontGlobalScale: f32,
     pub FontAllowUserScaling: bool,
@@ -2028,28 +818,22 @@ pub struct ImGuiIO {
     pub ConfigWindowsResizeFromEdges: bool,
     pub ConfigWindowsMoveFromTitleBarOnly: bool,
     pub ConfigWindowsMemoryCompactTimer: f32,
-    pub BackendPlatformName: *const ::std::os::raw::c_char,
-    pub BackendRendererName: *const ::std::os::raw::c_char,
-    pub BackendPlatformUserData: *mut ::std::os::raw::c_void,
-    pub BackendRendererUserData: *mut ::std::os::raw::c_void,
-    pub BackendLanguageUserData: *mut ::std::os::raw::c_void,
-    pub GetClipboardTextFn: ::std::option::Option<
-        unsafe extern "C" fn(
-            user_data: *mut ::std::os::raw::c_void,
-        ) -> *const ::std::os::raw::c_char,
+    pub BackendPlatformName: *const cty::c_char,
+    pub BackendRendererName: *const cty::c_char,
+    pub BackendPlatformUserData: *mut cty::c_void,
+    pub BackendRendererUserData: *mut cty::c_void,
+    pub BackendLanguageUserData: *mut cty::c_void,
+    pub GetClipboardTextFn: ::core::option::Option<
+        unsafe extern "C" fn(user_data: *mut cty::c_void) -> *const cty::c_char,
     >,
-    pub SetClipboardTextFn: ::std::option::Option<
-        unsafe extern "C" fn(
-            user_data: *mut ::std::os::raw::c_void,
-            text: *const ::std::os::raw::c_char,
-        ),
+    pub SetClipboardTextFn: ::core::option::Option<
+        unsafe extern "C" fn(user_data: *mut cty::c_void, text: *const cty::c_char),
     >,
-    pub ClipboardUserData: *mut ::std::os::raw::c_void,
-    pub ImeSetInputScreenPosFn: ::std::option::Option<
-        unsafe extern "C" fn(x: ::std::os::raw::c_int, y: ::std::os::raw::c_int),
-    >,
-    pub ImeWindowHandle: *mut ::std::os::raw::c_void,
-    pub RenderDrawListsFnUnused: *mut ::std::os::raw::c_void,
+    pub ClipboardUserData: *mut cty::c_void,
+    pub ImeSetInputScreenPosFn:
+        ::core::option::Option<unsafe extern "C" fn(x: cty::c_int, y: cty::c_int)>,
+    pub ImeWindowHandle: *mut cty::c_void,
+    pub RenderDrawListsFnUnused: *mut cty::c_void,
     pub MousePos: ImVec2,
     pub MouseDown: [bool; 5usize],
     pub MouseWheel: f32,
@@ -2068,11 +852,11 @@ pub struct ImGuiIO {
     pub NavActive: bool,
     pub NavVisible: bool,
     pub Framerate: f32,
-    pub MetricsRenderVertices: ::std::os::raw::c_int,
-    pub MetricsRenderIndices: ::std::os::raw::c_int,
-    pub MetricsRenderWindows: ::std::os::raw::c_int,
-    pub MetricsActiveWindows: ::std::os::raw::c_int,
-    pub MetricsActiveAllocations: ::std::os::raw::c_int,
+    pub MetricsRenderVertices: cty::c_int,
+    pub MetricsRenderIndices: cty::c_int,
+    pub MetricsRenderWindows: cty::c_int,
+    pub MetricsActiveWindows: cty::c_int,
+    pub MetricsActiveAllocations: cty::c_int,
     pub MouseDelta: ImVec2,
     pub KeyMods: ImGuiKeyModFlags,
     pub MousePosPrev: ImVec2,
@@ -2095,840 +879,14 @@ pub struct ImGuiIO {
     pub InputQueueSurrogate: ImWchar16,
     pub InputQueueCharacters: ImVector_ImWchar,
 }
-#[test]
-fn bindgen_test_layout_ImGuiIO() {
-    assert_eq!(
-        ::std::mem::size_of::<ImGuiIO>(),
-        5472usize,
-        concat!("Size of: ", stringify!(ImGuiIO))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<ImGuiIO>(),
-        8usize,
-        concat!("Alignment of ", stringify!(ImGuiIO))
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiIO>())).ConfigFlags as *const _ as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiIO),
-            "::",
-            stringify!(ConfigFlags)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiIO>())).BackendFlags as *const _ as usize },
-        4usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiIO),
-            "::",
-            stringify!(BackendFlags)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiIO>())).DisplaySize as *const _ as usize },
-        8usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiIO),
-            "::",
-            stringify!(DisplaySize)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiIO>())).DeltaTime as *const _ as usize },
-        16usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiIO),
-            "::",
-            stringify!(DeltaTime)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiIO>())).IniSavingRate as *const _ as usize },
-        20usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiIO),
-            "::",
-            stringify!(IniSavingRate)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiIO>())).IniFilename as *const _ as usize },
-        24usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiIO),
-            "::",
-            stringify!(IniFilename)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiIO>())).LogFilename as *const _ as usize },
-        32usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiIO),
-            "::",
-            stringify!(LogFilename)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiIO>())).MouseDoubleClickTime as *const _ as usize },
-        40usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiIO),
-            "::",
-            stringify!(MouseDoubleClickTime)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiIO>())).MouseDoubleClickMaxDist as *const _ as usize },
-        44usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiIO),
-            "::",
-            stringify!(MouseDoubleClickMaxDist)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiIO>())).MouseDragThreshold as *const _ as usize },
-        48usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiIO),
-            "::",
-            stringify!(MouseDragThreshold)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiIO>())).KeyMap as *const _ as usize },
-        52usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiIO),
-            "::",
-            stringify!(KeyMap)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiIO>())).KeyRepeatDelay as *const _ as usize },
-        140usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiIO),
-            "::",
-            stringify!(KeyRepeatDelay)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiIO>())).KeyRepeatRate as *const _ as usize },
-        144usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiIO),
-            "::",
-            stringify!(KeyRepeatRate)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiIO>())).UserData as *const _ as usize },
-        152usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiIO),
-            "::",
-            stringify!(UserData)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiIO>())).Fonts as *const _ as usize },
-        160usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiIO),
-            "::",
-            stringify!(Fonts)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiIO>())).FontGlobalScale as *const _ as usize },
-        168usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiIO),
-            "::",
-            stringify!(FontGlobalScale)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiIO>())).FontAllowUserScaling as *const _ as usize },
-        172usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiIO),
-            "::",
-            stringify!(FontAllowUserScaling)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiIO>())).FontDefault as *const _ as usize },
-        176usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiIO),
-            "::",
-            stringify!(FontDefault)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiIO>())).DisplayFramebufferScale as *const _ as usize },
-        184usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiIO),
-            "::",
-            stringify!(DisplayFramebufferScale)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiIO>())).MouseDrawCursor as *const _ as usize },
-        192usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiIO),
-            "::",
-            stringify!(MouseDrawCursor)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiIO>())).ConfigMacOSXBehaviors as *const _ as usize },
-        193usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiIO),
-            "::",
-            stringify!(ConfigMacOSXBehaviors)
-        )
-    );
-    assert_eq!(
-        unsafe {
-            &(*(::std::ptr::null::<ImGuiIO>())).ConfigInputTextCursorBlink as *const _ as usize
-        },
-        194usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiIO),
-            "::",
-            stringify!(ConfigInputTextCursorBlink)
-        )
-    );
-    assert_eq!(
-        unsafe {
-            &(*(::std::ptr::null::<ImGuiIO>())).ConfigWindowsResizeFromEdges as *const _ as usize
-        },
-        195usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiIO),
-            "::",
-            stringify!(ConfigWindowsResizeFromEdges)
-        )
-    );
-    assert_eq!(
-        unsafe {
-            &(*(::std::ptr::null::<ImGuiIO>())).ConfigWindowsMoveFromTitleBarOnly as *const _
-                as usize
-        },
-        196usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiIO),
-            "::",
-            stringify!(ConfigWindowsMoveFromTitleBarOnly)
-        )
-    );
-    assert_eq!(
-        unsafe {
-            &(*(::std::ptr::null::<ImGuiIO>())).ConfigWindowsMemoryCompactTimer as *const _ as usize
-        },
-        200usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiIO),
-            "::",
-            stringify!(ConfigWindowsMemoryCompactTimer)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiIO>())).BackendPlatformName as *const _ as usize },
-        208usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiIO),
-            "::",
-            stringify!(BackendPlatformName)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiIO>())).BackendRendererName as *const _ as usize },
-        216usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiIO),
-            "::",
-            stringify!(BackendRendererName)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiIO>())).BackendPlatformUserData as *const _ as usize },
-        224usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiIO),
-            "::",
-            stringify!(BackendPlatformUserData)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiIO>())).BackendRendererUserData as *const _ as usize },
-        232usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiIO),
-            "::",
-            stringify!(BackendRendererUserData)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiIO>())).BackendLanguageUserData as *const _ as usize },
-        240usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiIO),
-            "::",
-            stringify!(BackendLanguageUserData)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiIO>())).GetClipboardTextFn as *const _ as usize },
-        248usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiIO),
-            "::",
-            stringify!(GetClipboardTextFn)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiIO>())).SetClipboardTextFn as *const _ as usize },
-        256usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiIO),
-            "::",
-            stringify!(SetClipboardTextFn)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiIO>())).ClipboardUserData as *const _ as usize },
-        264usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiIO),
-            "::",
-            stringify!(ClipboardUserData)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiIO>())).ImeSetInputScreenPosFn as *const _ as usize },
-        272usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiIO),
-            "::",
-            stringify!(ImeSetInputScreenPosFn)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiIO>())).ImeWindowHandle as *const _ as usize },
-        280usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiIO),
-            "::",
-            stringify!(ImeWindowHandle)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiIO>())).RenderDrawListsFnUnused as *const _ as usize },
-        288usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiIO),
-            "::",
-            stringify!(RenderDrawListsFnUnused)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiIO>())).MousePos as *const _ as usize },
-        296usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiIO),
-            "::",
-            stringify!(MousePos)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiIO>())).MouseDown as *const _ as usize },
-        304usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiIO),
-            "::",
-            stringify!(MouseDown)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiIO>())).MouseWheel as *const _ as usize },
-        312usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiIO),
-            "::",
-            stringify!(MouseWheel)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiIO>())).MouseWheelH as *const _ as usize },
-        316usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiIO),
-            "::",
-            stringify!(MouseWheelH)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiIO>())).KeyCtrl as *const _ as usize },
-        320usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiIO),
-            "::",
-            stringify!(KeyCtrl)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiIO>())).KeyShift as *const _ as usize },
-        321usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiIO),
-            "::",
-            stringify!(KeyShift)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiIO>())).KeyAlt as *const _ as usize },
-        322usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiIO),
-            "::",
-            stringify!(KeyAlt)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiIO>())).KeySuper as *const _ as usize },
-        323usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiIO),
-            "::",
-            stringify!(KeySuper)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiIO>())).KeysDown as *const _ as usize },
-        324usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiIO),
-            "::",
-            stringify!(KeysDown)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiIO>())).NavInputs as *const _ as usize },
-        836usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiIO),
-            "::",
-            stringify!(NavInputs)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiIO>())).WantCaptureMouse as *const _ as usize },
-        920usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiIO),
-            "::",
-            stringify!(WantCaptureMouse)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiIO>())).WantCaptureKeyboard as *const _ as usize },
-        921usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiIO),
-            "::",
-            stringify!(WantCaptureKeyboard)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiIO>())).WantTextInput as *const _ as usize },
-        922usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiIO),
-            "::",
-            stringify!(WantTextInput)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiIO>())).WantSetMousePos as *const _ as usize },
-        923usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiIO),
-            "::",
-            stringify!(WantSetMousePos)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiIO>())).WantSaveIniSettings as *const _ as usize },
-        924usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiIO),
-            "::",
-            stringify!(WantSaveIniSettings)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiIO>())).NavActive as *const _ as usize },
-        925usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiIO),
-            "::",
-            stringify!(NavActive)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiIO>())).NavVisible as *const _ as usize },
-        926usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiIO),
-            "::",
-            stringify!(NavVisible)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiIO>())).Framerate as *const _ as usize },
-        928usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiIO),
-            "::",
-            stringify!(Framerate)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiIO>())).MetricsRenderVertices as *const _ as usize },
-        932usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiIO),
-            "::",
-            stringify!(MetricsRenderVertices)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiIO>())).MetricsRenderIndices as *const _ as usize },
-        936usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiIO),
-            "::",
-            stringify!(MetricsRenderIndices)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiIO>())).MetricsRenderWindows as *const _ as usize },
-        940usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiIO),
-            "::",
-            stringify!(MetricsRenderWindows)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiIO>())).MetricsActiveWindows as *const _ as usize },
-        944usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiIO),
-            "::",
-            stringify!(MetricsActiveWindows)
-        )
-    );
-    assert_eq!(
-        unsafe {
-            &(*(::std::ptr::null::<ImGuiIO>())).MetricsActiveAllocations as *const _ as usize
-        },
-        948usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiIO),
-            "::",
-            stringify!(MetricsActiveAllocations)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiIO>())).MouseDelta as *const _ as usize },
-        952usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiIO),
-            "::",
-            stringify!(MouseDelta)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiIO>())).KeyMods as *const _ as usize },
-        960usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiIO),
-            "::",
-            stringify!(KeyMods)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiIO>())).MousePosPrev as *const _ as usize },
-        964usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiIO),
-            "::",
-            stringify!(MousePosPrev)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiIO>())).MouseClickedPos as *const _ as usize },
-        972usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiIO),
-            "::",
-            stringify!(MouseClickedPos)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiIO>())).MouseClickedTime as *const _ as usize },
-        1016usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiIO),
-            "::",
-            stringify!(MouseClickedTime)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiIO>())).MouseClicked as *const _ as usize },
-        1056usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiIO),
-            "::",
-            stringify!(MouseClicked)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiIO>())).MouseDoubleClicked as *const _ as usize },
-        1061usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiIO),
-            "::",
-            stringify!(MouseDoubleClicked)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiIO>())).MouseReleased as *const _ as usize },
-        1066usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiIO),
-            "::",
-            stringify!(MouseReleased)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiIO>())).MouseDownOwned as *const _ as usize },
-        1071usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiIO),
-            "::",
-            stringify!(MouseDownOwned)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiIO>())).MouseDownWasDoubleClick as *const _ as usize },
-        1076usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiIO),
-            "::",
-            stringify!(MouseDownWasDoubleClick)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiIO>())).MouseDownDuration as *const _ as usize },
-        1084usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiIO),
-            "::",
-            stringify!(MouseDownDuration)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiIO>())).MouseDownDurationPrev as *const _ as usize },
-        1104usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiIO),
-            "::",
-            stringify!(MouseDownDurationPrev)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiIO>())).MouseDragMaxDistanceAbs as *const _ as usize },
-        1124usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiIO),
-            "::",
-            stringify!(MouseDragMaxDistanceAbs)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiIO>())).MouseDragMaxDistanceSqr as *const _ as usize },
-        1164usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiIO),
-            "::",
-            stringify!(MouseDragMaxDistanceSqr)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiIO>())).KeysDownDuration as *const _ as usize },
-        1184usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiIO),
-            "::",
-            stringify!(KeysDownDuration)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiIO>())).KeysDownDurationPrev as *const _ as usize },
-        3232usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiIO),
-            "::",
-            stringify!(KeysDownDurationPrev)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiIO>())).NavInputsDownDuration as *const _ as usize },
-        5280usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiIO),
-            "::",
-            stringify!(NavInputsDownDuration)
-        )
-    );
-    assert_eq!(
-        unsafe {
-            &(*(::std::ptr::null::<ImGuiIO>())).NavInputsDownDurationPrev as *const _ as usize
-        },
-        5364usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiIO),
-            "::",
-            stringify!(NavInputsDownDurationPrev)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiIO>())).PenPressure as *const _ as usize },
-        5448usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiIO),
-            "::",
-            stringify!(PenPressure)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiIO>())).InputQueueSurrogate as *const _ as usize },
-        5452usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiIO),
-            "::",
-            stringify!(InputQueueSurrogate)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiIO>())).InputQueueCharacters as *const _ as usize },
-        5456usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiIO),
-            "::",
-            stringify!(InputQueueCharacters)
-        )
-    );
-}
 impl Default for ImGuiIO {
     fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
+        unsafe { ::core::mem::zeroed() }
     }
 }
-impl ::std::fmt::Debug for ImGuiIO {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        write ! (f , "ImGuiIO {{ ConfigFlags: {:?}, BackendFlags: {:?}, DisplaySize: {:?}, DeltaTime: {:?}, IniSavingRate: {:?}, IniFilename: {:?}, LogFilename: {:?}, MouseDoubleClickTime: {:?}, MouseDoubleClickMaxDist: {:?}, MouseDragThreshold: {:?}, KeyMap: {:?}, KeyRepeatDelay: {:?}, KeyRepeatRate: {:?}, UserData: {:?}, Fonts: {:?}, FontGlobalScale: {:?}, FontAllowUserScaling: {:?}, FontDefault: {:?}, DisplayFramebufferScale: {:?}, MouseDrawCursor: {:?}, ConfigMacOSXBehaviors: {:?}, ConfigInputTextCursorBlink: {:?}, ConfigWindowsResizeFromEdges: {:?}, ConfigWindowsMoveFromTitleBarOnly: {:?}, ConfigWindowsMemoryCompactTimer: {:?}, BackendPlatformName: {:?}, BackendRendererName: {:?}, BackendPlatformUserData: {:?}, BackendRendererUserData: {:?}, BackendLanguageUserData: {:?}, GetClipboardTextFn: {:?}, SetClipboardTextFn: {:?}, ClipboardUserData: {:?}, ImeSetInputScreenPosFn: {:?}, ImeWindowHandle: {:?}, RenderDrawListsFnUnused: {:?}, MousePos: {:?}, MouseDown: {:?}, MouseWheel: {:?}, MouseWheelH: {:?}, KeyCtrl: {:?}, KeyShift: {:?}, KeyAlt: {:?}, KeySuper: {:?}, KeysDown: [{}], NavInputs: {:?}, WantCaptureMouse: {:?}, WantCaptureKeyboard: {:?}, WantTextInput: {:?}, WantSetMousePos: {:?}, WantSaveIniSettings: {:?}, NavActive: {:?}, NavVisible: {:?}, Framerate: {:?}, MetricsRenderVertices: {:?}, MetricsRenderIndices: {:?}, MetricsRenderWindows: {:?}, MetricsActiveWindows: {:?}, MetricsActiveAllocations: {:?}, MouseDelta: {:?}, KeyMods: {:?}, MousePosPrev: {:?}, MouseClickedPos: {:?}, MouseClickedTime: {:?}, MouseClicked: {:?}, MouseDoubleClicked: {:?}, MouseReleased: {:?}, MouseDownOwned: {:?}, MouseDownWasDoubleClick: {:?}, MouseDownDuration: {:?}, MouseDownDurationPrev: {:?}, MouseDragMaxDistanceAbs: {:?}, MouseDragMaxDistanceSqr: {:?}, KeysDownDuration: [{}], KeysDownDurationPrev: [{}], NavInputsDownDuration: {:?}, NavInputsDownDurationPrev: {:?}, PenPressure: {:?}, InputQueueSurrogate: {:?}, InputQueueCharacters: {:?} }}" , self . ConfigFlags , self . BackendFlags , self . DisplaySize , self . DeltaTime , self . IniSavingRate , self . IniFilename , self . LogFilename , self . MouseDoubleClickTime , self . MouseDoubleClickMaxDist , self . MouseDragThreshold , self . KeyMap , self . KeyRepeatDelay , self . KeyRepeatRate , self . UserData , self . Fonts , self . FontGlobalScale , self . FontAllowUserScaling , self . FontDefault , self . DisplayFramebufferScale , self . MouseDrawCursor , self . ConfigMacOSXBehaviors , self . ConfigInputTextCursorBlink , self . ConfigWindowsResizeFromEdges , self . ConfigWindowsMoveFromTitleBarOnly , self . ConfigWindowsMemoryCompactTimer , self . BackendPlatformName , self . BackendRendererName , self . BackendPlatformUserData , self . BackendRendererUserData , self . BackendLanguageUserData , self . GetClipboardTextFn , self . SetClipboardTextFn , self . ClipboardUserData , self . ImeSetInputScreenPosFn , self . ImeWindowHandle , self . RenderDrawListsFnUnused , self . MousePos , self . MouseDown , self . MouseWheel , self . MouseWheelH , self . KeyCtrl , self . KeyShift , self . KeyAlt , self . KeySuper , self . KeysDown . iter () . enumerate () . map (| (i , v) | format ! ("{}{:?}" , if i > 0 { ", " } else { "" } , v)) . collect :: < String > () , self . NavInputs , self . WantCaptureMouse , self . WantCaptureKeyboard , self . WantTextInput , self . WantSetMousePos , self . WantSaveIniSettings , self . NavActive , self . NavVisible , self . Framerate , self . MetricsRenderVertices , self . MetricsRenderIndices , self . MetricsRenderWindows , self . MetricsActiveWindows , self . MetricsActiveAllocations , self . MouseDelta , self . KeyMods , self . MousePosPrev , self . MouseClickedPos , self . MouseClickedTime , self . MouseClicked , self . MouseDoubleClicked , self . MouseReleased , self . MouseDownOwned , self . MouseDownWasDoubleClick , self . MouseDownDuration , self . MouseDownDurationPrev , self . MouseDragMaxDistanceAbs , self . MouseDragMaxDistanceSqr , self . KeysDownDuration . iter () . enumerate () . map (| (i , v) | format ! ("{}{:?}" , if i > 0 { ", " } else { "" } , v)) . collect :: < String > () , self . KeysDownDurationPrev . iter () . enumerate () . map (| (i , v) | format ! ("{}{:?}" , if i > 0 { ", " } else { "" } , v)) . collect :: < String > () , self . NavInputsDownDuration , self . NavInputsDownDurationPrev , self . PenPressure , self . InputQueueSurrogate , self . InputQueueCharacters)
+impl ::core::fmt::Debug for ImGuiIO {
+    fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
+        write ! (f , "ImGuiIO {{ ConfigFlags: {:?}, BackendFlags: {:?}, DisplaySize: {:?}, DeltaTime: {:?}, IniSavingRate: {:?}, IniFilename: {:?}, LogFilename: {:?}, MouseDoubleClickTime: {:?}, MouseDoubleClickMaxDist: {:?}, MouseDragThreshold: {:?}, KeyMap: {:?}, KeyRepeatDelay: {:?}, KeyRepeatRate: {:?}, UserData: {:?}, Fonts: {:?}, FontGlobalScale: {:?}, FontAllowUserScaling: {:?}, FontDefault: {:?}, DisplayFramebufferScale: {:?}, MouseDrawCursor: {:?}, ConfigMacOSXBehaviors: {:?}, ConfigInputTextCursorBlink: {:?}, ConfigWindowsResizeFromEdges: {:?}, ConfigWindowsMoveFromTitleBarOnly: {:?}, ConfigWindowsMemoryCompactTimer: {:?}, BackendPlatformName: {:?}, BackendRendererName: {:?}, BackendPlatformUserData: {:?}, BackendRendererUserData: {:?}, BackendLanguageUserData: {:?}, GetClipboardTextFn: {:?}, SetClipboardTextFn: {:?}, ClipboardUserData: {:?}, ImeSetInputScreenPosFn: {:?}, ImeWindowHandle: {:?}, RenderDrawListsFnUnused: {:?}, MousePos: {:?}, MouseDown: {:?}, MouseWheel: {:?}, MouseWheelH: {:?}, KeyCtrl: {:?}, KeyShift: {:?}, KeyAlt: {:?}, KeySuper: {:?}, KeysDown: [...], NavInputs: {:?}, WantCaptureMouse: {:?}, WantCaptureKeyboard: {:?}, WantTextInput: {:?}, WantSetMousePos: {:?}, WantSaveIniSettings: {:?}, NavActive: {:?}, NavVisible: {:?}, Framerate: {:?}, MetricsRenderVertices: {:?}, MetricsRenderIndices: {:?}, MetricsRenderWindows: {:?}, MetricsActiveWindows: {:?}, MetricsActiveAllocations: {:?}, MouseDelta: {:?}, KeyMods: {:?}, MousePosPrev: {:?}, MouseClickedPos: {:?}, MouseClickedTime: {:?}, MouseClicked: {:?}, MouseDoubleClicked: {:?}, MouseReleased: {:?}, MouseDownOwned: {:?}, MouseDownWasDoubleClick: {:?}, MouseDownDuration: {:?}, MouseDownDurationPrev: {:?}, MouseDragMaxDistanceAbs: {:?}, MouseDragMaxDistanceSqr: {:?}, KeysDownDuration: [...], KeysDownDurationPrev: [...], NavInputsDownDuration: {:?}, NavInputsDownDurationPrev: {:?}, PenPressure: {:?}, InputQueueSurrogate: {:?}, InputQueueCharacters: {:?} }}" , self . ConfigFlags , self . BackendFlags , self . DisplaySize , self . DeltaTime , self . IniSavingRate , self . IniFilename , self . LogFilename , self . MouseDoubleClickTime , self . MouseDoubleClickMaxDist , self . MouseDragThreshold , self . KeyMap , self . KeyRepeatDelay , self . KeyRepeatRate , self . UserData , self . Fonts , self . FontGlobalScale , self . FontAllowUserScaling , self . FontDefault , self . DisplayFramebufferScale , self . MouseDrawCursor , self . ConfigMacOSXBehaviors , self . ConfigInputTextCursorBlink , self . ConfigWindowsResizeFromEdges , self . ConfigWindowsMoveFromTitleBarOnly , self . ConfigWindowsMemoryCompactTimer , self . BackendPlatformName , self . BackendRendererName , self . BackendPlatformUserData , self . BackendRendererUserData , self . BackendLanguageUserData , self . GetClipboardTextFn , self . SetClipboardTextFn , self . ClipboardUserData , self . ImeSetInputScreenPosFn , self . ImeWindowHandle , self . RenderDrawListsFnUnused , self . MousePos , self . MouseDown , self . MouseWheel , self . MouseWheelH , self . KeyCtrl , self . KeyShift , self . KeyAlt , self . KeySuper , self . NavInputs , self . WantCaptureMouse , self . WantCaptureKeyboard , self . WantTextInput , self . WantSetMousePos , self . WantSaveIniSettings , self . NavActive , self . NavVisible , self . Framerate , self . MetricsRenderVertices , self . MetricsRenderIndices , self . MetricsRenderWindows , self . MetricsActiveWindows , self . MetricsActiveAllocations , self . MouseDelta , self . KeyMods , self . MousePosPrev , self . MouseClickedPos , self . MouseClickedTime , self . MouseClicked , self . MouseDoubleClicked , self . MouseReleased , self . MouseDownOwned , self . MouseDownWasDoubleClick , self . MouseDownDuration , self . MouseDownDurationPrev , self . MouseDragMaxDistanceAbs , self . MouseDragMaxDistanceSqr , self . NavInputsDownDuration , self . NavInputsDownDurationPrev , self . PenPressure , self . InputQueueSurrogate , self . InputQueueCharacters)
     }
 }
 #[repr(C)]
@@ -2936,502 +894,91 @@ impl ::std::fmt::Debug for ImGuiIO {
 pub struct ImGuiInputTextCallbackData {
     pub EventFlag: ImGuiInputTextFlags,
     pub Flags: ImGuiInputTextFlags,
-    pub UserData: *mut ::std::os::raw::c_void,
+    pub UserData: *mut cty::c_void,
     pub EventChar: ImWchar,
     pub EventKey: ImGuiKey,
-    pub Buf: *mut ::std::os::raw::c_char,
-    pub BufTextLen: ::std::os::raw::c_int,
-    pub BufSize: ::std::os::raw::c_int,
+    pub Buf: *mut cty::c_char,
+    pub BufTextLen: cty::c_int,
+    pub BufSize: cty::c_int,
     pub BufDirty: bool,
-    pub CursorPos: ::std::os::raw::c_int,
-    pub SelectionStart: ::std::os::raw::c_int,
-    pub SelectionEnd: ::std::os::raw::c_int,
-}
-#[test]
-fn bindgen_test_layout_ImGuiInputTextCallbackData() {
-    assert_eq!(
-        ::std::mem::size_of::<ImGuiInputTextCallbackData>(),
-        56usize,
-        concat!("Size of: ", stringify!(ImGuiInputTextCallbackData))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<ImGuiInputTextCallbackData>(),
-        8usize,
-        concat!("Alignment of ", stringify!(ImGuiInputTextCallbackData))
-    );
-    assert_eq!(
-        unsafe {
-            &(*(::std::ptr::null::<ImGuiInputTextCallbackData>())).EventFlag as *const _ as usize
-        },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiInputTextCallbackData),
-            "::",
-            stringify!(EventFlag)
-        )
-    );
-    assert_eq!(
-        unsafe {
-            &(*(::std::ptr::null::<ImGuiInputTextCallbackData>())).Flags as *const _ as usize
-        },
-        4usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiInputTextCallbackData),
-            "::",
-            stringify!(Flags)
-        )
-    );
-    assert_eq!(
-        unsafe {
-            &(*(::std::ptr::null::<ImGuiInputTextCallbackData>())).UserData as *const _ as usize
-        },
-        8usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiInputTextCallbackData),
-            "::",
-            stringify!(UserData)
-        )
-    );
-    assert_eq!(
-        unsafe {
-            &(*(::std::ptr::null::<ImGuiInputTextCallbackData>())).EventChar as *const _ as usize
-        },
-        16usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiInputTextCallbackData),
-            "::",
-            stringify!(EventChar)
-        )
-    );
-    assert_eq!(
-        unsafe {
-            &(*(::std::ptr::null::<ImGuiInputTextCallbackData>())).EventKey as *const _ as usize
-        },
-        20usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiInputTextCallbackData),
-            "::",
-            stringify!(EventKey)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiInputTextCallbackData>())).Buf as *const _ as usize },
-        24usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiInputTextCallbackData),
-            "::",
-            stringify!(Buf)
-        )
-    );
-    assert_eq!(
-        unsafe {
-            &(*(::std::ptr::null::<ImGuiInputTextCallbackData>())).BufTextLen as *const _ as usize
-        },
-        32usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiInputTextCallbackData),
-            "::",
-            stringify!(BufTextLen)
-        )
-    );
-    assert_eq!(
-        unsafe {
-            &(*(::std::ptr::null::<ImGuiInputTextCallbackData>())).BufSize as *const _ as usize
-        },
-        36usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiInputTextCallbackData),
-            "::",
-            stringify!(BufSize)
-        )
-    );
-    assert_eq!(
-        unsafe {
-            &(*(::std::ptr::null::<ImGuiInputTextCallbackData>())).BufDirty as *const _ as usize
-        },
-        40usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiInputTextCallbackData),
-            "::",
-            stringify!(BufDirty)
-        )
-    );
-    assert_eq!(
-        unsafe {
-            &(*(::std::ptr::null::<ImGuiInputTextCallbackData>())).CursorPos as *const _ as usize
-        },
-        44usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiInputTextCallbackData),
-            "::",
-            stringify!(CursorPos)
-        )
-    );
-    assert_eq!(
-        unsafe {
-            &(*(::std::ptr::null::<ImGuiInputTextCallbackData>())).SelectionStart as *const _
-                as usize
-        },
-        48usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiInputTextCallbackData),
-            "::",
-            stringify!(SelectionStart)
-        )
-    );
-    assert_eq!(
-        unsafe {
-            &(*(::std::ptr::null::<ImGuiInputTextCallbackData>())).SelectionEnd as *const _ as usize
-        },
-        52usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiInputTextCallbackData),
-            "::",
-            stringify!(SelectionEnd)
-        )
-    );
+    pub CursorPos: cty::c_int,
+    pub SelectionStart: cty::c_int,
+    pub SelectionEnd: cty::c_int,
 }
 impl Default for ImGuiInputTextCallbackData {
     fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
+        unsafe { ::core::mem::zeroed() }
     }
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub struct ImGuiSizeCallbackData {
-    pub UserData: *mut ::std::os::raw::c_void,
+    pub UserData: *mut cty::c_void,
     pub Pos: ImVec2,
     pub CurrentSize: ImVec2,
     pub DesiredSize: ImVec2,
 }
-#[test]
-fn bindgen_test_layout_ImGuiSizeCallbackData() {
-    assert_eq!(
-        ::std::mem::size_of::<ImGuiSizeCallbackData>(),
-        32usize,
-        concat!("Size of: ", stringify!(ImGuiSizeCallbackData))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<ImGuiSizeCallbackData>(),
-        8usize,
-        concat!("Alignment of ", stringify!(ImGuiSizeCallbackData))
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiSizeCallbackData>())).UserData as *const _ as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiSizeCallbackData),
-            "::",
-            stringify!(UserData)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiSizeCallbackData>())).Pos as *const _ as usize },
-        8usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiSizeCallbackData),
-            "::",
-            stringify!(Pos)
-        )
-    );
-    assert_eq!(
-        unsafe {
-            &(*(::std::ptr::null::<ImGuiSizeCallbackData>())).CurrentSize as *const _ as usize
-        },
-        16usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiSizeCallbackData),
-            "::",
-            stringify!(CurrentSize)
-        )
-    );
-    assert_eq!(
-        unsafe {
-            &(*(::std::ptr::null::<ImGuiSizeCallbackData>())).DesiredSize as *const _ as usize
-        },
-        24usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiSizeCallbackData),
-            "::",
-            stringify!(DesiredSize)
-        )
-    );
-}
 impl Default for ImGuiSizeCallbackData {
     fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
+        unsafe { ::core::mem::zeroed() }
     }
 }
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub struct ImGuiPayload {
-    pub Data: *mut ::std::os::raw::c_void,
-    pub DataSize: ::std::os::raw::c_int,
+    pub Data: *mut cty::c_void,
+    pub DataSize: cty::c_int,
     pub SourceId: ImGuiID,
     pub SourceParentId: ImGuiID,
-    pub DataFrameCount: ::std::os::raw::c_int,
-    pub DataType: [::std::os::raw::c_char; 33usize],
+    pub DataFrameCount: cty::c_int,
+    pub DataType: [cty::c_char; 33usize],
     pub Preview: bool,
     pub Delivery: bool,
 }
-#[test]
-fn bindgen_test_layout_ImGuiPayload() {
-    assert_eq!(
-        ::std::mem::size_of::<ImGuiPayload>(),
-        64usize,
-        concat!("Size of: ", stringify!(ImGuiPayload))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<ImGuiPayload>(),
-        8usize,
-        concat!("Alignment of ", stringify!(ImGuiPayload))
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiPayload>())).Data as *const _ as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiPayload),
-            "::",
-            stringify!(Data)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiPayload>())).DataSize as *const _ as usize },
-        8usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiPayload),
-            "::",
-            stringify!(DataSize)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiPayload>())).SourceId as *const _ as usize },
-        12usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiPayload),
-            "::",
-            stringify!(SourceId)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiPayload>())).SourceParentId as *const _ as usize },
-        16usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiPayload),
-            "::",
-            stringify!(SourceParentId)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiPayload>())).DataFrameCount as *const _ as usize },
-        20usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiPayload),
-            "::",
-            stringify!(DataFrameCount)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiPayload>())).DataType as *const _ as usize },
-        24usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiPayload),
-            "::",
-            stringify!(DataType)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiPayload>())).Preview as *const _ as usize },
-        57usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiPayload),
-            "::",
-            stringify!(Preview)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiPayload>())).Delivery as *const _ as usize },
-        58usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiPayload),
-            "::",
-            stringify!(Delivery)
-        )
-    );
-}
 impl Default for ImGuiPayload {
     fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
+        unsafe { ::core::mem::zeroed() }
     }
 }
-impl ::std::fmt::Debug for ImGuiPayload {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        write ! (f , "ImGuiPayload {{ Data: {:?}, DataSize: {:?}, SourceId: {:?}, SourceParentId: {:?}, DataFrameCount: {:?}, DataType: [{}], Preview: {:?}, Delivery: {:?} }}" , self . Data , self . DataSize , self . SourceId , self . SourceParentId , self . DataFrameCount , self . DataType . iter () . enumerate () . map (| (i , v) | format ! ("{}{:?}" , if i > 0 { ", " } else { "" } , v)) . collect :: < String > () , self . Preview , self . Delivery)
+impl ::core::fmt::Debug for ImGuiPayload {
+    fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
+        write ! (f , "ImGuiPayload {{ Data: {:?}, DataSize: {:?}, SourceId: {:?}, SourceParentId: {:?}, DataFrameCount: {:?}, DataType: [...], Preview: {:?}, Delivery: {:?} }}" , self . Data , self . DataSize , self . SourceId , self . SourceParentId , self . DataFrameCount , self . Preview , self . Delivery)
     }
 }
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone, Hash, PartialEq, Eq)]
 pub struct ImGuiOnceUponAFrame {
-    pub RefFrame: ::std::os::raw::c_int,
-}
-#[test]
-fn bindgen_test_layout_ImGuiOnceUponAFrame() {
-    assert_eq!(
-        ::std::mem::size_of::<ImGuiOnceUponAFrame>(),
-        4usize,
-        concat!("Size of: ", stringify!(ImGuiOnceUponAFrame))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<ImGuiOnceUponAFrame>(),
-        4usize,
-        concat!("Alignment of ", stringify!(ImGuiOnceUponAFrame))
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiOnceUponAFrame>())).RefFrame as *const _ as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiOnceUponAFrame),
-            "::",
-            stringify!(RefFrame)
-        )
-    );
+    pub RefFrame: cty::c_int,
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
 pub struct ImGuiTextRange {
-    pub b: *const ::std::os::raw::c_char,
-    pub e: *const ::std::os::raw::c_char,
-}
-#[test]
-fn bindgen_test_layout_ImGuiTextRange() {
-    assert_eq!(
-        ::std::mem::size_of::<ImGuiTextRange>(),
-        16usize,
-        concat!("Size of: ", stringify!(ImGuiTextRange))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<ImGuiTextRange>(),
-        8usize,
-        concat!("Alignment of ", stringify!(ImGuiTextRange))
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiTextRange>())).b as *const _ as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiTextRange),
-            "::",
-            stringify!(b)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiTextRange>())).e as *const _ as usize },
-        8usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiTextRange),
-            "::",
-            stringify!(e)
-        )
-    );
+    pub b: *const cty::c_char,
+    pub e: *const cty::c_char,
 }
 impl Default for ImGuiTextRange {
     fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
+        unsafe { ::core::mem::zeroed() }
     }
 }
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub struct ImGuiTextFilter {
-    pub InputBuf: [::std::os::raw::c_char; 256usize],
+    pub InputBuf: [cty::c_char; 256usize],
     pub Filters: ImVector_ImGuiTextRange,
-    pub CountGrep: ::std::os::raw::c_int,
-}
-#[test]
-fn bindgen_test_layout_ImGuiTextFilter() {
-    assert_eq!(
-        ::std::mem::size_of::<ImGuiTextFilter>(),
-        280usize,
-        concat!("Size of: ", stringify!(ImGuiTextFilter))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<ImGuiTextFilter>(),
-        8usize,
-        concat!("Alignment of ", stringify!(ImGuiTextFilter))
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiTextFilter>())).InputBuf as *const _ as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiTextFilter),
-            "::",
-            stringify!(InputBuf)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiTextFilter>())).Filters as *const _ as usize },
-        256usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiTextFilter),
-            "::",
-            stringify!(Filters)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiTextFilter>())).CountGrep as *const _ as usize },
-        272usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiTextFilter),
-            "::",
-            stringify!(CountGrep)
-        )
-    );
+    pub CountGrep: cty::c_int,
 }
 impl Default for ImGuiTextFilter {
     fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
+        unsafe { ::core::mem::zeroed() }
     }
 }
-impl ::std::fmt::Debug for ImGuiTextFilter {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+impl ::core::fmt::Debug for ImGuiTextFilter {
+    fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         write!(
             f,
-            "ImGuiTextFilter {{ InputBuf: [{}], Filters: {:?}, CountGrep: {:?} }}",
-            self.InputBuf
-                .iter()
-                .enumerate()
-                .map(|(i, v)| format!("{}{:?}", if i > 0 { ", " } else { "" }, v))
-                .collect::<String>(),
-            self.Filters,
-            self.CountGrep
+            "ImGuiTextFilter {{ InputBuf: [...], Filters: {:?}, CountGrep: {:?} }}",
+            self.Filters, self.CountGrep
         )
     }
 }
@@ -3440,32 +987,9 @@ impl ::std::fmt::Debug for ImGuiTextFilter {
 pub struct ImGuiTextBuffer {
     pub Buf: ImVector_char,
 }
-#[test]
-fn bindgen_test_layout_ImGuiTextBuffer() {
-    assert_eq!(
-        ::std::mem::size_of::<ImGuiTextBuffer>(),
-        16usize,
-        concat!("Size of: ", stringify!(ImGuiTextBuffer))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<ImGuiTextBuffer>(),
-        8usize,
-        concat!("Alignment of ", stringify!(ImGuiTextBuffer))
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiTextBuffer>())).Buf as *const _ as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiTextBuffer),
-            "::",
-            stringify!(Buf)
-        )
-    );
-}
 impl Default for ImGuiTextBuffer {
     fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
+        unsafe { ::core::mem::zeroed() }
     }
 }
 #[repr(C)]
@@ -3477,100 +1001,28 @@ pub struct ImGuiStoragePair {
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub union ImGuiStoragePair__bindgen_ty_1 {
-    pub val_i: ::std::os::raw::c_int,
+    pub val_i: cty::c_int,
     pub val_f: f32,
-    pub val_p: *mut ::std::os::raw::c_void,
+    pub val_p: *mut cty::c_void,
     _bindgen_union_align: u64,
-}
-#[test]
-fn bindgen_test_layout_ImGuiStoragePair__bindgen_ty_1() {
-    assert_eq!(
-        ::std::mem::size_of::<ImGuiStoragePair__bindgen_ty_1>(),
-        8usize,
-        concat!("Size of: ", stringify!(ImGuiStoragePair__bindgen_ty_1))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<ImGuiStoragePair__bindgen_ty_1>(),
-        8usize,
-        concat!("Alignment of ", stringify!(ImGuiStoragePair__bindgen_ty_1))
-    );
-    assert_eq!(
-        unsafe {
-            &(*(::std::ptr::null::<ImGuiStoragePair__bindgen_ty_1>())).val_i as *const _ as usize
-        },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiStoragePair__bindgen_ty_1),
-            "::",
-            stringify!(val_i)
-        )
-    );
-    assert_eq!(
-        unsafe {
-            &(*(::std::ptr::null::<ImGuiStoragePair__bindgen_ty_1>())).val_f as *const _ as usize
-        },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiStoragePair__bindgen_ty_1),
-            "::",
-            stringify!(val_f)
-        )
-    );
-    assert_eq!(
-        unsafe {
-            &(*(::std::ptr::null::<ImGuiStoragePair__bindgen_ty_1>())).val_p as *const _ as usize
-        },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiStoragePair__bindgen_ty_1),
-            "::",
-            stringify!(val_p)
-        )
-    );
 }
 impl Default for ImGuiStoragePair__bindgen_ty_1 {
     fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
+        unsafe { ::core::mem::zeroed() }
     }
 }
-impl ::std::fmt::Debug for ImGuiStoragePair__bindgen_ty_1 {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+impl ::core::fmt::Debug for ImGuiStoragePair__bindgen_ty_1 {
+    fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         write!(f, "ImGuiStoragePair__bindgen_ty_1 {{ union }}")
     }
 }
-#[test]
-fn bindgen_test_layout_ImGuiStoragePair() {
-    assert_eq!(
-        ::std::mem::size_of::<ImGuiStoragePair>(),
-        16usize,
-        concat!("Size of: ", stringify!(ImGuiStoragePair))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<ImGuiStoragePair>(),
-        8usize,
-        concat!("Alignment of ", stringify!(ImGuiStoragePair))
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiStoragePair>())).key as *const _ as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiStoragePair),
-            "::",
-            stringify!(key)
-        )
-    );
-}
 impl Default for ImGuiStoragePair {
     fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
+        unsafe { ::core::mem::zeroed() }
     }
 }
-impl ::std::fmt::Debug for ImGuiStoragePair {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+impl ::core::fmt::Debug for ImGuiStoragePair {
+    fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         write!(
             f,
             "ImGuiStoragePair {{ key: {:?}, __bindgen_anon_1: {:?} }}",
@@ -3583,242 +1035,40 @@ impl ::std::fmt::Debug for ImGuiStoragePair {
 pub struct ImGuiStorage {
     pub Data: ImVector_ImGuiStoragePair,
 }
-#[test]
-fn bindgen_test_layout_ImGuiStorage() {
-    assert_eq!(
-        ::std::mem::size_of::<ImGuiStorage>(),
-        16usize,
-        concat!("Size of: ", stringify!(ImGuiStorage))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<ImGuiStorage>(),
-        8usize,
-        concat!("Alignment of ", stringify!(ImGuiStorage))
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiStorage>())).Data as *const _ as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiStorage),
-            "::",
-            stringify!(Data)
-        )
-    );
-}
 impl Default for ImGuiStorage {
     fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
+        unsafe { ::core::mem::zeroed() }
     }
 }
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone, PartialEq)]
 pub struct ImGuiListClipper {
-    pub DisplayStart: ::std::os::raw::c_int,
-    pub DisplayEnd: ::std::os::raw::c_int,
-    pub ItemsCount: ::std::os::raw::c_int,
-    pub StepNo: ::std::os::raw::c_int,
+    pub DisplayStart: cty::c_int,
+    pub DisplayEnd: cty::c_int,
+    pub ItemsCount: cty::c_int,
+    pub StepNo: cty::c_int,
     pub ItemsHeight: f32,
     pub StartPosY: f32,
-}
-#[test]
-fn bindgen_test_layout_ImGuiListClipper() {
-    assert_eq!(
-        ::std::mem::size_of::<ImGuiListClipper>(),
-        24usize,
-        concat!("Size of: ", stringify!(ImGuiListClipper))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<ImGuiListClipper>(),
-        4usize,
-        concat!("Alignment of ", stringify!(ImGuiListClipper))
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiListClipper>())).DisplayStart as *const _ as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiListClipper),
-            "::",
-            stringify!(DisplayStart)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiListClipper>())).DisplayEnd as *const _ as usize },
-        4usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiListClipper),
-            "::",
-            stringify!(DisplayEnd)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiListClipper>())).ItemsCount as *const _ as usize },
-        8usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiListClipper),
-            "::",
-            stringify!(ItemsCount)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiListClipper>())).StepNo as *const _ as usize },
-        12usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiListClipper),
-            "::",
-            stringify!(StepNo)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiListClipper>())).ItemsHeight as *const _ as usize },
-        16usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiListClipper),
-            "::",
-            stringify!(ItemsHeight)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiListClipper>())).StartPosY as *const _ as usize },
-        20usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImGuiListClipper),
-            "::",
-            stringify!(StartPosY)
-        )
-    );
 }
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone, PartialEq)]
 pub struct ImColor {
     pub Value: ImVec4,
 }
-#[test]
-fn bindgen_test_layout_ImColor() {
-    assert_eq!(
-        ::std::mem::size_of::<ImColor>(),
-        16usize,
-        concat!("Size of: ", stringify!(ImColor))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<ImColor>(),
-        4usize,
-        concat!("Alignment of ", stringify!(ImColor))
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImColor>())).Value as *const _ as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImColor),
-            "::",
-            stringify!(Value)
-        )
-    );
-}
 #[repr(C)]
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub struct ImDrawCmd {
     pub ClipRect: ImVec4,
     pub TextureId: ImTextureID,
-    pub VtxOffset: ::std::os::raw::c_uint,
-    pub IdxOffset: ::std::os::raw::c_uint,
-    pub ElemCount: ::std::os::raw::c_uint,
+    pub VtxOffset: cty::c_uint,
+    pub IdxOffset: cty::c_uint,
+    pub ElemCount: cty::c_uint,
     pub UserCallback: ImDrawCallback,
-    pub UserCallbackData: *mut ::std::os::raw::c_void,
-}
-#[test]
-fn bindgen_test_layout_ImDrawCmd() {
-    assert_eq!(
-        ::std::mem::size_of::<ImDrawCmd>(),
-        56usize,
-        concat!("Size of: ", stringify!(ImDrawCmd))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<ImDrawCmd>(),
-        8usize,
-        concat!("Alignment of ", stringify!(ImDrawCmd))
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImDrawCmd>())).ClipRect as *const _ as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImDrawCmd),
-            "::",
-            stringify!(ClipRect)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImDrawCmd>())).TextureId as *const _ as usize },
-        16usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImDrawCmd),
-            "::",
-            stringify!(TextureId)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImDrawCmd>())).VtxOffset as *const _ as usize },
-        24usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImDrawCmd),
-            "::",
-            stringify!(VtxOffset)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImDrawCmd>())).IdxOffset as *const _ as usize },
-        28usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImDrawCmd),
-            "::",
-            stringify!(IdxOffset)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImDrawCmd>())).ElemCount as *const _ as usize },
-        32usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImDrawCmd),
-            "::",
-            stringify!(ElemCount)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImDrawCmd>())).UserCallback as *const _ as usize },
-        40usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImDrawCmd),
-            "::",
-            stringify!(UserCallback)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImDrawCmd>())).UserCallbackData as *const _ as usize },
-        48usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImDrawCmd),
-            "::",
-            stringify!(UserCallbackData)
-        )
-    );
+    pub UserCallbackData: *mut cty::c_void,
 }
 impl Default for ImDrawCmd {
     fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
+        unsafe { ::core::mem::zeroed() }
     }
 }
 #[repr(C)]
@@ -3828,146 +1078,27 @@ pub struct ImDrawVert {
     pub uv: ImVec2,
     pub col: ImU32,
 }
-#[test]
-fn bindgen_test_layout_ImDrawVert() {
-    assert_eq!(
-        ::std::mem::size_of::<ImDrawVert>(),
-        20usize,
-        concat!("Size of: ", stringify!(ImDrawVert))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<ImDrawVert>(),
-        4usize,
-        concat!("Alignment of ", stringify!(ImDrawVert))
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImDrawVert>())).pos as *const _ as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImDrawVert),
-            "::",
-            stringify!(pos)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImDrawVert>())).uv as *const _ as usize },
-        8usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImDrawVert),
-            "::",
-            stringify!(uv)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImDrawVert>())).col as *const _ as usize },
-        16usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImDrawVert),
-            "::",
-            stringify!(col)
-        )
-    );
-}
 #[repr(C)]
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
 pub struct ImDrawChannel {
     pub _CmdBuffer: ImVector_ImDrawCmd,
     pub _IdxBuffer: ImVector_ImDrawIdx,
 }
-#[test]
-fn bindgen_test_layout_ImDrawChannel() {
-    assert_eq!(
-        ::std::mem::size_of::<ImDrawChannel>(),
-        32usize,
-        concat!("Size of: ", stringify!(ImDrawChannel))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<ImDrawChannel>(),
-        8usize,
-        concat!("Alignment of ", stringify!(ImDrawChannel))
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImDrawChannel>()))._CmdBuffer as *const _ as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImDrawChannel),
-            "::",
-            stringify!(_CmdBuffer)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImDrawChannel>()))._IdxBuffer as *const _ as usize },
-        16usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImDrawChannel),
-            "::",
-            stringify!(_IdxBuffer)
-        )
-    );
-}
 impl Default for ImDrawChannel {
     fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
+        unsafe { ::core::mem::zeroed() }
     }
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
 pub struct ImDrawListSplitter {
-    pub _Current: ::std::os::raw::c_int,
-    pub _Count: ::std::os::raw::c_int,
+    pub _Current: cty::c_int,
+    pub _Count: cty::c_int,
     pub _Channels: ImVector_ImDrawChannel,
-}
-#[test]
-fn bindgen_test_layout_ImDrawListSplitter() {
-    assert_eq!(
-        ::std::mem::size_of::<ImDrawListSplitter>(),
-        24usize,
-        concat!("Size of: ", stringify!(ImDrawListSplitter))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<ImDrawListSplitter>(),
-        8usize,
-        concat!("Alignment of ", stringify!(ImDrawListSplitter))
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImDrawListSplitter>()))._Current as *const _ as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImDrawListSplitter),
-            "::",
-            stringify!(_Current)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImDrawListSplitter>()))._Count as *const _ as usize },
-        4usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImDrawListSplitter),
-            "::",
-            stringify!(_Count)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImDrawListSplitter>()))._Channels as *const _ as usize },
-        8usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImDrawListSplitter),
-            "::",
-            stringify!(_Channels)
-        )
-    );
 }
 impl Default for ImDrawListSplitter {
     fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
+        unsafe { ::core::mem::zeroed() }
     }
 }
 pub const ImDrawCornerFlags_None: ImDrawCornerFlags_ = 0;
@@ -3980,13 +1111,13 @@ pub const ImDrawCornerFlags_Bot: ImDrawCornerFlags_ = 12;
 pub const ImDrawCornerFlags_Left: ImDrawCornerFlags_ = 5;
 pub const ImDrawCornerFlags_Right: ImDrawCornerFlags_ = 10;
 pub const ImDrawCornerFlags_All: ImDrawCornerFlags_ = 15;
-pub type ImDrawCornerFlags_ = ::std::os::raw::c_uint;
+pub type ImDrawCornerFlags_ = cty::c_uint;
 pub const ImDrawListFlags_None: ImDrawListFlags_ = 0;
 pub const ImDrawListFlags_AntiAliasedLines: ImDrawListFlags_ = 1;
 pub const ImDrawListFlags_AntiAliasedLinesUseTex: ImDrawListFlags_ = 2;
 pub const ImDrawListFlags_AntiAliasedFill: ImDrawListFlags_ = 4;
 pub const ImDrawListFlags_AllowVtxOffset: ImDrawListFlags_ = 8;
-pub type ImDrawListFlags_ = ::std::os::raw::c_uint;
+pub type ImDrawListFlags_ = cty::c_uint;
 #[repr(C)]
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub struct ImDrawList {
@@ -3995,8 +1126,8 @@ pub struct ImDrawList {
     pub VtxBuffer: ImVector_ImDrawVert,
     pub Flags: ImDrawListFlags,
     pub _Data: *const ImDrawListSharedData,
-    pub _OwnerName: *const ::std::os::raw::c_char,
-    pub _VtxCurrentIdx: ::std::os::raw::c_uint,
+    pub _OwnerName: *const cty::c_char,
+    pub _VtxCurrentIdx: cty::c_uint,
     pub _VtxWritePtr: *mut ImDrawVert,
     pub _IdxWritePtr: *mut ImDrawIdx,
     pub _ClipRectStack: ImVector_ImVec4,
@@ -4005,162 +1136,9 @@ pub struct ImDrawList {
     pub _CmdHeader: ImDrawCmd,
     pub _Splitter: ImDrawListSplitter,
 }
-#[test]
-fn bindgen_test_layout_ImDrawList() {
-    assert_eq!(
-        ::std::mem::size_of::<ImDrawList>(),
-        224usize,
-        concat!("Size of: ", stringify!(ImDrawList))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<ImDrawList>(),
-        8usize,
-        concat!("Alignment of ", stringify!(ImDrawList))
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImDrawList>())).CmdBuffer as *const _ as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImDrawList),
-            "::",
-            stringify!(CmdBuffer)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImDrawList>())).IdxBuffer as *const _ as usize },
-        16usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImDrawList),
-            "::",
-            stringify!(IdxBuffer)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImDrawList>())).VtxBuffer as *const _ as usize },
-        32usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImDrawList),
-            "::",
-            stringify!(VtxBuffer)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImDrawList>())).Flags as *const _ as usize },
-        48usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImDrawList),
-            "::",
-            stringify!(Flags)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImDrawList>()))._Data as *const _ as usize },
-        56usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImDrawList),
-            "::",
-            stringify!(_Data)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImDrawList>()))._OwnerName as *const _ as usize },
-        64usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImDrawList),
-            "::",
-            stringify!(_OwnerName)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImDrawList>()))._VtxCurrentIdx as *const _ as usize },
-        72usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImDrawList),
-            "::",
-            stringify!(_VtxCurrentIdx)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImDrawList>()))._VtxWritePtr as *const _ as usize },
-        80usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImDrawList),
-            "::",
-            stringify!(_VtxWritePtr)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImDrawList>()))._IdxWritePtr as *const _ as usize },
-        88usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImDrawList),
-            "::",
-            stringify!(_IdxWritePtr)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImDrawList>()))._ClipRectStack as *const _ as usize },
-        96usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImDrawList),
-            "::",
-            stringify!(_ClipRectStack)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImDrawList>()))._TextureIdStack as *const _ as usize },
-        112usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImDrawList),
-            "::",
-            stringify!(_TextureIdStack)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImDrawList>()))._Path as *const _ as usize },
-        128usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImDrawList),
-            "::",
-            stringify!(_Path)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImDrawList>()))._CmdHeader as *const _ as usize },
-        144usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImDrawList),
-            "::",
-            stringify!(_CmdHeader)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImDrawList>()))._Splitter as *const _ as usize },
-        200usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImDrawList),
-            "::",
-            stringify!(_Splitter)
-        )
-    );
-}
 impl Default for ImDrawList {
     fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
+        unsafe { ::core::mem::zeroed() }
     }
 }
 #[repr(C)]
@@ -4168,121 +1146,28 @@ impl Default for ImDrawList {
 pub struct ImDrawData {
     pub Valid: bool,
     pub CmdLists: *mut *mut ImDrawList,
-    pub CmdListsCount: ::std::os::raw::c_int,
-    pub TotalIdxCount: ::std::os::raw::c_int,
-    pub TotalVtxCount: ::std::os::raw::c_int,
+    pub CmdListsCount: cty::c_int,
+    pub TotalIdxCount: cty::c_int,
+    pub TotalVtxCount: cty::c_int,
     pub DisplayPos: ImVec2,
     pub DisplaySize: ImVec2,
     pub FramebufferScale: ImVec2,
 }
-#[test]
-fn bindgen_test_layout_ImDrawData() {
-    assert_eq!(
-        ::std::mem::size_of::<ImDrawData>(),
-        56usize,
-        concat!("Size of: ", stringify!(ImDrawData))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<ImDrawData>(),
-        8usize,
-        concat!("Alignment of ", stringify!(ImDrawData))
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImDrawData>())).Valid as *const _ as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImDrawData),
-            "::",
-            stringify!(Valid)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImDrawData>())).CmdLists as *const _ as usize },
-        8usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImDrawData),
-            "::",
-            stringify!(CmdLists)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImDrawData>())).CmdListsCount as *const _ as usize },
-        16usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImDrawData),
-            "::",
-            stringify!(CmdListsCount)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImDrawData>())).TotalIdxCount as *const _ as usize },
-        20usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImDrawData),
-            "::",
-            stringify!(TotalIdxCount)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImDrawData>())).TotalVtxCount as *const _ as usize },
-        24usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImDrawData),
-            "::",
-            stringify!(TotalVtxCount)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImDrawData>())).DisplayPos as *const _ as usize },
-        28usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImDrawData),
-            "::",
-            stringify!(DisplayPos)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImDrawData>())).DisplaySize as *const _ as usize },
-        36usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImDrawData),
-            "::",
-            stringify!(DisplaySize)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImDrawData>())).FramebufferScale as *const _ as usize },
-        44usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImDrawData),
-            "::",
-            stringify!(FramebufferScale)
-        )
-    );
-}
 impl Default for ImDrawData {
     fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
+        unsafe { ::core::mem::zeroed() }
     }
 }
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub struct ImFontConfig {
-    pub FontData: *mut ::std::os::raw::c_void,
-    pub FontDataSize: ::std::os::raw::c_int,
+    pub FontData: *mut cty::c_void,
+    pub FontDataSize: cty::c_int,
     pub FontDataOwnedByAtlas: bool,
-    pub FontNo: ::std::os::raw::c_int,
+    pub FontNo: cty::c_int,
     pub SizePixels: f32,
-    pub OversampleH: ::std::os::raw::c_int,
-    pub OversampleV: ::std::os::raw::c_int,
+    pub OversampleH: cty::c_int,
+    pub OversampleV: cty::c_int,
     pub PixelSnapH: bool,
     pub GlyphExtraSpacing: ImVec2,
     pub GlyphOffset: ImVec2,
@@ -4290,225 +1175,20 @@ pub struct ImFontConfig {
     pub GlyphMinAdvanceX: f32,
     pub GlyphMaxAdvanceX: f32,
     pub MergeMode: bool,
-    pub RasterizerFlags: ::std::os::raw::c_uint,
+    pub RasterizerFlags: cty::c_uint,
     pub RasterizerMultiply: f32,
     pub EllipsisChar: ImWchar,
-    pub Name: [::std::os::raw::c_char; 40usize],
+    pub Name: [cty::c_char; 40usize],
     pub DstFont: *mut ImFont,
-}
-#[test]
-fn bindgen_test_layout_ImFontConfig() {
-    assert_eq!(
-        ::std::mem::size_of::<ImFontConfig>(),
-        136usize,
-        concat!("Size of: ", stringify!(ImFontConfig))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<ImFontConfig>(),
-        8usize,
-        concat!("Alignment of ", stringify!(ImFontConfig))
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImFontConfig>())).FontData as *const _ as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImFontConfig),
-            "::",
-            stringify!(FontData)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImFontConfig>())).FontDataSize as *const _ as usize },
-        8usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImFontConfig),
-            "::",
-            stringify!(FontDataSize)
-        )
-    );
-    assert_eq!(
-        unsafe {
-            &(*(::std::ptr::null::<ImFontConfig>())).FontDataOwnedByAtlas as *const _ as usize
-        },
-        12usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImFontConfig),
-            "::",
-            stringify!(FontDataOwnedByAtlas)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImFontConfig>())).FontNo as *const _ as usize },
-        16usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImFontConfig),
-            "::",
-            stringify!(FontNo)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImFontConfig>())).SizePixels as *const _ as usize },
-        20usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImFontConfig),
-            "::",
-            stringify!(SizePixels)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImFontConfig>())).OversampleH as *const _ as usize },
-        24usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImFontConfig),
-            "::",
-            stringify!(OversampleH)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImFontConfig>())).OversampleV as *const _ as usize },
-        28usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImFontConfig),
-            "::",
-            stringify!(OversampleV)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImFontConfig>())).PixelSnapH as *const _ as usize },
-        32usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImFontConfig),
-            "::",
-            stringify!(PixelSnapH)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImFontConfig>())).GlyphExtraSpacing as *const _ as usize },
-        36usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImFontConfig),
-            "::",
-            stringify!(GlyphExtraSpacing)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImFontConfig>())).GlyphOffset as *const _ as usize },
-        44usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImFontConfig),
-            "::",
-            stringify!(GlyphOffset)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImFontConfig>())).GlyphRanges as *const _ as usize },
-        56usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImFontConfig),
-            "::",
-            stringify!(GlyphRanges)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImFontConfig>())).GlyphMinAdvanceX as *const _ as usize },
-        64usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImFontConfig),
-            "::",
-            stringify!(GlyphMinAdvanceX)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImFontConfig>())).GlyphMaxAdvanceX as *const _ as usize },
-        68usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImFontConfig),
-            "::",
-            stringify!(GlyphMaxAdvanceX)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImFontConfig>())).MergeMode as *const _ as usize },
-        72usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImFontConfig),
-            "::",
-            stringify!(MergeMode)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImFontConfig>())).RasterizerFlags as *const _ as usize },
-        76usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImFontConfig),
-            "::",
-            stringify!(RasterizerFlags)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImFontConfig>())).RasterizerMultiply as *const _ as usize },
-        80usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImFontConfig),
-            "::",
-            stringify!(RasterizerMultiply)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImFontConfig>())).EllipsisChar as *const _ as usize },
-        84usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImFontConfig),
-            "::",
-            stringify!(EllipsisChar)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImFontConfig>())).Name as *const _ as usize },
-        86usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImFontConfig),
-            "::",
-            stringify!(Name)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImFontConfig>())).DstFont as *const _ as usize },
-        128usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImFontConfig),
-            "::",
-            stringify!(DstFont)
-        )
-    );
 }
 impl Default for ImFontConfig {
     fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
+        unsafe { ::core::mem::zeroed() }
     }
 }
-impl ::std::fmt::Debug for ImFontConfig {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        write ! (f , "ImFontConfig {{ FontData: {:?}, FontDataSize: {:?}, FontDataOwnedByAtlas: {:?}, FontNo: {:?}, SizePixels: {:?}, OversampleH: {:?}, OversampleV: {:?}, PixelSnapH: {:?}, GlyphExtraSpacing: {:?}, GlyphOffset: {:?}, GlyphRanges: {:?}, GlyphMinAdvanceX: {:?}, GlyphMaxAdvanceX: {:?}, MergeMode: {:?}, RasterizerFlags: {:?}, RasterizerMultiply: {:?}, EllipsisChar: {:?}, Name: [{}], DstFont: {:?} }}" , self . FontData , self . FontDataSize , self . FontDataOwnedByAtlas , self . FontNo , self . SizePixels , self . OversampleH , self . OversampleV , self . PixelSnapH , self . GlyphExtraSpacing , self . GlyphOffset , self . GlyphRanges , self . GlyphMinAdvanceX , self . GlyphMaxAdvanceX , self . MergeMode , self . RasterizerFlags , self . RasterizerMultiply , self . EllipsisChar , self . Name . iter () . enumerate () . map (| (i , v) | format ! ("{}{:?}" , if i > 0 { ", " } else { "" } , v)) . collect :: < String > () , self . DstFont)
+impl ::core::fmt::Debug for ImFontConfig {
+    fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
+        write ! (f , "ImFontConfig {{ FontData: {:?}, FontDataSize: {:?}, FontDataOwnedByAtlas: {:?}, FontNo: {:?}, SizePixels: {:?}, OversampleH: {:?}, OversampleV: {:?}, PixelSnapH: {:?}, GlyphExtraSpacing: {:?}, GlyphOffset: {:?}, GlyphRanges: {:?}, GlyphMinAdvanceX: {:?}, GlyphMaxAdvanceX: {:?}, MergeMode: {:?}, RasterizerFlags: {:?}, RasterizerMultiply: {:?}, EllipsisChar: {:?}, Name: [...], DstFont: {:?} }}" , self . FontData , self . FontDataSize , self . FontDataOwnedByAtlas , self . FontNo , self . SizePixels , self . OversampleH , self . OversampleV , self . PixelSnapH , self . GlyphExtraSpacing , self . GlyphOffset , self . GlyphRanges , self . GlyphMinAdvanceX , self . GlyphMaxAdvanceX , self . MergeMode , self . RasterizerFlags , self . RasterizerMultiply , self . EllipsisChar , self . DstFont)
     }
 }
 #[repr(C)]
@@ -4525,145 +1205,42 @@ pub struct ImFontGlyph {
     pub U1: f32,
     pub V1: f32,
 }
-#[test]
-fn bindgen_test_layout_ImFontGlyph() {
-    assert_eq!(
-        ::std::mem::size_of::<ImFontGlyph>(),
-        40usize,
-        concat!("Size of: ", stringify!(ImFontGlyph))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<ImFontGlyph>(),
-        4usize,
-        concat!("Alignment of ", stringify!(ImFontGlyph))
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImFontGlyph>())).AdvanceX as *const _ as usize },
-        4usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImFontGlyph),
-            "::",
-            stringify!(AdvanceX)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImFontGlyph>())).X0 as *const _ as usize },
-        8usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImFontGlyph),
-            "::",
-            stringify!(X0)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImFontGlyph>())).Y0 as *const _ as usize },
-        12usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImFontGlyph),
-            "::",
-            stringify!(Y0)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImFontGlyph>())).X1 as *const _ as usize },
-        16usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImFontGlyph),
-            "::",
-            stringify!(X1)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImFontGlyph>())).Y1 as *const _ as usize },
-        20usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImFontGlyph),
-            "::",
-            stringify!(Y1)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImFontGlyph>())).U0 as *const _ as usize },
-        24usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImFontGlyph),
-            "::",
-            stringify!(U0)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImFontGlyph>())).V0 as *const _ as usize },
-        28usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImFontGlyph),
-            "::",
-            stringify!(V0)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImFontGlyph>())).U1 as *const _ as usize },
-        32usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImFontGlyph),
-            "::",
-            stringify!(U1)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImFontGlyph>())).V1 as *const _ as usize },
-        36usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImFontGlyph),
-            "::",
-            stringify!(V1)
-        )
-    );
-}
 impl ImFontGlyph {
     #[inline]
-    pub fn Codepoint(&self) -> ::std::os::raw::c_uint {
-        unsafe { ::std::mem::transmute(self._bitfield_1.get(0usize, 31u8) as u32) }
+    pub fn Codepoint(&self) -> cty::c_uint {
+        unsafe { ::core::mem::transmute(self._bitfield_1.get(0usize, 31u8) as u32) }
     }
     #[inline]
-    pub fn set_Codepoint(&mut self, val: ::std::os::raw::c_uint) {
+    pub fn set_Codepoint(&mut self, val: cty::c_uint) {
         unsafe {
-            let val: u32 = ::std::mem::transmute(val);
+            let val: u32 = ::core::mem::transmute(val);
             self._bitfield_1.set(0usize, 31u8, val as u64)
         }
     }
     #[inline]
-    pub fn Visible(&self) -> ::std::os::raw::c_uint {
-        unsafe { ::std::mem::transmute(self._bitfield_1.get(31usize, 1u8) as u32) }
+    pub fn Visible(&self) -> cty::c_uint {
+        unsafe { ::core::mem::transmute(self._bitfield_1.get(31usize, 1u8) as u32) }
     }
     #[inline]
-    pub fn set_Visible(&mut self, val: ::std::os::raw::c_uint) {
+    pub fn set_Visible(&mut self, val: cty::c_uint) {
         unsafe {
-            let val: u32 = ::std::mem::transmute(val);
+            let val: u32 = ::core::mem::transmute(val);
             self._bitfield_1.set(31usize, 1u8, val as u64)
         }
     }
     #[inline]
     pub fn new_bitfield_1(
-        Codepoint: ::std::os::raw::c_uint,
-        Visible: ::std::os::raw::c_uint,
+        Codepoint: cty::c_uint,
+        Visible: cty::c_uint,
     ) -> __BindgenBitfieldUnit<[u8; 4usize], u32> {
         let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 4usize], u32> =
             Default::default();
         __bindgen_bitfield_unit.set(0usize, 31u8, {
-            let Codepoint: u32 = unsafe { ::std::mem::transmute(Codepoint) };
+            let Codepoint: u32 = unsafe { ::core::mem::transmute(Codepoint) };
             Codepoint as u64
         });
         __bindgen_bitfield_unit.set(31usize, 1u8, {
-            let Visible: u32 = unsafe { ::std::mem::transmute(Visible) };
+            let Visible: u32 = unsafe { ::core::mem::transmute(Visible) };
             Visible as u64
         });
         __bindgen_bitfield_unit
@@ -4674,367 +1251,62 @@ impl ImFontGlyph {
 pub struct ImFontGlyphRangesBuilder {
     pub UsedChars: ImVector_ImU32,
 }
-#[test]
-fn bindgen_test_layout_ImFontGlyphRangesBuilder() {
-    assert_eq!(
-        ::std::mem::size_of::<ImFontGlyphRangesBuilder>(),
-        16usize,
-        concat!("Size of: ", stringify!(ImFontGlyphRangesBuilder))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<ImFontGlyphRangesBuilder>(),
-        8usize,
-        concat!("Alignment of ", stringify!(ImFontGlyphRangesBuilder))
-    );
-    assert_eq!(
-        unsafe {
-            &(*(::std::ptr::null::<ImFontGlyphRangesBuilder>())).UsedChars as *const _ as usize
-        },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImFontGlyphRangesBuilder),
-            "::",
-            stringify!(UsedChars)
-        )
-    );
-}
 impl Default for ImFontGlyphRangesBuilder {
     fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
+        unsafe { ::core::mem::zeroed() }
     }
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub struct ImFontAtlasCustomRect {
-    pub Width: ::std::os::raw::c_ushort,
-    pub Height: ::std::os::raw::c_ushort,
-    pub X: ::std::os::raw::c_ushort,
-    pub Y: ::std::os::raw::c_ushort,
-    pub GlyphID: ::std::os::raw::c_uint,
+    pub Width: cty::c_ushort,
+    pub Height: cty::c_ushort,
+    pub X: cty::c_ushort,
+    pub Y: cty::c_ushort,
+    pub GlyphID: cty::c_uint,
     pub GlyphAdvanceX: f32,
     pub GlyphOffset: ImVec2,
     pub Font: *mut ImFont,
 }
-#[test]
-fn bindgen_test_layout_ImFontAtlasCustomRect() {
-    assert_eq!(
-        ::std::mem::size_of::<ImFontAtlasCustomRect>(),
-        32usize,
-        concat!("Size of: ", stringify!(ImFontAtlasCustomRect))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<ImFontAtlasCustomRect>(),
-        8usize,
-        concat!("Alignment of ", stringify!(ImFontAtlasCustomRect))
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImFontAtlasCustomRect>())).Width as *const _ as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImFontAtlasCustomRect),
-            "::",
-            stringify!(Width)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImFontAtlasCustomRect>())).Height as *const _ as usize },
-        2usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImFontAtlasCustomRect),
-            "::",
-            stringify!(Height)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImFontAtlasCustomRect>())).X as *const _ as usize },
-        4usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImFontAtlasCustomRect),
-            "::",
-            stringify!(X)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImFontAtlasCustomRect>())).Y as *const _ as usize },
-        6usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImFontAtlasCustomRect),
-            "::",
-            stringify!(Y)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImFontAtlasCustomRect>())).GlyphID as *const _ as usize },
-        8usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImFontAtlasCustomRect),
-            "::",
-            stringify!(GlyphID)
-        )
-    );
-    assert_eq!(
-        unsafe {
-            &(*(::std::ptr::null::<ImFontAtlasCustomRect>())).GlyphAdvanceX as *const _ as usize
-        },
-        12usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImFontAtlasCustomRect),
-            "::",
-            stringify!(GlyphAdvanceX)
-        )
-    );
-    assert_eq!(
-        unsafe {
-            &(*(::std::ptr::null::<ImFontAtlasCustomRect>())).GlyphOffset as *const _ as usize
-        },
-        16usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImFontAtlasCustomRect),
-            "::",
-            stringify!(GlyphOffset)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImFontAtlasCustomRect>())).Font as *const _ as usize },
-        24usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImFontAtlasCustomRect),
-            "::",
-            stringify!(Font)
-        )
-    );
-}
 impl Default for ImFontAtlasCustomRect {
     fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
+        unsafe { ::core::mem::zeroed() }
     }
 }
 pub const ImFontAtlasFlags_None: ImFontAtlasFlags_ = 0;
 pub const ImFontAtlasFlags_NoPowerOfTwoHeight: ImFontAtlasFlags_ = 1;
 pub const ImFontAtlasFlags_NoMouseCursors: ImFontAtlasFlags_ = 2;
 pub const ImFontAtlasFlags_NoBakedLines: ImFontAtlasFlags_ = 4;
-pub type ImFontAtlasFlags_ = ::std::os::raw::c_uint;
+pub type ImFontAtlasFlags_ = cty::c_uint;
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub struct ImFontAtlas {
     pub Locked: bool,
     pub Flags: ImFontAtlasFlags,
     pub TexID: ImTextureID,
-    pub TexDesiredWidth: ::std::os::raw::c_int,
-    pub TexGlyphPadding: ::std::os::raw::c_int,
-    pub TexPixelsAlpha8: *mut ::std::os::raw::c_uchar,
-    pub TexPixelsRGBA32: *mut ::std::os::raw::c_uint,
-    pub TexWidth: ::std::os::raw::c_int,
-    pub TexHeight: ::std::os::raw::c_int,
+    pub TexDesiredWidth: cty::c_int,
+    pub TexGlyphPadding: cty::c_int,
+    pub TexPixelsAlpha8: *mut cty::c_uchar,
+    pub TexPixelsRGBA32: *mut cty::c_uint,
+    pub TexWidth: cty::c_int,
+    pub TexHeight: cty::c_int,
     pub TexUvScale: ImVec2,
     pub TexUvWhitePixel: ImVec2,
     pub Fonts: ImVector_ImFontPtr,
     pub CustomRects: ImVector_ImFontAtlasCustomRect,
     pub ConfigData: ImVector_ImFontConfig,
     pub TexUvLines: [ImVec4; 64usize],
-    pub PackIdMouseCursors: ::std::os::raw::c_int,
-    pub PackIdLines: ::std::os::raw::c_int,
-}
-#[test]
-fn bindgen_test_layout_ImFontAtlas() {
-    assert_eq!(
-        ::std::mem::size_of::<ImFontAtlas>(),
-        1144usize,
-        concat!("Size of: ", stringify!(ImFontAtlas))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<ImFontAtlas>(),
-        8usize,
-        concat!("Alignment of ", stringify!(ImFontAtlas))
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImFontAtlas>())).Locked as *const _ as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImFontAtlas),
-            "::",
-            stringify!(Locked)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImFontAtlas>())).Flags as *const _ as usize },
-        4usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImFontAtlas),
-            "::",
-            stringify!(Flags)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImFontAtlas>())).TexID as *const _ as usize },
-        8usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImFontAtlas),
-            "::",
-            stringify!(TexID)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImFontAtlas>())).TexDesiredWidth as *const _ as usize },
-        16usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImFontAtlas),
-            "::",
-            stringify!(TexDesiredWidth)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImFontAtlas>())).TexGlyphPadding as *const _ as usize },
-        20usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImFontAtlas),
-            "::",
-            stringify!(TexGlyphPadding)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImFontAtlas>())).TexPixelsAlpha8 as *const _ as usize },
-        24usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImFontAtlas),
-            "::",
-            stringify!(TexPixelsAlpha8)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImFontAtlas>())).TexPixelsRGBA32 as *const _ as usize },
-        32usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImFontAtlas),
-            "::",
-            stringify!(TexPixelsRGBA32)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImFontAtlas>())).TexWidth as *const _ as usize },
-        40usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImFontAtlas),
-            "::",
-            stringify!(TexWidth)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImFontAtlas>())).TexHeight as *const _ as usize },
-        44usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImFontAtlas),
-            "::",
-            stringify!(TexHeight)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImFontAtlas>())).TexUvScale as *const _ as usize },
-        48usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImFontAtlas),
-            "::",
-            stringify!(TexUvScale)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImFontAtlas>())).TexUvWhitePixel as *const _ as usize },
-        56usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImFontAtlas),
-            "::",
-            stringify!(TexUvWhitePixel)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImFontAtlas>())).Fonts as *const _ as usize },
-        64usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImFontAtlas),
-            "::",
-            stringify!(Fonts)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImFontAtlas>())).CustomRects as *const _ as usize },
-        80usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImFontAtlas),
-            "::",
-            stringify!(CustomRects)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImFontAtlas>())).ConfigData as *const _ as usize },
-        96usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImFontAtlas),
-            "::",
-            stringify!(ConfigData)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImFontAtlas>())).TexUvLines as *const _ as usize },
-        112usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImFontAtlas),
-            "::",
-            stringify!(TexUvLines)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImFontAtlas>())).PackIdMouseCursors as *const _ as usize },
-        1136usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImFontAtlas),
-            "::",
-            stringify!(PackIdMouseCursors)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImFontAtlas>())).PackIdLines as *const _ as usize },
-        1140usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImFontAtlas),
-            "::",
-            stringify!(PackIdLines)
-        )
-    );
+    pub PackIdMouseCursors: cty::c_int,
+    pub PackIdLines: cty::c_int,
 }
 impl Default for ImFontAtlas {
     fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
+        unsafe { ::core::mem::zeroed() }
     }
 }
-impl ::std::fmt::Debug for ImFontAtlas {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        write ! (f , "ImFontAtlas {{ Locked: {:?}, Flags: {:?}, TexID: {:?}, TexDesiredWidth: {:?}, TexGlyphPadding: {:?}, TexPixelsAlpha8: {:?}, TexPixelsRGBA32: {:?}, TexWidth: {:?}, TexHeight: {:?}, TexUvScale: {:?}, TexUvWhitePixel: {:?}, Fonts: {:?}, CustomRects: {:?}, ConfigData: {:?}, TexUvLines: [{}], PackIdMouseCursors: {:?}, PackIdLines: {:?} }}" , self . Locked , self . Flags , self . TexID , self . TexDesiredWidth , self . TexGlyphPadding , self . TexPixelsAlpha8 , self . TexPixelsRGBA32 , self . TexWidth , self . TexHeight , self . TexUvScale , self . TexUvWhitePixel , self . Fonts , self . CustomRects , self . ConfigData , self . TexUvLines . iter () . enumerate () . map (| (i , v) | format ! ("{}{:?}" , if i > 0 { ", " } else { "" } , v)) . collect :: < String > () , self . PackIdMouseCursors , self . PackIdLines)
+impl ::core::fmt::Debug for ImFontAtlas {
+    fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
+        write ! (f , "ImFontAtlas {{ Locked: {:?}, Flags: {:?}, TexID: {:?}, TexDesiredWidth: {:?}, TexGlyphPadding: {:?}, TexPixelsAlpha8: {:?}, TexPixelsRGBA32: {:?}, TexWidth: {:?}, TexHeight: {:?}, TexUvScale: {:?}, TexUvWhitePixel: {:?}, Fonts: {:?}, CustomRects: {:?}, ConfigData: {:?}, TexUvLines: [...], PackIdMouseCursors: {:?}, PackIdLines: {:?} }}" , self . Locked , self . Flags , self . TexID , self . TexDesiredWidth , self . TexGlyphPadding , self . TexPixelsAlpha8 , self . TexPixelsRGBA32 , self . TexWidth , self . TexHeight , self . TexUvScale , self . TexUvWhitePixel , self . Fonts , self . CustomRects , self . ConfigData , self . PackIdMouseCursors , self . PackIdLines)
     }
 }
 #[repr(C)]
@@ -5048,202 +1320,19 @@ pub struct ImFont {
     pub FallbackGlyph: *const ImFontGlyph,
     pub ContainerAtlas: *mut ImFontAtlas,
     pub ConfigData: *const ImFontConfig,
-    pub ConfigDataCount: ::std::os::raw::c_short,
+    pub ConfigDataCount: cty::c_short,
     pub FallbackChar: ImWchar,
     pub EllipsisChar: ImWchar,
     pub DirtyLookupTables: bool,
     pub Scale: f32,
     pub Ascent: f32,
     pub Descent: f32,
-    pub MetricsTotalSurface: ::std::os::raw::c_int,
+    pub MetricsTotalSurface: cty::c_int,
     pub Used4kPagesMap: [ImU8; 2usize],
-}
-#[test]
-fn bindgen_test_layout_ImFont() {
-    assert_eq!(
-        ::std::mem::size_of::<ImFont>(),
-        112usize,
-        concat!("Size of: ", stringify!(ImFont))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<ImFont>(),
-        8usize,
-        concat!("Alignment of ", stringify!(ImFont))
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImFont>())).IndexAdvanceX as *const _ as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImFont),
-            "::",
-            stringify!(IndexAdvanceX)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImFont>())).FallbackAdvanceX as *const _ as usize },
-        16usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImFont),
-            "::",
-            stringify!(FallbackAdvanceX)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImFont>())).FontSize as *const _ as usize },
-        20usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImFont),
-            "::",
-            stringify!(FontSize)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImFont>())).IndexLookup as *const _ as usize },
-        24usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImFont),
-            "::",
-            stringify!(IndexLookup)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImFont>())).Glyphs as *const _ as usize },
-        40usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImFont),
-            "::",
-            stringify!(Glyphs)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImFont>())).FallbackGlyph as *const _ as usize },
-        56usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImFont),
-            "::",
-            stringify!(FallbackGlyph)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImFont>())).ContainerAtlas as *const _ as usize },
-        64usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImFont),
-            "::",
-            stringify!(ContainerAtlas)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImFont>())).ConfigData as *const _ as usize },
-        72usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImFont),
-            "::",
-            stringify!(ConfigData)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImFont>())).ConfigDataCount as *const _ as usize },
-        80usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImFont),
-            "::",
-            stringify!(ConfigDataCount)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImFont>())).FallbackChar as *const _ as usize },
-        82usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImFont),
-            "::",
-            stringify!(FallbackChar)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImFont>())).EllipsisChar as *const _ as usize },
-        84usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImFont),
-            "::",
-            stringify!(EllipsisChar)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImFont>())).DirtyLookupTables as *const _ as usize },
-        86usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImFont),
-            "::",
-            stringify!(DirtyLookupTables)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImFont>())).Scale as *const _ as usize },
-        88usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImFont),
-            "::",
-            stringify!(Scale)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImFont>())).Ascent as *const _ as usize },
-        92usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImFont),
-            "::",
-            stringify!(Ascent)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImFont>())).Descent as *const _ as usize },
-        96usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImFont),
-            "::",
-            stringify!(Descent)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImFont>())).MetricsTotalSurface as *const _ as usize },
-        100usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImFont),
-            "::",
-            stringify!(MetricsTotalSurface)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImFont>())).Used4kPagesMap as *const _ as usize },
-        104usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ImFont),
-            "::",
-            stringify!(Used4kPagesMap)
-        )
-    );
 }
 impl Default for ImFont {
     fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
+        unsafe { ::core::mem::zeroed() }
     }
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
@@ -5328,11 +1417,11 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igShowStyleSelector(label: *const ::std::os::raw::c_char) -> bool;
+    pub fn igShowStyleSelector(label: *const cty::c_char) -> bool;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igShowFontSelector(label: *const ::std::os::raw::c_char);
+    pub fn igShowFontSelector(label: *const cty::c_char);
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
@@ -5340,7 +1429,7 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igGetVersion() -> *const ::std::os::raw::c_char;
+    pub fn igGetVersion() -> *const cty::c_char;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
@@ -5356,11 +1445,7 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igBegin(
-        name: *const ::std::os::raw::c_char,
-        p_open: *mut bool,
-        flags: ImGuiWindowFlags,
-    ) -> bool;
+    pub fn igBegin(name: *const cty::c_char, p_open: *mut bool, flags: ImGuiWindowFlags) -> bool;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
@@ -5369,7 +1454,7 @@ extern "C" {
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igBeginChildStr(
-        str_id: *const ::std::os::raw::c_char,
+        str_id: *const cty::c_char,
         size: ImVec2,
         border: bool,
         flags: ImGuiWindowFlags,
@@ -5434,7 +1519,7 @@ extern "C" {
         size_min: ImVec2,
         size_max: ImVec2,
         custom_callback: ImGuiSizeCallback,
-        custom_callback_data: *mut ::std::os::raw::c_void,
+        custom_callback_data: *mut cty::c_void,
     );
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
@@ -5475,23 +1560,19 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igSetWindowPosStr(name: *const ::std::os::raw::c_char, pos: ImVec2, cond: ImGuiCond);
+    pub fn igSetWindowPosStr(name: *const cty::c_char, pos: ImVec2, cond: ImGuiCond);
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igSetWindowSizeStr(name: *const ::std::os::raw::c_char, size: ImVec2, cond: ImGuiCond);
+    pub fn igSetWindowSizeStr(name: *const cty::c_char, size: ImVec2, cond: ImGuiCond);
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igSetWindowCollapsedStr(
-        name: *const ::std::os::raw::c_char,
-        collapsed: bool,
-        cond: ImGuiCond,
-    );
+    pub fn igSetWindowCollapsedStr(name: *const cty::c_char, collapsed: bool, cond: ImGuiCond);
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igSetWindowFocusStr(name: *const ::std::os::raw::c_char);
+    pub fn igSetWindowFocusStr(name: *const cty::c_char);
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
@@ -5571,7 +1652,7 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igPopStyleColor(count: ::std::os::raw::c_int);
+    pub fn igPopStyleColor(count: cty::c_int);
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
@@ -5583,7 +1664,7 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igPopStyleVar(count: ::std::os::raw::c_int);
+    pub fn igPopStyleVar(count: cty::c_int);
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
@@ -5747,22 +1828,19 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igPushIDStr(str_id: *const ::std::os::raw::c_char);
+    pub fn igPushIDStr(str_id: *const cty::c_char);
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igPushIDStrStr(
-        str_id_begin: *const ::std::os::raw::c_char,
-        str_id_end: *const ::std::os::raw::c_char,
-    );
+    pub fn igPushIDStrStr(str_id_begin: *const cty::c_char, str_id_end: *const cty::c_char);
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igPushIDPtr(ptr_id: *const ::std::os::raw::c_void);
+    pub fn igPushIDPtr(ptr_id: *const cty::c_void);
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igPushIDInt(int_id: ::std::os::raw::c_int);
+    pub fn igPushIDInt(int_id: cty::c_int);
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
@@ -5770,73 +1848,66 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igGetIDStr(str_id: *const ::std::os::raw::c_char) -> ImGuiID;
+    pub fn igGetIDStr(str_id: *const cty::c_char) -> ImGuiID;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igGetIDStrStr(
-        str_id_begin: *const ::std::os::raw::c_char,
-        str_id_end: *const ::std::os::raw::c_char,
+        str_id_begin: *const cty::c_char,
+        str_id_end: *const cty::c_char,
     ) -> ImGuiID;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igGetIDPtr(ptr_id: *const ::std::os::raw::c_void) -> ImGuiID;
+    pub fn igGetIDPtr(ptr_id: *const cty::c_void) -> ImGuiID;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igTextUnformatted(
-        text: *const ::std::os::raw::c_char,
-        text_end: *const ::std::os::raw::c_char,
-    );
+    pub fn igTextUnformatted(text: *const cty::c_char, text_end: *const cty::c_char);
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igText(fmt: *const ::std::os::raw::c_char, ...);
+    pub fn igText(fmt: *const cty::c_char, ...);
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igTextColored(col: ImVec4, fmt: *const ::std::os::raw::c_char, ...);
+    pub fn igTextColored(col: ImVec4, fmt: *const cty::c_char, ...);
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igTextDisabled(fmt: *const ::std::os::raw::c_char, ...);
+    pub fn igTextDisabled(fmt: *const cty::c_char, ...);
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igTextWrapped(fmt: *const ::std::os::raw::c_char, ...);
+    pub fn igTextWrapped(fmt: *const cty::c_char, ...);
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igLabelText(
-        label: *const ::std::os::raw::c_char,
-        fmt: *const ::std::os::raw::c_char,
-        ...
-    );
+    pub fn igLabelText(label: *const cty::c_char, fmt: *const cty::c_char, ...);
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igBulletText(fmt: *const ::std::os::raw::c_char, ...);
+    pub fn igBulletText(fmt: *const cty::c_char, ...);
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igButton(label: *const ::std::os::raw::c_char, size: ImVec2) -> bool;
+    pub fn igButton(label: *const cty::c_char, size: ImVec2) -> bool;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igSmallButton(label: *const ::std::os::raw::c_char) -> bool;
+    pub fn igSmallButton(label: *const cty::c_char) -> bool;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igInvisibleButton(
-        str_id: *const ::std::os::raw::c_char,
+        str_id: *const cty::c_char,
         size: ImVec2,
         flags: ImGuiButtonFlags,
     ) -> bool;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igArrowButton(str_id: *const ::std::os::raw::c_char, dir: ImGuiDir) -> bool;
+    pub fn igArrowButton(str_id: *const cty::c_char, dir: ImGuiDir) -> bool;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
@@ -5856,38 +1927,38 @@ extern "C" {
         size: ImVec2,
         uv0: ImVec2,
         uv1: ImVec2,
-        frame_padding: ::std::os::raw::c_int,
+        frame_padding: cty::c_int,
         bg_col: ImVec4,
         tint_col: ImVec4,
     ) -> bool;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igCheckbox(label: *const ::std::os::raw::c_char, v: *mut bool) -> bool;
+    pub fn igCheckbox(label: *const cty::c_char, v: *mut bool) -> bool;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igCheckboxFlags(
-        label: *const ::std::os::raw::c_char,
-        flags: *mut ::std::os::raw::c_uint,
-        flags_value: ::std::os::raw::c_uint,
+        label: *const cty::c_char,
+        flags: *mut cty::c_uint,
+        flags_value: cty::c_uint,
     ) -> bool;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igRadioButtonBool(label: *const ::std::os::raw::c_char, active: bool) -> bool;
+    pub fn igRadioButtonBool(label: *const cty::c_char, active: bool) -> bool;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igRadioButtonIntPtr(
-        label: *const ::std::os::raw::c_char,
-        v: *mut ::std::os::raw::c_int,
-        v_button: ::std::os::raw::c_int,
+        label: *const cty::c_char,
+        v: *mut cty::c_int,
+        v_button: cty::c_int,
     ) -> bool;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igProgressBar(fraction: f32, size_arg: ImVec2, overlay: *const ::std::os::raw::c_char);
+    pub fn igProgressBar(fraction: f32, size_arg: ImVec2, overlay: *const cty::c_char);
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
@@ -5896,8 +1967,8 @@ extern "C" {
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igBeginCombo(
-        label: *const ::std::os::raw::c_char,
-        preview_value: *const ::std::os::raw::c_char,
+        label: *const cty::c_char,
+        preview_value: *const cty::c_char,
         flags: ImGuiComboFlags,
     ) -> bool;
 }
@@ -5908,498 +1979,498 @@ extern "C" {
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igComboStr_arr(
-        label: *const ::std::os::raw::c_char,
-        current_item: *mut ::std::os::raw::c_int,
-        items: *const *const ::std::os::raw::c_char,
-        items_count: ::std::os::raw::c_int,
-        popup_max_height_in_items: ::std::os::raw::c_int,
+        label: *const cty::c_char,
+        current_item: *mut cty::c_int,
+        items: *const *const cty::c_char,
+        items_count: cty::c_int,
+        popup_max_height_in_items: cty::c_int,
     ) -> bool;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igComboStr(
-        label: *const ::std::os::raw::c_char,
-        current_item: *mut ::std::os::raw::c_int,
-        items_separated_by_zeros: *const ::std::os::raw::c_char,
-        popup_max_height_in_items: ::std::os::raw::c_int,
+        label: *const cty::c_char,
+        current_item: *mut cty::c_int,
+        items_separated_by_zeros: *const cty::c_char,
+        popup_max_height_in_items: cty::c_int,
     ) -> bool;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igComboFnBoolPtr(
-        label: *const ::std::os::raw::c_char,
-        current_item: *mut ::std::os::raw::c_int,
-        items_getter: ::std::option::Option<
+        label: *const cty::c_char,
+        current_item: *mut cty::c_int,
+        items_getter: ::core::option::Option<
             unsafe extern "C" fn(
-                data: *mut ::std::os::raw::c_void,
-                idx: ::std::os::raw::c_int,
-                out_text: *mut *const ::std::os::raw::c_char,
+                data: *mut cty::c_void,
+                idx: cty::c_int,
+                out_text: *mut *const cty::c_char,
             ) -> bool,
         >,
-        data: *mut ::std::os::raw::c_void,
-        items_count: ::std::os::raw::c_int,
-        popup_max_height_in_items: ::std::os::raw::c_int,
+        data: *mut cty::c_void,
+        items_count: cty::c_int,
+        popup_max_height_in_items: cty::c_int,
     ) -> bool;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igDragFloat(
-        label: *const ::std::os::raw::c_char,
+        label: *const cty::c_char,
         v: *mut f32,
         v_speed: f32,
         v_min: f32,
         v_max: f32,
-        format: *const ::std::os::raw::c_char,
+        format: *const cty::c_char,
         flags: ImGuiSliderFlags,
     ) -> bool;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igDragFloat2(
-        label: *const ::std::os::raw::c_char,
+        label: *const cty::c_char,
         v: *mut f32,
         v_speed: f32,
         v_min: f32,
         v_max: f32,
-        format: *const ::std::os::raw::c_char,
+        format: *const cty::c_char,
         flags: ImGuiSliderFlags,
     ) -> bool;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igDragFloat3(
-        label: *const ::std::os::raw::c_char,
+        label: *const cty::c_char,
         v: *mut f32,
         v_speed: f32,
         v_min: f32,
         v_max: f32,
-        format: *const ::std::os::raw::c_char,
+        format: *const cty::c_char,
         flags: ImGuiSliderFlags,
     ) -> bool;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igDragFloat4(
-        label: *const ::std::os::raw::c_char,
+        label: *const cty::c_char,
         v: *mut f32,
         v_speed: f32,
         v_min: f32,
         v_max: f32,
-        format: *const ::std::os::raw::c_char,
+        format: *const cty::c_char,
         flags: ImGuiSliderFlags,
     ) -> bool;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igDragFloatRange2(
-        label: *const ::std::os::raw::c_char,
+        label: *const cty::c_char,
         v_current_min: *mut f32,
         v_current_max: *mut f32,
         v_speed: f32,
         v_min: f32,
         v_max: f32,
-        format: *const ::std::os::raw::c_char,
-        format_max: *const ::std::os::raw::c_char,
+        format: *const cty::c_char,
+        format_max: *const cty::c_char,
         flags: ImGuiSliderFlags,
     ) -> bool;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igDragInt(
-        label: *const ::std::os::raw::c_char,
-        v: *mut ::std::os::raw::c_int,
+        label: *const cty::c_char,
+        v: *mut cty::c_int,
         v_speed: f32,
-        v_min: ::std::os::raw::c_int,
-        v_max: ::std::os::raw::c_int,
-        format: *const ::std::os::raw::c_char,
+        v_min: cty::c_int,
+        v_max: cty::c_int,
+        format: *const cty::c_char,
         flags: ImGuiSliderFlags,
     ) -> bool;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igDragInt2(
-        label: *const ::std::os::raw::c_char,
-        v: *mut ::std::os::raw::c_int,
+        label: *const cty::c_char,
+        v: *mut cty::c_int,
         v_speed: f32,
-        v_min: ::std::os::raw::c_int,
-        v_max: ::std::os::raw::c_int,
-        format: *const ::std::os::raw::c_char,
+        v_min: cty::c_int,
+        v_max: cty::c_int,
+        format: *const cty::c_char,
         flags: ImGuiSliderFlags,
     ) -> bool;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igDragInt3(
-        label: *const ::std::os::raw::c_char,
-        v: *mut ::std::os::raw::c_int,
+        label: *const cty::c_char,
+        v: *mut cty::c_int,
         v_speed: f32,
-        v_min: ::std::os::raw::c_int,
-        v_max: ::std::os::raw::c_int,
-        format: *const ::std::os::raw::c_char,
+        v_min: cty::c_int,
+        v_max: cty::c_int,
+        format: *const cty::c_char,
         flags: ImGuiSliderFlags,
     ) -> bool;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igDragInt4(
-        label: *const ::std::os::raw::c_char,
-        v: *mut ::std::os::raw::c_int,
+        label: *const cty::c_char,
+        v: *mut cty::c_int,
         v_speed: f32,
-        v_min: ::std::os::raw::c_int,
-        v_max: ::std::os::raw::c_int,
-        format: *const ::std::os::raw::c_char,
+        v_min: cty::c_int,
+        v_max: cty::c_int,
+        format: *const cty::c_char,
         flags: ImGuiSliderFlags,
     ) -> bool;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igDragIntRange2(
-        label: *const ::std::os::raw::c_char,
-        v_current_min: *mut ::std::os::raw::c_int,
-        v_current_max: *mut ::std::os::raw::c_int,
+        label: *const cty::c_char,
+        v_current_min: *mut cty::c_int,
+        v_current_max: *mut cty::c_int,
         v_speed: f32,
-        v_min: ::std::os::raw::c_int,
-        v_max: ::std::os::raw::c_int,
-        format: *const ::std::os::raw::c_char,
-        format_max: *const ::std::os::raw::c_char,
+        v_min: cty::c_int,
+        v_max: cty::c_int,
+        format: *const cty::c_char,
+        format_max: *const cty::c_char,
         flags: ImGuiSliderFlags,
     ) -> bool;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igDragScalar(
-        label: *const ::std::os::raw::c_char,
+        label: *const cty::c_char,
         data_type: ImGuiDataType,
-        p_data: *mut ::std::os::raw::c_void,
+        p_data: *mut cty::c_void,
         v_speed: f32,
-        p_min: *const ::std::os::raw::c_void,
-        p_max: *const ::std::os::raw::c_void,
-        format: *const ::std::os::raw::c_char,
+        p_min: *const cty::c_void,
+        p_max: *const cty::c_void,
+        format: *const cty::c_char,
         flags: ImGuiSliderFlags,
     ) -> bool;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igDragScalarN(
-        label: *const ::std::os::raw::c_char,
+        label: *const cty::c_char,
         data_type: ImGuiDataType,
-        p_data: *mut ::std::os::raw::c_void,
-        components: ::std::os::raw::c_int,
+        p_data: *mut cty::c_void,
+        components: cty::c_int,
         v_speed: f32,
-        p_min: *const ::std::os::raw::c_void,
-        p_max: *const ::std::os::raw::c_void,
-        format: *const ::std::os::raw::c_char,
+        p_min: *const cty::c_void,
+        p_max: *const cty::c_void,
+        format: *const cty::c_char,
         flags: ImGuiSliderFlags,
     ) -> bool;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igSliderFloat(
-        label: *const ::std::os::raw::c_char,
+        label: *const cty::c_char,
         v: *mut f32,
         v_min: f32,
         v_max: f32,
-        format: *const ::std::os::raw::c_char,
+        format: *const cty::c_char,
         flags: ImGuiSliderFlags,
     ) -> bool;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igSliderFloat2(
-        label: *const ::std::os::raw::c_char,
+        label: *const cty::c_char,
         v: *mut f32,
         v_min: f32,
         v_max: f32,
-        format: *const ::std::os::raw::c_char,
+        format: *const cty::c_char,
         flags: ImGuiSliderFlags,
     ) -> bool;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igSliderFloat3(
-        label: *const ::std::os::raw::c_char,
+        label: *const cty::c_char,
         v: *mut f32,
         v_min: f32,
         v_max: f32,
-        format: *const ::std::os::raw::c_char,
+        format: *const cty::c_char,
         flags: ImGuiSliderFlags,
     ) -> bool;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igSliderFloat4(
-        label: *const ::std::os::raw::c_char,
+        label: *const cty::c_char,
         v: *mut f32,
         v_min: f32,
         v_max: f32,
-        format: *const ::std::os::raw::c_char,
+        format: *const cty::c_char,
         flags: ImGuiSliderFlags,
     ) -> bool;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igSliderAngle(
-        label: *const ::std::os::raw::c_char,
+        label: *const cty::c_char,
         v_rad: *mut f32,
         v_degrees_min: f32,
         v_degrees_max: f32,
-        format: *const ::std::os::raw::c_char,
+        format: *const cty::c_char,
         flags: ImGuiSliderFlags,
     ) -> bool;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igSliderInt(
-        label: *const ::std::os::raw::c_char,
-        v: *mut ::std::os::raw::c_int,
-        v_min: ::std::os::raw::c_int,
-        v_max: ::std::os::raw::c_int,
-        format: *const ::std::os::raw::c_char,
+        label: *const cty::c_char,
+        v: *mut cty::c_int,
+        v_min: cty::c_int,
+        v_max: cty::c_int,
+        format: *const cty::c_char,
         flags: ImGuiSliderFlags,
     ) -> bool;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igSliderInt2(
-        label: *const ::std::os::raw::c_char,
-        v: *mut ::std::os::raw::c_int,
-        v_min: ::std::os::raw::c_int,
-        v_max: ::std::os::raw::c_int,
-        format: *const ::std::os::raw::c_char,
+        label: *const cty::c_char,
+        v: *mut cty::c_int,
+        v_min: cty::c_int,
+        v_max: cty::c_int,
+        format: *const cty::c_char,
         flags: ImGuiSliderFlags,
     ) -> bool;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igSliderInt3(
-        label: *const ::std::os::raw::c_char,
-        v: *mut ::std::os::raw::c_int,
-        v_min: ::std::os::raw::c_int,
-        v_max: ::std::os::raw::c_int,
-        format: *const ::std::os::raw::c_char,
+        label: *const cty::c_char,
+        v: *mut cty::c_int,
+        v_min: cty::c_int,
+        v_max: cty::c_int,
+        format: *const cty::c_char,
         flags: ImGuiSliderFlags,
     ) -> bool;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igSliderInt4(
-        label: *const ::std::os::raw::c_char,
-        v: *mut ::std::os::raw::c_int,
-        v_min: ::std::os::raw::c_int,
-        v_max: ::std::os::raw::c_int,
-        format: *const ::std::os::raw::c_char,
+        label: *const cty::c_char,
+        v: *mut cty::c_int,
+        v_min: cty::c_int,
+        v_max: cty::c_int,
+        format: *const cty::c_char,
         flags: ImGuiSliderFlags,
     ) -> bool;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igSliderScalar(
-        label: *const ::std::os::raw::c_char,
+        label: *const cty::c_char,
         data_type: ImGuiDataType,
-        p_data: *mut ::std::os::raw::c_void,
-        p_min: *const ::std::os::raw::c_void,
-        p_max: *const ::std::os::raw::c_void,
-        format: *const ::std::os::raw::c_char,
+        p_data: *mut cty::c_void,
+        p_min: *const cty::c_void,
+        p_max: *const cty::c_void,
+        format: *const cty::c_char,
         flags: ImGuiSliderFlags,
     ) -> bool;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igSliderScalarN(
-        label: *const ::std::os::raw::c_char,
+        label: *const cty::c_char,
         data_type: ImGuiDataType,
-        p_data: *mut ::std::os::raw::c_void,
-        components: ::std::os::raw::c_int,
-        p_min: *const ::std::os::raw::c_void,
-        p_max: *const ::std::os::raw::c_void,
-        format: *const ::std::os::raw::c_char,
+        p_data: *mut cty::c_void,
+        components: cty::c_int,
+        p_min: *const cty::c_void,
+        p_max: *const cty::c_void,
+        format: *const cty::c_char,
         flags: ImGuiSliderFlags,
     ) -> bool;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igVSliderFloat(
-        label: *const ::std::os::raw::c_char,
+        label: *const cty::c_char,
         size: ImVec2,
         v: *mut f32,
         v_min: f32,
         v_max: f32,
-        format: *const ::std::os::raw::c_char,
+        format: *const cty::c_char,
         flags: ImGuiSliderFlags,
     ) -> bool;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igVSliderInt(
-        label: *const ::std::os::raw::c_char,
+        label: *const cty::c_char,
         size: ImVec2,
-        v: *mut ::std::os::raw::c_int,
-        v_min: ::std::os::raw::c_int,
-        v_max: ::std::os::raw::c_int,
-        format: *const ::std::os::raw::c_char,
+        v: *mut cty::c_int,
+        v_min: cty::c_int,
+        v_max: cty::c_int,
+        format: *const cty::c_char,
         flags: ImGuiSliderFlags,
     ) -> bool;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igVSliderScalar(
-        label: *const ::std::os::raw::c_char,
+        label: *const cty::c_char,
         size: ImVec2,
         data_type: ImGuiDataType,
-        p_data: *mut ::std::os::raw::c_void,
-        p_min: *const ::std::os::raw::c_void,
-        p_max: *const ::std::os::raw::c_void,
-        format: *const ::std::os::raw::c_char,
+        p_data: *mut cty::c_void,
+        p_min: *const cty::c_void,
+        p_max: *const cty::c_void,
+        format: *const cty::c_char,
         flags: ImGuiSliderFlags,
     ) -> bool;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igInputText(
-        label: *const ::std::os::raw::c_char,
-        buf: *mut ::std::os::raw::c_char,
+        label: *const cty::c_char,
+        buf: *mut cty::c_char,
         buf_size: usize,
         flags: ImGuiInputTextFlags,
         callback: ImGuiInputTextCallback,
-        user_data: *mut ::std::os::raw::c_void,
+        user_data: *mut cty::c_void,
     ) -> bool;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igInputTextMultiline(
-        label: *const ::std::os::raw::c_char,
-        buf: *mut ::std::os::raw::c_char,
+        label: *const cty::c_char,
+        buf: *mut cty::c_char,
         buf_size: usize,
         size: ImVec2,
         flags: ImGuiInputTextFlags,
         callback: ImGuiInputTextCallback,
-        user_data: *mut ::std::os::raw::c_void,
+        user_data: *mut cty::c_void,
     ) -> bool;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igInputTextWithHint(
-        label: *const ::std::os::raw::c_char,
-        hint: *const ::std::os::raw::c_char,
-        buf: *mut ::std::os::raw::c_char,
+        label: *const cty::c_char,
+        hint: *const cty::c_char,
+        buf: *mut cty::c_char,
         buf_size: usize,
         flags: ImGuiInputTextFlags,
         callback: ImGuiInputTextCallback,
-        user_data: *mut ::std::os::raw::c_void,
+        user_data: *mut cty::c_void,
     ) -> bool;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igInputFloat(
-        label: *const ::std::os::raw::c_char,
+        label: *const cty::c_char,
         v: *mut f32,
         step: f32,
         step_fast: f32,
-        format: *const ::std::os::raw::c_char,
+        format: *const cty::c_char,
         flags: ImGuiInputTextFlags,
     ) -> bool;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igInputFloat2(
-        label: *const ::std::os::raw::c_char,
+        label: *const cty::c_char,
         v: *mut f32,
-        format: *const ::std::os::raw::c_char,
+        format: *const cty::c_char,
         flags: ImGuiInputTextFlags,
     ) -> bool;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igInputFloat3(
-        label: *const ::std::os::raw::c_char,
+        label: *const cty::c_char,
         v: *mut f32,
-        format: *const ::std::os::raw::c_char,
+        format: *const cty::c_char,
         flags: ImGuiInputTextFlags,
     ) -> bool;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igInputFloat4(
-        label: *const ::std::os::raw::c_char,
+        label: *const cty::c_char,
         v: *mut f32,
-        format: *const ::std::os::raw::c_char,
+        format: *const cty::c_char,
         flags: ImGuiInputTextFlags,
     ) -> bool;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igInputInt(
-        label: *const ::std::os::raw::c_char,
-        v: *mut ::std::os::raw::c_int,
-        step: ::std::os::raw::c_int,
-        step_fast: ::std::os::raw::c_int,
+        label: *const cty::c_char,
+        v: *mut cty::c_int,
+        step: cty::c_int,
+        step_fast: cty::c_int,
         flags: ImGuiInputTextFlags,
     ) -> bool;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igInputInt2(
-        label: *const ::std::os::raw::c_char,
-        v: *mut ::std::os::raw::c_int,
+        label: *const cty::c_char,
+        v: *mut cty::c_int,
         flags: ImGuiInputTextFlags,
     ) -> bool;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igInputInt3(
-        label: *const ::std::os::raw::c_char,
-        v: *mut ::std::os::raw::c_int,
+        label: *const cty::c_char,
+        v: *mut cty::c_int,
         flags: ImGuiInputTextFlags,
     ) -> bool;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igInputInt4(
-        label: *const ::std::os::raw::c_char,
-        v: *mut ::std::os::raw::c_int,
+        label: *const cty::c_char,
+        v: *mut cty::c_int,
         flags: ImGuiInputTextFlags,
     ) -> bool;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igInputDouble(
-        label: *const ::std::os::raw::c_char,
+        label: *const cty::c_char,
         v: *mut f64,
         step: f64,
         step_fast: f64,
-        format: *const ::std::os::raw::c_char,
+        format: *const cty::c_char,
         flags: ImGuiInputTextFlags,
     ) -> bool;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igInputScalar(
-        label: *const ::std::os::raw::c_char,
+        label: *const cty::c_char,
         data_type: ImGuiDataType,
-        p_data: *mut ::std::os::raw::c_void,
-        p_step: *const ::std::os::raw::c_void,
-        p_step_fast: *const ::std::os::raw::c_void,
-        format: *const ::std::os::raw::c_char,
+        p_data: *mut cty::c_void,
+        p_step: *const cty::c_void,
+        p_step_fast: *const cty::c_void,
+        format: *const cty::c_char,
         flags: ImGuiInputTextFlags,
     ) -> bool;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igInputScalarN(
-        label: *const ::std::os::raw::c_char,
+        label: *const cty::c_char,
         data_type: ImGuiDataType,
-        p_data: *mut ::std::os::raw::c_void,
-        components: ::std::os::raw::c_int,
-        p_step: *const ::std::os::raw::c_void,
-        p_step_fast: *const ::std::os::raw::c_void,
-        format: *const ::std::os::raw::c_char,
+        p_data: *mut cty::c_void,
+        components: cty::c_int,
+        p_step: *const cty::c_void,
+        p_step_fast: *const cty::c_void,
+        format: *const cty::c_char,
         flags: ImGuiInputTextFlags,
     ) -> bool;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igColorEdit3(
-        label: *const ::std::os::raw::c_char,
+        label: *const cty::c_char,
         col: *mut f32,
         flags: ImGuiColorEditFlags,
     ) -> bool;
@@ -6407,7 +2478,7 @@ extern "C" {
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igColorEdit4(
-        label: *const ::std::os::raw::c_char,
+        label: *const cty::c_char,
         col: *mut f32,
         flags: ImGuiColorEditFlags,
     ) -> bool;
@@ -6415,7 +2486,7 @@ extern "C" {
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igColorPicker3(
-        label: *const ::std::os::raw::c_char,
+        label: *const cty::c_char,
         col: *mut f32,
         flags: ImGuiColorEditFlags,
     ) -> bool;
@@ -6423,7 +2494,7 @@ extern "C" {
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igColorPicker4(
-        label: *const ::std::os::raw::c_char,
+        label: *const cty::c_char,
         col: *mut f32,
         flags: ImGuiColorEditFlags,
         ref_col: *const f32,
@@ -6432,7 +2503,7 @@ extern "C" {
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igColorButton(
-        desc_id: *const ::std::os::raw::c_char,
+        desc_id: *const cty::c_char,
         col: ImVec4,
         flags: ImGuiColorEditFlags,
         size: ImVec2,
@@ -6444,54 +2515,45 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igTreeNodeStr(label: *const ::std::os::raw::c_char) -> bool;
+    pub fn igTreeNodeStr(label: *const cty::c_char) -> bool;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igTreeNodeStrStr(
-        str_id: *const ::std::os::raw::c_char,
-        fmt: *const ::std::os::raw::c_char,
-        ...
-    ) -> bool;
+    pub fn igTreeNodeStrStr(str_id: *const cty::c_char, fmt: *const cty::c_char, ...) -> bool;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igTreeNodePtr(
-        ptr_id: *const ::std::os::raw::c_void,
-        fmt: *const ::std::os::raw::c_char,
-        ...
-    ) -> bool;
+    pub fn igTreeNodePtr(ptr_id: *const cty::c_void, fmt: *const cty::c_char, ...) -> bool;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igTreeNodeExStr(label: *const ::std::os::raw::c_char, flags: ImGuiTreeNodeFlags)
-        -> bool;
+    pub fn igTreeNodeExStr(label: *const cty::c_char, flags: ImGuiTreeNodeFlags) -> bool;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igTreeNodeExStrStr(
-        str_id: *const ::std::os::raw::c_char,
+        str_id: *const cty::c_char,
         flags: ImGuiTreeNodeFlags,
-        fmt: *const ::std::os::raw::c_char,
+        fmt: *const cty::c_char,
         ...
     ) -> bool;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igTreeNodeExPtr(
-        ptr_id: *const ::std::os::raw::c_void,
+        ptr_id: *const cty::c_void,
         flags: ImGuiTreeNodeFlags,
-        fmt: *const ::std::os::raw::c_char,
+        fmt: *const cty::c_char,
         ...
     ) -> bool;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igTreePushStr(str_id: *const ::std::os::raw::c_char);
+    pub fn igTreePushStr(str_id: *const cty::c_char);
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igTreePushPtr(ptr_id: *const ::std::os::raw::c_void);
+    pub fn igTreePushPtr(ptr_id: *const cty::c_void);
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
@@ -6504,14 +2566,14 @@ extern "C" {
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igCollapsingHeaderTreeNodeFlags(
-        label: *const ::std::os::raw::c_char,
+        label: *const cty::c_char,
         flags: ImGuiTreeNodeFlags,
     ) -> bool;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igCollapsingHeaderBoolPtr(
-        label: *const ::std::os::raw::c_char,
+        label: *const cty::c_char,
         p_open: *mut bool,
         flags: ImGuiTreeNodeFlags,
     ) -> bool;
@@ -6523,7 +2585,7 @@ extern "C" {
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igSelectableBool(
-        label: *const ::std::os::raw::c_char,
+        label: *const cty::c_char,
         selected: bool,
         flags: ImGuiSelectableFlags,
         size: ImVec2,
@@ -6532,7 +2594,7 @@ extern "C" {
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igSelectableBoolPtr(
-        label: *const ::std::os::raw::c_char,
+        label: *const cty::c_char,
         p_selected: *mut bool,
         flags: ImGuiSelectableFlags,
         size: ImVec2,
@@ -6541,40 +2603,40 @@ extern "C" {
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igListBoxStr_arr(
-        label: *const ::std::os::raw::c_char,
-        current_item: *mut ::std::os::raw::c_int,
-        items: *const *const ::std::os::raw::c_char,
-        items_count: ::std::os::raw::c_int,
-        height_in_items: ::std::os::raw::c_int,
+        label: *const cty::c_char,
+        current_item: *mut cty::c_int,
+        items: *const *const cty::c_char,
+        items_count: cty::c_int,
+        height_in_items: cty::c_int,
     ) -> bool;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igListBoxFnBoolPtr(
-        label: *const ::std::os::raw::c_char,
-        current_item: *mut ::std::os::raw::c_int,
-        items_getter: ::std::option::Option<
+        label: *const cty::c_char,
+        current_item: *mut cty::c_int,
+        items_getter: ::core::option::Option<
             unsafe extern "C" fn(
-                data: *mut ::std::os::raw::c_void,
-                idx: ::std::os::raw::c_int,
-                out_text: *mut *const ::std::os::raw::c_char,
+                data: *mut cty::c_void,
+                idx: cty::c_int,
+                out_text: *mut *const cty::c_char,
             ) -> bool,
         >,
-        data: *mut ::std::os::raw::c_void,
-        items_count: ::std::os::raw::c_int,
-        height_in_items: ::std::os::raw::c_int,
+        data: *mut cty::c_void,
+        items_count: cty::c_int,
+        height_in_items: cty::c_int,
     ) -> bool;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igListBoxHeaderVec2(label: *const ::std::os::raw::c_char, size: ImVec2) -> bool;
+    pub fn igListBoxHeaderVec2(label: *const cty::c_char, size: ImVec2) -> bool;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igListBoxHeaderInt(
-        label: *const ::std::os::raw::c_char,
-        items_count: ::std::os::raw::c_int,
-        height_in_items: ::std::os::raw::c_int,
+        label: *const cty::c_char,
+        items_count: cty::c_int,
+        height_in_items: cty::c_int,
     ) -> bool;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
@@ -6584,31 +2646,28 @@ extern "C" {
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igPlotLinesFloatPtr(
-        label: *const ::std::os::raw::c_char,
+        label: *const cty::c_char,
         values: *const f32,
-        values_count: ::std::os::raw::c_int,
-        values_offset: ::std::os::raw::c_int,
-        overlay_text: *const ::std::os::raw::c_char,
+        values_count: cty::c_int,
+        values_offset: cty::c_int,
+        overlay_text: *const cty::c_char,
         scale_min: f32,
         scale_max: f32,
         graph_size: ImVec2,
-        stride: ::std::os::raw::c_int,
+        stride: cty::c_int,
     );
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igPlotLinesFnFloatPtr(
-        label: *const ::std::os::raw::c_char,
-        values_getter: ::std::option::Option<
-            unsafe extern "C" fn(
-                data: *mut ::std::os::raw::c_void,
-                idx: ::std::os::raw::c_int,
-            ) -> f32,
+        label: *const cty::c_char,
+        values_getter: ::core::option::Option<
+            unsafe extern "C" fn(data: *mut cty::c_void, idx: cty::c_int) -> f32,
         >,
-        data: *mut ::std::os::raw::c_void,
-        values_count: ::std::os::raw::c_int,
-        values_offset: ::std::os::raw::c_int,
-        overlay_text: *const ::std::os::raw::c_char,
+        data: *mut cty::c_void,
+        values_count: cty::c_int,
+        values_offset: cty::c_int,
+        overlay_text: *const cty::c_char,
         scale_min: f32,
         scale_max: f32,
         graph_size: ImVec2,
@@ -6617,31 +2676,28 @@ extern "C" {
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igPlotHistogramFloatPtr(
-        label: *const ::std::os::raw::c_char,
+        label: *const cty::c_char,
         values: *const f32,
-        values_count: ::std::os::raw::c_int,
-        values_offset: ::std::os::raw::c_int,
-        overlay_text: *const ::std::os::raw::c_char,
+        values_count: cty::c_int,
+        values_offset: cty::c_int,
+        overlay_text: *const cty::c_char,
         scale_min: f32,
         scale_max: f32,
         graph_size: ImVec2,
-        stride: ::std::os::raw::c_int,
+        stride: cty::c_int,
     );
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igPlotHistogramFnFloatPtr(
-        label: *const ::std::os::raw::c_char,
-        values_getter: ::std::option::Option<
-            unsafe extern "C" fn(
-                data: *mut ::std::os::raw::c_void,
-                idx: ::std::os::raw::c_int,
-            ) -> f32,
+        label: *const cty::c_char,
+        values_getter: ::core::option::Option<
+            unsafe extern "C" fn(data: *mut cty::c_void, idx: cty::c_int) -> f32,
         >,
-        data: *mut ::std::os::raw::c_void,
-        values_count: ::std::os::raw::c_int,
-        values_offset: ::std::os::raw::c_int,
-        overlay_text: *const ::std::os::raw::c_char,
+        data: *mut cty::c_void,
+        values_count: cty::c_int,
+        values_offset: cty::c_int,
+        overlay_text: *const cty::c_char,
         scale_min: f32,
         scale_max: f32,
         graph_size: ImVec2,
@@ -6649,23 +2705,19 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igValueBool(prefix: *const ::std::os::raw::c_char, b: bool);
+    pub fn igValueBool(prefix: *const cty::c_char, b: bool);
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igValueInt(prefix: *const ::std::os::raw::c_char, v: ::std::os::raw::c_int);
+    pub fn igValueInt(prefix: *const cty::c_char, v: cty::c_int);
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igValueUint(prefix: *const ::std::os::raw::c_char, v: ::std::os::raw::c_uint);
+    pub fn igValueUint(prefix: *const cty::c_char, v: cty::c_uint);
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igValueFloat(
-        prefix: *const ::std::os::raw::c_char,
-        v: f32,
-        float_format: *const ::std::os::raw::c_char,
-    );
+    pub fn igValueFloat(prefix: *const cty::c_char, v: f32, float_format: *const cty::c_char);
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
@@ -6685,7 +2737,7 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igBeginMenu(label: *const ::std::os::raw::c_char, enabled: bool) -> bool;
+    pub fn igBeginMenu(label: *const cty::c_char, enabled: bool) -> bool;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
@@ -6694,8 +2746,8 @@ extern "C" {
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igMenuItemBool(
-        label: *const ::std::os::raw::c_char,
-        shortcut: *const ::std::os::raw::c_char,
+        label: *const cty::c_char,
+        shortcut: *const cty::c_char,
         selected: bool,
         enabled: bool,
     ) -> bool;
@@ -6703,8 +2755,8 @@ extern "C" {
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igMenuItemBoolPtr(
-        label: *const ::std::os::raw::c_char,
-        shortcut: *const ::std::os::raw::c_char,
+        label: *const cty::c_char,
+        shortcut: *const cty::c_char,
         p_selected: *mut bool,
         enabled: bool,
     ) -> bool;
@@ -6719,16 +2771,16 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igSetTooltip(fmt: *const ::std::os::raw::c_char, ...);
+    pub fn igSetTooltip(fmt: *const cty::c_char, ...);
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igBeginPopup(str_id: *const ::std::os::raw::c_char, flags: ImGuiWindowFlags) -> bool;
+    pub fn igBeginPopup(str_id: *const cty::c_char, flags: ImGuiWindowFlags) -> bool;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igBeginPopupModal(
-        name: *const ::std::os::raw::c_char,
+        name: *const cty::c_char,
         p_open: *mut bool,
         flags: ImGuiWindowFlags,
     ) -> bool;
@@ -6739,14 +2791,11 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igOpenPopup(str_id: *const ::std::os::raw::c_char, popup_flags: ImGuiPopupFlags);
+    pub fn igOpenPopup(str_id: *const cty::c_char, popup_flags: ImGuiPopupFlags);
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igOpenPopupOnItemClick(
-        str_id: *const ::std::os::raw::c_char,
-        popup_flags: ImGuiPopupFlags,
-    );
+    pub fn igOpenPopupOnItemClick(str_id: *const cty::c_char, popup_flags: ImGuiPopupFlags);
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
@@ -6755,31 +2804,31 @@ extern "C" {
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igBeginPopupContextItem(
-        str_id: *const ::std::os::raw::c_char,
+        str_id: *const cty::c_char,
         popup_flags: ImGuiPopupFlags,
     ) -> bool;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igBeginPopupContextWindow(
-        str_id: *const ::std::os::raw::c_char,
+        str_id: *const cty::c_char,
         popup_flags: ImGuiPopupFlags,
     ) -> bool;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igBeginPopupContextVoid(
-        str_id: *const ::std::os::raw::c_char,
+        str_id: *const cty::c_char,
         popup_flags: ImGuiPopupFlags,
     ) -> bool;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igIsPopupOpen(str_id: *const ::std::os::raw::c_char, flags: ImGuiPopupFlags) -> bool;
+    pub fn igIsPopupOpen(str_id: *const cty::c_char, flags: ImGuiPopupFlags) -> bool;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igColumns(count: ::std::os::raw::c_int, id: *const ::std::os::raw::c_char, border: bool);
+    pub fn igColumns(count: cty::c_int, id: *const cty::c_char, border: bool);
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
@@ -6787,31 +2836,31 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igGetColumnIndex() -> ::std::os::raw::c_int;
+    pub fn igGetColumnIndex() -> cty::c_int;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igGetColumnWidth(column_index: ::std::os::raw::c_int) -> f32;
+    pub fn igGetColumnWidth(column_index: cty::c_int) -> f32;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igSetColumnWidth(column_index: ::std::os::raw::c_int, width: f32);
+    pub fn igSetColumnWidth(column_index: cty::c_int, width: f32);
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igGetColumnOffset(column_index: ::std::os::raw::c_int) -> f32;
+    pub fn igGetColumnOffset(column_index: cty::c_int) -> f32;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igSetColumnOffset(column_index: ::std::os::raw::c_int, offset_x: f32);
+    pub fn igSetColumnOffset(column_index: cty::c_int, offset_x: f32);
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igGetColumnsCount() -> ::std::os::raw::c_int;
+    pub fn igGetColumnsCount() -> cty::c_int;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igBeginTabBar(str_id: *const ::std::os::raw::c_char, flags: ImGuiTabBarFlags) -> bool;
+    pub fn igBeginTabBar(str_id: *const cty::c_char, flags: ImGuiTabBarFlags) -> bool;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
@@ -6820,7 +2869,7 @@ extern "C" {
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igBeginTabItem(
-        label: *const ::std::os::raw::c_char,
+        label: *const cty::c_char,
         p_open: *mut bool,
         flags: ImGuiTabItemFlags,
     ) -> bool;
@@ -6831,26 +2880,23 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igTabItemButton(label: *const ::std::os::raw::c_char, flags: ImGuiTabItemFlags) -> bool;
+    pub fn igTabItemButton(label: *const cty::c_char, flags: ImGuiTabItemFlags) -> bool;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igSetTabItemClosed(tab_or_docked_window_label: *const ::std::os::raw::c_char);
+    pub fn igSetTabItemClosed(tab_or_docked_window_label: *const cty::c_char);
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igLogToTTY(auto_open_depth: ::std::os::raw::c_int);
+    pub fn igLogToTTY(auto_open_depth: cty::c_int);
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igLogToFile(
-        auto_open_depth: ::std::os::raw::c_int,
-        filename: *const ::std::os::raw::c_char,
-    );
+    pub fn igLogToFile(auto_open_depth: cty::c_int, filename: *const cty::c_char);
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igLogToClipboard(auto_open_depth: ::std::os::raw::c_int);
+    pub fn igLogToClipboard(auto_open_depth: cty::c_int);
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
@@ -6867,8 +2913,8 @@ extern "C" {
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igSetDragDropPayload(
-        type_: *const ::std::os::raw::c_char,
-        data: *const ::std::os::raw::c_void,
+        type_: *const cty::c_char,
+        data: *const cty::c_void,
         sz: usize,
         cond: ImGuiCond,
     ) -> bool;
@@ -6884,7 +2930,7 @@ extern "C" {
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igAcceptDragDropPayload(
-        type_: *const ::std::os::raw::c_char,
+        type_: *const cty::c_char,
         flags: ImGuiDragDropFlags,
     ) -> *const ImGuiPayload;
 }
@@ -6914,7 +2960,7 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igSetKeyboardFocusHere(offset: ::std::os::raw::c_int);
+    pub fn igSetKeyboardFocusHere(offset: cty::c_int);
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
@@ -6998,7 +3044,7 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igGetFrameCount() -> ::std::os::raw::c_int;
+    pub fn igGetFrameCount() -> cty::c_int;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
@@ -7014,7 +3060,7 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igGetStyleColorName(idx: ImGuiCol) -> *const ::std::os::raw::c_char;
+    pub fn igGetStyleColorName(idx: ImGuiCol) -> *const cty::c_char;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
@@ -7027,10 +3073,10 @@ extern "C" {
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igCalcListClipping(
-        items_count: ::std::os::raw::c_int,
+        items_count: cty::c_int,
         items_height: f32,
-        out_items_display_start: *mut ::std::os::raw::c_int,
-        out_items_display_end: *mut ::std::os::raw::c_int,
+        out_items_display_start: *mut cty::c_int,
+        out_items_display_end: *mut cty::c_int,
     );
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
@@ -7045,8 +3091,8 @@ extern "C" {
 extern "C" {
     pub fn igCalcTextSize(
         pOut: *mut ImVec2,
-        text: *const ::std::os::raw::c_char,
-        text_end: *const ::std::os::raw::c_char,
+        text: *const cty::c_char,
+        text_end: *const cty::c_char,
         hide_text_after_double_hash: bool,
         wrap_width: f32,
     );
@@ -7083,27 +3129,24 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igGetKeyIndex(imgui_key: ImGuiKey) -> ::std::os::raw::c_int;
+    pub fn igGetKeyIndex(imgui_key: ImGuiKey) -> cty::c_int;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igIsKeyDown(user_key_index: ::std::os::raw::c_int) -> bool;
+    pub fn igIsKeyDown(user_key_index: cty::c_int) -> bool;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igIsKeyPressed(user_key_index: ::std::os::raw::c_int, repeat: bool) -> bool;
+    pub fn igIsKeyPressed(user_key_index: cty::c_int, repeat: bool) -> bool;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igIsKeyReleased(user_key_index: ::std::os::raw::c_int) -> bool;
+    pub fn igIsKeyReleased(user_key_index: cty::c_int) -> bool;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igGetKeyPressedAmount(
-        key_index: ::std::os::raw::c_int,
-        repeat_delay: f32,
-        rate: f32,
-    ) -> ::std::os::raw::c_int;
+    pub fn igGetKeyPressedAmount(key_index: cty::c_int, repeat_delay: f32, rate: f32)
+        -> cty::c_int;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
@@ -7171,32 +3214,32 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igGetClipboardText() -> *const ::std::os::raw::c_char;
+    pub fn igGetClipboardText() -> *const cty::c_char;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igSetClipboardText(text: *const ::std::os::raw::c_char);
+    pub fn igSetClipboardText(text: *const cty::c_char);
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igLoadIniSettingsFromDisk(ini_filename: *const ::std::os::raw::c_char);
+    pub fn igLoadIniSettingsFromDisk(ini_filename: *const cty::c_char);
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igLoadIniSettingsFromMemory(ini_data: *const ::std::os::raw::c_char, ini_size: usize);
+    pub fn igLoadIniSettingsFromMemory(ini_data: *const cty::c_char, ini_size: usize);
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igSaveIniSettingsToDisk(ini_filename: *const ::std::os::raw::c_char);
+    pub fn igSaveIniSettingsToDisk(ini_filename: *const cty::c_char);
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igSaveIniSettingsToMemory(out_ini_size: *mut usize) -> *const ::std::os::raw::c_char;
+    pub fn igSaveIniSettingsToMemory(out_ini_size: *mut usize) -> *const cty::c_char;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igDebugCheckVersionAndDataLayout(
-        version_str: *const ::std::os::raw::c_char,
+        version_str: *const cty::c_char,
         sz_io: usize,
         sz_style: usize,
         sz_vec2: usize,
@@ -7208,28 +3251,22 @@ extern "C" {
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igSetAllocatorFunctions(
-        alloc_func: ::std::option::Option<
-            unsafe extern "C" fn(
-                sz: usize,
-                user_data: *mut ::std::os::raw::c_void,
-            ) -> *mut ::std::os::raw::c_void,
+        alloc_func: ::core::option::Option<
+            unsafe extern "C" fn(sz: usize, user_data: *mut cty::c_void) -> *mut cty::c_void,
         >,
-        free_func: ::std::option::Option<
-            unsafe extern "C" fn(
-                ptr: *mut ::std::os::raw::c_void,
-                user_data: *mut ::std::os::raw::c_void,
-            ),
+        free_func: ::core::option::Option<
+            unsafe extern "C" fn(ptr: *mut cty::c_void, user_data: *mut cty::c_void),
         >,
-        user_data: *mut ::std::os::raw::c_void,
+        user_data: *mut cty::c_void,
     );
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igMemAlloc(size: usize) -> *mut ::std::os::raw::c_void;
+    pub fn igMemAlloc(size: usize) -> *mut cty::c_void;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igMemFree(ptr: *mut ::std::os::raw::c_void);
+    pub fn igMemFree(ptr: *mut cty::c_void);
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
@@ -7245,7 +3282,7 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn ImGuiIO_AddInputCharacter(self_: *mut ImGuiIO, c: ::std::os::raw::c_uint);
+    pub fn ImGuiIO_AddInputCharacter(self_: *mut ImGuiIO, c: cty::c_uint);
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
@@ -7253,7 +3290,7 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn ImGuiIO_AddInputCharactersUTF8(self_: *mut ImGuiIO, str_: *const ::std::os::raw::c_char);
+    pub fn ImGuiIO_AddInputCharactersUTF8(self_: *mut ImGuiIO, str_: *const cty::c_char);
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
@@ -7279,17 +3316,17 @@ extern "C" {
 extern "C" {
     pub fn ImGuiInputTextCallbackData_DeleteChars(
         self_: *mut ImGuiInputTextCallbackData,
-        pos: ::std::os::raw::c_int,
-        bytes_count: ::std::os::raw::c_int,
+        pos: cty::c_int,
+        bytes_count: cty::c_int,
     );
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImGuiInputTextCallbackData_InsertChars(
         self_: *mut ImGuiInputTextCallbackData,
-        pos: ::std::os::raw::c_int,
-        text: *const ::std::os::raw::c_char,
-        text_end: *const ::std::os::raw::c_char,
+        pos: cty::c_int,
+        text: *const cty::c_char,
+        text_end: *const cty::c_char,
     );
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
@@ -7318,10 +3355,7 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn ImGuiPayload_IsDataType(
-        self_: *mut ImGuiPayload,
-        type_: *const ::std::os::raw::c_char,
-    ) -> bool;
+    pub fn ImGuiPayload_IsDataType(self_: *mut ImGuiPayload, type_: *const cty::c_char) -> bool;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
@@ -7342,7 +3376,7 @@ extern "C" {
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImGuiTextFilter_ImGuiTextFilter(
-        default_filter: *const ::std::os::raw::c_char,
+        default_filter: *const cty::c_char,
     ) -> *mut ImGuiTextFilter;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
@@ -7353,7 +3387,7 @@ extern "C" {
 extern "C" {
     pub fn ImGuiTextFilter_Draw(
         self_: *mut ImGuiTextFilter,
-        label: *const ::std::os::raw::c_char,
+        label: *const cty::c_char,
         width: f32,
     ) -> bool;
 }
@@ -7361,8 +3395,8 @@ extern "C" {
 extern "C" {
     pub fn ImGuiTextFilter_PassFilter(
         self_: *mut ImGuiTextFilter,
-        text: *const ::std::os::raw::c_char,
-        text_end: *const ::std::os::raw::c_char,
+        text: *const cty::c_char,
+        text_end: *const cty::c_char,
     ) -> bool;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
@@ -7388,8 +3422,8 @@ extern "C" {
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImGuiTextRange_ImGuiTextRangeStr(
-        _b: *const ::std::os::raw::c_char,
-        _e: *const ::std::os::raw::c_char,
+        _b: *const cty::c_char,
+        _e: *const cty::c_char,
     ) -> *mut ImGuiTextRange;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
@@ -7400,7 +3434,7 @@ extern "C" {
 extern "C" {
     pub fn ImGuiTextRange_split(
         self_: *mut ImGuiTextRange,
-        separator: ::std::os::raw::c_char,
+        separator: cty::c_char,
         out: *mut ImVector_ImGuiTextRange,
     );
 }
@@ -7414,15 +3448,15 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn ImGuiTextBuffer_begin(self_: *mut ImGuiTextBuffer) -> *const ::std::os::raw::c_char;
+    pub fn ImGuiTextBuffer_begin(self_: *mut ImGuiTextBuffer) -> *const cty::c_char;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn ImGuiTextBuffer_end(self_: *mut ImGuiTextBuffer) -> *const ::std::os::raw::c_char;
+    pub fn ImGuiTextBuffer_end(self_: *mut ImGuiTextBuffer) -> *const cty::c_char;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn ImGuiTextBuffer_size(self_: *mut ImGuiTextBuffer) -> ::std::os::raw::c_int;
+    pub fn ImGuiTextBuffer_size(self_: *mut ImGuiTextBuffer) -> cty::c_int;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
@@ -7434,25 +3468,25 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn ImGuiTextBuffer_reserve(self_: *mut ImGuiTextBuffer, capacity: ::std::os::raw::c_int);
+    pub fn ImGuiTextBuffer_reserve(self_: *mut ImGuiTextBuffer, capacity: cty::c_int);
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn ImGuiTextBuffer_c_str(self_: *mut ImGuiTextBuffer) -> *const ::std::os::raw::c_char;
+    pub fn ImGuiTextBuffer_c_str(self_: *mut ImGuiTextBuffer) -> *const cty::c_char;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImGuiTextBuffer_append(
         self_: *mut ImGuiTextBuffer,
-        str_: *const ::std::os::raw::c_char,
-        str_end: *const ::std::os::raw::c_char,
+        str_: *const cty::c_char,
+        str_end: *const cty::c_char,
     );
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImGuiStoragePair_ImGuiStoragePairInt(
         _key: ImGuiID,
-        _val_i: ::std::os::raw::c_int,
+        _val_i: cty::c_int,
     ) -> *mut ImGuiStoragePair;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
@@ -7470,7 +3504,7 @@ extern "C" {
 extern "C" {
     pub fn ImGuiStoragePair_ImGuiStoragePairPtr(
         _key: ImGuiID,
-        _val_p: *mut ::std::os::raw::c_void,
+        _val_p: *mut cty::c_void,
     ) -> *mut ImGuiStoragePair;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
@@ -7482,12 +3516,12 @@ extern "C" {
     pub fn ImGuiStorage_GetInt(
         self_: *mut ImGuiStorage,
         key: ImGuiID,
-        default_val: ::std::os::raw::c_int,
-    ) -> ::std::os::raw::c_int;
+        default_val: cty::c_int,
+    ) -> cty::c_int;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn ImGuiStorage_SetInt(self_: *mut ImGuiStorage, key: ImGuiID, val: ::std::os::raw::c_int);
+    pub fn ImGuiStorage_SetInt(self_: *mut ImGuiStorage, key: ImGuiID, val: cty::c_int);
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
@@ -7507,26 +3541,19 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn ImGuiStorage_GetVoidPtr(
-        self_: *mut ImGuiStorage,
-        key: ImGuiID,
-    ) -> *mut ::std::os::raw::c_void;
+    pub fn ImGuiStorage_GetVoidPtr(self_: *mut ImGuiStorage, key: ImGuiID) -> *mut cty::c_void;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn ImGuiStorage_SetVoidPtr(
-        self_: *mut ImGuiStorage,
-        key: ImGuiID,
-        val: *mut ::std::os::raw::c_void,
-    );
+    pub fn ImGuiStorage_SetVoidPtr(self_: *mut ImGuiStorage, key: ImGuiID, val: *mut cty::c_void);
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImGuiStorage_GetIntRef(
         self_: *mut ImGuiStorage,
         key: ImGuiID,
-        default_val: ::std::os::raw::c_int,
-    ) -> *mut ::std::os::raw::c_int;
+        default_val: cty::c_int,
+    ) -> *mut cty::c_int;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
@@ -7549,12 +3576,12 @@ extern "C" {
     pub fn ImGuiStorage_GetVoidPtrRef(
         self_: *mut ImGuiStorage,
         key: ImGuiID,
-        default_val: *mut ::std::os::raw::c_void,
-    ) -> *mut *mut ::std::os::raw::c_void;
+        default_val: *mut cty::c_void,
+    ) -> *mut *mut cty::c_void;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn ImGuiStorage_SetAllInt(self_: *mut ImGuiStorage, val: ::std::os::raw::c_int);
+    pub fn ImGuiStorage_SetAllInt(self_: *mut ImGuiStorage, val: cty::c_int);
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
@@ -7572,7 +3599,7 @@ extern "C" {
 extern "C" {
     pub fn ImGuiListClipper_Begin(
         self_: *mut ImGuiListClipper,
-        items_count: ::std::os::raw::c_int,
+        items_count: cty::c_int,
         items_height: f32,
     );
 }
@@ -7595,10 +3622,10 @@ extern "C" {
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImColor_ImColorInt(
-        r: ::std::os::raw::c_int,
-        g: ::std::os::raw::c_int,
-        b: ::std::os::raw::c_int,
-        a: ::std::os::raw::c_int,
+        r: cty::c_int,
+        g: cty::c_int,
+        b: cty::c_int,
+        a: cty::c_int,
     ) -> *mut ImColor;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
@@ -7650,7 +3677,7 @@ extern "C" {
     pub fn ImDrawListSplitter_Split(
         self_: *mut ImDrawListSplitter,
         draw_list: *mut ImDrawList,
-        count: ::std::os::raw::c_int,
+        count: cty::c_int,
     );
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
@@ -7662,7 +3689,7 @@ extern "C" {
     pub fn ImDrawListSplitter_SetCurrentChannel(
         self_: *mut ImDrawListSplitter,
         draw_list: *mut ImDrawList,
-        channel_idx: ::std::os::raw::c_int,
+        channel_idx: cty::c_int,
     );
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
@@ -7802,7 +3829,7 @@ extern "C" {
         center: ImVec2,
         radius: f32,
         col: ImU32,
-        num_segments: ::std::os::raw::c_int,
+        num_segments: cty::c_int,
         thickness: f32,
     );
 }
@@ -7813,7 +3840,7 @@ extern "C" {
         center: ImVec2,
         radius: f32,
         col: ImU32,
-        num_segments: ::std::os::raw::c_int,
+        num_segments: cty::c_int,
     );
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
@@ -7823,7 +3850,7 @@ extern "C" {
         center: ImVec2,
         radius: f32,
         col: ImU32,
-        num_segments: ::std::os::raw::c_int,
+        num_segments: cty::c_int,
         thickness: f32,
     );
 }
@@ -7834,7 +3861,7 @@ extern "C" {
         center: ImVec2,
         radius: f32,
         col: ImU32,
-        num_segments: ::std::os::raw::c_int,
+        num_segments: cty::c_int,
     );
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
@@ -7843,8 +3870,8 @@ extern "C" {
         self_: *mut ImDrawList,
         pos: ImVec2,
         col: ImU32,
-        text_begin: *const ::std::os::raw::c_char,
-        text_end: *const ::std::os::raw::c_char,
+        text_begin: *const cty::c_char,
+        text_end: *const cty::c_char,
     );
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
@@ -7855,8 +3882,8 @@ extern "C" {
         font_size: f32,
         pos: ImVec2,
         col: ImU32,
-        text_begin: *const ::std::os::raw::c_char,
-        text_end: *const ::std::os::raw::c_char,
+        text_begin: *const cty::c_char,
+        text_end: *const cty::c_char,
         wrap_width: f32,
         cpu_fine_clip_rect: *const ImVec4,
     );
@@ -7866,7 +3893,7 @@ extern "C" {
     pub fn ImDrawList_AddPolyline(
         self_: *mut ImDrawList,
         points: *const ImVec2,
-        num_points: ::std::os::raw::c_int,
+        num_points: cty::c_int,
         col: ImU32,
         closed: bool,
         thickness: f32,
@@ -7877,7 +3904,7 @@ extern "C" {
     pub fn ImDrawList_AddConvexPolyFilled(
         self_: *mut ImDrawList,
         points: *const ImVec2,
-        num_points: ::std::os::raw::c_int,
+        num_points: cty::c_int,
         col: ImU32,
     );
 }
@@ -7891,7 +3918,7 @@ extern "C" {
         p4: ImVec2,
         col: ImU32,
         thickness: f32,
-        num_segments: ::std::os::raw::c_int,
+        num_segments: cty::c_int,
     );
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
@@ -7964,7 +3991,7 @@ extern "C" {
         radius: f32,
         a_min: f32,
         a_max: f32,
-        num_segments: ::std::os::raw::c_int,
+        num_segments: cty::c_int,
     );
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
@@ -7973,8 +4000,8 @@ extern "C" {
         self_: *mut ImDrawList,
         center: ImVec2,
         radius: f32,
-        a_min_of_12: ::std::os::raw::c_int,
-        a_max_of_12: ::std::os::raw::c_int,
+        a_min_of_12: cty::c_int,
+        a_max_of_12: cty::c_int,
     );
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
@@ -7984,7 +4011,7 @@ extern "C" {
         p2: ImVec2,
         p3: ImVec2,
         p4: ImVec2,
-        num_segments: ::std::os::raw::c_int,
+        num_segments: cty::c_int,
     );
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
@@ -8002,7 +4029,7 @@ extern "C" {
     pub fn ImDrawList_AddCallback(
         self_: *mut ImDrawList,
         callback: ImDrawCallback,
-        callback_data: *mut ::std::os::raw::c_void,
+        callback_data: *mut cty::c_void,
     );
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
@@ -8015,7 +4042,7 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn ImDrawList_ChannelsSplit(self_: *mut ImDrawList, count: ::std::os::raw::c_int);
+    pub fn ImDrawList_ChannelsSplit(self_: *mut ImDrawList, count: cty::c_int);
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
@@ -8023,22 +4050,22 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn ImDrawList_ChannelsSetCurrent(self_: *mut ImDrawList, n: ::std::os::raw::c_int);
+    pub fn ImDrawList_ChannelsSetCurrent(self_: *mut ImDrawList, n: cty::c_int);
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImDrawList_PrimReserve(
         self_: *mut ImDrawList,
-        idx_count: ::std::os::raw::c_int,
-        vtx_count: ::std::os::raw::c_int,
+        idx_count: cty::c_int,
+        vtx_count: cty::c_int,
     );
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImDrawList_PrimUnreserve(
         self_: *mut ImDrawList,
-        idx_count: ::std::os::raw::c_int,
-        vtx_count: ::std::os::raw::c_int,
+        idx_count: cty::c_int,
+        vtx_count: cty::c_int,
     );
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
@@ -8163,8 +4190,8 @@ extern "C" {
 extern "C" {
     pub fn ImFontGlyphRangesBuilder_AddText(
         self_: *mut ImFontGlyphRangesBuilder,
-        text: *const ::std::os::raw::c_char,
-        text_end: *const ::std::os::raw::c_char,
+        text: *const cty::c_char,
+        text_end: *const cty::c_char,
     );
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
@@ -8219,7 +4246,7 @@ extern "C" {
 extern "C" {
     pub fn ImFontAtlas_AddFontFromFileTTF(
         self_: *mut ImFontAtlas,
-        filename: *const ::std::os::raw::c_char,
+        filename: *const cty::c_char,
         size_pixels: f32,
         font_cfg: *const ImFontConfig,
         glyph_ranges: *const ImWchar,
@@ -8229,8 +4256,8 @@ extern "C" {
 extern "C" {
     pub fn ImFontAtlas_AddFontFromMemoryTTF(
         self_: *mut ImFontAtlas,
-        font_data: *mut ::std::os::raw::c_void,
-        font_size: ::std::os::raw::c_int,
+        font_data: *mut cty::c_void,
+        font_size: cty::c_int,
         size_pixels: f32,
         font_cfg: *const ImFontConfig,
         glyph_ranges: *const ImWchar,
@@ -8240,8 +4267,8 @@ extern "C" {
 extern "C" {
     pub fn ImFontAtlas_AddFontFromMemoryCompressedTTF(
         self_: *mut ImFontAtlas,
-        compressed_font_data: *const ::std::os::raw::c_void,
-        compressed_font_size: ::std::os::raw::c_int,
+        compressed_font_data: *const cty::c_void,
+        compressed_font_size: cty::c_int,
         size_pixels: f32,
         font_cfg: *const ImFontConfig,
         glyph_ranges: *const ImWchar,
@@ -8251,7 +4278,7 @@ extern "C" {
 extern "C" {
     pub fn ImFontAtlas_AddFontFromMemoryCompressedBase85TTF(
         self_: *mut ImFontAtlas,
-        compressed_font_data_base85: *const ::std::os::raw::c_char,
+        compressed_font_data_base85: *const cty::c_char,
         size_pixels: f32,
         font_cfg: *const ImFontConfig,
         glyph_ranges: *const ImWchar,
@@ -8281,20 +4308,20 @@ extern "C" {
 extern "C" {
     pub fn ImFontAtlas_GetTexDataAsAlpha8(
         self_: *mut ImFontAtlas,
-        out_pixels: *mut *mut ::std::os::raw::c_uchar,
-        out_width: *mut ::std::os::raw::c_int,
-        out_height: *mut ::std::os::raw::c_int,
-        out_bytes_per_pixel: *mut ::std::os::raw::c_int,
+        out_pixels: *mut *mut cty::c_uchar,
+        out_width: *mut cty::c_int,
+        out_height: *mut cty::c_int,
+        out_bytes_per_pixel: *mut cty::c_int,
     );
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImFontAtlas_GetTexDataAsRGBA32(
         self_: *mut ImFontAtlas,
-        out_pixels: *mut *mut ::std::os::raw::c_uchar,
-        out_width: *mut ::std::os::raw::c_int,
-        out_height: *mut ::std::os::raw::c_int,
-        out_bytes_per_pixel: *mut ::std::os::raw::c_int,
+        out_pixels: *mut *mut cty::c_uchar,
+        out_width: *mut cty::c_int,
+        out_height: *mut cty::c_int,
+        out_bytes_per_pixel: *mut cty::c_int,
     );
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
@@ -8343,9 +4370,9 @@ extern "C" {
 extern "C" {
     pub fn ImFontAtlas_AddCustomRectRegular(
         self_: *mut ImFontAtlas,
-        width: ::std::os::raw::c_int,
-        height: ::std::os::raw::c_int,
-    ) -> ::std::os::raw::c_int;
+        width: cty::c_int,
+        height: cty::c_int,
+    ) -> cty::c_int;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
@@ -8353,17 +4380,17 @@ extern "C" {
         self_: *mut ImFontAtlas,
         font: *mut ImFont,
         id: ImWchar,
-        width: ::std::os::raw::c_int,
-        height: ::std::os::raw::c_int,
+        width: cty::c_int,
+        height: cty::c_int,
         advance_x: f32,
         offset: ImVec2,
-    ) -> ::std::os::raw::c_int;
+    ) -> cty::c_int;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImFontAtlas_GetCustomRectByIndex(
         self_: *mut ImFontAtlas,
-        index: ::std::os::raw::c_int,
+        index: cty::c_int,
     ) -> *mut ImFontAtlasCustomRect;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
@@ -8412,7 +4439,7 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn ImFont_GetDebugName(self_: *mut ImFont) -> *const ::std::os::raw::c_char;
+    pub fn ImFont_GetDebugName(self_: *mut ImFont) -> *const cty::c_char;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
@@ -8422,9 +4449,9 @@ extern "C" {
         size: f32,
         max_width: f32,
         wrap_width: f32,
-        text_begin: *const ::std::os::raw::c_char,
-        text_end: *const ::std::os::raw::c_char,
-        remaining: *mut *const ::std::os::raw::c_char,
+        text_begin: *const cty::c_char,
+        text_end: *const cty::c_char,
+        remaining: *mut *const cty::c_char,
     );
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
@@ -8432,10 +4459,10 @@ extern "C" {
     pub fn ImFont_CalcWordWrapPositionA(
         self_: *mut ImFont,
         scale: f32,
-        text: *const ::std::os::raw::c_char,
-        text_end: *const ::std::os::raw::c_char,
+        text: *const cty::c_char,
+        text_end: *const cty::c_char,
         wrap_width: f32,
-    ) -> *const ::std::os::raw::c_char;
+    ) -> *const cty::c_char;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
@@ -8457,8 +4484,8 @@ extern "C" {
         pos: ImVec2,
         col: ImU32,
         clip_rect: ImVec4,
-        text_begin: *const ::std::os::raw::c_char,
-        text_end: *const ::std::os::raw::c_char,
+        text_begin: *const cty::c_char,
+        text_end: *const cty::c_char,
         wrap_width: f32,
         cpu_fine_clip: bool,
     );
@@ -8473,7 +4500,7 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn ImFont_GrowIndex(self_: *mut ImFont, new_size: ::std::os::raw::c_int);
+    pub fn ImFont_GrowIndex(self_: *mut ImFont, new_size: cty::c_int);
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
@@ -8508,19 +4535,15 @@ extern "C" {
 extern "C" {
     pub fn ImFont_IsGlyphRangeUnused(
         self_: *mut ImFont,
-        c_begin: ::std::os::raw::c_uint,
-        c_last: ::std::os::raw::c_uint,
+        c_begin: cty::c_uint,
+        c_last: cty::c_uint,
     ) -> bool;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igLogText(fmt: *const ::std::os::raw::c_char, ...);
+    pub fn igLogText(fmt: *const cty::c_char, ...);
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn ImGuiTextBuffer_appendf(
-        buffer: *mut ImGuiTextBuffer,
-        fmt: *const ::std::os::raw::c_char,
-        ...
-    );
+    pub fn ImGuiTextBuffer_appendf(buffer: *mut ImGuiTextBuffer, fmt: *const cty::c_char, ...);
 }
