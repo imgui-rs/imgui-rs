@@ -7,5 +7,5 @@ members = [
     "imgui-winit-support",
     "imgui-examples",
     "imgui-gfx-examples",
-    "imgui-sys-bindgen",
+    "xtask",
 ]
