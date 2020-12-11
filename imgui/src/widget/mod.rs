@@ -2,6 +2,7 @@ pub mod color_editors;
 pub mod combo_box;
 pub mod drag;
 pub mod image;
+pub mod list_box;
 pub mod menu;
 pub mod misc;
 pub mod progress_bar;
