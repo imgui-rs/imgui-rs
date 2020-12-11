@@ -4,7 +4,7 @@ use glutin::{
     event::{Event, WindowEvent},
     event_loop::{ControlFlow, EventLoop},
     // XXX for easier porting...
-    platform::desktop::EventLoopExtDesktop,
+    platform::run_return::EventLoopExtRunReturn,
     window::WindowBuilder,
 };
 use imgui::{Context, FontConfig, FontGlyphRanges, FontSource, Ui};

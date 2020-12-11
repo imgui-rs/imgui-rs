@@ -79,7 +79,7 @@
 //!
 //! The following versions are supported, controlled by the listed feature.
 //!
-//! - The `winit-23` feature uses winit versions compatible with `0.23`. This is
+//! - The `winit-23` feature supports winit versions `0.23` and `0.24`. This is
 //!   on by default, so to use any other version you need to disable this crates
 //!   default features.
 //! - The `winit-22` feature uses winit versions compatible with `0.22`.
