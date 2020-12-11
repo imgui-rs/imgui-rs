@@ -36,6 +36,7 @@ pub use self::widget::color_editors::*;
 pub use self::widget::combo_box::*;
 pub use self::widget::drag::*;
 pub use self::widget::image::*;
+pub use self::widget::list_box::*;
 pub use self::widget::menu::*;
 pub use self::widget::progress_bar::*;
 pub use self::widget::selectable::*;

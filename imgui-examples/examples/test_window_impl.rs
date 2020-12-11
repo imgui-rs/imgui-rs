@@ -28,6 +28,7 @@ struct State {
     buf: ImString,
     item: usize,
     item2: usize,
+    item3: i32,
     text: ImString,
     text_multiline: ImString,
     i0: i32,
@@ -39,6 +40,7 @@ struct State {
     col1: [f32; 3],
     col2: [f32; 4],
     selected_fish: Option<usize>,
+    selected_fish2: Option<usize>,
     auto_resize_state: AutoResizeState,
     file_menu: FileMenuState,
     radio_button: i32,
@@ -85,6 +87,7 @@ impl Default for State {
             buf,
             item: 0,
             item2: 0,
+            item3: 0,
             text,
             text_multiline,
             i0: 123,
@@ -96,6 +99,7 @@ impl Default for State {
             col1: [1.0, 0.0, 0.2],
             col2: [0.4, 0.7, 0.0, 0.5],
             selected_fish: None,
+            selected_fish2: None,
             auto_resize_state: Default::default(),
             file_menu: Default::default(),
             radio_button: 0,
@@ -490,6 +494,37 @@ fn show_test_window(ui: &Ui, state: &mut State, opened: &mut bool) {
                 im_str!("KKKK"),
             ];
             ComboBox::new(im_str!("combo scroll")).build_simple_string(ui, &mut state.item2, &items);
+
+            ui.list_box(im_str!("list"), &mut state.item3, &items, 8);
+
+
+            let names = [
+                im_str!("Bream"),
+                im_str!("Haddock"),
+                im_str!("Mackerel"),
+                im_str!("Pollock"),
+                im_str!("Tilefish"),
+            ];
+
+            ListBox::new(im_str!("selectables list")).calculate_size(8, 4).build(ui, || {
+                for (index, name) in names.iter().enumerate() {
+                    let selected = matches!(state.selected_fish2, Some(i) if i == index );
+                    if Selectable::new(name).selected(selected).build(ui) {
+                        state.selected_fish2 = Some(index);
+                    }
+                }
+            });
+
+            let last_size = ui.item_rect_size();
+            ListBox::new(im_str!("selectable list 2")).size([0.0, last_size[1] * 0.66]).build(ui, || {
+                for (index, name) in names.iter().enumerate() {
+                    let selected = matches!(state.selected_fish2, Some(i) if i == index );
+                    if Selectable::new(name).selected(selected).build(ui) {
+                        state.selected_fish2 = Some(index);
+                    }
+                }
+            });
+
             ui.input_text(im_str!("input text"), &mut state.text)
                 .build();
             ui.input_int(im_str!("input int"), &mut state.i0).build();
