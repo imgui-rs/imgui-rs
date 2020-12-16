@@ -6,6 +6,7 @@ use glium::{Display, Surface};
 use imgui::{Context, FontConfig, FontGlyphRanges, FontSource, Ui};
 use imgui_glium_renderer::Renderer;
 use imgui_winit_support::{HiDpiMode, WinitPlatform};
+use std::path::MAIN_SEPARATOR;
 use std::time::Instant;
 
 mod clipboard;
@@ -20,7 +21,7 @@ pub struct System {
 }
 
 pub fn init(title: &str) -> System {
-    let title = match title.rfind('/') {
+    let title = match title.rfind(MAIN_SEPARATOR) {
         Some(idx) => title.split_at(idx + 1).1,
         None => title,
     };
