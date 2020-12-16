@@ -6,7 +6,7 @@ use glium::{Display, Surface};
 use imgui::{Context, FontConfig, FontGlyphRanges, FontSource, Ui};
 use imgui_glium_renderer::Renderer;
 use imgui_winit_support::{HiDpiMode, WinitPlatform};
-use std::path::MAIN_SEPARATOR;
+use std::path::Path;
 use std::time::Instant;
 
 mod clipboard;
@@ -21,8 +21,8 @@ pub struct System {
 }
 
 pub fn init(title: &str) -> System {
-    let title = match title.rfind(MAIN_SEPARATOR) {
-        Some(idx) => title.split_at(idx + 1).1,
+    let title = match Path::new(&title).file_name() {
+        Some(file_name) => file_name.to_str().unwrap(),
         None => title,
     };
     let event_loop = EventLoop::new();
