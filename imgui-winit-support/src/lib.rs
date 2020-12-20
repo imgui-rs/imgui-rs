@@ -285,7 +285,7 @@ struct CursorSettings {
 
 fn to_winit_cursor(cursor: imgui::MouseCursor) -> MouseCursor {
     match cursor {
-        imgui::MouseCursor::Arrow => MouseCursor::Arrow,
+        imgui::MouseCursor::Arrow => MouseCursor::Default,
         imgui::MouseCursor::TextInput => MouseCursor::Text,
         imgui::MouseCursor::ResizeAll => MouseCursor::Move,
         imgui::MouseCursor::ResizeNS => MouseCursor::NsResize,
