@@ -29,7 +29,7 @@ fn main() -> io::Result<()> {
     println!(
         "cargo:THIRD_PARTY={}",
         manifest_dir.join("third-party").display()
-            );
+    );
     for (key, value) in DEFINES.iter() {
         println!("cargo:DEFINE_{}={}", key, value.unwrap_or(""));
     }
