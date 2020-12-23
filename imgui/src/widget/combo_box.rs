@@ -39,19 +39,19 @@ bitflags!(
 #[repr(transparent)]
 pub struct ComboBoxFlags: u32 {
     /// Align the popup toward the left by default
-    const POPUP_ALIGN_LEFT = sys::ImGuiComboFlags_PopupAlignLeft;
+    const POPUP_ALIGN_LEFT = sys::ImGuiComboFlags_PopupAlignLeft as u32;
     /// Max ~4 items visible.
-    const HEIGHT_SMALL = sys::ImGuiComboFlags_HeightSmall;
+    const HEIGHT_SMALL = sys::ImGuiComboFlags_HeightSmall as u32;
     /// Max ~8 items visible (default)
-    const HEIGHT_REGULAR = sys::ImGuiComboFlags_HeightRegular;
+    const HEIGHT_REGULAR = sys::ImGuiComboFlags_HeightRegular as u32;
     /// Max ~20 items visible
-    const HEIGHT_LARGE = sys::ImGuiComboFlags_HeightLarge;
+    const HEIGHT_LARGE = sys::ImGuiComboFlags_HeightLarge as u32;
     /// As many fitting items as possible
-    const HEIGHT_LARGEST = sys::ImGuiComboFlags_HeightLargest;
+    const HEIGHT_LARGEST = sys::ImGuiComboFlags_HeightLargest as u32;
     /// Display on the preview box without the square arrow button
-    const NO_ARROW_BUTTON = sys::ImGuiComboFlags_NoArrowButton;
+    const NO_ARROW_BUTTON = sys::ImGuiComboFlags_NoArrowButton as u32;
     /// Display only a square arrow button
-    const NO_PREVIEW = sys::ImGuiComboFlags_NoPreview;
+    const NO_PREVIEW = sys::ImGuiComboFlags_NoPreview as u32;
 }
 );
 

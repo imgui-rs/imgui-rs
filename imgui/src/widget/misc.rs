@@ -10,11 +10,11 @@ bitflags!(
     #[repr(transparent)]
     pub struct ButtonFlags: u32 {
         /// React on left mouse button
-        const MOUSE_BUTTON_LEFT = sys::ImGuiButtonFlags_MouseButtonLeft;
+        const MOUSE_BUTTON_LEFT = sys::ImGuiButtonFlags_MouseButtonLeft as u32;
         /// React on right mouse button
-        const MOUSE_BUTTON_RIGHT = sys::ImGuiButtonFlags_MouseButtonRight;
+        const MOUSE_BUTTON_RIGHT = sys::ImGuiButtonFlags_MouseButtonRight as u32;
         /// React on middle mouse button
-        const MOUSE_BUTTON_MIDDLE = sys::ImGuiButtonFlags_MouseButtonMiddle;
+        const MOUSE_BUTTON_MIDDLE = sys::ImGuiButtonFlags_MouseButtonMiddle as u32;
     }
 );
 

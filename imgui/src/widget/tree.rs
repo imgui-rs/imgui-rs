@@ -13,45 +13,45 @@ bitflags!(
     #[repr(transparent)]
     pub struct TreeNodeFlags: u32 {
         /// Draw as selected
-        const SELECTED = sys::ImGuiTreeNodeFlags_Selected;
+        const SELECTED = sys::ImGuiTreeNodeFlags_Selected as u32;
         /// Full colored frame (e.g. for CollapsingHeader)
-        const FRAMED = sys::ImGuiTreeNodeFlags_Framed;
+        const FRAMED = sys::ImGuiTreeNodeFlags_Framed as u32;
         /// Hit testing to allow subsequent widgets to overlap this one
-        const ALLOW_ITEM_OVERLAP = sys::ImGuiTreeNodeFlags_AllowItemOverlap;
+        const ALLOW_ITEM_OVERLAP = sys::ImGuiTreeNodeFlags_AllowItemOverlap as u32;
         /// Don't push a tree node when open (e.g. for CollapsingHeader) = no extra indent nor
         /// pushing on ID stack
-        const NO_TREE_PUSH_ON_OPEN = sys::ImGuiTreeNodeFlags_NoTreePushOnOpen;
+        const NO_TREE_PUSH_ON_OPEN = sys::ImGuiTreeNodeFlags_NoTreePushOnOpen as u32;
         /// Don't automatically and temporarily open node when Logging is active (by default
         /// logging will automatically open tree nodes)
-        const NO_AUTO_OPEN_ON_LOG = sys::ImGuiTreeNodeFlags_NoAutoOpenOnLog;
+        const NO_AUTO_OPEN_ON_LOG = sys::ImGuiTreeNodeFlags_NoAutoOpenOnLog as u32;
         /// Default node to be open
-        const DEFAULT_OPEN = sys::ImGuiTreeNodeFlags_DefaultOpen;
+        const DEFAULT_OPEN = sys::ImGuiTreeNodeFlags_DefaultOpen as u32;
         /// Need double-click to open node
-        const OPEN_ON_DOUBLE_CLICK = sys::ImGuiTreeNodeFlags_OpenOnDoubleClick;
+        const OPEN_ON_DOUBLE_CLICK = sys::ImGuiTreeNodeFlags_OpenOnDoubleClick as u32;
         /// Only open when clicking on the arrow part.
         ///
         /// If `TreeNodeFlags::OPEN_ON_DOUBLE_CLICK` is also set, single-click arrow or
         /// double-click all box to open.
-        const OPEN_ON_ARROW = sys::ImGuiTreeNodeFlags_OpenOnArrow;
+        const OPEN_ON_ARROW = sys::ImGuiTreeNodeFlags_OpenOnArrow as u32;
         /// No collapsing, no arrow (use as a convenience for leaf nodes)
-        const LEAF = sys::ImGuiTreeNodeFlags_Leaf;
+        const LEAF = sys::ImGuiTreeNodeFlags_Leaf as u32;
         /// Display a bullet instead of arrow
-        const BULLET = sys::ImGuiTreeNodeFlags_Bullet;
+        const BULLET = sys::ImGuiTreeNodeFlags_Bullet as u32;
         /// Use `Style::frame_padding` (even for an unframed text node) to vertically align text
         /// baseline to regular widget height.
         ///
         /// Equivalent to calling `Ui::align_text_to_frame_padding`.
-        const FRAME_PADDING = sys::ImGuiTreeNodeFlags_FramePadding;
+        const FRAME_PADDING = sys::ImGuiTreeNodeFlags_FramePadding as u32;
         /// Extend hit box to the right-most edge, even if not framed.
         ///
         /// This is not the default in order to allow adding other items on the same line. In the
         /// future we may refactor the hit system to be front-to-back, allowing natural overlaps
         /// and then this can become the default.
-        const SPAN_AVAIL_WIDTH = sys::ImGuiTreeNodeFlags_SpanAvailWidth;
+        const SPAN_AVAIL_WIDTH = sys::ImGuiTreeNodeFlags_SpanAvailWidth as u32;
         /// Extend hit box to the left-most and right-most edges (bypass the indented area)
-        const SPAN_FULL_WIDTH = sys::ImGuiTreeNodeFlags_SpanFullWidth;
+        const SPAN_FULL_WIDTH = sys::ImGuiTreeNodeFlags_SpanFullWidth as u32;
         /// (WIP) Nav: left direction may move to this tree node from any of its child
-        const NAV_LEFT_JUMPS_BACK_HERE = sys::ImGuiTreeNodeFlags_NavLeftJumpsBackHere;
+        const NAV_LEFT_JUMPS_BACK_HERE = sys::ImGuiTreeNodeFlags_NavLeftJumpsBackHere as u32;
     }
 );
 

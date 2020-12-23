@@ -10,14 +10,14 @@ bitflags! {
     #[repr(transparent)]
     pub struct ItemHoveredFlags: u32 {
         /// Return true even if a popup window is blocking access to this item
-        const ALLOW_WHEN_BLOCKED_BY_POPUP = sys::ImGuiHoveredFlags_AllowWhenBlockedByPopup;
+        const ALLOW_WHEN_BLOCKED_BY_POPUP = sys::ImGuiHoveredFlags_AllowWhenBlockedByPopup as u32;
         /// Return true even if an active item is blocking access to this item
-        const ALLOW_WHEN_BLOCKED_BY_ACTIVE_ITEM = sys::ImGuiHoveredFlags_AllowWhenBlockedByActiveItem;
+        const ALLOW_WHEN_BLOCKED_BY_ACTIVE_ITEM = sys::ImGuiHoveredFlags_AllowWhenBlockedByActiveItem as u32;
         /// Return true even if the position is obstructed or overlapped by another window
-        const ALLOW_WHEN_OVERLAPPED = sys::ImGuiHoveredFlags_AllowWhenOverlapped;
+        const ALLOW_WHEN_OVERLAPPED = sys::ImGuiHoveredFlags_AllowWhenOverlapped as u32;
         /// Return true even if the item is disabled
-        const ALLOW_WHEN_DISABLED = sys::ImGuiHoveredFlags_AllowWhenDisabled;
-        const RECT_ONLY = sys::ImGuiHoveredFlags_RectOnly;
+        const ALLOW_WHEN_DISABLED = sys::ImGuiHoveredFlags_AllowWhenDisabled as u32;
+        const RECT_ONLY = sys::ImGuiHoveredFlags_RectOnly as u32;
     }
 }
 

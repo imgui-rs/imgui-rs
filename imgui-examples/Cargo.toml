@@ -16,3 +16,4 @@ image = "0.23"
 imgui = { path = "../imgui" }
 imgui-glium-renderer = { path = "../imgui-glium-renderer" }
 imgui-winit-support = { path = "../imgui-winit-support" }
+imgui-sys = {path = "../imgui-sys"}

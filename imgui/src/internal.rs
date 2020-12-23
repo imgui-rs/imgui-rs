@@ -101,16 +101,16 @@ pub unsafe trait RawCast<T>: Sized {
 #[repr(u32)]
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
 pub enum DataType {
-    I8 = sys::ImGuiDataType_S8,
-    U8 = sys::ImGuiDataType_U8,
-    I16 = sys::ImGuiDataType_S16,
-    U16 = sys::ImGuiDataType_U16,
-    I32 = sys::ImGuiDataType_S32,
-    U32 = sys::ImGuiDataType_U32,
-    I64 = sys::ImGuiDataType_S64,
-    U64 = sys::ImGuiDataType_U64,
-    F32 = sys::ImGuiDataType_Float,
-    F64 = sys::ImGuiDataType_Double,
+    I8 = sys::ImGuiDataType_S8 as u32,
+    U8 = sys::ImGuiDataType_U8 as u32,
+    I16 = sys::ImGuiDataType_S16 as u32,
+    U16 = sys::ImGuiDataType_U16 as u32,
+    I32 = sys::ImGuiDataType_S32 as u32,
+    U32 = sys::ImGuiDataType_U32 as u32,
+    I64 = sys::ImGuiDataType_S64 as u32,
+    U64 = sys::ImGuiDataType_U64 as u32,
+    F32 = sys::ImGuiDataType_Float as u32,
+    F64 = sys::ImGuiDataType_Double as u32,
 }
 
 /// Primitive type marker.

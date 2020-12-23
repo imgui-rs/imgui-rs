@@ -17,11 +17,11 @@ bitflags! {
     #[repr(transparent)]
     pub struct FontAtlasFlags: u32 {
         /// Don't round the height to next power of two
-        const NO_POWER_OF_TWO_HEIGHT = sys::ImFontAtlasFlags_NoPowerOfTwoHeight;
+        const NO_POWER_OF_TWO_HEIGHT = sys::ImFontAtlasFlags_NoPowerOfTwoHeight as u32;
         /// Don't build software mouse cursors into the atlas
-        const NO_MOUSE_CURSORS = sys::ImFontAtlasFlags_NoMouseCursors;
+        const NO_MOUSE_CURSORS = sys::ImFontAtlasFlags_NoMouseCursors as u32;
         /// Don't build thick line textures into the atlas
-        const NO_BAKED_LINES = sys::ImFontAtlasFlags_NoBakedLines;
+        const NO_BAKED_LINES = sys::ImFontAtlasFlags_NoBakedLines as u32;
     }
 }
 

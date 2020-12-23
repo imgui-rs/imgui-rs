@@ -18,40 +18,40 @@ bitflags! {
         /// Master keyboard navigation enable flag.
         ///
         /// `frame()` will automatically fill `io.nav_inputs` based on `io.keys_down`.
-        const NAV_ENABLE_KEYBOARD = sys::ImGuiConfigFlags_NavEnableKeyboard;
+        const NAV_ENABLE_KEYBOARD = sys::ImGuiConfigFlags_NavEnableKeyboard as u32;
         /// Master gamepad navigation enable flag.
         ///
         /// This is mostly to instruct the backend to fill `io.nav_inputs`. The backend
         /// also needs to set `BackendFlags::HasGamepad`.
-        const NAV_ENABLE_GAMEPAD = sys::ImGuiConfigFlags_NavEnableGamepad;
+        const NAV_ENABLE_GAMEPAD = sys::ImGuiConfigFlags_NavEnableGamepad as u32;
         /// Instruction navigation to move the mouse cursor.
         ///
         /// May be useful on TV/console systems where moving a virtual mouse is awkward.
         /// Will update `io.mouse_pos` and set `io.want_set_mouse_pos = true`. If enabled,
         /// you *must* honor `io.want_set_mouse_pos`, or imgui-rs will react as if the mouse is
         /// jumping around back and forth.
-        const NAV_ENABLE_SET_MOUSE_POS = sys::ImGuiConfigFlags_NavEnableSetMousePos;
+        const NAV_ENABLE_SET_MOUSE_POS = sys::ImGuiConfigFlags_NavEnableSetMousePos as u32;
         /// Instruction navigation to not set the `io.want_capture_keyboard` flag when
         /// `io.nav_active` is set.
-        const NAV_NO_CAPTURE_KEYBOARD = sys::ImGuiConfigFlags_NavNoCaptureKeyboard;
+        const NAV_NO_CAPTURE_KEYBOARD = sys::ImGuiConfigFlags_NavNoCaptureKeyboard as u32;
         /// Instruction imgui-rs to clear mouse position/buttons in `frame()`.
         ///
         /// This allows ignoring the mouse information set by the backend.
-        const NO_MOUSE = sys::ImGuiConfigFlags_NoMouse;
+        const NO_MOUSE = sys::ImGuiConfigFlags_NoMouse as u32;
         /// Instruction backend to not alter mouse cursor shape and visibility.
         ///
         /// Use if the backend cursor changes are interfering with yours and you don't want to use
         /// `set_mouse_cursor` to change the mouse cursor. You may want to honor requests from
         /// imgui-rs by reading `get_mouse_cursor` yourself instead.
-        const NO_MOUSE_CURSOR_CHANGE = sys::ImGuiConfigFlags_NoMouseCursorChange;
+        const NO_MOUSE_CURSOR_CHANGE = sys::ImGuiConfigFlags_NoMouseCursorChange as u32;
         /// Application is SRGB-aware.
         ///
         /// Not used by core imgui-rs.
-        const IS_SRGB = sys::ImGuiConfigFlags_IsSRGB;
+        const IS_SRGB = sys::ImGuiConfigFlags_IsSRGB as u32;
         /// Application is using a touch screen instead of a mouse.
         ///
         /// Not used by core imgui-rs.
-        const IS_TOUCH_SCREEN = sys::ImGuiConfigFlags_IsTouchScreen;
+        const IS_TOUCH_SCREEN = sys::ImGuiConfigFlags_IsTouchScreen as u32;
     }
 }
 
@@ -60,17 +60,17 @@ bitflags! {
     #[repr(transparent)]
     pub struct BackendFlags: u32 {
         /// Backend supports gamepad and currently has one connected
-        const HAS_GAMEPAD = sys::ImGuiBackendFlags_HasGamepad;
+        const HAS_GAMEPAD = sys::ImGuiBackendFlags_HasGamepad as u32;
         /// Backend supports honoring `get_mouse_cursor` value to change the OS cursor shape
-        const HAS_MOUSE_CURSORS = sys::ImGuiBackendFlags_HasMouseCursors;
+        const HAS_MOUSE_CURSORS = sys::ImGuiBackendFlags_HasMouseCursors as u32;
         /// Backend supports `io.want_set_mouse_pos` requests to reposition the OS mouse position.
         ///
         /// Only used if `ConfigFlags::NavEnableSetMousePos` is set.
-        const HAS_SET_MOUSE_POS = sys::ImGuiBackendFlags_HasSetMousePos;
+        const HAS_SET_MOUSE_POS = sys::ImGuiBackendFlags_HasSetMousePos as u32;
         /// Backend renderer supports DrawCmd::vtx_offset.
         ///
         /// This enables output of large meshes (64K+ vertices) while still using 16-bits indices.
-        const RENDERER_HAS_VTX_OFFSET = sys::ImGuiBackendFlags_RendererHasVtxOffset;
+        const RENDERER_HAS_VTX_OFFSET = sys::ImGuiBackendFlags_RendererHasVtxOffset as u32;
     }
 }
 
@@ -78,22 +78,22 @@ bitflags! {
 #[repr(u32)]
 #[derive(Copy, Clone, Debug, Hash, Eq, PartialEq)]
 pub enum NavInput {
-    Activate = sys::ImGuiNavInput_Activate,
-    Cancel = sys::ImGuiNavInput_Cancel,
-    Input = sys::ImGuiNavInput_Input,
-    Menu = sys::ImGuiNavInput_Menu,
-    DpadLeft = sys::ImGuiNavInput_DpadLeft,
-    DpadRight = sys::ImGuiNavInput_DpadRight,
-    DpadUp = sys::ImGuiNavInput_DpadUp,
-    DpadDown = sys::ImGuiNavInput_DpadDown,
-    LStickLeft = sys::ImGuiNavInput_LStickLeft,
-    LStickRight = sys::ImGuiNavInput_LStickRight,
-    LStickUp = sys::ImGuiNavInput_LStickUp,
-    LStickDown = sys::ImGuiNavInput_LStickDown,
-    FocusPrev = sys::ImGuiNavInput_FocusPrev,
-    FocusNext = sys::ImGuiNavInput_FocusNext,
-    TweakSlow = sys::ImGuiNavInput_TweakSlow,
-    TweakFast = sys::ImGuiNavInput_TweakFast,
+    Activate = sys::ImGuiNavInput_Activate as u32,
+    Cancel = sys::ImGuiNavInput_Cancel as u32,
+    Input = sys::ImGuiNavInput_Input as u32,
+    Menu = sys::ImGuiNavInput_Menu as u32,
+    DpadLeft = sys::ImGuiNavInput_DpadLeft as u32,
+    DpadRight = sys::ImGuiNavInput_DpadRight as u32,
+    DpadUp = sys::ImGuiNavInput_DpadUp as u32,
+    DpadDown = sys::ImGuiNavInput_DpadDown as u32,
+    LStickLeft = sys::ImGuiNavInput_LStickLeft as u32,
+    LStickRight = sys::ImGuiNavInput_LStickRight as u32,
+    LStickUp = sys::ImGuiNavInput_LStickUp as u32,
+    LStickDown = sys::ImGuiNavInput_LStickDown as u32,
+    FocusPrev = sys::ImGuiNavInput_FocusPrev as u32,
+    FocusNext = sys::ImGuiNavInput_FocusNext as u32,
+    TweakSlow = sys::ImGuiNavInput_TweakSlow as u32,
+    TweakFast = sys::ImGuiNavInput_TweakFast as u32,
 }
 
 impl NavInput {

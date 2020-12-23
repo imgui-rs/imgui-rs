@@ -29,30 +29,30 @@ use std::{ptr, thread};
 bitflags! {
     #[repr(transparent)]
     pub struct TabBarFlags: u32 {
-        const REORDERABLE = sys::ImGuiTabBarFlags_Reorderable;
-        const AUTO_SELECT_NEW_TABS = sys::ImGuiTabBarFlags_AutoSelectNewTabs;
-        const TAB_LIST_POPUP_BUTTON = sys::ImGuiTabBarFlags_TabListPopupButton;
-        const NO_CLOSE_WITH_MIDDLE_MOUSE_BUTTON = sys::ImGuiTabBarFlags_NoCloseWithMiddleMouseButton;
-        const NO_TAB_LIST_SCROLLING_BUTTONS = sys::ImGuiTabBarFlags_NoTabListScrollingButtons;
-        const NO_TOOLTIP = sys::ImGuiTabBarFlags_NoTooltip;
-        const FITTING_POLICY_RESIZE_DOWN = sys::ImGuiTabBarFlags_FittingPolicyResizeDown;
-        const FITTING_POLICY_SCROLL = sys::ImGuiTabBarFlags_FittingPolicyScroll;
-        const FITTING_POLICY_MASK = sys::ImGuiTabBarFlags_FittingPolicyMask_;
-        const FITTING_POLICY_DEFAULT = sys::ImGuiTabBarFlags_FittingPolicyDefault_;
+        const REORDERABLE = sys::ImGuiTabBarFlags_Reorderable as u32;
+        const AUTO_SELECT_NEW_TABS = sys::ImGuiTabBarFlags_AutoSelectNewTabs as u32;
+        const TAB_LIST_POPUP_BUTTON = sys::ImGuiTabBarFlags_TabListPopupButton as u32;
+        const NO_CLOSE_WITH_MIDDLE_MOUSE_BUTTON = sys::ImGuiTabBarFlags_NoCloseWithMiddleMouseButton as u32;
+        const NO_TAB_LIST_SCROLLING_BUTTONS = sys::ImGuiTabBarFlags_NoTabListScrollingButtons as u32;
+        const NO_TOOLTIP = sys::ImGuiTabBarFlags_NoTooltip as u32;
+        const FITTING_POLICY_RESIZE_DOWN = sys::ImGuiTabBarFlags_FittingPolicyResizeDown as u32;
+        const FITTING_POLICY_SCROLL = sys::ImGuiTabBarFlags_FittingPolicyScroll as u32;
+        const FITTING_POLICY_MASK = sys::ImGuiTabBarFlags_FittingPolicyMask_ as u32;
+        const FITTING_POLICY_DEFAULT = sys::ImGuiTabBarFlags_FittingPolicyDefault_ as u32;
     }
 }
 
 bitflags! {
     #[repr(transparent)]
     pub struct TabItemFlags: u32 {
-        const UNSAVED_DOCUMENT = sys::ImGuiTabItemFlags_UnsavedDocument;
-        const SET_SELECTED = sys::ImGuiTabItemFlags_SetSelected;
-        const NO_CLOSE_WITH_MIDDLE_MOUSE_BUTTON = sys::ImGuiTabItemFlags_NoCloseWithMiddleMouseButton;
-        const NO_PUSH_ID = sys::ImGuiTabItemFlags_NoPushId;
-        const NO_TOOLTIP = sys::ImGuiTabItemFlags_NoTooltip;
-        const NO_REORDER = sys::ImGuiTabItemFlags_NoReorder;
-        const LEADING = sys::ImGuiTabItemFlags_Leading;
-        const TRAILING = sys::ImGuiTabItemFlags_Trailing;
+        const UNSAVED_DOCUMENT = sys::ImGuiTabItemFlags_UnsavedDocument as u32;
+        const SET_SELECTED = sys::ImGuiTabItemFlags_SetSelected as u32;
+        const NO_CLOSE_WITH_MIDDLE_MOUSE_BUTTON = sys::ImGuiTabItemFlags_NoCloseWithMiddleMouseButton as u32;
+        const NO_PUSH_ID = sys::ImGuiTabItemFlags_NoPushId as u32;
+        const NO_TOOLTIP = sys::ImGuiTabItemFlags_NoTooltip as u32;
+        const NO_REORDER = sys::ImGuiTabItemFlags_NoReorder as u32;
+        const LEADING = sys::ImGuiTabItemFlags_Leading as u32;
+        const TRAILING = sys::ImGuiTabItemFlags_Trailing as u32;
     }
 }
 

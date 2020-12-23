@@ -11,7 +11,7 @@ categories = ["gui", "external-ffi-bindings"]
 build = "build.rs"
 links = "imgui"
 # exclude json, lua, and the imgui subdirs (imgui/examples, imgui/docs, etc)
-exclude = ["third-party/*.json", "third-party/*.lua", "third-party/imgui/*/"]
+exclude = ["third-party/*.json", "third-party/*.lua", "third-party/cimgui/imgui/*/"]
 
 [dependencies]
 cty = "0.2"

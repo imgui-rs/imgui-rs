@@ -14,13 +14,13 @@ bitflags!(
         /// Clamp value to min/max bounds when input manually with CTRL+Click.
         ///
         /// By default CTRL+click allows going out of bounds.
-        const ALWAYS_CLAMP = sys::ImGuiSliderFlags_AlwaysClamp;
+        const ALWAYS_CLAMP = sys::ImGuiSliderFlags_AlwaysClamp as u32;
         /// Make the widget logarithmic instead of linear
-        const LOGARITHMIC = sys::ImGuiSliderFlags_Logarithmic;
+        const LOGARITHMIC = sys::ImGuiSliderFlags_Logarithmic as u32;
         /// Disable rounding underlying value to match precision of the display format string
-        const NO_ROUND_TO_FORMAT = sys::ImGuiSliderFlags_NoRoundToFormat;
+        const NO_ROUND_TO_FORMAT = sys::ImGuiSliderFlags_NoRoundToFormat as u32;
         /// Disable CTRL+Click or Enter key allowing to input text directly into the widget
-        const NO_INPUT = sys::ImGuiSliderFlags_NoInput;
+        const NO_INPUT = sys::ImGuiSliderFlags_NoInput as u32;
     }
 );
 
