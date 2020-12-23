@@ -10,3 +10,4 @@ publish = false
 anyhow = "1"
 pico-args = "0.3"
 smoljson = "0.1"
+bindgen = "0.56.0"
