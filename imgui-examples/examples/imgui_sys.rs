@@ -1,7 +1,6 @@
 use imgui::*;
 use imgui_sys::*;
 use std::ptr::null_mut;
-use std::ffi::CString;
 
 mod support;
 

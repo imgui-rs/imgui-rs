@@ -101,6 +101,7 @@ fn get_definitions(definitions: &Path) -> Result<Vec<String>> {
 	Ok(keep_defs)
 }
 
+#[allow(dead_code)]
 fn generate_binding_file(
 	header: &Path,
 	output: &Path,
@@ -177,8 +178,8 @@ fn generate_binding_file_direct(
 		.ctypes_prefix("cty");
 	
 	
-	if wasm_import_mod.is_some() {
-		bindgen = bindgen.wasm_import_module_name(wasm_import_mod.unwrap());
+	if let Some(name ) = wasm_import_mod {
+		bindgen = bindgen.wasm_import_module_name(name);
 	}
 	
 	for t in types {
