@@ -10,6 +10,7 @@ use std::thread;
 
 pub use self::clipboard::*;
 pub use self::context::*;
+pub use self::draw_list::{ChannelsSplit, DrawListMut, ImColor};
 pub use self::fonts::atlas::*;
 pub use self::fonts::font::*;
 pub use self::fonts::glyph::*;
@@ -46,12 +47,12 @@ pub use self::widget::tab::*;
 pub use self::widget::tree::*;
 pub use self::window::child_window::*;
 pub use self::window::*;
-pub use self::window_draw_list::{ChannelsSplit, ImColor, WindowDrawList};
 use internal::RawCast;
 
 mod clipboard;
 mod columns;
 mod context;
+mod draw_list;
 mod fonts;
 mod input;
 mod input_widget;
@@ -72,7 +73,6 @@ mod test;
 mod utils;
 mod widget;
 mod window;
-mod window_draw_list;
 
 /// Returns the underlying Dear ImGui library version
 pub fn dear_imgui_version() -> &'static str {
@@ -470,7 +470,7 @@ impl<'ui> Ui<'ui> {
     /// }
     /// ```
     ///
-    /// This function will panic if several instances of [`WindowDrawList`]
+    /// This function will panic if several instances of [`DrawListMut`]
     /// coexist. Before a new instance is got, a previous instance should be
     /// dropped.
     ///
@@ -485,13 +485,18 @@ impl<'ui> Ui<'ui> {
     /// }
     /// ```
     #[must_use]
-    pub fn get_window_draw_list(&'ui self) -> WindowDrawList<'ui> {
-        WindowDrawList::new(self)
+    pub fn get_window_draw_list(&'ui self) -> DrawListMut<'ui> {
+        DrawListMut::window(self)
     }
 
     #[must_use]
-    pub fn get_background_draw_list(&'ui self) -> WindowDrawList<'ui> {
-        WindowDrawList::new(self).background()
+    pub fn get_background_draw_list(&'ui self) -> DrawListMut<'ui> {
+        DrawListMut::background(self)
+    }
+
+    #[must_use]
+    pub fn get_foreground_draw_list(&'ui self) -> DrawListMut<'ui> {
+        DrawListMut::foreground(self)
     }
 }
 

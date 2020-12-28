@@ -53,26 +53,25 @@ impl From<(f32, f32, f32)> for ImColor {
 
 /// Object implementing the custom draw API.
 ///
-/// Called from [`Ui::get_window_draw_list`]. No more than one instance of this
-/// structure can live in a program at the same time.
+/// Called from [`Ui::get_window_draw_list`], [`Ui::get_background_draw_list`] or [`Ui::get_foreground_draw_list`].
+/// No more than one instance of this structure can live in a program at the same time.
 /// The program will panic on creating a second instance.
-pub struct WindowDrawList<'ui> {
+pub struct DrawListMut<'ui> {
     draw_list: *mut ImDrawList,
     _phantom: PhantomData<&'ui Ui<'ui>>,
 }
 
-static WINDOW_DRAW_LIST_LOADED: std::sync::atomic::AtomicBool =
-    std::sync::atomic::AtomicBool::new(false);
+static DRAW_LIST_LOADED: std::sync::atomic::AtomicBool = std::sync::atomic::AtomicBool::new(false);
 
-impl<'ui> Drop for WindowDrawList<'ui> {
+impl<'ui> Drop for DrawListMut<'ui> {
     fn drop(&mut self) {
-        WINDOW_DRAW_LIST_LOADED.store(false, std::sync::atomic::Ordering::Release);
+        DRAW_LIST_LOADED.store(false, std::sync::atomic::Ordering::Release);
     }
 }
 
-impl<'ui> WindowDrawList<'ui> {
-    pub(crate) fn new(_: &Ui<'ui>) -> Self {
-        let already_loaded = WINDOW_DRAW_LIST_LOADED
+impl<'ui> DrawListMut<'ui> {
+    fn lock_draw_list() {
+        let already_loaded = DRAW_LIST_LOADED
             .compare_exchange(
                 false,
                 true,
@@ -81,17 +80,30 @@ impl<'ui> WindowDrawList<'ui> {
             )
             .is_err();
         if already_loaded {
-            panic!("WindowDrawList is already loaded! You can only load one instance of it!")
+            panic!("DrawListMut is already loaded! You can only load one instance of it!")
         }
+    }
+
+    pub(crate) fn window(_: &Ui<'ui>) -> Self {
+        Self::lock_draw_list();
         Self {
             draw_list: unsafe { sys::igGetWindowDrawList() },
             _phantom: PhantomData,
         }
     }
 
-    pub(crate) fn background(self) -> Self {
+    pub(crate) fn background(_: &Ui<'ui>) -> Self {
+        Self::lock_draw_list();
         Self {
             draw_list: unsafe { sys::igGetBackgroundDrawList() },
+            _phantom: PhantomData,
+        }
+    }
+
+    pub(crate) fn foreground(_: &Ui<'ui>) -> Self {
+        Self::lock_draw_list();
+        Self {
+            draw_list: unsafe { sys::igGetForegroundDrawList() },
             _phantom: PhantomData,
         }
     }
@@ -127,9 +139,9 @@ impl<'ui> WindowDrawList<'ui> {
 
 /// Represent the drawing interface within a call to [`channels_split`].
 ///
-/// [`channels_split`]: WindowDrawList::channels_split
+/// [`channels_split`]: DrawListMut::channels_split
 pub struct ChannelsSplit<'ui> {
-    draw_list: &'ui WindowDrawList<'ui>,
+    draw_list: &'ui DrawListMut<'ui>,
     channels_count: u32,
 }
 
@@ -151,7 +163,7 @@ impl<'ui> ChannelsSplit<'ui> {
 }
 
 /// Drawing functions
-impl<'ui> WindowDrawList<'ui> {
+impl<'ui> DrawListMut<'ui> {
     /// Returns a line from point `p1` to `p2` with color `c`.
     pub fn add_line<C>(&'ui self, p1: [f32; 2], p2: [f32; 2], c: C) -> Line<'ui>
     where
@@ -291,11 +303,11 @@ pub struct Line<'ui> {
     p2: [f32; 2],
     color: ImColor,
     thickness: f32,
-    draw_list: &'ui WindowDrawList<'ui>,
+    draw_list: &'ui DrawListMut<'ui>,
 }
 
 impl<'ui> Line<'ui> {
-    fn new<C>(draw_list: &'ui WindowDrawList, p1: [f32; 2], p2: [f32; 2], c: C) -> Self
+    fn new<C>(draw_list: &'ui DrawListMut, p1: [f32; 2], p2: [f32; 2], c: C) -> Self
     where
         C: Into<ImColor>,
     {
@@ -338,11 +350,11 @@ pub struct Rect<'ui> {
     flags: ImDrawCornerFlags,
     thickness: f32,
     filled: bool,
-    draw_list: &'ui WindowDrawList<'ui>,
+    draw_list: &'ui DrawListMut<'ui>,
 }
 
 impl<'ui> Rect<'ui> {
-    fn new<C>(draw_list: &'ui WindowDrawList, p1: [f32; 2], p2: [f32; 2], c: C) -> Self
+    fn new<C>(draw_list: &'ui DrawListMut, p1: [f32; 2], p2: [f32; 2], c: C) -> Self
     where
         C: Into<ImColor>,
     {
@@ -439,17 +451,11 @@ pub struct Triangle<'ui> {
     color: ImColor,
     thickness: f32,
     filled: bool,
-    draw_list: &'ui WindowDrawList<'ui>,
+    draw_list: &'ui DrawListMut<'ui>,
 }
 
 impl<'ui> Triangle<'ui> {
-    fn new<C>(
-        draw_list: &'ui WindowDrawList,
-        p1: [f32; 2],
-        p2: [f32; 2],
-        p3: [f32; 2],
-        c: C,
-    ) -> Self
+    fn new<C>(draw_list: &'ui DrawListMut, p1: [f32; 2], p2: [f32; 2], p3: [f32; 2], c: C) -> Self
     where
         C: Into<ImColor>,
     {
@@ -512,11 +518,11 @@ pub struct Circle<'ui> {
     num_segments: u32,
     thickness: f32,
     filled: bool,
-    draw_list: &'ui WindowDrawList<'ui>,
+    draw_list: &'ui DrawListMut<'ui>,
 }
 
 impl<'ui> Circle<'ui> {
-    pub fn new<C>(draw_list: &'ui WindowDrawList, center: [f32; 2], radius: f32, color: C) -> Self
+    pub fn new<C>(draw_list: &'ui DrawListMut, center: [f32; 2], radius: f32, color: C) -> Self
     where
         C: Into<ImColor>,
     {
@@ -588,12 +594,12 @@ pub struct BezierCurve<'ui> {
     thickness: f32,
     /// If num_segments is not set, the bezier curve is auto-tessalated.
     num_segments: Option<u32>,
-    draw_list: &'ui WindowDrawList<'ui>,
+    draw_list: &'ui DrawListMut<'ui>,
 }
 
 impl<'ui> BezierCurve<'ui> {
     fn new<C>(
-        draw_list: &'ui WindowDrawList,
+        draw_list: &'ui DrawListMut,
         pos0: [f32; 2],
         cp0: [f32; 2],
         cp1: [f32; 2],
