@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+### Changed
+
+- is_key_down, is_key_pressed, is_key_released and key_pressed_amount now make a call to key_index internally and thus take a Key instead of u32
+
+### Removed
+
+- key_index is now only used internally
+
 ## [0.6.0] - 2020-11-15
 
 ### Added
