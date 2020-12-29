@@ -94,31 +94,35 @@ impl<'ui> Ui<'ui> {
     /// Returns the key index of the given key identifier.
     ///
     /// Equivalent to indexing the Io struct `key_map` field: `ui.io().key_map[key]`
-    pub fn key_index(&self, key: Key) -> u32 {
-        unsafe { sys::igGetKeyIndex(key as i32) as u32 }
+    fn key_index(&self, key: Key) -> i32 {
+        unsafe { sys::igGetKeyIndex(key as i32) }
     }
     /// Returns true if the key is being held.
     ///
     /// Equivalent to indexing the Io struct `keys_down` field: `ui.io().keys_down[key_index]`
-    pub fn is_key_down(&self, key_index: u32) -> bool {
-        unsafe { sys::igIsKeyDown(key_index as i32) }
+    pub fn is_key_down(&self, key: Key) -> bool {
+        let key_index = self.key_index(key);
+        unsafe { sys::igIsKeyDown(key_index) }
     }
     /// Returns true if the key was pressed (went from !down to down).
     ///
     /// Affected by key repeat settings (`io.key_repeat_delay`, `io.key_repeat_rate`)
-    pub fn is_key_pressed(&self, key_index: u32) -> bool {
-        unsafe { sys::igIsKeyPressed(key_index as i32, true) }
+    pub fn is_key_pressed(&self, key: Key) -> bool {
+        let key_index = self.key_index(key);
+        unsafe { sys::igIsKeyPressed(key_index, true) }
     }
     /// Returns true if the key was released (went from down to !down)
-    pub fn is_key_released(&self, key_index: u32) -> bool {
-        unsafe { sys::igIsKeyReleased(key_index as i32) }
+    pub fn is_key_released(&self, key: Key) -> bool {
+        let key_index = self.key_index(key);
+        unsafe { sys::igIsKeyReleased(key_index) }
     }
     /// Returns a count of key presses using the given repeat rate/delay settings.
     ///
     /// Usually returns 0 or 1, but might be >1 if `rate` is small enough that `io.delta_time` >
     /// `rate`.
-    pub fn key_pressed_amount(&self, key_index: u32, repeat_delay: f32, rate: f32) -> u32 {
-        unsafe { sys::igGetKeyPressedAmount(key_index as i32, repeat_delay, rate) as u32 }
+    pub fn key_pressed_amount(&self, key: Key, repeat_delay: f32, rate: f32) -> u32 {
+        let key_index = self.key_index(key);
+        unsafe { sys::igGetKeyPressedAmount(key_index, repeat_delay, rate) as u32 }
     }
     /// Focuses keyboard on a widget relative to current position
     pub fn set_keyboard_focus_here(&self, target_widget: FocusedWidget) {
