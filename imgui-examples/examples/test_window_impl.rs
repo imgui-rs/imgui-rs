@@ -49,6 +49,7 @@ struct State {
     dont_ask_me_next_time: bool,
     stacked_modals_item: usize,
     stacked_modals_color: [f32; 4],
+    app_log: Vec<String>,
 
     tabs: TabState,
 }
@@ -108,6 +109,7 @@ impl Default for State {
             dont_ask_me_next_time: false,
             stacked_modals_item: 0,
             stacked_modals_color: [0.4, 0.7, 0.0, 0.5],
+            app_log: Vec::new(),
             tabs: TabState::default(),
         }
     }
@@ -310,6 +312,10 @@ fn show_test_window(ui: &Ui, state: &mut State, opened: &mut bool) {
             &mut state.custom_rendering,
             &mut state.show_app_custom_rendering,
         );
+    }
+
+    if state.show_app_log {
+        show_app_log(ui, &mut state.app_log);
     }
 
     let mut window = Window::new(im_str!("ImGui Demo"))
@@ -1230,5 +1236,58 @@ fn show_example_app_custom_rendering(ui: &Ui, state: &mut CustomRenderingState, 
             if adding_preview {
                 state.points.pop();
             }
+        });
+}
+
+fn show_app_log(ui: &Ui, app_log: &mut Vec<String>) {
+    Window::new(im_str!("Example: Log"))
+        .size([500.0, 400.0], Condition::FirstUseEver)
+        .build(ui, || {
+            if ui.small_button(im_str!("[Debug] Add 5 entries")) {
+                let categories = ["info", "warn", "error"];
+                let words = [
+                    "Bumfuzzled",
+                    "Cattywampus",
+                    "Snickersnee",
+                    "Abibliophobia",
+                    "Absquatulate",
+                    "Nincompoop",
+                    "Pauciloquent",
+                ];
+                for _ in 0..5 {
+                    let category = categories[app_log.len() % categories.len()];
+                    let word = words[app_log.len() % words.len()];
+                    let frame = ui.frame_count();
+                    let time = ui.time();
+                    let text = format!(
+                        "{:05} {} Hello, current time is {:.1}, here's a word: {}",
+                        frame, category, time, word
+                    );
+                    app_log.push(text);
+                }
+            }
+            if ui.button(im_str!("Clear"), [0.0, 0.0]) {
+                app_log.clear();
+            }
+            ui.same_line(0.0);
+            if ui.button(im_str!("Copy"), [0.0, 0.0]) {
+                ui.set_clipboard_text(&ImString::from(app_log.join("\n")));
+            }
+            ui.separator();
+            ChildWindow::new("logwindow")
+                .flags(WindowFlags::HORIZONTAL_SCROLLBAR)
+                .build(ui, || {
+                    let mut clipper = ListClipper::new()
+                        .items_count(app_log.len() as i32)
+                        .begin(ui);
+                    while clipper.step() {
+                        for line in clipper.display_start()..clipper.display_end() {
+                            ui.text(&app_log[line as usize]);
+                        }
+                    }
+                    if ui.scroll_y() >= ui.scroll_max_y() {
+                        ui.set_scroll_here_y();
+                    }
+                });
         });
 }
