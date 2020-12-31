@@ -1277,12 +1277,12 @@ fn show_app_log(ui: &Ui, app_log: &mut Vec<String>) {
             ChildWindow::new("logwindow")
                 .flags(WindowFlags::HORIZONTAL_SCROLLBAR)
                 .build(ui, || {
-                    let mut clipper = ListClipper::new()
-                        .items_count(app_log.len() as i32)
-                        .begin(ui);
-                    while clipper.step() {
-                        for line in clipper.display_start()..clipper.display_end() {
-                            ui.text(&app_log[line as usize]);
+                    if !app_log.is_empty() {
+                        let mut clipper = ListClipper::new(app_log.len() as i32).begin(ui);
+                        while clipper.step() {
+                            for line in clipper.display_start()..clipper.display_end() {
+                                ui.text(&app_log[line as usize]);
+                            }
                         }
                     }
                     if ui.scroll_y() >= ui.scroll_max_y() {
