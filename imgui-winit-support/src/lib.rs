@@ -199,7 +199,11 @@ fn check_multiple_winits() {
     // Note that the `Ordering` basically doesn't matter here, but even if it
     // did, `Relaxed` is still correct because we're only interested in the
     // effects on a single atomic variable.
-    if winits_enabled <= 1 || COMPLAINED.compare_and_swap(false, true, Ordering::Relaxed) {
+    if winits_enabled <= 1
+        || COMPLAINED
+            .compare_exchange(false, true, Ordering::Relaxed, Ordering::Relaxed)
+            .is_err()
+    {
         return;
     }
     let mut err = Vec::with_capacity(512);
