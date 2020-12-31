@@ -10,16 +10,11 @@ pub struct ListClipper {
 }
 
 impl ListClipper {
-    pub fn new() -> Self {
+    pub fn new(items_count: i32) -> Self {
         ListClipper {
-            items_count: -1,
+            items_count,
             items_height: -1.0,
         }
-    }
-
-    pub fn items_count(mut self, items_count: i32) -> Self {
-        self.items_count = items_count;
-        self
     }
 
     pub fn items_height(mut self, items_height: f32) -> Self {
@@ -76,7 +71,7 @@ impl<'ui> Drop for ListClipperToken<'ui> {
                 sys::ImGuiListClipper_destroy(self.list_clipper);
             };
         } else if !thread::panicking() {
-            panic!("step() was not called until it returned false");
+            panic!("Forgot to call End(), or to Step() until false?");
         }
     }
 }
