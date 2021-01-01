@@ -2,28 +2,43 @@
 
 ## [Unreleased]
 
-### Changed
+- `Ui::key_index()` is now called internally when needed, and the various `is_key_foo` now take a `Key` directly: https://github.com/imgui-rs/imgui-rs/pull/416
+    - `is_key_down`, `is_key_pressed`, `is_key_released` and `key_pressed_amount` now take a `Key` instead of `u32` (breaking).
+    - `key_index` is no longer public (breaking). If you need access to the key map, it can be accessed as `ui.io().key_map[key]` (If you need to do this, file a bug, since I'm open to exposing this if there's actually a use case).
 
-- is_key_down, is_key_pressed, is_key_released and key_pressed_amount now make a call to key_index internally and thus take a Key instead of u32
-- `imgui-winit-support`'s `winit-23` feature no longer is compatible with `winit` 0.24.x, which apparently didn't work anyway. Instead the
-- The default `imgui-winit-support` feature has been changed to `winit-24`, as it's now the latest.
+- `winit` 0.23/0.24 handling has been (hopefully) fixed: https://github.com/imgui-rs/imgui-rs/pull/420 (breaking, see also https://github.com/imgui-rs/imgui-rs/issues/412).
+    - `imgui-winit-support`'s `winit-23` feature no longer supports `winit` version `0.24` (this caused an unintentional semver breakage before, unfortunately).
+    - `imgui-winit-support` has a new `winit-24` feature for 0.24 support.
+    - By default `imgui-winit-support` feature now enables `winit-24`, and not `winit-23` (by default it will always enable the latest).
 
-### Removed
+- The `imgui` crate no longer depends on `gfx` or `glium` directly: https://github.com/imgui-rs/imgui-rs/pull/420 (breaking, related to the previous change).
+    - That is, the `gfx` and `glium` features are removed to reduce version compatibility issues going forward.
+        - This only matters if you manually implement `gfx` or `glium` renderers without using the `imgui-glium-renderer` or `imgui-gfx-renderer` crates.
+        - In the (somewhat unlikely) case you were relying on these this, you should define your own vertex type that's layout-compatible with `imgui::DrawVert`, and replace calls to `imgui::DrawList::vtx_buffer()` with `imgui::DrawList::transmute_vtx_buffer::<MyDrawVert>()`. You can see `imgui_glium_renderer::GliumDrawVert` and `imgui_gfx_renderer::GfxDrawVert` types respectively for examples of this, if needed, but it should be straightforward enough if you're already implementing a renderer from scratch.
+    - This is admittedly less convenient, but avoids depending on any specific version of `gfx` or `glium` in the core `imgui` crate, which will ease maintenance and reduce unintentional breakage in the future.
 
-- key_index is now only used internally
+- Non-window DrawList support has been fixed/improved: https://github.com/imgui-rs/imgui-rs/pull/414
+    - `WindowDrawList` has been renamed to `DrawListMut`, to reflect that it may refer to other kinds of draw lists, and is mutable, unlike `imgui::DrawList` (breaking).
+    - `Ui::get_background_draw_list()` has been fixed when used outside of a window context, and now has an example.
+    - `Ui::get_foreground_draw_list()` has been added, analogous to `Ui::get_background_draw_list()`.
 
-- The `gfx` and `glium` features are removed to reduce version compatibility issues going forward.
-    - In the somewhat unlikely case that you used these features directly (and not as part of `imgui-{gfx,glium}-renderer`) you should use replace calls to `draw_list.vtx_buffer::<imgui::DrawVert>()` with `draw_list.transmute_vtx_buffer::<MyDrawVert>()`, where `MyDrawVert` is a struct with the same layout as `imgui::DrawVert` (For examples, please see the `imgui-gfx-renderer` and `imgui-glium-renderer` crates — in particular, the definition and implementation of `GliumDrawVert`/`GfxDrawVert`).
+## [0.6.1] - 2020-12-16
 
-    This is less convenient, but avoids depending on any specific version of `gfx` or `glium`, which will ease maintenance.
+- Support for winit 0.24.x
+    - Note: this change was accidentally semver-breaking, see the caveat below.
+- Support multiple simultaneous winit versions in imgui-winit-support:
+    - The latest will be if more than one is specified, and a single warning will be logged in debug builds (based on `cfg!(debug_assertions)`) at runtime if multiple are specified.
+    - This is intended to make features behave a bit more closely to additively, and reduce the pain of using this crate in a larger workspace.
+- Avoid dropping mouse events when press/release are on the same frame (macos)
+- Substantial repository layout reorganization
 
-## [0.6.1](https://github.com/imgui-rs/imgui-rs/releases/tag/v0.6.1) - 2020-12-16
+### Caveat: Semver broken in 0.6.1
 
-This release mainly updated the glium/winit/glium versions, adding support for winit `0.24` and related.
+This release accidentally broke semver, and should have been 0.7.0. It will be yanked when 0.7.0 is released, unless there are objections.
 
-Unfortunately, this caused unintentional breaking changes (it was the holidays and not enough attention was paid to the changes in an urgent-sounding request for supporting the new version), and thus violated the stated semver change.
+This happened when updating the glium/winit/glium versions, adding support for winit `0.24` and related. Unfortunately, while an attempt to avoid breakage was made, it happened regardless. This mainly happened as it was the holidays and not enough attention was paid to the changes in an urgent-sounding request for supporting the new version, and more care will be taken in the future to avoid cutting a hasty release without adequate testing.
 
-This release will be yanked once 0.7.0 is released, but not before, so that users who need 0.24 support are still able to use imgui.
+As mentioned, this release will be yanked once 0.7.0 is released, but not before, so that users who need 0.24 support are still able to use imgui until then.
 
 ## [0.6.0] - 2020-11-15
 
@@ -41,11 +56,8 @@ This release will be yanked once 0.7.0 is released, but not before, so that user
 
 ### Added
 
-- Support for ConfigFlags::RENDERER_HAS_VTX_OFFSET in imgui-glium-renderer
-  and imgui-gfx-renderer. This makes it possible to output large meshes (e.g.
-  complex UIs) without problems when using these renderers
-- `Ui::begin_tooltip` to support using tooltips with stack tokens instead
-  of closures
+- Support for ConfigFlags::RENDERER_HAS_VTX_OFFSET in imgui-glium-renderer and imgui-gfx-renderer. This makes it possible to output large meshes (e.g. complex UIs) without problems when using these renderers
+- `Ui::begin_tooltip` to support using tooltips with stack tokens instead of closures
 - API for accessing the background drawlist
 - Tab bar / tab item API
 - Redesigned drag slider API
@@ -53,15 +65,12 @@ This release will be yanked once 0.7.0 is released, but not before, so that user
 ### Changed
 
 - Upgrade to cimgui / imgui 1.78
-- Store per-texture sampler parameters in imgui-glium-renderer to support
-  customizing them
-- Slider widget constructors no longer require the range parameter. Call the
-  range function on the builder to set the range.
+- Store per-texture sampler parameters in imgui-glium-renderer to support customizing them
+- Slider widget constructors no longer require the range parameter. Call the range function on the builder to set the range.
 
 ### Fixed
 
-- Reduce unnecessary winit cursor changes which earlier caused cursor
-  flickering or invalid cursors on some platforms (at least Windows)
+- Reduce unnecessary winit cursor changes which earlier caused cursor flickering or invalid cursors on some platforms (at least Windows)
 
 ### Removed
 
@@ -112,8 +121,7 @@ This release will be yanked once 0.7.0 is released, but not before, so that user
 
 ### Fixed
 
-- Fix toggling behavior on using `MenuItem::build_with_ref` and
-  `Selectable::build_with_ref`.
+- Fix toggling behavior on using `MenuItem::build_with_ref` and `Selectable::build_with_ref`.
 - ImString nul terminator handling
 
 ## [0.2.1] - 2019-09-09
@@ -141,8 +149,7 @@ This release will be yanked once 0.7.0 is released, but not before, so that user
 - Redesigned image / image button API
 - Redesigned combo box API
 - Redesigned selectable API
-- Redesigned slider API. Generic scalar sliders support all main data types and replace
-  previous individual sliders (int, int2, int3, int4, etc...)
+- Redesigned slider API. Generic scalar sliders support all main data types and replace previous individual sliders (int, int2, int3, int4, etc...)
 - Redesigned menu API
 - Updated layout API
 - Renderer errors implement std::error::Error
@@ -151,9 +158,7 @@ This release will be yanked once 0.7.0 is released, but not before, so that user
 - These functions now take/return PathBuf: log_filename, set_log_filename, ini_filename, set_logfilename
 - ID stack manipulation now uses stack tokens
 - Parameter stack pushes *must almost always be paired by a manual call to stack pop*
-- Container widget tokens *must be ended manually by calling end*.
-  Closure-based function (e.g. build()) are unaffected and do this
-  automatically
+- Container widget tokens *must be ended manually by calling end*. Closure-based function (e.g. build()) are unaffected and do this automatically
 - Bump minimum Rust version to 1.36 (some dependencies, including winit, require MaybeUninit)
 - Upgrade to cimgui / imgui 1.72b
 
@@ -167,8 +172,7 @@ This release will be yanked once 0.7.0 is released, but not before, so that user
 
 - Support for font atlas sharing
 - Support for using multiple fonts
-- Support for suspended contexts (useful for having multiple independent
-  operating system windows)
+- Support for suspended contexts (useful for having multiple independent operating system windows)
 - Support for DX11 in imgui-gfx-renderer
 - Support for navigation input system
 - Support for backend/renderer name strings
@@ -177,19 +181,14 @@ This release will be yanked once 0.7.0 is released, but not before, so that user
 
 ### Changed
 
-- imgui-sys is now almost completely automatically generated. **This is a big
-  breaking change in imgui-sys API**
+- imgui-sys is now almost completely automatically generated. **This is a big breaking change in imgui-sys API**
 - ImGui/Context API is now safer
 - The library context (known as Context, previously known as ImGui) is no longer Send or Sync
 - Many getter/setter APIs have been replaced with direct access to struct fields
-- [f32; 2] and [f32; 4] are now the main vector types. ImVec/ImVec4 and
-  corresponding tuples are no longer used in the main API
-- imgui-gfx-renderer is parameterized over the color format, so Rgba8 and
-  Srgba8 are both supported
-- imgui-winit-support has been rewritten to provide a more robust abstraction
-  that is easier to use correctly
-- Parameter stack (e.g. StyleVar) manipulation is now done using push functions
-  and automatically or manually droppable stack tokens
+- [f32; 2] and [f32; 4] are now the main vector types. ImVec/ImVec4 and corresponding tuples are no longer used in the main API
+- imgui-gfx-renderer is parameterized over the color format, so Rgba8 and Srgba8 are both supported
+- imgui-winit-support has been rewritten to provide a more robust abstraction that is easier to use correctly
+- Parameter stack (e.g. StyleVar) manipulation is now done using push functions and automatically or manually droppable stack tokens
 - Upgrade to glium 0.25
 - Upgrade to cimgui / imgui 1.71
 - Bump minimum Rust version to 1.33
@@ -221,10 +220,8 @@ This release will be yanked once 0.7.0 is released, but not before, so that user
 
 ### Changed
 
-- Upgrade to cimgui 1.66.2+ / imgui 1.66b. **This is a very big update, so there
-  are a lot of breaking changes**
-- Bump minimum Rust version to 1.31 (1.28 required by the glutin crate, and
-  1.31 required by the stb_truetype crate)
+- Upgrade to cimgui 1.66.2+ / imgui 1.66b. **This is a very big update, so there are a lot of breaking changes**
+- Bump minimum Rust version to 1.31 (1.28 required by the glutin crate, and 1.31 required by the stb_truetype crate)
 - Upgrade to glium 0.23
 - Replaced `imgui-glutin-support` with `imgui-winit-support`
 
@@ -265,18 +262,18 @@ This release will be yanked once 0.7.0 is released, but not before, so that user
 ### Added
 
 - New things in imgui/cimgui 1.53.1
-  - Style: Add `PopupRounding`, `FrameBorderSize`, `WindowBorderSize`, `PopupBorderSize`.
-  - DemoWindow: Add `no_close` state.
-  - Input: Add `no_undo_redo` method.
-  - *imgui-sys*:
-    - `igStyleColorsDark` and `igStyleColorsLight`
-    - DragDrop low level API
-    - `igGetFrameHeight`
-    - `igBeginCombo`, `igEndCombo`
-    - `igSetItemDefaultFocus`
-    - `igGetOverlayDrawList` and `igGetDrawListSharedData`
-    - `ImFontConfig_DefaultConstructor`
-    - `ImDrawList_AddImageRounded`
+    - Style: Add `PopupRounding`, `FrameBorderSize`, `WindowBorderSize`, `PopupBorderSize`.
+    - DemoWindow: Add `no_close` state.
+    - Input: Add `no_undo_redo` method.
+    - *imgui-sys*:
+        - `igStyleColorsDark` and `igStyleColorsLight`
+        - DragDrop low level API
+        - `igGetFrameHeight`
+        - `igBeginCombo`, `igEndCombo`
+        - `igSetItemDefaultFocus`
+        - `igGetOverlayDrawList` and `igGetDrawListSharedData`
+        - `ImFontConfig_DefaultConstructor`
+        - `ImDrawList_AddImageRounded`
 - Input: Add `read_only` and `password` methods.
 - Various utility functions
 - Support for changing the mouse cursor
@@ -289,18 +286,13 @@ This release will be yanked once 0.7.0 is released, but not before, so that user
 ### Changed
 
 - Upgrade to imgui/cimgui 1.53.1
-  - Rename `Ui::show_test_window` to `Ui::show_demo_window`. Keep redirection.
-  - Rename `sys::igGetItemsLineHeightWithSpacing` to `sys::igGetFrameHeightWithSpacing`.
-  Keep redirection.
-  - Rename `ImGuiTreeNodeFlags::AllowOverlapMode` to `ImGuiTreeNodeFlags::AllowItemOverlap`.
-  `sys::igSetNextWindowContentSize()`. Keep redirection.
-  - Rename `sys::ImGuiTextBuffer_append()` helper to `appendf()`.
-  - Rename `ImGuiStyleVar::ChildWindowRounding` to `ImGuiStyleVar::ChildRounding`.
-  Keep redirection.
-  - Rename `StyleVar::ChildWindowRounding` to `StyleVar::ChildRounding`.
-  Keep redirection.
-  - Rename `ImGuiCol::ChildWindowBg` to `ImGuiCol::ChildBg`.
-  Keep redirection.
+    - Rename `Ui::show_test_window` to `Ui::show_demo_window`. Keep redirection.
+    - Rename `sys::igGetItemsLineHeightWithSpacing` to `sys::igGetFrameHeightWithSpacing`. Keep redirection.
+    - Rename `ImGuiTreeNodeFlags::AllowOverlapMode` to `ImGuiTreeNodeFlags::AllowItemOverlap`. `sys::igSetNextWindowContentSize()`. Keep redirection.
+    - Rename `sys::ImGuiTextBuffer_append()` helper to `appendf()`.
+    - Rename `ImGuiStyleVar::ChildWindowRounding` to `ImGuiStyleVar::ChildRounding`. Keep redirection.
+    - Rename `StyleVar::ChildWindowRounding` to `StyleVar::ChildRounding`. Keep redirection.
+    - Rename `ImGuiCol::ChildWindowBg` to `ImGuiCol::ChildBg`. Keep redirection.
 - Upgrade glium to 0.22.0. This updates winit to 0.16. This changes the way
 HIDPI are calculated. Depending on your needs, you may want to set HIDPI to 1
 by setting the environment variable `WINIT_HIDPI_FACTOR=1` if you use X11.
@@ -311,23 +303,17 @@ by setting the environment variable `WINIT_HIDPI_FACTOR=1` if you use X11.
 ### Deprecated
 
 - Various imgui-sys things that were deprecated in imgui/cimgui 1.53.1
-  - Obsolete `sys::igIsRootWindowFocused()` in favor of using
-  `sys::igIsWindowFocused(ImGuiFocusedFlags::RootWindow)`.
-  - Obsolete `sys::igIsRootWindowOrAnyChildFocused()` in favor of using
-  `sys::igIsWindowFocused(ImGuiFocusedFlags::RootAndChildWindows)`.
-  - Obsolete `sys::igIsRootWindowOrAnyChildHovered()` in favor of using
-  `sys::igIsWindowHovered(ImGuiHoveredFlags::RootAndChildWindows)`.
-  - Obsolete `sys::SetNextWindowContentWidth()` in favor of using
-  - Obsolete `Window::show_borders`. Use `StyleVar` instead.
-  - Obsolete `ImGuiCol::ComboBg`. Use `PopupBg` instead.
+    - Obsolete `sys::igIsRootWindowFocused()` in favor of using `sys::igIsWindowFocused(ImGuiFocusedFlags::RootWindow)`.
+    - Obsolete `sys::igIsRootWindowOrAnyChildFocused()` in favor of using `sys::igIsWindowFocused(ImGuiFocusedFlags::RootAndChildWindows)`.
+    - Obsolete `sys::igIsRootWindowOrAnyChildHovered()` in favor of using `sys::igIsWindowHovered(ImGuiHoveredFlags::RootAndChildWindows)`.
+    - Obsolete `sys::SetNextWindowContentWidth()` in favor of using - Obsolete `Window::show_borders`. Use `StyleVar` instead.
+    - Obsolete `ImGuiCol::ComboBg`. Use `PopupBg` instead.
 
 ### Removed
 
 - Features that were removed in imgui/cimgui 1.53.1
-  - Remove `anti_aliased: bool` final parameter of `sys::ImDrawList_AddPolyline`
-  and `sys::ImDrawList_AddConvexPolyFilled`.
-  - Remove `ImGuiWindowFlags::ShowBorders` window flag. Borders are now fully
-  set up in the ImGuiStyle structure.
+    - Remove `anti_aliased: bool` final parameter of `sys::ImDrawList_AddPolyline` and `sys::ImDrawList_AddConvexPolyFilled`.
+    - Remove `ImGuiWindowFlags::ShowBorders` window flag. Borders are now fully set up in the ImGuiStyle structure.
 - Various imgui-sys things that were deprecated in imgui/cimgui 1.52
 
 ## [0.0.18] - 2017-12-23
@@ -404,15 +390,12 @@ by setting the environment variable `WINIT_HIDPI_FACTOR=1` if you use X11.
 ### Changed
 
 - Upgrade to glium 0.18
-- imgui-gfx-renderer `Renderer::init` now requires a `shaders: Shaders`
-  parameter. Please see examples/support_gfx/mod.rs for a shader resolution
-  example
+- imgui-gfx-renderer `Renderer::init` now requires a `shaders: Shaders` parameter. Please see examples/support_gfx/mod.rs for a shader resolution example
 - Bump minimum Rust version to 1.19 because some dependencies require it.
 
 ### Fixed
 
-- Glium renderer now uses MinifySamplerFilter::Nearest. This fixes a blurry font
-  issue in some configurations
+- Glium renderer now uses MinifySamplerFilter::Nearest. This fixes a blurry font issue in some configurations
 
 ### Removed
 
@@ -430,16 +413,15 @@ by setting the environment variable `WINIT_HIDPI_FACTOR=1` if you use X11.
 - Support for scoped color customization
 - Support for child frames
 - Unsafe ImString/ImStr creation functions for advanced users:
-  + `ImString::from_utf8_unchecked` (renamed from `ImString::from_bytes_unchecked`)
-  + `ImString::from_utf8_with_nul_unchecked`)
-  + `ImStr::from_utf8_with_nul_unchecked` (renamed from `ImStr::from_bytes_unchecked`)
+    - `ImString::from_utf8_unchecked` (renamed from `ImString::from_bytes_unchecked`)
+    - `ImString::from_utf8_with_nul_unchecked`
+    - `ImStr::from_utf8_with_nul_unchecked` (renamed from `ImStr::from_bytes_unchecked`)
 
 ### Changed
 
 - Button, selectable, histogram, plotlines, and progress bar accept size with `Into<ImVec2>`
 - `ImString::new` always succeeds and any interior NULs truncate the string. **Breaking change**
-- All builder constructor functions (e.g. Window::new) now take `&Ui` reference
-  to tie the lifetime of the builder to it.
+- All builder constructor functions (e.g. Window::new) now take `&Ui` reference to tie the lifetime of the builder to it.
 - Bumped minimum Rust version to 1.17 because some dependencies require it.
 - Upgrade to glium 0.17
 
@@ -451,8 +433,7 @@ by setting the environment variable `WINIT_HIDPI_FACTOR=1` if you use X11.
 
 ### Fixed
 
-- Histogram, plotlines, progressbar builders were not tied to the `&Ui`
-  lifetime, so it was possible to misuse them.
+- Histogram, plotlines, progressbar builders were not tied to the `&Ui` lifetime, so it was possible to misuse them.
 
 ## [0.0.14] - 2017-06-18
 
@@ -464,8 +445,7 @@ by setting the environment variable `WINIT_HIDPI_FACTOR=1` if you use X11.
 
 ### Changed
 
-- ImStr is now "a dear imgui -compatible string slice". This change
-  significantly affects how strings are handled.
+- ImStr is now "a dear imgui -compatible string slice". This change significantly affects how strings are handled.
 - Upgrade to imgui/cimgui 1.50
 - Upgrade to bitflags 0.9
 
@@ -621,7 +601,8 @@ by setting the environment variable `WINIT_HIDPI_FACTOR=1` if you use X11.
 
 - Initial release with cimgui/imgui 1.44, glium 0.9
 
-[Unreleased]: https://github.com/Gekkio/imgui-rs/compare/v0.6.0...HEAD
+[Unreleased]: https://github.com/Gekkio/imgui-rs/compare/v0.6.1...HEAD
+[0.6.1]: https://github.com/Gekkio/imgui-rs/compare/v0.6.0...v0.6.1
 [0.6.0]: https://github.com/Gekkio/imgui-rs/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/Gekkio/imgui-rs/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/Gekkio/imgui-rs/compare/v0.3.0...v0.4.0
