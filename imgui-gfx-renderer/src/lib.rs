@@ -1,3 +1,4 @@
+#[macro_use]
 pub extern crate gfx;
 pub extern crate imgui;
 
@@ -10,8 +11,7 @@ use gfx::traits::FactoryExt;
 use gfx::{CommandBuffer, Encoder, Factory, IntoIndexBuffer, Rect, Resources, Slice};
 use imgui::internal::RawWrapper;
 use imgui::{
-    BackendFlags, DrawCmd, DrawCmdParams, DrawData, DrawIdx, DrawVert, ImString, TextureId,
-    Textures,
+    BackendFlags, DrawCmd, DrawCmdParams, DrawData, DrawIdx, ImString, TextureId, Textures,
 };
 use std::error::Error;
 use std::fmt;
@@ -136,7 +136,7 @@ pub type Texture<R> = (
 );
 
 pub struct Renderer<Cf: BlendFormat, R: Resources> {
-    vertex_buffer: Buffer<R, DrawVert>,
+    vertex_buffer: Buffer<R, GfxDrawVert>,
     index_buffer: Buffer<R, DrawIdx>,
     slice: Slice<R>,
     pso: PipelineState<R, pipeline::Meta<Cf>>,
@@ -158,7 +158,7 @@ where
     ) -> Result<Renderer<Cf, R>, RendererError> {
         let (vs_code, ps_code) = shaders.get_program_code();
         let pso = factory.create_pipeline_simple(vs_code, ps_code, pipeline::new::<Cf>())?;
-        let vertex_buffer = factory.create_buffer::<DrawVert>(
+        let vertex_buffer = factory.create_buffer::<GfxDrawVert>(
             256,
             gfx::buffer::Role::Vertex,
             gfx::memory::Usage::Dynamic,
@@ -237,7 +237,9 @@ where
         let clip_off = draw_data.display_pos;
         let clip_scale = draw_data.framebuffer_scale;
         for draw_list in draw_data.draw_lists() {
-            self.upload_vertex_buffer(factory, encoder, draw_list.vtx_buffer())?;
+            self.upload_vertex_buffer(factory, encoder, unsafe {
+                draw_list.transmute_vtx_buffer::<GfxDrawVert>()
+            })?;
             self.upload_index_buffer(factory, encoder, draw_list.idx_buffer())?;
             self.slice.start = 0;
             for cmd in draw_list.commands() {
@@ -307,10 +309,10 @@ where
         &mut self,
         factory: &mut F,
         encoder: &mut Encoder<R, C>,
-        vtx_buffer: &[DrawVert],
+        vtx_buffer: &[GfxDrawVert],
     ) -> Result<(), RendererError> {
         if self.vertex_buffer.len() < vtx_buffer.len() {
-            self.vertex_buffer = factory.create_buffer::<DrawVert>(
+            self.vertex_buffer = factory.create_buffer::<GfxDrawVert>(
                 vtx_buffer.len(),
                 gfx::buffer::Role::Vertex,
                 gfx::memory::Usage::Dynamic,
@@ -388,6 +390,7 @@ mod constants {
 // * Everything is parameterized with BlendFormat
 // * Pipeline init is specialized for our structs
 mod pipeline {
+    use super::*;
     use gfx::format::BlendFormat;
     use gfx::handle::Manager;
     use gfx::preset::blend;
@@ -397,11 +400,10 @@ mod pipeline {
     };
     use gfx::state::ColorMask;
     use gfx::{ProgramInfo, Resources};
-    use imgui::DrawVert;
 
     #[derive(Clone, Debug, PartialEq)]
     pub struct Data<'a, R: Resources, Cf: BlendFormat + 'a> {
-        pub vertex_buffer: &'a <gfx::VertexBuffer<DrawVert> as DataBind<R>>::Data,
+        pub vertex_buffer: &'a <gfx::VertexBuffer<GfxDrawVert> as DataBind<R>>::Data,
         #[cfg(not(feature = "directx"))]
         pub matrix: &'a <gfx::Global<[[f32; 4]; 4]> as DataBind<R>>::Data,
         #[cfg(feature = "directx")]
@@ -413,7 +415,7 @@ mod pipeline {
 
     #[derive(Clone, Debug, Hash, PartialEq)]
     pub struct Meta<Cf: BlendFormat> {
-        vertex_buffer: gfx::VertexBuffer<DrawVert>,
+        vertex_buffer: gfx::VertexBuffer<GfxDrawVert>,
         #[cfg(not(feature = "directx"))]
         matrix: gfx::Global<[[f32; 4]; 4]>,
         #[cfg(feature = "directx")]
@@ -425,7 +427,7 @@ mod pipeline {
 
     #[derive(Clone, Debug, PartialEq)]
     pub struct Init<'a, Cf: BlendFormat> {
-        vertex_buffer: <gfx::VertexBuffer<DrawVert> as DataLink<'a>>::Init,
+        vertex_buffer: <gfx::VertexBuffer<GfxDrawVert> as DataLink<'a>>::Init,
         #[cfg(not(feature = "directx"))]
         matrix: <gfx::Global<[[f32; 4]; 4]> as DataLink<'a>>::Init,
         #[cfg(feature = "directx")]
@@ -580,5 +582,13 @@ mod pipeline {
             target: ("Target0", ColorMask::all(), blend::ALPHA),
             scissor: (),
         }
+    }
+}
+
+gfx_vertex_struct! {
+    GfxDrawVert {
+        pos: [f32; 2] = "pos",
+        uv: [f32; 2] = "uv",
+        col: [gfx::format::U8Norm; 4] = "col",
     }
 }

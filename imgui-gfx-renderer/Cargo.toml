@@ -16,7 +16,7 @@ default = ["opengl"]
 
 [dependencies]
 gfx = "0.18"
-imgui = { version = "0.6.1", path = "../imgui", features = ["gfx"] }
+imgui = { version = "0.6.1", path = "../imgui" }
 
 [target.'cfg(windows)'.build-dependencies]
 winapi = { version = "0.3", features = ["d3dcompiler"] }

@@ -423,17 +423,20 @@ fn test_style_color_indexing() {
 }
 
 #[test]
+#[cfg(test)]
 fn test_style_memory_layout() {
     use std::mem;
     assert_eq!(mem::size_of::<Style>(), mem::size_of::<sys::ImGuiStyle>());
     assert_eq!(mem::align_of::<Style>(), mem::align_of::<sys::ImGuiStyle>());
-    use memoffset::offset_of;
     use sys::ImGuiStyle;
     macro_rules! assert_field_offset {
         ($l:ident, $r:ident) => {
-            assert_eq!(offset_of!(Style, $l), offset_of!(ImGuiStyle, $r));
+            assert_eq!(
+                memoffset::offset_of!(Style, $l),
+                memoffset::offset_of!(ImGuiStyle, $r)
+            );
         };
-    };
+    }
     assert_field_offset!(alpha, Alpha);
     assert_field_offset!(window_padding, WindowPadding);
     assert_field_offset!(window_rounding, WindowRounding);

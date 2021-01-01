@@ -18,6 +18,7 @@ impl<T> ImVector<T> {
 }
 
 #[test]
+#[cfg(test)]
 fn test_imvector_memory_layout() {
     use std::mem;
     assert_eq!(
@@ -28,14 +29,16 @@ fn test_imvector_memory_layout() {
         mem::align_of::<ImVector<u8>>(),
         mem::align_of::<sys::ImVector_char>()
     );
-    use memoffset::offset_of;
     use sys::ImVector_char;
     type VectorChar = ImVector<u8>;
     macro_rules! assert_field_offset {
         ($l:ident, $r:ident) => {
-            assert_eq!(offset_of!(VectorChar, $l), offset_of!(ImVector_char, $r));
+            assert_eq!(
+                memoffset::offset_of!(VectorChar, $l),
+                memoffset::offset_of!(ImVector_char, $r)
+            );
         };
-    };
+    }
     assert_field_offset!(size, Size);
     assert_field_offset!(capacity, Capacity);
     assert_field_offset!(data, Data);

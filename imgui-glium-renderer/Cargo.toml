@@ -11,4 +11,4 @@ categories = ["gui", "rendering"]
 
 [dependencies]
 glium = { version = ">=0.28, < 0.30", default-features = false }
-imgui = { version = "0.6.1", path = "../imgui", features = ["glium"] }
+imgui = { version = "0.6.1", path = "../imgui" }

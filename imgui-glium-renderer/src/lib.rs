@@ -100,6 +100,42 @@ pub struct Renderer {
     textures: Textures<Texture>,
 }
 
+#[repr(C)]
+#[derive(Copy, Clone, Debug, PartialEq)]
+pub struct GliumDrawVert {
+    pub pos: [f32; 2],
+    pub uv: [f32; 2],
+    pub col: [u8; 4],
+}
+
+// manual impl to avoid an allocation, and to reduce macro wonkiness.
+impl glium::vertex::Vertex for GliumDrawVert {
+    #[inline]
+    fn build_bindings() -> glium::vertex::VertexFormat {
+        use std::borrow::Cow::*;
+        Borrowed(&[
+            (
+                Borrowed("pos"),
+                0,
+                glium::vertex::AttributeType::F32F32,
+                false,
+            ),
+            (
+                Borrowed("uv"),
+                8,
+                glium::vertex::AttributeType::F32F32,
+                false,
+            ),
+            (
+                Borrowed("col"),
+                16,
+                glium::vertex::AttributeType::U8U8U8U8,
+                false,
+            ),
+        ])
+    }
+}
+
 impl Renderer {
     pub fn init<F: Facade>(
         ctx: &mut imgui::Context,
@@ -166,7 +202,9 @@ impl Renderer {
         let clip_off = draw_data.display_pos;
         let clip_scale = draw_data.framebuffer_scale;
         for draw_list in draw_data.draw_lists() {
-            let vtx_buffer = VertexBuffer::immutable(&self.ctx, draw_list.vtx_buffer())?;
+            let vtx_buffer = VertexBuffer::immutable(&self.ctx, unsafe {
+                draw_list.transmute_vtx_buffer::<GliumDrawVert>()
+            })?;
             let idx_buffer = IndexBuffer::immutable(
                 &self.ctx,
                 PrimitiveType::TrianglesList,

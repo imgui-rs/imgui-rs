@@ -5,10 +5,25 @@
 ### Changed
 
 - is_key_down, is_key_pressed, is_key_released and key_pressed_amount now make a call to key_index internally and thus take a Key instead of u32
+- `imgui-winit-support`'s `winit-23` feature no longer is compatible with `winit` 0.24.x, which apparently didn't work anyway. Instead the
+- The default `imgui-winit-support` feature has been changed to `winit-24`, as it's now the latest.
 
 ### Removed
 
 - key_index is now only used internally
+
+- The `gfx` and `glium` features are removed to reduce version compatibility issues going forward.
+    - In the somewhat unlikely case that you used these features directly (and not as part of `imgui-{gfx,glium}-renderer`) you should use replace calls to `draw_list.vtx_buffer::<imgui::DrawVert>()` with `draw_list.transmute_vtx_buffer::<MyDrawVert>()`, where `MyDrawVert` is a struct with the same layout as `imgui::DrawVert` (For examples, please see the `imgui-gfx-renderer` and `imgui-glium-renderer` crates — in particular, the definition and implementation of `GliumDrawVert`/`GfxDrawVert`).
+
+    This is less convenient, but avoids depending on any specific version of `gfx` or `glium`, which will ease maintenance.
+
+## [0.6.1](https://github.com/imgui-rs/imgui-rs/releases/tag/v0.6.1) - 2020-12-16
+
+This release mainly updated the glium/winit/glium versions, adding support for winit `0.24` and related.
+
+Unfortunately, this caused unintentional breaking changes (it was the holidays and not enough attention was paid to the changes in an urgent-sounding request for supporting the new version), and thus violated the stated semver change.
+
+This release will be yanked once 0.7.0 is released, but not before, so that users who need 0.24 support are still able to use imgui.
 
 ## [0.6.0] - 2020-11-15
 

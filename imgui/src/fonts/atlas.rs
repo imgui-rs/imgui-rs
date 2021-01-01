@@ -228,6 +228,7 @@ impl FontAtlas {
 }
 
 #[test]
+#[cfg(test)]
 fn test_font_atlas_memory_layout() {
     use std::mem;
     assert_eq!(
@@ -238,13 +239,15 @@ fn test_font_atlas_memory_layout() {
         mem::align_of::<FontAtlas>(),
         mem::align_of::<sys::ImFontAtlas>()
     );
-    use memoffset::offset_of;
     use sys::ImFontAtlas;
     macro_rules! assert_field_offset {
         ($l:ident, $r:ident) => {
-            assert_eq!(offset_of!(FontAtlas, $l), offset_of!(ImFontAtlas, $r));
+            assert_eq!(
+                memoffset::offset_of!(FontAtlas, $l),
+                memoffset::offset_of!(ImFontAtlas, $r)
+            );
         };
-    };
+    }
     assert_field_offset!(locked, Locked);
     assert_field_offset!(flags, Flags);
     assert_field_offset!(tex_id, TexID);
