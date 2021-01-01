@@ -139,8 +139,8 @@ use winit_24 as winit;
 use winit_23 as winit;
 
 #[cfg(all(
-    not(any(feature = "winit-24", feature = "winit-23", feature = "winit-22")),
-    feature = "winit-20",
+    not(any(feature = "winit-24", feature = "winit-23")),
+    feature = "winit-22",
 ))]
 use winit_22 as winit;
 
