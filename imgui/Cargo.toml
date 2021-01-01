@@ -13,9 +13,7 @@ readme = "../README.markdown"
 exclude = ["/resources"]
 
 [dependencies]
-bitflags = "1.0"
-glium = { version = ">= 0.28, < 0.30", default-features = false, optional = true }
-gfx = { version = "0.18", optional = true }
+bitflags = "1"
 imgui-sys = { version = "0.6.0", path = "../imgui-sys" }
 parking_lot = "0.11"
 

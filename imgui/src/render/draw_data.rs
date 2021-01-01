@@ -88,6 +88,7 @@ impl<'a> Iterator for DrawListIterator<'a> {
 }
 
 #[test]
+#[cfg(test)]
 fn test_drawdata_memory_layout() {
     use std::mem;
     assert_eq!(
@@ -98,13 +99,15 @@ fn test_drawdata_memory_layout() {
         mem::align_of::<DrawData>(),
         mem::align_of::<sys::ImDrawData>()
     );
-    use memoffset::offset_of;
     use sys::ImDrawData;
     macro_rules! assert_field_offset {
         ($l:ident, $r:ident) => {
-            assert_eq!(offset_of!(DrawData, $l), offset_of!(ImDrawData, $r));
+            assert_eq!(
+                memoffset::offset_of!(DrawData, $l),
+                memoffset::offset_of!(ImDrawData, $r)
+            );
         };
-    };
+    }
     assert_field_offset!(valid, Valid);
     assert_field_offset!(cmd_lists, CmdLists);
     assert_field_offset!(cmd_lists_count, CmdListsCount);
@@ -152,6 +155,21 @@ impl DrawList {
             )
         }
     }
+
+    /// # Safety
+    /// This is equivalent to `transmute(self.vtx_buffer())` with a little more
+    /// checking, and thus inherits the safety considerations of `transmute`ing
+    /// slices.
+    pub unsafe fn transmute_vtx_buffer<VTy: Copy>(&self) -> &[VTy] {
+        // these checks are constant and thus are removed from release builds
+        assert_eq!(
+            core::mem::size_of::<VTy>(),
+            core::mem::size_of::<DrawVert>(),
+        );
+        assert!(core::mem::align_of::<VTy>() <= core::mem::align_of::<DrawVert>());
+        slice::from_raw_parts(self.0.VtxBuffer.Data.cast(), self.0.VtxBuffer.Size as usize)
+    }
+
     pub fn commands(&self) -> DrawCmdIterator {
         unsafe {
             DrawCmdIterator {
@@ -228,55 +246,8 @@ pub struct DrawVert {
     pub col: [u8; 4],
 }
 
-#[cfg(feature = "glium")]
-mod glium_support {
-    #![allow(clippy::unneeded_field_pattern)]
-    use super::DrawVert;
-    use glium::implement_vertex;
-    implement_vertex!(DrawVert, pos, uv, col);
-}
-
-#[cfg(feature = "gfx")]
-mod gfx_support {
-    use super::DrawVert;
-    use gfx::*;
-
-    // gfx doesn't provide a macro to implement vertex structure for an existing struct, so we
-    // create a dummy vertex with the same memory layout using gfx macros, and delegate query(name)
-    // calls later to the automatically derived implementation
-    gfx_vertex_struct! {
-        Dummy {
-            pos: [f32; 2] = "pos",
-            uv: [f32; 2] = "uv",
-            col: [format::U8Norm; 4] = "col",
-        }
-    }
-    unsafe impl gfx::traits::Pod for DrawVert {}
-    impl gfx::pso::buffer::Structure<gfx::format::Format> for DrawVert {
-        fn query(name: &str) -> Option<gfx::pso::buffer::Element<gfx::format::Format>> {
-            // Dummy has the same memory layout, so this should be ok
-            Dummy::query(name)
-        }
-    }
-
-    #[test]
-    fn test_dummy_memory_layout() {
-        use std::mem;
-        assert_eq!(mem::size_of::<DrawVert>(), mem::size_of::<Dummy>());
-        assert_eq!(mem::align_of::<DrawVert>(), mem::align_of::<Dummy>());
-        use memoffset::offset_of;
-        macro_rules! assert_field_offset {
-            ($l:ident, $r:ident) => {
-                assert_eq!(offset_of!(DrawVert, $l), offset_of!(Dummy, $r));
-            };
-        };
-        assert_field_offset!(pos, pos);
-        assert_field_offset!(uv, uv);
-        assert_field_offset!(col, col);
-    }
-}
-
 #[test]
+#[cfg(test)]
 fn test_drawvert_memory_layout() {
     use std::mem;
     assert_eq!(
@@ -287,13 +258,15 @@ fn test_drawvert_memory_layout() {
         mem::align_of::<DrawVert>(),
         mem::align_of::<sys::ImDrawVert>()
     );
-    use memoffset::offset_of;
     use sys::ImDrawVert;
     macro_rules! assert_field_offset {
         ($l:ident, $r:ident) => {
-            assert_eq!(offset_of!(DrawVert, $l), offset_of!(ImDrawVert, $r));
+            assert_eq!(
+                memoffset::offset_of!(DrawVert, $l),
+                memoffset::offset_of!(ImDrawVert, $r)
+            );
         };
-    };
+    }
     assert_field_offset!(pos, pos);
     assert_field_offset!(uv, uv);
     assert_field_offset!(col, col);
