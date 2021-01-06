@@ -203,6 +203,9 @@ impl<'a> ComboBox<'a> {
                     *current_item = idx;
                     result = true;
                 }
+                if selected {
+                    ui.set_item_default_focus();
+                }
             }
         }
         result
