@@ -10,6 +10,7 @@ use std::thread;
 
 pub use self::clipboard::*;
 pub use self::context::*;
+pub use self::drag_drop::*;
 pub use self::draw_list::{ChannelsSplit, DrawListMut, ImColor};
 pub use self::fonts::atlas::*;
 pub use self::fonts::font::*;
@@ -52,6 +53,7 @@ use internal::RawCast;
 mod clipboard;
 mod columns;
 mod context;
+mod drag_drop;
 mod draw_list;
 mod fonts;
 mod input;
