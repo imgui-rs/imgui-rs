@@ -52,6 +52,9 @@ pub struct DragDropSource<'a> {
 }
 
 impl<'a> DragDropSource<'a> {
+    /// Creates a new [DragDropSource] with no flags and the `Condition::Always` with the given name.
+    /// ImGui refers to this `name` field as a `type`, but really it's just an identifier to match up
+    /// Source/Target for DragDrop.
     pub fn new(name: &'a ImStr) -> Self {
         Self {
             name,
@@ -60,6 +63,24 @@ impl<'a> DragDropSource<'a> {
             size: 0,
             cond: Condition::Always,
         }
+    }
+
+    /// Creates a new [DragDropSource] with no flags and the `Condition::Always` with the given name.
+    /// ImGui refers to this `name` field as a `type`, but really it's just an identifier to match up
+    /// Source/Target for DragDrop.
+    ///
+    /// This payload will be passed to ImGui, which will provide it to
+    /// a target when it runs [accept_drag_drop_payload](DragDropTarget::accept_drag_drop_payload).
+    ///
+    /// ## Safety
+    /// This function is not inherently unsafe, and won't panic itself, but using it opts you into
+    /// managing the lifetime yourself. When you dereference the pointer given in [accept_drag_drop_payload](DragDropTarget::accept_drag_drop_payload),
+    /// you can easily create memory safety problems.
+    pub unsafe fn payload<T>(name: &'a ImStr, payload: *const T) -> Self {
+        let mut output = Self::new(name);
+        output.payload = payload as *const ffi::c_void;
+        output.size = std::mem::size_of::<T>();
+        output
     }
 
     /// Sets the flags on the [DragDropSource]. Only the flags `SOURCE_NO_PREVIEW_TOOLTIP`,
@@ -74,19 +95,6 @@ impl<'a> DragDropSource<'a> {
     /// Sets the condition on the [DragDropSource]. Defaults to [Always](Condition::Always).
     pub fn condition(mut self, cond: Condition) -> Self {
         self.cond = cond;
-        self
-    }
-
-    /// Sets a payload. This payload will be passed to ImGui, which will provide it to
-    /// a target when it runs [accept_drag_drop_payload](DragDropTarget::accept_drag_drop_payload).
-    ///
-    /// ## Safety
-    /// This function is not inherently unsafe, and won't panic itself, but using it opts you into
-    /// managing the lifetime yourself. When you dereference the pointer given in [accept_drag_drop_payload](DragDropTarget::accept_drag_drop_payload),
-    /// you can easily create memory safety problems.
-    pub unsafe fn payload<T>(mut self, payload: *const T) -> Self {
-        self.payload = payload as *const ffi::c_void;
-        self.size = std::mem::size_of::<T>();
         self
     }
 
@@ -133,13 +141,20 @@ pub struct DragDropPayload {
     /// Data which is copied and owned by ImGui. If you have accepted the payload, you can
     /// take ownership of the data; otherwise, view it immutably. Interacting with `data` is
     /// very unsafe.
+    /// @fixme: this doesn't make a ton of sense.
     pub data: *const ffi::c_void,
     /// Set when [`accept_drag_drop_payload`](Self::accept_drag_drop_payload) was called
     /// and mouse has been hovering the target item (nb: handle overlapping drag targets).
-    /// @fixme: literally what does this mean
+    /// @fixme: literally what does this mean -- I believe this is false on the first
+    /// frame when source hovers over target and then is subsequently true? but I'm not sure
+    /// when this matters. If DragDropFlags::ACCEPT_NO_PREVIEW is set, it doesn't make a difference
+    /// to this flag.
     pub preview: bool,
 
     /// Set when AcceptDragDropPayload() was called and mouse button is released over the target item.
+    /// If this is set to false, then you set DragDropFlags::ACCEPT_BEFORE_DELIVERY and shouldn't
+    /// mess with `data`
+    /// @fixme: obviously this isn't an impressive implementation of ffi data mutability.
     pub delivery: bool,
 }
 
@@ -158,6 +173,7 @@ impl<'ui> DragDropTarget<'ui> {
 
     /// Accepts, popping the drag_drop payload, if it exists. If `DragDropFlags::ACCEPT_BEFORE_DELIVERY` is
     /// set, this function will return `Some` even if the type is wrong as long as there is a payload to accept.
+    /// How do we possibly handle communicating that this data is somewhat immutable?
     pub fn accept_drag_drop_payload(&self, name: &ImStr, flags: DragDropFlags) -> Option<DragDropPayload> {
         unsafe {
             let inner = sys::igAcceptDragDropPayload(name.as_ptr(), flags.bits() as i32);
@@ -166,6 +182,9 @@ impl<'ui> DragDropTarget<'ui> {
             } else {
                 let inner = *inner;
 
+                // @fixme: there are actually other fields on `inner` which I have shorn -- they're
+                // considered internal to imgui (such as id of who sent this), so i've left it for
+                // now this way.
                 Some(DragDropPayload {
                     data: inner.Data,
                     preview: inner.Preview,
