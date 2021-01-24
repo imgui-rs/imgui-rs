@@ -104,7 +104,12 @@ impl<'a> DragDropSource<'a> {
 
         if should_begin {
             unsafe {
-                sys::igSetDragDropPayload(self.name.as_ptr(), self.payload, self.size, self.cond as i32);
+                sys::igSetDragDropPayload(
+                    self.name.as_ptr(),
+                    self.payload,
+                    self.size,
+                    self.cond as i32,
+                );
 
                 Some(DragDropSourceToolTip::push())
             }
@@ -174,7 +179,11 @@ impl<'ui> DragDropTarget<'ui> {
     /// Accepts, popping the drag_drop payload, if it exists. If `DragDropFlags::ACCEPT_BEFORE_DELIVERY` is
     /// set, this function will return `Some` even if the type is wrong as long as there is a payload to accept.
     /// How do we possibly handle communicating that this data is somewhat immutable?
-    pub fn accept_drag_drop_payload(&self, name: &ImStr, flags: DragDropFlags) -> Option<DragDropPayload> {
+    pub fn accept_drag_drop_payload(
+        &self,
+        name: &ImStr,
+        flags: DragDropFlags,
+    ) -> Option<DragDropPayload> {
         unsafe {
             let inner = sys::igAcceptDragDropPayload(name.as_ptr(), flags.bits() as i32);
             if inner.is_null() {
