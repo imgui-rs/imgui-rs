@@ -333,7 +333,8 @@ impl<'ui> DragDropTarget<'ui> {
                 None
             } else {
                 let inner = *inner;
-                let data = std::slice::from_raw_parts(inner.Data as *const u8, 1);
+                let data =
+                    std::slice::from_raw_parts(inner.Data as *const u8, inner.DataSize as usize);
 
                 Some(
                     bytemuck::try_from_bytes(data).map(|data| DragDropPodPayload {
