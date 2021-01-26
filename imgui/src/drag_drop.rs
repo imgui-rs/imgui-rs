@@ -42,49 +42,27 @@ bitflags!(
     }
 );
 
-/// A drag-drop source without any payload. Typically, when dragging and dropping data in Dear ImGui,
-/// a user will attach a payload to that drag and drop, so the accepter of the drop can read or
-/// otherwise react to the drop. This struct attaches no data to the drag-drop, which means that an
-/// accepter will simply be notified when the payload of a given type has been dropped.
-///
-/// This is still probably the most useful way in imgui-rs to handle payloads.
-/// Using `once_cell` or some shared data, this pattern can be very powerful:
+/// Creates a source for drag drop data out of the last ID created.
 ///
 /// ```no_run
-/// fn show_ui(ui: &Ui<'_>, drop_message: &mut Option<String>) {
-///     ui.button(im_str!("Drag me!"));
-///
-///     let drag_drop_name = im_str!("Test Drag");
+/// # use imgui::*;
+/// fn show_ui(ui: &Ui<'_>) {
+///     ui.button(im_str!("Hello, I am a drag source!"), [0.0, 0.0]);
 ///     
-///     // drag drop SOURCE
-///     if DragDropSource::new(drag_drop_name).begin(ui).is_some() {
-///         // warning -- this would allocate every frame if `DragDropSource` has
-///         // condition `Always`, which it does by default. We're okay with that for
-///         // this example, but real code probably wouldn't want to allocate so much.
-///         *drop_message = Some("Test Payload".to_string());
-///     }
-///
-///     ui.button(im_str!("Target me!"));
-///
-///     // drag drop TARGET
-///     if let Some(target) = imgui::DragDropTarget::new(ui) {
-///         if target
-///             .accept_drag_drop_payload(drag_drop_name, DragDropFlags::empty())
-///             .is_some()
-///         {
-///             let msg = drop_message.take().unwrap();
-///             assert_eq!(msg, "Test Payload");
-///         }
-///
-///         target.pop();
-///     }
+///     // Creates an empty DragSource with no tooltip
+///     DragDropSource::new(im_str!("BUTTON_DRAG")).begin(ui);
 /// }
 /// ```
 ///
-/// In the above, you'll see how the payload is really just a message passing service.
-/// This method will give a user an easier time than using [DragDropSourcePayloadPod] or
-/// the unsafe [DragDropSourcePayloadUnsafe], as the data for a user can be kept entirely in
-/// Rust and never has to do a roundtrip into C++, which can cause unexpected issues.
+/// Notice especially the `"BUTTON_DRAG"` name -- this is the identifier of this
+/// DragDropSource; [DragDropTarget]'s will specify an identifier to *receive*, and these
+/// names must match up. A single item should only have one [DragDropSource], though
+/// a target may have multiple different targets.
+///
+/// DropDropSources don't do anything until you use one of the three `begin_` methods
+/// on this struct. Each of these methods describes how you handle the Payload which ImGui
+/// will manage, and then give to a [DragDropTarget], which will received the payload. The
+/// simplest and safest Payload is the empty payload, created with [begin](Self::begin).
 #[derive(Debug)]
 pub struct DragDropSource<'a> {
     name: &'a ImStr,
@@ -103,24 +81,6 @@ impl<'a> DragDropSource<'a> {
             cond: Condition::Always,
         }
     }
-
-    // /// Creates a new [DragDropSource] with no flags and the `Condition::Always` with the given name.
-    // /// ImGui refers to this `name` field as a `type`, but really it's just an identifier to match up
-    // /// Source/Target for DragDrop.
-    // ///
-    // /// This payload will be passed to ImGui, which will provide it to
-    // /// a target when it runs [accept_drag_drop_payload](DragDropTarget::accept_drag_drop_payload).
-    // ///
-    // /// ## Safety
-    // /// This function is not inherently unsafe, and won't panic itself, but using it opts you into
-    // /// managing the lifetime yourself. When you dereference the pointer given in [accept_drag_drop_payload](DragDropTarget::accept_drag_drop_payload),
-    // /// you can easily create memory safety problems.
-    // pub unsafe fn payload<T>(name: &'a ImStr, payload: *const T) -> Self {
-    //     let mut output = Self::new(name);
-    //     output.payload = payload as *const ffi::c_void;
-    //     output.size = std::mem::size_of::<T>();
-    //     output
-    // }
 
     /// Sets the flags on the [DragDropSource]. Only the flags `SOURCE_NO_PREVIEW_TOOLTIP`,
     /// `SOURCE_NO_DISABLE_HOVER`, `SOURCE_NO_HOLD_TO_OPEN_OTHERS`, `SOURCE_ALLOW_NULL_ID`,
@@ -146,78 +106,112 @@ impl<'a> DragDropSource<'a> {
     /// and this returned token does nothing. Additionally, a given target may use the flag
     /// `ACCEPT_NO_PREVIEW_TOOLTIP`, which will also prevent this tooltip from being shown.
     ///
-    /// For more information on how to use payload-less drag/drops, please see [DragDropSource]'s
-    /// documentation.
-    pub fn begin<'ui>(self, _ui: &'ui Ui) -> Option<DragDropSourceToolTip<'ui>> {
-        let should_begin = unsafe { sys::igBeginDragDropSource(self.flags.bits() as i32) };
+    /// This drag has no payload, but is still probably the most useful way in imgui-rs to handle payloads.
+    /// Using `once_cell` or some shared data, this pattern can be very powerful:
+    ///
+    /// ```no_run
+    /// # use imgui::*;
+    /// fn show_ui(ui: &Ui<'_>, drop_message: &mut Option<String>) {
+    ///     ui.button(im_str!("Drag me!"), [0.0, 0.0]);
+    ///
+    ///     let drag_drop_name = im_str!("Test Drag");
+    ///     
+    ///     // drag drop SOURCE
+    ///     if DragDropSource::new(drag_drop_name).begin(ui).is_some() {
+    ///         // warning -- this would allocate every frame if `DragDropSource` has
+    ///         // condition `Always`, which it does by default. We're okay with that for
+    ///         // this example, but real code probably wouldn't want to allocate so much.
+    ///         *drop_message = Some("Test Payload".to_string());
+    ///     }
+    ///
+    ///     ui.button(im_str!("Target me!"), [0.0, 0.0]);
+    ///
+    ///     // drag drop TARGET
+    ///     if let Some(target) = imgui::DragDropTarget::new(ui) {
+    ///         if target
+    ///             .accept_payload_empty(drag_drop_name, DragDropFlags::empty())
+    ///             .is_some()
+    ///         {
+    ///             let msg = drop_message.take().unwrap();
+    ///             assert_eq!(msg, "Test Payload");
+    ///         }
+    ///
+    ///         target.pop();
+    ///     }
+    /// }
+    /// ```
+    ///
+    /// In the above, you'll see how the payload is really just a message passing service.
+    /// If you want to pass a simple integer or other "plain old data", take a look at
+    /// [begin_payload_pod](Self::begin_payload_pod).
+    pub fn begin<'ui>(self, ui: &Ui<'ui>) -> Option<DragDropSourceToolTip<'ui>> {
+        unsafe { self.begin_payload_unchecked(ui, ptr::null(), 0) }
+    }
 
-        if should_begin {
-            unsafe {
-                sys::igSetDragDropPayload(self.name.as_ptr(), ptr::null(), 0, self.cond as i32);
-
-                Some(DragDropSourceToolTip::push())
-            }
-        } else {
-            None
+    /// Creates the source of a drag and returns a handle on the tooltip.
+    /// This handle can be immediately dropped without binding it, in which case a default empty
+    /// circle will be used for the "blank" tooltip as this item is being dragged around.
+    ///
+    /// Otherwise, use this tooltip to add data which will display as this item is dragged.
+    /// If `SOURCE_NO_PREVIEW_TOOLTIP` is enabled, however, no preview will be displayed
+    /// and this returned token does nothing. Additionally, a given target may use the flag
+    /// `ACCEPT_NO_PREVIEW_TOOLTIP`, which will also prevent this tooltip from being shown.
+    ///
+    /// This function also takes a payload in the form of `T: bytemuck::Pod`. We use this bound to
+    /// ensure that we can safely send and receive the given type from C++. Integers are natively
+    /// supported by this operation already, but you'll need to implement `bytemuck::Pod` for your own
+    /// types to use this method.
+    pub fn begin_payload_pod<'ui, T: bytemuck::Pod>(
+        self,
+        ui: &Ui<'ui>,
+        payload: &T,
+    ) -> Option<DragDropSourceToolTip<'ui>> {
+        unsafe {
+            self.begin_payload_unchecked(
+                ui,
+                payload as *const _ as *const ffi::c_void,
+                std::mem::size_of::<T>(),
+            )
         }
     }
-}
 
-#[derive(Debug)]
-pub struct DragDropSourcePayloadPod<'a, T> {
-    name: &'a ImStr,
-    payload: &'a T,
-    flags: DragDropFlags,
-    cond: Condition,
-}
-
-impl<'a, T: bytemuck::Pod> DragDropSourcePayloadPod<'a, T> {
-    /// Creates a new [DragDropSourcePayloadPod] with no flags and the `Condition::Always` with the given name.
-    /// ImGui refers to this `name` field as a `type`, but really it's just an identifier to match up
-    /// Source/Target for DragDrop.
-    pub fn new(name: &'a ImStr, payload: &'a T) -> Self {
-        Self {
-            name,
-            flags: DragDropFlags::empty(),
-            payload,
-            cond: Condition::Always,
-        }
-    }
-
-    /// Sets the flags on the [DragDropSourcePayloadPod]. Only the flags `SOURCE_NO_PREVIEW_TOOLTIP`,
-    /// `SOURCE_NO_DISABLE_HOVER`, `SOURCE_NO_HOLD_TO_OPEN_OTHERS`, `SOURCE_ALLOW_NULL_ID`,
-    /// `SOURCE_EXTERN`, `SOURCE_AUTO_EXPIRE_PAYLOAD` make semantic sense, but any other flags will
-    /// be accepted without panic.
+    /// Creates the source of a drag and returns a handle on the tooltip.
+    /// This handle can be immediately dropped without binding it, in which case a default empty
+    /// circle will be used for the "blank" tooltip as this item is being dragged around.
     ///
-    /// Defaults to empty.
-    pub fn flags(mut self, flags: DragDropFlags) -> Self {
-        self.flags = flags;
-        self
-    }
-
-    /// Sets the condition on the [DragDropSourcePayloadPod].
+    /// Otherwise, use this tooltip to add data which will display as this item is dragged.
+    /// If `SOURCE_NO_PREVIEW_TOOLTIP` is enabled, however, no preview will be displayed
+    /// and this returned token does nothing. Additionally, a given target may use the flag
+    /// `ACCEPT_NO_PREVIEW_TOOLTIP`, which will also prevent this tooltip from being shown.
     ///
-    /// Defaults to [Always](Condition::Always).
-    pub fn condition(mut self, cond: Condition) -> Self {
-        self.cond = cond;
-        self
-    }
-
-    /// When this returns true you need to: a) call SetDragDropPayload() exactly once, b) you may render the payload visual/description, c) call EndDragDropSource()
-    pub fn begin<'ui>(self, _ui: &'ui Ui) -> Option<DragDropSourceToolTip<'ui>> {
-        let should_begin = unsafe { sys::igBeginDragDropSource(self.flags.bits() as i32) };
+    /// This function also takes a payload of any `*const T`. Please avoid directly using it
+    /// if you can.
+    ///
+    /// ## Safety
+    /// This function itself will not cause a panic, but using it directly opts you into
+    /// managing the lifetime of the pointer provided yourself. Dear ImGui will execute a memcpy on
+    /// the data passed in with the size (in bytes) given, but this is, of course, just a copy,
+    /// so if you pass in an `&String`, for example, the underlying String data will not be cloned,
+    /// and could easily dangle if the `String` is dropped.
+    ///
+    /// Moreover, if `Condition::Always` is set (as it is by default), you will be copying in your data
+    /// every time this function is ran in your update loop, which if it involves an allocating and then
+    /// handing the allocation to ImGui, would result in a significant amount of data created.
+    ///
+    /// Overall, users should be very sure that this function is needed before they reach for it, and instead
+    /// should consider either [begin_payload](Self::begin_payload) or [begin_payload_pod](Self::begin_payload_pod).
+    pub unsafe fn begin_payload_unchecked<'ui>(
+        &self,
+        _ui: &Ui<'ui>,
+        ptr: *const ffi::c_void,
+        size: usize,
+    ) -> Option<DragDropSourceToolTip<'ui>> {
+        let should_begin = sys::igBeginDragDropSource(self.flags.bits() as i32);
 
         if should_begin {
-            unsafe {
-                sys::igSetDragDropPayload(
-                    self.name.as_ptr(),
-                    self.payload as *const _ as *const ffi::c_void,
-                    std::mem::size_of::<T>(),
-                    self.cond as i32,
-                );
+            sys::igSetDragDropPayload(self.name.as_ptr(), ptr, size, self.cond as i32);
 
-                Some(DragDropSourceToolTip::push())
-            }
+            Some(DragDropSourceToolTip::push())
         } else {
             None
         }
@@ -246,53 +240,45 @@ impl Drop for DragDropSourceToolTip<'_> {
     }
 }
 
-#[derive(Debug)]
-pub struct DragDropPayload {
-    /// Data which is copied and owned by ImGui. If you have accepted the payload, you can
-    /// take ownership of the data; otherwise, view it immutably. Interacting with `data` is
-    /// very unsafe.
-    /// @fixme: this doesn't make a ton of sense.
-    pub data: *const ffi::c_void,
-    /// Set when [`accept_drag_drop_payload`](Self::accept_drag_drop_payload) was called
-    /// and mouse has been hovering the target item (nb: handle overlapping drag targets).
-    /// @fixme: literally what does this mean -- I believe this is false on the first
-    /// frame when source hovers over target and then is subsequently true? but I'm not sure
-    /// when this matters. If DragDropFlags::ACCEPT_NO_PREVIEW is set, it doesn't make a difference
-    /// to this flag.
-    pub preview: bool,
-
-    /// Set when AcceptDragDropPayload() was called and mouse button is released over the target item.
-    /// If this is set to false, then you set DragDropFlags::ACCEPT_BEFORE_DELIVERY and shouldn't
-    /// mess with `data`
-    /// @fixme: obviously this isn't an impressive implementation of ffi data mutability.
-    pub delivery: bool,
-}
-
-#[derive(Debug)]
-pub struct DragDropEmptyPayload {
-    /// @fixme add docs.
-    pub preview: bool,
-
-    // @fixme add docs
-    pub delivery: bool,
-}
-
-#[derive(Debug)]
-pub struct DragDropPodPayload<T: bytemuck::Pod> {
-    /// The kind data which was requested.
-    pub data: T,
-
-    /// @fixme add docs.
-    pub preview: bool,
-
-    // @fixme add docs
-    pub delivery: bool,
-}
-
+/// Creates a target for drag drop data out of the last ID created.
+///
+/// ```no_run
+/// # use imgui::*;
+/// fn show_ui(ui: &Ui<'_>) {
+///     // Drop something on this button please!
+///     ui.button(im_str!("Hello, I am a drag Target!"), [0.0, 0.0]);
+///     
+///     if let Some(target) = DragDropTarget::new(ui) {
+///         // accepting an empty payload (which is really just raising an event)
+///         if let Some(_payload_data) = target.accept_payload_empty(im_str!("BUTTON_DRAG"), DragDropFlags::empty()) {
+///             println!("Nice job getting on the payload!");
+///         }
+///    
+///         // and we can accept multiple, different types of payloads with one drop target.
+///         // this is a good pattern for handling different kinds of drag/drop situations with
+///         // different kinds of data in them.
+///         if let Some(Ok(payload_data)) = target.accept_payload_pod::<usize>(im_str!("BUTTON_ID"), DragDropFlags::empty()) {
+///             println!("Our payload's data was {}", payload_data.data);
+///         }
+///     }
+/// }
+/// ```
+///
+/// Notice especially the `"BUTTON_DRAG"` and `"BUTTON_ID"` name -- this is the identifier of this
+/// DragDropTarget; [DragDropSource]s will specify an identifier when they send a payload, and these
+/// names must match up. Notice how a target can have multiple acceptances on them -- this is a good
+/// pattern to handle multiple kinds of data which could be passed around.
+///
+/// DropDropTargets don't do anything until you use one of the three `accept_` methods
+/// on this struct. Each of these methods will spit out a _Payload struct with an increasing
+/// amount of information on the Payload. The absolute safest solution is [accept_payload_empty](Self::accept_payload_empty).
 #[derive(Debug)]
 pub struct DragDropTarget<'ui>(PhantomData<Ui<'ui>>);
 
 impl<'ui> DragDropTarget<'ui> {
+    /// Creates a new DragDropTarget, holding the [Ui]'s lifetime for the duration
+    /// of its existence. This is required since this struct runs some code on its Drop
+    /// to end the DragDropTarget code.
     pub fn new(_ui: &Ui<'_>) -> Option<Self> {
         let should_begin = unsafe { sys::igBeginDragDropTarget() };
         if should_begin {
@@ -302,80 +288,97 @@ impl<'ui> DragDropTarget<'ui> {
         }
     }
 
-    pub fn accept_empty_payload(
+    /// Accepts an empty payload. This is the safest option for raising named events
+    /// in the DragDrop API. See [DragDropSource::begin] for more information on how you
+    /// might use this pattern.
+    pub fn accept_payload_empty(
         &self,
         name: &ImStr,
         flags: DragDropFlags,
-    ) -> Option<DragDropEmptyPayload> {
-        unsafe {
-            let inner = sys::igAcceptDragDropPayload(name.as_ptr(), flags.bits() as i32);
-            if inner.is_null() {
-                None
-            } else {
-                let inner = *inner;
+    ) -> Option<DragDropPayloadEmpty> {
+        let output = unsafe { self.accept_payload_unchecked(name, flags) };
 
-                Some(DragDropEmptyPayload {
-                    preview: inner.Preview,
-                    delivery: inner.Delivery,
-                })
-            }
-        }
+        output.map(|unsafe_pod| DragDropPayloadEmpty {
+            preview: unsafe_pod.preview,
+            delivery: unsafe_pod.delivery,
+        })
     }
 
-    pub fn accept_pod_payload<T: bytemuck::Pod>(
+    /// Accepts an payload with POD in it. This returns a Result, since you can specify any
+    /// type, which we will try to cast the data in, and give you a failure enum if it could
+    /// not be cast to it. Your data must implement `bytemuck::Pod` to use this method.
+    pub fn accept_payload_pod<T: bytemuck::Pod>(
         &self,
         name: &ImStr,
         flags: DragDropFlags,
-    ) -> Option<Result<DragDropPodPayload<T>, bytemuck::PodCastError>> {
-        unsafe {
-            let inner = sys::igAcceptDragDropPayload(name.as_ptr(), flags.bits() as i32);
-            if inner.is_null() {
-                None
-            } else {
-                let inner = *inner;
-                let data =
-                    std::slice::from_raw_parts(inner.Data as *const u8, inner.DataSize as usize);
+    ) -> Option<Result<DragDropPayloadPod<T>, bytemuck::PodCastError>> {
+        let output = unsafe { self.accept_payload_unchecked(name, flags) };
 
-                Some(
-                    bytemuck::try_from_bytes(data).map(|data| DragDropPodPayload {
-                        data: *data,
-                        preview: inner.Preview,
-                        delivery: inner.Delivery,
-                    }),
+        // convert the unsafe payload to our Result
+        output.map(|unsafe_payload| {
+            let data = unsafe {
+                std::slice::from_raw_parts(
+                    unsafe_payload.data as *const u8,
+                    unsafe_payload.size as usize,
                 )
-            }
-        }
+            };
+
+            // if we succeed, convert to PayloadPod
+            bytemuck::try_from_bytes(data).map(|data| DragDropPayloadPod {
+                data: *data,
+                preview: unsafe_payload.preview,
+                delivery: unsafe_payload.delivery,
+            })
+        })
     }
 
-    /// Accepts, popping the drag_drop payload, if it exists. If `DragDropFlags::ACCEPT_BEFORE_DELIVERY` is
-    /// set, this function will return `Some` even if the type is wrong as long as there is a payload to accept.
-    /// How do we possibly handle communicating that this data is somewhat immutable?
-    pub fn accept_drag_drop_payload(
+    /// Accepts a drag and drop payload, and returns a [DragDropPayload] which
+    /// contains a raw pointer to [c_void](std::ffi::c_void) and a size in bytes.
+    /// Users should generally avoid using this function if one of the safer variants
+    /// is acceptable.
+    ///
+    /// ## Safety
+    ///
+    /// Because this pointer comes from ImGui, absolutely no promises can be made on its
+    /// contents, alignment, or lifetime. Interacting with it is therefore extremely unsafe.
+    /// **Important:** a special note needs to be made to the [ACCEPT_BEFORE_DELIVERY] flag --
+    /// passing this flag will make this function return `Some(DragDropPayload)` **even before
+    /// the user has actually "dropped" the payload by release their mouse button.**
+    ///
+    /// In safe functions, this works just fine, since the data can be freely copied
+    /// (or doesn't exist at all!). However, if you are working with your own data, you must
+    /// be extremely careful with this data, as you may, effectively, only have immutable access to it.
+    ///
+    /// Moreover, if the `DragDropSource` has also used `Condition::Once` or similar when they sent the data,
+    /// ImGui will assume its data is still valid even after your preview, so corrupting that data could
+    /// lead to all sorts of unsafe behvaior on ImGui's side. In summary, using this function for any data
+    /// which isn't truly `Copy` or "plain old data" is difficult, and requires substantial knowledge
+    /// of the various edge cases.
+    pub unsafe fn accept_payload_unchecked(
         &self,
         name: &ImStr,
         flags: DragDropFlags,
     ) -> Option<DragDropPayload> {
-        unsafe {
-            let inner = sys::igAcceptDragDropPayload(name.as_ptr(), flags.bits() as i32);
-            if inner.is_null() {
-                None
-            } else {
-                let inner = *inner;
+        let inner = sys::igAcceptDragDropPayload(name.as_ptr(), flags.bits() as i32);
+        if inner.is_null() {
+            None
+        } else {
+            let inner = *inner;
 
-                // @fixme: there are actually other fields on `inner` which I have shorn -- they're
-                // considered internal to imgui (such as id of who sent this), so i've left it for
-                // now this way.
-                Some(DragDropPayload {
-                    data: inner.Data,
-                    preview: inner.Preview,
-                    delivery: inner.Delivery,
-                })
-            }
+            // @fixme: there are actually other fields on `inner` which I have shorn -- they're
+            // considered internal to imgui (such as id of who sent this), so i've left it for
+            // now this way.
+            Some(DragDropPayload {
+                data: inner.Data,
+                size: inner.DataSize,
+                preview: inner.Preview,
+                delivery: inner.Delivery,
+            })
         }
     }
 
-    /// Ends the current target. Ironically, this doesn't really do
-    /// anything in ImGui or in imgui-rs, but it might in the future.
+    /// Ends the current target. Ironically, this doesn't really do anything in ImGui
+    /// or in imgui-rs, but it might in the future.
     pub fn pop(self) {
         // omitted...exists just to run Drop.
     }
@@ -385,4 +388,53 @@ impl Drop for DragDropTarget<'_> {
     fn drop(&mut self) {
         unsafe { sys::igEndDragDropTarget() }
     }
+}
+
+/// An empty DragDropPayload. It has no data in it, and just includes
+/// two bools with status information.
+#[derive(Debug)]
+pub struct DragDropPayloadEmpty {
+    /// Set when [`accept_payload_empty`](Self::accept_payload_empty) was called
+    /// and mouse has been hovering the target item.
+    pub preview: bool,
+
+    /// Set when [`accept_payload_empty`](Self::accept_payload_empty) was
+    /// called and mouse button is released over the target item.
+    pub delivery: bool,
+}
+
+/// A DragDropPayload with status information and some POD, or plain old data,
+/// in it.
+#[derive(Debug)]
+pub struct DragDropPayloadPod<T: bytemuck::Pod> {
+    /// The kind data which was requested.
+    pub data: T,
+
+    /// Set when [`accept_payload_pod`](Self::accept_payload_pod) was called
+    /// and mouse has been hovering the target item.
+    pub preview: bool,
+
+    /// Set when [`accept_payload_pod`](Self::accept_payload_pod) was
+    /// called and mouse button is released over the target item.
+    pub delivery: bool,
+}
+
+#[derive(Debug)]
+pub struct DragDropPayload {
+    /// Data which is copied and owned by ImGui. If you have accepted the payload, you can
+    /// take ownership of the data; otherwise, view it immutably. Interacting with `data` is
+    /// very unsafe.
+    pub data: *const ffi::c_void,
+
+    /// The size of the data in bytes.
+    pub size: i32,
+
+    /// Set when [`accept_payload_unchecked`](Self::accept_payload_unchecked) was called
+    /// and mouse has been hovering the target item.
+    pub preview: bool,
+
+    /// Set when [`accept_payload_unchecked`](Self::accept_payload_unchecked) was
+    /// called and mouse button is released over the target item. If this is set to false, then you
+    /// set DragDropFlags::ACCEPT_BEFORE_DELIVERY and shouldn't mutate `data`.
+    pub delivery: bool,
 }

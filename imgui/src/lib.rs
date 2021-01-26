@@ -10,7 +10,7 @@ use std::thread;
 
 pub use self::clipboard::*;
 pub use self::context::*;
-pub use self::drag_drop::*;
+pub use self::drag_drop::{DragDropFlags, DragDropSource, DragDropTarget};
 pub use self::draw_list::{ChannelsSplit, DrawListMut, ImColor};
 pub use self::fonts::atlas::*;
 pub use self::fonts::font::*;
