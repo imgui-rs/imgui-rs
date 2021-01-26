@@ -1,4 +1,4 @@
-use std::{ffi, marker::PhantomData, ptr};
+use std::{any, ffi, marker::PhantomData};
 
 use crate::{sys, Condition, ImStr, Ui};
 use bitflags::bitflags;
@@ -143,9 +143,9 @@ impl<'a> DragDropSource<'a> {
     ///
     /// In the above, you'll see how the payload is really just a message passing service.
     /// If you want to pass a simple integer or other "plain old data", take a look at
-    /// [begin_payload_pod](Self::begin_payload_pod).
+    /// [begin_payload](Self::begin_payload).
     pub fn begin<'ui>(self, ui: &Ui<'ui>) -> Option<DragDropSourceToolTip<'ui>> {
-        unsafe { self.begin_payload_unchecked(ui, ptr::null(), 0) }
+        self.begin_payload(ui, ())
     }
 
     /// Creates the source of a drag and returns a handle on the tooltip.
@@ -157,20 +157,20 @@ impl<'a> DragDropSource<'a> {
     /// and this returned token does nothing. Additionally, a given target may use the flag
     /// `ACCEPT_NO_PREVIEW_TOOLTIP`, which will also prevent this tooltip from being shown.
     ///
-    /// This function also takes a payload in the form of `T: bytemuck::Pod`. We use this bound to
-    /// ensure that we can safely send and receive the given type from C++. Integers are natively
-    /// supported by this operation already, but you'll need to implement `bytemuck::Pod` for your own
-    /// types to use this method.
-    pub fn begin_payload_pod<'ui, T: bytemuck::Pod>(
+    /// This function also takes a payload in the form of `T: Copy + 'static`. We use this bound to
+    /// ensure that we can safely send and receive the given type from C++ without worrying about
+    /// handling drops.
+    pub fn begin_payload<'ui, T: Copy + 'static>(
         self,
         ui: &Ui<'ui>,
-        payload: &T,
+        payload: T,
     ) -> Option<DragDropSourceToolTip<'ui>> {
         unsafe {
+            let payload = TypedPayload::new(payload);
             self.begin_payload_unchecked(
                 ui,
-                payload as *const _ as *const ffi::c_void,
-                std::mem::size_of::<T>(),
+                &payload as *const _ as *const ffi::c_void,
+                std::mem::size_of::<TypedPayload<T>>(),
             )
         }
     }
@@ -199,7 +199,7 @@ impl<'a> DragDropSource<'a> {
     /// handing the allocation to ImGui, would result in a significant amount of data created.
     ///
     /// Overall, users should be very sure that this function is needed before they reach for it, and instead
-    /// should consider either [begin_payload](Self::begin_payload) or [begin_payload_pod](Self::begin_payload_pod).
+    /// should consider either [begin](Self::begin) or [begin_payload](Self::begin_payload).
     pub unsafe fn begin_payload_unchecked<'ui>(
         &self,
         _ui: &Ui<'ui>,
@@ -257,7 +257,7 @@ impl Drop for DragDropSourceToolTip<'_> {
 ///         // and we can accept multiple, different types of payloads with one drop target.
 ///         // this is a good pattern for handling different kinds of drag/drop situations with
 ///         // different kinds of data in them.
-///         if let Some(Ok(payload_data)) = target.accept_payload_pod::<usize>(im_str!("BUTTON_ID"), DragDropFlags::empty()) {
+///         if let Some(Ok(payload_data)) = target.accept_payload::<usize>(im_str!("BUTTON_ID"), DragDropFlags::empty()) {
 ///             println!("Our payload's data was {}", payload_data.data);
 ///         }
 ///     }
@@ -296,52 +296,54 @@ impl<'ui> DragDropTarget<'ui> {
         name: &ImStr,
         flags: DragDropFlags,
     ) -> Option<DragDropPayloadEmpty> {
-        let output = unsafe { self.accept_payload_unchecked(name, flags) };
-
-        output.map(|unsafe_pod| DragDropPayloadEmpty {
-            preview: unsafe_pod.preview,
-            delivery: unsafe_pod.delivery,
-        })
+        self.accept_payload::<()>(name, flags)?
+            .ok()
+            .map(|payload_pod| DragDropPayloadEmpty {
+                preview: payload_pod.preview,
+                delivery: payload_pod.delivery,
+            })
     }
 
-    /// Accepts an payload with POD in it. This returns a Result, since you can specify any
-    /// type, which we will try to cast the data in, and give you a failure enum if it could
-    /// not be cast to it. Your data must implement `bytemuck::Pod` to use this method.
-    pub fn accept_payload_pod<T: bytemuck::Pod>(
+    /// Accepts a payload with plain old data in it. This returns a Result, since you can specify any
+    /// type. The sent type must match the return type (via TypeId) to receive an `Ok`.
+    pub fn accept_payload<T: 'static + Copy>(
         &self,
         name: &ImStr,
         flags: DragDropFlags,
-    ) -> Option<Result<DragDropPayloadPod<T>, bytemuck::PodCastError>> {
+    ) -> Option<Result<DragDropPayloadPod<T>, PayloadIsWrongType>> {
         let output = unsafe { self.accept_payload_unchecked(name, flags) };
 
         // convert the unsafe payload to our Result
         output.map(|unsafe_payload| {
-            let data = unsafe {
-                std::slice::from_raw_parts(
-                    unsafe_payload.data as *const u8,
-                    unsafe_payload.size as usize,
-                )
-            };
+            // sheering off the typeid...
+            let received = unsafe { *(unsafe_payload.data as *const any::TypeId) };
+            let requested = any::TypeId::of::<T>();
 
-            // if we succeed, convert to PayloadPod
-            bytemuck::try_from_bytes(data).map(|data| DragDropPayloadPod {
-                data: *data,
-                preview: unsafe_payload.preview,
-                delivery: unsafe_payload.delivery,
-            })
+            if received == requested {
+                let data = unsafe { *(unsafe_payload.data as *const TypedPayload<T>) }.data;
+                Ok(DragDropPayloadPod {
+                    data,
+                    preview: unsafe_payload.preview,
+                    delivery: unsafe_payload.delivery,
+                })
+            } else {
+                Err(PayloadIsWrongType {
+                    requested,
+                    received,
+                })
+            }
         })
     }
 
-    /// Accepts a drag and drop payload, and returns a [DragDropPayload] which
-    /// contains a raw pointer to [c_void](std::ffi::c_void) and a size in bytes.
-    /// Users should generally avoid using this function if one of the safer variants
-    /// is acceptable.
+    /// Accepts a drag and drop payload  which contains a raw pointer to [c_void](std::ffi::c_void)
+    /// and a size in bytes. Users should generally avoid using this function
+    /// if one of the safer variants is acceptable.
     ///
     /// ## Safety
     ///
     /// Because this pointer comes from ImGui, absolutely no promises can be made on its
     /// contents, alignment, or lifetime. Interacting with it is therefore extremely unsafe.
-    /// **Important:** a special note needs to be made to the [ACCEPT_BEFORE_DELIVERY] flag --
+    /// **Important:** a special note needs to be made to the [ACCEPT_BEFORE_DELIVERY](DragDropFlags::ACCEPT_BEFORE_DELIVERY) flag --
     /// passing this flag will make this function return `Some(DragDropPayload)` **even before
     /// the user has actually "dropped" the payload by release their mouse button.**
     ///
@@ -406,15 +408,15 @@ pub struct DragDropPayloadEmpty {
 /// A DragDropPayload with status information and some POD, or plain old data,
 /// in it.
 #[derive(Debug)]
-pub struct DragDropPayloadPod<T: bytemuck::Pod> {
+pub struct DragDropPayloadPod<T> {
     /// The kind data which was requested.
     pub data: T,
 
-    /// Set when [`accept_payload_pod`](Self::accept_payload_pod) was called
+    /// Set when [`accept_payload`](Self::accept_payload) was called
     /// and mouse has been hovering the target item.
     pub preview: bool,
 
-    /// Set when [`accept_payload_pod`](Self::accept_payload_pod) was
+    /// Set when [`accept_payload`](Self::accept_payload) was
     /// called and mouse button is released over the target item.
     pub delivery: bool,
 }
@@ -438,3 +440,36 @@ pub struct DragDropPayload {
     /// set DragDropFlags::ACCEPT_BEFORE_DELIVERY and shouldn't mutate `data`.
     pub delivery: bool,
 }
+
+#[derive(Debug, Clone, Copy)]
+#[repr(C)]
+struct TypedPayload<T> {
+    type_id: any::TypeId,
+    data: T,
+}
+
+impl<T: Copy + 'static> TypedPayload<T> {
+    /// Creates a new typed payload which contains this data.
+    pub fn new(data: T) -> Self {
+        Self {
+            type_id: any::TypeId::of::<T>(),
+            data,
+        }
+    }
+}
+
+/// Indicates that an incorrect payload type was received. It is opaque,
+/// but you can view questionably useful debug information with Debug formatting.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Ord, PartialOrd)]
+pub struct PayloadIsWrongType {
+    requested: any::TypeId,
+    received: any::TypeId,
+}
+
+impl std::fmt::Display for PayloadIsWrongType {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "Payload is wrong type")
+    }
+}
+
+impl std::error::Error for PayloadIsWrongType {}
