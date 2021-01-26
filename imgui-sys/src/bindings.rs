@@ -2,6 +2,9 @@
 
 #![allow(nonstandard_style, clippy::all)]
 
+extern crate std;
+use std::os::raw::c_char;
+
 #[repr(C)]
 #[derive(Copy, Clone, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd)]
 pub struct __BindgenBitfieldUnit<Storage, Align> {
@@ -321,7 +324,7 @@ impl Default for ImVector_ImWchar {
 pub struct ImVector_char {
     pub Size: cty::c_int,
     pub Capacity: cty::c_int,
-    pub Data: *mut cty::c_char,
+    pub Data: *mut c_char,
 }
 impl Default for ImVector_char {
     fn default() -> Self {
@@ -798,8 +801,8 @@ pub struct ImGuiIO {
     pub DisplaySize: ImVec2,
     pub DeltaTime: f32,
     pub IniSavingRate: f32,
-    pub IniFilename: *const cty::c_char,
-    pub LogFilename: *const cty::c_char,
+    pub IniFilename: *const c_char,
+    pub LogFilename: *const c_char,
     pub MouseDoubleClickTime: f32,
     pub MouseDoubleClickMaxDist: f32,
     pub MouseDragThreshold: f32,
@@ -818,16 +821,16 @@ pub struct ImGuiIO {
     pub ConfigWindowsResizeFromEdges: bool,
     pub ConfigWindowsMoveFromTitleBarOnly: bool,
     pub ConfigWindowsMemoryCompactTimer: f32,
-    pub BackendPlatformName: *const cty::c_char,
-    pub BackendRendererName: *const cty::c_char,
+    pub BackendPlatformName: *const c_char,
+    pub BackendRendererName: *const c_char,
     pub BackendPlatformUserData: *mut cty::c_void,
     pub BackendRendererUserData: *mut cty::c_void,
     pub BackendLanguageUserData: *mut cty::c_void,
     pub GetClipboardTextFn: ::core::option::Option<
-        unsafe extern "C" fn(user_data: *mut cty::c_void) -> *const cty::c_char,
+        unsafe extern "C" fn(user_data: *mut cty::c_void) -> *const c_char,
     >,
     pub SetClipboardTextFn: ::core::option::Option<
-        unsafe extern "C" fn(user_data: *mut cty::c_void, text: *const cty::c_char),
+        unsafe extern "C" fn(user_data: *mut cty::c_void, text: *const c_char),
     >,
     pub ClipboardUserData: *mut cty::c_void,
     pub ImeSetInputScreenPosFn:
@@ -897,7 +900,7 @@ pub struct ImGuiInputTextCallbackData {
     pub UserData: *mut cty::c_void,
     pub EventChar: ImWchar,
     pub EventKey: ImGuiKey,
-    pub Buf: *mut cty::c_char,
+    pub Buf: *mut c_char,
     pub BufTextLen: cty::c_int,
     pub BufSize: cty::c_int,
     pub BufDirty: bool,
@@ -931,7 +934,7 @@ pub struct ImGuiPayload {
     pub SourceId: ImGuiID,
     pub SourceParentId: ImGuiID,
     pub DataFrameCount: cty::c_int,
-    pub DataType: [cty::c_char; 33usize],
+    pub DataType: [c_char; 33usize],
     pub Preview: bool,
     pub Delivery: bool,
 }
@@ -953,8 +956,8 @@ pub struct ImGuiOnceUponAFrame {
 #[repr(C)]
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
 pub struct ImGuiTextRange {
-    pub b: *const cty::c_char,
-    pub e: *const cty::c_char,
+    pub b: *const c_char,
+    pub e: *const c_char,
 }
 impl Default for ImGuiTextRange {
     fn default() -> Self {
@@ -964,7 +967,7 @@ impl Default for ImGuiTextRange {
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub struct ImGuiTextFilter {
-    pub InputBuf: [cty::c_char; 256usize],
+    pub InputBuf: [c_char; 256usize],
     pub Filters: ImVector_ImGuiTextRange,
     pub CountGrep: cty::c_int,
 }
@@ -1126,7 +1129,7 @@ pub struct ImDrawList {
     pub VtxBuffer: ImVector_ImDrawVert,
     pub Flags: ImDrawListFlags,
     pub _Data: *const ImDrawListSharedData,
-    pub _OwnerName: *const cty::c_char,
+    pub _OwnerName: *const c_char,
     pub _VtxCurrentIdx: cty::c_uint,
     pub _VtxWritePtr: *mut ImDrawVert,
     pub _IdxWritePtr: *mut ImDrawIdx,
@@ -1178,7 +1181,7 @@ pub struct ImFontConfig {
     pub RasterizerFlags: cty::c_uint,
     pub RasterizerMultiply: f32,
     pub EllipsisChar: ImWchar,
-    pub Name: [cty::c_char; 40usize],
+    pub Name: [c_char; 40usize],
     pub DstFont: *mut ImFont,
 }
 impl Default for ImFontConfig {
@@ -1396,16 +1399,16 @@ extern "C" {
     pub fn igShowStyleEditor(ref_: *mut ImGuiStyle);
 }
 extern "C" {
-    pub fn igShowStyleSelector(label: *const cty::c_char) -> bool;
+    pub fn igShowStyleSelector(label: *const c_char) -> bool;
 }
 extern "C" {
-    pub fn igShowFontSelector(label: *const cty::c_char);
+    pub fn igShowFontSelector(label: *const c_char);
 }
 extern "C" {
     pub fn igShowUserGuide();
 }
 extern "C" {
-    pub fn igGetVersion() -> *const cty::c_char;
+    pub fn igGetVersion() -> *const c_char;
 }
 extern "C" {
     pub fn igStyleColorsDark(dst: *mut ImGuiStyle);
@@ -1417,14 +1420,14 @@ extern "C" {
     pub fn igStyleColorsLight(dst: *mut ImGuiStyle);
 }
 extern "C" {
-    pub fn igBegin(name: *const cty::c_char, p_open: *mut bool, flags: ImGuiWindowFlags) -> bool;
+    pub fn igBegin(name: *const c_char, p_open: *mut bool, flags: ImGuiWindowFlags) -> bool;
 }
 extern "C" {
     pub fn igEnd();
 }
 extern "C" {
     pub fn igBeginChildStr(
-        str_id: *const cty::c_char,
+        str_id: *const c_char,
         size: ImVec2,
         border: bool,
         flags: ImGuiWindowFlags,
@@ -1506,16 +1509,16 @@ extern "C" {
     pub fn igSetWindowFontScale(scale: f32);
 }
 extern "C" {
-    pub fn igSetWindowPosStr(name: *const cty::c_char, pos: ImVec2, cond: ImGuiCond);
+    pub fn igSetWindowPosStr(name: *const c_char, pos: ImVec2, cond: ImGuiCond);
 }
 extern "C" {
-    pub fn igSetWindowSizeStr(name: *const cty::c_char, size: ImVec2, cond: ImGuiCond);
+    pub fn igSetWindowSizeStr(name: *const c_char, size: ImVec2, cond: ImGuiCond);
 }
 extern "C" {
-    pub fn igSetWindowCollapsedStr(name: *const cty::c_char, collapsed: bool, cond: ImGuiCond);
+    pub fn igSetWindowCollapsedStr(name: *const c_char, collapsed: bool, cond: ImGuiCond);
 }
 extern "C" {
-    pub fn igSetWindowFocusStr(name: *const cty::c_char);
+    pub fn igSetWindowFocusStr(name: *const c_char);
 }
 extern "C" {
     pub fn igGetContentRegionMax(pOut: *mut ImVec2);
@@ -1707,10 +1710,10 @@ extern "C" {
     pub fn igGetFrameHeightWithSpacing() -> f32;
 }
 extern "C" {
-    pub fn igPushIDStr(str_id: *const cty::c_char);
+    pub fn igPushIDStr(str_id: *const c_char);
 }
 extern "C" {
-    pub fn igPushIDStrStr(str_id_begin: *const cty::c_char, str_id_end: *const cty::c_char);
+    pub fn igPushIDStrStr(str_id_begin: *const c_char, str_id_end: *const c_char);
 }
 extern "C" {
     pub fn igPushIDPtr(ptr_id: *const cty::c_void);
@@ -1722,53 +1725,53 @@ extern "C" {
     pub fn igPopID();
 }
 extern "C" {
-    pub fn igGetIDStr(str_id: *const cty::c_char) -> ImGuiID;
+    pub fn igGetIDStr(str_id: *const c_char) -> ImGuiID;
 }
 extern "C" {
     pub fn igGetIDStrStr(
-        str_id_begin: *const cty::c_char,
-        str_id_end: *const cty::c_char,
+        str_id_begin: *const c_char,
+        str_id_end: *const c_char,
     ) -> ImGuiID;
 }
 extern "C" {
     pub fn igGetIDPtr(ptr_id: *const cty::c_void) -> ImGuiID;
 }
 extern "C" {
-    pub fn igTextUnformatted(text: *const cty::c_char, text_end: *const cty::c_char);
+    pub fn igTextUnformatted(text: *const c_char, text_end: *const c_char);
 }
 extern "C" {
-    pub fn igText(fmt: *const cty::c_char, ...);
+    pub fn igText(fmt: *const c_char, ...);
 }
 extern "C" {
-    pub fn igTextColored(col: ImVec4, fmt: *const cty::c_char, ...);
+    pub fn igTextColored(col: ImVec4, fmt: *const c_char, ...);
 }
 extern "C" {
-    pub fn igTextDisabled(fmt: *const cty::c_char, ...);
+    pub fn igTextDisabled(fmt: *const c_char, ...);
 }
 extern "C" {
-    pub fn igTextWrapped(fmt: *const cty::c_char, ...);
+    pub fn igTextWrapped(fmt: *const c_char, ...);
 }
 extern "C" {
-    pub fn igLabelText(label: *const cty::c_char, fmt: *const cty::c_char, ...);
+    pub fn igLabelText(label: *const c_char, fmt: *const c_char, ...);
 }
 extern "C" {
-    pub fn igBulletText(fmt: *const cty::c_char, ...);
+    pub fn igBulletText(fmt: *const c_char, ...);
 }
 extern "C" {
-    pub fn igButton(label: *const cty::c_char, size: ImVec2) -> bool;
+    pub fn igButton(label: *const c_char, size: ImVec2) -> bool;
 }
 extern "C" {
-    pub fn igSmallButton(label: *const cty::c_char) -> bool;
+    pub fn igSmallButton(label: *const c_char) -> bool;
 }
 extern "C" {
     pub fn igInvisibleButton(
-        str_id: *const cty::c_char,
+        str_id: *const c_char,
         size: ImVec2,
         flags: ImGuiButtonFlags,
     ) -> bool;
 }
 extern "C" {
-    pub fn igArrowButton(str_id: *const cty::c_char, dir: ImGuiDir) -> bool;
+    pub fn igArrowButton(str_id: *const c_char, dir: ImGuiDir) -> bool;
 }
 extern "C" {
     pub fn igImage(
@@ -1792,35 +1795,35 @@ extern "C" {
     ) -> bool;
 }
 extern "C" {
-    pub fn igCheckbox(label: *const cty::c_char, v: *mut bool) -> bool;
+    pub fn igCheckbox(label: *const c_char, v: *mut bool) -> bool;
 }
 extern "C" {
     pub fn igCheckboxFlags(
-        label: *const cty::c_char,
+        label: *const c_char,
         flags: *mut cty::c_uint,
         flags_value: cty::c_uint,
     ) -> bool;
 }
 extern "C" {
-    pub fn igRadioButtonBool(label: *const cty::c_char, active: bool) -> bool;
+    pub fn igRadioButtonBool(label: *const c_char, active: bool) -> bool;
 }
 extern "C" {
     pub fn igRadioButtonIntPtr(
-        label: *const cty::c_char,
+        label: *const c_char,
         v: *mut cty::c_int,
         v_button: cty::c_int,
     ) -> bool;
 }
 extern "C" {
-    pub fn igProgressBar(fraction: f32, size_arg: ImVec2, overlay: *const cty::c_char);
+    pub fn igProgressBar(fraction: f32, size_arg: ImVec2, overlay: *const c_char);
 }
 extern "C" {
     pub fn igBullet();
 }
 extern "C" {
     pub fn igBeginCombo(
-        label: *const cty::c_char,
-        preview_value: *const cty::c_char,
+        label: *const c_char,
+        preview_value: *const c_char,
         flags: ImGuiComboFlags,
     ) -> bool;
 }
@@ -1829,30 +1832,30 @@ extern "C" {
 }
 extern "C" {
     pub fn igComboStr_arr(
-        label: *const cty::c_char,
+        label: *const c_char,
         current_item: *mut cty::c_int,
-        items: *const *const cty::c_char,
+        items: *const *const c_char,
         items_count: cty::c_int,
         popup_max_height_in_items: cty::c_int,
     ) -> bool;
 }
 extern "C" {
     pub fn igComboStr(
-        label: *const cty::c_char,
+        label: *const c_char,
         current_item: *mut cty::c_int,
-        items_separated_by_zeros: *const cty::c_char,
+        items_separated_by_zeros: *const c_char,
         popup_max_height_in_items: cty::c_int,
     ) -> bool;
 }
 extern "C" {
     pub fn igComboFnBoolPtr(
-        label: *const cty::c_char,
+        label: *const c_char,
         current_item: *mut cty::c_int,
         items_getter: ::core::option::Option<
             unsafe extern "C" fn(
                 data: *mut cty::c_void,
                 idx: cty::c_int,
-                out_text: *mut *const cty::c_char,
+                out_text: *mut *const c_char,
             ) -> bool,
         >,
         data: *mut cty::c_void,
@@ -1862,294 +1865,294 @@ extern "C" {
 }
 extern "C" {
     pub fn igDragFloat(
-        label: *const cty::c_char,
+        label: *const c_char,
         v: *mut f32,
         v_speed: f32,
         v_min: f32,
         v_max: f32,
-        format: *const cty::c_char,
+        format: *const c_char,
         flags: ImGuiSliderFlags,
     ) -> bool;
 }
 extern "C" {
     pub fn igDragFloat2(
-        label: *const cty::c_char,
+        label: *const c_char,
         v: *mut f32,
         v_speed: f32,
         v_min: f32,
         v_max: f32,
-        format: *const cty::c_char,
+        format: *const c_char,
         flags: ImGuiSliderFlags,
     ) -> bool;
 }
 extern "C" {
     pub fn igDragFloat3(
-        label: *const cty::c_char,
+        label: *const c_char,
         v: *mut f32,
         v_speed: f32,
         v_min: f32,
         v_max: f32,
-        format: *const cty::c_char,
+        format: *const c_char,
         flags: ImGuiSliderFlags,
     ) -> bool;
 }
 extern "C" {
     pub fn igDragFloat4(
-        label: *const cty::c_char,
+        label: *const c_char,
         v: *mut f32,
         v_speed: f32,
         v_min: f32,
         v_max: f32,
-        format: *const cty::c_char,
+        format: *const c_char,
         flags: ImGuiSliderFlags,
     ) -> bool;
 }
 extern "C" {
     pub fn igDragFloatRange2(
-        label: *const cty::c_char,
+        label: *const c_char,
         v_current_min: *mut f32,
         v_current_max: *mut f32,
         v_speed: f32,
         v_min: f32,
         v_max: f32,
-        format: *const cty::c_char,
-        format_max: *const cty::c_char,
+        format: *const c_char,
+        format_max: *const c_char,
         flags: ImGuiSliderFlags,
     ) -> bool;
 }
 extern "C" {
     pub fn igDragInt(
-        label: *const cty::c_char,
+        label: *const c_char,
         v: *mut cty::c_int,
         v_speed: f32,
         v_min: cty::c_int,
         v_max: cty::c_int,
-        format: *const cty::c_char,
+        format: *const c_char,
         flags: ImGuiSliderFlags,
     ) -> bool;
 }
 extern "C" {
     pub fn igDragInt2(
-        label: *const cty::c_char,
+        label: *const c_char,
         v: *mut cty::c_int,
         v_speed: f32,
         v_min: cty::c_int,
         v_max: cty::c_int,
-        format: *const cty::c_char,
+        format: *const c_char,
         flags: ImGuiSliderFlags,
     ) -> bool;
 }
 extern "C" {
     pub fn igDragInt3(
-        label: *const cty::c_char,
+        label: *const c_char,
         v: *mut cty::c_int,
         v_speed: f32,
         v_min: cty::c_int,
         v_max: cty::c_int,
-        format: *const cty::c_char,
+        format: *const c_char,
         flags: ImGuiSliderFlags,
     ) -> bool;
 }
 extern "C" {
     pub fn igDragInt4(
-        label: *const cty::c_char,
+        label: *const c_char,
         v: *mut cty::c_int,
         v_speed: f32,
         v_min: cty::c_int,
         v_max: cty::c_int,
-        format: *const cty::c_char,
+        format: *const c_char,
         flags: ImGuiSliderFlags,
     ) -> bool;
 }
 extern "C" {
     pub fn igDragIntRange2(
-        label: *const cty::c_char,
+        label: *const c_char,
         v_current_min: *mut cty::c_int,
         v_current_max: *mut cty::c_int,
         v_speed: f32,
         v_min: cty::c_int,
         v_max: cty::c_int,
-        format: *const cty::c_char,
-        format_max: *const cty::c_char,
+        format: *const c_char,
+        format_max: *const c_char,
         flags: ImGuiSliderFlags,
     ) -> bool;
 }
 extern "C" {
     pub fn igDragScalar(
-        label: *const cty::c_char,
+        label: *const c_char,
         data_type: ImGuiDataType,
         p_data: *mut cty::c_void,
         v_speed: f32,
         p_min: *const cty::c_void,
         p_max: *const cty::c_void,
-        format: *const cty::c_char,
+        format: *const c_char,
         flags: ImGuiSliderFlags,
     ) -> bool;
 }
 extern "C" {
     pub fn igDragScalarN(
-        label: *const cty::c_char,
+        label: *const c_char,
         data_type: ImGuiDataType,
         p_data: *mut cty::c_void,
         components: cty::c_int,
         v_speed: f32,
         p_min: *const cty::c_void,
         p_max: *const cty::c_void,
-        format: *const cty::c_char,
+        format: *const c_char,
         flags: ImGuiSliderFlags,
     ) -> bool;
 }
 extern "C" {
     pub fn igSliderFloat(
-        label: *const cty::c_char,
+        label: *const c_char,
         v: *mut f32,
         v_min: f32,
         v_max: f32,
-        format: *const cty::c_char,
+        format: *const c_char,
         flags: ImGuiSliderFlags,
     ) -> bool;
 }
 extern "C" {
     pub fn igSliderFloat2(
-        label: *const cty::c_char,
+        label: *const c_char,
         v: *mut f32,
         v_min: f32,
         v_max: f32,
-        format: *const cty::c_char,
+        format: *const c_char,
         flags: ImGuiSliderFlags,
     ) -> bool;
 }
 extern "C" {
     pub fn igSliderFloat3(
-        label: *const cty::c_char,
+        label: *const c_char,
         v: *mut f32,
         v_min: f32,
         v_max: f32,
-        format: *const cty::c_char,
+        format: *const c_char,
         flags: ImGuiSliderFlags,
     ) -> bool;
 }
 extern "C" {
     pub fn igSliderFloat4(
-        label: *const cty::c_char,
+        label: *const c_char,
         v: *mut f32,
         v_min: f32,
         v_max: f32,
-        format: *const cty::c_char,
+        format: *const c_char,
         flags: ImGuiSliderFlags,
     ) -> bool;
 }
 extern "C" {
     pub fn igSliderAngle(
-        label: *const cty::c_char,
+        label: *const c_char,
         v_rad: *mut f32,
         v_degrees_min: f32,
         v_degrees_max: f32,
-        format: *const cty::c_char,
+        format: *const c_char,
         flags: ImGuiSliderFlags,
     ) -> bool;
 }
 extern "C" {
     pub fn igSliderInt(
-        label: *const cty::c_char,
+        label: *const c_char,
         v: *mut cty::c_int,
         v_min: cty::c_int,
         v_max: cty::c_int,
-        format: *const cty::c_char,
+        format: *const c_char,
         flags: ImGuiSliderFlags,
     ) -> bool;
 }
 extern "C" {
     pub fn igSliderInt2(
-        label: *const cty::c_char,
+        label: *const c_char,
         v: *mut cty::c_int,
         v_min: cty::c_int,
         v_max: cty::c_int,
-        format: *const cty::c_char,
+        format: *const c_char,
         flags: ImGuiSliderFlags,
     ) -> bool;
 }
 extern "C" {
     pub fn igSliderInt3(
-        label: *const cty::c_char,
+        label: *const c_char,
         v: *mut cty::c_int,
         v_min: cty::c_int,
         v_max: cty::c_int,
-        format: *const cty::c_char,
+        format: *const c_char,
         flags: ImGuiSliderFlags,
     ) -> bool;
 }
 extern "C" {
     pub fn igSliderInt4(
-        label: *const cty::c_char,
+        label: *const c_char,
         v: *mut cty::c_int,
         v_min: cty::c_int,
         v_max: cty::c_int,
-        format: *const cty::c_char,
+        format: *const c_char,
         flags: ImGuiSliderFlags,
     ) -> bool;
 }
 extern "C" {
     pub fn igSliderScalar(
-        label: *const cty::c_char,
+        label: *const c_char,
         data_type: ImGuiDataType,
         p_data: *mut cty::c_void,
         p_min: *const cty::c_void,
         p_max: *const cty::c_void,
-        format: *const cty::c_char,
+        format: *const c_char,
         flags: ImGuiSliderFlags,
     ) -> bool;
 }
 extern "C" {
     pub fn igSliderScalarN(
-        label: *const cty::c_char,
+        label: *const c_char,
         data_type: ImGuiDataType,
         p_data: *mut cty::c_void,
         components: cty::c_int,
         p_min: *const cty::c_void,
         p_max: *const cty::c_void,
-        format: *const cty::c_char,
+        format: *const c_char,
         flags: ImGuiSliderFlags,
     ) -> bool;
 }
 extern "C" {
     pub fn igVSliderFloat(
-        label: *const cty::c_char,
+        label: *const c_char,
         size: ImVec2,
         v: *mut f32,
         v_min: f32,
         v_max: f32,
-        format: *const cty::c_char,
+        format: *const c_char,
         flags: ImGuiSliderFlags,
     ) -> bool;
 }
 extern "C" {
     pub fn igVSliderInt(
-        label: *const cty::c_char,
+        label: *const c_char,
         size: ImVec2,
         v: *mut cty::c_int,
         v_min: cty::c_int,
         v_max: cty::c_int,
-        format: *const cty::c_char,
+        format: *const c_char,
         flags: ImGuiSliderFlags,
     ) -> bool;
 }
 extern "C" {
     pub fn igVSliderScalar(
-        label: *const cty::c_char,
+        label: *const c_char,
         size: ImVec2,
         data_type: ImGuiDataType,
         p_data: *mut cty::c_void,
         p_min: *const cty::c_void,
         p_max: *const cty::c_void,
-        format: *const cty::c_char,
+        format: *const c_char,
         flags: ImGuiSliderFlags,
     ) -> bool;
 }
 extern "C" {
     pub fn igInputText(
-        label: *const cty::c_char,
-        buf: *mut cty::c_char,
+        label: *const c_char,
+        buf: *mut c_char,
         buf_size: usize,
         flags: ImGuiInputTextFlags,
         callback: ImGuiInputTextCallback,
@@ -2158,8 +2161,8 @@ extern "C" {
 }
 extern "C" {
     pub fn igInputTextMultiline(
-        label: *const cty::c_char,
-        buf: *mut cty::c_char,
+        label: *const c_char,
+        buf: *mut c_char,
         buf_size: usize,
         size: ImVec2,
         flags: ImGuiInputTextFlags,
@@ -2169,9 +2172,9 @@ extern "C" {
 }
 extern "C" {
     pub fn igInputTextWithHint(
-        label: *const cty::c_char,
-        hint: *const cty::c_char,
-        buf: *mut cty::c_char,
+        label: *const c_char,
+        hint: *const c_char,
+        buf: *mut c_char,
         buf_size: usize,
         flags: ImGuiInputTextFlags,
         callback: ImGuiInputTextCallback,
@@ -2180,41 +2183,41 @@ extern "C" {
 }
 extern "C" {
     pub fn igInputFloat(
-        label: *const cty::c_char,
+        label: *const c_char,
         v: *mut f32,
         step: f32,
         step_fast: f32,
-        format: *const cty::c_char,
+        format: *const c_char,
         flags: ImGuiInputTextFlags,
     ) -> bool;
 }
 extern "C" {
     pub fn igInputFloat2(
-        label: *const cty::c_char,
+        label: *const c_char,
         v: *mut f32,
-        format: *const cty::c_char,
+        format: *const c_char,
         flags: ImGuiInputTextFlags,
     ) -> bool;
 }
 extern "C" {
     pub fn igInputFloat3(
-        label: *const cty::c_char,
+        label: *const c_char,
         v: *mut f32,
-        format: *const cty::c_char,
+        format: *const c_char,
         flags: ImGuiInputTextFlags,
     ) -> bool;
 }
 extern "C" {
     pub fn igInputFloat4(
-        label: *const cty::c_char,
+        label: *const c_char,
         v: *mut f32,
-        format: *const cty::c_char,
+        format: *const c_char,
         flags: ImGuiInputTextFlags,
     ) -> bool;
 }
 extern "C" {
     pub fn igInputInt(
-        label: *const cty::c_char,
+        label: *const c_char,
         v: *mut cty::c_int,
         step: cty::c_int,
         step_fast: cty::c_int,
@@ -2223,82 +2226,82 @@ extern "C" {
 }
 extern "C" {
     pub fn igInputInt2(
-        label: *const cty::c_char,
+        label: *const c_char,
         v: *mut cty::c_int,
         flags: ImGuiInputTextFlags,
     ) -> bool;
 }
 extern "C" {
     pub fn igInputInt3(
-        label: *const cty::c_char,
+        label: *const c_char,
         v: *mut cty::c_int,
         flags: ImGuiInputTextFlags,
     ) -> bool;
 }
 extern "C" {
     pub fn igInputInt4(
-        label: *const cty::c_char,
+        label: *const c_char,
         v: *mut cty::c_int,
         flags: ImGuiInputTextFlags,
     ) -> bool;
 }
 extern "C" {
     pub fn igInputDouble(
-        label: *const cty::c_char,
+        label: *const c_char,
         v: *mut f64,
         step: f64,
         step_fast: f64,
-        format: *const cty::c_char,
+        format: *const c_char,
         flags: ImGuiInputTextFlags,
     ) -> bool;
 }
 extern "C" {
     pub fn igInputScalar(
-        label: *const cty::c_char,
+        label: *const c_char,
         data_type: ImGuiDataType,
         p_data: *mut cty::c_void,
         p_step: *const cty::c_void,
         p_step_fast: *const cty::c_void,
-        format: *const cty::c_char,
+        format: *const c_char,
         flags: ImGuiInputTextFlags,
     ) -> bool;
 }
 extern "C" {
     pub fn igInputScalarN(
-        label: *const cty::c_char,
+        label: *const c_char,
         data_type: ImGuiDataType,
         p_data: *mut cty::c_void,
         components: cty::c_int,
         p_step: *const cty::c_void,
         p_step_fast: *const cty::c_void,
-        format: *const cty::c_char,
+        format: *const c_char,
         flags: ImGuiInputTextFlags,
     ) -> bool;
 }
 extern "C" {
     pub fn igColorEdit3(
-        label: *const cty::c_char,
+        label: *const c_char,
         col: *mut f32,
         flags: ImGuiColorEditFlags,
     ) -> bool;
 }
 extern "C" {
     pub fn igColorEdit4(
-        label: *const cty::c_char,
+        label: *const c_char,
         col: *mut f32,
         flags: ImGuiColorEditFlags,
     ) -> bool;
 }
 extern "C" {
     pub fn igColorPicker3(
-        label: *const cty::c_char,
+        label: *const c_char,
         col: *mut f32,
         flags: ImGuiColorEditFlags,
     ) -> bool;
 }
 extern "C" {
     pub fn igColorPicker4(
-        label: *const cty::c_char,
+        label: *const c_char,
         col: *mut f32,
         flags: ImGuiColorEditFlags,
         ref_col: *const f32,
@@ -2306,7 +2309,7 @@ extern "C" {
 }
 extern "C" {
     pub fn igColorButton(
-        desc_id: *const cty::c_char,
+        desc_id: *const c_char,
         col: ImVec4,
         flags: ImGuiColorEditFlags,
         size: ImVec2,
@@ -2316,22 +2319,22 @@ extern "C" {
     pub fn igSetColorEditOptions(flags: ImGuiColorEditFlags);
 }
 extern "C" {
-    pub fn igTreeNodeStr(label: *const cty::c_char) -> bool;
+    pub fn igTreeNodeStr(label: *const c_char) -> bool;
 }
 extern "C" {
-    pub fn igTreeNodeStrStr(str_id: *const cty::c_char, fmt: *const cty::c_char, ...) -> bool;
+    pub fn igTreeNodeStrStr(str_id: *const c_char, fmt: *const c_char, ...) -> bool;
 }
 extern "C" {
-    pub fn igTreeNodePtr(ptr_id: *const cty::c_void, fmt: *const cty::c_char, ...) -> bool;
+    pub fn igTreeNodePtr(ptr_id: *const cty::c_void, fmt: *const c_char, ...) -> bool;
 }
 extern "C" {
-    pub fn igTreeNodeExStr(label: *const cty::c_char, flags: ImGuiTreeNodeFlags) -> bool;
+    pub fn igTreeNodeExStr(label: *const c_char, flags: ImGuiTreeNodeFlags) -> bool;
 }
 extern "C" {
     pub fn igTreeNodeExStrStr(
-        str_id: *const cty::c_char,
+        str_id: *const c_char,
         flags: ImGuiTreeNodeFlags,
-        fmt: *const cty::c_char,
+        fmt: *const c_char,
         ...
     ) -> bool;
 }
@@ -2339,12 +2342,12 @@ extern "C" {
     pub fn igTreeNodeExPtr(
         ptr_id: *const cty::c_void,
         flags: ImGuiTreeNodeFlags,
-        fmt: *const cty::c_char,
+        fmt: *const c_char,
         ...
     ) -> bool;
 }
 extern "C" {
-    pub fn igTreePushStr(str_id: *const cty::c_char);
+    pub fn igTreePushStr(str_id: *const c_char);
 }
 extern "C" {
     pub fn igTreePushPtr(ptr_id: *const cty::c_void);
@@ -2357,13 +2360,13 @@ extern "C" {
 }
 extern "C" {
     pub fn igCollapsingHeaderTreeNodeFlags(
-        label: *const cty::c_char,
+        label: *const c_char,
         flags: ImGuiTreeNodeFlags,
     ) -> bool;
 }
 extern "C" {
     pub fn igCollapsingHeaderBoolPtr(
-        label: *const cty::c_char,
+        label: *const c_char,
         p_open: *mut bool,
         flags: ImGuiTreeNodeFlags,
     ) -> bool;
@@ -2373,7 +2376,7 @@ extern "C" {
 }
 extern "C" {
     pub fn igSelectableBool(
-        label: *const cty::c_char,
+        label: *const c_char,
         selected: bool,
         flags: ImGuiSelectableFlags,
         size: ImVec2,
@@ -2381,7 +2384,7 @@ extern "C" {
 }
 extern "C" {
     pub fn igSelectableBoolPtr(
-        label: *const cty::c_char,
+        label: *const c_char,
         p_selected: *mut bool,
         flags: ImGuiSelectableFlags,
         size: ImVec2,
@@ -2389,22 +2392,22 @@ extern "C" {
 }
 extern "C" {
     pub fn igListBoxStr_arr(
-        label: *const cty::c_char,
+        label: *const c_char,
         current_item: *mut cty::c_int,
-        items: *const *const cty::c_char,
+        items: *const *const c_char,
         items_count: cty::c_int,
         height_in_items: cty::c_int,
     ) -> bool;
 }
 extern "C" {
     pub fn igListBoxFnBoolPtr(
-        label: *const cty::c_char,
+        label: *const c_char,
         current_item: *mut cty::c_int,
         items_getter: ::core::option::Option<
             unsafe extern "C" fn(
                 data: *mut cty::c_void,
                 idx: cty::c_int,
-                out_text: *mut *const cty::c_char,
+                out_text: *mut *const c_char,
             ) -> bool,
         >,
         data: *mut cty::c_void,
@@ -2413,11 +2416,11 @@ extern "C" {
     ) -> bool;
 }
 extern "C" {
-    pub fn igListBoxHeaderVec2(label: *const cty::c_char, size: ImVec2) -> bool;
+    pub fn igListBoxHeaderVec2(label: *const c_char, size: ImVec2) -> bool;
 }
 extern "C" {
     pub fn igListBoxHeaderInt(
-        label: *const cty::c_char,
+        label: *const c_char,
         items_count: cty::c_int,
         height_in_items: cty::c_int,
     ) -> bool;
@@ -2427,11 +2430,11 @@ extern "C" {
 }
 extern "C" {
     pub fn igPlotLinesFloatPtr(
-        label: *const cty::c_char,
+        label: *const c_char,
         values: *const f32,
         values_count: cty::c_int,
         values_offset: cty::c_int,
-        overlay_text: *const cty::c_char,
+        overlay_text: *const c_char,
         scale_min: f32,
         scale_max: f32,
         graph_size: ImVec2,
@@ -2440,14 +2443,14 @@ extern "C" {
 }
 extern "C" {
     pub fn igPlotLinesFnFloatPtr(
-        label: *const cty::c_char,
+        label: *const c_char,
         values_getter: ::core::option::Option<
             unsafe extern "C" fn(data: *mut cty::c_void, idx: cty::c_int) -> f32,
         >,
         data: *mut cty::c_void,
         values_count: cty::c_int,
         values_offset: cty::c_int,
-        overlay_text: *const cty::c_char,
+        overlay_text: *const c_char,
         scale_min: f32,
         scale_max: f32,
         graph_size: ImVec2,
@@ -2455,11 +2458,11 @@ extern "C" {
 }
 extern "C" {
     pub fn igPlotHistogramFloatPtr(
-        label: *const cty::c_char,
+        label: *const c_char,
         values: *const f32,
         values_count: cty::c_int,
         values_offset: cty::c_int,
-        overlay_text: *const cty::c_char,
+        overlay_text: *const c_char,
         scale_min: f32,
         scale_max: f32,
         graph_size: ImVec2,
@@ -2468,30 +2471,30 @@ extern "C" {
 }
 extern "C" {
     pub fn igPlotHistogramFnFloatPtr(
-        label: *const cty::c_char,
+        label: *const c_char,
         values_getter: ::core::option::Option<
             unsafe extern "C" fn(data: *mut cty::c_void, idx: cty::c_int) -> f32,
         >,
         data: *mut cty::c_void,
         values_count: cty::c_int,
         values_offset: cty::c_int,
-        overlay_text: *const cty::c_char,
+        overlay_text: *const c_char,
         scale_min: f32,
         scale_max: f32,
         graph_size: ImVec2,
     );
 }
 extern "C" {
-    pub fn igValueBool(prefix: *const cty::c_char, b: bool);
+    pub fn igValueBool(prefix: *const c_char, b: bool);
 }
 extern "C" {
-    pub fn igValueInt(prefix: *const cty::c_char, v: cty::c_int);
+    pub fn igValueInt(prefix: *const c_char, v: cty::c_int);
 }
 extern "C" {
-    pub fn igValueUint(prefix: *const cty::c_char, v: cty::c_uint);
+    pub fn igValueUint(prefix: *const c_char, v: cty::c_uint);
 }
 extern "C" {
-    pub fn igValueFloat(prefix: *const cty::c_char, v: f32, float_format: *const cty::c_char);
+    pub fn igValueFloat(prefix: *const c_char, v: f32, float_format: *const c_char);
 }
 extern "C" {
     pub fn igBeginMenuBar() -> bool;
@@ -2506,23 +2509,23 @@ extern "C" {
     pub fn igEndMainMenuBar();
 }
 extern "C" {
-    pub fn igBeginMenu(label: *const cty::c_char, enabled: bool) -> bool;
+    pub fn igBeginMenu(label: *const c_char, enabled: bool) -> bool;
 }
 extern "C" {
     pub fn igEndMenu();
 }
 extern "C" {
     pub fn igMenuItemBool(
-        label: *const cty::c_char,
-        shortcut: *const cty::c_char,
+        label: *const c_char,
+        shortcut: *const c_char,
         selected: bool,
         enabled: bool,
     ) -> bool;
 }
 extern "C" {
     pub fn igMenuItemBoolPtr(
-        label: *const cty::c_char,
-        shortcut: *const cty::c_char,
+        label: *const c_char,
+        shortcut: *const c_char,
         p_selected: *mut bool,
         enabled: bool,
     ) -> bool;
@@ -2534,14 +2537,14 @@ extern "C" {
     pub fn igEndTooltip();
 }
 extern "C" {
-    pub fn igSetTooltip(fmt: *const cty::c_char, ...);
+    pub fn igSetTooltip(fmt: *const c_char, ...);
 }
 extern "C" {
-    pub fn igBeginPopup(str_id: *const cty::c_char, flags: ImGuiWindowFlags) -> bool;
+    pub fn igBeginPopup(str_id: *const c_char, flags: ImGuiWindowFlags) -> bool;
 }
 extern "C" {
     pub fn igBeginPopupModal(
-        name: *const cty::c_char,
+        name: *const c_char,
         p_open: *mut bool,
         flags: ImGuiWindowFlags,
     ) -> bool;
@@ -2550,37 +2553,37 @@ extern "C" {
     pub fn igEndPopup();
 }
 extern "C" {
-    pub fn igOpenPopup(str_id: *const cty::c_char, popup_flags: ImGuiPopupFlags);
+    pub fn igOpenPopup(str_id: *const c_char, popup_flags: ImGuiPopupFlags);
 }
 extern "C" {
-    pub fn igOpenPopupOnItemClick(str_id: *const cty::c_char, popup_flags: ImGuiPopupFlags);
+    pub fn igOpenPopupOnItemClick(str_id: *const c_char, popup_flags: ImGuiPopupFlags);
 }
 extern "C" {
     pub fn igCloseCurrentPopup();
 }
 extern "C" {
     pub fn igBeginPopupContextItem(
-        str_id: *const cty::c_char,
+        str_id: *const c_char,
         popup_flags: ImGuiPopupFlags,
     ) -> bool;
 }
 extern "C" {
     pub fn igBeginPopupContextWindow(
-        str_id: *const cty::c_char,
+        str_id: *const c_char,
         popup_flags: ImGuiPopupFlags,
     ) -> bool;
 }
 extern "C" {
     pub fn igBeginPopupContextVoid(
-        str_id: *const cty::c_char,
+        str_id: *const c_char,
         popup_flags: ImGuiPopupFlags,
     ) -> bool;
 }
 extern "C" {
-    pub fn igIsPopupOpen(str_id: *const cty::c_char, flags: ImGuiPopupFlags) -> bool;
+    pub fn igIsPopupOpen(str_id: *const c_char, flags: ImGuiPopupFlags) -> bool;
 }
 extern "C" {
-    pub fn igColumns(count: cty::c_int, id: *const cty::c_char, border: bool);
+    pub fn igColumns(count: cty::c_int, id: *const c_char, border: bool);
 }
 extern "C" {
     pub fn igNextColumn();
@@ -2604,14 +2607,14 @@ extern "C" {
     pub fn igGetColumnsCount() -> cty::c_int;
 }
 extern "C" {
-    pub fn igBeginTabBar(str_id: *const cty::c_char, flags: ImGuiTabBarFlags) -> bool;
+    pub fn igBeginTabBar(str_id: *const c_char, flags: ImGuiTabBarFlags) -> bool;
 }
 extern "C" {
     pub fn igEndTabBar();
 }
 extern "C" {
     pub fn igBeginTabItem(
-        label: *const cty::c_char,
+        label: *const c_char,
         p_open: *mut bool,
         flags: ImGuiTabItemFlags,
     ) -> bool;
@@ -2620,16 +2623,16 @@ extern "C" {
     pub fn igEndTabItem();
 }
 extern "C" {
-    pub fn igTabItemButton(label: *const cty::c_char, flags: ImGuiTabItemFlags) -> bool;
+    pub fn igTabItemButton(label: *const c_char, flags: ImGuiTabItemFlags) -> bool;
 }
 extern "C" {
-    pub fn igSetTabItemClosed(tab_or_docked_window_label: *const cty::c_char);
+    pub fn igSetTabItemClosed(tab_or_docked_window_label: *const c_char);
 }
 extern "C" {
     pub fn igLogToTTY(auto_open_depth: cty::c_int);
 }
 extern "C" {
-    pub fn igLogToFile(auto_open_depth: cty::c_int, filename: *const cty::c_char);
+    pub fn igLogToFile(auto_open_depth: cty::c_int, filename: *const c_char);
 }
 extern "C" {
     pub fn igLogToClipboard(auto_open_depth: cty::c_int);
@@ -2645,7 +2648,7 @@ extern "C" {
 }
 extern "C" {
     pub fn igSetDragDropPayload(
-        type_: *const cty::c_char,
+        type_: *const c_char,
         data: *const cty::c_void,
         sz: usize,
         cond: ImGuiCond,
@@ -2659,7 +2662,7 @@ extern "C" {
 }
 extern "C" {
     pub fn igAcceptDragDropPayload(
-        type_: *const cty::c_char,
+        type_: *const c_char,
         flags: ImGuiDragDropFlags,
     ) -> *const ImGuiPayload;
 }
@@ -2758,7 +2761,7 @@ extern "C" {
     pub fn igGetDrawListSharedData() -> *mut ImDrawListSharedData;
 }
 extern "C" {
-    pub fn igGetStyleColorName(idx: ImGuiCol) -> *const cty::c_char;
+    pub fn igGetStyleColorName(idx: ImGuiCol) -> *const c_char;
 }
 extern "C" {
     pub fn igSetStateStorage(storage: *mut ImGuiStorage);
@@ -2783,8 +2786,8 @@ extern "C" {
 extern "C" {
     pub fn igCalcTextSize(
         pOut: *mut ImVec2,
-        text: *const cty::c_char,
-        text_end: *const cty::c_char,
+        text: *const c_char,
+        text_end: *const c_char,
         hide_text_after_double_hash: bool,
         wrap_width: f32,
     );
@@ -2880,26 +2883,26 @@ extern "C" {
     pub fn igCaptureMouseFromApp(want_capture_mouse_value: bool);
 }
 extern "C" {
-    pub fn igGetClipboardText() -> *const cty::c_char;
+    pub fn igGetClipboardText() -> *const c_char;
 }
 extern "C" {
-    pub fn igSetClipboardText(text: *const cty::c_char);
+    pub fn igSetClipboardText(text: *const c_char);
 }
 extern "C" {
-    pub fn igLoadIniSettingsFromDisk(ini_filename: *const cty::c_char);
+    pub fn igLoadIniSettingsFromDisk(ini_filename: *const c_char);
 }
 extern "C" {
-    pub fn igLoadIniSettingsFromMemory(ini_data: *const cty::c_char, ini_size: usize);
+    pub fn igLoadIniSettingsFromMemory(ini_data: *const c_char, ini_size: usize);
 }
 extern "C" {
-    pub fn igSaveIniSettingsToDisk(ini_filename: *const cty::c_char);
+    pub fn igSaveIniSettingsToDisk(ini_filename: *const c_char);
 }
 extern "C" {
-    pub fn igSaveIniSettingsToMemory(out_ini_size: *mut usize) -> *const cty::c_char;
+    pub fn igSaveIniSettingsToMemory(out_ini_size: *mut usize) -> *const c_char;
 }
 extern "C" {
     pub fn igDebugCheckVersionAndDataLayout(
-        version_str: *const cty::c_char,
+        version_str: *const c_char,
         sz_io: usize,
         sz_style: usize,
         sz_vec2: usize,
@@ -2941,7 +2944,7 @@ extern "C" {
     pub fn ImGuiIO_AddInputCharacterUTF16(self_: *mut ImGuiIO, c: ImWchar16);
 }
 extern "C" {
-    pub fn ImGuiIO_AddInputCharactersUTF8(self_: *mut ImGuiIO, str_: *const cty::c_char);
+    pub fn ImGuiIO_AddInputCharactersUTF8(self_: *mut ImGuiIO, str_: *const c_char);
 }
 extern "C" {
     pub fn ImGuiIO_ClearInputCharacters(self_: *mut ImGuiIO);
@@ -2969,8 +2972,8 @@ extern "C" {
     pub fn ImGuiInputTextCallbackData_InsertChars(
         self_: *mut ImGuiInputTextCallbackData,
         pos: cty::c_int,
-        text: *const cty::c_char,
-        text_end: *const cty::c_char,
+        text: *const c_char,
+        text_end: *const c_char,
     );
 }
 extern "C" {
@@ -2992,7 +2995,7 @@ extern "C" {
     pub fn ImGuiPayload_Clear(self_: *mut ImGuiPayload);
 }
 extern "C" {
-    pub fn ImGuiPayload_IsDataType(self_: *mut ImGuiPayload, type_: *const cty::c_char) -> bool;
+    pub fn ImGuiPayload_IsDataType(self_: *mut ImGuiPayload, type_: *const c_char) -> bool;
 }
 extern "C" {
     pub fn ImGuiPayload_IsPreview(self_: *mut ImGuiPayload) -> bool;
@@ -3008,7 +3011,7 @@ extern "C" {
 }
 extern "C" {
     pub fn ImGuiTextFilter_ImGuiTextFilter(
-        default_filter: *const cty::c_char,
+        default_filter: *const c_char,
     ) -> *mut ImGuiTextFilter;
 }
 extern "C" {
@@ -3017,15 +3020,15 @@ extern "C" {
 extern "C" {
     pub fn ImGuiTextFilter_Draw(
         self_: *mut ImGuiTextFilter,
-        label: *const cty::c_char,
+        label: *const c_char,
         width: f32,
     ) -> bool;
 }
 extern "C" {
     pub fn ImGuiTextFilter_PassFilter(
         self_: *mut ImGuiTextFilter,
-        text: *const cty::c_char,
-        text_end: *const cty::c_char,
+        text: *const c_char,
+        text_end: *const c_char,
     ) -> bool;
 }
 extern "C" {
@@ -3045,8 +3048,8 @@ extern "C" {
 }
 extern "C" {
     pub fn ImGuiTextRange_ImGuiTextRangeStr(
-        _b: *const cty::c_char,
-        _e: *const cty::c_char,
+        _b: *const c_char,
+        _e: *const c_char,
     ) -> *mut ImGuiTextRange;
 }
 extern "C" {
@@ -3055,7 +3058,7 @@ extern "C" {
 extern "C" {
     pub fn ImGuiTextRange_split(
         self_: *mut ImGuiTextRange,
-        separator: cty::c_char,
+        separator: c_char,
         out: *mut ImVector_ImGuiTextRange,
     );
 }
@@ -3066,10 +3069,10 @@ extern "C" {
     pub fn ImGuiTextBuffer_destroy(self_: *mut ImGuiTextBuffer);
 }
 extern "C" {
-    pub fn ImGuiTextBuffer_begin(self_: *mut ImGuiTextBuffer) -> *const cty::c_char;
+    pub fn ImGuiTextBuffer_begin(self_: *mut ImGuiTextBuffer) -> *const c_char;
 }
 extern "C" {
-    pub fn ImGuiTextBuffer_end(self_: *mut ImGuiTextBuffer) -> *const cty::c_char;
+    pub fn ImGuiTextBuffer_end(self_: *mut ImGuiTextBuffer) -> *const c_char;
 }
 extern "C" {
     pub fn ImGuiTextBuffer_size(self_: *mut ImGuiTextBuffer) -> cty::c_int;
@@ -3084,13 +3087,13 @@ extern "C" {
     pub fn ImGuiTextBuffer_reserve(self_: *mut ImGuiTextBuffer, capacity: cty::c_int);
 }
 extern "C" {
-    pub fn ImGuiTextBuffer_c_str(self_: *mut ImGuiTextBuffer) -> *const cty::c_char;
+    pub fn ImGuiTextBuffer_c_str(self_: *mut ImGuiTextBuffer) -> *const c_char;
 }
 extern "C" {
     pub fn ImGuiTextBuffer_append(
         self_: *mut ImGuiTextBuffer,
-        str_: *const cty::c_char,
-        str_end: *const cty::c_char,
+        str_: *const c_char,
+        str_end: *const c_char,
     );
 }
 extern "C" {
@@ -3418,8 +3421,8 @@ extern "C" {
         self_: *mut ImDrawList,
         pos: ImVec2,
         col: ImU32,
-        text_begin: *const cty::c_char,
-        text_end: *const cty::c_char,
+        text_begin: *const c_char,
+        text_end: *const c_char,
     );
 }
 extern "C" {
@@ -3429,8 +3432,8 @@ extern "C" {
         font_size: f32,
         pos: ImVec2,
         col: ImU32,
-        text_begin: *const cty::c_char,
-        text_end: *const cty::c_char,
+        text_begin: *const c_char,
+        text_end: *const c_char,
         wrap_width: f32,
         cpu_fine_clip_rect: *const ImVec4,
     );
@@ -3688,8 +3691,8 @@ extern "C" {
 extern "C" {
     pub fn ImFontGlyphRangesBuilder_AddText(
         self_: *mut ImFontGlyphRangesBuilder,
-        text: *const cty::c_char,
-        text_end: *const cty::c_char,
+        text: *const c_char,
+        text_end: *const c_char,
     );
 }
 extern "C" {
@@ -3734,7 +3737,7 @@ extern "C" {
 extern "C" {
     pub fn ImFontAtlas_AddFontFromFileTTF(
         self_: *mut ImFontAtlas,
-        filename: *const cty::c_char,
+        filename: *const c_char,
         size_pixels: f32,
         font_cfg: *const ImFontConfig,
         glyph_ranges: *const ImWchar,
@@ -3763,7 +3766,7 @@ extern "C" {
 extern "C" {
     pub fn ImFontAtlas_AddFontFromMemoryCompressedBase85TTF(
         self_: *mut ImFontAtlas,
-        compressed_font_data_base85: *const cty::c_char,
+        compressed_font_data_base85: *const c_char,
         size_pixels: f32,
         font_cfg: *const ImFontConfig,
         glyph_ranges: *const ImWchar,
@@ -3895,7 +3898,7 @@ extern "C" {
     pub fn ImFont_IsLoaded(self_: *mut ImFont) -> bool;
 }
 extern "C" {
-    pub fn ImFont_GetDebugName(self_: *mut ImFont) -> *const cty::c_char;
+    pub fn ImFont_GetDebugName(self_: *mut ImFont) -> *const c_char;
 }
 extern "C" {
     pub fn ImFont_CalcTextSizeA(
@@ -3904,19 +3907,19 @@ extern "C" {
         size: f32,
         max_width: f32,
         wrap_width: f32,
-        text_begin: *const cty::c_char,
-        text_end: *const cty::c_char,
-        remaining: *mut *const cty::c_char,
+        text_begin: *const c_char,
+        text_end: *const c_char,
+        remaining: *mut *const c_char,
     );
 }
 extern "C" {
     pub fn ImFont_CalcWordWrapPositionA(
         self_: *mut ImFont,
         scale: f32,
-        text: *const cty::c_char,
-        text_end: *const cty::c_char,
+        text: *const c_char,
+        text_end: *const c_char,
         wrap_width: f32,
-    ) -> *const cty::c_char;
+    ) -> *const c_char;
 }
 extern "C" {
     pub fn ImFont_RenderChar(
@@ -3936,8 +3939,8 @@ extern "C" {
         pos: ImVec2,
         col: ImU32,
         clip_rect: ImVec4,
-        text_begin: *const cty::c_char,
-        text_end: *const cty::c_char,
+        text_begin: *const c_char,
+        text_end: *const c_char,
         wrap_width: f32,
         cpu_fine_clip: bool,
     );
@@ -3984,8 +3987,8 @@ extern "C" {
     ) -> bool;
 }
 extern "C" {
-    pub fn igLogText(fmt: *const cty::c_char, ...);
+    pub fn igLogText(fmt: *const c_char, ...);
 }
 extern "C" {
-    pub fn ImGuiTextBuffer_appendf(buffer: *mut ImGuiTextBuffer, fmt: *const cty::c_char, ...);
+    pub fn ImGuiTextBuffer_appendf(buffer: *mut ImGuiTextBuffer, fmt: *const c_char, ...);
 }
