@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Upgrade to [Dear ImGui v1.80](https://github.com/ocornut/imgui/releases/tag/v1.80).
+
 - `Ui::key_index()` is now called internally when needed, and the various `is_key_foo` now take a `Key` directly: https://github.com/imgui-rs/imgui-rs/pull/416
     - `is_key_down`, `is_key_pressed`, `is_key_released` and `key_pressed_amount` now take a `Key` instead of `u32` (breaking).
     - `key_index` is no longer public (breaking). If you need access to the key map, it can be accessed as `ui.io().key_map[key]` (If you need to do this, file a bug, since I'm open to exposing this if there's actually a use case).
