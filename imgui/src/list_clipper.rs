@@ -10,14 +10,14 @@ pub struct ListClipper {
 }
 
 impl ListClipper {
-    pub fn new(items_count: i32) -> Self {
+    pub const fn new(items_count: i32) -> Self {
         ListClipper {
             items_count,
             items_height: -1.0,
         }
     }
 
-    pub fn items_height(mut self, items_height: f32) -> Self {
+    pub const fn items_height(mut self, items_height: f32) -> Self {
         self.items_height = items_height;
         self
     }

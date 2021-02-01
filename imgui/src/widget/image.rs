@@ -18,7 +18,7 @@ pub struct Image {
 
 impl Image {
     /// Creates a new image builder with the given texture and size
-    pub fn new(texture_id: TextureId, size: [f32; 2]) -> Image {
+    pub const fn new(texture_id: TextureId, size: [f32; 2]) -> Image {
         Image {
             texture_id,
             size,
@@ -29,27 +29,27 @@ impl Image {
         }
     }
     /// Sets the image size
-    pub fn size(mut self, size: [f32; 2]) -> Self {
+    pub const fn size(mut self, size: [f32; 2]) -> Self {
         self.size = size;
         self
     }
     /// Sets uv0 (default `[0.0, 0.0]`)
-    pub fn uv0(mut self, uv0: [f32; 2]) -> Self {
+    pub const fn uv0(mut self, uv0: [f32; 2]) -> Self {
         self.uv0 = uv0;
         self
     }
     /// Sets uv1 (default `[1.0, 1.0]`)
-    pub fn uv1(mut self, uv1: [f32; 2]) -> Self {
+    pub const fn uv1(mut self, uv1: [f32; 2]) -> Self {
         self.uv1 = uv1;
         self
     }
     /// Sets the tint color (default: no tint color)
-    pub fn tint_col(mut self, tint_col: [f32; 4]) -> Self {
+    pub const fn tint_col(mut self, tint_col: [f32; 4]) -> Self {
         self.tint_col = tint_col;
         self
     }
     /// Sets the border color (default: no border)
-    pub fn border_col(mut self, border_col: [f32; 4]) -> Self {
+    pub const fn border_col(mut self, border_col: [f32; 4]) -> Self {
         self.border_col = border_col;
         self
     }

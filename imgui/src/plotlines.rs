@@ -17,7 +17,7 @@ pub struct PlotLines<'ui, 'p> {
 }
 
 impl<'ui, 'p> PlotLines<'ui, 'p> {
-    pub fn new(_: &Ui<'ui>, label: &'p ImStr, values: &'p [f32]) -> Self {
+    pub const fn new(_: &Ui<'ui>, label: &'p ImStr, values: &'p [f32]) -> Self {
         PlotLines {
             label,
             values,
@@ -31,31 +31,31 @@ impl<'ui, 'p> PlotLines<'ui, 'p> {
     }
 
     #[inline]
-    pub fn values_offset(mut self, values_offset: usize) -> Self {
+    pub const fn values_offset(mut self, values_offset: usize) -> Self {
         self.values_offset = values_offset;
         self
     }
 
     #[inline]
-    pub fn overlay_text(mut self, overlay_text: &'p ImStr) -> Self {
+    pub const fn overlay_text(mut self, overlay_text: &'p ImStr) -> Self {
         self.overlay_text = Some(overlay_text);
         self
     }
 
     #[inline]
-    pub fn scale_min(mut self, scale_min: f32) -> Self {
+    pub const fn scale_min(mut self, scale_min: f32) -> Self {
         self.scale_min = scale_min;
         self
     }
 
     #[inline]
-    pub fn scale_max(mut self, scale_max: f32) -> Self {
+    pub const fn scale_max(mut self, scale_max: f32) -> Self {
         self.scale_max = scale_max;
         self
     }
 
     #[inline]
-    pub fn graph_size(mut self, graph_size: [f32; 2]) -> Self {
+    pub const fn graph_size(mut self, graph_size: [f32; 2]) -> Self {
         self.graph_size = graph_size;
         self
     }

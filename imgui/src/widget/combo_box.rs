@@ -66,25 +66,28 @@ pub struct ComboBox<'a> {
 
 impl<'a> ComboBox<'a> {
     /// Constructs a new combo box builder.
-    pub fn new(label: &'a ImStr) -> ComboBox<'a> {
+    pub const fn new(label: &'a ImStr) -> ComboBox<'a> {
         ComboBox {
             label,
             preview_value: None,
             flags: ComboBoxFlags::empty(),
         }
     }
+
     /// Sets the preview value displayed in the preview box (if visible).
     #[inline]
-    pub fn preview_value(mut self, preview_value: &'a ImStr) -> Self {
+    pub const fn preview_value(mut self, preview_value: &'a ImStr) -> Self {
         self.preview_value = Some(preview_value);
         self
     }
+
     /// Replaces all current settings with the given flags.
     #[inline]
-    pub fn flags(mut self, flags: ComboBoxFlags) -> Self {
+    pub const fn flags(mut self, flags: ComboBoxFlags) -> Self {
         self.flags = flags;
         self
     }
+
     /// Enables/disables aligning the combo box popup toward the left.
     ///
     /// Disabled by default.
@@ -94,6 +97,7 @@ impl<'a> ComboBox<'a> {
             .set(ComboBoxFlags::POPUP_ALIGN_LEFT, popup_align_left);
         self
     }
+
     /// Sets the combo box height.
     ///
     /// Default: `ComboBoxHeight::Regular`
@@ -113,6 +117,7 @@ impl<'a> ComboBox<'a> {
         );
         self
     }
+
     /// Sets the combo box preview mode.
     ///
     /// Default: `ComboBoxPreviewMode::Full`
@@ -128,6 +133,7 @@ impl<'a> ComboBox<'a> {
         );
         self
     }
+
     /// Creates a combo box and starts appending to it.
     ///
     /// Returns `Some(ComboBoxToken)` if the combo box is open. After content has been

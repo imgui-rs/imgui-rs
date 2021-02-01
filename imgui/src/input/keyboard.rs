@@ -80,6 +80,7 @@ pub enum FocusedWidget {
 }
 
 impl FocusedWidget {
+    #[inline]
     fn as_offset(self) -> i32 {
         match self {
             FocusedWidget::Previous => -1,
@@ -94,12 +95,14 @@ impl<'ui> Ui<'ui> {
     /// Returns the key index of the given key identifier.
     ///
     /// Equivalent to indexing the Io struct `key_map` field: `ui.io().key_map[key]`
+    #[inline]
     fn key_index(&self, key: Key) -> i32 {
         unsafe { sys::igGetKeyIndex(key as i32) }
     }
     /// Returns true if the key is being held.
     ///
     /// Equivalent to indexing the Io struct `keys_down` field: `ui.io().keys_down[key_index]`
+    #[inline]
     pub fn is_key_down(&self, key: Key) -> bool {
         let key_index = self.key_index(key);
         unsafe { sys::igIsKeyDown(key_index) }
@@ -107,11 +110,13 @@ impl<'ui> Ui<'ui> {
     /// Returns true if the key was pressed (went from !down to down).
     ///
     /// Affected by key repeat settings (`io.key_repeat_delay`, `io.key_repeat_rate`)
+    #[inline]
     pub fn is_key_pressed(&self, key: Key) -> bool {
         let key_index = self.key_index(key);
         unsafe { sys::igIsKeyPressed(key_index, true) }
     }
     /// Returns true if the key was released (went from down to !down)
+    #[inline]
     pub fn is_key_released(&self, key: Key) -> bool {
         let key_index = self.key_index(key);
         unsafe { sys::igIsKeyReleased(key_index) }
@@ -120,11 +125,13 @@ impl<'ui> Ui<'ui> {
     ///
     /// Usually returns 0 or 1, but might be >1 if `rate` is small enough that `io.delta_time` >
     /// `rate`.
+    #[inline]
     pub fn key_pressed_amount(&self, key: Key, repeat_delay: f32, rate: f32) -> u32 {
         let key_index = self.key_index(key);
         unsafe { sys::igGetKeyPressedAmount(key_index, repeat_delay, rate) as u32 }
     }
     /// Focuses keyboard on a widget relative to current position
+    #[inline]
     pub fn set_keyboard_focus_here(&self, target_widget: FocusedWidget) {
         unsafe {
             sys::igSetKeyboardFocusHere(target_widget.as_offset());
