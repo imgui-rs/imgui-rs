@@ -213,8 +213,7 @@ pub struct Io {
     pub(crate) clipboard_user_data: *mut c_void,
     ime_set_input_screen_pos_fn: Option<unsafe extern "C" fn(x: c_int, y: c_int)>,
     ime_window_handle: *mut c_void,
-    render_draw_lists_fn_unused: *mut c_void,
-
+    // render_draw_lists_fn_unused: *mut c_void,
     /// Mouse position, in pixels.
     ///
     /// Set to [f32::MAX, f32::MAX] if mouse is unavailable (on another screen, etc.).
@@ -438,7 +437,7 @@ fn test_io_memory_layout() {
     assert_field_offset!(clipboard_user_data, ClipboardUserData);
     assert_field_offset!(ime_set_input_screen_pos_fn, ImeSetInputScreenPosFn);
     assert_field_offset!(ime_window_handle, ImeWindowHandle);
-    assert_field_offset!(render_draw_lists_fn_unused, RenderDrawListsFnUnused);
+    // assert_field_offset!(render_draw_lists_fn_unused, RenderDrawListsFnUnused);
     assert_field_offset!(mouse_pos, MousePos);
     assert_field_offset!(mouse_down, MouseDown);
     assert_field_offset!(mouse_wheel, MouseWheel);
