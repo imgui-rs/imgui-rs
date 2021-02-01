@@ -62,6 +62,8 @@ pub struct Style {
     /// Horizontal and vertical spacing between elements of a composed widget (e.g. a slider and
     /// its label)
     pub item_inner_spacing: [f32; 2],
+    /// Padding within a table cell.
+    pub cell_padding: [f32; 2],
     /// Expand reactive bounding box for touch-based system where touch position is not accurate
     /// enough.
     ///
@@ -144,7 +146,7 @@ pub struct Style {
     /// Decrease for higher quality but more geometry.
     pub circle_segment_max_error: f32,
     /// Style colors.
-    pub colors: [[f32; 4]; 48],
+    pub colors: [[f32; 4]; StyleColor::COUNT],
 }
 
 unsafe impl RawCast<sys::ImGuiStyle> for Style {}
@@ -199,13 +201,6 @@ impl IndexMut<StyleColor> for Style {
 #[repr(u32)]
 #[derive(Copy, Clone, Debug, Hash, Eq, PartialEq)]
 pub enum StyleColor {
-    // pub const ImGuiCol_TextSelectedBg: ImGuiCol_ = 47;
-    // pub const ImGuiCol_DragDropTarget: ImGuiCol_ = 48;
-    // pub const ImGuiCol_NavHighlight: ImGuiCol_ = 49;
-    // pub const ImGuiCol_NavWindowingHighlight: ImGuiCol_ = 50;
-    // pub const ImGuiCol_NavWindowingDimBg: ImGuiCol_ = 51;
-    // pub const ImGuiCol_ModalWindowDimBg: ImGuiCol_ = 52;
-    // pub const ImGuiCol_COUNT: ImGuiCol_ = 53;
     Text = sys::ImGuiCol_Text,
     TextDisabled = sys::ImGuiCol_TextDisabled,
     /// Background of normal windows
