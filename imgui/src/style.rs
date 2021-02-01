@@ -199,6 +199,13 @@ impl IndexMut<StyleColor> for Style {
 #[repr(u32)]
 #[derive(Copy, Clone, Debug, Hash, Eq, PartialEq)]
 pub enum StyleColor {
+    // pub const ImGuiCol_TextSelectedBg: ImGuiCol_ = 47;
+    // pub const ImGuiCol_DragDropTarget: ImGuiCol_ = 48;
+    // pub const ImGuiCol_NavHighlight: ImGuiCol_ = 49;
+    // pub const ImGuiCol_NavWindowingHighlight: ImGuiCol_ = 50;
+    // pub const ImGuiCol_NavWindowingDimBg: ImGuiCol_ = 51;
+    // pub const ImGuiCol_ModalWindowDimBg: ImGuiCol_ = 52;
+    // pub const ImGuiCol_COUNT: ImGuiCol_ = 53;
     Text = sys::ImGuiCol_Text,
     TextDisabled = sys::ImGuiCol_TextDisabled,
     /// Background of normal windows
@@ -245,6 +252,11 @@ pub enum StyleColor {
     PlotLinesHovered = sys::ImGuiCol_PlotLinesHovered,
     PlotHistogram = sys::ImGuiCol_PlotHistogram,
     PlotHistogramHovered = sys::ImGuiCol_PlotHistogramHovered,
+    TableHeaderBg = sys::ImGuiCol_TableHeaderBg,
+    TableBorderStrong = sys::ImGuiCol_TableBorderStrong,
+    TableBorderLight = sys::ImGuiCol_TableBorderLight,
+    TableRowBg = sys::ImGuiCol_TableRowBg,
+    TableRowBgAlt = sys::ImGuiCol_TableRowBgAlt,
     TextSelectedBg = sys::ImGuiCol_TextSelectedBg,
     DragDropTarget = sys::ImGuiCol_DragDropTarget,
     /// Gamepad/keyboard: current highlighted item
@@ -302,6 +314,11 @@ impl StyleColor {
         StyleColor::PlotLinesHovered,
         StyleColor::PlotHistogram,
         StyleColor::PlotHistogramHovered,
+        StyleColor::TableHeaderBg,
+        StyleColor::TableBorderStrong,
+        StyleColor::TableBorderLight,
+        StyleColor::TableRowBg,
+        StyleColor::TableRowBgAlt,
         StyleColor::TextSelectedBg,
         StyleColor::DragDropTarget,
         StyleColor::NavHighlight,
