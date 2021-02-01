@@ -25,6 +25,15 @@
 - `ImColor` (which is a wrapper around `u32`) has been renamed to `ImColor32` in order to avoid confusion with the `ImColor` type from the Dear ImGui C++ code (which is a wrapper around `ImVec4`). In the future an `ImColor` type which maps more closely to the C++ one will be added.
     - Additionally, a number of constructor and accessor methods have been added to it `ImColor`, which are `const fn` where possible.
 
+- The `im_str!` macro can now be used in `const` contexts (when the `format!` version is not used).
+
+- `im_str!` now verifies that the parameter has no interior nuls at compile time. This can be avoided to get the old (truncating) behavior by forcing it to use the `format!`-like version, e.g. `im_str!("for_some_reason_this_should_be_truncated\0 there {}", "")`.
+    - This is not recommended, and is probably not useful.
+
+- Many functions are now `const fn`.
+
+- A large number of small functions are now `#[inline]`, but many still aren't, so you probably will want to build with LTO for release builds if you use `imgui` heavily.
+
 ## [0.6.1] - 2020-12-16
 
 - Support for winit 0.24.x

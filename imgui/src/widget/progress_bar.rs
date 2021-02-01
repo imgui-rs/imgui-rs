@@ -31,16 +31,18 @@ impl<'a> ProgressBar<'a> {
     ///
     /// The progress bar will be automatically sized to fill the entire width of the window if no
     /// custom size is specified.
-    pub fn new(fraction: f32) -> ProgressBar<'a> {
+    #[inline]
+    pub const fn new(fraction: f32) -> ProgressBar<'a> {
         ProgressBar {
             fraction,
             size: [-1.0, 0.0],
             overlay_text: None,
         }
     }
+
     /// Sets an optional text that will be drawn over the progress bar.
     #[inline]
-    pub fn overlay_text(mut self, overlay_text: &'a ImStr) -> ProgressBar {
+    pub const fn overlay_text(mut self, overlay_text: &'a ImStr) -> ProgressBar {
         self.overlay_text = Some(overlay_text);
         self
     }
@@ -50,10 +52,11 @@ impl<'a> ProgressBar<'a> {
     /// Negative values will automatically align to the end of the axis, zero will let the progress
     /// bar choose a size, and positive values will use the given size.
     #[inline]
-    pub fn size(mut self, size: [f32; 2]) -> Self {
+    pub const fn size(mut self, size: [f32; 2]) -> Self {
         self.size = size;
         self
     }
+
     /// Builds the progress bar
     pub fn build(self, _: &Ui) {
         unsafe {

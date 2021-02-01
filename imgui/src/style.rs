@@ -182,12 +182,14 @@ impl Style {
 
 impl Index<StyleColor> for Style {
     type Output = [f32; 4];
+    #[inline]
     fn index(&self, index: StyleColor) -> &[f32; 4] {
         &self.colors[index as usize]
     }
 }
 
 impl IndexMut<StyleColor> for Style {
+    #[inline]
     fn index_mut(&mut self, index: StyleColor) -> &mut [f32; 4] {
         &mut self.colors[index as usize]
     }

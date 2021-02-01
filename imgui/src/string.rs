@@ -7,19 +7,34 @@ use std::str;
 
 #[macro_export]
 macro_rules! im_str {
-    ($e:tt) => ({
-        unsafe {
-          $crate::ImStr::from_utf8_with_nul_unchecked(concat!($e, "\0").as_bytes())
+    ($e:literal $(,)?) => {{
+        const __INPUT: &str = concat!($e, "\0");
+        {
+            // Trigger a compile error if there's an interior NUL character.
+            const _CHECK_NUL: [(); 0] = [(); {
+                let bytes = __INPUT.as_bytes();
+                let mut i = 0;
+                let mut found_nul = 0;
+                while i < bytes.len() - 1 && found_nul == 0 {
+                    if bytes[i] == 0 {
+                        found_nul = 1;
+                    }
+                    i += 1;
+                }
+                found_nul
+            }];
+            const RESULT: &'static $crate::ImStr = unsafe {
+                $crate::__core::mem::transmute::<&'static [u8], &'static $crate::ImStr>(__INPUT.as_bytes())
+            };
+            RESULT
         }
+    }};
+    ($e:literal, $($arg:tt)+) => ({
+        $crate::ImString::new(format!($e, $($arg)*))
     });
-    ($e:tt, $($arg:tt)*) => ({
-        unsafe {
-          $crate::ImString::from_utf8_with_nul_unchecked(format!(concat!($e, "\0"), $($arg)*).into_bytes())
-        }
-    })
 }
 
-/// A UTF-8 encoded, growable, implicitly null-terminated string.
+/// A UTF-8 encoded, growable, implicitly nul-terminated string.
 #[derive(Clone, Hash, Ord, Eq, PartialOrd, PartialEq)]
 pub struct ImString(pub(crate) Vec<u8>);
 
@@ -32,42 +47,54 @@ impl ImString {
             s
         }
     }
+
     /// Creates a new empty `ImString` with a particular capacity
+    #[inline]
     pub fn with_capacity(capacity: usize) -> ImString {
         let mut v = Vec::with_capacity(capacity + 1);
         v.push(b'\0');
         ImString(v)
     }
+
     /// Converts a vector of bytes to a `ImString` without checking that the string contains valid
     /// UTF-8
     ///
     /// # Safety
     ///
     /// It is up to the caller to guarantee the vector contains valid UTF-8 and no null terminator.
+    #[inline]
     pub unsafe fn from_utf8_unchecked(mut v: Vec<u8>) -> ImString {
         v.push(b'\0');
         ImString(v)
     }
+
     /// Converts a vector of bytes to a `ImString` without checking that the string contains valid
     /// UTF-8
     ///
     /// # Safety
     ///
     /// It is up to the caller to guarantee the vector contains valid UTF-8 and a null terminator.
+    #[inline]
     pub unsafe fn from_utf8_with_nul_unchecked(v: Vec<u8>) -> ImString {
         ImString(v)
     }
+
     /// Truncates this `ImString`, removing all contents
+    #[inline]
     pub fn clear(&mut self) {
         self.0.clear();
         self.0.push(b'\0');
     }
+
     /// Appends the given character to the end of this `ImString`
+    #[inline]
     pub fn push(&mut self, ch: char) {
         let mut buf = [0; 4];
         self.push_str(ch.encode_utf8(&mut buf));
     }
+
     /// Appends a given string slice to the end of this `ImString`
+    #[inline]
     pub fn push_str(&mut self, string: &str) {
         self.0.pop();
         self.0.extend(string.bytes());
@@ -76,14 +103,19 @@ impl ImString {
             self.refresh_len();
         }
     }
+
     /// Returns the capacity of this `ImString` in bytes
+    #[inline]
     pub fn capacity(&self) -> usize {
         self.0.capacity() - 1
     }
+
     /// Returns the capacity of this `ImString` in bytes, including the implicit null byte
+    #[inline]
     pub fn capacity_with_nul(&self) -> usize {
         self.0.capacity()
     }
+
     /// Ensures that the capacity of this `ImString` is at least `additional` bytes larger than the
     /// current length.
     ///
@@ -91,21 +123,27 @@ impl ImString {
     pub fn reserve(&mut self, additional: usize) {
         self.0.reserve(additional);
     }
+
     /// Ensures that the capacity of this `ImString` is at least `additional` bytes larger than the
     /// current length
     pub fn reserve_exact(&mut self, additional: usize) {
         self.0.reserve_exact(additional);
     }
+
     /// Returns a raw pointer to the underlying buffer
+    #[inline]
     pub fn as_ptr(&self) -> *const c_char {
         self.0.as_ptr() as *const c_char
     }
+
     /// Returns a raw mutable pointer to the underlying buffer.
     ///
     /// If the underlying data is modified, `refresh_len` *must* be called afterwards.
+    #[inline]
     pub fn as_mut_ptr(&mut self) -> *mut c_char {
         self.0.as_mut_ptr() as *mut c_char
     }
+
     /// Updates the underlying buffer length based on the current contents.
     ///
     /// This function *must* be called if the underlying data is modified via a pointer
@@ -115,6 +153,7 @@ impl ImString {
     ///
     /// It is up to the caller to guarantee the this ImString contains valid UTF-8 and a null
     /// terminator.
+    #[inline]
     pub unsafe fn refresh_len(&mut self) {
         let len = CStr::from_ptr(self.0.as_ptr() as *const c_char)
             .to_bytes_with_nul()
@@ -124,54 +163,63 @@ impl ImString {
 }
 
 impl<'a> Default for ImString {
+    #[inline]
     fn default() -> ImString {
         ImString(vec![b'\0'])
     }
 }
 
 impl From<String> for ImString {
+    #[inline]
     fn from(s: String) -> ImString {
         ImString::new(s)
     }
 }
 
 impl<'a> From<ImString> for Cow<'a, ImStr> {
+    #[inline]
     fn from(s: ImString) -> Cow<'a, ImStr> {
         Cow::Owned(s)
     }
 }
 
 impl<'a> From<&'a ImString> for Cow<'a, ImStr> {
+    #[inline]
     fn from(s: &'a ImString) -> Cow<'a, ImStr> {
         Cow::Borrowed(s)
     }
 }
 
 impl<'a, T: ?Sized + AsRef<ImStr>> From<&'a T> for ImString {
+    #[inline]
     fn from(s: &'a T) -> ImString {
         s.as_ref().to_owned()
     }
 }
 
 impl AsRef<ImStr> for ImString {
+    #[inline]
     fn as_ref(&self) -> &ImStr {
         self
     }
 }
 
 impl Borrow<ImStr> for ImString {
+    #[inline]
     fn borrow(&self) -> &ImStr {
         self
     }
 }
 
 impl AsRef<str> for ImString {
+    #[inline]
     fn as_ref(&self) -> &str {
         self.to_str()
     }
 }
 
 impl Borrow<str> for ImString {
+    #[inline]
     fn borrow(&self) -> &str {
         self.to_str()
     }
@@ -179,18 +227,21 @@ impl Borrow<str> for ImString {
 
 impl Index<RangeFull> for ImString {
     type Output = ImStr;
+    #[inline]
     fn index(&self, _index: RangeFull) -> &ImStr {
         self
     }
 }
 
 impl fmt::Debug for ImString {
+    #[inline]
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         fmt::Debug::fmt(self.to_str(), f)
     }
 }
 
 impl fmt::Display for ImString {
+    #[inline]
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         fmt::Display::fmt(self.to_str(), f)
     }
@@ -198,6 +249,7 @@ impl fmt::Display for ImString {
 
 impl Deref for ImString {
     type Target = ImStr;
+    #[inline]
     fn deref(&self) -> &ImStr {
         // as_ptr() is used, because we need to look at the bytes to figure out the length
         // self.0.len() is incorrect, because there might be more than one nul byte in the end, or
@@ -222,11 +274,13 @@ impl fmt::Write for ImString {
     }
 }
 
-/// A UTF-8 encoded, implicitly null-terminated string slice.
+/// A UTF-8 encoded, implicitly nul-terminated string slice.
 #[derive(Hash, PartialEq, Eq, PartialOrd, Ord)]
-pub struct ImStr(CStr);
+#[repr(transparent)]
+pub struct ImStr([u8]);
 
 impl<'a> Default for &'a ImStr {
+    #[inline]
     fn default() -> &'a ImStr {
         static SLICE: &[u8] = &[0];
         unsafe { ImStr::from_utf8_with_nul_unchecked(SLICE) }
@@ -234,12 +288,14 @@ impl<'a> Default for &'a ImStr {
 }
 
 impl fmt::Debug for ImStr {
+    #[inline]
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         fmt::Debug::fmt(&self.0, f)
     }
 }
 
 impl fmt::Display for ImStr {
+    #[inline]
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         fmt::Display::fmt(self.to_str(), f)
     }
@@ -252,60 +308,91 @@ impl ImStr {
     ///
     /// It is up to the caller to guarantee the pointer is not null and it points to a
     /// null-terminated UTF-8 string valid for the duration of the arbitrary lifetime 'a.
+    #[inline]
     pub unsafe fn from_ptr_unchecked<'a>(ptr: *const c_char) -> &'a ImStr {
         ImStr::from_cstr_unchecked(CStr::from_ptr(ptr))
     }
+
     /// Converts a slice of bytes to an imgui-rs string slice without checking for valid UTF-8 or
     /// null termination.
     ///
     /// # Safety
     ///
     /// It is up to the caller to guarantee the slice contains valid UTF-8 and a null terminator.
+    #[inline]
     pub unsafe fn from_utf8_with_nul_unchecked(bytes: &[u8]) -> &ImStr {
         &*(bytes as *const [u8] as *const ImStr)
     }
+
     /// Converts a CStr reference to an imgui-rs string slice without checking for valid UTF-8.
     ///
     /// # Safety
     ///
     /// It is up to the caller to guarantee the CStr reference contains valid UTF-8.
+    #[inline]
     pub unsafe fn from_cstr_unchecked(value: &CStr) -> &ImStr {
-        &*(value as *const CStr as *const ImStr)
+        &*(value.to_bytes_with_nul() as *const [u8] as *const ImStr)
     }
+
     /// Converts an imgui-rs string slice to a raw pointer
+    #[inline]
     pub fn as_ptr(&self) -> *const c_char {
-        self.0.as_ptr()
+        self.0.as_ptr() as *const c_char
     }
+
     /// Converts an imgui-rs string slice to a normal string slice
+    #[inline]
     pub fn to_str(&self) -> &str {
-        // CStr::to_bytes does *not* include the null terminator
-        unsafe { str::from_utf8_unchecked(self.0.to_bytes()) }
+        self.sanity_check();
+        unsafe { str::from_utf8_unchecked(&self.0[..(self.0.len() - 1)]) }
     }
+
     /// Returns true if the imgui-rs string slice is empty
+    #[inline]
     pub fn is_empty(&self) -> bool {
-        self.0.to_bytes().is_empty()
+        debug_assert!(self.0.len() != 0);
+        self.0.len() == 1
+    }
+
+    // TODO: if this is too slow, avoid the UTF8 validation except if we'd
+    // already be doing O(n) stuff.
+    #[inline]
+    fn sanity_check(&self) {
+        debug_assert!(
+            str::from_utf8(&self.0).is_ok()
+                && !self.0.is_empty()
+                && !self.0[..(self.0.len() - 1)].contains(&0u8)
+                && self.0[self.0.len() - 1] == 0,
+            "bad ImStr: {:?}",
+            &self.0
+        );
     }
 }
 
 impl AsRef<CStr> for ImStr {
+    #[inline]
     fn as_ref(&self) -> &CStr {
-        &self.0
+        // Safety: our safety requirements are a superset of CStr's, so this is fine
+        unsafe { CStr::from_bytes_with_nul_unchecked(&self.0) }
     }
 }
 
 impl AsRef<ImStr> for ImStr {
+    #[inline]
     fn as_ref(&self) -> &ImStr {
         self
     }
 }
 
 impl AsRef<str> for ImStr {
+    #[inline]
     fn as_ref(&self) -> &str {
         self.to_str()
     }
 }
 
 impl<'a> From<&'a ImStr> for Cow<'a, ImStr> {
+    #[inline]
     fn from(s: &'a ImStr) -> Cow<'a, ImStr> {
         Cow::Borrowed(s)
     }
@@ -313,8 +400,10 @@ impl<'a> From<&'a ImStr> for Cow<'a, ImStr> {
 
 impl ToOwned for ImStr {
     type Owned = ImString;
+    #[inline]
     fn to_owned(&self) -> ImString {
-        ImString(self.0.to_owned().into_bytes())
+        self.sanity_check();
+        ImString(self.0.to_owned())
     }
 }
 

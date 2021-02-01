@@ -36,6 +36,7 @@ unsafe impl RawCast<sys::ImDrawData> for DrawData {}
 
 impl DrawData {
     /// Returns an iterator over the draw lists included in the draw data.
+    #[inline]
     pub fn draw_lists(&self) -> DrawListIterator {
         unsafe {
             DrawListIterator {
@@ -44,10 +45,12 @@ impl DrawData {
         }
     }
     /// Returns the number of draw lists included in the draw data.
+    #[inline]
     pub fn draw_lists_count(&self) -> usize {
         use std::convert::TryInto;
         self.cmd_lists_count.try_into().unwrap()
     }
+    #[inline]
     pub(crate) unsafe fn cmd_lists(&self) -> &[*const DrawList] {
         slice::from_raw_parts(
             self.cmd_lists as *const *const DrawList,
@@ -124,21 +127,25 @@ pub struct DrawList(sys::ImDrawList);
 
 impl RawWrapper for DrawList {
     type Raw = sys::ImDrawList;
+    #[inline]
     unsafe fn raw(&self) -> &sys::ImDrawList {
         &self.0
     }
+    #[inline]
     unsafe fn raw_mut(&mut self) -> &mut sys::ImDrawList {
         &mut self.0
     }
 }
 
 impl DrawList {
+    #[inline]
     pub(crate) unsafe fn cmd_buffer(&self) -> &[sys::ImDrawCmd] {
         slice::from_raw_parts(
             self.0.CmdBuffer.Data as *const sys::ImDrawCmd,
             self.0.CmdBuffer.Size as usize,
         )
     }
+    #[inline]
     pub fn idx_buffer(&self) -> &[DrawIdx] {
         unsafe {
             slice::from_raw_parts(
@@ -147,6 +154,7 @@ impl DrawList {
             )
         }
     }
+    #[inline]
     pub fn vtx_buffer(&self) -> &[DrawVert] {
         unsafe {
             slice::from_raw_parts(
@@ -170,6 +178,7 @@ impl DrawList {
         slice::from_raw_parts(self.0.VtxBuffer.Data.cast(), self.0.VtxBuffer.Size as usize)
     }
 
+    #[inline]
     pub fn commands(&self) -> DrawCmdIterator {
         unsafe {
             DrawCmdIterator {
@@ -186,6 +195,7 @@ pub struct DrawCmdIterator<'a> {
 impl<'a> Iterator for DrawCmdIterator<'a> {
     type Item = DrawCmd;
 
+    #[inline]
     fn next(&mut self) -> Option<Self::Item> {
         self.iter.next().map(|cmd| {
             let cmd_params = DrawCmdParams {

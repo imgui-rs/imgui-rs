@@ -9,9 +9,7 @@ use crate::Ui;
 
 #[derive(Copy, Clone, Debug)]
 enum Size {
-    Vec {
-        size: sys::ImVec2,
-    },
+    Vec(sys::ImVec2),
     Items {
         items_count: i32,
         height_in_items: i32,
@@ -27,12 +25,10 @@ pub struct ListBox<'a> {
 
 impl<'a> ListBox<'a> {
     /// Constructs a new list box builder.
-    pub fn new(label: &'a ImStr) -> ListBox<'a> {
+    pub const fn new(label: &'a ImStr) -> ListBox<'a> {
         ListBox {
             label,
-            size: Size::Vec {
-                size: [0.0, 0.0].into(),
-            },
+            size: Size::Vec(sys::ImVec2::zero()),
         }
     }
     /// Sets the list box size based on the number of items that you want to make visible
@@ -40,13 +36,14 @@ impl<'a> ListBox<'a> {
     /// We add +25% worth of item height to allow the user to see at a glance if there are more items up/down, without looking at the scrollbar.
     /// We don't add this extra bit if items_count <= height_in_items. It is slightly dodgy, because it means a dynamic list of items will make the widget resize occasionally when it crosses that size.
     #[inline]
-    pub fn calculate_size(mut self, items_count: i32, height_in_items: i32) -> Self {
+    pub const fn calculate_size(mut self, items_count: i32, height_in_items: i32) -> Self {
         self.size = Size::Items {
             items_count,
             height_in_items,
         };
         self
     }
+
     /// Sets the list box size based on the given width and height
     /// If width or height are 0 or smaller, a default value is calculated
     /// Helper to calculate the size of a listbox and display a label on the right.
@@ -54,8 +51,8 @@ impl<'a> ListBox<'a> {
     ///
     /// Default: [0.0, 0.0], in which case the combobox calculates a sensible width and height
     #[inline]
-    pub fn size(mut self, size: [f32; 2]) -> Self {
-        self.size = Size::Vec { size: size.into() };
+    pub const fn size(mut self, size: [f32; 2]) -> Self {
+        self.size = Size::Vec(sys::ImVec2::new(size[0], size[1]));
         self
     }
     /// Creates a list box and starts appending to it.
@@ -68,7 +65,7 @@ impl<'a> ListBox<'a> {
     pub fn begin(self, ui: &Ui) -> Option<ListBoxToken> {
         let should_render = unsafe {
             match self.size {
-                Size::Vec { size } => sys::igListBoxHeaderVec2(self.label.as_ptr(), size),
+                Size::Vec(size) => sys::igListBoxHeaderVec2(self.label.as_ptr(), size),
                 Size::Items {
                     items_count,
                     height_in_items,
