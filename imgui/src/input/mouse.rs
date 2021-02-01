@@ -36,6 +36,8 @@ fn test_mouse_button_variants() {
 /// Mouse cursor type identifier
 #[repr(i32)]
 #[derive(Copy, Clone, Debug, Hash, Eq, PartialEq)]
+#[allow(unknown_lints)] // Fixme: remove once `clippy::upper_case_acronyms` is stable
+#[allow(clippy::upper_case_acronyms)]
 pub enum MouseCursor {
     Arrow = sys::ImGuiMouseCursor_Arrow,
     /// Automatically used when hovering over text inputs, etc.
@@ -57,6 +59,7 @@ pub enum MouseCursor {
     /// Usually a crossed circle.
     NotAllowed = sys::ImGuiMouseCursor_NotAllowed,
 }
+
 
 impl MouseCursor {
     /// All possible `MouseCursor` varirants
