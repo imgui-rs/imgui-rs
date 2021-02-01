@@ -60,7 +60,6 @@ pub enum MouseCursor {
     NotAllowed = sys::ImGuiMouseCursor_NotAllowed,
 }
 
-
 impl MouseCursor {
     /// All possible `MouseCursor` varirants
     pub const VARIANTS: [MouseCursor; MouseCursor::COUNT] = [

@@ -76,7 +76,6 @@ impl ColorEditDisplayMode {
     pub const HEX: Self = Self::Hex;
 }
 
-
 /// Color picker hue/saturation/value editor mode
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
 pub enum ColorPickerMode {
