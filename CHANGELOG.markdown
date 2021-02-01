@@ -36,6 +36,8 @@
 
 - A large number of small functions are now `#[inline]`, but many still aren't, so you probably will want to build with LTO for release builds if you use `imgui` heavily.
 
+- The `io.config_windows_memory_compact_timer` flag has been renamed to `io.config_memory_compact_timer`. This follows the similar rename in the C++ ImGui, and was done because it no longer only applies to window memory usage.
+
 ## [0.6.1] - 2020-12-16
 
 - Support for winit 0.24.x
