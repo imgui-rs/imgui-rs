@@ -25,12 +25,14 @@ impl<'a> EditableColor<'a> {
 }
 
 impl<'a> From<&'a mut [f32; 3]> for EditableColor<'a> {
+    #[inline]
     fn from(value: &'a mut [f32; 3]) -> EditableColor<'a> {
         EditableColor::Float3(value)
     }
 }
 
 impl<'a> From<&'a mut [f32; 4]> for EditableColor<'a> {
+    #[inline]
     fn from(value: &'a mut [f32; 4]) -> EditableColor<'a> {
         EditableColor::Float4(value)
     }
@@ -40,21 +42,40 @@ impl<'a> From<&'a mut [f32; 4]> for EditableColor<'a> {
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
 pub enum ColorEditInputMode {
     /// Edit as RGB(A).
-    RGB,
+    Rgb,
     /// Edit as HSV(A).
-    HSV,
+    Hsv,
+}
+
+impl ColorEditInputMode {
+    // Note: Probably no point in deprecating these since they're ~0 maintance burden.
+    /// Edit as RGB(A). Alias for [`Self::Rgb`] for backwards-compatibility.
+    pub const RGB: Self = Self::Rgb;
+    /// Edit as HSV(A). Alias for [`Self::Hsv`] for backwards-compatibility.
+    pub const HSV: Self = Self::Hsv;
 }
 
 /// Color editor display mode.
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
 pub enum ColorEditDisplayMode {
     /// Display as RGB(A).
-    RGB,
+    Rgb,
     /// Display as HSV(A).
-    HSV,
-    /// Display as hex (e.g. #AABBCC(DD))
-    HEX,
+    Hsv,
+    /// Display as hex (e.g. `#AABBCC(DD)`)
+    Hex,
 }
+
+impl ColorEditDisplayMode {
+    // Note: Probably no point in deprecating these since they're ~0 maintance burden.
+    /// Display as RGB(A). Alias for [`Self::Rgb`] for backwards-compatibility.
+    pub const RGB: Self = Self::Rgb;
+    /// Display as HSV(A). Alias for [`Self::Hsv`] for backwards-compatibility.
+    pub const HSV: Self = Self::Hsv;
+    /// Display as hex. Alias for [`Self::Hex`] for backwards-compatibility.
+    pub const HEX: Self = Self::Hex;
+}
+
 
 /// Color picker hue/saturation/value editor mode
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]

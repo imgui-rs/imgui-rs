@@ -272,7 +272,7 @@ impl<'ui> Ui<'ui> {
     /// the right side)
     pub fn push_item_width(&self, item_width: f32) -> ItemWidthStackToken {
         unsafe { sys::igPushItemWidth(item_width) };
-        ItemWidthStackToken { ctx: self.ctx }
+        ItemWidthStackToken { _ctx: self.ctx }
     }
     /// Sets the width of the next item.
     ///
@@ -298,7 +298,7 @@ impl<'ui> Ui<'ui> {
     /// - `< 0.0`: no wrapping
     pub fn push_text_wrap_pos(&self, wrap_pos_x: f32) -> TextWrapPosStackToken {
         unsafe { sys::igPushTextWrapPos(wrap_pos_x) };
-        TextWrapPosStackToken { ctx: self.ctx }
+        TextWrapPosStackToken { _ctx: self.ctx }
     }
     /// Changes an item flag by pushing a change to the item flag stack.
     ///
@@ -311,7 +311,7 @@ impl<'ui> Ui<'ui> {
         }
         ItemFlagsStackToken {
             discriminant: mem::discriminant(&item_flag),
-            ctx: self.ctx,
+            _ctx: self.ctx,
         }
     }
 }
@@ -325,26 +325,26 @@ pub enum ItemFlag {
 
 /// Tracks a change pushed to the item width stack
 pub struct ItemWidthStackToken {
-    ctx: *const Context,
+    _ctx: *const Context,
 }
 
 impl ItemWidthStackToken {
     /// Pops a change from the item width stack
     pub fn pop(mut self, _: &Ui) {
-        self.ctx = ptr::null();
+        self._ctx = ptr::null();
         unsafe { sys::igPopItemWidth() };
     }
 }
 
 /// Tracks a change pushed to the text wrap position stack
 pub struct TextWrapPosStackToken {
-    ctx: *const Context,
+    _ctx: *const Context,
 }
 
 impl TextWrapPosStackToken {
     /// Pops a change from the text wrap position stack
     pub fn pop(mut self, _: &Ui) {
-        self.ctx = ptr::null();
+        self._ctx = ptr::null();
         unsafe { sys::igPopTextWrapPos() };
     }
 }
@@ -352,13 +352,13 @@ impl TextWrapPosStackToken {
 /// Tracks a change pushed to the item flags stack
 pub struct ItemFlagsStackToken {
     discriminant: mem::Discriminant<ItemFlag>,
-    ctx: *const Context,
+    _ctx: *const Context,
 }
 
 impl ItemFlagsStackToken {
     /// Pops a change from the item flags stack
     pub fn pop(mut self, _: &Ui) {
-        self.ctx = ptr::null();
+        self._ctx = ptr::null();
         const ALLOW_KEYBOARD_FOCUS: ItemFlag = ItemFlag::AllowKeyboardFocus(true);
         const BUTTON_REPEAT: ItemFlag = ItemFlag::ButtonRepeat(true);
 
