@@ -2,7 +2,7 @@
 
 ## [Unreleased]
 
-- Upgrade to [Dear ImGui v1.80](https://github.com/ocornut/imgui/releases/tag/v1.80).
+- Upgrade to [Dear ImGui v1.80](https://github.com/ocornut/imgui/releases/tag/v1.80). (Note that the new table functionality is not yet supported, however)
 
 - `Ui::key_index()` is now called internally when needed, and the various `is_key_foo` now take a `Key` directly: https://github.com/imgui-rs/imgui-rs/pull/416
     - `is_key_down`, `is_key_pressed`, `is_key_released` and `key_pressed_amount` now take a `Key` instead of `u32` (breaking).
