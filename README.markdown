@@ -32,7 +32,7 @@ Window::new(im_str!("Hello world"))
 * imgui-gfx-renderer: Renderer implementation that uses the `gfx` crate (*not
   the new gfx-hal crate*)
 * imgui-winit-support: Backend platform implementation that uses the `winit`
-  crate (0.22 by default, but 0.19-0.21 are supported via feature flags)
+  crate (latest by default, but earlier versions are supported via feature flags)
 * imgui-sys: Low-level unsafe API (automatically generated)
 
 ## Features
