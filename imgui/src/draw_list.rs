@@ -1,55 +1,10 @@
-use sys::{ImDrawList, ImU32};
+use crate::ImColor32;
+use sys::ImDrawList;
 
 use super::Ui;
 use crate::legacy::ImDrawCornerFlags;
 
 use std::marker::PhantomData;
-
-/// Wrap `ImU32` (a type typically used by ImGui to store packed colors)
-/// This type is used to represent the color of drawing primitives in ImGui's
-/// custom drawing API.
-///
-/// The type implements `From<ImU32>`, `From<ImVec4>`, `From<[f32; 4]>`,
-/// `From<[f32; 3]>`, `From<(f32, f32, f32, f32)>` and `From<(f32, f32, f32)>`
-/// for convenience. If alpha is not provided, it is assumed to be 1.0 (255).
-#[derive(Copy, Clone, Eq, PartialEq, Debug)]
-pub struct ImColor(ImU32);
-
-impl From<ImColor> for ImU32 {
-    fn from(color: ImColor) -> Self {
-        color.0
-    }
-}
-
-impl From<ImU32> for ImColor {
-    fn from(color: ImU32) -> Self {
-        ImColor(color)
-    }
-}
-
-impl From<[f32; 4]> for ImColor {
-    fn from(v: [f32; 4]) -> Self {
-        ImColor(unsafe { sys::igColorConvertFloat4ToU32(v.into()) })
-    }
-}
-
-impl From<(f32, f32, f32, f32)> for ImColor {
-    fn from(v: (f32, f32, f32, f32)) -> Self {
-        ImColor(unsafe { sys::igColorConvertFloat4ToU32(v.into()) })
-    }
-}
-
-impl From<[f32; 3]> for ImColor {
-    fn from(v: [f32; 3]) -> Self {
-        [v[0], v[1], v[2], 1.0].into()
-    }
-}
-
-impl From<(f32, f32, f32)> for ImColor {
-    fn from(v: (f32, f32, f32)) -> Self {
-        [v.0, v.1, v.2, 1.0].into()
-    }
-}
 
 /// Object implementing the custom draw API.
 ///
@@ -167,7 +122,7 @@ impl<'ui> DrawListMut<'ui> {
     /// Returns a line from point `p1` to `p2` with color `c`.
     pub fn add_line<C>(&'ui self, p1: [f32; 2], p2: [f32; 2], c: C) -> Line<'ui>
     where
-        C: Into<ImColor>,
+        C: Into<ImColor32>,
     {
         Line::new(self, p1, p2, c)
     }
@@ -176,7 +131,7 @@ impl<'ui> DrawListMut<'ui> {
     /// and lower-right corner is at point `p2`, with color `c`.
     pub fn add_rect<C>(&'ui self, p1: [f32; 2], p2: [f32; 2], c: C) -> Rect<'ui>
     where
-        C: Into<ImColor>,
+        C: Into<ImColor32>,
     {
         Rect::new(self, p1, p2, c)
     }
@@ -195,10 +150,10 @@ impl<'ui> DrawListMut<'ui> {
         col_bot_right: C3,
         col_bot_left: C4,
     ) where
-        C1: Into<ImColor>,
-        C2: Into<ImColor>,
-        C3: Into<ImColor>,
-        C4: Into<ImColor>,
+        C1: Into<ImColor32>,
+        C2: Into<ImColor32>,
+        C3: Into<ImColor32>,
+        C4: Into<ImColor32>,
     {
         unsafe {
             sys::ImDrawList_AddRectFilledMultiColor(
@@ -223,7 +178,7 @@ impl<'ui> DrawListMut<'ui> {
         c: C,
     ) -> Triangle<'ui>
     where
-        C: Into<ImColor>,
+        C: Into<ImColor32>,
     {
         Triangle::new(self, p1, p2, p3, c)
     }
@@ -231,7 +186,7 @@ impl<'ui> DrawListMut<'ui> {
     /// Returns a circle with the given `center`, `radius` and `color`.
     pub fn add_circle<C>(&'ui self, center: [f32; 2], radius: f32, color: C) -> Circle<'ui>
     where
-        C: Into<ImColor>,
+        C: Into<ImColor32>,
     {
         Circle::new(self, center, radius, color)
     }
@@ -239,7 +194,7 @@ impl<'ui> DrawListMut<'ui> {
     /// Draw a text whose upper-left corner is at point `pos`.
     pub fn add_text<C, T>(&self, pos: [f32; 2], col: C, text: T)
     where
-        C: Into<ImColor>,
+        C: Into<ImColor32>,
         T: AsRef<str>,
     {
         use std::os::raw::c_char;
@@ -263,7 +218,7 @@ impl<'ui> DrawListMut<'ui> {
         color: C,
     ) -> BezierCurve<'ui>
     where
-        C: Into<ImColor>,
+        C: Into<ImColor32>,
     {
         BezierCurve::new(self, pos0, cp0, cp1, pos1, color)
     }
@@ -301,7 +256,7 @@ impl<'ui> DrawListMut<'ui> {
 pub struct Line<'ui> {
     p1: [f32; 2],
     p2: [f32; 2],
-    color: ImColor,
+    color: ImColor32,
     thickness: f32,
     draw_list: &'ui DrawListMut<'ui>,
 }
@@ -309,7 +264,7 @@ pub struct Line<'ui> {
 impl<'ui> Line<'ui> {
     fn new<C>(draw_list: &'ui DrawListMut, p1: [f32; 2], p2: [f32; 2], c: C) -> Self
     where
-        C: Into<ImColor>,
+        C: Into<ImColor32>,
     {
         Self {
             p1,
@@ -345,7 +300,7 @@ impl<'ui> Line<'ui> {
 pub struct Rect<'ui> {
     p1: [f32; 2],
     p2: [f32; 2],
-    color: ImColor,
+    color: ImColor32,
     rounding: f32,
     flags: ImDrawCornerFlags,
     thickness: f32,
@@ -356,7 +311,7 @@ pub struct Rect<'ui> {
 impl<'ui> Rect<'ui> {
     fn new<C>(draw_list: &'ui DrawListMut, p1: [f32; 2], p2: [f32; 2], c: C) -> Self
     where
-        C: Into<ImColor>,
+        C: Into<ImColor32>,
     {
         Self {
             p1,
@@ -448,7 +403,7 @@ pub struct Triangle<'ui> {
     p1: [f32; 2],
     p2: [f32; 2],
     p3: [f32; 2],
-    color: ImColor,
+    color: ImColor32,
     thickness: f32,
     filled: bool,
     draw_list: &'ui DrawListMut<'ui>,
@@ -457,7 +412,7 @@ pub struct Triangle<'ui> {
 impl<'ui> Triangle<'ui> {
     fn new<C>(draw_list: &'ui DrawListMut, p1: [f32; 2], p2: [f32; 2], p3: [f32; 2], c: C) -> Self
     where
-        C: Into<ImColor>,
+        C: Into<ImColor32>,
     {
         Self {
             p1,
@@ -514,7 +469,7 @@ impl<'ui> Triangle<'ui> {
 pub struct Circle<'ui> {
     center: [f32; 2],
     radius: f32,
-    color: ImColor,
+    color: ImColor32,
     num_segments: u32,
     thickness: f32,
     filled: bool,
@@ -524,7 +479,7 @@ pub struct Circle<'ui> {
 impl<'ui> Circle<'ui> {
     pub fn new<C>(draw_list: &'ui DrawListMut, center: [f32; 2], radius: f32, color: C) -> Self
     where
-        C: Into<ImColor>,
+        C: Into<ImColor32>,
     {
         Self {
             center,
@@ -590,7 +545,7 @@ pub struct BezierCurve<'ui> {
     cp0: [f32; 2],
     pos1: [f32; 2],
     cp1: [f32; 2],
-    color: ImColor,
+    color: ImColor32,
     thickness: f32,
     /// If num_segments is not set, the bezier curve is auto-tessalated.
     num_segments: Option<u32>,
@@ -607,7 +562,7 @@ impl<'ui> BezierCurve<'ui> {
         c: C,
     ) -> Self
     where
-        C: Into<ImColor>,
+        C: Into<ImColor32>,
     {
         Self {
             pos0,

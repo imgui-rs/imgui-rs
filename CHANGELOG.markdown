@@ -22,6 +22,9 @@
     - `Ui::get_background_draw_list()` has been fixed when used outside of a window context, and now has an example.
     - `Ui::get_foreground_draw_list()` has been added, analogous to `Ui::get_background_draw_list()`.
 
+- `ImColor` (which is a wrapper around `u32`) has been renamed to `ImColor32` in order to avoid confusion with the `ImColor` type from the Dear ImGui C++ code (which is a wrapper around `ImVec4`). In the future an `ImColor` type which maps more closely to the C++ one will be added.
+    - Additionally, a number of constructor and accessor methods have been added to it `ImColor`, which are `const fn` where possible.
+
 ## [0.6.1] - 2020-12-16
 
 - Support for winit 0.24.x

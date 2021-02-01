@@ -9,8 +9,9 @@ use std::str;
 use std::thread;
 
 pub use self::clipboard::*;
+pub use self::color::ImColor32;
 pub use self::context::*;
-pub use self::draw_list::{ChannelsSplit, DrawListMut, ImColor};
+pub use self::draw_list::{ChannelsSplit, DrawListMut};
 pub use self::fonts::atlas::*;
 pub use self::fonts::font::*;
 pub use self::fonts::glyph::*;
@@ -50,6 +51,7 @@ pub use self::window::*;
 use internal::RawCast;
 
 mod clipboard;
+pub mod color;
 mod columns;
 mod context;
 mod draw_list;
