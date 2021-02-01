@@ -137,3 +137,7 @@ jobs:
       - run: cargo test --manifest-path imgui-winit-support/Cargo.toml --no-default-features --features winit-22
       - run: cargo test --manifest-path imgui-winit-support/Cargo.toml --no-default-features --features winit-23
       - run: cargo test --manifest-path imgui-winit-support/Cargo.toml --no-default-features --features winit-24
+      # Run unreasonably slow tests under release, but only the crates that have
+      # them, and don't bother doing this on most platforms.
+      - run: cargo test -p imgui --release -- --ignored
+        if: matrix.os == 'ubuntu-latest' && matrix.rust == 'stable'
