@@ -38,6 +38,9 @@
 
 - The `io.config_windows_memory_compact_timer` flag has been renamed to `io.config_memory_compact_timer`. This follows the similar rename in the C++ ImGui, and was done because it no longer only applies to window memory usage.
 
+- The variants of `ColorEditInputMode` and `ColorEditDisplayMode` have been renamed to be CamelCase instead of upper case (e.g. `ColorEditFooMode::RGB` => `ColorEditFooMode::Rgb`).
+    - However, this change is probably not breaking (in practice if not in theory) because const aliases using the old names are provided.
+
 ## [0.6.1] - 2020-12-16
 
 - Support for winit 0.24.x
