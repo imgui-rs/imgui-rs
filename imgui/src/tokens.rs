@@ -28,6 +28,7 @@ macro_rules! create_token {
             }
 
             $(#[$end_meta])*
+            #[inline]
             pub fn end(self) {
                 // left empty for drop
             }
