@@ -51,6 +51,11 @@
 - The variants of `ColorEditInputMode` and `ColorEditDisplayMode` have been renamed to be CamelCase instead of upper case (e.g. `ColorEditFooMode::RGB` => `ColorEditFooMode::Rgb`).
     - However, this change is probably not breaking (in practice if not in theory) because const aliases using the old names are provided.
 
+- Most tokens through the repository (eg. `WindowToken`, `TabBarToken`, `FontStackToken`, etc) now allow for permissive dropping -- i.e, you don't need to actually call the `.end()` method on them anymore. In exchange, these tokens have taken on a lifetime, which allows them to be safe.
+- `end()` no longer takes `Ui`. This is a breaking change, but hopefully should be trivial (and perhaps nice) for users to fix. Simply delete the parameters, or add a `_` before the token's binding name and allow it to be dropped on its own.
+
+- `PopupModal`'s `new` was reworked so that it didn't take `Ui` until `build` was called. This is a breaking change if you were invoking it directly. Simply move your `ui` call to `build` or `begin`.
+
 ## [0.6.1] - 2020-12-16
 
 - Support for winit 0.24.x
