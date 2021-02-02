@@ -231,10 +231,9 @@ impl<'a> TreeNode<'a> {
     /// Pushes a tree node and starts appending to it.
     ///
     /// Returns `Some(TreeNodeToken)` if the tree node is open. After content has been
-    /// rendered, the token must be popped by calling `.pop()`.
+    /// rendered, the token can be popped by calling `.pop()`.
     ///
     /// Returns `None` if the tree node is not open and no content should be rendered.
-    #[must_use]
     pub fn push<'ui>(self, ui: &Ui<'ui>) -> Option<TreeNodeToken<'ui>> {
         let open = unsafe {
             if self.opened_cond != Condition::Never {

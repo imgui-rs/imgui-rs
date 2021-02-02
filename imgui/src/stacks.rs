@@ -347,7 +347,6 @@ pub enum ItemFlag {
     ButtonRepeat(bool),
 }
 
-/// Tracks a change pushed to the item width stack
 pub struct ItemWidthStackToken {
     _ctx: *const Context,
 }
@@ -407,7 +406,6 @@ create_token!(
 
 impl IdStackToken<'_> {
     /// Pops a change from the ID stack
-    #[deprecated = "deprecated in 0.7.0. Use `end` instead."]
     pub fn pop(self) {
         self.end()
     }
@@ -419,7 +417,7 @@ impl<'ui> Ui<'ui> {
     ///
     /// Returns an `IdStackToken` that can be popped by calling `.end()`
     /// or by dropping manually.
-    pub fn push_id<'a, I: Into<Id<'a>>>(&self, id: I) -> IdStackToken<'_> {
+    pub fn push_id<'a, I: Into<Id<'a>>>(&self, id: I) -> IdStackToken<'ui> {
         let id = id.into();
 
         unsafe {

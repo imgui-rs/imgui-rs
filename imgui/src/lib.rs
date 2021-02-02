@@ -29,7 +29,7 @@ pub use self::legacy::*;
 pub use self::list_clipper::ListClipper;
 pub use self::plothistogram::PlotHistogram;
 pub use self::plotlines::PlotLines;
-pub use self::popups::PopupModal;
+pub use self::popups::*;
 pub use self::render::draw_data::*;
 pub use self::render::renderer::*;
 pub use self::stacks::*;
