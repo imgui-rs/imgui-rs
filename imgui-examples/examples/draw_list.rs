@@ -54,7 +54,7 @@ fn main() {
             .size([300.0, 110.0], Condition::FirstUseEver)
             .scroll_bar(false)
             .build(ui, || {
-                ui.button(im_str!("random button"));
+                ui.button(im_str!("random button"), [0.0, 0.0]);
                 let draw_list = ui.get_window_draw_list();
                 let o = ui.cursor_screen_pos();
                 let ws = ui.content_region_avail();
