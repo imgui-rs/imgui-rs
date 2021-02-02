@@ -1,9 +1,6 @@
 use std::f32;
 use std::os::raw::{c_char, c_void};
-use std::ptr;
-use std::thread;
 
-use crate::context::Context;
 use crate::sys;
 use crate::window::WindowFlags;
 use crate::{Id, Ui};
@@ -244,7 +241,7 @@ impl<'a> ChildWindow<'a> {
     /// rendered, the token must be ended by calling `.end()`.
     ///
     /// Returns `None` if the window is not visible and no content should be rendered.
-    pub fn begin(self, ui: &Ui) -> Option<ChildWindowToken> {
+    pub fn begin<'ui>(self, ui: &Ui<'ui>) -> Option<ChildWindowToken<'ui>> {
         if self.content_size[0] != 0.0 || self.content_size[1] != 0.0 {
             unsafe { sys::igSetNextWindowContentSize(self.content_size.into()) };
         }
@@ -269,7 +266,7 @@ impl<'a> ChildWindow<'a> {
             sys::igBeginChildID(id, self.size.into(), self.border, self.flags.bits() as i32)
         };
         if should_render {
-            Some(ChildWindowToken { ctx: ui.ctx })
+            Some(ChildWindowToken::new(ui))
         } else {
             unsafe { sys::igEndChild() };
             None
@@ -280,30 +277,17 @@ impl<'a> ChildWindow<'a> {
     /// Note: the closure is not called if no window content is visible (e.g. window is collapsed
     /// or fully clipped).
     pub fn build<F: FnOnce()>(self, ui: &Ui, f: F) {
-        if let Some(window) = self.begin(ui) {
+        if let Some(_window) = self.begin(ui) {
             f();
-            window.end(ui);
         }
     }
 }
 
-/// Tracks a child window that must be ended by calling `.end()`
-pub struct ChildWindowToken {
-    ctx: *const Context,
-}
+create_token!(
+    /// Tracks a child window that can be ended by calling `.end()`
+    /// or by dropping
+    pub struct ChildWindowToken<'ui>;
 
-impl ChildWindowToken {
     /// Ends a window
-    pub fn end(mut self, _: &Ui) {
-        self.ctx = ptr::null();
-        unsafe { sys::igEndChild() };
-    }
-}
-
-impl Drop for ChildWindowToken {
-    fn drop(&mut self) {
-        if !self.ctx.is_null() && !thread::panicking() {
-            panic!("A ChildWindowToken was leaked. Did you call .end()?");
-        }
-    }
-}
+    drop { sys::igEndChild() }
+);

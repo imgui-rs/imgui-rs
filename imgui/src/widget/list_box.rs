@@ -1,8 +1,5 @@
 use std::borrow::Cow;
-use std::ptr;
-use std::thread;
 
-use crate::context::Context;
 use crate::string::ImStr;
 use crate::sys;
 use crate::Ui;
@@ -62,7 +59,7 @@ impl<'a> ListBox<'a> {
     ///
     /// Returns `None` if the list box is not open and no content should be rendered.
     #[must_use]
-    pub fn begin(self, ui: &Ui) -> Option<ListBoxToken> {
+    pub fn begin<'ui>(self, ui: &Ui<'ui>) -> Option<ListBoxToken<'ui>> {
         let should_render = unsafe {
             match self.size {
                 Size::Vec(size) => sys::igListBoxHeaderVec2(self.label.as_ptr(), size),
@@ -73,7 +70,7 @@ impl<'a> ListBox<'a> {
             }
         };
         if should_render {
-            Some(ListBoxToken { ctx: ui.ctx })
+            Some(ListBoxToken::new(ui))
         } else {
             None
         }
@@ -82,34 +79,20 @@ impl<'a> ListBox<'a> {
     ///
     /// Note: the closure is not called if the list box is not open.
     pub fn build<F: FnOnce()>(self, ui: &Ui, f: F) {
-        if let Some(list) = self.begin(ui) {
+        if let Some(_list) = self.begin(ui) {
             f();
-            list.end(ui);
         }
     }
 }
 
-/// Tracks a list box that must be ended by calling `.end()`
-#[must_use]
-pub struct ListBoxToken {
-    ctx: *const Context,
-}
+create_token!(
+    /// Tracks a list box that can be ended by calling `.end()`
+    /// or by dropping
+    pub struct ListBoxToken<'ui>;
 
-impl ListBoxToken {
     /// Ends a list box
-    pub fn end(mut self, _: &Ui) {
-        self.ctx = ptr::null();
-        unsafe { sys::igListBoxFooter() };
-    }
-}
-
-impl Drop for ListBoxToken {
-    fn drop(&mut self) {
-        if !self.ctx.is_null() && !thread::panicking() {
-            panic!("A ListBoxToken was leaked. Did you call .end()?");
-        }
-    }
-}
+    drop { sys::igListBoxFooter() }
+);
 
 /// # Convenience functions
 impl<'a> ListBox<'a> {
@@ -136,7 +119,6 @@ impl<'a> ListBox<'a> {
                     result = true;
                 }
             }
-            _cb.end(ui);
         }
         result
     }

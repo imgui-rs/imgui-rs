@@ -34,13 +34,13 @@ impl<'ui> Ui<'ui> {
     /// ui.text("I use the custom font!");
     /// font.pop(&ui);
     /// ```
-    pub fn push_font(&self, id: FontId) -> FontStackToken {
+    pub fn push_font(&self, id: FontId) -> FontStackToken<'_> {
         let fonts = self.fonts();
         let font = fonts
             .get_font(id)
             .expect("Font atlas did not contain the given font");
         unsafe { sys::igPushFont(font.raw() as *const _ as *mut _) };
-        FontStackToken { ctx: self.ctx }
+        FontStackToken::new(self)
     }
     /// Changes a style color by pushing a change to the color stack.
     ///
@@ -59,11 +59,9 @@ impl<'ui> Ui<'ui> {
     /// ```
     pub fn push_style_color(&self, style_color: StyleColor, color: [f32; 4]) -> ColorStackToken {
         unsafe { sys::igPushStyleColorVec4(style_color as i32, color.into()) };
-        ColorStackToken {
-            count: 1,
-            ctx: self.ctx,
-        }
+        ColorStackToken::new(self)
     }
+
     /// Changes style colors by pushing several changes to the color stack.
     ///
     /// Returns a `ColorStackToken` that must be popped by calling `.pop()`
@@ -84,7 +82,8 @@ impl<'ui> Ui<'ui> {
     /// ui.text_disabled("I'm green!");
     /// colors.pop(&ui);
     /// ```
-    pub fn push_style_colors<'a, I>(&self, style_colors: I) -> ColorStackToken
+    #[deprecated = "deprecated in 0.7.0. Use `push_style_color` multiple times for similar effect."]
+    pub fn push_style_colors<'a, I>(&self, style_colors: I) -> MultiColorStackToken
     where
         I: IntoIterator<Item = &'a (StyleColor, [f32; 4])>,
     {
@@ -93,14 +92,15 @@ impl<'ui> Ui<'ui> {
             unsafe { sys::igPushStyleColorVec4(style_color as i32, color.into()) };
             count += 1;
         }
-        ColorStackToken {
+        MultiColorStackToken {
             count,
             ctx: self.ctx,
         }
     }
     /// Changes a style variable by pushing a change to the style stack.
     ///
-    /// Returns a `StyleStackToken` that must be popped by calling `.pop()`
+    /// Returns a `StyleStackToken` that can be popped by calling `.end()`
+    /// or by allowing to drop.
     ///
     /// # Examples
     ///
@@ -114,10 +114,7 @@ impl<'ui> Ui<'ui> {
     /// ```
     pub fn push_style_var(&self, style_var: StyleVar) -> StyleStackToken {
         unsafe { push_style_var(style_var) };
-        StyleStackToken {
-            count: 1,
-            ctx: self.ctx,
-        }
+        StyleStackToken::new(self)
     }
     /// Changes style variables by pushing several changes to the style stack.
     ///
@@ -137,7 +134,8 @@ impl<'ui> Ui<'ui> {
     /// ui.text("...with large spacing as well");
     /// styles.pop(&ui);
     /// ```
-    pub fn push_style_vars<'a, I>(&self, style_vars: I) -> StyleStackToken
+    #[deprecated = "deprecated in 0.7.0. Use `push_style_var` multiple times for similar effect."]
+    pub fn push_style_vars<'a, I>(&self, style_vars: I) -> MultiStyleStackToken
     where
         I: IntoIterator<Item = &'a StyleVar>,
     {
@@ -146,43 +144,53 @@ impl<'ui> Ui<'ui> {
             unsafe { push_style_var(style_var) };
             count += 1;
         }
-        StyleStackToken {
+        MultiStyleStackToken {
             count,
             ctx: self.ctx,
         }
     }
 }
 
-/// Tracks a font pushed to the font stack that must be popped by calling `.pop()`
-#[must_use]
-pub struct FontStackToken {
-    ctx: *const Context,
-}
+create_token!(
+    /// Tracks a font pushed to the font stack that can be popped by calling `.end()`
+    /// or by dropping.
+    pub struct FontStackToken<'ui>;
 
-impl FontStackToken {
-    /// Pops a change from the font stack
-    pub fn pop(mut self, _: &Ui) {
-        self.ctx = ptr::null();
-        unsafe { sys::igPopFont() };
+    /// Pops a change from the font stack.
+    drop { sys::igPopFont() }
+);
+
+impl FontStackToken<'_> {
+    /// Pops a change from the font stack.
+    pub fn pop(self) {
+        self.end()
     }
 }
 
-impl Drop for FontStackToken {
-    fn drop(&mut self) {
-        if !self.ctx.is_null() && !thread::panicking() {
-            panic!("A FontStackToken was leaked. Did you call .pop()?");
-        }
+create_token!(
+    /// Tracks a color pushed to the color stack that can be popped by calling `.end()`
+    /// or by dropping.
+    pub struct ColorStackToken<'ui>;
+
+    /// Pops a change from the color stack.
+    drop { sys::igPopStyleColor(1) }
+);
+
+impl ColorStackToken<'_> {
+    /// Pops a change from the color stack.
+    pub fn pop(self) {
+        self.end()
     }
 }
 
 /// Tracks one or more changes pushed to the color stack that must be popped by calling `.pop()`
 #[must_use]
-pub struct ColorStackToken {
+pub struct MultiColorStackToken {
     count: usize,
     ctx: *const Context,
 }
 
-impl ColorStackToken {
+impl MultiColorStackToken {
     /// Pops changes from the color stack
     pub fn pop(mut self, _: &Ui) {
         self.ctx = ptr::null();
@@ -190,7 +198,7 @@ impl ColorStackToken {
     }
 }
 
-impl Drop for ColorStackToken {
+impl Drop for MultiColorStackToken {
     fn drop(&mut self) {
         if !self.ctx.is_null() && !thread::panicking() {
             panic!("A ColorStackToken was leaked. Did you call .pop()?");
@@ -198,14 +206,30 @@ impl Drop for ColorStackToken {
     }
 }
 
+create_token!(
+    /// Tracks a style pushed to the style stack that can be popped by calling `.end()`
+    /// or by dropping.
+    pub struct StyleStackToken<'ui>;
+
+    /// Pops a change from the style stack.
+    drop { sys::igPopStyleVar(1) }
+);
+
+impl StyleStackToken<'_> {
+    /// Pops a change from the style stack.
+    pub fn pop(self) {
+        self.end()
+    }
+}
+
 /// Tracks one or more changes pushed to the style stack that must be popped by calling `.pop()`
 #[must_use]
-pub struct StyleStackToken {
+pub struct MultiStyleStackToken {
     count: usize,
     ctx: *const Context,
 }
 
-impl StyleStackToken {
+impl MultiStyleStackToken {
     /// Pops changes from the style stack
     pub fn pop(mut self, _: &Ui) {
         self.ctx = ptr::null();
@@ -213,7 +237,7 @@ impl StyleStackToken {
     }
 }
 
-impl Drop for StyleStackToken {
+impl Drop for MultiStyleStackToken {
     fn drop(&mut self) {
         if !self.ctx.is_null() && !thread::panicking() {
             panic!("A StyleStackToken was leaked. Did you call .pop()?");
@@ -372,13 +396,30 @@ impl ItemFlagsStackToken {
     }
 }
 
+create_token!(
+    /// Tracks an ID pushed to the ID stack that can be popped by calling `.pop()`
+    /// or by dropping.
+    pub struct IdStackToken<'ui>;
+
+    /// Pops a change from the ID stack
+    drop { sys::igPopID() }
+);
+
+impl IdStackToken<'_> {
+    /// Pops a change from the ID stack
+    #[deprecated = "deprecated in 0.7.0. Use `end` instead."]
+    pub fn pop(self) {
+        self.end()
+    }
+}
+
 /// # ID stack
 impl<'ui> Ui<'ui> {
     /// Pushes an identifier to the ID stack.
     ///
-    /// Returns an `IdStackToken` that must be popped by calling `.pop()`
-    ///
-    pub fn push_id<'a, I: Into<Id<'a>>>(&self, id: I) -> IdStackToken {
+    /// Returns an `IdStackToken` that can be popped by calling `.end()`
+    /// or by dropping manually.
+    pub fn push_id<'a, I: Into<Id<'a>>>(&self, id: I) -> IdStackToken<'_> {
         let id = id.into();
 
         unsafe {
@@ -392,28 +433,6 @@ impl<'ui> Ui<'ui> {
                 Id::Ptr(p) => sys::igPushIDPtr(p as *const c_void),
             }
         }
-        IdStackToken { ctx: self.ctx }
-    }
-}
-
-/// Tracks an ID pushed to the ID stack that must be popped by calling `.pop()`
-#[must_use]
-pub struct IdStackToken {
-    ctx: *const Context,
-}
-
-impl IdStackToken {
-    /// Pops a change from the ID stack
-    pub fn pop(mut self, _: &Ui) {
-        self.ctx = ptr::null();
-        unsafe { sys::igPopID() };
-    }
-}
-
-impl Drop for IdStackToken {
-    fn drop(&mut self) {
-        if !self.ctx.is_null() && !thread::panicking() {
-            panic!("A IdStackToken was leaked. Did you call .pop()?");
-        }
+        IdStackToken::new(self)
     }
 }

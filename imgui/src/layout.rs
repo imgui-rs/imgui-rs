@@ -1,31 +1,14 @@
-use std::ptr;
-use std::thread;
-
-use crate::context::Context;
 use crate::sys;
 use crate::Ui;
 
-/// Tracks a layout group that must be ended by calling `.end()`
-#[must_use]
-pub struct GroupToken {
-    ctx: *const Context,
-}
+create_token!(
+    /// Tracks a layout group that can be ended with `end` or by dropping.
+    pub struct GroupToken<'ui>;
 
-impl GroupToken {
-    /// Ends a layout group
-    pub fn end(mut self, _: &Ui) {
-        self.ctx = ptr::null();
-        unsafe { sys::igEndGroup() };
-    }
-}
-
-impl Drop for GroupToken {
-    fn drop(&mut self) {
-        if !self.ctx.is_null() && !thread::panicking() {
-            panic!("A GroupToken was leaked. Did you call .end()?");
-        }
-    }
-}
+    /// Drops the layout group manually. You can also just allow this token
+    /// to drop on its own.
+    drop { sys::igEndGroup() }
+);
 
 /// # Cursor / Layout
 impl<'ui> Ui<'ui> {
@@ -84,7 +67,7 @@ impl<'ui> Ui<'ui> {
     /// Returns a `GroupToken` that must be ended by calling `.end()`
     pub fn begin_group(&self) -> GroupToken {
         unsafe { sys::igBeginGroup() };
-        GroupToken { ctx: self.ctx }
+        GroupToken::new(self)
     }
     /// Creates a layout group and runs a closure to construct the contents.
     ///
@@ -92,7 +75,7 @@ impl<'ui> Ui<'ui> {
     pub fn group<R, F: FnOnce() -> R>(&self, f: F) -> R {
         let group = self.begin_group();
         let result = f();
-        group.end(self);
+        group.end();
         result
     }
     /// Returns the cursor position (in window coordinates)

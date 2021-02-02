@@ -29,7 +29,7 @@ pub use self::legacy::*;
 pub use self::list_clipper::ListClipper;
 pub use self::plothistogram::PlotHistogram;
 pub use self::plotlines::PlotLines;
-pub use self::popup_modal::PopupModal;
+pub use self::popups::PopupModal;
 pub use self::render::draw_data::*;
 pub use self::render::renderer::*;
 pub use self::stacks::*;
@@ -54,6 +54,9 @@ use internal::RawCast;
 #[macro_use]
 mod string;
 
+#[macro_use]
+mod tokens;
+
 mod clipboard;
 pub mod color;
 mod columns;
@@ -70,7 +73,7 @@ mod legacy;
 mod list_clipper;
 mod plothistogram;
 mod plotlines;
-mod popup_modal;
+mod popups;
 mod render;
 mod stacks;
 mod style;
@@ -287,27 +290,14 @@ impl<'ui> Ui<'ui> {
     }
 }
 
-/// Tracks a layout tooltip that must be ended by calling `.end()`
-#[must_use]
-pub struct TooltipToken {
-    ctx: *const Context,
-}
+create_token!(
+    /// Tracks a layout tooltip that can be ended by calling `.end()` or by dropping.
+    pub struct TooltipToken<'ui>;
 
-impl TooltipToken {
-    /// Ends a layout tooltip
-    pub fn end(mut self, _: &Ui) {
-        self.ctx = ptr::null();
-        unsafe { sys::igEndTooltip() };
-    }
-}
-
-impl Drop for TooltipToken {
-    fn drop(&mut self) {
-        if !self.ctx.is_null() && !thread::panicking() {
-            panic!("A TooltipToken was leaked. Did you call .end()?");
-        }
-    }
-}
+    /// Drops the layout tooltip manually. You can also just allow this token
+    /// to drop on its own.
+    drop { sys::igEndTooltip() }
+);
 
 /// # Tooltips
 impl<'ui> Ui<'ui> {
@@ -336,9 +326,9 @@ impl<'ui> Ui<'ui> {
     /// Construct a tooltip window that can have any kind of content.
     ///
     /// Returns a `TooltipToken` that must be ended by calling `.end()`
-    pub fn begin_tooltip(&self) -> TooltipToken {
+    pub fn begin_tooltip(&self) -> TooltipToken<'_> {
         unsafe { sys::igBeginTooltip() };
-        TooltipToken { ctx: self.ctx }
+        TooltipToken::new(self)
     }
     /// Construct a tooltip window with simple text content.
     ///
@@ -357,49 +347,6 @@ impl<'ui> Ui<'ui> {
     /// ```
     pub fn tooltip_text<T: AsRef<str>>(&self, text: T) {
         self.tooltip(|| self.text(text));
-    }
-}
-
-// Widgets: Popups
-impl<'ui> Ui<'ui> {
-    pub fn open_popup(&self, str_id: &ImStr) {
-        unsafe { sys::igOpenPopup(str_id.as_ptr(), 0) };
-    }
-    pub fn popup<F>(&self, str_id: &ImStr, f: F)
-    where
-        F: FnOnce(),
-    {
-        let render =
-            unsafe { sys::igBeginPopup(str_id.as_ptr(), WindowFlags::empty().bits() as i32) };
-        if render {
-            f();
-            unsafe { sys::igEndPopup() };
-        }
-    }
-    /// Create a modal pop-up.
-    ///
-    /// # Example
-    /// ```rust,no_run
-    /// # use imgui::*;
-    /// # let mut imgui = Context::create();
-    /// # let ui = imgui.frame();
-    /// if ui.button(im_str!("Show modal"), [0.0, 0.0]) {
-    ///     ui.open_popup(im_str!("modal"));
-    /// }
-    /// ui.popup_modal(im_str!("modal")).build(|| {
-    ///     ui.text("Content of my modal");
-    ///     if ui.button(im_str!("OK"), [0.0, 0.0]) {
-    ///         ui.close_current_popup();
-    ///     }
-    /// });
-    /// ```
-    pub fn popup_modal<'p>(&self, str_id: &'p ImStr) -> PopupModal<'ui, 'p> {
-        PopupModal::new(self, str_id)
-    }
-    /// Close a popup. Should be called within the closure given as argument to
-    /// [`Ui::popup`] or [`Ui::popup_modal`].
-    pub fn close_current_popup(&self) {
-        unsafe { sys::igCloseCurrentPopup() };
     }
 }
 
