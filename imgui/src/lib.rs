@@ -53,7 +53,7 @@ use internal::RawCast;
 mod clipboard;
 mod columns;
 mod context;
-mod drag_drop;
+pub mod drag_drop;
 mod draw_list;
 mod fonts;
 mod input;

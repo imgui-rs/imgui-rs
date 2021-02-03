@@ -74,7 +74,8 @@ impl<'a> DragDropSource<'a> {
     /// Creates a new [DragDropSource] with no flags and the `Condition::Always` with the given name.
     /// ImGui refers to this `name` field as a `type`, but really it's just an identifier to match up
     /// Source/Target for DragDrop.
-    pub fn new(name: &'a ImStr) -> Self {
+    #[inline]
+    pub const fn new(name: &'a ImStr) -> Self {
         Self {
             name,
             flags: DragDropFlags::empty(),
@@ -86,13 +87,15 @@ impl<'a> DragDropSource<'a> {
     /// `SOURCE_NO_DISABLE_HOVER`, `SOURCE_NO_HOLD_TO_OPEN_OTHERS`, `SOURCE_ALLOW_NULL_ID`,
     /// `SOURCE_EXTERN`, `SOURCE_AUTO_EXPIRE_PAYLOAD` make semantic sense, but any other flags will
     /// be accepted without panic.
-    pub fn flags(mut self, flags: DragDropFlags) -> Self {
+    #[inline]
+    pub const fn flags(mut self, flags: DragDropFlags) -> Self {
         self.flags = flags;
         self
     }
 
     /// Sets the condition on the [DragDropSource]. Defaults to [Always](Condition::Always).
-    pub fn condition(mut self, cond: Condition) -> Self {
+    #[inline]
+    pub const fn condition(mut self, cond: Condition) -> Self {
         self.cond = cond;
         self
     }
@@ -144,6 +147,7 @@ impl<'a> DragDropSource<'a> {
     /// In the above, you'll see how the payload is really just a message passing service.
     /// If you want to pass a simple integer or other "plain old data", take a look at
     /// [begin_payload](Self::begin_payload).
+    #[inline]
     pub fn begin<'ui>(self, ui: &Ui<'ui>) -> Option<DragDropSourceToolTip<'ui>> {
         self.begin_payload(ui, ())
     }
@@ -157,9 +161,10 @@ impl<'a> DragDropSource<'a> {
     /// and this returned token does nothing. Additionally, a given target may use the flag
     /// `ACCEPT_NO_PREVIEW_TOOLTIP`, which will also prevent this tooltip from being shown.
     ///
-    /// This function also takes a payload in the form of `T: Copy + 'static`. We use this bound to
-    /// ensure that we can safely send and receive the given type from C++ without worrying about
-    /// handling drops.
+    /// This function also takes a payload in the form of `T: Copy + 'static`. ImGui will
+    /// memcpy this data immediately to an internally held buffer, and will return the data
+    /// to [DragDropTarget].
+    #[inline]
     pub fn begin_payload<'ui, T: Copy + 'static>(
         self,
         ui: &Ui<'ui>,
@@ -184,8 +189,9 @@ impl<'a> DragDropSource<'a> {
     /// and this returned token does nothing. Additionally, a given target may use the flag
     /// `ACCEPT_NO_PREVIEW_TOOLTIP`, which will also prevent this tooltip from being shown.
     ///
-    /// This function also takes a payload of any `*const T`. Please avoid directly using it
-    /// if you can.
+    /// This function also takes a payload of any `*const T`. ImGui will
+    /// memcpy this data immediately to an internally held buffer, and will return the data
+    /// to [DragDropTarget].
     ///
     /// ## Safety
     /// This function itself will not cause a panic, but using it directly opts you into
@@ -200,6 +206,7 @@ impl<'a> DragDropSource<'a> {
     ///
     /// Overall, users should be very sure that this function is needed before they reach for it, and instead
     /// should consider either [begin](Self::begin) or [begin_payload](Self::begin_payload).
+    #[inline]
     pub unsafe fn begin_payload_unchecked<'ui>(
         &self,
         _ui: &Ui<'ui>,
@@ -223,12 +230,14 @@ pub struct DragDropSourceToolTip<'ui>(PhantomData<Ui<'ui>>);
 
 impl DragDropSourceToolTip<'_> {
     /// Creates a new tooltip internally.
+    #[inline]
     fn push() -> Self {
         Self(PhantomData)
     }
 
     /// Ends the tooltip directly. You could choose to simply allow this to drop
     /// by not calling this, which will also be fine.
+    #[inline]
     pub fn pop(self) {
         // left empty to invoke drop...
     }
@@ -291,6 +300,9 @@ impl<'ui> DragDropTarget<'ui> {
     /// Accepts an empty payload. This is the safest option for raising named events
     /// in the DragDrop API. See [DragDropSource::begin] for more information on how you
     /// might use this pattern.
+    ///
+    /// Note: If you began this operation with `begin_payload_unchecked` it always incorrect
+    /// to use this function. Use `accept_payload_unchecked` instead
     pub fn accept_payload_empty(
         &self,
         name: &ImStr,
@@ -306,6 +318,9 @@ impl<'ui> DragDropTarget<'ui> {
 
     /// Accepts a payload with plain old data in it. This returns a Result, since you can specify any
     /// type. The sent type must match the return type (via TypeId) to receive an `Ok`.
+    ///
+    /// Note: If you began this operation with `begin_payload_unchecked` it always incorrect
+    /// to use this function. Use `accept_payload_unchecked` instead
     pub fn accept_payload<T: 'static + Copy>(
         &self,
         name: &ImStr,
@@ -316,11 +331,14 @@ impl<'ui> DragDropTarget<'ui> {
         // convert the unsafe payload to our Result
         output.map(|unsafe_payload| {
             // sheering off the typeid...
-            let received = unsafe { *(unsafe_payload.data as *const any::TypeId) };
-            let requested = any::TypeId::of::<T>();
+            let received =
+                unsafe { (unsafe_payload.data as *const TypedPayloadHeader).read_unaligned() };
+            let expected = any::TypeId::of::<T>();
 
-            if received == requested {
-                let data = unsafe { *(unsafe_payload.data as *const TypedPayload<T>) }.data;
+            if received.type_id == expected {
+                let data =
+                    unsafe { (unsafe_payload.data as *const TypedPayload<T>).read_unaligned() }
+                        .data;
                 Ok(DragDropPayloadPod {
                     data,
                     preview: unsafe_payload.preview,
@@ -328,8 +346,8 @@ impl<'ui> DragDropTarget<'ui> {
                 })
             } else {
                 Err(PayloadIsWrongType {
-                    requested,
                     received,
+                    expected: TypedPayloadHeader::new::<T>(),
                 })
             }
         })
@@ -372,7 +390,7 @@ impl<'ui> DragDropTarget<'ui> {
             // now this way.
             Some(DragDropPayload {
                 data: inner.Data,
-                size: inner.DataSize,
+                size: inner.DataSize as usize,
                 preview: inner.Preview,
                 delivery: inner.Delivery,
             })
@@ -394,7 +412,8 @@ impl Drop for DragDropTarget<'_> {
 
 /// An empty DragDropPayload. It has no data in it, and just includes
 /// two bools with status information.
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
+#[non_exhaustive]
 pub struct DragDropPayloadEmpty {
     /// Set when [`accept_payload_empty`](Self::accept_payload_empty) was called
     /// and mouse has been hovering the target item.
@@ -407,8 +426,9 @@ pub struct DragDropPayloadEmpty {
 
 /// A DragDropPayload with status information and some POD, or plain old data,
 /// in it.
-#[derive(Debug)]
-pub struct DragDropPayloadPod<T> {
+#[derive(Debug, Copy, Clone)]
+#[non_exhaustive]
+pub struct DragDropPayloadPod<T: 'static + Copy> {
     /// The kind data which was requested.
     pub data: T,
 
@@ -422,6 +442,7 @@ pub struct DragDropPayloadPod<T> {
 }
 
 #[derive(Debug)]
+#[non_exhaustive]
 pub struct DragDropPayload {
     /// Data which is copied and owned by ImGui. If you have accepted the payload, you can
     /// take ownership of the data; otherwise, view it immutably. Interacting with `data` is
@@ -429,7 +450,7 @@ pub struct DragDropPayload {
     pub data: *const ffi::c_void,
 
     /// The size of the data in bytes.
-    pub size: i32,
+    pub size: usize,
 
     /// Set when [`accept_payload_unchecked`](Self::accept_payload_unchecked) was called
     /// and mouse has been hovering the target item.
@@ -444,15 +465,41 @@ pub struct DragDropPayload {
 #[derive(Debug, Clone, Copy)]
 #[repr(C)]
 struct TypedPayload<T> {
-    type_id: any::TypeId,
+    header: TypedPayloadHeader,
     data: T,
+}
+
+/// We have this struct separately to easily read it off in unsafe code.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Ord, PartialOrd)]
+#[repr(C)]
+struct TypedPayloadHeader {
+    type_id: any::TypeId,
+    #[cfg(debug_assertions)]
+    type_name: &'static str,
+}
+
+impl TypedPayloadHeader {
+    #[cfg(debug_assertions)]
+    fn new<T: 'static>() -> Self {
+        Self {
+            type_id: any::TypeId::of::<T>(),
+            type_name: any::type_name::<T>(),
+        }
+    }
+
+    #[cfg(not(debug_assertions))]
+    fn new<T: 'static>() -> Self {
+        Self {
+            type_id: any::TypeId::of::<T>(),
+        }
+    }
 }
 
 impl<T: Copy + 'static> TypedPayload<T> {
     /// Creates a new typed payload which contains this data.
     pub fn new(data: T) -> Self {
         Self {
-            type_id: any::TypeId::of::<T>(),
+            header: TypedPayloadHeader::new::<T>(),
             data,
         }
     }
@@ -462,13 +509,25 @@ impl<T: Copy + 'static> TypedPayload<T> {
 /// but you can view questionably useful debug information with Debug formatting.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Ord, PartialOrd)]
 pub struct PayloadIsWrongType {
-    requested: any::TypeId,
-    received: any::TypeId,
+    expected: TypedPayloadHeader,
+    received: TypedPayloadHeader,
 }
 
+#[cfg(debug_assertions)]
 impl std::fmt::Display for PayloadIsWrongType {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "Payload is wrong type")
+        write!(
+            f,
+            "Payload is {} -- expected {}",
+            self.received.type_name, self.expected.type_name
+        )
+    }
+}
+
+#[cfg(not(debug_assertions))]
+impl std::fmt::Display for PayloadIsWrongType {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.pad("Payload is wrong type")
     }
 }
 
