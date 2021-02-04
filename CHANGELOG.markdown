@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Upgrade to [Dear ImGui v1.80](https://github.com/ocornut/imgui/releases/tag/v1.80). (Note that the new table functionality is not yet supported, however)
+
 - `Ui::key_index()` is now called internally when needed, and the various `is_key_foo` now take a `Key` directly: https://github.com/imgui-rs/imgui-rs/pull/416
     - `is_key_down`, `is_key_pressed`, `is_key_released` and `key_pressed_amount` now take a `Key` instead of `u32` (breaking).
     - `key_index` is no longer public (breaking). If you need access to the key map, it can be accessed as `ui.io().key_map[key]` (If you need to do this, file a bug, since I'm open to exposing this if there's actually a use case).
@@ -27,6 +29,23 @@
     or `unsafe`, allowing for theoretically arbitrary payloads.
     - `DragDropTarget` allows users to accept any of the above payloads.
     - Extensive documentation has been made on all of these features, hopefully as a target for future features.
+
+- `ImColor` (which is a wrapper around `u32`) has been renamed to `ImColor32` in order to avoid confusion with the `ImColor` type from the Dear ImGui C++ code (which is a wrapper around `ImVec4`). In the future an `ImColor` type which maps more closely to the C++ one will be added.
+    - Additionally, a number of constructor and accessor methods have been added to it `ImColor`, which are `const fn` where possible.
+
+- The `im_str!` macro can now be used in `const` contexts (when the `format!` version is not used).
+
+- `im_str!` now verifies that the parameter has no interior nuls at compile time. This can be avoided to get the old (truncating) behavior by forcing it to use the `format!`-like version, e.g. `im_str!("for_some_reason_this_should_be_truncated\0 there {}", "")`.
+    - This is not recommended, and is probably not useful.
+
+- Many functions are now `const fn`.
+
+- A large number of small functions are now `#[inline]`, but many still aren't, so you probably will want to build with LTO for release builds if you use `imgui` heavily.
+
+- The `io.config_windows_memory_compact_timer` flag has been renamed to `io.config_memory_compact_timer`. This follows the similar rename in the C++ ImGui, and was done because it no longer only applies to window memory usage.
+
+- The variants of `ColorEditInputMode` and `ColorEditDisplayMode` have been renamed to be CamelCase instead of upper case (e.g. `ColorEditFooMode::RGB` => `ColorEditFooMode::Rgb`).
+    - However, this change is probably not breaking (in practice if not in theory) because const aliases using the old names are provided.
 
 ## [0.6.1] - 2020-12-16
 

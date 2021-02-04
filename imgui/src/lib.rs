@@ -9,9 +9,10 @@ use std::str;
 use std::thread;
 
 pub use self::clipboard::*;
+pub use self::color::ImColor32;
 pub use self::context::*;
 pub use self::drag_drop::{DragDropFlags, DragDropSource, DragDropTarget};
-pub use self::draw_list::{ChannelsSplit, DrawListMut, ImColor};
+pub use self::draw_list::{ChannelsSplit, DrawListMut};
 pub use self::fonts::atlas::*;
 pub use self::fonts::font::*;
 pub use self::fonts::glyph::*;
@@ -50,7 +51,11 @@ pub use self::window::child_window::*;
 pub use self::window::*;
 use internal::RawCast;
 
+#[macro_use]
+mod string;
+
 mod clipboard;
+pub mod color;
 mod columns;
 mod context;
 pub mod drag_drop;
@@ -68,13 +73,17 @@ mod plotlines;
 mod popup_modal;
 mod render;
 mod stacks;
-mod string;
 mod style;
 #[cfg(test)]
 mod test;
 mod utils;
 mod widget;
 mod window;
+
+// Used by macros. Underscores are just to make it clear it's not part of the
+// public API.
+#[doc(hidden)]
+pub use core as __core;
 
 /// Returns the underlying Dear ImGui library version
 pub fn dear_imgui_version() -> &'static str {
@@ -86,7 +95,8 @@ pub fn dear_imgui_version() -> &'static str {
 
 #[test]
 fn test_version() {
-    assert_eq!(dear_imgui_version(), "1.79");
+    // TODO: what's the point of this test?
+    assert_eq!(dear_imgui_version(), "1.80");
 }
 
 impl Context {
@@ -199,24 +209,28 @@ pub enum Id<'a> {
 }
 
 impl From<i32> for Id<'static> {
+    #[inline]
     fn from(i: i32) -> Self {
         Id::Int(i)
     }
 }
 
 impl<'a, T: ?Sized + AsRef<str>> From<&'a T> for Id<'a> {
+    #[inline]
     fn from(s: &'a T) -> Self {
         Id::Str(s.as_ref())
     }
 }
 
 impl<T> From<*const T> for Id<'static> {
+    #[inline]
     fn from(p: *const T) -> Self {
         Id::Ptr(p as *const c_void)
     }
 }
 
 impl<T> From<*mut T> for Id<'static> {
+    #[inline]
     fn from(p: *mut T) -> Self {
         Id::Ptr(p as *const T as *const c_void)
     }

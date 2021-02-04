@@ -6,6 +6,7 @@
 #include "./third-party/imgui/imgui_demo.cpp"
 #include "./third-party/imgui/imgui_draw.cpp"
 #include "./third-party/imgui/imgui_widgets.cpp"
+#include "./third-party/imgui/imgui_tables.cpp"
 #include "./third-party/cimgui.cpp"
 
 

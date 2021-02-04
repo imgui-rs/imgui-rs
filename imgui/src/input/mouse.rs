@@ -36,6 +36,11 @@ fn test_mouse_button_variants() {
 /// Mouse cursor type identifier
 #[repr(i32)]
 #[derive(Copy, Clone, Debug, Hash, Eq, PartialEq)]
+// TODO: this should just be `#[allow(clippy::upper_case_acronyms)]`, but doing
+// so in a way that works before it stabilizes is a pain (in part because
+// `unknown_clippy_lints` was renamed to unknown_lints). Oh well, it's over a
+// small amount of code.
+#[allow(warnings)]
 pub enum MouseCursor {
     Arrow = sys::ImGuiMouseCursor_Arrow,
     /// Automatically used when hovering over text inputs, etc.

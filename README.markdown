@@ -3,7 +3,7 @@
 [![Build Status](https://github.com/imgui-rs/imgui-rs/workflows/ci/badge.svg)](https://github.com/imgui-rs/imgui-rs/actions)
 [![Latest release on crates.io](https://meritbadge.herokuapp.com/imgui)](https://crates.io/crates/imgui)
 [![Documentation on docs.rs](https://docs.rs/imgui/badge.svg)](https://docs.rs/imgui)
-[![Wrapped Dear ImGui Version](https://img.shields.io/badge/Dear%20ImGui%20Version-1.79-blue.svg)](https://github.com/ocornut/imgui)
+[![Wrapped Dear ImGui Version](https://img.shields.io/badge/Dear%20ImGui%20Version-1.80-blue.svg)](https://github.com/ocornut/imgui)
 
 (Recently under new maintenance, things subject to change)
 
@@ -32,7 +32,7 @@ Window::new(im_str!("Hello world"))
 * imgui-gfx-renderer: Renderer implementation that uses the `gfx` crate (*not
   the new gfx-hal crate*)
 * imgui-winit-support: Backend platform implementation that uses the `winit`
-  crate (0.22 by default, but 0.19-0.21 are supported via feature flags)
+  crate (latest by default, but earlier versions are supported via feature flags)
 * imgui-sys: Low-level unsafe API (automatically generated)
 
 ## Features

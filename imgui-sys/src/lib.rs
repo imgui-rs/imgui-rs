@@ -13,11 +13,11 @@ pub use crate::bindings::*;
 
 impl ImVec2 {
     #[inline]
-    pub fn new(x: f32, y: f32) -> ImVec2 {
+    pub const fn new(x: f32, y: f32) -> ImVec2 {
         ImVec2 { x, y }
     }
     #[inline]
-    pub fn zero() -> ImVec2 {
+    pub const fn zero() -> ImVec2 {
         ImVec2 { x: 0.0, y: 0.0 }
     }
 }
@@ -36,27 +36,27 @@ impl From<(f32, f32)> for ImVec2 {
     }
 }
 
-impl Into<[f32; 2]> for ImVec2 {
+impl From<ImVec2> for [f32; 2] {
     #[inline]
-    fn into(self) -> [f32; 2] {
-        [self.x, self.y]
+    fn from(v: ImVec2) -> [f32; 2] {
+        [v.x, v.y]
     }
 }
 
-impl Into<(f32, f32)> for ImVec2 {
+impl From<ImVec2> for (f32, f32) {
     #[inline]
-    fn into(self) -> (f32, f32) {
-        (self.x, self.y)
+    fn from(v: ImVec2) -> (f32, f32) {
+        (v.x, v.y)
     }
 }
 
 impl ImVec4 {
     #[inline]
-    pub fn new(x: f32, y: f32, z: f32, w: f32) -> ImVec4 {
+    pub const fn new(x: f32, y: f32, z: f32, w: f32) -> ImVec4 {
         ImVec4 { x, y, z, w }
     }
     #[inline]
-    pub fn zero() -> ImVec4 {
+    pub const fn zero() -> ImVec4 {
         ImVec4 {
             x: 0.0,
             y: 0.0,
@@ -80,17 +80,17 @@ impl From<(f32, f32, f32, f32)> for ImVec4 {
     }
 }
 
-impl Into<[f32; 4]> for ImVec4 {
+impl From<ImVec4> for [f32; 4] {
     #[inline]
-    fn into(self) -> [f32; 4] {
-        [self.x, self.y, self.z, self.w]
+    fn from(v: ImVec4) -> [f32; 4] {
+        [v.x, v.y, v.z, v.w]
     }
 }
 
-impl Into<(f32, f32, f32, f32)> for ImVec4 {
+impl From<ImVec4> for (f32, f32, f32, f32) {
     #[inline]
-    fn into(self) -> (f32, f32, f32, f32) {
-        (self.x, self.y, self.z, self.w)
+    fn from(v: ImVec4) -> (f32, f32, f32, f32) {
+        (v.x, v.y, v.z, v.w)
     }
 }
 

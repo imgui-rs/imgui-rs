@@ -7,29 +7,34 @@ pub struct TextureId(usize);
 
 impl TextureId {
     /// Creates a new texture id with the given identifier.
-    pub fn new(id: usize) -> Self {
+    #[inline]
+    pub const fn new(id: usize) -> Self {
         Self(id)
     }
 
     /// Returns the id of the TextureId.
-    pub fn id(self) -> usize {
+    #[inline]
+    pub const fn id(self) -> usize {
         self.0
     }
 }
 
 impl From<usize> for TextureId {
+    #[inline]
     fn from(id: usize) -> Self {
         TextureId(id)
     }
 }
 
 impl<T> From<*const T> for TextureId {
+    #[inline]
     fn from(ptr: *const T) -> Self {
         TextureId(ptr as usize)
     }
 }
 
 impl<T> From<*mut T> for TextureId {
+    #[inline]
     fn from(ptr: *mut T) -> Self {
         TextureId(ptr as usize)
     }
@@ -56,6 +61,8 @@ pub struct Textures<T> {
 }
 
 impl<T> Textures<T> {
+    // TODO: hasher like rustc_hash::FxHashMap or something would let this be
+    // `const fn`
     pub fn new() -> Self {
         Textures {
             textures: HashMap::new(),

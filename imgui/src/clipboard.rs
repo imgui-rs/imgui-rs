@@ -23,6 +23,7 @@ pub(crate) struct ClipboardContext {
 }
 
 impl ClipboardContext {
+    #[inline]
     pub fn new(backend: Box<dyn ClipboardBackend>) -> ClipboardContext {
         ClipboardContext {
             backend,

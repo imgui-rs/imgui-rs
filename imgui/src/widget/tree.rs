@@ -70,18 +70,21 @@ pub enum TreeNodeId<'a> {
 }
 
 impl<'a, T: ?Sized + AsRef<ImStr>> From<&'a T> for TreeNodeId<'a> {
+    #[inline]
     fn from(s: &'a T) -> Self {
         TreeNodeId::Str(s.as_ref())
     }
 }
 
 impl<T> From<*const T> for TreeNodeId<'static> {
+    #[inline]
     fn from(p: *const T) -> Self {
         TreeNodeId::Ptr(p as *const c_void)
     }
 }
 
 impl<T> From<*mut T> for TreeNodeId<'static> {
+    #[inline]
     fn from(p: *mut T) -> Self {
         TreeNodeId::Ptr(p as *const T as *const c_void)
     }
@@ -289,6 +292,7 @@ pub struct TreeNodeToken {
 
 impl TreeNodeToken {
     /// Pops a tree node
+    #[inline]
     pub fn pop(mut self, _: &Ui) {
         if !self.ctx.is_null() {
             self.ctx = ptr::null();

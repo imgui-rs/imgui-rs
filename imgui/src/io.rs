@@ -188,6 +188,10 @@ pub struct Io {
     pub config_mac_os_behaviors: bool,
     /// Set to false to disable blinking cursor
     pub config_input_text_cursor_blink: bool,
+    /// Enable turning DragXXX widgets into text input with a simple mouse
+    /// click-release (without moving). Not desirable on devices without a
+    /// keyboard.
+    pub config_drag_click_to_input_text: bool,
     /// Enable resizing of windows from their edges and from the lower-left corner.
     ///
     /// Requires `HasMouserCursors` in `backend_flags`, because it needs mouse cursor feedback.
@@ -196,10 +200,10 @@ pub struct Io {
     ///
     /// Windows without a title bar are not affected.
     pub config_windows_move_from_title_bar_only: bool,
-    /// Compact window memory usage when unused.
+    /// Compact memory usage when unused.
     ///
     /// Set to -1.0 to disable.
-    pub config_windows_memory_compact_timer: f32,
+    pub config_memory_compact_timer: f32,
 
     pub(crate) backend_platform_name: *const c_char,
     pub(crate) backend_renderer_name: *const c_char,
@@ -213,8 +217,6 @@ pub struct Io {
     pub(crate) clipboard_user_data: *mut c_void,
     ime_set_input_screen_pos_fn: Option<unsafe extern "C" fn(x: c_int, y: c_int)>,
     ime_window_handle: *mut c_void,
-    render_draw_lists_fn_unused: *mut c_void,
-
     /// Mouse position, in pixels.
     ///
     /// Set to [f32::MAX, f32::MAX] if mouse is unavailable (on another screen, etc.).
@@ -438,7 +440,6 @@ fn test_io_memory_layout() {
     assert_field_offset!(clipboard_user_data, ClipboardUserData);
     assert_field_offset!(ime_set_input_screen_pos_fn, ImeSetInputScreenPosFn);
     assert_field_offset!(ime_window_handle, ImeWindowHandle);
-    assert_field_offset!(render_draw_lists_fn_unused, RenderDrawListsFnUnused);
     assert_field_offset!(mouse_pos, MousePos);
     assert_field_offset!(mouse_down, MouseDown);
     assert_field_offset!(mouse_wheel, MouseWheel);

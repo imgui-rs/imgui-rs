@@ -48,6 +48,9 @@ ImVector_resize	2
 igBeginChild	2
 1	bool	igBeginChildStr (const char*,const ImVec2,bool,ImGuiWindowFlags)
 2	bool	igBeginChildID (ImGuiID,const ImVec2,bool,ImGuiWindowFlags)
+igCheckboxFlags	2
+1	bool	igCheckboxFlagsIntPtr (const char*,int*,int)
+2	bool	igCheckboxFlagsUintPtr (const char*,unsigned int*,unsigned int)
 igCollapsingHeader	2
 1	bool	igCollapsingHeaderTreeNodeFlags (const char*,ImGuiTreeNodeFlags)
 2	bool	igCollapsingHeaderBoolPtr (const char*,bool*,ImGuiTreeNodeFlags)
@@ -132,4 +135,4 @@ igValue	4
 2	void	igValueInt (const char*,int)
 3	void	igValueUint (const char*,unsigned int)
 4	void	igValueFloat (const char*,float,const char*)
-93 overloaded
+95 overloaded

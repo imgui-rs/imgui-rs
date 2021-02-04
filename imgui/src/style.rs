@@ -62,6 +62,8 @@ pub struct Style {
     /// Horizontal and vertical spacing between elements of a composed widget (e.g. a slider and
     /// its label)
     pub item_inner_spacing: [f32; 2],
+    /// Padding within a table cell.
+    pub cell_padding: [f32; 2],
     /// Expand reactive bounding box for touch-based system where touch position is not accurate
     /// enough.
     ///
@@ -144,7 +146,7 @@ pub struct Style {
     /// Decrease for higher quality but more geometry.
     pub circle_segment_max_error: f32,
     /// Style colors.
-    pub colors: [[f32; 4]; 48],
+    pub colors: [[f32; 4]; StyleColor::COUNT],
 }
 
 unsafe impl RawCast<sys::ImGuiStyle> for Style {}
@@ -182,12 +184,14 @@ impl Style {
 
 impl Index<StyleColor> for Style {
     type Output = [f32; 4];
+    #[inline]
     fn index(&self, index: StyleColor) -> &[f32; 4] {
         &self.colors[index as usize]
     }
 }
 
 impl IndexMut<StyleColor> for Style {
+    #[inline]
     fn index_mut(&mut self, index: StyleColor) -> &mut [f32; 4] {
         &mut self.colors[index as usize]
     }
@@ -243,6 +247,11 @@ pub enum StyleColor {
     PlotLinesHovered = sys::ImGuiCol_PlotLinesHovered,
     PlotHistogram = sys::ImGuiCol_PlotHistogram,
     PlotHistogramHovered = sys::ImGuiCol_PlotHistogramHovered,
+    TableHeaderBg = sys::ImGuiCol_TableHeaderBg,
+    TableBorderStrong = sys::ImGuiCol_TableBorderStrong,
+    TableBorderLight = sys::ImGuiCol_TableBorderLight,
+    TableRowBg = sys::ImGuiCol_TableRowBg,
+    TableRowBgAlt = sys::ImGuiCol_TableRowBgAlt,
     TextSelectedBg = sys::ImGuiCol_TextSelectedBg,
     DragDropTarget = sys::ImGuiCol_DragDropTarget,
     /// Gamepad/keyboard: current highlighted item
@@ -300,6 +309,11 @@ impl StyleColor {
         StyleColor::PlotLinesHovered,
         StyleColor::PlotHistogram,
         StyleColor::PlotHistogramHovered,
+        StyleColor::TableHeaderBg,
+        StyleColor::TableBorderStrong,
+        StyleColor::TableBorderLight,
+        StyleColor::TableRowBg,
+        StyleColor::TableRowBgAlt,
         StyleColor::TextSelectedBg,
         StyleColor::DragDropTarget,
         StyleColor::NavHighlight,

@@ -63,7 +63,8 @@ pub struct TabBar<'a> {
 }
 
 impl<'a> TabBar<'a> {
-    pub fn new(id: &'a ImStr) -> Self {
+    #[inline]
+    pub const fn new(id: &'a ImStr) -> Self {
         Self {
             id,
             flags: TabBarFlags::empty(),

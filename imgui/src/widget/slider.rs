@@ -182,7 +182,6 @@ pub struct AngleSlider<'a> {
 impl<'a> AngleSlider<'a> {
     /// Constructs a new angle slider builder.
     pub fn new(label: &ImStr) -> AngleSlider {
-        use crate::im_str;
         AngleSlider {
             label,
             min_degrees: -360.0,

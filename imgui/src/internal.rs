@@ -12,6 +12,7 @@ pub struct ImVector<T> {
 }
 
 impl<T> ImVector<T> {
+    #[inline]
     pub fn as_slice(&self) -> &[T] {
         unsafe { slice::from_raw_parts(self.data, self.size as usize) }
     }
@@ -71,6 +72,7 @@ pub unsafe trait RawCast<T>: Sized {
     /// # Safety
     ///
     /// It is up to the caller to guarantee the cast is valid.
+    #[inline]
     unsafe fn from_raw(raw: &T) -> &Self {
         &*(raw as *const _ as *const Self)
     }
@@ -79,6 +81,7 @@ pub unsafe trait RawCast<T>: Sized {
     /// # Safety
     ///
     /// It is up to the caller to guarantee the cast is valid.
+    #[inline]
     unsafe fn from_raw_mut(raw: &mut T) -> &mut Self {
         &mut *(raw as *mut _ as *mut Self)
     }
@@ -87,6 +90,7 @@ pub unsafe trait RawCast<T>: Sized {
     /// # Safety
     ///
     /// It is up to the caller to guarantee the cast is valid.
+    #[inline]
     unsafe fn raw(&self) -> &T {
         &*(self as *const _ as *const T)
     }
@@ -95,6 +99,7 @@ pub unsafe trait RawCast<T>: Sized {
     /// # Safety
     ///
     /// It is up to the caller to guarantee the cast is valid.
+    #[inline]
     unsafe fn raw_mut(&mut self) -> &mut T {
         &mut *(self as *mut _ as *mut T)
     }
@@ -182,27 +187,33 @@ pub trait InclusiveRangeBounds<T: Copy> {
 }
 
 impl<T: Copy> InclusiveRangeBounds<T> for RangeFrom<T> {
+    #[inline]
     fn start_bound(&self) -> Option<&T> {
         Some(&self.start)
     }
+    #[inline]
     fn end_bound(&self) -> Option<&T> {
         None
     }
 }
 
 impl<T: Copy> InclusiveRangeBounds<T> for RangeInclusive<T> {
+    #[inline]
     fn start_bound(&self) -> Option<&T> {
         Some(self.start())
     }
+    #[inline]
     fn end_bound(&self) -> Option<&T> {
         Some(self.end())
     }
 }
 
 impl<T: Copy> InclusiveRangeBounds<T> for RangeToInclusive<T> {
+    #[inline]
     fn start_bound(&self) -> Option<&T> {
         None
     }
+    #[inline]
     fn end_bound(&self) -> Option<&T> {
         Some(&self.end)
     }
