@@ -22,6 +22,12 @@
     - `Ui::get_background_draw_list()` has been fixed when used outside of a window context, and now has an example.
     - `Ui::get_foreground_draw_list()` has been added, analogous to `Ui::get_background_draw_list()`.
 
+- Added drag drop support, with a safe and an unsafe variant: https://github.com/imgui-rs/imgui-rs/pull/428
+    - `DragDropSource` allows users to create a dragdrop payload which is either empty, of `'static + Copy` data,
+    or `unsafe`, allowing for theoretically arbitrary payloads.
+    - `DragDropTarget` allows users to accept any of the above payloads.
+    - Extensive documentation has been made on all of these features, hopefully as a target for future features.
+
 ## [0.6.1] - 2020-12-16
 
 - Support for winit 0.24.x

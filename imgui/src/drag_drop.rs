@@ -1,3 +1,31 @@
+//! Structs to create a Drag and Drop sequence. Almost all structs are re-exported
+//! and can be accessed from the crate root; some additional utilities can be found in here.
+//!
+//! A DragDrop is a UI mechanism where users can appear to "drag"
+//! some data from one [source](DragDropSource) to one [target](DragDropTarget).
+//! A source and a target must both have some `name` identifier, which is declared when they
+//! are created. If these names are equal, then a `payload` of some kind
+//! will be given to the target caller whne the user releases their mouse button over
+//! the target (additionally, the UI will reflect that the payload *can* be deposited
+//! in the target).
+//!
+//! The complexity of this implementation is primarily in managing this payload. Users
+//! can provide three different kinds of payloads:
+//!
+//! 1.  Users can give an [empty payload](DragDropPayloadEmpty) with [begin](DragDropSource::begin).
+//!     This payload type is essentially just a notification system, but using some shared state,
+//!     this can be reasonably powerful, and is the safest way to transfer non-Copy data offered
+//!     right now.
+//! 2.  Users can give a [simple Copy payload](DragDropPayloadPod) with [begin](DragDropSource::begin_payload).
+//!     This allows users to copy data to Dear ImGui, which will take ownership over it, and then be given
+//!     it back to the Target. Please note: users are of course free to not drop any drag (cancel a drag),
+//!     so this data could easily be lost forever. Our `'static + Copy` bound is intended to keep users
+//!     to simplistic types.
+//! 3.  An unsafe implementation is provided which allows for any data to be unsafely copied. Note that once
+//!     you use this method, the safe implementations in #1 and #2 can create memory unsafety problems; notably,
+//!     they both assume that a payload has certain header information within it.
+//!
+//! For examples of each payload type, see [DragDropSource].
 use std::{any, ffi, marker::PhantomData};
 
 use crate::{sys, Condition, ImStr, Ui};
@@ -164,6 +192,36 @@ impl<'a> DragDropSource<'a> {
     /// This function also takes a payload in the form of `T: Copy + 'static`. ImGui will
     /// memcpy this data immediately to an internally held buffer, and will return the data
     /// to [DragDropTarget].
+    ///
+    /// ```no_run
+    /// # use imgui::*;
+    /// fn show_ui(ui: &Ui<'_>) {
+    ///     ui.button(im_str!("Drag me!"), [0.0, 0.0]);
+    ///
+    ///     let drag_drop_name = im_str!("Test Drag");
+    ///     let msg_to_send = "hello there sailor";
+    ///     
+    ///     // drag drop SOURCE
+    ///     if let Some(tooltip) = DragDropSource::new(drag_drop_name).begin_payload(ui, msg_to_send) {
+    ///         ui.text("Sending message!");
+    ///         tooltip.end();
+    ///     }
+    ///
+    ///     ui.button(im_str!("Target me!"), [0.0, 0.0]);
+    ///
+    ///     // drag drop TARGET
+    ///     if let Some(target) = imgui::DragDropTarget::new(ui) {
+    ///         if let Some(Ok(payload_data)) = target
+    ///             .accept_payload::<&'static str>(drag_drop_name, DragDropFlags::empty())
+    ///         {
+    ///             let msg = payload_data.data;
+    ///             assert_eq!(msg, msg_to_send);
+    ///         }
+    ///
+    ///         target.pop();
+    ///     }
+    /// }
+    /// ```
     #[inline]
     pub fn begin_payload<'ui, T: Copy + 'static>(
         self,
@@ -238,7 +296,7 @@ impl DragDropSourceToolTip<'_> {
     /// Ends the tooltip directly. You could choose to simply allow this to drop
     /// by not calling this, which will also be fine.
     #[inline]
-    pub fn pop(self) {
+    pub fn end(self) {
         // left empty to invoke drop...
     }
 }
@@ -415,11 +473,11 @@ impl Drop for DragDropTarget<'_> {
 #[derive(Debug, Clone, Copy)]
 #[non_exhaustive]
 pub struct DragDropPayloadEmpty {
-    /// Set when [`accept_payload_empty`](Self::accept_payload_empty) was called
+    /// Set when [`accept_payload_empty`](DragDropTarget::accept_payload_empty) was called
     /// and mouse has been hovering the target item.
     pub preview: bool,
 
-    /// Set when [`accept_payload_empty`](Self::accept_payload_empty) was
+    /// Set when [`accept_payload_empty`](DragDropTarget::accept_payload_empty) was
     /// called and mouse button is released over the target item.
     pub delivery: bool,
 }
@@ -432,11 +490,11 @@ pub struct DragDropPayloadPod<T: 'static + Copy> {
     /// The kind data which was requested.
     pub data: T,
 
-    /// Set when [`accept_payload`](Self::accept_payload) was called
+    /// Set when [`accept_payload`](DragDropTarget::accept_payload) was called
     /// and mouse has been hovering the target item.
     pub preview: bool,
 
-    /// Set when [`accept_payload`](Self::accept_payload) was
+    /// Set when [`accept_payload`](DragDropTarget::accept_payload) was
     /// called and mouse button is released over the target item.
     pub delivery: bool,
 }
@@ -452,16 +510,17 @@ pub struct DragDropPayload {
     /// The size of the data in bytes.
     pub size: usize,
 
-    /// Set when [`accept_payload_unchecked`](Self::accept_payload_unchecked) was called
+    /// Set when [`accept_payload_unchecked`](DragDropTarget::accept_payload_unchecked) was called
     /// and mouse has been hovering the target item.
     pub preview: bool,
 
-    /// Set when [`accept_payload_unchecked`](Self::accept_payload_unchecked) was
+    /// Set when [`accept_payload_unchecked`](DragDropTarget::accept_payload_unchecked) was
     /// called and mouse button is released over the target item. If this is set to false, then you
     /// set DragDropFlags::ACCEPT_BEFORE_DELIVERY and shouldn't mutate `data`.
     pub delivery: bool,
 }
 
+/// A typed payload.
 #[derive(Debug, Clone, Copy)]
 #[repr(C)]
 struct TypedPayload<T> {
@@ -469,7 +528,17 @@ struct TypedPayload<T> {
     data: T,
 }
 
-/// We have this struct separately to easily read it off in unsafe code.
+impl<T: Copy + 'static> TypedPayload<T> {
+    /// Creates a new typed payload which contains this data.
+    fn new(data: T) -> Self {
+        Self {
+            header: TypedPayloadHeader::new::<T>(),
+            data,
+        }
+    }
+}
+
+/// A header for a typed payload.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Ord, PartialOrd)]
 #[repr(C)]
 struct TypedPayloadHeader {
@@ -495,18 +564,9 @@ impl TypedPayloadHeader {
     }
 }
 
-impl<T: Copy + 'static> TypedPayload<T> {
-    /// Creates a new typed payload which contains this data.
-    pub fn new(data: T) -> Self {
-        Self {
-            header: TypedPayloadHeader::new::<T>(),
-            data,
-        }
-    }
-}
-
 /// Indicates that an incorrect payload type was received. It is opaque,
-/// but you can view questionably useful debug information with Debug formatting.
+/// but you can view useful information with Debug formatting when
+/// `debug_assertions` are enabled.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Ord, PartialOrd)]
 pub struct PayloadIsWrongType {
     expected: TypedPayloadHeader,
