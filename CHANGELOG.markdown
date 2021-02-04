@@ -24,6 +24,12 @@
     - `Ui::get_background_draw_list()` has been fixed when used outside of a window context, and now has an example.
     - `Ui::get_foreground_draw_list()` has been added, analogous to `Ui::get_background_draw_list()`.
 
+- Added drag drop support, with a safe and an unsafe variant: https://github.com/imgui-rs/imgui-rs/pull/428
+    - `DragDropSource` allows users to create a dragdrop payload which is either empty, of `'static + Copy` data,
+    or `unsafe`, allowing for theoretically arbitrary payloads.
+    - `DragDropTarget` allows users to accept any of the above payloads.
+    - Extensive documentation has been made on all of these features, hopefully as a target for future features.
+
 - `ImColor` (which is a wrapper around `u32`) has been renamed to `ImColor32` in order to avoid confusion with the `ImColor` type from the Dear ImGui C++ code (which is a wrapper around `ImVec4`). In the future an `ImColor` type which maps more closely to the C++ one will be added.
     - Additionally, a number of constructor and accessor methods have been added to it `ImColor`, which are `const fn` where possible.
 
