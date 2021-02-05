@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [0.7.0] - 2021-02-04
+
 - Upgrade to [Dear ImGui v1.80](https://github.com/ocornut/imgui/releases/tag/v1.80). (Note that the new table functionality is not yet supported, however)
 
 - `Ui::key_index()` is now called internally when needed, and the various `is_key_foo` now take a `Key` directly: https://github.com/imgui-rs/imgui-rs/pull/416
@@ -626,7 +628,8 @@ by setting the environment variable `WINIT_HIDPI_FACTOR=1` if you use X11.
 
 - Initial release with cimgui/imgui 1.44, glium 0.9
 
-[Unreleased]: https://github.com/Gekkio/imgui-rs/compare/v0.6.1...HEAD
+[Unreleased]: https://github.com/Gekkio/imgui-rs/compare/v0.7.0...HEAD
+[0.7.0]: https://github.com/Gekkio/imgui-rs/compare/v0.6.1...v0.7.0
 [0.6.1]: https://github.com/Gekkio/imgui-rs/compare/v0.6.0...v0.6.1
 [0.6.0]: https://github.com/Gekkio/imgui-rs/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/Gekkio/imgui-rs/compare/v0.4.0...v0.5.0
