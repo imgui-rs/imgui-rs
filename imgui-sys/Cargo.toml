@@ -14,7 +14,7 @@ links = "imgui"
 exclude = ["third-party/*.json", "third-party/*.lua", "third-party/imgui/*/"]
 
 [dependencies]
-cty = "0.2"
+chlorine = "1.0.7"
 
 [build-dependencies]
 cc = "1.0"

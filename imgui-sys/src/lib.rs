@@ -1,4 +1,25 @@
 #![no_std]
+// We use `chlorine` over (the more well known) `cty` right now since `cty`
+// doesn't fully match std::os::raw (leading to issues like
+// https://github.com/japaric/cty/issues/18). Chlorine *does* match std::os::raw
+// (and libc), but has a longer and more confusing name, so we just alias it.
+// Also, this makes it easier to switch to something else/back easier, if we
+// decide to.
+//
+// Note that with the exception of bugs like the above, which crate we use (cty,
+// chlorine, libc, std::os::raw, ...) shouldn't matter to end user code¹, since
+// these are type aliases that should all be equivalent. This means that we're
+// free to switch back iff the bug is fixed, and users are free to use whichever
+// they prefer regardless of what we chose.
+//
+// (TODO: using extern crate for this is a hack, we probably should replace this
+// with `use chlorine as cty` in the binding files eventually, but lets punt on
+// it for a bit)
+//
+// ¹ The exception to this is that `std::os::raw` isn't there for `no_std`, and
+// `libc` has potentially undesirable linking impacts on windows.
+extern crate chlorine as cty;
+
 #[cfg(feature = "wasm")]
 mod wasm_bindings;
 
