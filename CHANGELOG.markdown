@@ -59,13 +59,15 @@
 - Avoid dropping mouse events when press/release are on the same frame (macos)
 - Substantial repository layout reorganization
 
-### Caveat: Semver broken in 0.6.1
+### Caveat: Semver broken in 0.6.1 in `imgui-winit-support`
+
+*Note from the future: `imgui-winit-support@0.6.1` has been yanked. I don't believe the breakage impacted the other crates so I'm leaving those to avoid impacting non-`winit` usages.*
 
 This release accidentally broke semver, and should have been 0.7.0. It will be yanked when 0.7.0 is released, unless there are objections.
 
 This happened when updating the glium/winit/glium versions, adding support for winit `0.24` and related. Unfortunately, while an attempt to avoid breakage was made, it happened regardless. This mainly happened as it was the holidays and not enough attention was paid to the changes in an urgent-sounding request for supporting the new version, and more care will be taken in the future to avoid cutting a hasty release without adequate testing.
 
-As mentioned, this release will be yanked once 0.7.0 is released, but not before, so that users who need 0.24 support are still able to use imgui until then.
+As mentioned, the 0.6.1 release of `imgui-winit-support` has been yanked.
 
 ## [0.6.0] - 2020-11-15
 
