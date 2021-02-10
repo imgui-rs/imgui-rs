@@ -113,7 +113,7 @@ impl FontGlyphRanges {
 
     /// Creates a glyph range from a static slice without checking its validity.
     ///
-    /// See [`FontRangeGlyph::from_slice`] for more information.
+    /// See [`FontGlyphRanges::from_slice`] for more information.
     ///
     /// # Safety
     ///
