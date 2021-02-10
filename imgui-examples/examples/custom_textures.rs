@@ -164,7 +164,7 @@ impl CustomTexturesApp {
                             // Tint brighter for visiblity of corners
                             .col([2.0, 0.5, 0.5, 1.0])
                             // Rounding on each corner can be changed separately
-                            .round_top_left((ui.frame_count() + 0) / 60 % 4 == 0)
+                            .round_top_left(ui.frame_count() / 60 % 4 == 0)
                             .round_top_right((ui.frame_count() + 1) / 60 % 4 == 1)
                             .round_bot_right((ui.frame_count() + 3) / 60 % 4 == 2)
                             .round_bot_left((ui.frame_count() + 2) / 60 % 4 == 3)
