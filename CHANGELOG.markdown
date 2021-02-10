@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Removed legacy `ImGuiDragDropFlags` from `legacy.rs`, which were accidentally not cleared when they were remade in `drag_drop.rs` in v0.7.0.
+
 ## [0.7.0] - 2021-02-04
 
 - Upgrade to [Dear ImGui v1.80](https://github.com/ocornut/imgui/releases/tag/v1.80). (Note that the new table functionality is not yet supported, however)
