@@ -262,23 +262,13 @@ impl<'ui> DrawListMut<'ui> {
     /// ```
     /// # use imgui::*;
     /// fn custom_button(ui: &Ui, img_id: TextureId) {
-    ///     // Tint image red
-    ///
-    ///     // Invisible button is good widget to customise with custom image
+    ///     // Invisible button is good widget to customise with image
     ///     ui.invisible_button(im_str!("custom_button"), [100.0, 20.0]);
-    ///
-    ///     // Red tint when button is hovered, no tint otherwise
-    ///     let overlay_color = if ui.is_item_hovered() {
-    ///         [1.0, 0.6, 0.6, 1.0]
-    ///     } else {
-    ///         [1.0, 1.0, 1.0, 1.0]
-    ///     };
     ///
     ///     // Get draw list and draw image over invisible button
     ///     let draw_list = ui.get_window_draw_list();
     ///     draw_list
     ///         .add_image(img_id, ui.item_rect_min(), ui.item_rect_max())
-    ///         .col(overlay_color)
     ///         .build();
     /// }
     /// ```
