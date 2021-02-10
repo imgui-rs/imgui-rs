@@ -912,7 +912,7 @@ impl<'ui> ImageRounded<'ui> {
                 self.uv_min.into(),
                 self.uv_max.into(),
                 self.col.into(),
-                self.rounding.into(),
+                self.rounding,
                 self.rounding_corners.bits(),
             );
         }
