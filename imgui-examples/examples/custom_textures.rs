@@ -79,7 +79,7 @@ impl CustomTexturesApp {
 
     fn show_textures(&self, ui: &Ui) {
         Window::new(im_str!("Hello textures"))
-            .size([400.0, 600.0], Condition::FirstUseEver)
+            .size([400.0, 400.0], Condition::FirstUseEver)
             .build(ui, || {
                 ui.text(im_str!("Hello textures!"));
                 if let Some(my_texture_id) = self.my_texture_id {
@@ -90,6 +90,89 @@ impl CustomTexturesApp {
                 if let Some(lenna) = &self.lenna {
                     ui.text("Say hello to Lenna.jpg");
                     lenna.show(ui);
+                }
+
+                // Example of using custom textures on a button
+                if let Some(lenna) = &self.lenna {
+                    ui.text("The Lenna buttons");
+
+                    {
+                        let _is_clicked =
+                            ui.invisible_button(im_str!("Boring Button"), [100.0, 100.0]);
+                        // See also `imgui::Ui::style_color`
+                        let tint_none = [1.0, 1.0, 1.0, 1.0];
+                        let tint_green = [0.5, 1.0, 0.5, 1.0];
+                        let tint_red = [1.0, 0.5, 0.5, 1.0];
+
+                        let tint = match (
+                            ui.is_item_hovered(),
+                            ui.is_mouse_down(imgui::MouseButton::Left),
+                        ) {
+                            (false, false) => tint_none,
+                            (false, true) => tint_none,
+                            (true, false) => tint_green,
+                            (true, true) => tint_red,
+                        };
+
+                        let draw_list = ui.get_window_draw_list();
+                        draw_list
+                            .add_image(lenna.texture_id, ui.item_rect_min(), ui.item_rect_max())
+                            .col(tint)
+                            .build();
+                    }
+
+                    {
+                        ui.same_line(0.0);
+
+                        // Button using quad positioned image
+                        let is_clicked =
+                            ui.invisible_button(im_str!("Exciting Button"), [100.0, 100.0]);
+
+                        // Button bounds
+                        let min = ui.item_rect_min();
+                        let max = ui.item_rect_max();
+
+                        // get corner coordinates
+                        let tl = [
+                            min[0],
+                            min[1] + (ui.frame_count() as f32 / 10.0).cos() * 10.0,
+                        ];
+                        let tr = [
+                            max[0],
+                            min[1] + (ui.frame_count() as f32 / 10.0).sin() * 10.0,
+                        ];
+                        let bl = [min[0], max[1]];
+                        let br = max;
+
+                        let draw_list = ui.get_window_draw_list();
+                        draw_list
+                            .add_image_quad(lenna.texture_id, tl, tr, br, bl)
+                            .build();
+                    }
+
+                    // Rounded image
+                    {
+                        ui.same_line(0.0);
+                        let is_clicked =
+                            ui.invisible_button(im_str!("Smooth Button"), [100.0, 100.0]);
+
+                        let draw_list = ui.get_window_draw_list();
+                        draw_list
+                            .add_image_rounded(
+                                lenna.texture_id,
+                                ui.item_rect_min(),
+                                ui.item_rect_max(),
+                                16.0,
+                            )
+                            // Tint brighter for visiblity of corners
+                            .col([2.0, 0.5, 0.5, 1.0])
+                            // Rounding on each corner can be changed separately
+                            .round_top_left((ui.frame_count()+0) / 60 % 4 == 0)
+                            .round_top_right((ui.frame_count()+1) / 60 % 4 == 1)
+                            .round_bot_right((ui.frame_count()+3) / 60 % 4 == 2)
+                            .round_bot_left((ui.frame_count()+2) / 60 % 4 == 3)
+                            .build();
+                    }
                 }
             });
     }
