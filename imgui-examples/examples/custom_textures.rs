@@ -97,8 +97,7 @@ impl CustomTexturesApp {
                     ui.text("The Lenna buttons");
 
                     {
-                        let _is_clicked =
-                            ui.invisible_button(im_str!("Boring Button"), [100.0, 100.0]);
+                        ui.invisible_button(im_str!("Boring Button"), [100.0, 100.0]);
                         // See also `imgui::Ui::style_color`
                         let tint_none = [1.0, 1.0, 1.0, 1.0];
                         let tint_green = [0.5, 1.0, 0.5, 1.0];
@@ -125,8 +124,7 @@ impl CustomTexturesApp {
                         ui.same_line(0.0);
 
                         // Button using quad positioned image
-                        let is_clicked =
-                            ui.invisible_button(im_str!("Exciting Button"), [100.0, 100.0]);
+                        ui.invisible_button(im_str!("Exciting Button"), [100.0, 100.0]);
 
                         // Button bounds
                         let min = ui.item_rect_min();
@@ -153,8 +151,7 @@ impl CustomTexturesApp {
                     // Rounded image
                     {
                         ui.same_line(0.0);
-                        let is_clicked =
-                            ui.invisible_button(im_str!("Smooth Button"), [100.0, 100.0]);
+                        ui.invisible_button(im_str!("Smooth Button"), [100.0, 100.0]);
 
                         let draw_list = ui.get_window_draw_list();
                         draw_list
