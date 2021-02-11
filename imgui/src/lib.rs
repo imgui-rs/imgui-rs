@@ -25,7 +25,6 @@ pub use self::input_widget::{
 };
 pub use self::io::*;
 pub use self::layout::*;
-pub use self::legacy::*;
 pub use self::list_clipper::ListClipper;
 pub use self::plothistogram::PlotHistogram;
 pub use self::plotlines::PlotLines;
@@ -66,7 +65,6 @@ mod input_widget;
 pub mod internal;
 mod io;
 mod layout;
-mod legacy;
 mod list_clipper;
 mod plothistogram;
 mod plotlines;
