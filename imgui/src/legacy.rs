@@ -5,37 +5,6 @@ use std::os::raw::c_int;
 use crate::widget::tree::TreeNodeFlags;
 
 bitflags!(
-    /// Flags for indictating which corner of a rectangle should be rounded
-    #[repr(C)]
-    pub struct ImDrawCornerFlags: c_int {
-        const TopLeft = 1;
-        const TopRight = 1 << 1;
-        const BotLeft = 1 << 2;
-        const BotRight = 1 << 3;
-        const Top = ImDrawCornerFlags::TopLeft.bits
-            | ImDrawCornerFlags::TopRight.bits;
-        const Bot = ImDrawCornerFlags::BotLeft.bits
-            | ImDrawCornerFlags::BotRight.bits;
-        const Left = ImDrawCornerFlags::TopLeft.bits
-            | ImDrawCornerFlags::BotLeft.bits;
-        const Right = ImDrawCornerFlags::TopRight.bits
-            | ImDrawCornerFlags::BotRight.bits;
-        const All = 0xF;
-    }
-);
-
-bitflags!(
-    /// Draw list flags
-    #[repr(C)]
-    pub struct ImDrawListFlags: c_int {
-        const AntiAliasedLines = 1;
-        const AntiAliasedLinesUseTex = 1 << 1;
-        const AntiAliasedFill = 1 << 2;
-        const AllowVtxOffset = 1 << 3;
-    }
-);
-
-bitflags!(
     /// Flags for text inputs
     #[repr(C)]
     pub struct ImGuiInputTextFlags: c_int {

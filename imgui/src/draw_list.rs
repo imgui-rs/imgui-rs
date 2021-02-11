@@ -1,11 +1,48 @@
+use bitflags::bitflags;
+
 use crate::ImColor32;
 use sys::ImDrawList;
 
 use super::Ui;
-use crate::legacy::ImDrawCornerFlags;
 use crate::render::renderer::TextureId;
 
 use std::marker::PhantomData;
+
+bitflags!(
+    /// Flags for indictating which corner of a rectangle should be rounded
+    #[repr(C)]
+    pub struct CornerFlags: u32 {
+        const NONE = sys::ImDrawCornerFlags_None;
+        const TOP_LEFT = sys::ImDrawCornerFlags_TopLeft;
+        const TOP_RIGHT = sys::ImDrawCornerFlags_TopRight;
+        const BOT_LEFT = sys::ImDrawCornerFlags_BotLeft;
+        const BOT_RIGHT = sys::ImDrawCornerFlags_BotRight;
+        const TOP = sys::ImDrawCornerFlags_Top;
+        const BOT = sys::ImDrawCornerFlags_Bot;
+        const LEFT = sys::ImDrawCornerFlags_Left;
+        const RIGHT = sys::ImDrawCornerFlags_Right;
+        const ALL = sys::ImDrawCornerFlags_All;
+    }
+);
+
+bitflags!(
+    /// Draw list flags
+    #[repr(C)]
+    pub struct DrawListFlags: u32 {
+        const NONE = sys::ImDrawListFlags_None;
+        /// Enable anti-aliased lines/borders (*2 the number of triangles for 1.0f wide line or lines
+        /// thin enough to be drawn using textures, otherwise *3 the number of triangles)
+        const ANTI_ALIASED_LINES = sys::ImDrawListFlags_AntiAliasedLines;
+        /// Enable anti-aliased lines/borders using textures when possible. Require backend to render
+        /// with bilinear filtering.
+        const ANTI_ALIASED_LINES_USE_TEX = sys::ImDrawListFlags_AntiAliasedLinesUseTex;
+        /// Enable anti-aliased edge around filled shapes (rounded rectangles, circles).
+        const ANTI_ALIASED_FILL = sys::ImDrawListFlags_AntiAliasedFill;
+        /// Can emit 'VtxOffset > 0' to allow large meshes. Set when
+        /// [`BackendFlags::RENDERER_HAS_VTX_OFFSET`] is enabled.
+        const ALLOW_VTX_OFFSET = sys::ImDrawListFlags_AllowVtxOffset;
+    }
+);
 
 /// Object implementing the custom draw API.
 ///
@@ -353,7 +390,7 @@ pub struct Rect<'ui> {
     p2: [f32; 2],
     color: ImColor32,
     rounding: f32,
-    flags: ImDrawCornerFlags,
+    flags: CornerFlags,
     thickness: f32,
     filled: bool,
     draw_list: &'ui DrawListMut<'ui>,
@@ -369,7 +406,7 @@ impl<'ui> Rect<'ui> {
             p2,
             color: c.into(),
             rounding: 0.0,
-            flags: ImDrawCornerFlags::All,
+            flags: CornerFlags::ALL,
             thickness: 1.0,
             filled: false,
             draw_list,
@@ -385,25 +422,25 @@ impl<'ui> Rect<'ui> {
 
     /// Set flag to indicate if rectangle's top-left corner will be rounded.
     pub fn round_top_left(mut self, value: bool) -> Self {
-        self.flags.set(ImDrawCornerFlags::TopLeft, value);
+        self.flags.set(CornerFlags::TOP_LEFT, value);
         self
     }
 
     /// Set flag to indicate if rectangle's top-right corner will be rounded.
     pub fn round_top_right(mut self, value: bool) -> Self {
-        self.flags.set(ImDrawCornerFlags::TopRight, value);
+        self.flags.set(CornerFlags::TOP_RIGHT, value);
         self
     }
 
     /// Set flag to indicate if rectangle's bottom-left corner will be rounded.
     pub fn round_bot_left(mut self, value: bool) -> Self {
-        self.flags.set(ImDrawCornerFlags::BotLeft, value);
+        self.flags.set(CornerFlags::BOT_LEFT, value);
         self
     }
 
     /// Set flag to indicate if rectangle's bottom-right corner will be rounded.
     pub fn round_bot_right(mut self, value: bool) -> Self {
-        self.flags.set(ImDrawCornerFlags::BotRight, value);
+        self.flags.set(CornerFlags::BOT_RIGHT, value);
         self
     }
 
@@ -429,7 +466,7 @@ impl<'ui> Rect<'ui> {
                     self.p2.into(),
                     self.color.into(),
                     self.rounding,
-                    self.flags.bits(),
+                    self.flags.bits() as i32,
                 );
             }
         } else {
@@ -440,7 +477,7 @@ impl<'ui> Rect<'ui> {
                     self.p2.into(),
                     self.color.into(),
                     self.rounding,
-                    self.flags.bits(),
+                    self.flags.bits() as i32,
                     self.thickness,
                 );
             }
@@ -822,7 +859,7 @@ pub struct ImageRounded<'ui> {
     uv_max: [f32; 2],
     col: ImColor32,
     rounding: f32,
-    rounding_corners: ImDrawCornerFlags,
+    rounding_corners: CornerFlags,
     draw_list: &'ui DrawListMut<'ui>,
 }
 
@@ -842,7 +879,7 @@ impl<'ui> ImageRounded<'ui> {
             uv_max: [1.0, 1.0],
             col: [1.0, 1.0, 1.0, 1.0].into(),
             rounding,
-            rounding_corners: ImDrawCornerFlags::All,
+            rounding_corners: CornerFlags::ALL,
             draw_list,
         }
     }
@@ -869,33 +906,31 @@ impl<'ui> ImageRounded<'ui> {
 
     /// Set flag to indicate rounding on all all corners.
     pub fn round_all(mut self, value: bool) -> Self {
-        self.rounding_corners.set(ImDrawCornerFlags::All, value);
+        self.rounding_corners.set(CornerFlags::ALL, value);
         self
     }
 
     /// Set flag to indicate if image's top-left corner will be rounded.
     pub fn round_top_left(mut self, value: bool) -> Self {
-        self.rounding_corners.set(ImDrawCornerFlags::TopLeft, value);
+        self.rounding_corners.set(CornerFlags::TOP_LEFT, value);
         self
     }
 
     /// Set flag to indicate if image's top-right corner will be rounded.
     pub fn round_top_right(mut self, value: bool) -> Self {
-        self.rounding_corners
-            .set(ImDrawCornerFlags::TopRight, value);
+        self.rounding_corners.set(CornerFlags::TOP_RIGHT, value);
         self
     }
 
     /// Set flag to indicate if image's bottom-left corner will be rounded.
     pub fn round_bot_left(mut self, value: bool) -> Self {
-        self.rounding_corners.set(ImDrawCornerFlags::BotLeft, value);
+        self.rounding_corners.set(CornerFlags::BOT_LEFT, value);
         self
     }
 
     /// Set flag to indicate if image's bottom-right corner will be rounded.
     pub fn round_bot_right(mut self, value: bool) -> Self {
-        self.rounding_corners
-            .set(ImDrawCornerFlags::BotRight, value);
+        self.rounding_corners.set(CornerFlags::BOT_RIGHT, value);
         self
     }
 
@@ -913,7 +948,7 @@ impl<'ui> ImageRounded<'ui> {
                 self.uv_max.into(),
                 self.col.into(),
                 self.rounding,
-                self.rounding_corners.bits(),
+                self.rounding_corners.bits() as i32,
             );
         }
     }
