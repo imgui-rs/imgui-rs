@@ -159,6 +159,7 @@ extern "C" fn resize_callback(data: *mut sys::ImGuiInputTextCallbackData) -> c_i
 #[must_use]
 pub struct InputText<'ui, 'p> {
     label: &'p ImStr,
+    hint: Option<&'p ImStr>,
     buf: &'p mut ImString,
     flags: ImGuiInputTextFlags,
     _phantom: PhantomData<&'ui Ui<'ui>>,
@@ -168,10 +169,18 @@ impl<'ui, 'p> InputText<'ui, 'p> {
     pub fn new(_: &Ui<'ui>, label: &'p ImStr, buf: &'p mut ImString) -> Self {
         InputText {
             label,
+            hint: None,
             buf,
             flags: ImGuiInputTextFlags::empty(),
             _phantom: PhantomData,
         }
+    }
+
+    /// Sets the hint displayed in the input text background.
+    #[inline]
+    pub fn hint(mut self, hint: &'p ImStr) -> Self {
+        self.hint = Some(hint);
+        self
     }
 
     impl_text_flags!(InputText);
@@ -190,14 +199,26 @@ impl<'ui, 'p> InputText<'ui, 'p> {
         };
 
         unsafe {
-            let result = sys::igInputText(
-                self.label.as_ptr(),
-                ptr,
-                capacity,
-                self.flags.bits(),
-                callback,
-                data,
-            );
+            let result = if let Some(hint) = self.hint {
+                sys::igInputTextWithHint(
+                    self.label.as_ptr(),
+                    hint.as_ptr(),
+                    ptr,
+                    capacity,
+                    self.flags.bits(),
+                    callback,
+                    data,
+                )
+            } else {
+                sys::igInputText(
+                    self.label.as_ptr(),
+                    ptr,
+                    capacity,
+                    self.flags.bits(),
+                    callback,
+                    data,
+                )
+            };
             self.buf.refresh_len();
             result
         }
