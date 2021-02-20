@@ -58,7 +58,7 @@ pub mod color;
 mod columns;
 mod context;
 pub mod drag_drop;
-mod draw_list;
+pub mod draw_list;
 mod fonts;
 mod input;
 mod input_widget;
