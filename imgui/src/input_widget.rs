@@ -1,7 +1,7 @@
+use bitflags::bitflags;
 use std::marker::PhantomData;
 use std::os::raw::{c_int, c_void};
 use std::ptr;
-use bitflags::bitflags;
 
 use crate::sys;
 use crate::{ImStr, ImString, Ui};
@@ -98,8 +98,7 @@ macro_rules! impl_text_flags {
 
         #[inline]
         pub fn callback_completion(mut self, value: bool) -> Self {
-            self.flags
-                .set(InputTextFlags::CALLBACK_COMPLETION, value);
+            self.flags.set(InputTextFlags::CALLBACK_COMPLETION, value);
             self
         }
 
@@ -117,8 +116,7 @@ macro_rules! impl_text_flags {
 
         #[inline]
         pub fn callback_char_filter(mut self, value: bool) -> Self {
-            self.flags
-                .set(InputTextFlags::CALLBACK_CHAR_FILTER, value);
+            self.flags.set(InputTextFlags::CALLBACK_CHAR_FILTER, value);
             self
         }
 
@@ -136,8 +134,7 @@ macro_rules! impl_text_flags {
 
         #[inline]
         pub fn no_horizontal_scroll(mut self, value: bool) -> Self {
-            self.flags
-                .set(InputTextFlags::NO_HORIZONTAL_SCROLL, value);
+            self.flags.set(InputTextFlags::NO_HORIZONTAL_SCROLL, value);
             self
         }
 
