@@ -309,8 +309,8 @@ impl<'ui> DrawListMut<'ui> {
     ///         .build();
     /// }
     /// ```
-    pub fn add_image(&'ui self, texture_id: TextureId, p_min: [f32; 2], p_max: [f32; 2]) -> Image {
-        Image::new(self, texture_id, p_min, p_max)
+    pub fn add_image(&'ui self, texture_id: TextureId, p_min: [f32; 2], p_max: [f32; 2]) -> DrawListImage {
+        DrawListImage::new(self, texture_id, p_min, p_max)
     }
 
     /// Draw the specified image to a quad with the specified
@@ -323,8 +323,8 @@ impl<'ui> DrawListMut<'ui> {
         p2: [f32; 2],
         p3: [f32; 2],
         p4: [f32; 2],
-    ) -> ImageQuad {
-        ImageQuad::new(self, texture_id, p1, p2, p3, p4)
+    ) -> DrawListImageQuad {
+        DrawListImageQuad::new(self, texture_id, p1, p2, p3, p4)
     }
 
     /// Draw the speciied image, with rounded corners
@@ -334,8 +334,8 @@ impl<'ui> DrawListMut<'ui> {
         p_min: [f32; 2],
         p_max: [f32; 2],
         rounding: f32,
-    ) -> ImageRounded {
-        ImageRounded::new(self, texture_id, p_min, p_max, rounding)
+    ) -> DrawListImageRounded {
+        DrawListImageRounded::new(self, texture_id, p_min, p_max, rounding)
     }
 }
 
@@ -696,7 +696,7 @@ impl<'ui> BezierCurve<'ui> {
 
 /// Represents a image about to be drawn
 #[must_use = "should call .build() to draw the object"]
-pub struct Image<'ui> {
+pub struct DrawListImage<'ui> {
     texture_id: TextureId,
     p_min: [f32; 2],
     p_max: [f32; 2],
@@ -706,8 +706,9 @@ pub struct Image<'ui> {
     draw_list: &'ui DrawListMut<'ui>,
 }
 
-impl<'ui> Image<'ui> {
-    fn new(
+impl<'ui> DrawListImage<'ui> {
+    /// Typically constructed by [`DrawListMut::add_image`]
+    pub fn new(
         draw_list: &'ui DrawListMut,
         texture_id: TextureId,
         p_min: [f32; 2],
@@ -764,7 +765,7 @@ impl<'ui> Image<'ui> {
 
 /// Represents a image about to be drawn
 #[must_use = "should call .build() to draw the object"]
-pub struct ImageQuad<'ui> {
+pub struct DrawListImageQuad<'ui> {
     texture_id: TextureId,
     p1: [f32; 2],
     p2: [f32; 2],
@@ -778,8 +779,9 @@ pub struct ImageQuad<'ui> {
     draw_list: &'ui DrawListMut<'ui>,
 }
 
-impl<'ui> ImageQuad<'ui> {
-    fn new(
+impl<'ui> DrawListImageQuad<'ui> {
+    /// Typically constructed by [`DrawListMut::add_image_quad`]
+    pub fn new(
         draw_list: &'ui DrawListMut,
         texture_id: TextureId,
         p1: [f32; 2],
@@ -849,9 +851,10 @@ impl<'ui> ImageQuad<'ui> {
     }
 }
 
-/// Represents a image about to be drawn
+/// Represents a image about to be drawn. Similar to [`DrawListImage`] but
+/// with corners rounded with a given radius
 #[must_use = "should call .build() to draw the object"]
-pub struct ImageRounded<'ui> {
+pub struct DrawListImageRounded<'ui> {
     texture_id: TextureId,
     p_min: [f32; 2],
     p_max: [f32; 2],
@@ -863,8 +866,9 @@ pub struct ImageRounded<'ui> {
     draw_list: &'ui DrawListMut<'ui>,
 }
 
-impl<'ui> ImageRounded<'ui> {
-    fn new(
+impl<'ui> DrawListImageRounded<'ui> {
+    /// Typically constructed by [`DrawListMut::add_image_rounded`]
+    pub fn new(
         draw_list: &'ui DrawListMut,
         texture_id: TextureId,
         p_min: [f32; 2],
