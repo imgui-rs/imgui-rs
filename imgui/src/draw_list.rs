@@ -1,3 +1,18 @@
+//! The draw list lets you create custom graphics with a window.
+//!
+//! Each dear imgui window contains its own draw list. You can use
+//! [`Ui::get_window_draw_list`] to access the current window draw
+//! list and draw custom primitives. You can interleave normal widget
+//! calls and adding primitives to the current draw list.
+//!
+//! Interaction is mostly through the mtehods [`DrawListMut`] struct,
+//! such as [`DrawListMut::add_line`], however you can also construct
+//!  structs like [`DrawListLine`] directly, then call
+//!  `DrawListLine::build` with a reference to your draw list
+//!
+//! There are examples such as `draw_list.rs` and `custom_textures.rs`
+//! within the `imgui-examples` directory
+
 use bitflags::bitflags;
 
 use crate::ImColor32;
