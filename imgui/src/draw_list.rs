@@ -158,20 +158,20 @@ impl<'ui> ChannelsSplit<'ui> {
 /// Drawing functions
 impl<'ui> DrawListMut<'ui> {
     /// Returns a line from point `p1` to `p2` with color `c`.
-    pub fn add_line<C>(&'ui self, p1: [f32; 2], p2: [f32; 2], c: C) -> Line<'ui>
+    pub fn add_line<C>(&'ui self, p1: [f32; 2], p2: [f32; 2], c: C) -> DrawListLine<'ui>
     where
         C: Into<ImColor32>,
     {
-        Line::new(self, p1, p2, c)
+        DrawListLine::new(self, p1, p2, c)
     }
 
     /// Returns a rectangle whose upper-left corner is at point `p1`
     /// and lower-right corner is at point `p2`, with color `c`.
-    pub fn add_rect<C>(&'ui self, p1: [f32; 2], p2: [f32; 2], c: C) -> Rect<'ui>
+    pub fn add_rect<C>(&'ui self, p1: [f32; 2], p2: [f32; 2], c: C) -> DrawListRect<'ui>
     where
         C: Into<ImColor32>,
     {
-        Rect::new(self, p1, p2, c)
+        DrawListRect::new(self, p1, p2, c)
     }
 
     /// Draw a rectangle whose upper-left corner is at point `p1`
@@ -214,19 +214,19 @@ impl<'ui> DrawListMut<'ui> {
         p2: [f32; 2],
         p3: [f32; 2],
         c: C,
-    ) -> Triangle<'ui>
+    ) -> DrawListTriangle<'ui>
     where
         C: Into<ImColor32>,
     {
-        Triangle::new(self, p1, p2, p3, c)
+        DrawListTriangle::new(self, p1, p2, p3, c)
     }
 
     /// Returns a circle with the given `center`, `radius` and `color`.
-    pub fn add_circle<C>(&'ui self, center: [f32; 2], radius: f32, color: C) -> Circle<'ui>
+    pub fn add_circle<C>(&'ui self, center: [f32; 2], radius: f32, color: C) -> DrawListCircle<'ui>
     where
         C: Into<ImColor32>,
     {
-        Circle::new(self, center, radius, color)
+        DrawListCircle::new(self, center, radius, color)
     }
 
     /// Draw a text whose upper-left corner is at point `pos`.
@@ -254,11 +254,11 @@ impl<'ui> DrawListMut<'ui> {
         cp1: [f32; 2],
         pos1: [f32; 2],
         color: C,
-    ) -> BezierCurve<'ui>
+    ) -> DrawListBezierCurve<'ui>
     where
         C: Into<ImColor32>,
     {
-        BezierCurve::new(self, pos0, cp0, cp1, pos1, color)
+        DrawListBezierCurve::new(self, pos0, cp0, cp1, pos1, color)
     }
 
     /// Push a clipping rectangle on the stack, run `f` and pop it.
@@ -341,7 +341,7 @@ impl<'ui> DrawListMut<'ui> {
 
 /// Represents a line about to be drawn
 #[must_use = "should call .build() to draw the object"]
-pub struct Line<'ui> {
+pub struct DrawListLine<'ui> {
     p1: [f32; 2],
     p2: [f32; 2],
     color: ImColor32,
@@ -349,7 +349,7 @@ pub struct Line<'ui> {
     draw_list: &'ui DrawListMut<'ui>,
 }
 
-impl<'ui> Line<'ui> {
+impl<'ui> DrawListLine<'ui> {
     fn new<C>(draw_list: &'ui DrawListMut, p1: [f32; 2], p2: [f32; 2], c: C) -> Self
     where
         C: Into<ImColor32>,
@@ -385,7 +385,7 @@ impl<'ui> Line<'ui> {
 
 /// Represents a rectangle about to be drawn
 #[must_use = "should call .build() to draw the object"]
-pub struct Rect<'ui> {
+pub struct DrawListRect<'ui> {
     p1: [f32; 2],
     p2: [f32; 2],
     color: ImColor32,
@@ -396,7 +396,7 @@ pub struct Rect<'ui> {
     draw_list: &'ui DrawListMut<'ui>,
 }
 
-impl<'ui> Rect<'ui> {
+impl<'ui> DrawListRect<'ui> {
     fn new<C>(draw_list: &'ui DrawListMut, p1: [f32; 2], p2: [f32; 2], c: C) -> Self
     where
         C: Into<ImColor32>,
@@ -487,7 +487,7 @@ impl<'ui> Rect<'ui> {
 
 /// Represents a triangle about to be drawn on the window
 #[must_use = "should call .build() to draw the object"]
-pub struct Triangle<'ui> {
+pub struct DrawListTriangle<'ui> {
     p1: [f32; 2],
     p2: [f32; 2],
     p3: [f32; 2],
@@ -497,7 +497,7 @@ pub struct Triangle<'ui> {
     draw_list: &'ui DrawListMut<'ui>,
 }
 
-impl<'ui> Triangle<'ui> {
+impl<'ui> DrawListTriangle<'ui> {
     fn new<C>(draw_list: &'ui DrawListMut, p1: [f32; 2], p2: [f32; 2], p3: [f32; 2], c: C) -> Self
     where
         C: Into<ImColor32>,
@@ -554,7 +554,7 @@ impl<'ui> Triangle<'ui> {
 
 /// Represents a circle about to be drawn
 #[must_use = "should call .build() to draw the object"]
-pub struct Circle<'ui> {
+pub struct DrawListCircle<'ui> {
     center: [f32; 2],
     radius: f32,
     color: ImColor32,
@@ -564,7 +564,8 @@ pub struct Circle<'ui> {
     draw_list: &'ui DrawListMut<'ui>,
 }
 
-impl<'ui> Circle<'ui> {
+impl<'ui> DrawListCircle<'ui> {
+    /// Typically constructed by [`DrawListMut::add_circle`]
     pub fn new<C>(draw_list: &'ui DrawListMut, center: [f32; 2], radius: f32, color: C) -> Self
     where
         C: Into<ImColor32>,
@@ -628,7 +629,7 @@ impl<'ui> Circle<'ui> {
 
 /// Represents a Bezier curve about to be drawn
 #[must_use = "should call .build() to draw the object"]
-pub struct BezierCurve<'ui> {
+pub struct DrawListBezierCurve<'ui> {
     pos0: [f32; 2],
     cp0: [f32; 2],
     pos1: [f32; 2],
@@ -640,8 +641,9 @@ pub struct BezierCurve<'ui> {
     draw_list: &'ui DrawListMut<'ui>,
 }
 
-impl<'ui> BezierCurve<'ui> {
-    fn new<C>(
+impl<'ui> DrawListBezierCurve<'ui> {
+    /// Typically constructed by [`DrawListMut::add_bezier_curve`]
+    pub fn new<C>(
         draw_list: &'ui DrawListMut,
         pos0: [f32; 2],
         cp0: [f32; 2],
