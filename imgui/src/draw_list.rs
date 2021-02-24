@@ -717,7 +717,7 @@ impl<'ui> BezierCurve<'ui> {
 }
 
 /// Image draw list primitive, not to be confused with the widget
-/// [`imgui::widgets::image::Image`]. See [`DrawListMut::add_image`]
+/// [`imgui::Image`](crate::Image).
 #[must_use = "should call .build() to draw the object"]
 pub struct Image<'ui> {
     texture_id: TextureId,
