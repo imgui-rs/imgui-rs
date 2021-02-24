@@ -1,4 +1,4 @@
-//! The draw list lets you create custom graphics with a window.
+//! The draw list lets you create custom graphics within a window.
 //!
 //! Each dear imgui window contains its own draw list. You can use
 //! [`Ui::get_window_draw_list`] to access the current window draw
