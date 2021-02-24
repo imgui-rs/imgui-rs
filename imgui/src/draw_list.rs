@@ -7,8 +7,8 @@
 //!
 //! Interaction is mostly through the mtehods [`DrawListMut`] struct,
 //! such as [`DrawListMut::add_line`], however you can also construct
-//!  structs like [`DrawListLine`] directly, then call
-//!  `DrawListLine::build` with a reference to your draw list
+//!  structs like [`Line`] directly, then call
+//!  `Line::build` with a reference to your draw list
 //!
 //! There are examples such as `draw_list.rs` and `custom_textures.rs`
 //! within the `imgui-examples` directory
@@ -173,20 +173,20 @@ impl<'ui> ChannelsSplit<'ui> {
 /// Drawing functions
 impl<'ui> DrawListMut<'ui> {
     /// Returns a line from point `p1` to `p2` with color `c`.
-    pub fn add_line<C>(&'ui self, p1: [f32; 2], p2: [f32; 2], c: C) -> DrawListLine<'ui>
+    pub fn add_line<C>(&'ui self, p1: [f32; 2], p2: [f32; 2], c: C) -> Line<'ui>
     where
         C: Into<ImColor32>,
     {
-        DrawListLine::new(self, p1, p2, c)
+        Line::new(self, p1, p2, c)
     }
 
     /// Returns a rectangle whose upper-left corner is at point `p1`
     /// and lower-right corner is at point `p2`, with color `c`.
-    pub fn add_rect<C>(&'ui self, p1: [f32; 2], p2: [f32; 2], c: C) -> DrawListRect<'ui>
+    pub fn add_rect<C>(&'ui self, p1: [f32; 2], p2: [f32; 2], c: C) -> Rect<'ui>
     where
         C: Into<ImColor32>,
     {
-        DrawListRect::new(self, p1, p2, c)
+        Rect::new(self, p1, p2, c)
     }
 
     /// Draw a rectangle whose upper-left corner is at point `p1`
@@ -237,11 +237,11 @@ impl<'ui> DrawListMut<'ui> {
     }
 
     /// Returns a circle with the given `center`, `radius` and `color`.
-    pub fn add_circle<C>(&'ui self, center: [f32; 2], radius: f32, color: C) -> DrawListCircle<'ui>
+    pub fn add_circle<C>(&'ui self, center: [f32; 2], radius: f32, color: C) -> Circle<'ui>
     where
         C: Into<ImColor32>,
     {
-        DrawListCircle::new(self, center, radius, color)
+        Circle::new(self, center, radius, color)
     }
 
     /// Draw a text whose upper-left corner is at point `pos`.
@@ -269,11 +269,11 @@ impl<'ui> DrawListMut<'ui> {
         cp1: [f32; 2],
         pos1: [f32; 2],
         color: C,
-    ) -> DrawListBezierCurve<'ui>
+    ) -> BezierCurve<'ui>
     where
         C: Into<ImColor32>,
     {
-        DrawListBezierCurve::new(self, pos0, cp0, cp1, pos1, color)
+        BezierCurve::new(self, pos0, cp0, cp1, pos1, color)
     }
 
     /// Push a clipping rectangle on the stack, run `f` and pop it.
@@ -329,8 +329,8 @@ impl<'ui> DrawListMut<'ui> {
         texture_id: TextureId,
         p_min: [f32; 2],
         p_max: [f32; 2],
-    ) -> DrawListImage {
-        DrawListImage::new(self, texture_id, p_min, p_max)
+    ) -> Image {
+        Image::new(self, texture_id, p_min, p_max)
     }
 
     /// Draw the specified image to a quad with the specified
@@ -343,8 +343,8 @@ impl<'ui> DrawListMut<'ui> {
         p2: [f32; 2],
         p3: [f32; 2],
         p4: [f32; 2],
-    ) -> DrawListImageQuad {
-        DrawListImageQuad::new(self, texture_id, p1, p2, p3, p4)
+    ) -> ImageQuad {
+        ImageQuad::new(self, texture_id, p1, p2, p3, p4)
     }
 
     /// Draw the speciied image, with rounded corners
@@ -354,14 +354,14 @@ impl<'ui> DrawListMut<'ui> {
         p_min: [f32; 2],
         p_max: [f32; 2],
         rounding: f32,
-    ) -> DrawListImageRounded {
-        DrawListImageRounded::new(self, texture_id, p_min, p_max, rounding)
+    ) -> ImageRounded {
+        ImageRounded::new(self, texture_id, p_min, p_max, rounding)
     }
 }
 
 /// Represents a line about to be drawn
 #[must_use = "should call .build() to draw the object"]
-pub struct DrawListLine<'ui> {
+pub struct Line<'ui> {
     p1: [f32; 2],
     p2: [f32; 2],
     color: ImColor32,
@@ -369,7 +369,7 @@ pub struct DrawListLine<'ui> {
     draw_list: &'ui DrawListMut<'ui>,
 }
 
-impl<'ui> DrawListLine<'ui> {
+impl<'ui> Line<'ui> {
     fn new<C>(draw_list: &'ui DrawListMut, p1: [f32; 2], p2: [f32; 2], c: C) -> Self
     where
         C: Into<ImColor32>,
@@ -405,7 +405,7 @@ impl<'ui> DrawListLine<'ui> {
 
 /// Represents a rectangle about to be drawn
 #[must_use = "should call .build() to draw the object"]
-pub struct DrawListRect<'ui> {
+pub struct Rect<'ui> {
     p1: [f32; 2],
     p2: [f32; 2],
     color: ImColor32,
@@ -416,7 +416,7 @@ pub struct DrawListRect<'ui> {
     draw_list: &'ui DrawListMut<'ui>,
 }
 
-impl<'ui> DrawListRect<'ui> {
+impl<'ui> Rect<'ui> {
     fn new<C>(draw_list: &'ui DrawListMut, p1: [f32; 2], p2: [f32; 2], c: C) -> Self
     where
         C: Into<ImColor32>,
@@ -574,7 +574,7 @@ impl<'ui> DrawListTriangle<'ui> {
 
 /// Represents a circle about to be drawn
 #[must_use = "should call .build() to draw the object"]
-pub struct DrawListCircle<'ui> {
+pub struct Circle<'ui> {
     center: [f32; 2],
     radius: f32,
     color: ImColor32,
@@ -584,7 +584,7 @@ pub struct DrawListCircle<'ui> {
     draw_list: &'ui DrawListMut<'ui>,
 }
 
-impl<'ui> DrawListCircle<'ui> {
+impl<'ui> Circle<'ui> {
     /// Typically constructed by [`DrawListMut::add_circle`]
     pub fn new<C>(draw_list: &'ui DrawListMut, center: [f32; 2], radius: f32, color: C) -> Self
     where
@@ -649,7 +649,7 @@ impl<'ui> DrawListCircle<'ui> {
 
 /// Represents a Bezier curve about to be drawn
 #[must_use = "should call .build() to draw the object"]
-pub struct DrawListBezierCurve<'ui> {
+pub struct BezierCurve<'ui> {
     pos0: [f32; 2],
     cp0: [f32; 2],
     pos1: [f32; 2],
@@ -661,7 +661,7 @@ pub struct DrawListBezierCurve<'ui> {
     draw_list: &'ui DrawListMut<'ui>,
 }
 
-impl<'ui> DrawListBezierCurve<'ui> {
+impl<'ui> BezierCurve<'ui> {
     /// Typically constructed by [`DrawListMut::add_bezier_curve`]
     pub fn new<C>(
         draw_list: &'ui DrawListMut,
@@ -716,9 +716,10 @@ impl<'ui> DrawListBezierCurve<'ui> {
     }
 }
 
-/// Represents a image about to be drawn
+/// Image draw list primitive, not to be confused with the widget
+/// [`imgui::widgets::image::Image`]. See [`DrawListMut::add_image`]
 #[must_use = "should call .build() to draw the object"]
-pub struct DrawListImage<'ui> {
+pub struct Image<'ui> {
     texture_id: TextureId,
     p_min: [f32; 2],
     p_max: [f32; 2],
@@ -728,7 +729,7 @@ pub struct DrawListImage<'ui> {
     draw_list: &'ui DrawListMut<'ui>,
 }
 
-impl<'ui> DrawListImage<'ui> {
+impl<'ui> Image<'ui> {
     /// Typically constructed by [`DrawListMut::add_image`]
     pub fn new(
         draw_list: &'ui DrawListMut,
@@ -787,7 +788,7 @@ impl<'ui> DrawListImage<'ui> {
 
 /// Represents a image about to be drawn
 #[must_use = "should call .build() to draw the object"]
-pub struct DrawListImageQuad<'ui> {
+pub struct ImageQuad<'ui> {
     texture_id: TextureId,
     p1: [f32; 2],
     p2: [f32; 2],
@@ -801,7 +802,7 @@ pub struct DrawListImageQuad<'ui> {
     draw_list: &'ui DrawListMut<'ui>,
 }
 
-impl<'ui> DrawListImageQuad<'ui> {
+impl<'ui> ImageQuad<'ui> {
     /// Typically constructed by [`DrawListMut::add_image_quad`]
     pub fn new(
         draw_list: &'ui DrawListMut,
@@ -873,10 +874,10 @@ impl<'ui> DrawListImageQuad<'ui> {
     }
 }
 
-/// Represents a image about to be drawn. Similar to [`DrawListImage`] but
+/// Represents a image about to be drawn. Similar to [`Image`] but
 /// with corners rounded with a given radius
 #[must_use = "should call .build() to draw the object"]
-pub struct DrawListImageRounded<'ui> {
+pub struct ImageRounded<'ui> {
     texture_id: TextureId,
     p_min: [f32; 2],
     p_max: [f32; 2],
@@ -888,7 +889,7 @@ pub struct DrawListImageRounded<'ui> {
     draw_list: &'ui DrawListMut<'ui>,
 }
 
-impl<'ui> DrawListImageRounded<'ui> {
+impl<'ui> ImageRounded<'ui> {
     /// Typically constructed by [`DrawListMut::add_image_rounded`]
     pub fn new(
         draw_list: &'ui DrawListMut,
