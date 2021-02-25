@@ -4,6 +4,16 @@
 
 - Removed legacy `ImGuiDragDropFlags` from `legacy.rs`, which were accidentally not cleared when they were remade in `drag_drop.rs` in v0.7.0.
 
+- The remaining flags in `imgui::legacy` have been updated to be consistent with other flags in the project.
+    - `imgui::legacy::ImGuiInputTextFlags` is now `imgui::input_widgets::InputTextFlags`
+    - `imgui::legacy::ImGuiTreeNodeFlags` is now `imgui::widget::tree::TreeNodeFlags`
+    - `imgui::legacy::ImDrawListFlags` is now `imgui::draw_list::DrawListFlags`
+
+- `DrawListMut` has new methods to draw images
+    - The methods are `add_image`, `add_image_quad`, and `add_image_rounded`. The `imgui-examples/examples/custom_textures.rs` has been updated to show their usage.
+    - Additionally the `imgui::draw_list` module is now public, which contains the various draw list objects. While the `add_*` methods are preferred, `imgui::draw_list::Circle::new(&draw_list_mut, ...).build()` is equivalent
+
+
 ## [0.7.0] - 2021-02-04
 
 - Upgrade to [Dear ImGui v1.80](https://github.com/ocornut/imgui/releases/tag/v1.80). (Note that the new table functionality is not yet supported, however)
