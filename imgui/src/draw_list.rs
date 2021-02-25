@@ -324,12 +324,7 @@ impl<'ui> DrawListMut<'ui> {
     ///         .build();
     /// }
     /// ```
-    pub fn add_image(
-        &'ui self,
-        texture_id: TextureId,
-        p_min: [f32; 2],
-        p_max: [f32; 2],
-    ) -> Image {
+    pub fn add_image(&'ui self, texture_id: TextureId, p_min: [f32; 2], p_max: [f32; 2]) -> Image {
         Image::new(self, texture_id, p_min, p_max)
     }
 
