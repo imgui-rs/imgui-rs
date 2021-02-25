@@ -229,11 +229,11 @@ impl<'ui> DrawListMut<'ui> {
         p2: [f32; 2],
         p3: [f32; 2],
         c: C,
-    ) -> DrawListTriangle<'ui>
+    ) -> Triangle<'ui>
     where
         C: Into<ImColor32>,
     {
-        DrawListTriangle::new(self, p1, p2, p3, c)
+        Triangle::new(self, p1, p2, p3, c)
     }
 
     /// Returns a circle with the given `center`, `radius` and `color`.
@@ -502,7 +502,7 @@ impl<'ui> Rect<'ui> {
 
 /// Represents a triangle about to be drawn on the window
 #[must_use = "should call .build() to draw the object"]
-pub struct DrawListTriangle<'ui> {
+pub struct Triangle<'ui> {
     p1: [f32; 2],
     p2: [f32; 2],
     p3: [f32; 2],
@@ -512,7 +512,7 @@ pub struct DrawListTriangle<'ui> {
     draw_list: &'ui DrawListMut<'ui>,
 }
 
-impl<'ui> DrawListTriangle<'ui> {
+impl<'ui> Triangle<'ui> {
     fn new<C>(draw_list: &'ui DrawListMut, p1: [f32; 2], p2: [f32; 2], p3: [f32; 2], c: C) -> Self
     where
         C: Into<ImColor32>,
