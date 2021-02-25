@@ -30,6 +30,7 @@ struct State {
     item2: usize,
     item3: i32,
     text: ImString,
+    text_with_hint: ImString,
     text_multiline: ImString,
     i0: i32,
     f0: f32,
@@ -60,6 +61,7 @@ impl Default for State {
         buf.push_str("日本語");
         let mut text = ImString::with_capacity(128);
         text.push_str("Hello, world!");
+        let text_with_hint = ImString::with_capacity(128);
         let mut text_multiline = ImString::with_capacity(128);
         text_multiline.push_str("Hello, world!\nMultiline");
         State {
@@ -90,6 +92,7 @@ impl Default for State {
             item2: 0,
             item3: 0,
             text,
+            text_with_hint,
             text_multiline,
             i0: 123,
             f0: 0.001,
@@ -532,6 +535,9 @@ fn show_test_window(ui: &Ui, state: &mut State, opened: &mut bool) {
             });
 
             ui.input_text(im_str!("input text"), &mut state.text)
+                .build();
+            ui.input_text(im_str!("input text with hint"), &mut state.text_with_hint)
+                .hint(im_str!("enter text here"))
                 .build();
             ui.input_int(im_str!("input int"), &mut state.i0).build();
             Drag::new(im_str!("drag int")).build(ui, &mut state.i0);
