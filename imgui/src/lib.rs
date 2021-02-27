@@ -121,6 +121,13 @@ pub struct Ui<'ui> {
 }
 
 impl<'ui> Ui<'ui> {
+    /// Creates an Ui object with a given context
+    pub fn from_ctx(ctx: &'ui Context) -> Self {
+        Self {
+            ctx,
+            font_atlas: None,
+        }
+    }
     /// Returns an immutable reference to the inputs/outputs object
     pub fn io(&self) -> &Io {
         unsafe { &*(sys::igGetIO() as *const Io) }
