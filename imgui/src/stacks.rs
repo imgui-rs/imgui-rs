@@ -313,6 +313,18 @@ impl<'ui> Ui<'ui> {
     pub fn calc_item_width(&self) -> f32 {
         unsafe { sys::igCalcItemWidth() }
     }
+
+    /// Changes the text wrapping position to the end of window (or column), which
+    /// is generally the default.
+    ///
+    /// This is the same as calling [push_text_wrap_pos_with_pos](Self::push_text_wrap_pos_with_pos)
+    /// with `wrap_pos_x` set to 0.0.
+    ///
+    /// Returns a `TextWrapPosStackToken` that may be popped by calling `.pop()`
+    pub fn push_text_wrap_pos(&self) -> TextWrapPosStackToken {
+        self.push_text_wrap_pos_with_pos(0.0)
+    }
+
     /// Changes the text wrapping position by pushing a change to the text wrapping position stack.
     ///
     /// Returns a `TextWrapPosStackToken` that may be popped by calling `.pop()`
@@ -320,10 +332,11 @@ impl<'ui> Ui<'ui> {
     /// - `> 0.0`: wrap at `wrap_pos_x` position in window local space
     /// - `= 0.0`: wrap to end of window (or column)
     /// - `< 0.0`: no wrapping
-    pub fn push_text_wrap_pos(&self, wrap_pos_x: f32) -> TextWrapPosStackToken {
+    pub fn push_text_wrap_pos_with_pos(&self, wrap_pos_x: f32) -> TextWrapPosStackToken {
         unsafe { sys::igPushTextWrapPos(wrap_pos_x) };
         TextWrapPosStackToken { _ctx: self.ctx }
     }
+
     /// Changes an item flag by pushing a change to the item flag stack.
     ///
     /// Returns a `ItemFlagsStackToken` that may be popped by calling `.pop()`

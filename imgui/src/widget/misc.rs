@@ -23,7 +23,21 @@ impl<'ui> Ui<'ui> {
     /// Renders a clickable button.
     ///
     /// Returns true if this button was clicked.
-    pub fn button(&self, label: &ImStr, size: [f32; 2]) -> bool {
+    ///
+    /// This is the equivalent of [button_with_size](Self::button_with_size)
+    /// with `size` set to `[0.0, 0.0]`, which will size the button to the
+    /// label's width in the current style.
+    pub fn button(&self, label: &ImStr) -> bool {
+        self.button_with_size(label, [0.0, 0.0])
+    }
+
+    /// Renders a clickable button.
+    ///
+    /// Returns true if this button was clicked.
+    ///
+    /// Setting `size` as `[0.0, 0.0]` will size the button to the label's width in
+    /// the current style.
+    pub fn button_with_size(&self, label: &ImStr, size: [f32; 2]) -> bool {
         unsafe { sys::igButton(label.as_ptr(), size.into()) }
     }
     /// Renders a small clickable button that is easy to embed in text.
