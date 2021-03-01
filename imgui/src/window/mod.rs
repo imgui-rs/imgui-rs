@@ -1,9 +1,7 @@
 use bitflags::bitflags;
 use std::f32;
 use std::ptr;
-use std::thread;
 
-use crate::context::Context;
 use crate::string::ImStr;
 use crate::sys;
 use crate::{Condition, Ui};
@@ -482,7 +480,7 @@ impl<'a> Window<'a> {
     ///
     /// Returns `None` if the window is not visible and no content should be rendered.
     #[must_use]
-    pub fn begin(self, ui: &Ui) -> Option<WindowToken> {
+    pub fn begin<'ui>(self, ui: &Ui<'ui>) -> Option<WindowToken<'ui>> {
         if self.pos_cond != Condition::Never {
             unsafe {
                 sys::igSetNextWindowPos(
@@ -528,7 +526,7 @@ impl<'a> Window<'a> {
             )
         };
         if should_render {
-            Some(WindowToken { ctx: ui.ctx })
+            Some(WindowToken::new(ui))
         } else {
             unsafe { sys::igEnd() };
             None
@@ -539,30 +537,17 @@ impl<'a> Window<'a> {
     /// Note: the closure is not called if no window content is visible (e.g. window is collapsed
     /// or fully clipped).
     pub fn build<F: FnOnce()>(self, ui: &Ui, f: F) {
-        if let Some(window) = self.begin(ui) {
+        if let Some(_window) = self.begin(ui) {
             f();
-            window.end(ui);
         }
     }
 }
 
-/// Tracks a window that must be ended by calling `.end()`
-pub struct WindowToken {
-    ctx: *const Context,
-}
+create_token!(
+    /// Tracks a window that can be ended by calling `.end()`
+    /// or by dropping.
+    pub struct WindowToken<'ui>;
 
-impl WindowToken {
     /// Ends a window
-    pub fn end(mut self, _: &Ui) {
-        self.ctx = ptr::null();
-        unsafe { sys::igEnd() };
-    }
-}
-
-impl Drop for WindowToken {
-    fn drop(&mut self) {
-        if !self.ctx.is_null() && !thread::panicking() {
-            panic!("A WindowToken was leaked. Did you call .end()?");
-        }
-    }
-}
+    drop { sys::igEnd() }
+);

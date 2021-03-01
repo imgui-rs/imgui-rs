@@ -338,7 +338,7 @@ fn show_test_window(ui: &Ui, state: &mut State, opened: &mut bool) {
         if let Some(menu_bar) = ui.begin_menu_bar() {
             if let Some(menu) = ui.begin_menu(im_str!("Menu"), true) {
                 show_example_menu_file(ui, &mut state.file_menu);
-                menu.end(ui);
+                menu.end();
             }
             if let Some(menu) = ui.begin_menu(im_str!("Examples"), true) {
                 MenuItem::new(im_str!("Main menu bar"))
@@ -363,7 +363,7 @@ fn show_test_window(ui: &Ui, state: &mut State, opened: &mut bool) {
                     .build_with_ref(ui, &mut state.show_app_manipulating_window_title);
                 MenuItem::new(im_str!("Custom rendering"))
                     .build_with_ref(ui, &mut state.show_app_custom_rendering);
-                menu.end(ui);
+                menu.end();
             }
             if let Some(menu) = ui.begin_menu(im_str!("Help"), true) {
                 MenuItem::new(im_str!("Metrics"))
@@ -372,9 +372,9 @@ fn show_test_window(ui: &Ui, state: &mut State, opened: &mut bool) {
                     .build_with_ref(ui, &mut state.show_app_style_editor);
                 MenuItem::new(im_str!("About ImGui"))
                     .build_with_ref(ui, &mut state.show_app_about);
-                menu.end(ui);
+                menu.end();
             }
-            menu_bar.end(ui);
+            menu_bar.end();
         }
         ui.spacing();
         if CollapsingHeader::new(im_str!("Help")).build(&ui) {
@@ -709,7 +709,7 @@ CTRL+click on individual component to input value.\n",
                     ui.checkbox(im_str!("Celery"), &mut s.celery_tab);
                     ui.same_line(0.0);
                     ui.checkbox(im_str!("Daikon"), &mut s.daikon_tab);
-                    style.pop(ui);
+                    style.pop();
 
                     let flags = {
                         let mut f = TabBarFlags::empty();
@@ -782,7 +782,7 @@ CTRL+click on individual component to input value.\n",
                 if ui.button(im_str!("Delete.."), [0.0, 0.0]) {
                     ui.open_popup(im_str!("Delete?"));
                 }
-                ui.popup_modal(im_str!("Delete?")).always_auto_resize(true).build(|| {
+                PopupModal::new(im_str!("Delete?")).always_auto_resize(true).build(ui, || {
                     ui.text("All those beautiful files will be deleted.\nThis operation cannot be undone!\n\n");
                     ui.separator();
                     let style = ui.push_style_var(StyleVar::FramePadding([0.0, 0.0]));
@@ -795,13 +795,13 @@ CTRL+click on individual component to input value.\n",
                     if ui.button(im_str!("Cancel"), [120.0, 0.0]) {
                         ui.close_current_popup();
                     }
-                    style.pop(ui);
+                    style.pop();
                 });
 
                 if ui.button(im_str!("Stacked modals.."), [0.0, 0.0]) {
                     ui.open_popup(im_str!("Stacked 1"));
                 }
-                ui.popup_modal(im_str!("Stacked 1")).build(|| {
+                PopupModal::new(im_str!("Stacked 1")).build(ui, || {
                     ui.text(
                        "Hello from Stacked The First\n\
                         Using style[StyleColor::ModalWindowDarkening] for darkening."
@@ -815,7 +815,7 @@ CTRL+click on individual component to input value.\n",
                     if ui.button(im_str!("Add another modal.."), [0.0, 0.0]) {
                         ui.open_popup(im_str!("Stacked 2"))   ;
                     }
-                    ui.popup_modal(im_str!("Stacked 2")).build(|| {
+                    PopupModal::new(im_str!("Stacked 2")).build(ui, || {
                         ui.text("Hello from Stacked The Second");
                         if ui.button(im_str!("Close"), [0.0, 0.0]) {
                             ui.close_current_popup();
@@ -835,7 +835,7 @@ fn show_example_app_main_menu_bar<'a>(ui: &Ui<'a>, state: &mut State) {
     if let Some(menu_bar) = ui.begin_main_menu_bar() {
         if let Some(menu) = ui.begin_menu(im_str!("File"), true) {
             show_example_menu_file(ui, &mut state.file_menu);
-            menu.end(ui);
+            menu.end();
         }
         if let Some(menu) = ui.begin_menu(im_str!("Edit"), true) {
             MenuItem::new(im_str!("Undo"))
@@ -855,9 +855,9 @@ fn show_example_app_main_menu_bar<'a>(ui: &Ui<'a>, state: &mut State) {
             MenuItem::new(im_str!("Paste"))
                 .shortcut(im_str!("CTRL+V"))
                 .build(ui);
-            menu.end(ui);
+            menu.end();
         }
-        menu_bar.end(ui);
+        menu_bar.end();
     }
 }
 
@@ -878,11 +878,11 @@ fn show_example_menu_file<'a>(ui: &Ui<'a>, state: &mut FileMenuState) {
             MenuItem::new(im_str!("Sailor")).build(ui);
             if let Some(menu) = ui.begin_menu(im_str!("Recurse.."), true) {
                 show_example_menu_file(ui, state);
-                menu.end(ui);
+                menu.end();
             }
-            menu.end(ui);
+            menu.end();
         }
-        menu.end(ui);
+        menu.end();
     }
     MenuItem::new(im_str!("Save"))
         .shortcut(im_str!("Ctrl+S"))
@@ -909,13 +909,13 @@ fn show_example_menu_file<'a>(ui: &Ui<'a>, state: &mut FileMenuState) {
         let items = [im_str!("Yes"), im_str!("No"), im_str!("Maybe")];
         ComboBox::new(im_str!("Combo")).build_simple_string(ui, &mut state.n, &items);
         ui.checkbox(im_str!("Check"), &mut state.b);
-        menu.end(ui);
+        menu.end();
     }
     if let Some(menu) = ui.begin_menu(im_str!("Colors"), true) {
         for &col in StyleColor::VARIANTS.iter() {
             MenuItem::new(&im_str!("{:?}", col)).build(ui);
         }
-        menu.end(ui);
+        menu.end();
     }
     assert!(ui.begin_menu(im_str!("Disabled"), false).is_none());
     MenuItem::new(im_str!("Checked")).selected(true).build(ui);
@@ -966,7 +966,7 @@ fn show_example_app_fixed_overlay(ui: &Ui, opened: &mut bool) {
                 mouse_pos[0], mouse_pos[1]
             ));
         });
-    style.pop(ui);
+    style.pop();
 }
 
 fn show_example_app_manipulating_window_title(ui: &Ui) {

@@ -27,9 +27,9 @@ fn main() {
                 ui.text("Hello, I'm Roboto Regular!");
                 let _dokdo = ui.push_font(dokdo);
                 ui.text("Hello, I'm Dokdo Regular!");
-                _dokdo.pop(&ui);
+                _dokdo.pop();
                 ui.text("Hello, I'm Roboto Regular again!");
-                _roboto.pop(&ui);
+                _roboto.pop();
                 ui.text("Hello, I'm the default font again!");
             });
     });

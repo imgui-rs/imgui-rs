@@ -1,9 +1,7 @@
 use bitflags::bitflags;
 use std::borrow::Cow;
 use std::ptr;
-use std::thread;
 
-use crate::context::Context;
 use crate::string::ImStr;
 use crate::sys;
 use crate::Ui;
@@ -141,7 +139,7 @@ impl<'a> ComboBox<'a> {
     ///
     /// Returns `None` if the combo box is not open and no content should be rendered.
     #[must_use]
-    pub fn begin(self, ui: &Ui) -> Option<ComboBoxToken> {
+    pub fn begin<'ui>(self, ui: &Ui<'ui>) -> Option<ComboBoxToken<'ui>> {
         let should_render = unsafe {
             sys::igBeginCombo(
                 self.label.as_ptr(),
@@ -150,7 +148,7 @@ impl<'a> ComboBox<'a> {
             )
         };
         if should_render {
-            Some(ComboBoxToken { ctx: ui.ctx })
+            Some(ComboBoxToken::new(ui))
         } else {
             None
         }
@@ -159,34 +157,20 @@ impl<'a> ComboBox<'a> {
     ///
     /// Note: the closure is not called if the combo box is not open.
     pub fn build<F: FnOnce()>(self, ui: &Ui, f: F) {
-        if let Some(combo) = self.begin(ui) {
+        if let Some(_combo) = self.begin(ui) {
             f();
-            combo.end(ui);
         }
     }
 }
 
-/// Tracks a combo box that must be ended by calling `.end()`
-#[must_use]
-pub struct ComboBoxToken {
-    ctx: *const Context,
-}
+create_token!(
+    /// Tracks a combo box that can be ended by calling `.end()`
+    /// or by dropping.
+    pub struct ComboBoxToken<'ui>;
 
-impl ComboBoxToken {
     /// Ends a combo box
-    pub fn end(mut self, _: &Ui) {
-        self.ctx = ptr::null();
-        unsafe { sys::igEndCombo() };
-    }
-}
-
-impl Drop for ComboBoxToken {
-    fn drop(&mut self) {
-        if !self.ctx.is_null() && !thread::panicking() {
-            panic!("A ComboBoxToken was leaked. Did you call .end()?");
-        }
-    }
-}
+    drop { sys::igEndCombo() }
+);
 
 /// # Convenience functions
 impl<'a> ComboBox<'a> {
@@ -219,7 +203,6 @@ impl<'a> ComboBox<'a> {
                     result = true;
                 }
             }
-            _cb.end(ui);
         }
         result
     }

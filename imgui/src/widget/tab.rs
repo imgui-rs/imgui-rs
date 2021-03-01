@@ -19,12 +19,11 @@
 //! ```
 //!
 //! See `test_window_impl.rs` for a more complicated example.
-use crate::context::Context;
 use crate::string::ImStr;
 use crate::sys;
 use crate::Ui;
 use bitflags::bitflags;
-use std::{ptr, thread};
+use std::ptr;
 
 bitflags! {
     #[repr(transparent)]
@@ -90,12 +89,12 @@ impl<'a> TabBar<'a> {
     }
 
     #[must_use]
-    pub fn begin(self, ui: &Ui) -> Option<TabBarToken> {
+    pub fn begin<'ui>(self, ui: &Ui<'ui>) -> Option<TabBarToken<'ui>> {
         let should_render =
             unsafe { sys::igBeginTabBar(self.id.as_ptr(), self.flags.bits() as i32) };
 
         if should_render {
-            Some(TabBarToken { ctx: ui.ctx })
+            Some(TabBarToken::new(ui))
         } else {
             unsafe { sys::igEndTabBar() };
             None
@@ -106,33 +105,20 @@ impl<'a> TabBar<'a> {
     ///
     /// Note: the closure is not called if no tabbar content is visible
     pub fn build<F: FnOnce()>(self, ui: &Ui, f: F) {
-        if let Some(tab) = self.begin(ui) {
+        if let Some(_tab) = self.begin(ui) {
             f();
-            tab.end(ui);
         }
     }
 }
 
-/// Tracks a window that must be ended by calling `.end()`
-pub struct TabBarToken {
-    ctx: *const Context,
-}
+create_token!(
+    /// Tracks a window that can be ended by calling `.end()`
+    /// or by dropping
+    pub struct TabBarToken<'ui>;
 
-impl TabBarToken {
-    /// Ends a tab bar
-    pub fn end(mut self, _: &Ui) {
-        self.ctx = ptr::null();
-        unsafe { sys::igEndTabBar() };
-    }
-}
-
-impl Drop for TabBarToken {
-    fn drop(&mut self) {
-        if !self.ctx.is_null() && !thread::panicking() {
-            panic!("A TabBarToken was leaked. Did you call .end()?");
-        }
-    }
-}
+    /// Ends a tab bar.
+    drop { sys::igEndTabBar() }
+);
 
 pub struct TabItem<'a> {
     name: &'a ImStr,
@@ -168,7 +154,7 @@ impl<'a> TabItem<'a> {
     }
 
     #[must_use]
-    pub fn begin(self, ui: &Ui) -> Option<TabItemToken> {
+    pub fn begin<'ui>(self, ui: &Ui<'ui>) -> Option<TabItemToken<'ui>> {
         let should_render = unsafe {
             sys::igBeginTabItem(
                 self.name.as_ptr(),
@@ -180,7 +166,7 @@ impl<'a> TabItem<'a> {
         };
 
         if should_render {
-            Some(TabItemToken { ctx: ui.ctx })
+            Some(TabItemToken::new(ui))
         } else {
             None
         }
@@ -190,28 +176,17 @@ impl<'a> TabItem<'a> {
     ///
     /// Note: the closure is not called if the tab item is not selected
     pub fn build<F: FnOnce()>(self, ui: &Ui, f: F) {
-        if let Some(tab) = self.begin(ui) {
+        if let Some(_tab) = self.begin(ui) {
             f();
-            tab.end(ui);
         }
     }
 }
 
-pub struct TabItemToken {
-    ctx: *const Context,
-}
+create_token!(
+    /// Tracks a tab bar item that can be ended by calling `.end()`
+    /// or by dropping
+    pub struct TabItemToken<'ui>;
 
-impl TabItemToken {
-    pub fn end(mut self, _: &Ui) {
-        self.ctx = ptr::null();
-        unsafe { sys::igEndTabItem() };
-    }
-}
-
-impl Drop for TabItemToken {
-    fn drop(&mut self) {
-        if !self.ctx.is_null() && !thread::panicking() {
-            panic!("A TabItemToken was leaked. Did you call .end()?");
-        }
-    }
-}
+    /// Ends a tab bar item.
+    drop { sys::igEndTabItem() }
+);
