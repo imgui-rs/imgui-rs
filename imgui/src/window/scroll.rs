@@ -29,11 +29,11 @@ impl<'ui> Ui<'ui> {
     }
     /// Sets the horizontal scrolling position
     pub fn set_scroll_x(&self, scroll_x: f32) {
-        unsafe { sys::igSetScrollX(scroll_x) };
+        unsafe { sys::igSetScrollXFloat(scroll_x) };
     }
     /// Sets the vertical scroll position
     pub fn set_scroll_y(&self, scroll_y: f32) {
-        unsafe { sys::igSetScrollY(scroll_y) };
+        unsafe { sys::igSetScrollYFloat(scroll_y) };
     }
     /// Adjusts the horizontal scroll position to make the current cursor position visible
     pub fn set_scroll_here_x(&self) {
@@ -65,7 +65,7 @@ impl<'ui> Ui<'ui> {
     }
     /// Adjusts the horizontal scroll position to make the given position visible
     pub fn set_scroll_from_pos_x(&self, local_x: f32) {
-        unsafe { sys::igSetScrollFromPosX(local_x, 0.5) };
+        unsafe { sys::igSetScrollFromPosXFloat(local_x, 0.5) };
     }
     /// Adjusts the horizontal scroll position to make the given position visible.
     ///
@@ -75,11 +75,11 @@ impl<'ui> Ui<'ui> {
     /// - `0.5`: center
     /// - `1.0`: right
     pub fn set_scroll_from_pos_x_with_ratio(&self, local_x: f32, center_x_ratio: f32) {
-        unsafe { sys::igSetScrollFromPosX(local_x, center_x_ratio) };
+        unsafe { sys::igSetScrollFromPosXFloat(local_x, center_x_ratio) };
     }
     /// Adjusts the vertical scroll position to make the given position visible
     pub fn set_scroll_from_pos_y(&self, local_y: f32) {
-        unsafe { sys::igSetScrollFromPosY(local_y, 0.5) };
+        unsafe { sys::igSetScrollFromPosYFloat(local_y, 0.5) };
     }
     /// Adjusts the vertical scroll position to make the given position visible.
     ///
@@ -89,6 +89,6 @@ impl<'ui> Ui<'ui> {
     /// - `0.5`: center
     /// - `1.0`: bottom
     pub fn set_scroll_from_pos_y_with_ratio(&self, local_y: f32, center_y_ratio: f32) {
-        unsafe { sys::igSetScrollFromPosY(local_y, center_y_ratio) };
+        unsafe { sys::igSetScrollFromPosYFloat(local_y, center_y_ratio) };
     }
 }
