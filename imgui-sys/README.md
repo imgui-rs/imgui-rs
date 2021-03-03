@@ -58,6 +58,22 @@
 
     cargo run --example test_window_impl
 
+### Building a specific revision
+
+cimgui has pre-generated bindings to specific versions of imgui - usually for each regular imgui release, and the WIP docking branch at the same time as the release.
+
+However this will not work if you need to either
+
+1. Build `imgui-rs` against a specific revision, or
+2. Build `imgui-rs` against another branch or fork
+
+Luckily running the generator is quite straight forward:
+
+1. Ensure `luajit` is installed (required by cimgui's generator)
+2. In the `cimgui` submodule, check out the master branch
+3. Update the nested `imgui` submodule (`imgui-sys/third-party/cimgui/imgui/`) to point to your desired upstream `imgui`
+4. Run the generator as per https://github.com/cimgui/cimgui#using-generator
+5. Run `cargo xtask bindgen` and follow the rest of the steps as usual
 
 ## Common sources of problems
 
