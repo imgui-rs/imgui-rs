@@ -13,7 +13,7 @@ impl GenBindings {
         let bindings = self
             .bindings_path
             .map(PathBuf::from)
-            .unwrap_or_else(|| root.join("imgui-sys/third-party"));
+            .unwrap_or_else(|| root.join("imgui-sys/third-party/cimgui"));
 
         let output = self
             .output_path
@@ -24,8 +24,8 @@ impl GenBindings {
             .wasm_import_name
             .or_else(|| std::env::var("IMGUI_RS_WASM_IMPORT_NAME").ok())
             .unwrap_or_else(|| "imgui-sys-v0".to_string());
-        let types = get_types(&bindings.join("structs_and_enums.json"))?;
-        let funcs = get_definitions(&bindings.join("definitions.json"))?;
+        let types = get_types(&bindings.join("generator/output/structs_and_enums.json"))?;
+        let funcs = get_definitions(&bindings.join("generator/output/definitions.json"))?;
         let header = bindings.join("cimgui.h");
 
         generate_binding_file(&header, &output.join("bindings.rs"), &types, &funcs, None)?;
@@ -42,7 +42,8 @@ impl GenBindings {
 }
 
 fn get_types(structs_and_enums: &Path) -> Result<Vec<String>> {
-    let types_txt = std::fs::read_to_string(structs_and_enums)?;
+    let types_txt = std::fs::read_to_string(structs_and_enums)
+        .with_context(|| format!("Failed to read {:?}", &structs_and_enums))?;
     let types_val = types_txt
         .parse::<smoljson::ValOwn>()
         .map_err(|e| anyhow!("Failed to parse {}: {:?}", structs_and_enums.display(), e))?;

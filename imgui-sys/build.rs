@@ -36,8 +36,8 @@ fn main() -> io::Result<()> {
     if std::env::var_os("CARGO_FEATURE_WASM").is_none() {
         // Check submodule status. (Anything else should be a compile error in
         // the C code).
-        assert_file_exists("third-party/cimgui.cpp")?;
-        assert_file_exists("third-party/imgui/imgui.cpp")?;
+        assert_file_exists("third-party/cimgui/cimgui.cpp")?;
+        assert_file_exists("third-party/cimgui/imgui/imgui.cpp")?;
 
         let mut build = cc::Build::new();
 
