@@ -336,11 +336,11 @@ fn show_test_window(ui: &Ui, state: &mut State, opened: &mut bool) {
         ui.push_item_width(-140.0);
         ui.text(format!("dear imgui says hello. ({})", imgui::dear_imgui_version()));
         if let Some(menu_bar) = ui.begin_menu_bar() {
-            if let Some(menu) = ui.begin_menu(im_str!("Menu"), true) {
+            if let Some(menu) = ui.begin_menu(im_str!("Menu")) {
                 show_example_menu_file(ui, &mut state.file_menu);
                 menu.end();
             }
-            if let Some(menu) = ui.begin_menu(im_str!("Examples"), true) {
+            if let Some(menu) = ui.begin_menu(im_str!("Examples")) {
                 MenuItem::new(im_str!("Main menu bar"))
                     .build_with_ref(ui, &mut state.show_app_main_menu_bar);
                 MenuItem::new(im_str!("Console"))
@@ -365,7 +365,7 @@ fn show_test_window(ui: &Ui, state: &mut State, opened: &mut bool) {
                     .build_with_ref(ui, &mut state.show_app_custom_rendering);
                 menu.end();
             }
-            if let Some(menu) = ui.begin_menu(im_str!("Help"), true) {
+            if let Some(menu) = ui.begin_menu(im_str!("Help")) {
                 MenuItem::new(im_str!("Metrics"))
                     .build_with_ref(ui, &mut state.show_app_metrics);
                 MenuItem::new(im_str!("Style Editor"))
@@ -388,14 +388,14 @@ fn show_test_window(ui: &Ui, state: &mut State, opened: &mut bool) {
 
         if CollapsingHeader::new(im_str!("Window options")).build(&ui) {
             ui.checkbox(im_str!("No titlebar"), &mut state.no_titlebar);
-            ui.same_line(150.0);
+            ui.same_line_with_pos(150.0);
             ui.checkbox(im_str!("No scrollbar"), &mut state.no_scrollbar);
-            ui.same_line(300.0);
+            ui.same_line_with_pos(300.0);
             ui.checkbox(im_str!("No menu"), &mut state.no_menu);
             ui.checkbox(im_str!("No move"), &mut state.no_move);
-            ui.same_line(150.0);
+            ui.same_line_with_pos(150.0);
             ui.checkbox(im_str!("No resize"), &mut state.no_resize);
-            ui.same_line(300.0);
+            ui.same_line_with_pos(300.0);
             ui.checkbox(im_str!("No collapse"), &mut state.no_collapse);
             ui.checkbox(im_str!("No close"), &mut state.no_close);
 
@@ -408,7 +408,7 @@ fn show_test_window(ui: &Ui, state: &mut State, opened: &mut bool) {
                 for i in 0..5 {
                     TreeNode::new(&im_str!("Child {}", i)).build(&ui, || {
                         ui.text(im_str!("blah blah"));
-                        ui.same_line(0.0);
+                        ui.same_line();
                         if ui.small_button(im_str!("print")) {
                             println!("Child {} pressed", i);
                         }
@@ -473,9 +473,9 @@ fn show_test_window(ui: &Ui, state: &mut State, opened: &mut bool) {
             });
 
             ui.radio_button(im_str!("radio a"), &mut state.radio_button, 0);
-            ui.same_line(0.0);
+            ui.same_line();
             ui.radio_button(im_str!("radio b"), &mut state.radio_button, 1);
-            ui.same_line(0.0);
+            ui.same_line();
             ui.radio_button(im_str!("radio c"), &mut state.radio_button, 2);
 
             ui.separator();
@@ -568,7 +568,7 @@ fn show_test_window(ui: &Ui, state: &mut State, opened: &mut bool) {
             TreeNode::new(im_str!("Color/Picker Widgets")).build(&ui, || {
                 let s = &mut state.color_edit;
                 ui.checkbox(im_str!("With HDR"), &mut s.hdr);
-                ui.same_line(0.0);
+                ui.same_line();
                 show_help_marker(
                     ui,
                     "Currently all this does is to lift the 0..1 \
@@ -581,7 +581,7 @@ fn show_test_window(ui: &Ui, state: &mut State, opened: &mut bool) {
                     &mut s.alpha_half_preview,
                 );
                 ui.checkbox(im_str!("With Options Menu"), &mut s.options_menu);
-                ui.same_line(0.0);
+                ui.same_line();
                 show_help_marker(
                     ui,
                     "Right-click on the individual color widget to \
@@ -599,7 +599,7 @@ fn show_test_window(ui: &Ui, state: &mut State, opened: &mut bool) {
                 };
 
                 ui.text(im_str!("Color widget:"));
-                ui.same_line(0.0);
+                ui.same_line();
                 show_help_marker(
                     ui,
                     "Click on the colored square to open a color picker.
@@ -623,7 +623,7 @@ CTRL+click on individual component to input value.\n",
                     .build(ui);
 
                 ui.text(im_str!("Color button with Picker:"));
-                ui.same_line(0.0);
+                ui.same_line();
                 show_help_marker(
                     ui,
                     "With the inputs(false) function you can hide all \
@@ -642,10 +642,10 @@ CTRL+click on individual component to input value.\n",
                 ui.checkbox(im_str!("With Alpha Bar"), &mut s.alpha_bar);
                 ui.checkbox(im_str!("With Side Preview"), &mut s.side_preview);
                 if s.side_preview {
-                    ui.same_line(0.0);
+                    ui.same_line();
                     ui.checkbox(im_str!("With Ref Color"), &mut s.ref_color);
                     if s.ref_color {
-                        ui.same_line(0.0);
+                        ui.same_line();
                         ColorEdit::new(im_str!("##RefColor"), &mut s.ref_color_v)
                             .flags(misc_flags)
                             .inputs(false)
@@ -703,11 +703,11 @@ CTRL+click on individual component to input value.\n",
                     }
                     let style = ui.push_style_var(StyleVar::FramePadding([0.0, 0.0]));
                     ui.checkbox(im_str!("Artichoke"), &mut s.artichoke_tab);
-                    ui.same_line(0.0);
+                    ui.same_line();
                     ui.checkbox(im_str!("Beetroot"), &mut s.beetroot_tab);
-                    ui.same_line(0.0);
+                    ui.same_line();
                     ui.checkbox(im_str!("Celery"), &mut s.celery_tab);
-                    ui.same_line(0.0);
+                    ui.same_line();
                     ui.checkbox(im_str!("Daikon"), &mut s.daikon_tab);
                     style.pop();
 
@@ -757,7 +757,7 @@ CTRL+click on individual component to input value.\n",
                 if ui.small_button(im_str!("Select..")) {
                     ui.open_popup(im_str!("select"));
                 }
-                ui.same_line(0.0);
+                ui.same_line();
                 ui.text(match state.selected_fish {
                     Some(index) => names[index],
                     None => im_str!("<None>"),
@@ -779,7 +779,7 @@ CTRL+click on individual component to input value.\n",
                      them by clicking outside the window."
                 ));
 
-                if ui.button(im_str!("Delete.."), [0.0, 0.0]) {
+                if ui.button(im_str!("Delete..")) {
                     ui.open_popup(im_str!("Delete?"));
                 }
                 PopupModal::new(im_str!("Delete?")).always_auto_resize(true).build(ui, || {
@@ -788,17 +788,17 @@ CTRL+click on individual component to input value.\n",
                     let style = ui.push_style_var(StyleVar::FramePadding([0.0, 0.0]));
                     ui.checkbox(im_str!("Don't ask me next time"), &mut state.dont_ask_me_next_time);
 
-                    if ui.button(im_str!("OK"), [120.0, 0.0]) {
+                    if ui.button_with_size(im_str!("OK"), [120.0, 0.0]) {
                         ui.close_current_popup();
                     }
-                    ui.same_line(0.0);
-                    if ui.button(im_str!("Cancel"), [120.0, 0.0]) {
+                    ui.same_line();
+                    if ui.button_with_size(im_str!("Cancel"), [120.0, 0.0]) {
                         ui.close_current_popup();
                     }
                     style.pop();
                 });
 
-                if ui.button(im_str!("Stacked modals.."), [0.0, 0.0]) {
+                if ui.button(im_str!("Stacked modals..")) {
                     ui.open_popup(im_str!("Stacked 1"));
                 }
                 PopupModal::new(im_str!("Stacked 1")).build(ui, || {
@@ -812,17 +812,17 @@ CTRL+click on individual component to input value.\n",
 
                     ColorEdit::new(im_str!("color"), &mut state.stacked_modals_color).build(ui);
 
-                    if ui.button(im_str!("Add another modal.."), [0.0, 0.0]) {
+                    if ui.button(im_str!("Add another modal..")) {
                         ui.open_popup(im_str!("Stacked 2"))   ;
                     }
                     PopupModal::new(im_str!("Stacked 2")).build(ui, || {
                         ui.text("Hello from Stacked The Second");
-                        if ui.button(im_str!("Close"), [0.0, 0.0]) {
+                        if ui.button(im_str!("Close")) {
                             ui.close_current_popup();
                         }
                     });
 
-                    if ui.button(im_str!("Close"), [0.0, 0.0]) {
+                    if ui.button(im_str!("Close")) {
                         ui.close_current_popup();
                     }
                 });
@@ -833,11 +833,11 @@ CTRL+click on individual component to input value.\n",
 
 fn show_example_app_main_menu_bar<'a>(ui: &Ui<'a>, state: &mut State) {
     if let Some(menu_bar) = ui.begin_main_menu_bar() {
-        if let Some(menu) = ui.begin_menu(im_str!("File"), true) {
+        if let Some(menu) = ui.begin_menu(im_str!("File")) {
             show_example_menu_file(ui, &mut state.file_menu);
             menu.end();
         }
-        if let Some(menu) = ui.begin_menu(im_str!("Edit"), true) {
+        if let Some(menu) = ui.begin_menu(im_str!("Edit")) {
             MenuItem::new(im_str!("Undo"))
                 .shortcut(im_str!("CTRL+Z"))
                 .build(ui);
@@ -869,14 +869,14 @@ fn show_example_menu_file<'a>(ui: &Ui<'a>, state: &mut FileMenuState) {
     MenuItem::new(im_str!("Open"))
         .shortcut(im_str!("Ctrl+O"))
         .build(ui);
-    if let Some(menu) = ui.begin_menu(im_str!("Open Recent"), true) {
+    if let Some(menu) = ui.begin_menu(im_str!("Open Recent")) {
         MenuItem::new(im_str!("fish_hat.c")).build(ui);
         MenuItem::new(im_str!("fish_hat.inl")).build(ui);
         MenuItem::new(im_str!("fish_hat.h")).build(ui);
-        if let Some(menu) = ui.begin_menu(im_str!("More.."), true) {
+        if let Some(menu) = ui.begin_menu(im_str!("More..")) {
             MenuItem::new(im_str!("Hello")).build(ui);
             MenuItem::new(im_str!("Sailor")).build(ui);
-            if let Some(menu) = ui.begin_menu(im_str!("Recurse.."), true) {
+            if let Some(menu) = ui.begin_menu(im_str!("Recurse..")) {
                 show_example_menu_file(ui, state);
                 menu.end();
             }
@@ -889,7 +889,7 @@ fn show_example_menu_file<'a>(ui: &Ui<'a>, state: &mut FileMenuState) {
         .build(ui);
     MenuItem::new(im_str!("Save As..")).build(ui);
     ui.separator();
-    if let Some(menu) = ui.begin_menu(im_str!("Options"), true) {
+    if let Some(menu) = ui.begin_menu(im_str!("Options")) {
         MenuItem::new(im_str!("Enabled")).build_with_ref(ui, &mut state.enabled);
         ChildWindow::new("child")
             .size([0.0, 60.0])
@@ -911,13 +911,15 @@ fn show_example_menu_file<'a>(ui: &Ui<'a>, state: &mut FileMenuState) {
         ui.checkbox(im_str!("Check"), &mut state.b);
         menu.end();
     }
-    if let Some(menu) = ui.begin_menu(im_str!("Colors"), true) {
+    if let Some(menu) = ui.begin_menu(im_str!("Colors")) {
         for &col in StyleColor::VARIANTS.iter() {
             MenuItem::new(&im_str!("{:?}", col)).build(ui);
         }
         menu.end();
     }
-    assert!(ui.begin_menu(im_str!("Disabled"), false).is_none());
+    assert!(ui
+        .begin_menu_with_enabled(im_str!("Disabled"), false)
+        .is_none());
     MenuItem::new(im_str!("Checked")).selected(true).build(ui);
     MenuItem::new(im_str!("Quit"))
         .shortcut(im_str!("Alt+F4"))
@@ -1132,12 +1134,12 @@ fn show_example_app_custom_rendering(ui: &Ui, state: &mut CustomRenderingState, 
             ui.separator();
 
             ui.text(im_str!("Canvas example"));
-            if ui.button(im_str!("Clear"), [0.0, 0.0]) {
+            if ui.button(im_str!("Clear")) {
                 state.points.clear();
             }
             if state.points.len() >= 2 {
-                ui.same_line(0.0);
-                if ui.button(im_str!("Undo"), [0.0, 0.0]) {
+                ui.same_line();
+                if ui.button(im_str!("Undo")) {
                     state.points.pop();
                     state.points.pop();
                 }
@@ -1272,11 +1274,11 @@ fn show_app_log(ui: &Ui, app_log: &mut Vec<String>) {
                     app_log.push(text);
                 }
             }
-            if ui.button(im_str!("Clear"), [0.0, 0.0]) {
+            if ui.button(im_str!("Clear")) {
                 app_log.clear();
             }
-            ui.same_line(0.0);
-            if ui.button(im_str!("Copy"), [0.0, 0.0]) {
+            ui.same_line();
+            if ui.button(im_str!("Copy")) {
                 ui.set_clipboard_text(&ImString::from(app_log.join("\n")));
             }
             ui.separator();

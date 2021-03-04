@@ -18,18 +18,34 @@ impl<'ui> Ui<'ui> {
     pub fn separator(&self) {
         unsafe { sys::igSeparator() }
     }
+
     /// Call between widgets or groups to layout them horizontally.
     ///
     /// X position is given in window coordinates.
-    pub fn same_line(&self, pos_x: f32) {
-        unsafe { sys::igSameLine(pos_x, -1.0f32) }
+    ///
+    /// This is equivalent to calling [same_line_with_pos](Self::same_line_with_pos)
+    /// with the `pos` set to 0.0, which uses `Style::item_spacing`.
+    pub fn same_line(&self) {
+        self.same_line_with_pos(0.0);
     }
+
+    /// Call between widgets or groups to layout them horizontally.
+    ///
+    /// X position is given in window coordinates.
+    ///
+    /// This is equivalent to calling [same_line_with_spacing](Self::same_line_with_spacing)
+    /// with the `spacing` set to -1.0, which means no extra spacing.
+    pub fn same_line_with_pos(&self, pos_x: f32) {
+        self.same_line_with_spacing(pos_x, -1.0)
+    }
+
     /// Call between widgets or groups to layout them horizontally.
     ///
     /// X position is given in window coordinates.
     pub fn same_line_with_spacing(&self, pos_x: f32, spacing_w: f32) {
         unsafe { sys::igSameLine(pos_x, spacing_w) }
     }
+
     /// Undo a `same_line` call or force a new line when in horizontal layout mode
     pub fn new_line(&self) {
         unsafe { sys::igNewLine() }
@@ -44,17 +60,25 @@ impl<'ui> Ui<'ui> {
     pub fn dummy(&self, size: [f32; 2]) {
         unsafe { sys::igDummy(size.into()) }
     }
+
     /// Moves content position to the right by `Style::indent_spacing`
+    ///
+    /// This is equivalent to [indent_by](Self::indent_by) with `width` set to
+    /// `Style::ident_spacing`.
     pub fn indent(&self) {
-        unsafe { sys::igIndent(0.0) };
+        self.indent_by(0.0)
     }
+
     /// Moves content position to the right by `width`
     pub fn indent_by(&self, width: f32) {
         unsafe { sys::igIndent(width) };
     }
     /// Moves content position to the left by `Style::indent_spacing`
+    ///
+    /// This is equivalent to [unindent_by](Self::unindent_by) with `width` set to
+    /// `Style::ident_spacing`.
     pub fn unindent(&self) {
-        unsafe { sys::igUnindent(0.0) };
+        self.unindent_by(0.0)
     }
     /// Moves content position to the left by `width`
     pub fn unindent_by(&self, width: f32) {

@@ -40,10 +40,20 @@ impl<'ui> Ui<'ui> {
     pub fn is_item_focused(&self) -> bool {
         unsafe { sys::igIsItemFocused() }
     }
+
+    /// Returns `true` if the last item is being clicked by `MouseButton::Left`.
+    ///
+    /// This is the same as [is_item_clicked_with_button](Self::is_item_clicked_with_button)
+    /// with `button` set to `MouseButton::Left`.
+    pub fn is_item_clicked(&self) -> bool {
+        self.is_item_clicked_with_button(MouseButton::Left)
+    }
+
     /// Returns `true` if the last item is being clicked
-    pub fn is_item_clicked(&self, button: MouseButton) -> bool {
+    pub fn is_item_clicked_with_button(&self, button: MouseButton) -> bool {
         unsafe { sys::igIsItemClicked(button as i32) }
     }
+
     /// Returns `true` if the last item is visible
     pub fn is_item_visible(&self) -> bool {
         unsafe { sys::igIsItemVisible() }

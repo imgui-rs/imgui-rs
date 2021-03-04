@@ -75,7 +75,7 @@ bitflags!(
 /// ```no_run
 /// # use imgui::*;
 /// fn show_ui(ui: &Ui<'_>) {
-///     ui.button(im_str!("Hello, I am a drag source!"), [0.0, 0.0]);
+///     ui.button(im_str!("Hello, I am a drag source!"));
 ///     
 ///     // Creates an empty DragSource with no tooltip
 ///     DragDropSource::new(im_str!("BUTTON_DRAG")).begin(ui);
@@ -143,7 +143,7 @@ impl<'a> DragDropSource<'a> {
     /// ```no_run
     /// # use imgui::*;
     /// fn show_ui(ui: &Ui<'_>, drop_message: &mut Option<String>) {
-    ///     ui.button(im_str!("Drag me!"), [0.0, 0.0]);
+    ///     ui.button(im_str!("Drag me!"));
     ///
     ///     let drag_drop_name = im_str!("Test Drag");
     ///     
@@ -155,7 +155,7 @@ impl<'a> DragDropSource<'a> {
     ///         *drop_message = Some("Test Payload".to_string());
     ///     }
     ///
-    ///     ui.button(im_str!("Target me!"), [0.0, 0.0]);
+    ///     ui.button(im_str!("Target me!"));
     ///
     ///     // drag drop TARGET
     ///     if let Some(target) = imgui::DragDropTarget::new(ui) {
@@ -196,7 +196,7 @@ impl<'a> DragDropSource<'a> {
     /// ```no_run
     /// # use imgui::*;
     /// fn show_ui(ui: &Ui<'_>) {
-    ///     ui.button(im_str!("Drag me!"), [0.0, 0.0]);
+    ///     ui.button(im_str!("Drag me!"));
     ///
     ///     let drag_drop_name = im_str!("Test Drag");
     ///     let msg_to_send = "hello there sailor";
@@ -207,7 +207,7 @@ impl<'a> DragDropSource<'a> {
     ///         tooltip.end();
     ///     }
     ///
-    ///     ui.button(im_str!("Target me!"), [0.0, 0.0]);
+    ///     ui.button(im_str!("Target me!"));
     ///
     ///     // drag drop TARGET
     ///     if let Some(target) = imgui::DragDropTarget::new(ui) {
@@ -313,7 +313,7 @@ impl Drop for DragDropSourceToolTip<'_> {
 /// # use imgui::*;
 /// fn show_ui(ui: &Ui<'_>) {
 ///     // Drop something on this button please!
-///     ui.button(im_str!("Hello, I am a drag Target!"), [0.0, 0.0]);
+///     ui.button(im_str!("Hello, I am a drag Target!"));
 ///     
 ///     if let Some(target) = DragDropTarget::new(ui) {
 ///         // accepting an empty payload (which is really just raising an event)

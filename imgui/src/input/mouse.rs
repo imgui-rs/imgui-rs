@@ -135,14 +135,27 @@ impl<'ui> Ui<'ui> {
         unsafe { sys::igGetMousePosOnOpeningCurrentPopup(&mut out) };
         out.into()
     }
-    /// Returns the delta from the initial clicking position.
+
+    /// Returns the delta from the initial position when the left mouse button clicked.
     ///
     /// This is locked and returns [0.0, 0.0] until the mouse has moved past the global distance
     /// threshold (`io.mouse_drag_threshold`).
-    pub fn mouse_drag_delta(&self, button: MouseButton) -> [f32; 2] {
-        let mut out = sys::ImVec2::zero();
-        unsafe { sys::igGetMouseDragDelta(&mut out, button as i32, -1.0) };
-        out.into()
+    ///
+    /// This is the same as [mouse_drag_delta_with_button](Self::mouse_drag_delta_with_button) with
+    /// `button` set to `MouseButton::Left`.
+    pub fn mouse_drag_delta(&self) -> [f32; 2] {
+        self.mouse_drag_delta_with_button(MouseButton::Left)
+    }
+
+    /// Returns the delta from the initial position when the given button was clicked.
+    ///
+    /// This is locked and returns [0.0, 0.0] until the mouse has moved past the global distance
+    /// threshold (`io.mouse_drag_threshold`).
+    ///
+    /// This is the same as [mouse_drag_delta_with_threshold](Self::mouse_drag_delta_with_threshold) with
+    /// `threshold` set to `-1.0`, which uses the global threshold `io.mouse_drag_threshold`.
+    pub fn mouse_drag_delta_with_button(&self, button: MouseButton) -> [f32; 2] {
+        self.mouse_drag_delta_with_threshold(button, -1.0)
     }
     /// Returns the delta from the initial clicking position.
     ///
@@ -353,7 +366,7 @@ fn test_mouse_drags() {
             let ui = ctx.frame();
             assert!(!ui.is_mouse_dragging(button));
             assert!(!ui.is_mouse_dragging_with_threshold(button, 200.0));
-            assert_eq!(ui.mouse_drag_delta(button), [0.0, 0.0]);
+            assert_eq!(ui.mouse_drag_delta_with_button(button), [0.0, 0.0]);
             assert_eq!(
                 ui.mouse_drag_delta_with_threshold(button, 200.0),
                 [0.0, 0.0]
@@ -364,7 +377,7 @@ fn test_mouse_drags() {
             let ui = ctx.frame();
             assert!(!ui.is_mouse_dragging(button));
             assert!(!ui.is_mouse_dragging_with_threshold(button, 200.0));
-            assert_eq!(ui.mouse_drag_delta(button), [0.0, 0.0]);
+            assert_eq!(ui.mouse_drag_delta_with_button(button), [0.0, 0.0]);
             assert_eq!(
                 ui.mouse_drag_delta_with_threshold(button, 200.0),
                 [0.0, 0.0]
@@ -375,7 +388,7 @@ fn test_mouse_drags() {
             let ui = ctx.frame();
             assert!(ui.is_mouse_dragging(button));
             assert!(!ui.is_mouse_dragging_with_threshold(button, 200.0));
-            assert_eq!(ui.mouse_drag_delta(button), [0.0, 100.0]);
+            assert_eq!(ui.mouse_drag_delta_with_button(button), [0.0, 100.0]);
             assert_eq!(
                 ui.mouse_drag_delta_with_threshold(button, 200.0),
                 [0.0, 0.0]
@@ -386,7 +399,7 @@ fn test_mouse_drags() {
             let ui = ctx.frame();
             assert!(ui.is_mouse_dragging(button));
             assert!(ui.is_mouse_dragging_with_threshold(button, 200.0));
-            assert_eq!(ui.mouse_drag_delta(button), [0.0, 200.0]);
+            assert_eq!(ui.mouse_drag_delta_with_button(button), [0.0, 200.0]);
             assert_eq!(
                 ui.mouse_drag_delta_with_threshold(button, 200.0),
                 [0.0, 200.0]
@@ -398,7 +411,7 @@ fn test_mouse_drags() {
             let ui = ctx.frame();
             assert!(!ui.is_mouse_dragging(button));
             assert!(!ui.is_mouse_dragging_with_threshold(button, 200.0));
-            assert_eq!(ui.mouse_drag_delta(button), [10.0, 10.0]);
+            assert_eq!(ui.mouse_drag_delta_with_button(button), [10.0, 10.0]);
             assert_eq!(
                 ui.mouse_drag_delta_with_threshold(button, 200.0),
                 [10.0, 10.0]
@@ -409,7 +422,7 @@ fn test_mouse_drags() {
             let ui = ctx.frame();
             assert!(!ui.is_mouse_dragging(button));
             assert!(!ui.is_mouse_dragging_with_threshold(button, 200.0));
-            assert_eq!(ui.mouse_drag_delta(button), [0.0, 0.0]);
+            assert_eq!(ui.mouse_drag_delta_with_button(button), [0.0, 0.0]);
             assert_eq!(
                 ui.mouse_drag_delta_with_threshold(button, 200.0),
                 [0.0, 0.0]
@@ -420,7 +433,7 @@ fn test_mouse_drags() {
             let ui = ctx.frame();
             assert!(ui.is_mouse_dragging(button));
             assert!(ui.is_mouse_dragging_with_threshold(button, 200.0));
-            assert_eq!(ui.mouse_drag_delta(button), [170.0, 170.0]);
+            assert_eq!(ui.mouse_drag_delta_with_button(button), [170.0, 170.0]);
             assert_eq!(
                 ui.mouse_drag_delta_with_threshold(button, 200.0),
                 [170.0, 170.0]
@@ -428,7 +441,7 @@ fn test_mouse_drags() {
             ui.reset_mouse_drag_delta(button);
             assert!(ui.is_mouse_dragging(button));
             assert!(ui.is_mouse_dragging_with_threshold(button, 200.0));
-            assert_eq!(ui.mouse_drag_delta(button), [0.0, 0.0]);
+            assert_eq!(ui.mouse_drag_delta_with_button(button), [0.0, 0.0]);
             assert_eq!(
                 ui.mouse_drag_delta_with_threshold(button, 200.0),
                 [0.0, 0.0]
@@ -439,7 +452,7 @@ fn test_mouse_drags() {
             let ui = ctx.frame();
             assert!(ui.is_mouse_dragging(button));
             assert!(ui.is_mouse_dragging_with_threshold(button, 200.0));
-            assert_eq!(ui.mouse_drag_delta(button), [20.0, 20.0]);
+            assert_eq!(ui.mouse_drag_delta_with_button(button), [20.0, 20.0]);
             assert_eq!(
                 ui.mouse_drag_delta_with_threshold(button, 200.0),
                 [20.0, 20.0]

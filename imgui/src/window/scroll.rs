@@ -35,9 +35,11 @@ impl<'ui> Ui<'ui> {
     pub fn set_scroll_y(&self, scroll_y: f32) {
         unsafe { sys::igSetScrollY(scroll_y) };
     }
-    /// Adjusts the horizontal scroll position to make the current cursor position visible
+    /// Adjusts the horizontal scroll position to make the current cursor position visible.
+    ///
+    /// This is the same as [set_scroll_here_x_with_ratio](Self::set_scroll_here_x_with_ratio) but with `ratio` at 0.5.
     pub fn set_scroll_here_x(&self) {
-        unsafe { sys::igSetScrollHereX(0.5) };
+        self.set_scroll_here_x_with_ratio(0.5);
     }
     /// Adjusts the horizontal scroll position to make the current cursor position visible.
     ///
@@ -50,8 +52,10 @@ impl<'ui> Ui<'ui> {
         unsafe { sys::igSetScrollHereX(center_x_ratio) };
     }
     /// Adjusts the vertical scroll position to make the current cursor position visible
+    ///
+    /// This is the same as [set_scroll_here_y_with_ratio](Self::set_scroll_here_y_with_ratio) but with `ratio` at 0.5.
     pub fn set_scroll_here_y(&self) {
-        unsafe { sys::igSetScrollHereY(0.5) };
+        self.set_scroll_here_y_with_ratio(0.5);
     }
     /// Adjusts the vertical scroll position to make the current cursor position visible.
     ///
@@ -64,8 +68,11 @@ impl<'ui> Ui<'ui> {
         unsafe { sys::igSetScrollHereY(center_y_ratio) };
     }
     /// Adjusts the horizontal scroll position to make the given position visible
+    ///
+    /// This is the same as [set_scroll_from_pos_x_with_ratio](Self::set_scroll_from_pos_x_with_ratio)
+    /// but with `ratio` at 0.5.
     pub fn set_scroll_from_pos_x(&self, local_x: f32) {
-        unsafe { sys::igSetScrollFromPosX(local_x, 0.5) };
+        self.set_scroll_from_pos_x_with_ratio(local_x, 0.5);
     }
     /// Adjusts the horizontal scroll position to make the given position visible.
     ///
@@ -78,8 +85,11 @@ impl<'ui> Ui<'ui> {
         unsafe { sys::igSetScrollFromPosX(local_x, center_x_ratio) };
     }
     /// Adjusts the vertical scroll position to make the given position visible
+    ///
+    /// This is the same as [set_scroll_from_pos_y_with_ratio](Self::set_scroll_from_pos_y_with_ratio)
+    /// but with `ratio` at 0.5.
     pub fn set_scroll_from_pos_y(&self, local_y: f32) {
-        unsafe { sys::igSetScrollFromPosY(local_y, 0.5) };
+        self.set_scroll_from_pos_y_with_ratio(local_y, 0.5);
     }
     /// Adjusts the vertical scroll position to make the given position visible.
     ///

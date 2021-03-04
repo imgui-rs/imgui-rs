@@ -50,6 +50,21 @@ impl<'ui> Ui<'ui> {
             f();
         }
     }
+
+    /// Creates and starts appending to a sub-menu entry.
+    ///
+    /// Returns `Some(MenuToken)` if the menu is visible. After content has been
+    /// rendered, the token must be ended by calling `.end()`.
+    ///
+    /// Returns `None` if the menu is not visible and no content should be rendered.
+    ///
+    /// This is the equivalent of [begin_menu_with_enabled](Self::begin_menu_with_enabled)
+    /// with `enabled` set to `true`.
+    #[must_use]
+    pub fn begin_menu(&self, label: &ImStr) -> Option<MenuToken<'_>> {
+        self.begin_menu_with_enabled(label, true)
+    }
+
     /// Creates and starts appending to a sub-menu entry.
     ///
     /// Returns `Some(MenuToken)` if the menu is visible. After content has been
@@ -57,7 +72,7 @@ impl<'ui> Ui<'ui> {
     ///
     /// Returns `None` if the menu is not visible and no content should be rendered.
     #[must_use]
-    pub fn begin_menu(&self, label: &ImStr, enabled: bool) -> Option<MenuToken<'_>> {
+    pub fn begin_menu_with_enabled(&self, label: &ImStr, enabled: bool) -> Option<MenuToken<'_>> {
         if unsafe { sys::igBeginMenu(label.as_ptr(), enabled) } {
             Some(MenuToken::new(self))
         } else {
@@ -67,8 +82,18 @@ impl<'ui> Ui<'ui> {
     /// Creates a menu and runs a closure to construct the contents.
     ///
     /// Note: the closure is not called if the menu is not visible.
-    pub fn menu<F: FnOnce()>(&self, label: &ImStr, enabled: bool, f: F) {
-        if let Some(_menu) = self.begin_menu(label, enabled) {
+    ///
+    /// This is the equivalent of [menu_with_enabled](Self::menu_with_enabled)
+    /// with `enabled` set to `true`.
+    pub fn menu<F: FnOnce()>(&self, label: &ImStr, f: F) {
+        self.menu_with_enabled(label, true, f);
+    }
+
+    /// Creates a menu and runs a closure to construct the contents.
+    ///
+    /// Note: the closure is not called if the menu is not visible.
+    pub fn menu_with_enabled<F: FnOnce()>(&self, label: &ImStr, enabled: bool, f: F) {
+        if let Some(_menu) = self.begin_menu_with_enabled(label, enabled) {
             f();
         }
     }

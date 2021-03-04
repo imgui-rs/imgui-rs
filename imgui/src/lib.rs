@@ -392,22 +392,35 @@ impl<'ui> Ui<'ui> {
 impl<'ui> Ui<'ui> {
     /// Calculate the size required for a given text string.
     ///
+    /// This is the same as [calc_text_size_with_opts](Self::calc_text_size_with_opts)
+    /// with `hide_text_after_double_hash` set to false and `wrap_width` set to `-1.0`.
+    pub fn calc_text_size<T: AsRef<str>>(&self, text: T) -> [f32; 2] {
+        self.calc_text_size_with_opts(text, false, -1.0)
+    }
+
+    /// Calculate the size required for a given text string.
+    ///
     /// hide_text_after_double_hash allows the user to insert comments into their text, using a double hash-tag prefix.
     /// This is a feature of imgui.
     ///
     /// wrap_width allows you to request a width at which to wrap the text to a newline for the calculation.
-    pub fn calc_text_size(
+    pub fn calc_text_size_with_opts<T: AsRef<str>>(
         &self,
-        text: &ImStr,
+        text: T,
         hide_text_after_double_hash: bool,
         wrap_width: f32,
     ) -> [f32; 2] {
         let mut out = sys::ImVec2::zero();
+        let text = text.as_ref();
+
         unsafe {
+            let start = text.as_ptr();
+            let end = start.add(text.len());
+
             sys::igCalcTextSize(
                 &mut out,
-                text.as_ptr(),
-                std::ptr::null(),
+                start as *const c_char,
+                end as *const c_char,
                 hide_text_after_double_hash,
                 wrap_width,
             )

@@ -107,6 +107,7 @@ impl<'ui> Ui<'ui> {
         let key_index = self.key_index(key);
         unsafe { sys::igIsKeyDown(key_index) }
     }
+
     /// Returns true if the key was pressed (went from !down to down).
     ///
     /// Affected by key repeat settings (`io.key_repeat_delay`, `io.key_repeat_rate`)
@@ -115,12 +116,23 @@ impl<'ui> Ui<'ui> {
         let key_index = self.key_index(key);
         unsafe { sys::igIsKeyPressed(key_index, true) }
     }
+
+    /// Returns true if the key was pressed (went from !down to down).
+    ///
+    /// Is **not** affected by key repeat settings (`io.key_repeat_delay`, `io.key_repeat_rate`)
+    #[inline]
+    pub fn is_key_pressed_no_repeat(&self, key: Key) -> bool {
+        let key_index = self.key_index(key);
+        unsafe { sys::igIsKeyPressed(key_index, false) }
+    }
+
     /// Returns true if the key was released (went from down to !down)
     #[inline]
     pub fn is_key_released(&self, key: Key) -> bool {
         let key_index = self.key_index(key);
         unsafe { sys::igIsKeyReleased(key_index) }
     }
+
     /// Returns a count of key presses using the given repeat rate/delay settings.
     ///
     /// Usually returns 0 or 1, but might be >1 if `rate` is small enough that `io.delta_time` >
@@ -130,9 +142,19 @@ impl<'ui> Ui<'ui> {
         let key_index = self.key_index(key);
         unsafe { sys::igGetKeyPressedAmount(key_index, repeat_delay, rate) as u32 }
     }
-    /// Focuses keyboard on a widget relative to current position
+
+    /// Focuses keyboard on the next widget.
+    ///
+    /// This is the equivalent to [set_keyboard_focus_here_with_offset](Self::set_keyboard_focus_here_with_offset)
+    /// with `target_widget` set to `FocusedWidget::Next`.
     #[inline]
-    pub fn set_keyboard_focus_here(&self, target_widget: FocusedWidget) {
+    pub fn set_keyboard_focus_here(&self) {
+        self.set_keyboard_focus_here_with_offset(FocusedWidget::Next);
+    }
+
+    /// Focuses keyboard on a widget relative to current position.
+    #[inline]
+    pub fn set_keyboard_focus_here_with_offset(&self, target_widget: FocusedWidget) {
         unsafe {
             sys::igSetKeyboardFocusHere(target_widget.as_offset());
         }

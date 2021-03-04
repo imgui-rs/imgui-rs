@@ -2,12 +2,15 @@
 
 ## [Unreleased]
 
+- BREAKING: Created `with_x` variants for most functions which previously took multiple parameters where some had default arguments in the C++. This makes calling most functions simpler and more similar to the C++.
+ - The most likely breaking changes users will see is `button` and `same_line` now take one fewer parameter -- if you were calling `button` with `[0.0, 0.0]`, simply delete that -- otherwise, call `button_with_size`. Similarly, for `same_line`, if you were passing in `0.0.` simply delete that parameter. Otherwise, call `same_line_with_pos`.
+
 - Removed legacy `ImGuiDragDropFlags` from `legacy.rs`, which were accidentally not cleared when they were remade in `drag_drop.rs` in v0.7.0.
 
-- Most tokens through the repository (eg. `WindowToken`, `TabBarToken`, `FontStackToken`, etc) now allow for permissive dropping -- i.e, you don't need to actually call the `.end()` method on them anymore. In exchange, these tokens have taken on a lifetime, which allows them to be safe. This could make some patterns impossible. Please file an issue if this causes a problem.
+- BREAKING: Most tokens through the repository (eg. `WindowToken`, `TabBarToken`, `FontStackToken`, etc) now allow for permissive dropping -- i.e, you don't need to actually call the `.end()` method on them anymore. In exchange, these tokens have taken on a lifetime, which allows them to be safe. This could make some patterns impossible. Please file an issue if this causes a problem.
 - `end()` no longer takes `Ui`. This is a breaking change, but hopefully should be trivial (and perhaps nice) for users to fix. Simply delete the argument, or add a `_` before the token's binding name and allow it to be dropped on its own.
 
-- `PopupModal`'s `new` was reworked so that it didn't take `Ui` until `build` was called. This is a breaking change if you were invoking it directly. Simply move your `ui` call to `build` or `begin`.
+- BREAKING: `PopupModal`'s `new` was reworked so that it didn't take `Ui` until `build` was called. This is a breaking change if you were invoking it directly. Simply move your `ui` call to `build` or `begin`.
 
 ## [0.7.0] - 2021-02-04
 
