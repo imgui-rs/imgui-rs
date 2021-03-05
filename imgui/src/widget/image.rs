@@ -18,6 +18,7 @@ pub struct Image {
 
 impl Image {
     /// Creates a new image builder with the given texture and size
+    #[doc(alias = "Image")]
     pub const fn new(texture_id: TextureId, size: [f32; 2]) -> Image {
         Image {
             texture_id,
@@ -83,6 +84,7 @@ pub struct ImageButton {
 
 impl ImageButton {
     /// Creates a new image button builder with the given texture and size
+    #[doc(alias = "ImageButton")]
     pub fn new(texture_id: TextureId, size: [f32; 2]) -> ImageButton {
         ImageButton {
             texture_id,

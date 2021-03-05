@@ -65,6 +65,7 @@ pub struct FontAtlas {
 unsafe impl RawCast<sys::ImFontAtlas> for FontAtlas {}
 
 impl FontAtlas {
+    #[doc(alias = "AddFontDefault", alias = "AddFont")]
     pub fn add_font(&mut self, font_sources: &[FontSource]) -> FontId {
         let (head, tail) = font_sources.split_first().unwrap();
         let font_id = self.add_font_internal(head, false);
@@ -130,10 +131,12 @@ impl FontAtlas {
         None
     }
     /// Returns true if the font atlas has been built
+    #[doc(alias = "IsBuilt")]
     pub fn is_built(&self) -> bool {
         unsafe { sys::ImFontAtlas_IsBuilt(self.raw() as *const sys::ImFontAtlas as *mut _) }
     }
     /// Builds a 1 byte per-pixel font atlas texture
+    #[doc(alias = "GetTextDataAsAlpha8")]
     pub fn build_alpha8_texture(&mut self) -> FontAtlasTexture {
         let mut pixels: *mut c_uchar = ptr::null_mut();
         let mut width: c_int = 0;
@@ -167,6 +170,7 @@ impl FontAtlas {
         }
     }
     /// Builds a 4 byte per-pixel font atlas texture
+    #[doc(alias = "GetTextDataAsRGBA32")]
     pub fn build_rgba32_texture(&mut self) -> FontAtlasTexture {
         let mut pixels: *mut c_uchar = ptr::null_mut();
         let mut width: c_int = 0;
@@ -200,12 +204,14 @@ impl FontAtlas {
         }
     }
     /// Clears the font atlas completely (both input and output data)
+    #[doc(alias = "Clear")]
     pub fn clear(&mut self) {
         unsafe {
             sys::ImFontAtlas_Clear(self.raw_mut());
         }
     }
     /// Clears output font data (glyph storage, UV coordinates)
+    #[doc(alias = "ClearFonts")]
     pub fn clear_fonts(&mut self) {
         unsafe {
             sys::ImFontAtlas_ClearFonts(self.raw_mut());
@@ -214,12 +220,14 @@ impl FontAtlas {
     /// Clears output texture data.
     ///
     /// Can be used to save RAM once the texture has been transferred to the GPU.
+    #[doc(alias = "ClearTexData")]
     pub fn clear_tex_data(&mut self) {
         unsafe {
             sys::ImFontAtlas_ClearTexData(self.raw_mut());
         }
     }
     /// Clears all the data used to build the textures and fonts
+    #[doc(alias = "ClearInputData")]
     pub fn clear_input_data(&mut self) {
         unsafe {
             sys::ImFontAtlas_ClearInputData(self.raw_mut());
@@ -423,12 +431,14 @@ pub struct FontAtlasTexture<'a> {
 pub struct SharedFontAtlas(pub(crate) *mut sys::ImFontAtlas);
 
 impl SharedFontAtlas {
+    #[doc(alias = "ImFontAtlas", alias = "ImFontAtlas::ImFontAtlas")]
     pub fn create() -> SharedFontAtlas {
         SharedFontAtlas(unsafe { sys::ImFontAtlas_ImFontAtlas() })
     }
 }
 
 impl Drop for SharedFontAtlas {
+    #[doc(alias = "ImFontAtlas::Destory")]
     fn drop(&mut self) {
         unsafe { sys::ImFontAtlas_destroy(self.0) };
     }

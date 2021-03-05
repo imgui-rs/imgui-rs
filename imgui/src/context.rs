@@ -79,6 +79,7 @@ impl Context {
     /// # Panics
     ///
     /// Panics if an active context already exists
+    #[doc(alias = "CreateContext")]
     pub fn create() -> Self {
         Self::create_internal(None)
     }
@@ -87,10 +88,12 @@ impl Context {
     /// # Panics
     ///
     /// Panics if an active context already exists
+    #[doc(alias = "CreateContext")]
     pub fn create_with_shared_font_atlas(shared_font_atlas: Rc<RefCell<SharedFontAtlas>>) -> Self {
         Self::create_internal(Some(shared_font_atlas))
     }
     /// Suspends this context so another context can be the active context.
+    #[doc(alias = "CreateContext")]
     pub fn suspend(self) -> SuspendedContext {
         let _guard = CTX_MUTEX.lock();
         assert!(
@@ -183,10 +186,12 @@ impl Context {
         self.renderer_name = renderer_name;
     }
     /// Loads settings from a string slice containing settings in .Ini file format
+    #[doc(alias = "LoadIniSettingsFromMemory")]
     pub fn load_ini_settings(&mut self, data: &str) {
         unsafe { sys::igLoadIniSettingsFromMemory(data.as_ptr() as *const _, data.len()) }
     }
     /// Saves settings to a mutable string buffer in .Ini file format
+    #[doc(alias = "SaveInitSettingsToMemory")]
     pub fn save_ini_settings(&mut self, buf: &mut String) {
         let data = unsafe { CStr::from_ptr(sys::igSaveIniSettingsToMemory(ptr::null_mut())) };
         buf.push_str(&data.to_string_lossy());
@@ -236,6 +241,7 @@ impl Context {
 }
 
 impl Drop for Context {
+    #[doc(alias = "DestroyContext")]
     fn drop(&mut self) {
         let _guard = CTX_MUTEX.lock();
         // If this context is the active context, Dear ImGui automatically deactivates it during
@@ -270,6 +276,7 @@ pub struct SuspendedContext(Context);
 
 impl SuspendedContext {
     /// Creates a new suspended imgui-rs context.
+    #[doc(alias = "CreateContext")]
     pub fn create() -> Self {
         Self::create_internal(None)
     }
@@ -283,6 +290,7 @@ impl SuspendedContext {
     /// containing the activated context.
     /// If there is already an active context, nothing happens and `Err` is returned, containing
     /// the original suspended context.
+    #[doc(alias = "SetCurrentContext")]
     pub fn activate(self) -> Result<Context, SuspendedContext> {
         let _guard = CTX_MUTEX.lock();
         if no_current_context() {
@@ -465,6 +473,7 @@ impl Context {
         }
     }
     /// Returns an immutable reference to the user interface style
+    #[doc(alias = "GetStyle")]
     pub fn style(&self) -> &Style {
         unsafe {
             // safe because Style is a transparent wrapper around sys::ImGuiStyle
@@ -472,6 +481,7 @@ impl Context {
         }
     }
     /// Returns a mutable reference to the user interface style
+    #[doc(alias = "GetStyle")]
     pub fn style_mut(&mut self) -> &mut Style {
         unsafe {
             // safe because Style is a transparent wrapper around sys::ImGuiStyle
@@ -498,6 +508,7 @@ impl Context {
     /// # Panics
     ///
     /// Panics if the context uses a shared font atlas that is already borrowed
+    #[doc(alias = "NewFame")]
     pub fn frame(&mut self) -> Ui {
         // Clear default font if it no longer exists. This could be an error in the future
         let default_font = self.io().font_default;

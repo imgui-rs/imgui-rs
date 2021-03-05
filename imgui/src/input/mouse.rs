@@ -92,26 +92,32 @@ impl<'ui> Ui<'ui> {
     /// Returns true if the given mouse button is held down.
     ///
     /// Equivalent to indexing the Io struct with the button, e.g. `ui.io()[button]`.
+    #[doc(alias = "IsMouseDown")]
     pub fn is_mouse_down(&self, button: MouseButton) -> bool {
         unsafe { sys::igIsMouseDown(button as i32) }
     }
     /// Returns true if any mouse button is held down
+    #[doc(alias = "IsAnyMouseDown")]
     pub fn is_any_mouse_down(&self) -> bool {
         unsafe { sys::igIsAnyMouseDown() }
     }
     /// Returns true if the given mouse button was clicked (went from !down to down)
+    #[doc(alias = "IsMouseClicked")]
     pub fn is_mouse_clicked(&self, button: MouseButton) -> bool {
         unsafe { sys::igIsMouseClicked(button as i32, false) }
     }
     /// Returns true if the given mouse button was double-clicked
+    #[doc(alias = "IsMouseDoubleClicked")]
     pub fn is_mouse_double_clicked(&self, button: MouseButton) -> bool {
         unsafe { sys::igIsMouseDoubleClicked(button as i32) }
     }
     /// Returns true if the given mouse button was released (went from down to !down)
+    #[doc(alias = "IsMouseReleased")]
     pub fn is_mouse_released(&self, button: MouseButton) -> bool {
         unsafe { sys::igIsMouseReleased(button as i32) }
     }
     /// Returns true if the mouse is currently dragging with the given mouse button held down
+    #[doc(alias = "IsMouseDragging")]
     pub fn is_mouse_dragging(&self, button: MouseButton) -> bool {
         unsafe { sys::igIsMouseDragging(button as i32, -1.0) }
     }
@@ -119,6 +125,7 @@ impl<'ui> Ui<'ui> {
     ///
     /// If the given threshold is invalid or negative, the global distance threshold is used
     /// (`io.mouse_drag_threshold`).
+    #[doc(alias = "IsMouseDragging")]
     pub fn is_mouse_dragging_with_threshold(&self, button: MouseButton, threshold: f32) -> bool {
         unsafe { sys::igIsMouseDragging(button as i32, threshold) }
     }
@@ -130,6 +137,7 @@ impl<'ui> Ui<'ui> {
         unsafe { sys::igIsMouseHoveringRect(r_min.into(), r_max.into(), true) }
     }
     /// Returns the mouse position backed up at the time of opening a popup
+    #[doc(alias = "GetMousePosOnOpeningCurrentPopup")]
     pub fn mouse_pos_on_opening_current_popup(&self) -> [f32; 2] {
         let mut out = sys::ImVec2::zero();
         unsafe { sys::igGetMousePosOnOpeningCurrentPopup(&mut out) };
@@ -143,6 +151,7 @@ impl<'ui> Ui<'ui> {
     ///
     /// This is the same as [mouse_drag_delta_with_button](Self::mouse_drag_delta_with_button) with
     /// `button` set to `MouseButton::Left`.
+    #[doc(alias = "GetMouseDragDelta")]
     pub fn mouse_drag_delta(&self) -> [f32; 2] {
         self.mouse_drag_delta_with_button(MouseButton::Left)
     }
@@ -154,6 +163,7 @@ impl<'ui> Ui<'ui> {
     ///
     /// This is the same as [mouse_drag_delta_with_threshold](Self::mouse_drag_delta_with_threshold) with
     /// `threshold` set to `-1.0`, which uses the global threshold `io.mouse_drag_threshold`.
+    #[doc(alias = "GetMouseDragDelta")]
     pub fn mouse_drag_delta_with_button(&self, button: MouseButton) -> [f32; 2] {
         self.mouse_drag_delta_with_threshold(button, -1.0)
     }
@@ -162,12 +172,14 @@ impl<'ui> Ui<'ui> {
     /// This is locked and returns [0.0, 0.0] until the mouse has moved past the given threshold.
     /// If the given threshold is invalid or negative, the global distance threshold is used
     /// (`io.mouse_drag_threshold`).
+    #[doc(alias = "GetMouseDragDelta")]
     pub fn mouse_drag_delta_with_threshold(&self, button: MouseButton, threshold: f32) -> [f32; 2] {
         let mut out = sys::ImVec2::zero();
         unsafe { sys::igGetMouseDragDelta(&mut out, button as i32, threshold) };
         out.into()
     }
     /// Resets the current delta from initial clicking position.
+    #[doc(alias = "ResetMouseDragDelta")]
     pub fn reset_mouse_drag_delta(&self, button: MouseButton) {
         // This mutates the Io struct, but targets an internal field so there can't be any
         // references to it
@@ -176,6 +188,7 @@ impl<'ui> Ui<'ui> {
     /// Returns the currently desired mouse cursor type.
     ///
     /// Returns `None` if no cursor should be displayed
+    #[doc(alias = "GetMouseCursor")]
     pub fn mouse_cursor(&self) -> Option<MouseCursor> {
         match unsafe { sys::igGetMouseCursor() } {
             sys::ImGuiMouseCursor_Arrow => Some(MouseCursor::Arrow),
@@ -193,6 +206,7 @@ impl<'ui> Ui<'ui> {
     /// Sets the desired mouse cursor type.
     ///
     /// Passing `None` hides the mouse cursor.
+    #[doc(alias = "SetMouseCursor")]
     pub fn set_mouse_cursor(&self, cursor_type: Option<MouseCursor>) {
         unsafe {
             sys::igSetMouseCursor(
@@ -202,9 +216,11 @@ impl<'ui> Ui<'ui> {
             );
         }
     }
+    #[doc(alias = "IsMousePosValid")]
     pub fn is_current_mouse_pos_valid(&self) -> bool {
         unsafe { sys::igIsMousePosValid(ptr::null()) }
     }
+    #[doc(alias = "IsMousePosValid")]
     pub fn is_mouse_pos_valid(&self, mouse_pos: [f32; 2]) -> bool {
         unsafe { sys::igIsMousePosValid(&mouse_pos.into()) }
     }

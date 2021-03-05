@@ -346,6 +346,7 @@ impl<'ui> DragDropTarget<'ui> {
     /// Creates a new DragDropTarget, holding the [Ui]'s lifetime for the duration
     /// of its existence. This is required since this struct runs some code on its Drop
     /// to end the DragDropTarget code.
+    #[doc(alias = "BeginDragDropTarget")]
     pub fn new(_ui: &Ui<'_>) -> Option<Self> {
         let should_begin = unsafe { sys::igBeginDragDropTarget() };
         if should_begin {

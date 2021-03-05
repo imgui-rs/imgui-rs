@@ -125,6 +125,7 @@ impl<'p> PopupModal<'p> {
     }
 
     /// Consume and draw the PopupModal.
+    #[doc(alias = "BeginPopupModal")]
     pub fn build<F: FnOnce()>(self, ui: &Ui<'_>, f: F) {
         if let Some(_popup) = self.begin_popup(ui) {
             f();
@@ -136,6 +137,7 @@ impl<'p> PopupModal<'p> {
     ///
     /// This should be called *per frame*, whereas [`open_popup`](Self::open_popup) should be called *once*
     /// when you want to actual create the popup.
+    #[doc(alias = "BeginPopupModal")]
     pub fn begin_popup<'ui>(self, ui: &Ui<'ui>) -> Option<PopupToken<'ui>> {
         let render = unsafe {
             sys::igBeginPopupModal(
@@ -163,6 +165,7 @@ impl<'ui> Ui<'ui> {
     /// The confusing aspect to popups is that ImGui holds "control" over the popup fundamentally, so that ImGui
     /// can also force close a popup when a user clicks outside a popup. If you do not want users to be
     /// able to close a popup without selected an option, use [`PopupModal`].
+    #[doc(alias = "OpenPopup")]
     pub fn open_popup(&self, str_id: &ImStr) {
         unsafe { sys::igOpenPopup(str_id.as_ptr(), 0) };
     }
@@ -171,6 +174,7 @@ impl<'ui> Ui<'ui> {
     ///
     /// This should be called *per frame*, whereas [`open_popup`](Self::open_popup) should be called *once*
     /// when you want to actual create the popup.
+    #[doc(alias = "BeginPopup")]
     pub fn begin_popup(&self, str_id: &ImStr) -> Option<PopupToken<'_>> {
         let render =
             unsafe { sys::igBeginPopup(str_id.as_ptr(), WindowFlags::empty().bits() as i32) };
@@ -186,6 +190,7 @@ impl<'ui> Ui<'ui> {
     ///
     /// This should be called *per frame*, whereas [`open_popup`](Self::open_popup) should be called *once*
     /// when you want to actual create the popup.
+    #[doc(alias = "BeginPopup")]
     pub fn popup<F>(&self, str_id: &ImStr, f: F)
     where
         F: FnOnce(),
@@ -206,6 +211,7 @@ impl<'ui> Ui<'ui> {
 
     /// Close a popup. Should be called within the closure given as argument to
     /// [`Ui::popup`] or [`Ui::popup_modal`].
+    #[doc(alias = "CloseCurrentPopup")]
     pub fn close_current_popup(&self) {
         unsafe { sys::igCloseCurrentPopup() };
     }

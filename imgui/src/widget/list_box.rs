@@ -22,6 +22,7 @@ pub struct ListBox<'a> {
 
 impl<'a> ListBox<'a> {
     /// Constructs a new list box builder.
+    #[doc(alias = "ListBoxHeaderVec2", alias = "ListBoxHeaderInt")]
     pub const fn new(label: &'a ImStr) -> ListBox<'a> {
         ListBox {
             label,

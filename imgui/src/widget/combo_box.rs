@@ -64,6 +64,7 @@ pub struct ComboBox<'a> {
 
 impl<'a> ComboBox<'a> {
     /// Constructs a new combo box builder.
+    #[doc(alias = "BeginCombo")]
     pub const fn new(label: &'a ImStr) -> ComboBox<'a> {
         ComboBox {
             label,
@@ -175,6 +176,7 @@ create_token!(
 /// # Convenience functions
 impl<'a> ComboBox<'a> {
     /// Builds a simple combo box for choosing from a slice of values
+    #[doc(alias = "BeginCombo")]
     pub fn build_simple<T, L>(
         self,
         ui: &Ui,
@@ -207,6 +209,7 @@ impl<'a> ComboBox<'a> {
         result
     }
     /// Builds a simple combo box for choosing from a slice of strings
+    #[doc(alias = "BeginCombo")]
     pub fn build_simple_string<S>(self, ui: &Ui, current_item: &mut usize, items: &[&S]) -> bool
     where
         S: AsRef<ImStr> + ?Sized,

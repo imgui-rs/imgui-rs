@@ -113,36 +113,44 @@ bitflags! {
 /// # Window utilities
 impl<'ui> Ui<'ui> {
     /// Returns true if the current window appeared during this frame
+    #[doc(alias = "IsWindowAppearing")]
     pub fn is_window_appearing(&self) -> bool {
         unsafe { sys::igIsWindowAppearing() }
     }
     /// Returns true if the current window is in collapsed state (= only the title bar is visible)
+    #[doc(alias = "IsWindowCollapsed")]
     pub fn is_window_collapsed(&self) -> bool {
         unsafe { sys::igIsWindowCollapsed() }
     }
     /// Returns true if the current window is focused
+    #[doc(alias = "IsWindowFocused")]
     pub fn is_window_focused(&self) -> bool {
         unsafe { sys::igIsWindowFocused(0) }
     }
     /// Returns true if the current window is focused based on the given flags
+    #[doc(alias = "IsWindowFocused")]
     pub fn is_window_focused_with_flags(&self, flags: WindowFocusedFlags) -> bool {
         unsafe { sys::igIsWindowFocused(flags.bits() as i32) }
     }
     /// Returns true if the current window is hovered
+    #[doc(alias = "IsWindowHovered")]
     pub fn is_window_hovered(&self) -> bool {
         unsafe { sys::igIsWindowHovered(0) }
     }
     /// Returns true if the current window is hovered based on the given flags
+    #[doc(alias = "IsWindowHovered")]
     pub fn is_window_hovered_with_flags(&self, flags: WindowHoveredFlags) -> bool {
         unsafe { sys::igIsWindowHovered(flags.bits() as i32) }
     }
     /// Returns the position of the current window (in screen space)
+    #[doc(alias = "GetWindowPos")]
     pub fn window_pos(&self) -> [f32; 2] {
         let mut out = sys::ImVec2::zero();
         unsafe { sys::igGetWindowPos(&mut out) };
         out.into()
     }
     /// Returns the size of the current window
+    #[doc(alias = "GetWindowPos")]
     pub fn window_size(&self) -> [f32; 2] {
         let mut out = sys::ImVec2::zero();
         unsafe { sys::igGetWindowSize(&mut out) };

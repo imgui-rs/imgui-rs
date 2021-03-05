@@ -39,6 +39,7 @@ impl<'ui> DrawListMut<'ui> {
         }
     }
 
+    #[doc(alias = "GetWindowDrawList")]
     pub(crate) fn window(_: &Ui<'ui>) -> Self {
         Self::lock_draw_list();
         Self {
@@ -47,6 +48,7 @@ impl<'ui> DrawListMut<'ui> {
         }
     }
 
+    #[doc(alias = "GetBackgroundDrawList")]
     pub(crate) fn background(_: &Ui<'ui>) -> Self {
         Self::lock_draw_list();
         Self {
@@ -55,6 +57,7 @@ impl<'ui> DrawListMut<'ui> {
         }
     }
 
+    #[doc(alias = "GetForegroundDrawList")]
     pub(crate) fn foreground(_: &Ui<'ui>) -> Self {
         Self::lock_draw_list();
         Self {
@@ -82,6 +85,7 @@ impl<'ui> DrawListMut<'ui> {
     ///     });
     /// }
     /// ```
+    #[doc(alias = "ChannelsSplit")]
     pub fn channels_split<F: FnOnce(&ChannelsSplit)>(&self, channels_count: u32, f: F) {
         unsafe { sys::ImDrawList_ChannelsSplit(self.draw_list, channels_count as i32) };
         f(&ChannelsSplit {
@@ -104,6 +108,7 @@ impl<'ui> ChannelsSplit<'ui> {
     /// Change current channel.
     ///
     /// Panic if channel_index overflows the number of channels.
+    #[doc(alias = "ChannelsSetCurrent")]
     pub fn set_current(&self, channel_index: u32) {
         assert!(
             channel_index < self.channels_count,
@@ -120,6 +125,7 @@ impl<'ui> ChannelsSplit<'ui> {
 /// Drawing functions
 impl<'ui> DrawListMut<'ui> {
     /// Returns a line from point `p1` to `p2` with color `c`.
+    #[doc(alias = "AddLine")]
     pub fn add_line<C>(&'ui self, p1: [f32; 2], p2: [f32; 2], c: C) -> Line<'ui>
     where
         C: Into<ImColor32>,
@@ -129,6 +135,7 @@ impl<'ui> DrawListMut<'ui> {
 
     /// Returns a rectangle whose upper-left corner is at point `p1`
     /// and lower-right corner is at point `p2`, with color `c`.
+    #[doc(alias = "AddRectFilled", alias = "AddRect")]
     pub fn add_rect<C>(&'ui self, p1: [f32; 2], p2: [f32; 2], c: C) -> Rect<'ui>
     where
         C: Into<ImColor32>,
@@ -141,6 +148,7 @@ impl<'ui> DrawListMut<'ui> {
     /// The remains parameters are the respective color of the corners
     /// in the counter-clockwise starting from the upper-left corner
     /// first.
+    #[doc(alias = "AddRectFilledMultiColor")]
     pub fn add_rect_filled_multicolor<C1, C2, C3, C4>(
         &self,
         p1: [f32; 2],
@@ -170,6 +178,7 @@ impl<'ui> DrawListMut<'ui> {
 
     /// Returns a triangle with the given 3 vertices `p1`, `p2` and `p3`
     /// and color `c`.
+    #[doc(alias = "AddTriangleFilled", alias = "AddTriangle")]
     pub fn add_triangle<C>(
         &'ui self,
         p1: [f32; 2],
@@ -184,6 +193,7 @@ impl<'ui> DrawListMut<'ui> {
     }
 
     /// Returns a circle with the given `center`, `radius` and `color`.
+    #[doc(alias = "AddCircleFilled", alias = "AddCircle")]
     pub fn add_circle<C>(&'ui self, center: [f32; 2], radius: f32, color: C) -> Circle<'ui>
     where
         C: Into<ImColor32>,
@@ -192,6 +202,7 @@ impl<'ui> DrawListMut<'ui> {
     }
 
     /// Draw a text whose upper-left corner is at point `pos`.
+    #[doc(alias = "AddText")]
     pub fn add_text<C, T>(&self, pos: [f32; 2], col: C, text: T)
     where
         C: Into<ImColor32>,
@@ -209,6 +220,7 @@ impl<'ui> DrawListMut<'ui> {
 
     /// Returns a Bezier curve stretching from `pos0` to `pos1`, whose
     /// curvature is defined by `cp0` and `cp1`.
+    #[doc(alias = "AddBezier", alias = "AddBezierCubic")]
     pub fn add_bezier_curve<C>(
         &'ui self,
         pos0: [f32; 2],
@@ -227,6 +239,7 @@ impl<'ui> DrawListMut<'ui> {
     ///
     /// Clip all drawings done within the closure `f` in the given
     /// rectangle.
+    #[doc(alias = "PushClipRect", alias = "PopClipRect")]
     pub fn with_clip_rect<F>(&self, min: [f32; 2], max: [f32; 2], f: F)
     where
         F: FnOnce(),
@@ -241,6 +254,7 @@ impl<'ui> DrawListMut<'ui> {
     /// Clip all drawings done within the closure `f` in the given
     /// rectangle. Intersect with all clipping rectangle previously on
     /// the stack.
+    #[doc(alias = "PushClipRect", alias = "PopClipRect")]
     pub fn with_clip_rect_intersect<F>(&self, min: [f32; 2], max: [f32; 2], f: F)
     where
         F: FnOnce(),

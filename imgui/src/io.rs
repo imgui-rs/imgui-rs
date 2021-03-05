@@ -317,6 +317,7 @@ unsafe impl RawCast<sys::ImGuiIO> for Io {}
 
 impl Io {
     /// Queue new character input
+    #[doc(alias = "AddInputCharactersUTF8")]
     pub fn add_input_character(&mut self, character: char) {
         let mut buf = [0; 5];
         character.encode_utf8(&mut buf);
@@ -325,6 +326,7 @@ impl Io {
         }
     }
     /// Clear character input buffer
+    #[doc(alias = "ClearCharacters")]
     pub fn clear_input_characters(&mut self) {
         unsafe {
             sys::ImGuiIO_ClearInputCharacters(self.raw_mut());

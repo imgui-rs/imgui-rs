@@ -13,6 +13,7 @@ impl<'ui> Ui<'ui> {
     ///
     /// Returns `None` if the menu bar is not visible and no content should be rendered.
     #[must_use]
+    #[doc(alias = "BeginMainMenuBar")]
     pub fn begin_main_menu_bar(&self) -> Option<MainMenuBarToken<'ui>> {
         if unsafe { sys::igBeginMainMenuBar() } {
             Some(MainMenuBarToken::new(self))
@@ -23,6 +24,7 @@ impl<'ui> Ui<'ui> {
     /// Creates a full-screen main menu bar and runs a closure to construct the contents.
     ///
     /// Note: the closure is not called if the menu bar is not visible.
+    #[doc(alias = "BeginMenuBar")]
     pub fn main_menu_bar<F: FnOnce()>(&self, f: F) {
         if let Some(_menu_bar) = self.begin_main_menu_bar() {
             f();
@@ -35,6 +37,7 @@ impl<'ui> Ui<'ui> {
     ///
     /// Returns `None` if the menu bar is not visible and no content should be rendered.
     #[must_use]
+    #[doc(alias = "BeginMenuBar")]
     pub fn begin_menu_bar(&self) -> Option<MenuBarToken<'_>> {
         if unsafe { sys::igBeginMenuBar() } {
             Some(MenuBarToken::new(self))
@@ -45,6 +48,7 @@ impl<'ui> Ui<'ui> {
     /// Creates a menu bar in the current window and runs a closure to construct the contents.
     ///
     /// Note: the closure is not called if the menu bar is not visible.
+    #[doc(alias = "BeginMenuBar")]
     pub fn menu_bar<F: FnOnce()>(&self, f: F) {
         if let Some(_menu_bar) = self.begin_menu_bar() {
             f();
@@ -61,6 +65,7 @@ impl<'ui> Ui<'ui> {
     /// This is the equivalent of [begin_menu_with_enabled](Self::begin_menu_with_enabled)
     /// with `enabled` set to `true`.
     #[must_use]
+    #[doc(alias = "BeginMenu")]
     pub fn begin_menu(&self, label: &ImStr) -> Option<MenuToken<'_>> {
         self.begin_menu_with_enabled(label, true)
     }
@@ -72,6 +77,7 @@ impl<'ui> Ui<'ui> {
     ///
     /// Returns `None` if the menu is not visible and no content should be rendered.
     #[must_use]
+    #[doc(alias = "BeginMenu")]
     pub fn begin_menu_with_enabled(&self, label: &ImStr, enabled: bool) -> Option<MenuToken<'_>> {
         if unsafe { sys::igBeginMenu(label.as_ptr(), enabled) } {
             Some(MenuToken::new(self))
@@ -85,6 +91,7 @@ impl<'ui> Ui<'ui> {
     ///
     /// This is the equivalent of [menu_with_enabled](Self::menu_with_enabled)
     /// with `enabled` set to `true`.
+    #[doc(alias = "BeginMenu")]
     pub fn menu<F: FnOnce()>(&self, label: &ImStr, f: F) {
         self.menu_with_enabled(label, true, f);
     }
@@ -92,6 +99,7 @@ impl<'ui> Ui<'ui> {
     /// Creates a menu and runs a closure to construct the contents.
     ///
     /// Note: the closure is not called if the menu is not visible.
+    #[doc(alias = "BeginMenu")]
     pub fn menu_with_enabled<F: FnOnce()>(&self, label: &ImStr, enabled: bool, f: F) {
         if let Some(_menu) = self.begin_menu_with_enabled(label, enabled) {
             f();
@@ -146,6 +154,7 @@ impl<'a> MenuItem<'a> {
     /// Builds the menu item.
     ///
     /// Returns true if the menu item is activated.
+    #[doc(alias = "MenuItemBool")]
     pub fn build(self, _: &Ui) -> bool {
         unsafe {
             sys::igMenuItemBool(
