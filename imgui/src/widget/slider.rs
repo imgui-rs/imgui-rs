@@ -37,6 +37,7 @@ pub struct Slider<'a, T: DataTypeKind> {
 
 impl<'a, T: DataTypeKind> Slider<'a, T> {
     /// Constructs a new slider builder with the given range.
+    #[doc(alias = "SliderScalar", alias = "SliderScalarN")]
     pub fn new(label: &ImStr) -> Slider<T> {
         Slider {
             label,
@@ -118,6 +119,7 @@ pub struct VerticalSlider<'a, T: DataTypeKind + Copy> {
 
 impl<'a, T: DataTypeKind> VerticalSlider<'a, T> {
     /// Constructs a new vertical slider builder with the given size and range.
+    #[doc(alias = "VSliderScalar")]
     pub fn new(label: &ImStr, size: [f32; 2]) -> VerticalSlider<T> {
         VerticalSlider {
             label,
@@ -181,6 +183,7 @@ pub struct AngleSlider<'a> {
 
 impl<'a> AngleSlider<'a> {
     /// Constructs a new angle slider builder.
+    #[doc(alias = "SliderAngle")]
     pub fn new(label: &ImStr) -> AngleSlider {
         AngleSlider {
             label,

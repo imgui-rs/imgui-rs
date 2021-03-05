@@ -34,6 +34,7 @@ impl<'ui> Ui<'ui> {
     /// ui.text("I use the custom font!");
     /// font.pop(&ui);
     /// ```
+    #[doc(alias = "PushFont")]
     pub fn push_font(&self, id: FontId) -> FontStackToken<'_> {
         let fonts = self.fonts();
         let font = fonts
@@ -57,6 +58,7 @@ impl<'ui> Ui<'ui> {
     /// ui.text("I'm red!");
     /// color.pop(&ui);
     /// ```
+    #[doc(alias = "PushStyleColorVec4")]
     pub fn push_style_color(&self, style_color: StyleColor, color: [f32; 4]) -> ColorStackToken {
         unsafe { sys::igPushStyleColorVec4(style_color as i32, color.into()) };
         ColorStackToken::new(self)
@@ -112,6 +114,7 @@ impl<'ui> Ui<'ui> {
     /// ui.text("I'm transparent!");
     /// style.pop(&ui);
     /// ```
+    #[doc(alias = "PushStyleVar")]
     pub fn push_style_var(&self, style_var: StyleVar) -> StyleStackToken {
         unsafe { push_style_var(style_var) };
         StyleStackToken::new(self)
@@ -192,6 +195,7 @@ pub struct MultiColorStackToken {
 
 impl MultiColorStackToken {
     /// Pops changes from the color stack
+    #[doc(alias = "PopStyleColor")]
     pub fn pop(mut self, _: &Ui) {
         self.ctx = ptr::null();
         unsafe { sys::igPopStyleColor(self.count as i32) };
@@ -231,6 +235,7 @@ pub struct MultiStyleStackToken {
 
 impl MultiStyleStackToken {
     /// Pops changes from the style stack
+    #[doc(alias = "PopStyleVar")]
     pub fn pop(mut self, _: &Ui) {
         self.ctx = ptr::null();
         unsafe { sys::igPopStyleVar(self.count as i32) };
@@ -294,6 +299,7 @@ impl<'ui> Ui<'ui> {
     /// - `= 0.0`: default to ~2/3 of window width
     /// - `< 0.0`: `item_width` pixels relative to the right of window (-1.0 always aligns width to
     /// the right side)
+    #[doc(alias = "PushItemWith")]
     pub fn push_item_width(&self, item_width: f32) -> ItemWidthStackToken {
         unsafe { sys::igPushItemWidth(item_width) };
         ItemWidthStackToken { _ctx: self.ctx }
@@ -304,12 +310,14 @@ impl<'ui> Ui<'ui> {
     /// - `= 0.0`: default to ~2/3 of window width
     /// - `< 0.0`: `item_width` pixels relative to the right of window (-1.0 always aligns width to
     /// the right side)
+    #[doc(alias = "SetNextItemWidth")]
     pub fn set_next_item_width(&self, item_width: f32) {
         unsafe { sys::igSetNextItemWidth(item_width) };
     }
     /// Returns the width of the item given the pushed settings and the current cursor position.
     ///
     /// This is NOT necessarily the width of last item.
+    #[doc(alias = "CalcItemWidth")]
     pub fn calc_item_width(&self) -> f32 {
         unsafe { sys::igCalcItemWidth() }
     }
@@ -321,6 +329,7 @@ impl<'ui> Ui<'ui> {
     /// with `wrap_pos_x` set to 0.0.
     ///
     /// Returns a `TextWrapPosStackToken` that may be popped by calling `.pop()`
+    #[doc(alias = "PushTextWrapPos")]
     pub fn push_text_wrap_pos(&self) -> TextWrapPosStackToken {
         self.push_text_wrap_pos_with_pos(0.0)
     }
@@ -332,6 +341,7 @@ impl<'ui> Ui<'ui> {
     /// - `> 0.0`: wrap at `wrap_pos_x` position in window local space
     /// - `= 0.0`: wrap to end of window (or column)
     /// - `< 0.0`: no wrapping
+    #[doc(alias = "PushTextWrapPos")]
     pub fn push_text_wrap_pos_with_pos(&self, wrap_pos_x: f32) -> TextWrapPosStackToken {
         unsafe { sys::igPushTextWrapPos(wrap_pos_x) };
         TextWrapPosStackToken { _ctx: self.ctx }
@@ -340,6 +350,7 @@ impl<'ui> Ui<'ui> {
     /// Changes an item flag by pushing a change to the item flag stack.
     ///
     /// Returns a `ItemFlagsStackToken` that may be popped by calling `.pop()`
+    #[doc(alias = "PushItemFlag")]
     pub fn push_item_flag(&self, item_flag: ItemFlag) -> ItemFlagsStackToken {
         use self::ItemFlag::*;
         match item_flag {
@@ -366,6 +377,7 @@ pub struct ItemWidthStackToken {
 
 impl ItemWidthStackToken {
     /// Pops a change from the item width stack
+    #[doc(alias = "PopItemWidth")]
     pub fn pop(mut self, _: &Ui) {
         self._ctx = ptr::null();
         unsafe { sys::igPopItemWidth() };
@@ -379,6 +391,7 @@ pub struct TextWrapPosStackToken {
 
 impl TextWrapPosStackToken {
     /// Pops a change from the text wrap position stack
+    #[doc(alias = "PopTextWrapPos")]
     pub fn pop(mut self, _: &Ui) {
         self._ctx = ptr::null();
         unsafe { sys::igPopTextWrapPos() };
@@ -393,6 +406,8 @@ pub struct ItemFlagsStackToken {
 
 impl ItemFlagsStackToken {
     /// Pops a change from the item flags stack
+
+    #[doc(alias = "PopAllowKeyboardFocus", alias = "PopButtonRepeat")]
     pub fn pop(mut self, _: &Ui) {
         self._ctx = ptr::null();
         const ALLOW_KEYBOARD_FOCUS: ItemFlag = ItemFlag::AllowKeyboardFocus(true);
@@ -430,6 +445,7 @@ impl<'ui> Ui<'ui> {
     ///
     /// Returns an `IdStackToken` that can be popped by calling `.end()`
     /// or by dropping manually.
+    #[doc(alias = "PushId")]
     pub fn push_id<'a, I: Into<Id<'a>>>(&self, id: I) -> IdStackToken<'ui> {
         let id = id.into();
 

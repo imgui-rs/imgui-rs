@@ -21,6 +21,7 @@ pub struct Drag<'a, T: DataTypeKind> {
 
 impl<'a, T: DataTypeKind> Drag<'a, T> {
     /// Constructs a new drag slider builder.
+    #[doc(alias = "DragScalar", alias = "DragScalarN")]
     pub fn new(label: &ImStr) -> Drag<T> {
         Drag {
             label,
@@ -126,6 +127,7 @@ pub struct DragRange<'a, T: DataTypeKind> {
 
 impl<'a, T: DataTypeKind> DragRange<'a, T> {
     /// Constructs a new drag slider builder.
+    #[doc(alias = "DragIntRange2", alias = "DragFloatRange2")]
     pub fn new(label: &ImStr) -> DragRange<T> {
         DragRange {
             label,
@@ -175,6 +177,7 @@ impl<'a> DragRange<'a, f32> {
     /// Builds a drag range slider that is bound to the given min/max values.
     ///
     /// Returns true if the slider value was changed.
+    #[doc(alias = "DragFloatRange2")]
     pub fn build(self, _: &Ui, min: &mut f32, max: &mut f32) -> bool {
         unsafe {
             sys::igDragFloatRange2(
@@ -200,6 +203,7 @@ impl<'a> DragRange<'a, i32> {
     /// Builds a drag range slider that is bound to the given min/max values.
     ///
     /// Returns true if the slider value was changed.
+    #[doc(alias = "DragIntRange2")]
     pub fn build(self, _: &Ui, min: &mut i32, max: &mut i32) -> bool {
         unsafe {
             sys::igDragIntRange2(

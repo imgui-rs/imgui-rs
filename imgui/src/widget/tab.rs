@@ -63,6 +63,7 @@ pub struct TabBar<'a> {
 
 impl<'a> TabBar<'a> {
     #[inline]
+    #[doc(alias = "BeginTabBar")]
     pub const fn new(id: &'a ImStr) -> Self {
         Self {
             id,
@@ -127,6 +128,7 @@ pub struct TabItem<'a> {
 }
 
 impl<'a> TabItem<'a> {
+    #[doc(alias = "BeginTabItem")]
     pub fn new(name: &'a ImStr) -> Self {
         Self {
             name,

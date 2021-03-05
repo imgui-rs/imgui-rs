@@ -192,6 +192,7 @@ pub struct ColorEdit<'a> {
 
 impl<'a> ColorEdit<'a> {
     /// Constructs a new color editor builder.
+    #[doc(alias = "ColorEdit3", alias = "ColorEdit4")]
     pub fn new<T: Into<EditableColor<'a>>>(label: &'a ImStr, value: T) -> ColorEdit<'a> {
         ColorEdit {
             label,
@@ -366,6 +367,7 @@ pub struct ColorPicker<'a> {
 
 impl<'a> ColorPicker<'a> {
     /// Constructs a new color picker builder.
+    #[doc(alias = "ColorButton")]
     pub fn new<T: Into<EditableColor<'a>>>(label: &'a ImStr, value: T) -> ColorPicker<'a> {
         ColorPicker {
             label,
@@ -637,6 +639,7 @@ impl<'ui> Ui<'ui> {
     /// Initializes current color editor/picker options (generally on application startup) if you
     /// want to select a default format, picker type, etc. Users will be able to change many
     /// settings, unless you use .options(false) in your widget builders.
+    #[doc(alias = "SetColorEditOptions")]
     pub fn set_color_edit_options(&self, flags: ColorEditFlags) {
         unsafe {
             sys::igSetColorEditOptions(flags.bits() as i32);

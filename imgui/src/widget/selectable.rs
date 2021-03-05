@@ -34,6 +34,7 @@ pub struct Selectable<'a> {
 impl<'a> Selectable<'a> {
     /// Constructs a new selectable builder.
     #[inline]
+    #[doc(alias = "Selectable")]
     pub const fn new(label: &ImStr) -> Selectable {
         Selectable {
             label,

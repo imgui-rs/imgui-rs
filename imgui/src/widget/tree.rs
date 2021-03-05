@@ -300,6 +300,7 @@ impl<'a> TreeNodeToken<'a> {
 }
 
 impl Drop for TreeNodeToken<'_> {
+    #[doc(alias = "TreePop")]
     fn drop(&mut self) {
         if self.1 {
             unsafe { sys::igTreePop() }
@@ -317,6 +318,7 @@ pub struct CollapsingHeader<'a> {
 
 impl<'a> CollapsingHeader<'a> {
     /// Constructs a new collapsing header builder
+    #[doc(alias = "CollapsingHeader")]
     pub fn new(label: &ImStr) -> CollapsingHeader {
         CollapsingHeader {
             label,
