@@ -6,6 +6,7 @@ struct GLFWwindow;
 struct SDL_Window;
 typedef union SDL_Event SDL_Event;CIMGUI_API bool ImGui_ImplGlfw_InitForOpenGL(GLFWwindow* window,bool install_callbacks);
 CIMGUI_API bool ImGui_ImplGlfw_InitForVulkan(GLFWwindow* window,bool install_callbacks);
+CIMGUI_API bool ImGui_ImplGlfw_InitForOther(GLFWwindow* window,bool install_callbacks);
 CIMGUI_API void ImGui_ImplGlfw_Shutdown();
 CIMGUI_API void ImGui_ImplGlfw_NewFrame();
 CIMGUI_API void ImGui_ImplGlfw_MouseButtonCallback(GLFWwindow* window,int button,int action,int mods);
