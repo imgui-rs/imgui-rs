@@ -75,6 +75,8 @@ Luckily running the generator is quite straight forward:
 4. Run the generator as per https://github.com/cimgui/cimgui#using-generator
 5. Run `cargo xtask bindgen` and follow the rest of the steps as usual
 
+Note actually committing this change may be more complicated as you will need to either replace the submodule with a copy of the source, or update the cimgui submodule to point at your fork of imgui
+
 ## Common sources of problems
 
 ### Function changes
