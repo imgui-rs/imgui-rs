@@ -50,7 +50,7 @@ impl<'ui> DrawListMut<'ui> {
     pub(crate) fn background(_: &Ui<'ui>) -> Self {
         Self::lock_draw_list();
         Self {
-            draw_list: unsafe { sys::igGetBackgroundDrawListNil() },
+            draw_list: unsafe { sys::igGetBackgroundDrawList() },
             _phantom: PhantomData,
         }
     }
@@ -58,7 +58,7 @@ impl<'ui> DrawListMut<'ui> {
     pub(crate) fn foreground(_: &Ui<'ui>) -> Self {
         Self::lock_draw_list();
         Self {
-            draw_list: unsafe { sys::igGetForegroundDrawListNil() },
+            draw_list: unsafe { sys::igGetForegroundDrawList() },
             _phantom: PhantomData,
         }
     }
