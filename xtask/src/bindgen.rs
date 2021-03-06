@@ -1,17 +1,12 @@
+use crate::flags::Bindgen;
 use anyhow::{anyhow, Context, Result};
 use std::path::{Path, PathBuf};
 
-pub struct GenBindings {
-    pub bindings_path: Option<String>,
-    pub output_path: Option<String>,
-    pub wasm_import_name: Option<String>,
-}
-
-impl GenBindings {
+impl Bindgen {
     pub fn run(self) -> Result<()> {
         let root = crate::project_root();
         let bindings = self
-            .bindings_path
+            .cimgui_path
             .map(PathBuf::from)
             .unwrap_or_else(|| root.join("imgui-sys/third-party"));
 
@@ -24,6 +19,7 @@ impl GenBindings {
             .wasm_import_name
             .or_else(|| std::env::var("IMGUI_RS_WASM_IMPORT_NAME").ok())
             .unwrap_or_else(|| "imgui-sys-v0".to_string());
+
         let types = get_types(&bindings.join("structs_and_enums.json"))?;
         let funcs = get_definitions(&bindings.join("definitions.json"))?;
         let header = bindings.join("cimgui.h");
@@ -147,15 +143,3 @@ fn generate_binding_file(
 
     Ok(())
 }
-
-// impl Deref for CountingCommand {
-//     type Target = std::process::Command;
-//     fn deref(&self) -> &Self::Target {
-//         &self.c
-//     }
-// }
-// impl std::ops::DerefMut for CountingCommand {
-//     fn deref_mut(&mut self) -> &mut Self::Target {
-//         &mut self.c
-//     }
-// }

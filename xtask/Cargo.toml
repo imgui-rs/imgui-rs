@@ -8,5 +8,6 @@ publish = false
 
 [dependencies]
 anyhow = "1"
-pico-args = "0.3"
 smoljson = "0.1"
+xshell = "0.1"
+xflags = "0.1"
