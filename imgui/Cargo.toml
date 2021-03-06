@@ -16,6 +16,7 @@ exclude = ["/resources"]
 bitflags = "1"
 imgui-sys = { version = "0.7.0", path = "../imgui-sys" }
 parking_lot = "0.11"
+smallvec = "1"
 
 [features]
 wasm = ["imgui-sys/wasm"]

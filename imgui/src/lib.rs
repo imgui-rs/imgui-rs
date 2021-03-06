@@ -33,7 +33,7 @@ pub use self::popups::*;
 pub use self::render::draw_data::*;
 pub use self::render::renderer::*;
 pub use self::stacks::*;
-pub use self::string::*;
+pub use self::string::{AsImStr, ImStr, ImString};
 pub use self::style::*;
 pub use self::utils::*;
 pub use self::widget::color_editors::*;
