@@ -32,7 +32,7 @@ impl<'ui> Ui<'ui> {
     /// // During UI construction
     /// let font = ui.push_font(my_custom_font);
     /// ui.text("I use the custom font!");
-    /// font.pop(&ui);
+    /// font.pop();
     /// ```
     #[doc(alias = "PushFont")]
     pub fn push_font(&self, id: FontId) -> FontStackToken<'_> {
@@ -56,7 +56,7 @@ impl<'ui> Ui<'ui> {
     /// const RED: [f32; 4] = [1.0, 0.0, 0.0, 1.0];
     /// let color = ui.push_style_color(StyleColor::Text, RED);
     /// ui.text("I'm red!");
-    /// color.pop(&ui);
+    /// color.pop();
     /// ```
     #[doc(alias = "PushStyleColorVec4")]
     pub fn push_style_color(&self, style_color: StyleColor, color: [f32; 4]) -> ColorStackToken {
@@ -112,7 +112,7 @@ impl<'ui> Ui<'ui> {
     /// # let ui = ctx.frame();
     /// let style = ui.push_style_var(StyleVar::Alpha(0.2));
     /// ui.text("I'm transparent!");
-    /// style.pop(&ui);
+    /// style.pop();
     /// ```
     #[doc(alias = "PushStyleVar")]
     pub fn push_style_var(&self, style_var: StyleVar) -> StyleStackToken {
