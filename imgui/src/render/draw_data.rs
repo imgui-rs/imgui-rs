@@ -9,14 +9,14 @@ use crate::sys;
 pub struct DrawData {
     /// Only valid after render() is called and before the next new frame() is called.
     valid: bool,
-    // Array of DrawList.
-    cmd_lists: *mut *mut DrawList,
     /// Number of DrawList to render.
     cmd_lists_count: i32,
     /// For convenience, sum of all draw list index buffer sizes.
     pub total_idx_count: i32,
     /// For convenience, sum of all draw list vertex buffer sizes.
     pub total_vtx_count: i32,
+    // Array of DrawList.
+    cmd_lists: *mut *mut DrawList,
     /// Upper-left position of the viewport to render.
     ///
     /// (= upper-left corner of the orthogonal projection matrix to use)

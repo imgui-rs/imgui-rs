@@ -515,7 +515,7 @@ fn show_test_window(ui: &Ui, state: &mut State, opened: &mut bool) {
                 im_str!("Tilefish"),
             ];
 
-            ListBox::new(im_str!("selectables list")).calculate_size(8, 4).build(ui, || {
+            ListBox::new(im_str!("selectables list")).build(ui, || {
                 for (index, name) in names.iter().enumerate() {
                     let selected = matches!(state.selected_fish2, Some(i) if i == index );
                     if Selectable::new(name).selected(selected).build(ui) {

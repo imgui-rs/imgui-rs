@@ -58,6 +58,8 @@ pub struct FontAtlas {
     custom_rects: sys::ImVector_ImFontAtlasCustomRect,
     config_data: sys::ImVector_ImFontConfig,
     tex_uv_lines: [[f32; 4]; 64],
+    font_builder_io: *const sys::ImFontBuilderIO,
+    font_builder_flags: i32,
     pack_id_mouse_cursors: i32,
     pack_id_lines: i32,
 }
@@ -310,7 +312,7 @@ pub struct FontConfig {
     /// Maximum advance_x for glyphs
     pub glyph_max_advance_x: f32,
     /// Settings for a custom font rasterizer if used
-    pub rasterizer_flags: u32,
+    pub font_builder_flags: u32,
     /// Brighten (>1.0) or darken (<1.0) font output
     pub rasterizer_multiply: f32,
     /// Explicitly specify the ellipsis character.
@@ -332,7 +334,7 @@ impl Default for FontConfig {
             glyph_ranges: FontGlyphRanges::default(),
             glyph_min_advance_x: 0.0,
             glyph_max_advance_x: f32::MAX,
-            rasterizer_flags: 0,
+            font_builder_flags: 0,
             rasterizer_multiply: 1.0,
             ellipsis_char: None,
             name: None,
@@ -351,7 +353,7 @@ impl FontConfig {
         raw.GlyphRanges = unsafe { self.glyph_ranges.to_ptr(atlas) };
         raw.GlyphMinAdvanceX = self.glyph_min_advance_x;
         raw.GlyphMaxAdvanceX = self.glyph_max_advance_x;
-        raw.RasterizerFlags = self.rasterizer_flags;
+        raw.FontBuilderFlags = self.font_builder_flags;
         raw.RasterizerMultiply = self.rasterizer_multiply;
         raw.EllipsisChar = self.ellipsis_char.map(|x| x as u16).unwrap_or(0xffff);
         if let Some(name) = self.name.as_ref() {
@@ -404,8 +406,8 @@ fn test_font_config_default() {
         sys_font_config.GlyphMaxAdvanceX
     );
     assert_eq!(
-        font_config.rasterizer_flags,
-        sys_font_config.RasterizerFlags
+        font_config.font_builder_flags,
+        sys_font_config.FontBuilderFlags
     );
     assert_eq!(
         font_config.rasterizer_multiply,

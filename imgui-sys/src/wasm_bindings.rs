@@ -90,6 +90,11 @@ pub struct ImGuiContext {
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
+pub struct ImFontBuilderIO {
+    _unused: [u8; 0],
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
 pub struct ImDrawListSharedData {
     _unused: [u8; 0],
 }
@@ -125,6 +130,7 @@ pub type ImGuiTableFlags = cty::c_int;
 pub type ImGuiTableColumnFlags = cty::c_int;
 pub type ImGuiTableRowFlags = cty::c_int;
 pub type ImGuiTreeNodeFlags = cty::c_int;
+pub type ImGuiViewportFlags = cty::c_int;
 pub type ImGuiWindowFlags = cty::c_int;
 pub type ImTextureID = *mut cty::c_void;
 pub type ImGuiID = cty::c_uint;
@@ -1293,10 +1299,10 @@ impl Default for ImDrawList {
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub struct ImDrawData {
     pub Valid: bool,
-    pub CmdLists: *mut *mut ImDrawList,
     pub CmdListsCount: cty::c_int,
     pub TotalIdxCount: cty::c_int,
     pub TotalVtxCount: cty::c_int,
+    pub CmdLists: *mut *mut ImDrawList,
     pub DisplayPos: ImVec2,
     pub DisplaySize: ImVec2,
     pub FramebufferScale: ImVec2,
@@ -1323,7 +1329,7 @@ pub struct ImFontConfig {
     pub GlyphMinAdvanceX: f32,
     pub GlyphMaxAdvanceX: f32,
     pub MergeMode: bool,
-    pub RasterizerFlags: cty::c_uint,
+    pub FontBuilderFlags: cty::c_uint,
     pub RasterizerMultiply: f32,
     pub EllipsisChar: ImWchar,
     pub Name: [cty::c_char; 40usize],
@@ -1336,7 +1342,7 @@ impl Default for ImFontConfig {
 }
 impl ::core::fmt::Debug for ImFontConfig {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
-        write ! (f , "ImFontConfig {{ FontData: {:?}, FontDataSize: {:?}, FontDataOwnedByAtlas: {:?}, FontNo: {:?}, SizePixels: {:?}, OversampleH: {:?}, OversampleV: {:?}, PixelSnapH: {:?}, GlyphExtraSpacing: {:?}, GlyphOffset: {:?}, GlyphRanges: {:?}, GlyphMinAdvanceX: {:?}, GlyphMaxAdvanceX: {:?}, MergeMode: {:?}, RasterizerFlags: {:?}, RasterizerMultiply: {:?}, EllipsisChar: {:?}, Name: [...], DstFont: {:?} }}" , self . FontData , self . FontDataSize , self . FontDataOwnedByAtlas , self . FontNo , self . SizePixels , self . OversampleH , self . OversampleV , self . PixelSnapH , self . GlyphExtraSpacing , self . GlyphOffset , self . GlyphRanges , self . GlyphMinAdvanceX , self . GlyphMaxAdvanceX , self . MergeMode , self . RasterizerFlags , self . RasterizerMultiply , self . EllipsisChar , self . DstFont)
+        write ! (f , "ImFontConfig {{ FontData: {:?}, FontDataSize: {:?}, FontDataOwnedByAtlas: {:?}, FontNo: {:?}, SizePixels: {:?}, OversampleH: {:?}, OversampleV: {:?}, PixelSnapH: {:?}, GlyphExtraSpacing: {:?}, GlyphOffset: {:?}, GlyphRanges: {:?}, GlyphMinAdvanceX: {:?}, GlyphMaxAdvanceX: {:?}, MergeMode: {:?}, FontBuilderFlags: {:?}, RasterizerMultiply: {:?}, EllipsisChar: {:?}, Name: [...], DstFont: {:?} }}" , self . FontData , self . FontDataSize , self . FontDataOwnedByAtlas , self . FontNo , self . SizePixels , self . OversampleH , self . OversampleV , self . PixelSnapH , self . GlyphExtraSpacing , self . GlyphOffset , self . GlyphRanges , self . GlyphMinAdvanceX , self . GlyphMaxAdvanceX , self . MergeMode , self . FontBuilderFlags , self . RasterizerMultiply , self . EllipsisChar , self . DstFont)
     }
 }
 #[repr(C)]
@@ -1355,41 +1361,57 @@ pub struct ImFontGlyph {
 }
 impl ImFontGlyph {
     #[inline]
-    pub fn Codepoint(&self) -> cty::c_uint {
-        unsafe { ::core::mem::transmute(self._bitfield_1.get(0usize, 31u8) as u32) }
+    pub fn Colored(&self) -> cty::c_uint {
+        unsafe { ::core::mem::transmute(self._bitfield_1.get(0usize, 1u8) as u32) }
     }
     #[inline]
-    pub fn set_Codepoint(&mut self, val: cty::c_uint) {
+    pub fn set_Colored(&mut self, val: cty::c_uint) {
         unsafe {
             let val: u32 = ::core::mem::transmute(val);
-            self._bitfield_1.set(0usize, 31u8, val as u64)
+            self._bitfield_1.set(0usize, 1u8, val as u64)
         }
     }
     #[inline]
     pub fn Visible(&self) -> cty::c_uint {
-        unsafe { ::core::mem::transmute(self._bitfield_1.get(31usize, 1u8) as u32) }
+        unsafe { ::core::mem::transmute(self._bitfield_1.get(1usize, 1u8) as u32) }
     }
     #[inline]
     pub fn set_Visible(&mut self, val: cty::c_uint) {
         unsafe {
             let val: u32 = ::core::mem::transmute(val);
-            self._bitfield_1.set(31usize, 1u8, val as u64)
+            self._bitfield_1.set(1usize, 1u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn Codepoint(&self) -> cty::c_uint {
+        unsafe { ::core::mem::transmute(self._bitfield_1.get(2usize, 30u8) as u32) }
+    }
+    #[inline]
+    pub fn set_Codepoint(&mut self, val: cty::c_uint) {
+        unsafe {
+            let val: u32 = ::core::mem::transmute(val);
+            self._bitfield_1.set(2usize, 30u8, val as u64)
         }
     }
     #[inline]
     pub fn new_bitfield_1(
-        Codepoint: cty::c_uint,
+        Colored: cty::c_uint,
         Visible: cty::c_uint,
+        Codepoint: cty::c_uint,
     ) -> __BindgenBitfieldUnit<[u8; 4usize], u32> {
         let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 4usize], u32> =
             Default::default();
-        __bindgen_bitfield_unit.set(0usize, 31u8, {
-            let Codepoint: u32 = unsafe { ::core::mem::transmute(Codepoint) };
-            Codepoint as u64
+        __bindgen_bitfield_unit.set(0usize, 1u8, {
+            let Colored: u32 = unsafe { ::core::mem::transmute(Colored) };
+            Colored as u64
         });
-        __bindgen_bitfield_unit.set(31usize, 1u8, {
+        __bindgen_bitfield_unit.set(1usize, 1u8, {
             let Visible: u32 = unsafe { ::core::mem::transmute(Visible) };
             Visible as u64
+        });
+        __bindgen_bitfield_unit.set(2usize, 30u8, {
+            let Codepoint: u32 = unsafe { ::core::mem::transmute(Codepoint) };
+            Codepoint as u64
         });
         __bindgen_bitfield_unit
     }
@@ -1444,6 +1466,8 @@ pub struct ImFontAtlas {
     pub CustomRects: ImVector_ImFontAtlasCustomRect,
     pub ConfigData: ImVector_ImFontConfig,
     pub TexUvLines: [ImVec4; 64usize],
+    pub FontBuilderIO: *const ImFontBuilderIO,
+    pub FontBuilderFlags: cty::c_uint,
     pub PackIdMouseCursors: cty::c_int,
     pub PackIdLines: cty::c_int,
 }
@@ -1454,7 +1478,7 @@ impl Default for ImFontAtlas {
 }
 impl ::core::fmt::Debug for ImFontAtlas {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
-        write ! (f , "ImFontAtlas {{ Locked: {:?}, Flags: {:?}, TexID: {:?}, TexDesiredWidth: {:?}, TexGlyphPadding: {:?}, TexPixelsAlpha8: {:?}, TexPixelsRGBA32: {:?}, TexWidth: {:?}, TexHeight: {:?}, TexUvScale: {:?}, TexUvWhitePixel: {:?}, Fonts: {:?}, CustomRects: {:?}, ConfigData: {:?}, TexUvLines: [...], PackIdMouseCursors: {:?}, PackIdLines: {:?} }}" , self . Locked , self . Flags , self . TexID , self . TexDesiredWidth , self . TexGlyphPadding , self . TexPixelsAlpha8 , self . TexPixelsRGBA32 , self . TexWidth , self . TexHeight , self . TexUvScale , self . TexUvWhitePixel , self . Fonts , self . CustomRects , self . ConfigData , self . PackIdMouseCursors , self . PackIdLines)
+        write ! (f , "ImFontAtlas {{ Locked: {:?}, Flags: {:?}, TexID: {:?}, TexDesiredWidth: {:?}, TexGlyphPadding: {:?}, TexPixelsAlpha8: {:?}, TexPixelsRGBA32: {:?}, TexWidth: {:?}, TexHeight: {:?}, TexUvScale: {:?}, TexUvWhitePixel: {:?}, Fonts: {:?}, CustomRects: {:?}, ConfigData: {:?}, TexUvLines: [...], FontBuilderIO: {:?}, FontBuilderFlags: {:?}, PackIdMouseCursors: {:?}, PackIdLines: {:?} }}" , self . Locked , self . Flags , self . TexID , self . TexDesiredWidth , self . TexGlyphPadding , self . TexPixelsAlpha8 , self . TexPixelsRGBA32 , self . TexWidth , self . TexHeight , self . TexUvScale , self . TexUvWhitePixel , self . Fonts , self . CustomRects , self . ConfigData , self . FontBuilderIO , self . FontBuilderFlags , self . PackIdMouseCursors , self . PackIdLines)
     }
 }
 #[repr(C)]
@@ -1482,6 +1506,20 @@ impl Default for ImFont {
     fn default() -> Self {
         unsafe { ::core::mem::zeroed() }
     }
+}
+pub const ImGuiViewportFlags_None: ImGuiViewportFlags_ = 0;
+pub const ImGuiViewportFlags_IsPlatformWindow: ImGuiViewportFlags_ = 1;
+pub const ImGuiViewportFlags_IsPlatformMonitor: ImGuiViewportFlags_ = 2;
+pub const ImGuiViewportFlags_OwnedByApp: ImGuiViewportFlags_ = 4;
+pub type ImGuiViewportFlags_ = cty::c_uint;
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone, PartialEq)]
+pub struct ImGuiViewport {
+    pub Flags: ImGuiViewportFlags,
+    pub Pos: ImVec2,
+    pub Size: ImVec2,
+    pub WorkPos: ImVec2,
+    pub WorkSize: ImVec2,
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
@@ -2758,6 +2796,14 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
+    pub fn igBeginListBox(label: *const cty::c_char, size: ImVec2) -> bool;
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
+    pub fn igEndListBox();
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
     pub fn igListBoxStr_arr(
         label: *const cty::c_char,
         current_item: *mut cty::c_int,
@@ -2782,22 +2828,6 @@ extern "C" {
         items_count: cty::c_int,
         height_in_items: cty::c_int,
     ) -> bool;
-}
-#[link(wasm_import_module = "imgui-sys-v0")]
-extern "C" {
-    pub fn igListBoxHeaderVec2(label: *const cty::c_char, size: ImVec2) -> bool;
-}
-#[link(wasm_import_module = "imgui-sys-v0")]
-extern "C" {
-    pub fn igListBoxHeaderInt(
-        label: *const cty::c_char,
-        items_count: cty::c_int,
-        height_in_items: cty::c_int,
-    ) -> bool;
-}
-#[link(wasm_import_module = "imgui-sys-v0")]
-extern "C" {
-    pub fn igListBoxFooter();
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
@@ -3260,6 +3290,10 @@ extern "C" {
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igSetItemAllowOverlap();
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
+    pub fn igGetMainViewport() -> *mut ImGuiViewport;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
@@ -4806,6 +4840,22 @@ extern "C" {
         c_begin: cty::c_uint,
         c_last: cty::c_uint,
     ) -> bool;
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
+    pub fn ImGuiViewport_ImGuiViewport() -> *mut ImGuiViewport;
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
+    pub fn ImGuiViewport_destroy(self_: *mut ImGuiViewport);
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
+    pub fn ImGuiViewport_GetCenter(pOut: *mut ImVec2, self_: *mut ImGuiViewport);
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
+    pub fn ImGuiViewport_GetWorkCenter(pOut: *mut ImVec2, self_: *mut ImGuiViewport);
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {

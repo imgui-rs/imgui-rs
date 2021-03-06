@@ -17,7 +17,7 @@
       "cimguiname": "ImGui_ImplGlfw_CharCallback",
       "defaults": {},
       "funcname": "ImGui_ImplGlfw_CharCallback",
-      "location": "imgui_impl_glfw:35",
+      "location": "imgui_impl_glfw:36",
       "ov_cimguiname": "ImGui_ImplGlfw_CharCallback",
       "ret": "void",
       "signature": "(GLFWwindow*,unsigned int)",
@@ -44,6 +44,31 @@
       "funcname": "ImGui_ImplGlfw_InitForOpenGL",
       "location": "imgui_impl_glfw:24",
       "ov_cimguiname": "ImGui_ImplGlfw_InitForOpenGL",
+      "ret": "bool",
+      "signature": "(GLFWwindow*,bool)",
+      "stname": ""
+    }
+  ],
+  "ImGui_ImplGlfw_InitForOther": [
+    {
+      "args": "(GLFWwindow* window,bool install_callbacks)",
+      "argsT": [
+        {
+          "name": "window",
+          "type": "GLFWwindow*"
+        },
+        {
+          "name": "install_callbacks",
+          "type": "bool"
+        }
+      ],
+      "argsoriginal": "(GLFWwindow* window,bool install_callbacks)",
+      "call_args": "(window,install_callbacks)",
+      "cimguiname": "ImGui_ImplGlfw_InitForOther",
+      "defaults": {},
+      "funcname": "ImGui_ImplGlfw_InitForOther",
+      "location": "imgui_impl_glfw:26",
+      "ov_cimguiname": "ImGui_ImplGlfw_InitForOther",
       "ret": "bool",
       "signature": "(GLFWwindow*,bool)",
       "stname": ""
@@ -104,7 +129,7 @@
       "cimguiname": "ImGui_ImplGlfw_KeyCallback",
       "defaults": {},
       "funcname": "ImGui_ImplGlfw_KeyCallback",
-      "location": "imgui_impl_glfw:34",
+      "location": "imgui_impl_glfw:35",
       "ov_cimguiname": "ImGui_ImplGlfw_KeyCallback",
       "ret": "void",
       "signature": "(GLFWwindow*,int,int,int,int)",
@@ -137,7 +162,7 @@
       "cimguiname": "ImGui_ImplGlfw_MouseButtonCallback",
       "defaults": {},
       "funcname": "ImGui_ImplGlfw_MouseButtonCallback",
-      "location": "imgui_impl_glfw:32",
+      "location": "imgui_impl_glfw:33",
       "ov_cimguiname": "ImGui_ImplGlfw_MouseButtonCallback",
       "ret": "void",
       "signature": "(GLFWwindow*,int,int,int)",
@@ -153,7 +178,7 @@
       "cimguiname": "ImGui_ImplGlfw_NewFrame",
       "defaults": {},
       "funcname": "ImGui_ImplGlfw_NewFrame",
-      "location": "imgui_impl_glfw:27",
+      "location": "imgui_impl_glfw:28",
       "ov_cimguiname": "ImGui_ImplGlfw_NewFrame",
       "ret": "void",
       "signature": "()",
@@ -182,7 +207,7 @@
       "cimguiname": "ImGui_ImplGlfw_ScrollCallback",
       "defaults": {},
       "funcname": "ImGui_ImplGlfw_ScrollCallback",
-      "location": "imgui_impl_glfw:33",
+      "location": "imgui_impl_glfw:34",
       "ov_cimguiname": "ImGui_ImplGlfw_ScrollCallback",
       "ret": "void",
       "signature": "(GLFWwindow*,double,double)",
@@ -198,7 +223,7 @@
       "cimguiname": "ImGui_ImplGlfw_Shutdown",
       "defaults": {},
       "funcname": "ImGui_ImplGlfw_Shutdown",
-      "location": "imgui_impl_glfw:26",
+      "location": "imgui_impl_glfw:27",
       "ov_cimguiname": "ImGui_ImplGlfw_Shutdown",
       "ret": "void",
       "signature": "()",
