@@ -186,7 +186,7 @@ impl core::fmt::Write for SmallCStrBuf {
         // that much. (it would proably be reasonable to debug_assert about it
         // tho)
         let mut first = true;
-        for chunk in s.split("\0") {
+        for chunk in s.split('\0') {
             if !first {
                 self.0.extend_from_slice(b"\\0");
             }
