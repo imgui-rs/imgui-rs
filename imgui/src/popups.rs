@@ -20,15 +20,15 @@ create_token!(
 /// # use imgui::*;
 /// # let mut imgui = Context::create();
 /// # let ui = imgui.frame();
-/// if ui.button(im_str!("Show modal"), [0.0, 0.0]) {
+/// if ui.button(im_str!("Show modal")) {
 ///     ui.open_popup(im_str!("modal"));
 /// }
-/// if let Some(_token) = PopupModal::new(im_str!("modal")).begin_popup() {
+/// if let Some(_token) = PopupModal::new(im_str!("modal")).begin_popup(&ui) {
 ///     ui.text("Content of my modal");
-///     if ui.button(im_str!("OK"), [0.0, 0.0]) {
+///     if ui.button(im_str!("OK")) {
 ///         ui.close_current_popup();
 ///     }
-/// });
+/// };
 /// ```
 #[must_use]
 pub struct PopupModal<'p> {
