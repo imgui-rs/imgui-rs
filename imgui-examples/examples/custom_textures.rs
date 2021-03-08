@@ -121,7 +121,7 @@ impl CustomTexturesApp {
                     }
 
                     {
-                        ui.same_line(0.0);
+                        ui.same_line();
 
                         // Button using quad positioned image
                         ui.invisible_button(im_str!("Exciting Button"), [100.0, 100.0]);
@@ -150,7 +150,7 @@ impl CustomTexturesApp {
 
                     // Rounded image
                     {
-                        ui.same_line(0.0);
+                        ui.same_line();
                         ui.invisible_button(im_str!("Smooth Button"), [100.0, 100.0]);
 
                         let draw_list = ui.get_window_draw_list();

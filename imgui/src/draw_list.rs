@@ -838,8 +838,8 @@ impl<'ui> ImageQuad<'ui> {
 
     /// Set uv coordinates of each point of the quad. If not called, defaults are:
     ///
-    /// ```
-    /// uv1: [0, 0],
+    /// ```text
+    /// uv1: [0.0, 0.0],
     /// uv2: [1, 0],
     /// uv3: [1, 1],
     /// uv4: [0, 1],
