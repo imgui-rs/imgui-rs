@@ -2,9 +2,11 @@
 
 ## [Unreleased]
 
-- Removed legacy `ImGuiDragDropFlags` from `legacy.rs`, which were accidentally not cleared when they were remade in `drag_drop.rs` in v0.7.0.
+- BREAKING: Created `with_x` variants for most functions which previously took multiple parameters where some had default arguments in the C++. This makes calling most functions simpler and more similar to the C++.
+ - The most likely breaking changes users will see is `button` and `same_line` now take one fewer parameter -- if you were calling `button` with `[0.0, 0.0]`, simply delete that -- otherwise, call `button_with_size`. Similarly, for `same_line`, if you were passing in `0.0.` simply delete that parameter. Otherwise, call `same_line_with_pos`.
 
-- The remaining flags in `imgui::legacy` have been updated to be consistent with other flags in the project.
+- BREAKING: Removed `imgui::legacy` which contained the old style of flags.  The remaining flags in `imgui::legacy` have been updated to be consistent with other flags in the project.
+    - `imgui::legacy::ImGuiDragDropFlags` were accidentally not cleared when they were remade in `drag_drop.rs` in v0.7.0.
     - `imgui::legacy::ImGuiInputTextFlags` is now `imgui::input_widgets::InputTextFlags`
     - `imgui::legacy::ImGuiTreeNodeFlags` is now `imgui::widget::tree::TreeNodeFlags`
     - `imgui::legacy::ImDrawListFlags` is now `imgui::draw_list::DrawListFlags`
@@ -13,6 +15,13 @@
     - The methods are `add_image`, `add_image_quad`, and `add_image_rounded`. The `imgui-examples/examples/custom_textures.rs` has been updated to show their usage.
     - Additionally the `imgui::draw_list` module is now public, which contains the various draw list objects. While the `add_*` methods are preferred, `imgui::draw_list::Circle::new(&draw_list_mut, ...).build()` is equivalent
 
+- BREAKING: Most tokens through the repository (eg. `WindowToken`, `TabBarToken`, `FontStackToken`, etc) now allow for permissive dropping -- i.e, you don't need to actually call the `.end()` method on them anymore. In exchange, these tokens have taken on a lifetime, which allows them to be safe. This could make some patterns impossible. Please file an issue if this causes a problem.
+- `end()` no longer takes `Ui`. This is a breaking change, but hopefully should be trivial (and perhaps nice) for users to fix. Simply delete the argument, or add a `_` before the token's binding name and allow it to be dropped on its own.
+
+- BREAKING: `PopupModal`'s `new` was reworked so that it didn't take `Ui` until `build` was called. This is a breaking change if you were invoking it directly. Simply move your `ui` call to `build` or `begin`.
+
+- Upgrade to [Dear ImGui v1.81](https://github.com/ocornut/imgui/releases/tag/v1.81)
+    - BREAKING: `imgui::ListBox::calculate_size(items_count: ..., height_in_items: ...)` has been removed as the function backing it has been marked as obsolete. The recommended approach is to calculate the size yourself and use `.size(...)` (or use the default auto-calculated size)
 
 ## [0.7.0] - 2021-02-04
 

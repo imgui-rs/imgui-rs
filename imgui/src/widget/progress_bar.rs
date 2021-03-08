@@ -32,6 +32,7 @@ impl<'a> ProgressBar<'a> {
     /// The progress bar will be automatically sized to fill the entire width of the window if no
     /// custom size is specified.
     #[inline]
+    #[doc(alias = "ProgressBar")]
     pub const fn new(fraction: f32) -> ProgressBar<'a> {
         ProgressBar {
             fraction,

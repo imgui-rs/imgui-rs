@@ -1,9 +1,7 @@
 use bitflags::bitflags;
 use std::f32;
 use std::ptr;
-use std::thread;
 
-use crate::context::Context;
 use crate::string::ImStr;
 use crate::sys;
 use crate::{Condition, Ui};
@@ -115,36 +113,44 @@ bitflags! {
 /// # Window utilities
 impl<'ui> Ui<'ui> {
     /// Returns true if the current window appeared during this frame
+    #[doc(alias = "IsWindowAppearing")]
     pub fn is_window_appearing(&self) -> bool {
         unsafe { sys::igIsWindowAppearing() }
     }
     /// Returns true if the current window is in collapsed state (= only the title bar is visible)
+    #[doc(alias = "IsWindowCollapsed")]
     pub fn is_window_collapsed(&self) -> bool {
         unsafe { sys::igIsWindowCollapsed() }
     }
     /// Returns true if the current window is focused
+    #[doc(alias = "IsWindowFocused")]
     pub fn is_window_focused(&self) -> bool {
         unsafe { sys::igIsWindowFocused(0) }
     }
     /// Returns true if the current window is focused based on the given flags
+    #[doc(alias = "IsWindowFocused")]
     pub fn is_window_focused_with_flags(&self, flags: WindowFocusedFlags) -> bool {
         unsafe { sys::igIsWindowFocused(flags.bits() as i32) }
     }
     /// Returns true if the current window is hovered
+    #[doc(alias = "IsWindowHovered")]
     pub fn is_window_hovered(&self) -> bool {
         unsafe { sys::igIsWindowHovered(0) }
     }
     /// Returns true if the current window is hovered based on the given flags
+    #[doc(alias = "IsWindowHovered")]
     pub fn is_window_hovered_with_flags(&self, flags: WindowHoveredFlags) -> bool {
         unsafe { sys::igIsWindowHovered(flags.bits() as i32) }
     }
     /// Returns the position of the current window (in screen space)
+    #[doc(alias = "GetWindowPos")]
     pub fn window_pos(&self) -> [f32; 2] {
         let mut out = sys::ImVec2::zero();
         unsafe { sys::igGetWindowPos(&mut out) };
         out.into()
     }
     /// Returns the size of the current window
+    #[doc(alias = "GetWindowPos")]
     pub fn window_size(&self) -> [f32; 2] {
         let mut out = sys::ImVec2::zero();
         unsafe { sys::igGetWindowSize(&mut out) };
@@ -482,7 +488,7 @@ impl<'a> Window<'a> {
     ///
     /// Returns `None` if the window is not visible and no content should be rendered.
     #[must_use]
-    pub fn begin(self, ui: &Ui) -> Option<WindowToken> {
+    pub fn begin<'ui>(self, ui: &Ui<'ui>) -> Option<WindowToken<'ui>> {
         if self.pos_cond != Condition::Never {
             unsafe {
                 sys::igSetNextWindowPos(
@@ -528,7 +534,7 @@ impl<'a> Window<'a> {
             )
         };
         if should_render {
-            Some(WindowToken { ctx: ui.ctx })
+            Some(WindowToken::new(ui))
         } else {
             unsafe { sys::igEnd() };
             None
@@ -539,30 +545,17 @@ impl<'a> Window<'a> {
     /// Note: the closure is not called if no window content is visible (e.g. window is collapsed
     /// or fully clipped).
     pub fn build<F: FnOnce()>(self, ui: &Ui, f: F) {
-        if let Some(window) = self.begin(ui) {
+        if let Some(_window) = self.begin(ui) {
             f();
-            window.end(ui);
         }
     }
 }
 
-/// Tracks a window that must be ended by calling `.end()`
-pub struct WindowToken {
-    ctx: *const Context,
-}
+create_token!(
+    /// Tracks a window that can be ended by calling `.end()`
+    /// or by dropping.
+    pub struct WindowToken<'ui>;
 
-impl WindowToken {
     /// Ends a window
-    pub fn end(mut self, _: &Ui) {
-        self.ctx = ptr::null();
-        unsafe { sys::igEnd() };
-    }
-}
-
-impl Drop for WindowToken {
-    fn drop(&mut self) {
-        if !self.ctx.is_null() && !thread::panicking() {
-            panic!("A WindowToken was leaked. Did you call .end()?");
-        }
-    }
-}
+    drop { sys::igEnd() }
+);

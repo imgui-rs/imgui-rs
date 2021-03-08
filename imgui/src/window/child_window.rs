@@ -1,9 +1,6 @@
 use std::f32;
 use std::os::raw::{c_char, c_void};
-use std::ptr;
-use std::thread;
 
-use crate::context::Context;
 use crate::sys;
 use crate::window::WindowFlags;
 use crate::{Id, Ui};
@@ -23,6 +20,7 @@ pub struct ChildWindow<'a> {
 
 impl<'a> ChildWindow<'a> {
     /// Creates a new child window builder with the given ID
+    #[doc(alas = "BeginChildID")]
     pub fn new<T: Into<Id<'a>>>(id: T) -> ChildWindow<'a> {
         ChildWindow {
             id: id.into(),
@@ -57,12 +55,14 @@ impl<'a> ChildWindow<'a> {
     /// Does not include window decorations (title bar, menu bar, etc.). Set one of the values to
     /// 0.0 to leave the size automatic.
     #[inline]
+    #[doc(alias = "SetNextWindowContentSize")]
     pub fn content_size(mut self, size: [f32; 2]) -> Self {
         self.content_size = size;
         self
     }
     /// Sets the window focused state, which can be used to bring the window to front
     #[inline]
+    #[doc(alias = "SetNextWindwowFocus")]
     pub fn focused(mut self, focused: bool) -> Self {
         self.focused = focused;
         self
@@ -71,6 +71,7 @@ impl<'a> ChildWindow<'a> {
     ///
     /// See also `draw_background`
     #[inline]
+    #[doc(alias = "SetNextWindowContentBgAlpha")]
     pub fn bg_alpha(mut self, bg_alpha: f32) -> Self {
         self.bg_alpha = bg_alpha;
         self
@@ -244,7 +245,7 @@ impl<'a> ChildWindow<'a> {
     /// rendered, the token must be ended by calling `.end()`.
     ///
     /// Returns `None` if the window is not visible and no content should be rendered.
-    pub fn begin(self, ui: &Ui) -> Option<ChildWindowToken> {
+    pub fn begin<'ui>(self, ui: &Ui<'ui>) -> Option<ChildWindowToken<'ui>> {
         if self.content_size[0] != 0.0 || self.content_size[1] != 0.0 {
             unsafe { sys::igSetNextWindowContentSize(self.content_size.into()) };
         }
@@ -269,7 +270,7 @@ impl<'a> ChildWindow<'a> {
             sys::igBeginChildID(id, self.size.into(), self.border, self.flags.bits() as i32)
         };
         if should_render {
-            Some(ChildWindowToken { ctx: ui.ctx })
+            Some(ChildWindowToken::new(ui))
         } else {
             unsafe { sys::igEndChild() };
             None
@@ -280,30 +281,17 @@ impl<'a> ChildWindow<'a> {
     /// Note: the closure is not called if no window content is visible (e.g. window is collapsed
     /// or fully clipped).
     pub fn build<F: FnOnce()>(self, ui: &Ui, f: F) {
-        if let Some(window) = self.begin(ui) {
+        if let Some(_window) = self.begin(ui) {
             f();
-            window.end(ui);
         }
     }
 }
 
-/// Tracks a child window that must be ended by calling `.end()`
-pub struct ChildWindowToken {
-    ctx: *const Context,
-}
+create_token!(
+    /// Tracks a child window that can be ended by calling `.end()`
+    /// or by dropping
+    pub struct ChildWindowToken<'ui>;
 
-impl ChildWindowToken {
     /// Ends a window
-    pub fn end(mut self, _: &Ui) {
-        self.ctx = ptr::null();
-        unsafe { sys::igEndChild() };
-    }
-}
-
-impl Drop for ChildWindowToken {
-    fn drop(&mut self) {
-        if !self.ctx.is_null() && !thread::panicking() {
-            panic!("A ChildWindowToken was leaked. Did you call .end()?");
-        }
-    }
-}
+    drop { sys::igEndChild() }
+);

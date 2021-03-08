@@ -28,7 +28,7 @@ pub use self::layout::*;
 pub use self::list_clipper::ListClipper;
 pub use self::plothistogram::PlotHistogram;
 pub use self::plotlines::PlotLines;
-pub use self::popup_modal::PopupModal;
+pub use self::popups::*;
 pub use self::render::draw_data::*;
 pub use self::render::renderer::*;
 pub use self::stacks::*;
@@ -53,6 +53,9 @@ use internal::RawCast;
 #[macro_use]
 mod string;
 
+#[macro_use]
+mod tokens;
+
 mod clipboard;
 pub mod color;
 mod columns;
@@ -68,7 +71,7 @@ mod layout;
 mod list_clipper;
 mod plothistogram;
 mod plotlines;
-mod popup_modal;
+mod popups;
 mod render;
 mod stacks;
 mod style;
@@ -84,6 +87,7 @@ mod window;
 pub use core as __core;
 
 /// Returns the underlying Dear ImGui library version
+#[doc(alias = "GetVersion")]
 pub fn dear_imgui_version() -> &'static str {
     unsafe {
         let bytes = CStr::from_ptr(sys::igGetVersion()).to_bytes();
@@ -94,19 +98,21 @@ pub fn dear_imgui_version() -> &'static str {
 #[test]
 fn test_version() {
     // TODO: what's the point of this test?
-    assert_eq!(dear_imgui_version(), "1.80");
+    assert_eq!(dear_imgui_version(), "1.81");
 }
 
 impl Context {
     /// Returns the global imgui-rs time.
     ///
     /// Incremented by Io::delta_time every frame.
+    #[doc(alias = "GetTime")]
     pub fn time(&self) -> f64 {
         unsafe { sys::igGetTime() }
     }
     /// Returns the global imgui-rs frame count.
     ///
     /// Incremented by 1 every frame.
+    #[doc(alias = "GetFrameCount")]
     pub fn frame_count(&self) -> i32 {
         unsafe { sys::igGetFrameCount() }
     }
@@ -120,6 +126,7 @@ pub struct Ui<'ui> {
 
 impl<'ui> Ui<'ui> {
     /// Returns an immutable reference to the inputs/outputs object
+    #[doc(alias = "GetIO")]
     pub fn io(&self) -> &Io {
         unsafe { &*(sys::igGetIO() as *const Io) }
     }
@@ -138,6 +145,7 @@ impl<'ui> Ui<'ui> {
         *self.ctx.style()
     }
     /// Renders the frame and returns a reference to the resulting draw data
+    #[doc(alias = "Render", alias = "GetDrawData")]
     pub fn render(self) -> &'ui DrawData {
         unsafe {
             sys::igRender();
@@ -147,6 +155,7 @@ impl<'ui> Ui<'ui> {
 }
 
 impl<'a> Drop for Ui<'a> {
+    #[doc(alias = "EndFrame")]
     fn drop(&mut self) {
         if !thread::panicking() {
             unsafe {
@@ -160,6 +169,7 @@ impl<'a> Drop for Ui<'a> {
 impl<'ui> Ui<'ui> {
     /// Renders a demo window (previously called a test window), which demonstrates most
     /// Dear Imgui features.
+    #[doc(alias = "SnowDemoWindow")]
     pub fn show_demo_window(&self, opened: &mut bool) {
         unsafe {
             sys::igShowDemoWindow(opened);
@@ -168,6 +178,7 @@ impl<'ui> Ui<'ui> {
     /// Renders an about window.
     ///
     /// Displays the Dear ImGui version/credits, and build/system information.
+    #[doc(alias = "ShowAboutWindow")]
     pub fn show_about_window(&self, opened: &mut bool) {
         unsafe {
             sys::igShowAboutWindow(opened);
@@ -177,22 +188,26 @@ impl<'ui> Ui<'ui> {
     ///
     /// Displays Dear ImGui internals: draw commands (with individual draw calls and vertices),
     /// window list, basic internal state, etc.
+    #[doc(alias = "ShowMetricsWindow")]
     pub fn show_metrics_window(&self, opened: &mut bool) {
         unsafe {
             sys::igShowMetricsWindow(opened);
         }
     }
     /// Renders a style editor block (not a window) for the given `Style` structure
+    #[doc(alias = "ShowStyleEditor")]
     pub fn show_style_editor(&self, style: &mut Style) {
         unsafe {
             sys::igShowStyleEditor(style.raw_mut());
         }
     }
     /// Renders a style editor block (not a window) for the currently active style
+    #[doc(alias = "ShowStyleEditor")]
     pub fn show_default_style_editor(&self) {
         unsafe { sys::igShowStyleEditor(ptr::null_mut()) };
     }
     /// Renders a basic help/info block (not a window)
+    #[doc(alias = "ShowUserGuide")]
     pub fn show_user_guide(&self) {
         unsafe { sys::igShowUserGuide() };
     }
@@ -236,9 +251,11 @@ impl<T> From<*mut T> for Id<'static> {
 
 // Widgets: Input
 impl<'ui> Ui<'ui> {
+    #[doc(alias = "InputText", alias = "InputTextWithHint")]
     pub fn input_text<'p>(&self, label: &'p ImStr, buf: &'p mut ImString) -> InputText<'ui, 'p> {
         InputText::new(self, label, buf)
     }
+    #[doc(alias = "InputText", alias = "InputTextMultiline")]
     pub fn input_text_multiline<'p>(
         &self,
         label: &'p ImStr,
@@ -247,6 +264,7 @@ impl<'ui> Ui<'ui> {
     ) -> InputTextMultiline<'ui, 'p> {
         InputTextMultiline::new(self, label, buf, size)
     }
+    #[doc(alias = "InputFloat2")]
     pub fn input_float<'p>(&self, label: &'p ImStr, value: &'p mut f32) -> InputFloat<'ui, 'p> {
         InputFloat::new(self, label, value)
     }
@@ -257,6 +275,7 @@ impl<'ui> Ui<'ui> {
     ) -> InputFloat2<'ui, 'p> {
         InputFloat2::new(self, label, value)
     }
+    #[doc(alias = "InputFloat3")]
     pub fn input_float3<'p>(
         &self,
         label: &'p ImStr,
@@ -264,6 +283,7 @@ impl<'ui> Ui<'ui> {
     ) -> InputFloat3<'ui, 'p> {
         InputFloat3::new(self, label, value)
     }
+    #[doc(alias = "InputFloat4")]
     pub fn input_float4<'p>(
         &self,
         label: &'p ImStr,
@@ -271,41 +291,32 @@ impl<'ui> Ui<'ui> {
     ) -> InputFloat4<'ui, 'p> {
         InputFloat4::new(self, label, value)
     }
+    #[doc(alias = "InputInt")]
     pub fn input_int<'p>(&self, label: &'p ImStr, value: &'p mut i32) -> InputInt<'ui, 'p> {
         InputInt::new(self, label, value)
     }
+    #[doc(alias = "InputInt2")]
     pub fn input_int2<'p>(&self, label: &'p ImStr, value: &'p mut [i32; 2]) -> InputInt2<'ui, 'p> {
         InputInt2::new(self, label, value)
     }
+    #[doc(alias = "InputInt3")]
     pub fn input_int3<'p>(&self, label: &'p ImStr, value: &'p mut [i32; 3]) -> InputInt3<'ui, 'p> {
         InputInt3::new(self, label, value)
     }
+    #[doc(alias = "InputInt4")]
     pub fn input_int4<'p>(&self, label: &'p ImStr, value: &'p mut [i32; 4]) -> InputInt4<'ui, 'p> {
         InputInt4::new(self, label, value)
     }
 }
 
-/// Tracks a layout tooltip that must be ended by calling `.end()`
-#[must_use]
-pub struct TooltipToken {
-    ctx: *const Context,
-}
+create_token!(
+    /// Tracks a layout tooltip that can be ended by calling `.end()` or by dropping.
+    pub struct TooltipToken<'ui>;
 
-impl TooltipToken {
-    /// Ends a layout tooltip
-    pub fn end(mut self, _: &Ui) {
-        self.ctx = ptr::null();
-        unsafe { sys::igEndTooltip() };
-    }
-}
-
-impl Drop for TooltipToken {
-    fn drop(&mut self) {
-        if !self.ctx.is_null() && !thread::panicking() {
-            panic!("A TooltipToken was leaked. Did you call .end()?");
-        }
-    }
-}
+    /// Drops the layout tooltip manually. You can also just allow this token
+    /// to drop on its own.
+    drop { sys::igEndTooltip() }
+);
 
 /// # Tooltips
 impl<'ui> Ui<'ui> {
@@ -326,6 +337,7 @@ impl<'ui> Ui<'ui> {
     ///     }
     /// }
     /// ```
+    #[doc(alias = "BeginTooltip", alias = "EndTootip")]
     pub fn tooltip<F: FnOnce()>(&self, f: F) {
         unsafe { sys::igBeginTooltip() };
         f();
@@ -334,9 +346,10 @@ impl<'ui> Ui<'ui> {
     /// Construct a tooltip window that can have any kind of content.
     ///
     /// Returns a `TooltipToken` that must be ended by calling `.end()`
-    pub fn begin_tooltip(&self) -> TooltipToken {
+    #[doc(alias = "BeginTooltip")]
+    pub fn begin_tooltip(&self) -> TooltipToken<'_> {
         unsafe { sys::igBeginTooltip() };
-        TooltipToken { ctx: self.ctx }
+        TooltipToken::new(self)
     }
     /// Construct a tooltip window with simple text content.
     ///
@@ -353,56 +366,15 @@ impl<'ui> Ui<'ui> {
     ///     }
     /// }
     /// ```
+    #[doc(alias = "BeginTooltip", alias = "EndTootip")]
     pub fn tooltip_text<T: AsRef<str>>(&self, text: T) {
         self.tooltip(|| self.text(text));
     }
 }
 
-// Widgets: Popups
-impl<'ui> Ui<'ui> {
-    pub fn open_popup(&self, str_id: &ImStr) {
-        unsafe { sys::igOpenPopup(str_id.as_ptr(), 0) };
-    }
-    pub fn popup<F>(&self, str_id: &ImStr, f: F)
-    where
-        F: FnOnce(),
-    {
-        let render =
-            unsafe { sys::igBeginPopup(str_id.as_ptr(), WindowFlags::empty().bits() as i32) };
-        if render {
-            f();
-            unsafe { sys::igEndPopup() };
-        }
-    }
-    /// Create a modal pop-up.
-    ///
-    /// # Example
-    /// ```rust,no_run
-    /// # use imgui::*;
-    /// # let mut imgui = Context::create();
-    /// # let ui = imgui.frame();
-    /// if ui.button(im_str!("Show modal"), [0.0, 0.0]) {
-    ///     ui.open_popup(im_str!("modal"));
-    /// }
-    /// ui.popup_modal(im_str!("modal")).build(|| {
-    ///     ui.text("Content of my modal");
-    ///     if ui.button(im_str!("OK"), [0.0, 0.0]) {
-    ///         ui.close_current_popup();
-    ///     }
-    /// });
-    /// ```
-    pub fn popup_modal<'p>(&self, str_id: &'p ImStr) -> PopupModal<'ui, 'p> {
-        PopupModal::new(self, str_id)
-    }
-    /// Close a popup. Should be called within the closure given as argument to
-    /// [`Ui::popup`] or [`Ui::popup_modal`].
-    pub fn close_current_popup(&self) {
-        unsafe { sys::igCloseCurrentPopup() };
-    }
-}
-
 // Widgets: ListBox
 impl<'ui> Ui<'ui> {
+    #[doc(alias = "ListBox")]
     pub fn list_box<'p, StringType: AsRef<ImStr> + ?Sized>(
         &self,
         label: &'p ImStr,
@@ -425,12 +397,14 @@ impl<'ui> Ui<'ui> {
 }
 
 impl<'ui> Ui<'ui> {
+    #[doc(alias = "PlotLines")]
     pub fn plot_lines<'p>(&self, label: &'p ImStr, values: &'p [f32]) -> PlotLines<'ui, 'p> {
         PlotLines::new(self, label, values)
     }
 }
 
 impl<'ui> Ui<'ui> {
+    #[doc(alias = "PlotHistogram")]
     pub fn plot_histogram<'p>(
         &self,
         label: &'p ImStr,
@@ -443,22 +417,37 @@ impl<'ui> Ui<'ui> {
 impl<'ui> Ui<'ui> {
     /// Calculate the size required for a given text string.
     ///
+    /// This is the same as [calc_text_size_with_opts](Self::calc_text_size_with_opts)
+    /// with `hide_text_after_double_hash` set to false and `wrap_width` set to `-1.0`.
+    #[doc(alias = "CalcTextSize")]
+    pub fn calc_text_size<T: AsRef<str>>(&self, text: T) -> [f32; 2] {
+        self.calc_text_size_with_opts(text, false, -1.0)
+    }
+
+    /// Calculate the size required for a given text string.
+    ///
     /// hide_text_after_double_hash allows the user to insert comments into their text, using a double hash-tag prefix.
     /// This is a feature of imgui.
     ///
     /// wrap_width allows you to request a width at which to wrap the text to a newline for the calculation.
-    pub fn calc_text_size(
+    #[doc(alias = "CalcTextSize")]
+    pub fn calc_text_size_with_opts<T: AsRef<str>>(
         &self,
-        text: &ImStr,
+        text: T,
         hide_text_after_double_hash: bool,
         wrap_width: f32,
     ) -> [f32; 2] {
         let mut out = sys::ImVec2::zero();
+        let text = text.as_ref();
+
         unsafe {
+            let start = text.as_ptr();
+            let end = start.add(text.len());
+
             sys::igCalcTextSize(
                 &mut out,
-                text.as_ptr(),
-                std::ptr::null(),
+                start as *const c_char,
+                end as *const c_char,
                 hide_text_after_double_hash,
                 wrap_width,
             )
@@ -499,16 +488,19 @@ impl<'ui> Ui<'ui> {
     /// }
     /// ```
     #[must_use]
+    #[doc(alias = "GetWindowDrawList")]
     pub fn get_window_draw_list(&'ui self) -> DrawListMut<'ui> {
         DrawListMut::window(self)
     }
 
     #[must_use]
+    #[doc(alias = "GetBackgroundDrawList")]
     pub fn get_background_draw_list(&'ui self) -> DrawListMut<'ui> {
         DrawListMut::background(self)
     }
 
     #[must_use]
+    #[doc(alias = "GetForegroundDrawList")]
     pub fn get_foreground_draw_list(&'ui self) -> DrawListMut<'ui> {
         DrawListMut::foreground(self)
     }

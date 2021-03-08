@@ -130,6 +130,7 @@ jobs:
             ${{ runner.os }}-target-test-${{ matrix.rust }}-${{ hashFiles('**/Cargo.toml') }}
             ${{ runner.os }}-target-test-${{ matrix.rust }}-
       - run: cargo test --workspace --all-targets
+      - run: cargo test --workspace --doc
       # - run: cargo test --manifest-path imgui-gfx-examples/Cargo.toml --no-default-features --features directx
       #   if: runner.os == 'Windows'
       - run: cargo test --manifest-path imgui-winit-support/Cargo.toml --no-default-features --features winit-19

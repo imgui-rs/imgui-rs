@@ -9,14 +9,14 @@ use crate::sys;
 pub struct DrawData {
     /// Only valid after render() is called and before the next new frame() is called.
     valid: bool,
-    // Array of DrawList.
-    cmd_lists: *mut *mut DrawList,
     /// Number of DrawList to render.
     cmd_lists_count: i32,
     /// For convenience, sum of all draw list index buffer sizes.
     pub total_idx_count: i32,
     /// For convenience, sum of all draw list vertex buffer sizes.
     pub total_vtx_count: i32,
+    // Array of DrawList.
+    cmd_lists: *mut *mut DrawList,
     /// Upper-left position of the viewport to render.
     ///
     /// (= upper-left corner of the orthogonal projection matrix to use)
@@ -61,6 +61,7 @@ impl DrawData {
     /// buffers.
     ///
     /// **This is slow and most likely a waste of resources. Always prefer indexed rendering!**
+    #[doc(alias = "DeIndexAllBuffers")]
     pub fn deindex_all_buffers(&mut self) {
         unsafe {
             sys::ImDrawData_DeIndexAllBuffers(self.raw_mut());
@@ -70,6 +71,7 @@ impl DrawData {
     ///
     /// Can be used if your final output buffer is at a different scale than imgui-rs expects, or
     /// if there is a difference between your window resolution and framebuffer resolution.
+    #[doc(alias = "ScaleClipRects")]
     pub fn scale_clip_rects(&mut self, fb_scale: [f32; 2]) {
         unsafe {
             sys::ImDrawData_ScaleClipRects(self.raw_mut(), fb_scale.into());

@@ -1,9 +1,6 @@
 use bitflags::bitflags;
 use std::os::raw::{c_char, c_void};
-use std::ptr;
-use std::thread;
 
-use crate::context::Context;
 use crate::string::ImStr;
 use crate::sys;
 use crate::{Condition, Ui};
@@ -234,11 +231,10 @@ impl<'a> TreeNode<'a> {
     /// Pushes a tree node and starts appending to it.
     ///
     /// Returns `Some(TreeNodeToken)` if the tree node is open. After content has been
-    /// rendered, the token must be popped by calling `.pop()`.
+    /// rendered, the token can be popped by calling `.pop()`.
     ///
     /// Returns `None` if the tree node is not open and no content should be rendered.
-    #[must_use]
-    pub fn push(self, ui: &Ui) -> Option<TreeNodeToken> {
+    pub fn push<'ui>(self, ui: &Ui<'ui>) -> Option<TreeNodeToken<'ui>> {
         let open = unsafe {
             if self.opened_cond != Condition::Never {
                 sys::igSetNextItemOpen(self.opened, self.opened_cond as i32);
@@ -259,13 +255,10 @@ impl<'a> TreeNode<'a> {
             }
         };
         if open {
-            Some(TreeNodeToken {
-                ctx: if self.flags.contains(TreeNodeFlags::NO_TREE_PUSH_ON_OPEN) {
-                    ptr::null()
-                } else {
-                    ui.ctx
-                },
-            })
+            Some(TreeNodeToken::new(
+                ui,
+                !self.flags.contains(TreeNodeFlags::NO_TREE_PUSH_ON_OPEN),
+            ))
         } else {
             None
         }
@@ -274,37 +267,43 @@ impl<'a> TreeNode<'a> {
     ///
     /// Note: the closure is not called if the tree node is not open.
     pub fn build<F: FnOnce()>(self, ui: &Ui, f: F) {
-        if let Some(node) = self.push(ui) {
+        if let Some(_node) = self.push(ui) {
             f();
-            node.pop(ui);
         }
     }
 }
 
-/// Tracks a tree node that must be popped by calling `.pop()`.
+/// Tracks a tree node that can be popped by calling `.pop()`, `end()`, or by dropping.
 ///
 /// If `TreeNodeFlags::NO_TREE_PUSH_ON_OPEN` was used when this token was created, calling `.pop()`
 /// is not mandatory and is a no-op.
 #[must_use]
-pub struct TreeNodeToken {
-    ctx: *const Context,
-}
+pub struct TreeNodeToken<'a>(core::marker::PhantomData<crate::Ui<'a>>, bool);
 
-impl TreeNodeToken {
+impl<'a> TreeNodeToken<'a> {
+    /// Creates a new token type. This takes a bool for the no-op variant on NO_TREE_PUSH_ON_OPEN.
+    pub(crate) fn new(_: &crate::Ui<'a>, execute_drop: bool) -> Self {
+        Self(std::marker::PhantomData, execute_drop)
+    }
+
     /// Pops a tree node
     #[inline]
-    pub fn pop(mut self, _: &Ui) {
-        if !self.ctx.is_null() {
-            self.ctx = ptr::null();
-            unsafe { sys::igTreePop() };
-        }
+    pub fn end(self) {
+        // left empty for drop
+    }
+
+    /// Pops a tree node
+    #[inline]
+    pub fn pop(self) {
+        self.end()
     }
 }
 
-impl Drop for TreeNodeToken {
+impl Drop for TreeNodeToken<'_> {
+    #[doc(alias = "TreePop")]
     fn drop(&mut self) {
-        if !self.ctx.is_null() && !thread::panicking() {
-            panic!("A TreeNodeToken was leaked. Did you call .pop()?");
+        if self.1 {
+            unsafe { sys::igTreePop() }
         }
     }
 }
@@ -319,6 +318,7 @@ pub struct CollapsingHeader<'a> {
 
 impl<'a> CollapsingHeader<'a> {
     /// Constructs a new collapsing header builder
+    #[doc(alias = "CollapsingHeader")]
     pub fn new(label: &ImStr) -> CollapsingHeader {
         CollapsingHeader {
             label,

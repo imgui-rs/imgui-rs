@@ -153,12 +153,14 @@ unsafe impl RawCast<sys::ImGuiStyle> for Style {}
 
 impl Style {
     /// Scales all sizes in the style
+    #[doc(alias = "ScaleAllSizes")]
     pub fn scale_all_sizes(&mut self, scale_factor: f32) {
         unsafe {
             sys::ImGuiStyle_ScaleAllSizes(self.raw_mut(), scale_factor);
         }
     }
     /// Replaces current colors with classic Dear ImGui style
+    #[doc(alias = "StyleColors", alias = "StlyeColorsClassic")]
     pub fn use_classic_colors(&mut self) -> &mut Self {
         unsafe {
             sys::igStyleColorsClassic(self.raw_mut());
@@ -166,6 +168,7 @@ impl Style {
         self
     }
     /// Replaces current colors with a new, recommended style
+    #[doc(alias = "StyleColors", alias = "StyleColorsDark")]
     pub fn use_dark_colors(&mut self) -> &mut Self {
         unsafe {
             sys::igStyleColorsDark(self.raw_mut());
@@ -174,6 +177,7 @@ impl Style {
     }
     /// Replaces current colors with a light style. Best used with borders and a custom, thicker
     /// font
+    #[doc(alias = "StyleColors", alias = "StyleColorsLight")]
     pub fn use_light_colors(&mut self) -> &mut Self {
         unsafe {
             sys::igStyleColorsLight(self.raw_mut());

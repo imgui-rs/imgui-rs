@@ -14,6 +14,7 @@ fn fmt_ptr() -> *const c_char {
 /// # Widgets: Text
 impl<'ui> Ui<'ui> {
     /// Renders simple text
+    #[doc(alias = "TextUnformatted")]
     pub fn text<T: AsRef<str>>(&self, text: T) {
         let s = text.as_ref();
         unsafe {
@@ -26,24 +27,27 @@ impl<'ui> Ui<'ui> {
     pub fn text_colored<T: AsRef<str>>(&self, color: [f32; 4], text: T) {
         let style = self.push_style_color(StyleColor::Text, color);
         self.text(text);
-        style.pop(self);
+        style.end();
     }
     /// Renders simple text using `StyleColor::TextDisabled` color
     pub fn text_disabled<T: AsRef<str>>(&self, text: T) {
         let color = self.style_color(StyleColor::TextDisabled);
         let style = self.push_style_color(StyleColor::Text, color);
         self.text(text);
-        style.pop(self);
+        style.end();
     }
     /// Renders text wrapped to the end of window (or column)
+    #[doc(alias = "TextWrapperd")]
     pub fn text_wrapped(&self, text: &ImStr) {
         unsafe { sys::igTextWrapped(fmt_ptr(), text.as_ptr()) }
     }
     /// Render a text + label combination aligned the same way as value+label widgets
+    #[doc(alias = "LabelText")]
     pub fn label_text(&self, label: &ImStr, text: &ImStr) {
         unsafe { sys::igLabelText(label.as_ptr(), fmt_ptr(), text.as_ptr()) }
     }
     /// Renders text with a little bullet aligned to the typical tree node
+    #[doc(alias = "BulletText")]
     pub fn bullet_text(&self, text: &ImStr) {
         unsafe { sys::igBulletText(fmt_ptr(), text.as_ptr()) }
     }

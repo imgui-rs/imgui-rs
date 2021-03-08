@@ -58,6 +58,8 @@ pub struct FontAtlas {
     custom_rects: sys::ImVector_ImFontAtlasCustomRect,
     config_data: sys::ImVector_ImFontConfig,
     tex_uv_lines: [[f32; 4]; 64],
+    font_builder_io: *const sys::ImFontBuilderIO,
+    font_builder_flags: i32,
     pack_id_mouse_cursors: i32,
     pack_id_lines: i32,
 }
@@ -65,6 +67,7 @@ pub struct FontAtlas {
 unsafe impl RawCast<sys::ImFontAtlas> for FontAtlas {}
 
 impl FontAtlas {
+    #[doc(alias = "AddFontDefault", alias = "AddFont")]
     pub fn add_font(&mut self, font_sources: &[FontSource]) -> FontId {
         let (head, tail) = font_sources.split_first().unwrap();
         let font_id = self.add_font_internal(head, false);
@@ -130,10 +133,12 @@ impl FontAtlas {
         None
     }
     /// Returns true if the font atlas has been built
+    #[doc(alias = "IsBuilt")]
     pub fn is_built(&self) -> bool {
         unsafe { sys::ImFontAtlas_IsBuilt(self.raw() as *const sys::ImFontAtlas as *mut _) }
     }
     /// Builds a 1 byte per-pixel font atlas texture
+    #[doc(alias = "GetTextDataAsAlpha8")]
     pub fn build_alpha8_texture(&mut self) -> FontAtlasTexture {
         let mut pixels: *mut c_uchar = ptr::null_mut();
         let mut width: c_int = 0;
@@ -167,6 +172,7 @@ impl FontAtlas {
         }
     }
     /// Builds a 4 byte per-pixel font atlas texture
+    #[doc(alias = "GetTextDataAsRGBA32")]
     pub fn build_rgba32_texture(&mut self) -> FontAtlasTexture {
         let mut pixels: *mut c_uchar = ptr::null_mut();
         let mut width: c_int = 0;
@@ -200,12 +206,14 @@ impl FontAtlas {
         }
     }
     /// Clears the font atlas completely (both input and output data)
+    #[doc(alias = "Clear")]
     pub fn clear(&mut self) {
         unsafe {
             sys::ImFontAtlas_Clear(self.raw_mut());
         }
     }
     /// Clears output font data (glyph storage, UV coordinates)
+    #[doc(alias = "ClearFonts")]
     pub fn clear_fonts(&mut self) {
         unsafe {
             sys::ImFontAtlas_ClearFonts(self.raw_mut());
@@ -214,12 +222,14 @@ impl FontAtlas {
     /// Clears output texture data.
     ///
     /// Can be used to save RAM once the texture has been transferred to the GPU.
+    #[doc(alias = "ClearTexData")]
     pub fn clear_tex_data(&mut self) {
         unsafe {
             sys::ImFontAtlas_ClearTexData(self.raw_mut());
         }
     }
     /// Clears all the data used to build the textures and fonts
+    #[doc(alias = "ClearInputData")]
     pub fn clear_input_data(&mut self) {
         unsafe {
             sys::ImFontAtlas_ClearInputData(self.raw_mut());
@@ -302,7 +312,7 @@ pub struct FontConfig {
     /// Maximum advance_x for glyphs
     pub glyph_max_advance_x: f32,
     /// Settings for a custom font rasterizer if used
-    pub rasterizer_flags: u32,
+    pub font_builder_flags: u32,
     /// Brighten (>1.0) or darken (<1.0) font output
     pub rasterizer_multiply: f32,
     /// Explicitly specify the ellipsis character.
@@ -324,7 +334,7 @@ impl Default for FontConfig {
             glyph_ranges: FontGlyphRanges::default(),
             glyph_min_advance_x: 0.0,
             glyph_max_advance_x: f32::MAX,
-            rasterizer_flags: 0,
+            font_builder_flags: 0,
             rasterizer_multiply: 1.0,
             ellipsis_char: None,
             name: None,
@@ -343,7 +353,7 @@ impl FontConfig {
         raw.GlyphRanges = unsafe { self.glyph_ranges.to_ptr(atlas) };
         raw.GlyphMinAdvanceX = self.glyph_min_advance_x;
         raw.GlyphMaxAdvanceX = self.glyph_max_advance_x;
-        raw.RasterizerFlags = self.rasterizer_flags;
+        raw.FontBuilderFlags = self.font_builder_flags;
         raw.RasterizerMultiply = self.rasterizer_multiply;
         raw.EllipsisChar = self.ellipsis_char.map(|x| x as u16).unwrap_or(0xffff);
         if let Some(name) = self.name.as_ref() {
@@ -396,8 +406,8 @@ fn test_font_config_default() {
         sys_font_config.GlyphMaxAdvanceX
     );
     assert_eq!(
-        font_config.rasterizer_flags,
-        sys_font_config.RasterizerFlags
+        font_config.font_builder_flags,
+        sys_font_config.FontBuilderFlags
     );
     assert_eq!(
         font_config.rasterizer_multiply,
@@ -423,12 +433,14 @@ pub struct FontAtlasTexture<'a> {
 pub struct SharedFontAtlas(pub(crate) *mut sys::ImFontAtlas);
 
 impl SharedFontAtlas {
+    #[doc(alias = "ImFontAtlas", alias = "ImFontAtlas::ImFontAtlas")]
     pub fn create() -> SharedFontAtlas {
         SharedFontAtlas(unsafe { sys::ImFontAtlas_ImFontAtlas() })
     }
 }
 
 impl Drop for SharedFontAtlas {
+    #[doc(alias = "ImFontAtlas::Destory")]
     fn drop(&mut self) {
         unsafe { sys::ImFontAtlas_destroy(self.0) };
     }

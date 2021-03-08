@@ -1,47 +1,25 @@
 use std::borrow::Cow;
-use std::ptr;
-use std::thread;
 
-use crate::context::Context;
 use crate::string::ImStr;
 use crate::sys;
 use crate::Ui;
 
-#[derive(Copy, Clone, Debug)]
-enum Size {
-    Vec(sys::ImVec2),
-    Items {
-        items_count: i32,
-        height_in_items: i32,
-    },
-}
 /// Builder for a list box widget
 #[derive(Copy, Clone, Debug)]
 #[must_use]
 pub struct ListBox<'a> {
     label: &'a ImStr,
-    size: Size,
+    size: sys::ImVec2,
 }
 
 impl<'a> ListBox<'a> {
     /// Constructs a new list box builder.
+    #[doc(alias = "ListBoxHeaderVec2", alias = "ListBoxHeaderInt")]
     pub const fn new(label: &'a ImStr) -> ListBox<'a> {
         ListBox {
             label,
-            size: Size::Vec(sys::ImVec2::zero()),
+            size: sys::ImVec2::zero(),
         }
-    }
-    /// Sets the list box size based on the number of items that you want to make visible
-    /// Size default to hold ~7.25 items.
-    /// We add +25% worth of item height to allow the user to see at a glance if there are more items up/down, without looking at the scrollbar.
-    /// We don't add this extra bit if items_count <= height_in_items. It is slightly dodgy, because it means a dynamic list of items will make the widget resize occasionally when it crosses that size.
-    #[inline]
-    pub const fn calculate_size(mut self, items_count: i32, height_in_items: i32) -> Self {
-        self.size = Size::Items {
-            items_count,
-            height_in_items,
-        };
-        self
     }
 
     /// Sets the list box size based on the given width and height
@@ -52,7 +30,7 @@ impl<'a> ListBox<'a> {
     /// Default: [0.0, 0.0], in which case the combobox calculates a sensible width and height
     #[inline]
     pub const fn size(mut self, size: [f32; 2]) -> Self {
-        self.size = Size::Vec(sys::ImVec2::new(size[0], size[1]));
+        self.size = sys::ImVec2::new(size[0], size[1]);
         self
     }
     /// Creates a list box and starts appending to it.
@@ -62,18 +40,10 @@ impl<'a> ListBox<'a> {
     ///
     /// Returns `None` if the list box is not open and no content should be rendered.
     #[must_use]
-    pub fn begin(self, ui: &Ui) -> Option<ListBoxToken> {
-        let should_render = unsafe {
-            match self.size {
-                Size::Vec(size) => sys::igListBoxHeaderVec2(self.label.as_ptr(), size),
-                Size::Items {
-                    items_count,
-                    height_in_items,
-                } => sys::igListBoxHeaderInt(self.label.as_ptr(), items_count, height_in_items),
-            }
-        };
+    pub fn begin<'ui>(self, ui: &Ui<'ui>) -> Option<ListBoxToken<'ui>> {
+        let should_render = unsafe { sys::igBeginListBox(self.label.as_ptr(), self.size) };
         if should_render {
-            Some(ListBoxToken { ctx: ui.ctx })
+            Some(ListBoxToken::new(ui))
         } else {
             None
         }
@@ -82,34 +52,20 @@ impl<'a> ListBox<'a> {
     ///
     /// Note: the closure is not called if the list box is not open.
     pub fn build<F: FnOnce()>(self, ui: &Ui, f: F) {
-        if let Some(list) = self.begin(ui) {
+        if let Some(_list) = self.begin(ui) {
             f();
-            list.end(ui);
         }
     }
 }
 
-/// Tracks a list box that must be ended by calling `.end()`
-#[must_use]
-pub struct ListBoxToken {
-    ctx: *const Context,
-}
+create_token!(
+    /// Tracks a list box that can be ended by calling `.end()`
+    /// or by dropping
+    pub struct ListBoxToken<'ui>;
 
-impl ListBoxToken {
     /// Ends a list box
-    pub fn end(mut self, _: &Ui) {
-        self.ctx = ptr::null();
-        unsafe { sys::igListBoxFooter() };
-    }
-}
-
-impl Drop for ListBoxToken {
-    fn drop(&mut self) {
-        if !self.ctx.is_null() && !thread::panicking() {
-            panic!("A ListBoxToken was leaked. Did you call .end()?");
-        }
-    }
-}
+    drop { sys::igEndListBox() }
+);
 
 /// # Convenience functions
 impl<'a> ListBox<'a> {
@@ -136,7 +92,6 @@ impl<'a> ListBox<'a> {
                     result = true;
                 }
             }
-            _cb.end(ui);
         }
         result
     }
