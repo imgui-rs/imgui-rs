@@ -111,7 +111,7 @@ fn main() {
                 // key is indexed by it's integer value of
                 // `winit::VirtualKeyCode`. So we can query if a key
                 // is down based on it's virtual key code,
-                use winit::VirtualKeyCode;
+                use winit::event::VirtualKeyCode;
                 let home_key_idx: i32 = VirtualKeyCode::Home as i32;
                 if ui.io().keys_down[home_key_idx as usize] {
                     home_counter += 1;
