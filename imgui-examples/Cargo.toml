@@ -16,3 +16,7 @@ image = "0.23"
 imgui = { path = "../imgui" }
 imgui-glium-renderer = { path = "../imgui-glium-renderer" }
 imgui-winit-support = { path = "../imgui-winit-support" }
+
+# Direct dependency only required because `winit::VirtualKeyCode` is
+# used for one example.
+winit = "*"

@@ -107,6 +107,14 @@ impl<'ui> Ui<'ui> {
     #[doc(alias = "IsKeyDown")]
     pub fn is_key_down(&self, key: Key) -> bool {
         let key_index = self.key_index(key);
+        self.is_key_index_down(key_index)
+    }
+
+    /// Same as [`is_key_down`] but takes a key index. The meaning of
+    /// index is defined by your backend implementation.
+    #[inline]
+    #[doc(alias = "IsKeyDown")]
+    pub fn is_key_index_down(&self, key_index: i32) -> bool {
         unsafe { sys::igIsKeyDown(key_index) }
     }
 
@@ -117,6 +125,16 @@ impl<'ui> Ui<'ui> {
     #[doc(alias = "IsKeyPressed")]
     pub fn is_key_pressed(&self, key: Key) -> bool {
         let key_index = self.key_index(key);
+        self.is_key_index_pressed(key_index)
+    }
+
+    /// Same as [`is_key_pressed`] but takes a key index.
+    ///
+    /// The meaning of index is defined by your backend
+    /// implementation.
+    #[inline]
+    #[doc(alias = "IsKeyPressed")]
+    pub fn is_key_index_pressed(&self, key_index: i32) -> bool {
         unsafe { sys::igIsKeyPressed(key_index, true) }
     }
 
@@ -124,8 +142,19 @@ impl<'ui> Ui<'ui> {
     ///
     /// Is **not** affected by key repeat settings (`io.key_repeat_delay`, `io.key_repeat_rate`)
     #[inline]
+    #[doc(alias = "IsKeyPressed")]
     pub fn is_key_pressed_no_repeat(&self, key: Key) -> bool {
         let key_index = self.key_index(key);
+        self.is_key_index_pressed_no_repeat(key_index)
+    }
+
+    /// Same as [`is_key_pressed_no_repeat`] but takes a key index.
+    ///
+    /// The meaning of index is defined by your backend
+    /// implementation.
+    #[inline]
+    #[doc(alias = "IsKeyPressed")]
+    pub fn is_key_index_pressed_no_repeat(&self, key_index: i32) -> bool {
         unsafe { sys::igIsKeyPressed(key_index, false) }
     }
 
@@ -134,6 +163,16 @@ impl<'ui> Ui<'ui> {
     #[doc(alias = "IsKeyReleased")]
     pub fn is_key_released(&self, key: Key) -> bool {
         let key_index = self.key_index(key);
+        self.is_key_index_released(key_index)
+    }
+
+    /// Same as [`is_key_released`] but takes a key index.
+    ///
+    /// The meaning of index is defined by your backend
+    /// implementation.
+    #[inline]
+    #[doc(alias = "IsKeyReleased")]
+    pub fn is_key_index_released(&self, key_index: i32) -> bool {
         unsafe { sys::igIsKeyReleased(key_index) }
     }
 
@@ -145,6 +184,12 @@ impl<'ui> Ui<'ui> {
     #[doc(alias = "GetKeyPressedAmount")]
     pub fn key_pressed_amount(&self, key: Key, repeat_delay: f32, rate: f32) -> u32 {
         let key_index = self.key_index(key);
+        self.key_index_pressed_amount(key_index, repeat_delay, rate)
+    }
+
+    #[inline]
+    #[doc(alias = "GetKeyPressedAmount")]
+    pub fn key_index_pressed_amount(&self, key_index: i32, repeat_delay: f32, rate: f32) -> u32 {
         unsafe { sys::igGetKeyPressedAmount(key_index, repeat_delay, rate) as u32 }
     }
 
