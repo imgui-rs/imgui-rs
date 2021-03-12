@@ -23,6 +23,10 @@
 - Upgrade to [Dear ImGui v1.81](https://github.com/ocornut/imgui/releases/tag/v1.81)
     - BREAKING: `imgui::ListBox::calculate_size(items_count: ..., height_in_items: ...)` has been removed as the function backing it has been marked as obsolete. The recommended approach is to calculate the size yourself and use `.size(...)` (or use the default auto-calculated size)
 
+- Restored methods to access keyboard based on backend-defined keyboard map indexes. These allow access to most keys, not just those defined in the small subset of `imgui::Keys` (note the available keys may be expanded in future by [imgui PR #2625](https://github.com/ocornut/imgui/pull/2625))
+    - The new methods on `imgui::Ui` are `is_key_index_down`, `is_key_index_pressed`, `is_key_index_pressed_no_repeat`, `is_key_index_released`, `is_key_index_released`
+    - For example `ui.is_key_released(imgui::Key::A)` is same as `ui.is_key_index_released(winit::events::VirtualKeyCode::A as i32)` when using the winit backend
+
 ## [0.7.0] - 2021-02-04
 
 - Upgrade to [Dear ImGui v1.80](https://github.com/ocornut/imgui/releases/tag/v1.80). (Note that the new table functionality is not yet supported, however)
