@@ -130,8 +130,9 @@ fn main() {
                 // with arbitrary key indexes. For example, to check
                 // if the F1 key is been pressed
 
-                if ui.is_key_index_released(37) { // Hardcoded for imgui-examples only, instead do this:
-                //if ui.is_key_index_released(winit::event::VirtualKeyCode::F1 as i32) {
+                if ui.is_key_index_released(37) {
+                    // Index is hardcoded for imgui-examples only, instead do this:
+                    //if ui.is_key_index_released(winit::event::VirtualKeyCode::F1 as i32) {
                     f1_release_count += 1;
                 }
                 ui.text(format!("F1 has been released {} times", f1_release_count));
