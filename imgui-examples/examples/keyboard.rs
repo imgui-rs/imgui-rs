@@ -111,8 +111,8 @@ fn main() {
                 // key is indexed by it's integer value of
                 // `winit::VirtualKeyCode`. So we can query if a key
                 // is down based on it's virtual key code,
-                use winit::event::VirtualKeyCode;
-                let home_key_idx: i32 = VirtualKeyCode::Home as i32;
+
+                let home_key_idx = 65; // Hardcoded for imgui-examples only, instead use `winit::event::VirtualKeyCode::Home`
                 if ui.io().keys_down[home_key_idx as usize] {
                     home_counter += 1;
                 }
@@ -129,7 +129,9 @@ fn main() {
                 // It is also possible to use the `is_key_...` methods
                 // with arbitrary key indexes. For example, to check
                 // if the F1 key is been pressed
-                if ui.is_key_index_released(VirtualKeyCode::F1 as i32) {
+
+                if ui.is_key_index_released(37) { // Hardcoded for imgui-examples only, instead do this:
+                //if ui.is_key_index_released(winit::event::VirtualKeyCode::F1 as i32) {
                     f1_release_count += 1;
                 }
                 ui.text(format!("F1 has been released {} times", f1_release_count));
