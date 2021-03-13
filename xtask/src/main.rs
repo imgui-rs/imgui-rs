@@ -1,7 +1,9 @@
+mod bindgen;
+mod flags;
+
 use anyhow::Result;
-use pico_args::Arguments;
-use xtask::bindgen::GenBindings;
-use xtask::{project_root, pushd};
+use flags::XtaskCmd;
+use std::path::{Path, PathBuf};
 
 fn main() {
     if let Err(e) = try_main() {
@@ -13,47 +15,59 @@ fn main() {
     }
 }
 
-const HELP: &str = "\
-cargo xtask
-Run custom build command.
-
-USAGE:
-    cargo xtask <SUBCOMMAND>
-
-SUBCOMMANDS:
-    bindgen - produce bindings using bindgen \
-        must have bindgen installed, may require unix \
-        as we pass `bindgen` very many CLI args
-TODO:
-    run - run or list examples
-    lint-all - run clippy as we would in CI
-    test-all - run the tests we'd run in CI
-";
-
 fn try_main() -> Result<()> {
-    let _g = pushd(project_root())?;
-
-    let mut args = Arguments::from_env();
-    let subcommand = args.subcommand()?.unwrap_or_default();
-
-    match subcommand.as_str() {
-        "bindgen" => {
-            // none of these are required.
-            let cmd = GenBindings {
-                // defaults to <project>/imgui-sys/third-party
-                bindings_path: args.opt_value_from_str("--cimgui-dir")?,
-                // defaults to <project>/imgui-sys/src
-                output_path: args.opt_value_from_str("--output-dir")?,
-                // defaults to "imgui-sys-v0", but can be set in
-                // env("IMGUI_RS_WASM_IMPORT_NAME")
-                wasm_import_name: args.opt_value_from_str("--wasm-import-name")?,
-            };
-            args.finish()?;
-            cmd.run()?;
-        }
-        _ => {
-            eprintln!("{}", HELP);
-        }
+    let root = project_root();
+    let _d = xshell::pushd(&root)?;
+    let flags = flags::Xtask::from_env()?;
+    if flags.verbose {
+        VERBOSE.store(true, std::sync::atomic::Ordering::Relaxed);
+    }
+    match flags.subcommand {
+        XtaskCmd::Help(_) => eprintln!("{}", flags::Xtask::HELP),
+        XtaskCmd::Lint(_) => lint_all()?,
+        XtaskCmd::Test(_) => test_all()?,
+        XtaskCmd::Bindgen(cmd) => cmd.run()?,
     }
     Ok(())
+}
+
+fn lint_all() -> Result<()> {
+    xshell::cmd!("cargo clippy --workspace --all-targets").run()?;
+    xshell::cmd!(
+        "cargo clippy --manifest-path imgui-winit-support/Cargo.toml --all-features --all-targets"
+    )
+    .run()?;
+    let winits = &["winit-19", "winit-20", "winit-22", "winit-23", "winit-24"];
+    for &winit in winits {
+        xshell::cmd!("cargo clippy --manifest-path imgui-winit-support/Cargo.toml --no-default-features --features {winit} --all-targets").run()?;
+    }
+    xshell::cmd!("cargo fmt --all -- --check").run()?;
+    Ok(())
+}
+
+fn test_all() -> Result<()> {
+    xshell::cmd!("cargo test --workspace --all-targets").run()?;
+    xshell::cmd!("cargo test --workspace --doc").run()?;
+    let winits = &["winit-19", "winit-20", "winit-22", "winit-23", "winit-24"];
+    for &winit in winits {
+        xshell::cmd!("cargo test --manifest-path imgui-winit-support/Cargo.toml --no-default-features --features {winit} --all-targets").run()?;
+    }
+    xshell::cmd!("cargo test -p imgui --release -- --ignored").run()?;
+    Ok(())
+}
+
+static VERBOSE: std::sync::atomic::AtomicBool = std::sync::atomic::AtomicBool::new(false);
+pub fn verbose() -> bool {
+    VERBOSE.load(std::sync::atomic::Ordering::Relaxed)
+}
+
+pub fn project_root() -> PathBuf {
+    Path::new(
+        &std::env::var("CARGO_MANIFEST_DIR")
+            .unwrap_or_else(|_| env!("CARGO_MANIFEST_DIR").to_owned()),
+    )
+    .ancestors()
+    .nth(1)
+    .unwrap()
+    .to_path_buf()
 }
