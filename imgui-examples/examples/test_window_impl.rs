@@ -828,7 +828,7 @@ CTRL+click on individual component to input value.\n",
                 });
             });
         }
-    })
+    });
 }
 
 fn show_example_app_main_menu_bar<'a>(ui: &Ui<'a>, state: &mut State) {
@@ -942,7 +942,7 @@ output your content because that would create a feedback loop.",
             for i in 0..state.lines {
                 ui.text(format!("{:2$}This is line {}", "", i, i as usize * 4));
             }
-        })
+        });
 }
 
 fn show_example_app_fixed_overlay(ui: &Ui, opened: &mut bool) {

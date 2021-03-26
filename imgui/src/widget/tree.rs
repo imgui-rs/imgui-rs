@@ -264,12 +264,11 @@ impl<'a> TreeNode<'a> {
         }
     }
     /// Creates a tree node and runs a closure to construct the contents.
+    /// Returns the result of the closure, if it is called.
     ///
     /// Note: the closure is not called if the tree node is not open.
-    pub fn build<F: FnOnce()>(self, ui: &Ui, f: F) {
-        if let Some(_node) = self.push(ui) {
-            f();
-        }
+    pub fn build<T, F: FnOnce() -> T>(self, ui: &Ui<'_>, f: F) -> Option<T> {
+        self.push(ui).map(|_node| f())
     }
 }
 

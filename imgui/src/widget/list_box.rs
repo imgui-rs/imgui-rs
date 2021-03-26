@@ -49,12 +49,11 @@ impl<'a> ListBox<'a> {
         }
     }
     /// Creates a list box and runs a closure to construct the list contents.
+    /// Returns the result of the closure, if it is called.
     ///
     /// Note: the closure is not called if the list box is not open.
-    pub fn build<F: FnOnce()>(self, ui: &Ui, f: F) {
-        if let Some(_list) = self.begin(ui) {
-            f();
-        }
+    pub fn build<T, F: FnOnce() -> T>(self, ui: &Ui<'_>, f: F) -> Option<T> {
+        self.begin(ui).map(|_list| f())
     }
 }
 

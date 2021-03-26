@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+- BREAKING: Modifies `build` style methods to allow the provide closure to return a value.  The build call will then return Some(value) if the closure is called, and None if it isn't.
+ - The most likely breaking changes users will see is that they will need to add semicolons after calling `build`, because these function no longer return `()`.
+
 - BREAKING: Created `with_x` variants for most functions which previously took multiple parameters where some had default arguments in the C++. This makes calling most functions simpler and more similar to the C++.
  - The most likely breaking changes users will see is `button` and `same_line` now take one fewer parameter -- if you were calling `button` with `[0.0, 0.0]`, simply delete that -- otherwise, call `button_with_size`. Similarly, for `same_line`, if you were passing in `0.0.` simply delete that parameter. Otherwise, call `same_line_with_pos`.
 
