@@ -20,7 +20,7 @@ pub struct ChildWindow<'a> {
 
 impl<'a> ChildWindow<'a> {
     /// Creates a new child window builder with the given ID
-    #[doc(alas = "BeginChildID")]
+    #[doc(alias = "BeginChildID")]
     pub fn new<T: Into<Id<'a>>>(id: T) -> ChildWindow<'a> {
         ChildWindow {
             id: id.into(),
