@@ -155,12 +155,11 @@ impl<'a> ComboBox<'a> {
         }
     }
     /// Creates a combo box and runs a closure to construct the popup contents.
+    /// Returns the result of the closure, if it is called.
     ///
     /// Note: the closure is not called if the combo box is not open.
-    pub fn build<F: FnOnce()>(self, ui: &Ui, f: F) {
-        if let Some(_combo) = self.begin(ui) {
-            f();
-        }
+    pub fn build<T, F: FnOnce() -> T>(self, ui: &Ui, f: F) -> Option<T> {
+        self.begin(ui).map(|_combo| f())
     }
 }
 

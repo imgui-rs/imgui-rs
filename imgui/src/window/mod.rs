@@ -541,13 +541,12 @@ impl<'a> Window<'a> {
         }
     }
     /// Creates a window and runs a closure to construct the contents.
+    /// Returns the result of the closure, if it is called.
     ///
     /// Note: the closure is not called if no window content is visible (e.g. window is collapsed
     /// or fully clipped).
-    pub fn build<F: FnOnce()>(self, ui: &Ui, f: F) {
-        if let Some(_window) = self.begin(ui) {
-            f();
-        }
+    pub fn build<T, F: FnOnce() -> T>(self, ui: &Ui<'_>, f: F) -> Option<T> {
+        self.begin(ui).map(|_window| f())
     }
 }
 

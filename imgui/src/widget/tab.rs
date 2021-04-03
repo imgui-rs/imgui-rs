@@ -103,12 +103,11 @@ impl<'a> TabBar<'a> {
     }
 
     /// Creates a tab bar and runs a closure to construct the contents.
+    /// Returns the result of the closure, if it is called.
     ///
     /// Note: the closure is not called if no tabbar content is visible
-    pub fn build<F: FnOnce()>(self, ui: &Ui, f: F) {
-        if let Some(_tab) = self.begin(ui) {
-            f();
-        }
+    pub fn build<T, F: FnOnce() -> T>(self, ui: &Ui<'_>, f: F) -> Option<T> {
+        self.begin(ui).map(|_tab| f())
     }
 }
 
@@ -175,12 +174,11 @@ impl<'a> TabItem<'a> {
     }
 
     /// Creates a tab item and runs a closure to construct the contents.
+    /// Returns the result of the closure, if it is called.
     ///
     /// Note: the closure is not called if the tab item is not selected
-    pub fn build<F: FnOnce()>(self, ui: &Ui, f: F) {
-        if let Some(_tab) = self.begin(ui) {
-            f();
-        }
+    pub fn build<T, F: FnOnce() -> T>(self, ui: &Ui<'_>, f: F) -> Option<T> {
+        self.begin(ui).map(|_tab| f())
     }
 }
 

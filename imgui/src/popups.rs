@@ -125,11 +125,10 @@ impl<'p> PopupModal<'p> {
     }
 
     /// Consume and draw the PopupModal.
+    /// Returns the result of the closure, if it is called.
     #[doc(alias = "BeginPopupModal")]
-    pub fn build<F: FnOnce()>(self, ui: &Ui<'_>, f: F) {
-        if let Some(_popup) = self.begin_popup(ui) {
-            f();
-        }
+    pub fn build<T, F: FnOnce() -> T>(self, ui: &Ui<'_>, f: F) -> Option<T> {
+        self.begin_popup(ui).map(|_popup| f())
     }
 
     /// Consume and draw the PopupModal.
