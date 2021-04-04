@@ -1,10 +1,12 @@
 use bitflags::bitflags;
-use std::marker::PhantomData;
 use std::os::raw::{c_int, c_void};
 use std::ptr;
+use std::{convert::TryFrom, marker::PhantomData};
 
 use crate::sys;
 use crate::{ImStr, ImString, Ui};
+
+/// @angelofsol -- notice the "CALLBACK_EDIT" flag that I added too. We need to cover that also...probably.
 
 bitflags!(
     /// Flags for text inputs
@@ -30,6 +32,8 @@ bitflags!(
         const CALLBACK_ALWAYS = sys::ImGuiInputTextFlags_CallbackAlways;
         /// Call user function to filter character.
         const CALLBACK_CHAR_FILTER = sys::ImGuiInputTextFlags_CallbackCharFilter;
+        /// Callback on buffer edit (note that InputText() already returns true on edit, the callback is useful mainly to manipulate the underlying buffer while focus is active)
+        const CALLBACK_EDIT = sys::ImGuiInputTextFlags_CallbackEdit;
         /// Pressing TAB input a '\t' character into the text field
         const ALLOW_TAB_INPUT = sys::ImGuiInputTextFlags_AllowTabInput;
         /// In multi-line mode, unfocus with Enter, add new line with Ctrl+Enter (default is
@@ -180,23 +184,76 @@ macro_rules! impl_step_params {
     };
 }
 
-extern "C" fn resize_callback(data: *mut sys::ImGuiInputTextCallbackData) -> c_int {
-    unsafe {
-        if (*data).EventFlag == InputTextFlags::CALLBACK_RESIZE.bits() as i32 {
-            if let Some(buffer) = ((*data).UserData as *mut ImString).as_mut() {
-                let requested_size = (*data).BufSize as usize;
-                if requested_size > buffer.capacity_with_nul() {
-                    // Refresh the buffer's length to take into account changes made by dear imgui.
-                    buffer.refresh_len();
-                    buffer.reserve(requested_size - buffer.0.len());
-                    debug_assert!(buffer.capacity_with_nul() >= requested_size);
-                    (*data).Buf = buffer.as_mut_ptr();
-                    (*data).BufDirty = true;
+/// This is the callback that we *always* provide. It will, helpfully, pass along
+/// some data, which we use to figure out how to handle callbacks.
+///
+/// This modules role is essentially creating that payload and handling it as needed.
+///
+/// ## Safety
+/// The complexity of this module is to make sure that this operation is safe. Users should
+/// not be worried about safety here.
+///
+/// @angelofsol -- this code doesn't actually compile right now, but hey, it's getting there
+unsafe extern "C" fn callback(data: *mut sys::ImGuiInputTextCallbackData) -> c_int {
+    // rebind for ease
+    let data = &mut *data;
+    let event_flag = CallbackType::try_from(data.EventFlag as u32)
+        .expect("imgui-rs error -- couldn't convert callback flag. Please submit an issue.");
+
+    let handler = &mut *(data.UserData as *mut InternalCallback);
+
+    let mut cback_data = CallbackData { inner: data };
+
+    match event_flag {
+        CallbackType::Completion => handler.user_callbacks.completion_callback(&mut cback_data),
+        CallbackType::History => {
+            let key = match data.EventKey as u32 {
+                sys::ImGuiKey_UpArrow => HistoryKey::Up,
+                sys::ImGuiKey_DownArrow => HistoryKey::Down,
+                other => unimplemented!("internal imgui-rs -- couldn't convert {} to HistoryKey. Please submit an issue.", other),
+            };
+
+            handler
+                .user_callbacks
+                .history_callback(key, &mut cback_data)
+        }
+        CallbackType::CharacterFilter => {
+            // uhhhhh here's hoping this works!
+            let character = std::char::decode_utf16(std::iter::once(data.EventChar))
+                .next()
+                .unwrap()
+                .unwrap();
+
+            match handler
+                .user_callbacks
+                .filter_callback(character, &mut cback_data)
+            {
+                Some(chr) => {
+                    data.EventChar = chr as u16;
+                }
+                None => {
+                    // setting to 0 is a magic way to reject the character
+                    data.EventChar = 0;
                 }
             }
         }
-        0
+        CallbackType::Edit => todo!("no support yet..."),
+        CallbackType::Resize => {
+            // this is inline, but probably shoudl be in a function
+            let buffer = &mut *handler.buffer_to_resize;
+            let requested_size = data.BufSize as usize;
+            if requested_size > buffer.capacity_with_nul() {
+                // Refresh the buffer's length to take into account changes made by dear imgui.
+                buffer.refresh_len();
+                buffer.reserve(requested_size - buffer.0.len());
+                debug_assert!(buffer.capacity_with_nul() >= requested_size);
+                data.Buf = buffer.as_mut_ptr();
+                data.BufDirty = true;
+            }
+        }
     }
+
+    0
 }
 
 #[derive(Clone, Copy, PartialEq, Eq, Debug, PartialOrd, Ord, Hash)]
@@ -207,6 +264,32 @@ pub enum CallbackType {
     Edit,
     Resize,
 }
+
+// This is just a quick InputTextCallback From that should remain entirely internal to this
+// module. We will panic on Err, so it's no big deal to not have any information in it.
+impl TryFrom<u32> for CallbackType {
+    type Error = ();
+
+    fn try_from(value: u32) -> Result<Self, Self::Error> {
+        let found_flag = match value {
+            sys::ImGuiInputTextFlags_CallbackCompletion => Self::Completion,
+            sys::ImGuiInputTextFlags_CallbackHistory => Self::History,
+            sys::ImGuiInputTextFlags_CallbackAlways => todo!("what do"),
+            sys::ImGuiInputTextFlags_CallbackEdit => Self::Edit,
+            sys::ImGuiInputTextFlags_CallbackCharFilter => Self::CharacterFilter,
+            _ => return Err(()),
+        };
+
+        Ok(found_flag)
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum HistoryKey {
+    Up,
+    Down,
+}
+
 // tighten the data provided to each event type
 // so that the user can understand what they need to use to do what they want
 // don't allow resize to be registered, and just let the normal callback
@@ -480,7 +563,7 @@ extern "C" fn generic_callback(data: *mut sys::ImGuiInputTextCallbackData) -> c_
             }
         }
 
-        if let Some(user_callback) = &mut callback.user_callback {
+        if let Some(user_callback) = &mut callback.user_callbacks {
             if callback.buffer_to_resize.is_none()
                 || (*data).EventFlag != InputTextFlags::CALLBACK_RESIZE.bits() as i32
             {
@@ -560,7 +643,7 @@ impl<'ui, 'p> InputText<'ui, 'p> {
 
     pub fn build(self) -> bool {
         let mut user_data = InternalCallback {
-            user_callback: None,
+            user_callbacks: None,
             buffer_to_resize: self
                 .flags
                 .contains(InputTextFlags::CALLBACK_RESIZE)
@@ -578,7 +661,7 @@ impl<'ui, 'p> InputText<'ui, 'p> {
 
     pub fn build_with_callback<F: FnMut(&mut CallbackData) -> bool>(self, mut f: F) -> bool {
         let mut user_data = InternalCallback {
-            user_callback: Some(&mut f),
+            user_callbacks: Some(&mut f),
             buffer_to_resize: self
                 .flags
                 .contains(InputTextFlags::CALLBACK_RESIZE)
@@ -596,7 +679,7 @@ impl<'ui, 'p> InputText<'ui, 'p> {
 }
 
 struct InternalCallback<'a> {
-    user_callback: Option<&'a mut dyn FnMut(&mut CallbackData) -> bool>,
+    user_callbacks: CallbackRefs<'a>,
     buffer_to_resize: Option<*mut ImString>,
 }
 
