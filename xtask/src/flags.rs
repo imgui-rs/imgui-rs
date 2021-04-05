@@ -27,11 +27,15 @@ xflags::args_parser! {
         cmd lint {}
         /// Run tests the way we'd run them in CI
         cmd test {}
-
-        /// produce bindings using bindgen (must have bindgen installed)
+        /// magically wrangle the submodules if needed
+        cmd modfix {}
+        /// produce bindings using installed `bindgen`.
         cmd bindgen {
+            /// folder containing cimgui output (default: imgui-sys/third-party)
             optional --cimgui-path cimgui_path: String
+            /// default: imgui-sys/src
             optional --output-path output_path: String
+            /// default: imgui-sys-v0
             optional --wasm-import-name wasm_import_name: String
         }
     }
@@ -51,6 +55,7 @@ pub enum XtaskCmd {
     Help(Help),
     Lint(Lint),
     Test(Test),
+    Modfix(Modfix),
     Bindgen(Bindgen),
 }
 
@@ -64,6 +69,9 @@ pub struct Lint {}
 
 #[derive(Debug)]
 pub struct Test {}
+
+#[derive(Debug)]
+pub struct Modfix {}
 
 #[derive(Debug)]
 pub struct Bindgen {
