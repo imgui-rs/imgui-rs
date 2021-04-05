@@ -37,8 +37,8 @@ bitflags!(
         const CTRL_ENTER_FOR_NEW_LINE = sys::ImGuiInputTextFlags_CtrlEnterForNewLine;
         /// Disable following the cursor horizontally
         const NO_HORIZONTAL_SCROLL = sys::ImGuiInputTextFlags_NoHorizontalScroll;
-        /// Insert mode
-        const ALWAYS_INSERT_MODE = sys::ImGuiInputTextFlags_AlwaysInsertMode;
+        /// Always overwrite (aka "insert mode").
+        const ALWAYS_OVERWRITE = sys::ImGuiInputTextFlags_AlwaysOverwrite;
         /// Read-only mode
         const READ_ONLY = sys::ImGuiInputTextFlags_ReadOnly;
         /// Password mode, display all characters as '*'
@@ -138,9 +138,16 @@ macro_rules! impl_text_flags {
             self
         }
 
+        /// Note: this is equivalent to `always_overwrite`
         #[inline]
-        pub fn always_insert_mode(mut self, value: bool) -> Self {
-            self.flags.set(InputTextFlags::ALWAYS_INSERT_MODE, value);
+        pub fn always_insert_mode(self, value: bool) -> Self {
+            self.always_overwrite(value)
+        }
+
+        #[inline]
+        #[allow(deprecated)]
+        pub fn always_overwrite(mut self, value: bool) -> Self {
+            self.flags.set(InputTextFlags::ALWAYS_OVERWRITE, value);
             self
         }
 

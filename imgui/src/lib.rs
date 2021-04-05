@@ -98,7 +98,7 @@ pub fn dear_imgui_version() -> &'static str {
 #[test]
 fn test_version() {
     // TODO: what's the point of this test?
-    assert_eq!(dear_imgui_version(), "1.81");
+    assert_eq!(dear_imgui_version(), "1.82");
 }
 
 impl Context {

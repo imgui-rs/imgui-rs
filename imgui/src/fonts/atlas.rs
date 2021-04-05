@@ -32,7 +32,6 @@ pub struct FontId(pub(crate) *const Font);
 /// A font atlas that builds a single texture
 #[repr(C)]
 pub struct FontAtlas {
-    locked: bool,
     /// Configuration flags
     pub flags: FontAtlasFlags,
     /// Texture identifier
@@ -48,6 +47,8 @@ pub struct FontAtlas {
     /// this to 0.
     pub tex_glyph_padding: i32,
 
+    locked: bool,
+    tex_pixels_use_colors: bool,
     tex_pixels_alpha8: *mut u8,
     tex_pixels_rgba32: *mut u32,
     tex_width: i32,
@@ -263,6 +264,7 @@ fn test_font_atlas_memory_layout() {
     assert_field_offset!(tex_id, TexID);
     assert_field_offset!(tex_desired_width, TexDesiredWidth);
     assert_field_offset!(tex_glyph_padding, TexGlyphPadding);
+    assert_field_offset!(tex_pixels_use_colors, TexPixelsUseColors);
     assert_field_offset!(tex_pixels_alpha8, TexPixelsAlpha8);
     assert_field_offset!(tex_pixels_rgba32, TexPixelsRGBA32);
     assert_field_offset!(tex_width, TexWidth);

@@ -144,7 +144,7 @@ pub struct Style {
     /// explicit segment count specified.
     ///
     /// Decrease for higher quality but more geometry.
-    pub circle_segment_max_error: f32,
+    pub circle_tesselation_max_error: f32,
     /// Style colors.
     pub colors: [[f32; 4]; StyleColor::COUNT],
 }
@@ -492,7 +492,7 @@ fn test_style_memory_layout() {
     assert_field_offset!(anti_aliased_lines_use_tex, AntiAliasedLinesUseTex);
     assert_field_offset!(anti_aliased_fill, AntiAliasedFill);
     assert_field_offset!(curve_tessellation_tol, CurveTessellationTol);
-    assert_field_offset!(circle_segment_max_error, CircleSegmentMaxError);
+    assert_field_offset!(circle_tesselation_max_error, CircleTessellationMaxError);
     assert_field_offset!(colors, Colors);
 }
 
