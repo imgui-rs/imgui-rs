@@ -144,7 +144,9 @@ fn all_submodules() -> Result<Vec<PathBuf>> {
     let mut pb = vec![];
     for kv in out.stdout.split(|n| *n == 0).filter(|v| !v.is_empty()) {
         if let Ok(v) = std::str::from_utf8(kv) {
-            if let Some((_, path)) = v.split_once('\n') {
+            // `v` is formatted like "{name}\n{path}", so discard everything up
+            // to (and including) the newline.
+            if let Some(path) = v.find('\n').map(|p| &v[(p + 1)..]) {
                 pb.push(path.into());
             } else {
                 eprintln!(
