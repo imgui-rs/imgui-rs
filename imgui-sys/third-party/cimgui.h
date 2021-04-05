@@ -144,7 +144,7 @@ typedef void* (*ImGuiMemAllocFunc)(size_t sz, void* user_data);
 typedef void (*ImGuiMemFreeFunc)(void* ptr, void* user_data);
 typedef unsigned short ImWchar16;
 typedef unsigned int ImWchar32;
-typedef ImWchar16 ImWchar;
+typedef ImWchar32 ImWchar;
 typedef signed char ImS8;
 typedef unsigned char ImU8;
 typedef signed short ImS16;
@@ -1066,7 +1066,7 @@ struct ImFont
     float Scale;
     float Ascent, Descent;
     int MetricsTotalSurface;
-    ImU8 Used4kPagesMap[(0xFFFF +1)/4096/8];
+    ImU8 Used4kPagesMap[(0x10FFFF +1)/4096/8];
 };
 typedef enum {
     ImGuiViewportFlags_None = 0,

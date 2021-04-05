@@ -2703,8 +2703,8 @@
         "type": "int"
       },
       {
-        "name": "Used4kPagesMap[(0xFFFF+1)/4096/8]",
-        "size": 2,
+        "name": "Used4kPagesMap[(0x10FFFF+1)/4096/8]",
+        "size": 34,
         "type": "ImU8"
       }
     ],

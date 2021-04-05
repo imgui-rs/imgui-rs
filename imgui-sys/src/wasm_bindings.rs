@@ -145,7 +145,8 @@ pub type ImGuiMemFreeFunc = ::core::option::Option<
     unsafe extern "C" fn(ptr: *mut cty::c_void, user_data: *mut cty::c_void),
 >;
 pub type ImWchar16 = cty::c_ushort;
-pub type ImWchar = ImWchar16;
+pub type ImWchar32 = cty::c_uint;
+pub type ImWchar = ImWchar32;
 pub type ImU8 = cty::c_uchar;
 pub type ImS16 = cty::c_short;
 pub type ImU32 = cty::c_uint;
@@ -1491,7 +1492,7 @@ impl ::core::fmt::Debug for ImFontAtlas {
     }
 }
 #[repr(C)]
-#[derive(Debug, Copy, Clone, PartialEq)]
+#[derive(Copy, Clone)]
 pub struct ImFont {
     pub IndexAdvanceX: ImVector_float,
     pub FallbackAdvanceX: f32,
@@ -1509,11 +1510,16 @@ pub struct ImFont {
     pub Ascent: f32,
     pub Descent: f32,
     pub MetricsTotalSurface: cty::c_int,
-    pub Used4kPagesMap: [ImU8; 2usize],
+    pub Used4kPagesMap: [ImU8; 34usize],
 }
 impl Default for ImFont {
     fn default() -> Self {
         unsafe { ::core::mem::zeroed() }
+    }
+}
+impl ::core::fmt::Debug for ImFont {
+    fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
+        write ! (f , "ImFont {{ IndexAdvanceX: {:?}, FallbackAdvanceX: {:?}, FontSize: {:?}, IndexLookup: {:?}, Glyphs: {:?}, FallbackGlyph: {:?}, ContainerAtlas: {:?}, ConfigData: {:?}, ConfigDataCount: {:?}, FallbackChar: {:?}, EllipsisChar: {:?}, DirtyLookupTables: {:?}, Scale: {:?}, Ascent: {:?}, Descent: {:?}, MetricsTotalSurface: {:?}, Used4kPagesMap: [...] }}" , self . IndexAdvanceX , self . FallbackAdvanceX , self . FontSize , self . IndexLookup , self . Glyphs , self . FallbackGlyph , self . ContainerAtlas , self . ConfigData , self . ConfigDataCount , self . FallbackChar , self . EllipsisChar , self . DirtyLookupTables , self . Scale , self . Ascent , self . Descent , self . MetricsTotalSurface)
     }
 }
 pub const ImGuiViewportFlags_None: ImGuiViewportFlags_ = 0;
