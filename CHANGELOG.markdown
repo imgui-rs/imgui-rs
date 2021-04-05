@@ -23,8 +23,15 @@
 
 - BREAKING: `PopupModal`'s `new` was reworked so that it didn't take `Ui` until `build` was called. This is a breaking change if you were invoking it directly. Simply move your `ui` call to `build` or `begin`.
 
-- Upgrade to [Dear ImGui v1.81](https://github.com/ocornut/imgui/releases/tag/v1.81)
+- Upgrade to from v1.80 to [Dear ImGui v1.82](https://github.com/ocornut/imgui/releases/tag/v1.82) (see also the [Dear ImGui v1.81](https://github.com/ocornut/imgui/releases/tag/v1.81) release notes)
     - BREAKING: `imgui::ListBox::calculate_size(items_count: ..., height_in_items: ...)` has been removed as the function backing it has been marked as obsolete. The recommended approach is to calculate the size yourself and use `.size(...)` (or use the default auto-calculated size)
+    - BREAKING: `draw_list::CornerFlags` has been renamed to `draw_list::DrawFlags` to match the upstream change, and refle. However, the only draw flags that are useful to Rust currently are still the ones reflecting corner rounding.
+        - Similarly, the flag names have been updated so that `CornerFlags::$WHERE` has become `DrawFlags::ROUND_CORNERS_$WHERE`, for ecample `CornerFlags::TOP_LEFT` => `DrawFlags::ROUND_CORNERS_TOP_LEFT`.
+        - Importantly, `CornerFlags::NONE` became `DrawFlags::ROUND_CORNERS_NONE` (following the patter) and **not** `DrawFlags::NONE` which does exist now, and is a separate value.
+    - BREAKING: `InputTextFlags::ALWAYS_INSERT_MODE` is renamed to `InputTextFlags::
+        - However, the `always_insert_mode` funcitons on the various input builders remain as a (non-deprecated) alias, as the C++ code has kept an equivalent inline stub.
+    - BREAKING: `Style::circle_segment_max_error` is no more. `Style::circle_tesselation_max_error` behaves very similarly, but `circle_segment_max_error` values are not equivalent to `circle_tesselation_max_error` values.
+        - For example, the default `circle_segment_max_error` was 1.6, but the default `circle_tesselation_max_error` is 0.3. In practice, it's unlikely to matter much either way, though.
 
 - Restored methods to access keyboard based on backend-defined keyboard map indexes. These allow access to most keys, not just those defined in the small subset of `imgui::Keys` (note the available keys may be expanded in future by [imgui PR #2625](https://github.com/ocornut/imgui/pull/2625))
     - The new methods on `imgui::Ui` are `is_key_index_down`, `is_key_index_pressed`, `is_key_index_pressed_no_repeat`, `is_key_index_released`, `is_key_index_released`
