@@ -334,9 +334,25 @@ impl Io {
     }
     /// Peek character input buffer, return a copy of entire buffer
     pub fn peek_input_characters(&self) -> String {
-        let c16_slice = self.input_queue_characters.as_slice();
-        String::from_utf16(c16_slice).unwrap()
+        self.input_queue_characters().collect()
     }
+
+    /// Returns a view of the data in the input queue (without copying it).
+    ///
+    /// The returned iterator is a simple mapping over a slice more or less what
+    /// you need for random access to the data (Rust has no
+    /// `RandomAccessIterator`, or we'd use that).
+    pub fn input_queue_characters(
+        &self,
+    ) -> impl Iterator<Item = char> + DoubleEndedIterator + ExactSizeIterator + Clone + '_ {
+        self.input_queue_characters
+            .as_slice()
+            .iter()
+            // TODO: are the values in the buffer guaranteed to be valid unicode
+            // scalar values? if so we can just expose this as a `&[char]`...
+            .map(|c| core::char::from_u32(*c).unwrap_or(core::char::REPLACEMENT_CHARACTER))
+    }
+
     pub fn update_delta_time(&mut self, delta: Duration) {
         let delta_s = delta.as_secs() as f32 + delta.subsec_nanos() as f32 / 1_000_000_000.0;
         if delta_s > 0.0 {

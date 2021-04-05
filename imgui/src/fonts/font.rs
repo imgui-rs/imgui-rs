@@ -24,7 +24,7 @@ pub struct Font {
     pub ascent: f32,
     pub descent: f32,
     pub metrics_total_surface: c_int,
-    pub used_4k_pages_map: [u8; 2],
+    pub used_4k_pages_map: [u8; 34],
 }
 
 unsafe impl RawCast<sys::ImFont> for Font {}
