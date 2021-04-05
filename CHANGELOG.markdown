@@ -37,6 +37,16 @@
     - The new methods on `imgui::Ui` are `is_key_index_down`, `is_key_index_pressed`, `is_key_index_pressed_no_repeat`, `is_key_index_released`, `is_key_index_released`
     - For example `ui.is_key_released(imgui::Key::A)` is same as `ui.is_key_index_released(winit::events::VirtualKeyCode::A as i32)` when using the winit backend
 
+- Full (32-bit) unicode support is enabled in Dear Imgui (e.g. `-DIMGUI_USE_WCHAR32` is enabled now).  Previously UTF-16 was used internally.
+    - BREAKING: Some parts of the font atlas code now use `char` (or `u32`) instead of `u16` to reflect this.
+        - Note: `u32` is used over `char` in some situations, such as when surrogates are allowed
+    - BREAKING (sorta): Dear Imgui now will use 32 bits for character data internally. This impacts the ABI, including sizes of structs and such, and can break some low level or advanced use cases:
+        - If you're linking against extensions or plugins to Dear Imgui not written in Rust, you need to ensure it is built using `-DIMGUI_USE_WCHAR32`.
+            - However, if the `DEP_IMGUI_DEFINE_` vars are [used properly](https://github.com/4bb4/implot-rs/blob/f2a4c6a3d8919ec3438631873ce6a9f94135089c/implot-sys/build.rs#L37-L45), this is non-breaking.
+        - If you're using `features="wasm"` to "link" against emscripten-compiled Dear Imgui, you need to ensure you use `-DIMGUI_USE_WCHAR32` when compile the C and C++ code.
+            - If you're using `DEP_IMGUI_DEFINE_`s for this already, then no change is needed.
+        - If you're using `.cargo/config` to apply a build script override and link against a prebuilt `Dear Imgui` (or something else along these lines), you need to ensure you link with a version that was built using `-DIMGUI_USE_WCHAR32`.
+
 ## [0.7.0] - 2021-02-04
 
 - Upgrade to [Dear ImGui v1.80](https://github.com/ocornut/imgui/releases/tag/v1.80). (Note that the new table functionality is not yet supported, however)
