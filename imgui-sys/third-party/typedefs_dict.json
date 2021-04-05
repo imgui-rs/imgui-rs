@@ -84,7 +84,7 @@
   "ImU8": "unsigned char",
   "ImVec2": "struct ImVec2",
   "ImVec4": "struct ImVec4",
-  "ImWchar": "ImWchar16",
+  "ImWchar": "ImWchar32",
   "ImWchar16": "unsigned short",
   "ImWchar32": "unsigned int",
   "const_iterator": "const value_type*",

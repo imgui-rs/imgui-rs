@@ -5,6 +5,8 @@ use std::io;
 use std::path::Path;
 
 const DEFINES: &[(&str, Option<&str>)] = &[
+    // Rust `char` is a unicode scalar value, e.g. 32 bits.
+    ("IMGUI_USE_WCHAR32", None),
     // Disabled due to linking issues
     ("CIMGUI_NO_EXPORT", None),
     ("IMGUI_DISABLE_WIN32_FUNCTIONS", None),
