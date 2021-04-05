@@ -4,6 +4,7 @@ use std::path::{Path, PathBuf};
 
 impl Bindgen {
     pub fn run(self) -> Result<()> {
+        crate::autofix_submodules();
         let root = crate::project_root();
         let bindings = self
             .cimgui_path
