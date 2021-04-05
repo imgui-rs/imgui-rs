@@ -357,7 +357,8 @@ impl FontConfig {
         raw.GlyphMaxAdvanceX = self.glyph_max_advance_x;
         raw.FontBuilderFlags = self.font_builder_flags;
         raw.RasterizerMultiply = self.rasterizer_multiply;
-        raw.EllipsisChar = self.ellipsis_char.map(|x| x as u16).unwrap_or(0xffff);
+        // char is used as "unset" for EllipsisChar
+        raw.EllipsisChar = self.ellipsis_char.map(|c| c as u32).unwrap_or(!0);
         if let Some(name) = self.name.as_ref() {
             let bytes = name.as_bytes();
             let mut len = bytes.len().min(raw.Name.len() - 1);

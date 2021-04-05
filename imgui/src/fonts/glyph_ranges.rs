@@ -13,7 +13,7 @@ enum FontGlyphRangeData {
     Custom(*const sys::ImWchar),
 }
 
-/// A set of 16-bit Unicode codepoints
+/// A set of Unicode codepoints
 #[derive(Clone, Eq, PartialEq, Debug)]
 pub struct FontGlyphRanges(FontGlyphRangeData);
 impl FontGlyphRanges {
@@ -51,7 +51,7 @@ impl FontGlyphRanges {
     }
 
     /// Creates a glyph range from a static slice. The expected format is a series of pairs of
-    /// non-zero shorts, each representing an inclusive range of codepoints, followed by a single
+    /// non-zero codepoints, each representing an inclusive range, followed by a single
     /// zero terminating the range. The ranges must not overlap.
     ///
     /// As the slice is expected to last as long as a font is used, and is written into global
@@ -61,7 +61,12 @@ impl FontGlyphRanges {
     /// ======
     ///
     /// This function will panic if the given slice is not a valid font range.
-    pub fn from_slice(slice: &'static [u16]) -> FontGlyphRanges {
+    // TODO(thom): This takes `u32` for now, since I believe it's fine for it to
+    // contain surrogates? (It seems plausible that font data can describe what
+    // to show for unpaired surrogates) Would be nice to be sure, if so, this
+    // should accept `char` (we'd still have to check that the range doesn't
+    // fully contain the surrogate range though)
+    pub fn from_slice(slice: &'static [u32]) -> FontGlyphRanges {
         assert_eq!(
             slice.len() % 2,
             1,
@@ -79,7 +84,14 @@ impl FontGlyphRanges {
                 "A glyph in a range cannot be zero. \
                  (Glyph is zero at index {})",
                 i
-            )
+            );
+            assert!(
+                glyph <= core::char::MAX as u32,
+                "A glyph in a range cannot exceed the maximum codepoint. \
+                 (Glyph is {:#x} at index {})",
+                glyph,
+                i,
+            );
         }
 
         let mut ranges = Vec::new();
@@ -118,7 +130,7 @@ impl FontGlyphRanges {
     /// # Safety
     ///
     /// It is up to the caller to guarantee the slice contents are valid.
-    pub unsafe fn from_slice_unchecked(slice: &'static [u16]) -> FontGlyphRanges {
+    pub unsafe fn from_slice_unchecked(slice: &'static [u32]) -> FontGlyphRanges {
         FontGlyphRanges::from_ptr(slice.as_ptr())
     }
 
@@ -130,7 +142,7 @@ impl FontGlyphRanges {
     ///
     /// It is up to the caller to guarantee the pointer is not null, remains valid forever, and
     /// points to valid data.
-    pub unsafe fn from_ptr(ptr: *const u16) -> FontGlyphRanges {
+    pub unsafe fn from_ptr(ptr: *const u32) -> FontGlyphRanges {
         FontGlyphRanges(FontGlyphRangeData::Custom(ptr))
     }
 
