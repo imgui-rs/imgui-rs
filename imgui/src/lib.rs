@@ -220,6 +220,27 @@ pub enum Id<'a> {
     Int(i32),
     Str(&'a str),
     Ptr(*const c_void),
+    ImGuiID(sys::ImGuiID),
+}
+
+impl<'a> Id<'a> {
+    fn as_imgui_id(&self) -> sys::ImGuiID {
+        unsafe {
+            match self {
+                Id::Ptr(p) => sys::igGetID_Ptr(*p),
+                Id::Str(s) => {
+                    let s1 = s.as_ptr() as *const std::os::raw::c_char;
+                    let s2 = s1.add(s.len());
+                    sys::igGetID_StrStr(s1, s2)
+                }
+                Id::Int(i) => {
+                    let p = *i as *const std::os::raw::c_void;
+                    sys::igGetID_Ptr(p)
+                }
+                Id::ImGuiID(n) => *n,
+            }
+        }
+    }
 }
 
 impl From<i32> for Id<'static> {
@@ -534,4 +555,108 @@ pub enum Direction {
     Right = sys::ImGuiDir_Right,
     Up = sys::ImGuiDir_Up,
     Down = sys::ImGuiDir_Down,
+}
+
+
+pub struct DockNodeFlags;
+impl DockNodeFlags {
+    pub const NONE: i32 = sys::ImGuiDockNodeFlags_None as i32;
+    pub const KEEP_ALIVE_ONLY: i32 = sys::ImGuiDockNodeFlags_KeepAliveOnly as i32;
+    pub const NO_DOCKING_IN_CENTRAL_NODE: i32 = sys::ImGuiDockNodeFlags_NoDockingInCentralNode as i32;
+    pub const PASS_THRU_CENTRAL_NODE: i32 = sys::ImGuiDockNodeFlags_PassthruCentralNode as i32;
+    pub const NO_SPLIT: i32 = sys::ImGuiDockNodeFlags_NoSplit as i32;
+    pub const NO_RESIZE: i32 = sys::ImGuiDockNodeFlags_NoResize as i32;
+    pub const AUTO_HIDE_TAB_BAR: i32 = sys::ImGuiDockNodeFlags_AutoHideTabBar as i32;
+
+    pub const DOCK_SPACE: i32 = sys::ImGuiDockNodeFlags_DockSpace;
+    pub const CENTRAL_NODE: i32 = sys::ImGuiDockNodeFlags_CentralNode;
+    pub const NO_TAB_BAR: i32 = sys::ImGuiDockNodeFlags_NoTabBar;
+    pub const HIDDEN_TAB_BAR: i32 = sys::ImGuiDockNodeFlags_HiddenTabBar;
+    pub const NO_WINDOW_MENU_BUTTON: i32 = sys::ImGuiDockNodeFlags_NoWindowMenuButton;
+    pub const NO_CLOSE_BUTTON: i32 = sys::ImGuiDockNodeFlags_NoCloseButton;
+    pub const NO_DOCKING: i32 = sys::ImGuiDockNodeFlags_NoDocking;
+    pub const NO_DOCKING_SPLIT_ME: i32 = sys::ImGuiDockNodeFlags_NoDockingSplitMe;
+    pub const NO_DOCKING_SPLIT_OTHER: i32 = sys::ImGuiDockNodeFlags_NoDockingSplitOther;
+    pub const NO_DOCKING_OVER_ME: i32 = sys::ImGuiDockNodeFlags_NoDockingOverMe;
+    pub const NO_DOCKING_OVER_OTHER: i32 = sys::ImGuiDockNodeFlags_NoDockingOverOther;
+    pub const NO_RESIZE_X: i32 = sys::ImGuiDockNodeFlags_NoResizeX;
+    pub const NO_RESIZE_Y: i32 = sys::ImGuiDockNodeFlags_NoResizeY;
+}
+
+
+impl<'ui> Ui<'ui> {
+    pub fn dock_space(&self, id: Id, size: [f32; 2]) {
+        unsafe {
+            sys::igDockSpace(id.as_imgui_id(), size.into(), 0, std::ptr::null());
+        }
+    }
+
+//    pub fn dock_space_over_viewport() -> ImGuiID {
+//    }
+//    pub fn set_next_window_class() -> ImGuiID {
+//    }
+
+    pub fn set_next_window_dock_id(&self, id: Id, cond: Condition) {
+        unsafe {
+            sys::igSetNextWindowDockID(id.as_imgui_id(), cond as i32);
+        }
+    }
+
+    pub fn get_window_dock_id(&self) -> Id {
+        unsafe {
+            Id::ImGuiID(sys::igGetWindowDockID())
+        }
+    }
+
+    pub fn is_window_docked(&self) -> bool {
+        unsafe {
+            sys::igIsWindowDocked()
+        }
+    }
+
+    pub fn dock_builder_has_node(&self, id: Id) -> bool {
+        unsafe {
+            sys::igDockBuilderGetNode(id.as_imgui_id()) != std::ptr::null_mut()
+        }
+    }
+
+    pub fn dock_builder_remove_node(&self, id: Id) {
+        unsafe {
+            sys::igDockBuilderRemoveNode(id.as_imgui_id());
+        }
+    }
+
+    pub fn dock_builder_add_node(&self, id: Id, flags: i32) {
+        unsafe {
+            sys::igDockBuilderAddNode(id.as_imgui_id(), flags);
+        }
+    }
+
+    pub fn dock_builder_set_node_size(&self, id: Id, size: [f32; 2]) {
+        unsafe {
+            sys::igDockBuilderSetNodeSize(id.as_imgui_id(), size.into());
+        }
+    }
+
+    pub fn dock_builder_split_node(&self, id: Id, split_dir: Direction, split_ratio: f32) -> (Id<'static>, Id<'static>) {
+        unsafe {
+            let mut opposite: sys::ImGuiID = 0;
+            let id1 = sys::igDockBuilderSplitNode(id.as_imgui_id(), split_dir as i32, split_ratio,
+                std::ptr::null_mut(),
+                &mut opposite as *mut u32);
+            (Id::ImGuiID(id1), Id::ImGuiID(opposite))
+        }
+    }
+
+    pub fn dock_builder_dock_window<'p>(&self, window_name: &'p ImStr, id: Id) {
+        unsafe {
+            sys::igDockBuilderDockWindow(window_name.as_ptr(), id.as_imgui_id());
+        }
+    }
+
+    pub fn dock_builder_finish(&self, id: Id) {
+        unsafe {
+            sys::igDockBuilderFinish(id.as_imgui_id());
+        }
+    }
 }

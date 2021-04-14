@@ -52,6 +52,8 @@ bitflags! {
         ///
         /// Not used by core imgui-rs.
         const IS_TOUCH_SCREEN = sys::ImGuiConfigFlags_IsTouchScreen;
+        /// Enable docking support.
+        const DOCKING_ENABLE = sys::ImGuiConfigFlags_DockingEnable;
     }
 }
 

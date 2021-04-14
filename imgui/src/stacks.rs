@@ -458,6 +458,7 @@ impl<'ui> Ui<'ui> {
                     sys::igPushID_StrStr(start, end)
                 }
                 Id::Ptr(p) => sys::igPushID_Ptr(p as *const c_void),
+                Id::ImGuiID(i) => sys::igPushID_Int(i as i32),
             }
         }
         IdStackToken::new(self)
