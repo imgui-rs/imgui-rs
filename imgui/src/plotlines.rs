@@ -62,7 +62,7 @@ impl<'ui, 'p> PlotLines<'ui, 'p> {
 
     pub fn build(self) {
         unsafe {
-            sys::igPlotLinesFloatPtr(
+            sys::igPlotLines_FloatPtr(
                 self.label.as_ptr(),
                 self.values.as_ptr() as *const c_float,
                 self.values.len() as i32,

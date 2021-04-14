@@ -157,7 +157,7 @@ impl<'a> MenuItem<'a> {
     #[doc(alias = "MenuItemBool")]
     pub fn build(self, _: &Ui) -> bool {
         unsafe {
-            sys::igMenuItemBool(
+            sys::igMenuItem_Bool(
                 self.label.as_ptr(),
                 self.shortcut.map(ImStr::as_ptr).unwrap_or(ptr::null()),
                 self.selected,

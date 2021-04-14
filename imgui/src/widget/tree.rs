@@ -240,13 +240,13 @@ impl<'a> TreeNode<'a> {
                 sys::igSetNextItemOpen(self.opened, self.opened_cond as i32);
             }
             match self.id {
-                TreeNodeId::Str(id) => sys::igTreeNodeExStrStr(
+                TreeNodeId::Str(id) => sys::igTreeNodeEx_StrStr(
                     id.as_ptr(),
                     self.flags.bits() as i32,
                     fmt_ptr(),
                     self.label.unwrap_or(id).as_ptr(),
                 ),
-                TreeNodeId::Ptr(id) => sys::igTreeNodeExPtr(
+                TreeNodeId::Ptr(id) => sys::igTreeNodeEx_Ptr(
                     id,
                     self.flags.bits() as i32,
                     fmt_ptr(),
@@ -392,7 +392,7 @@ impl<'a> CollapsingHeader<'a> {
     #[must_use]
     pub fn build(self, _: &Ui) -> bool {
         unsafe {
-            sys::igCollapsingHeaderTreeNodeFlags(self.label.as_ptr(), self.flags.bits() as i32)
+            sys::igCollapsingHeader_TreeNodeFlags(self.label.as_ptr(), self.flags.bits() as i32)
         }
     }
     /// Builds the collapsing header, and adds an additional close button that changes the value of
@@ -402,7 +402,7 @@ impl<'a> CollapsingHeader<'a> {
     #[must_use]
     pub fn build_with_close_button(self, _: &Ui, opened: &mut bool) -> bool {
         unsafe {
-            sys::igCollapsingHeaderBoolPtr(
+            sys::igCollapsingHeader_BoolPtr(
                 self.label.as_ptr(),
                 opened as *mut bool,
                 self.flags.bits() as i32,

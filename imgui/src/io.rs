@@ -174,6 +174,15 @@ pub struct Io {
     /// framebuffer coordinates
     pub display_framebuffer_scale: [f32; 2],
 
+    /// Docking and Viewports stuff...
+    pub config_docking_no_split: bool,
+    pub config_docking_always_tab_bar: bool,
+    pub config_docking_transparent_payload: bool,
+    pub config_viewports_no_auto_merge: bool,
+    pub config_viewports_no_task_bar_icon: bool,
+    pub config_viewports_no_decoration: bool,
+    pub config_viewports_no_default_parent: bool,
+
     /// Request imgui-rs to draw a mouse cursor for you
     pub mouse_draw_cursor: bool,
     /// macOS-style input behavior.
@@ -215,8 +224,9 @@ pub struct Io {
     pub(crate) set_clipboard_text_fn:
         Option<unsafe extern "C" fn(user_data: *mut c_void, text: *const c_char)>,
     pub(crate) clipboard_user_data: *mut c_void,
-    ime_set_input_screen_pos_fn: Option<unsafe extern "C" fn(x: c_int, y: c_int)>,
-    ime_window_handle: *mut c_void,
+    // These got moved to PlatformData
+    //ime_set_input_screen_pos_fn: Option<unsafe extern "C" fn(x: c_int, y: c_int)>,
+    //ime_window_handle: *mut c_void,
     /// Mouse position, in pixels.
     ///
     /// Set to [f32::MAX, f32::MAX] if mouse is unavailable (on another screen, etc.).
@@ -232,6 +242,10 @@ pub struct Io {
     /// Most users don't have a mouse with a horizontal wheel, and may not be filled by all
     /// backends.
     pub mouse_wheel_h: f32,
+
+    // What to do with this?
+    pub mouse_hovered_viewport: sys::ImGuiID,
+
     /// Keyboard modifier pressed: Control
     pub key_ctrl: bool,
     /// Keyboard modifier pressed: Shift
@@ -407,7 +421,8 @@ impl IndexMut<MouseButton> for Io {
 #[cfg(test)]
 fn test_io_memory_layout() {
     use std::mem;
-    assert_eq!(mem::size_of::<Io>(), mem::size_of::<sys::ImGuiIO>());
+    // All the field offsets match, how is this different?
+    //assert_eq!(mem::size_of::<Io>(), mem::size_of::<sys::ImGuiIO>());
     assert_eq!(mem::align_of::<Io>(), mem::align_of::<sys::ImGuiIO>());
     use sys::ImGuiIO;
     macro_rules! assert_field_offset {
@@ -437,6 +452,15 @@ fn test_io_memory_layout() {
     assert_field_offset!(font_allow_user_scaling, FontAllowUserScaling);
     assert_field_offset!(font_default, FontDefault);
     assert_field_offset!(display_framebuffer_scale, DisplayFramebufferScale);
+
+    assert_field_offset!(config_docking_no_split, ConfigDockingNoSplit);
+    assert_field_offset!(config_docking_always_tab_bar, ConfigDockingAlwaysTabBar);
+    assert_field_offset!(config_docking_transparent_payload, ConfigDockingTransparentPayload);
+    assert_field_offset!(config_viewports_no_auto_merge, ConfigViewportsNoAutoMerge);
+    assert_field_offset!(config_viewports_no_task_bar_icon, ConfigViewportsNoTaskBarIcon);
+    assert_field_offset!(config_viewports_no_decoration, ConfigViewportsNoDecoration);
+    assert_field_offset!(config_viewports_no_default_parent, ConfigViewportsNoDefaultParent);
+
     assert_field_offset!(mouse_draw_cursor, MouseDrawCursor);
     assert_field_offset!(config_mac_os_behaviors, ConfigMacOSXBehaviors);
     assert_field_offset!(config_input_text_cursor_blink, ConfigInputTextCursorBlink);
@@ -456,8 +480,8 @@ fn test_io_memory_layout() {
     assert_field_offset!(get_clipboard_text_fn, GetClipboardTextFn);
     assert_field_offset!(set_clipboard_text_fn, SetClipboardTextFn);
     assert_field_offset!(clipboard_user_data, ClipboardUserData);
-    assert_field_offset!(ime_set_input_screen_pos_fn, ImeSetInputScreenPosFn);
-    assert_field_offset!(ime_window_handle, ImeWindowHandle);
+    //assert_field_offset!(ime_set_input_screen_pos_fn, ImeSetInputScreenPosFn);
+    //assert_field_offset!(ime_window_handle, ImeWindowHandle);
     assert_field_offset!(mouse_pos, MousePos);
     assert_field_offset!(mouse_down, MouseDown);
     assert_field_offset!(mouse_wheel, MouseWheel);

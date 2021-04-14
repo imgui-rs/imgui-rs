@@ -1,0 +1,36 @@
+# How to update
+
+cd imgui-sys/src/third_party
+
+# Check out cimgui and `git submodule update --init --recursive`
+git clone git@github.com:cimgui/cimgui.git
+
+# Get local copy of imgui up to date
+cd imgui
+git checkout docking
+git fetch
+git pull origin docking
+
+# Attach cimgui to our copy of imgui
+cd ../cimgui
+rmdir imgui
+ln -s ../imgui .
+
+# Edit update-cimgui-output.sh
+# Change:
+# luajit generator.lua gcc false -DIMGUI_USE_WCHAR32
+# To:
+# luajit generator.lua gcc internal -DIMGUI_USE_WCHAR32
+update-cimgui-output.sh ./cimgui
+
+cd ../../..
+
+# Generate bindings
+cd xtask
+cargo run -- bindgen
+cd ..
+
+# Build the library
+cargo build
+
+# clean up until tests pass.  Mostly struct alignment stuff.

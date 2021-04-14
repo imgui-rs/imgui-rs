@@ -107,7 +107,7 @@ impl<'ui> DrawListMut<'ui> {
     pub(crate) fn background(_: &Ui<'ui>) -> Self {
         Self::lock_draw_list();
         Self {
-            draw_list: unsafe { sys::igGetBackgroundDrawList() },
+            draw_list: unsafe { sys::igGetBackgroundDrawList_Nil() },
             _phantom: PhantomData,
         }
     }
@@ -116,7 +116,7 @@ impl<'ui> DrawListMut<'ui> {
     pub(crate) fn foreground(_: &Ui<'ui>) -> Self {
         Self::lock_draw_list();
         Self {
-            draw_list: unsafe { sys::igGetForegroundDrawList() },
+            draw_list: unsafe { sys::igGetForegroundDrawList_Nil() },
             _phantom: PhantomData,
         }
     }
@@ -269,7 +269,7 @@ impl<'ui> DrawListMut<'ui> {
         unsafe {
             let start = text.as_ptr() as *const c_char;
             let end = (start as usize + text.len()) as *const c_char;
-            sys::ImDrawList_AddTextVec2(self.draw_list, pos.into(), col.into().into(), start, end)
+            sys::ImDrawList_AddText_Vec2(self.draw_list, pos.into(), col.into().into(), start, end)
         }
     }
 
