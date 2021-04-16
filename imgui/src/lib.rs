@@ -35,6 +35,7 @@ pub use self::render::renderer::*;
 pub use self::stacks::*;
 pub use self::string::*;
 pub use self::style::*;
+pub use self::tables::*;
 pub use self::utils::*;
 pub use self::widget::color_editors::*;
 pub use self::widget::combo_box::*;
@@ -74,6 +75,7 @@ mod popup_modal;
 mod render;
 mod stacks;
 mod style;
+mod tables;
 #[cfg(test)]
 mod test;
 mod utils;
