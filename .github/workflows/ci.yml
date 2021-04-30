@@ -47,7 +47,7 @@ jobs:
             ${{ runner.os }}-target-lint-
       - run: cargo clippy --workspace --all-targets
       # supported winit versions
-      - run: cargo clippy --manifest-path imgui-winit-support/Cargo.toml --features winit-19 --features winit-20 --features winit-22 --features winit-23/default --features winit-24/default --all-targets
+      - run: cargo clippy --manifest-path imgui-winit-support/Cargo.toml --all-features --all-targets
       - run: cargo clippy --manifest-path imgui-winit-support/Cargo.toml --no-default-features --features winit-19 --all-targets
       - run: cargo clippy --manifest-path imgui-winit-support/Cargo.toml --no-default-features --features winit-20 --all-targets
       - run: cargo clippy --manifest-path imgui-winit-support/Cargo.toml --no-default-features --features winit-22 --all-targets
