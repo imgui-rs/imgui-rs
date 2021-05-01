@@ -354,13 +354,7 @@ impl Io {
     }
 
     pub fn update_delta_time(&mut self, delta: Duration) {
-        let delta_s = delta.as_secs() as f32 + delta.subsec_nanos() as f32 / 1_000_000_000.0;
-        if delta_s > 0.0 {
-            self.delta_time = delta_s;
-        } else {
-            self.delta_time = f32::MIN_POSITIVE;
-        }
-        self.delta_time = delta_s;
+        self.delta_time = delta.as_secs_f32().max(f32::MIN_POSITIVE);
     }
 }
 
