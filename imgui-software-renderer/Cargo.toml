@@ -1,0 +1,14 @@
+[package]
+name = "imgui-software-renderer"
+version = "0.7.0"
+edition = "2018"
+authors = ["The imgui-rs Developers"]
+description = "Software renderer for imgui-rs"
+homepage = "https://github.com/imgui-rs/imgui-rs"
+repository = "https://github.com/imgui-rs/imgui-rs"
+license = "MIT/Apache-2.0"
+categories = ["gui", "rendering"]
+
+[dependencies]
+tiny-skia = "0.5"
+imgui = { version = "0.7.0", path = "../imgui" }
