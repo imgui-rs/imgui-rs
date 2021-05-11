@@ -242,11 +242,12 @@ impl<'ui> Ui<'ui> {
         }
     }
 
-    pub fn table_set_column_enabled(&self, column_n: i32, v: bool) {
-        unsafe {
-            sys::igTableSetColumnEnabled(column_n, v);
-        }
-    }
+    // Not available in imgui 1.80
+    //pub fn table_set_column_enabled(&self, column_n: i32, v: bool) {
+    //    unsafe {
+    //        sys::igTableSetColumnEnabled(column_n, v);
+    //    }
+    //}
 
     pub fn table_set_bg_color(&self, target: TableBgTarget, color: [f32; 4]) {
         self.table_set_bg_color_with_column(target, color, -1);
