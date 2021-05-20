@@ -35,6 +35,7 @@ pub use self::render::renderer::*;
 pub use self::stacks::*;
 pub use self::string::*;
 pub use self::style::*;
+pub use self::tables::*;
 pub use self::utils::*;
 pub use self::widget::color_editors::*;
 pub use self::widget::combo_box::*;
@@ -74,6 +75,7 @@ mod popup_modal;
 mod render;
 mod stacks;
 mod style;
+mod tables;
 #[cfg(test)]
 mod test;
 mod utils;
@@ -213,6 +215,25 @@ pub enum Id<'a> {
     Int(i32),
     Str(&'a str),
     Ptr(*const c_void),
+}
+
+impl<'a> Id<'a> {
+    fn as_imgui_id(&self) -> sys::ImGuiID {
+        unsafe {
+            match self {
+                Id::Ptr(p) => sys::igGetIDPtr(*p),
+                Id::Str(s) => {
+                    let s1 = s.as_ptr() as *const std::os::raw::c_char;
+                    let s2 = s1.add(s.len());
+                    sys::igGetIDStrStr(s1, s2)
+                }
+                Id::Int(i) => {
+                    let p = *i as *const std::os::raw::c_void;
+                    sys::igGetIDPtr(p)
+                }
+            }
+        }
+    }
 }
 
 impl From<i32> for Id<'static> {
