@@ -133,7 +133,7 @@
 //! - Changing the default feature to the new latest `winit` version is *not* a
 //!   breaking change.
 
-#[cfg(feature = "winit-25")]
+#[cfg(all(not(feature = "winit-24"), feature = "winit-25"))]
 use winit_25 as winit;
 
 #[cfg(feature = "winit-24")]
