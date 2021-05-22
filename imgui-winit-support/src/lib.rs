@@ -79,10 +79,10 @@
 //!
 //! The following versions are supported, controlled by the listed feature.
 //!
-//! - The `winit-25` feature supports winit versions `0.25`. This is
+//! - The `winit-25` feature uses winit versions compatible with `0.25`.
+//! - The `winit-24` feature supports winit versions `0.24`. This is
 //!   on by default, so to use any other version you need to disable this crates
 //!   default features.
-//! - The `winit-24` feature uses winit versions compatible with `0.24`.
 //! - The `winit-23` feature uses winit versions compatible with `0.23`.
 //! - The `winit-22` feature uses winit versions compatible with `0.22`.
 //! - The `winit-20` feature should support winit either `0.20` or winit `0.21`.
@@ -258,8 +258,8 @@ fn check_multiple_winits() {
         (this likely indicates misconfiguration, see documentation for details)."
     );
     let feats = [
-        ("winit-25", cfg!(feature = "winit-25"), " (default)"),
-        ("winit-24", cfg!(feature = "winit-24"), ""),
+        ("winit-25", cfg!(feature = "winit-25"), ""),
+        ("winit-24", cfg!(feature = "winit-24"), " (default)"),
         ("winit-23", cfg!(feature = "winit-23"), ""),
         ("winit-22", cfg!(feature = "winit-22"), ""),
         ("winit-20", cfg!(feature = "winit-20"), ""),
@@ -270,7 +270,7 @@ fn check_multiple_winits() {
             let _ = writeln!(err, "    `feature = {:?}` is enabled{}", name, extra);
         }
     }
-    if cfg!(feature = "winit-25") && winits_enabled == 2 {
+    if cfg!(feature = "winit-24") && winits_enabled == 2 {
         let _ = writeln!(
             err,
             "    Perhaps you are missing a `default-features = false`?",
