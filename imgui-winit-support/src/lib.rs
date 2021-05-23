@@ -79,10 +79,10 @@
 //!
 //! The following versions are supported, controlled by the listed feature.
 //!
-//! - The `winit-25` feature uses winit versions compatible with `0.25`.
-//! - The `winit-24` feature supports winit versions `0.24`. This is
+//! - The `winit-25` feature supports winit versions `0.25`. This is
 //!   on by default, so to use any other version you need to disable this crates
 //!   default features.
+//! - The `winit-24` feature uses winit versions compatible with `0.24`.
 //! - The `winit-23` feature uses winit versions compatible with `0.23`.
 //! - The `winit-22` feature uses winit versions compatible with `0.22`.
 //! - The `winit-20` feature should support winit either `0.20` or winit `0.21`.
@@ -133,10 +133,10 @@
 //! - Changing the default feature to the new latest `winit` version is *not* a
 //!   breaking change.
 
-#[cfg(all(not(feature = "winit-24"), feature = "winit-25"))]
+#[cfg(feature = "winit-25")]
 use winit_25 as winit;
 
-#[cfg(feature = "winit-24")]
+#[cfg(all(not(feature = "winit-25"), feature = "winit-24"))]
 use winit_24 as winit;
 
 #[cfg(all(
