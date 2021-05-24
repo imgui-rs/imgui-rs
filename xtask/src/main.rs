@@ -47,6 +47,7 @@ fn lint_all() -> Result<()> {
         "winit-22",
         "winit-23/default",
         "winit-24/default",
+        "winit-25/default",
     ];
     for &winit in winits {
         xshell::cmd!("cargo clippy --manifest-path imgui-winit-support/Cargo.toml --no-default-features --features {winit} --all-targets").run()?;
@@ -64,6 +65,7 @@ fn test_all() -> Result<()> {
         "winit-22",
         "winit-23/default",
         "winit-24/default",
+        "winit-25/default",
     ];
     for &winit in winits {
         xshell::cmd!("cargo test --manifest-path imgui-winit-support/Cargo.toml --no-default-features --features {winit} --all-targets").run()?;
