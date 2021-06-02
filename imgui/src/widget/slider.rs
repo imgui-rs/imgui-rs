@@ -48,6 +48,22 @@ impl<'a, T: DataTypeKind> Slider<'a, T> {
         }
     }
     /// Sets the range (inclusive)
+    ///
+    /// The argument uses the standard Rust [`std::ops::Range`] syntax.
+    ///
+    /// For example, to set both the min and max values:
+    ///
+    /// ```rust
+    /// imgui::Slider::new(im_str!("Example"))
+    ///     .range(1 ..= 10)
+    /// ```
+    ///
+    /// To set only the max value, using the default minimum value:
+    ///
+    /// ```rust
+    /// imgui::Slider::new(im_str!("Example"))
+    ///     .range(..= 10)
+    /// ```
     #[inline]
     pub fn range<R: InclusiveRangeBounds<T>>(mut self, range: R) -> Self {
         self.min = range.start_bound().copied().unwrap_or(T::SLIDER_MIN);
