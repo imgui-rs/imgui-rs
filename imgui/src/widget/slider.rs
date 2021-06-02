@@ -54,15 +54,21 @@ impl<'a, T: DataTypeKind> Slider<'a, T> {
     /// For example, to set both the min and max values:
     ///
     /// ```rust
+    /// # use imgui::im_str;
     /// imgui::Slider::new(im_str!("Example"))
     ///     .range(1 ..= 10)
+    ///     // Remember to call .build(&ui)
+    ///     ;
     /// ```
     ///
     /// To set only the max value, using the default minimum value:
     ///
     /// ```rust
+    /// # use imgui::im_str;
     /// imgui::Slider::new(im_str!("Example"))
     ///     .range(..= 10)
+    ///     // Remember to call .build(&ui)
+    ///     ;
     /// ```
     #[inline]
     pub fn range<R: InclusiveRangeBounds<T>>(mut self, range: R) -> Self {
