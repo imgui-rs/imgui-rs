@@ -1030,12 +1030,12 @@ void main() {
 }
 
 pub struct GenericShaderData<G: Gl> {
-    program: G::Program,
-    texture_uniform_location: G::UniformLocation,
-    matrix_uniform_location: G::UniformLocation,
-    position_attribute_index: u32,
-    uv_attribute_index: u32,
-    color_attribute_index: u32,
+    pub program: G::Program,
+    pub texture_uniform_location: G::UniformLocation,
+    pub matrix_uniform_location: G::UniformLocation,
+    pub position_attribute_index: u32,
+    pub uv_attribute_index: u32,
+    pub color_attribute_index: u32,
 }
 
 impl<G: Gl> Default for GenericShaderData<G> {
