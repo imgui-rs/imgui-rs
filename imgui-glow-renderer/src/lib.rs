@@ -42,6 +42,14 @@ impl<
 /// you probably want to take more control (including ownership of the GL
 /// context). In those cases, construct an appropriate renderer with
 /// `RendererBuilder`.
+///
+/// By default, it constructs a renderer which owns the OpenGL context and
+/// attempts to backup the OpenGL state before rendering and restore it after
+/// rendering.
+///
+/// # Errors
+/// Any error initialising the OpenGL objects (including shaders) will
+/// result in an error.
 pub fn auto_renderer<G: Gl>(
     gl: G,
     imgui_context: &mut imgui::Context,
@@ -117,7 +125,12 @@ where
             phantom_gl: self.phantom_gl,
         }
     }
-
+    /// Build a renderer which owns the OpenGL context (which can be borrowed
+    /// from the renderer, but not taken).
+    ///
+    /// # Errors
+    /// Any error initialising the OpenGL objects (including shaders) will
+    /// result in an error.
     pub fn build_owning(
         self,
         gl: G,
@@ -127,6 +140,11 @@ where
         Ok(OwningRenderer::<G, T, S, C> { gl, renderer })
     }
 
+    /// Build a renderer which needs to borrow a context in order to render.
+    ///
+    /// # Errors
+    /// Any error initialising the OpenGL objects (including shaders) will
+    /// result in an error.
     pub fn build_borrowing(
         self,
         gl: &G,
@@ -142,7 +160,6 @@ where
     }
 }
 
-// TODO: builder pattern
 /// Renderer which owns the OpenGL context. Useful for simple applications, but
 /// more complicated applications may prefer to keep control of their own
 /// OpenGL context, or even change that context at runtime.
