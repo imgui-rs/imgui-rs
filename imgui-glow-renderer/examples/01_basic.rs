@@ -1,8 +1,6 @@
 //! A basic self-contained example to get you from zero-to-demo-window as fast
 //! as possible.
 
-use std::time::Instant;
-
 use glow::HasContext;
 use glutin::{event_loop::EventLoop, WindowedContext};
 use imgui_winit_support::WinitPlatform;
@@ -26,7 +24,6 @@ fn main() {
         .expect("failed to create renderer");
 
     // Standard winit event loop
-    let mut last_frame = Instant::now();
     event_loop.run(move |event, _, control_flow| {
         *control_flow = glutin::event_loop::ControlFlow::Wait;
         match event {
