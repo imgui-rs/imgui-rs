@@ -9,9 +9,9 @@ pub mod versions;
 // TODO: document all the things!
 
 // This may be generics overkill, but I have to assume there's some reason that
-// `glow` hid the functions of `Context` behind the `HasContext` trait. The
-// specified types I require here are necessary because otherwise I can't
-// perform the required initialisations or conversions in the code below. In
+// `glow` hid the functions of `[glow::Context]` behind the `[glow::Context]`
+// trait. The specified types required here are necessary because otherwise
+// required initialisations or conversions in this crate can't be performed. In
 // any case, the OpenGL standard specifies these types, so there should be no
 // loss of generality.
 pub trait Gl:
@@ -41,7 +41,7 @@ impl<
 /// Convenience function to get you going quickly. In most larger programs
 /// you probably want to take more control (including ownership of the GL
 /// context). In those cases, construct an appropriate renderer with
-/// `RendererBuilder`.
+/// `[RendererBuilder]`.
 ///
 /// By default, it constructs a renderer which owns the OpenGL context and
 /// attempts to backup the OpenGL state before rendering and restore it after
@@ -165,7 +165,7 @@ where
 /// OpenGL context, or even change that context at runtime.
 ///
 /// OpenGL context is still available to the rest of the application through
-/// the `gl_context` method.
+/// the `[gl_context]` method.
 pub struct OwningRenderer<G, T = TrivialTextureMap, S = AutoShaderProvider<G>, C = TrivialCsm>
 where
     G: Gl,
@@ -185,7 +185,7 @@ where
     C: ContextStateManager<G>,
 {
     /// Note: no need to provide a `mut` version of this, as all methods on
-    /// `glow::HasContext` are immutable.
+    /// `[glow::HasContext]` are immutable.
     #[inline]
     pub fn gl_context(&self) -> &G {
         &self.gl
@@ -669,14 +669,14 @@ pub struct TrivialCsm();
 
 impl<G: Gl> ContextStateManager<G> for TrivialCsm {}
 
-/// This `ContextStateManager` is based on the upstream OpenGL example from
+/// This `[ContextStateManager]` is based on the upstream OpenGL example from
 /// imgui, where an attempt is made to save and restore the OpenGL context state
 /// before and after rendering.
 ///
 /// It is unlikely that any such attempt will be comprehensive for all possible
 /// applications, due to the complexity of OpenGL and the possibility of
 /// arbitrary extensions. However, it remains as a useful tool for quickly
-/// getting started, and a good example of how to use a `ContextStateManager` to
+/// getting started, and a good example of how to use a `[ContextStateManager]` to
 /// customise the renderer.
 #[allow(clippy::struct_excessive_bools)]
 #[derive(Default)]
@@ -859,7 +859,7 @@ pub trait ShaderProvider<G: Gl> {
     /// OpenGL context.
     ///
     /// Implementors should use this opporunity to check whether the version of
-    /// the GL context (found with `GlVersion::read`) is compatible with the
+    /// the GL context (found with `[GlVersion::read]`) is compatible with the
     /// shader they provide.
     ///
     /// # Errors
