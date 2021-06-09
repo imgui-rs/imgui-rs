@@ -20,7 +20,6 @@ fn main() {
 
     // OpenGL context from glow
     let gl = glow_context(&window);
-    unsafe { gl.clear_color(0.05, 0.05, 0.1, 1.0) };
 
     // OpenGL renderer from this crate
     let mut ig_renderer = imgui_glow_renderer::auto_renderer(gl, &mut imgui_context)
@@ -31,13 +30,6 @@ fn main() {
     event_loop.run(move |event, _, control_flow| {
         *control_flow = glutin::event_loop::ControlFlow::Wait;
         match event {
-            glutin::event::Event::NewEvents(_) => {
-                let now = Instant::now();
-                imgui_context
-                    .io_mut()
-                    .update_delta_time(now.duration_since(last_frame));
-                last_frame = now;
-            }
             glutin::event::Event::MainEventsCleared => {
                 winit_platform
                     .prepare_frame(imgui_context.io_mut(), window.window())
