@@ -605,6 +605,7 @@ pub trait TextureMap {
     fn gl_texture(&self, imgui_texture: imgui::TextureId) -> Option<glow::Texture>;
 }
 
+#[derive(Default)]
 pub struct TrivialTextureMap();
 
 impl TextureMap for TrivialTextureMap {
@@ -646,6 +647,7 @@ pub trait ContextStateManager<G: Gl> {
     fn post_destroy(&mut self, gl: &G, gl_version: GlVersion) {}
 }
 
+#[derive(Default)]
 pub struct TrivialCsm();
 
 impl<G: Gl> ContextStateManager<G> for TrivialCsm {}
