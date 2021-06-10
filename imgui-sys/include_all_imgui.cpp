@@ -9,4 +9,8 @@
 #include "./third-party/imgui/imgui_tables.cpp"
 #include "./third-party/cimgui.cpp"
 
+#ifdef IMGUI_ENABLE_FREETYPE
+#include "./third-party/imgui/misc/freetype/imgui_freetype.cpp"
+#endif
+
 

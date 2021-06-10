@@ -48,6 +48,20 @@ fn main() -> io::Result<()> {
             build.define(key, *value);
         }
 
+        // Freetype font rasterizer feature
+        if std::env::var_os("CARGO_FEATURE_FREETYPE").is_some() {
+            let freetype = pkg_config::Config::new().find("freetype2").unwrap();
+            for include in freetype.include_paths.iter() {
+                build.include(include);
+            }
+            build.define("IMGUI_ENABLE_FREETYPE", None);
+            println!("cargo:DEFINE_{}={}", "IMGUI_ENABLE_FREETYPE", "");
+
+            // imgui_freetype.cpp needs access to imgui.h
+            build.include(
+                manifest_dir.join("third-party/imgui/"));
+        }
+
         let compiler = build.get_compiler();
         // Avoid the if-supported flag functions for easy cases, as they're
         // kinda costly.

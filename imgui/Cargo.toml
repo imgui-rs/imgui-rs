@@ -19,6 +19,7 @@ parking_lot = "0.11"
 
 [features]
 wasm = ["imgui-sys/wasm"]
+freetype = ["imgui-sys/freetype"]
 
 [dev-dependencies]
 memoffset = "0.6"
