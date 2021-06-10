@@ -49,7 +49,8 @@ fn main() -> io::Result<()> {
         }
 
         // Freetype font rasterizer feature
-        if std::env::var_os("CARGO_FEATURE_FREETYPE").is_some() {
+        #[cfg(feature = "feature")]
+        {
             let freetype = pkg_config::Config::new().find("freetype2").unwrap();
             for include in freetype.include_paths.iter() {
                 build.include(include);
