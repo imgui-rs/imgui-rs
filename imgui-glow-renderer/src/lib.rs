@@ -329,7 +329,7 @@ where
             self.vbo_handle = 0;
         }
         if self.ebo_handle != 0 {
-            unsafe { gl.delete_buffer(self.vbo_handle) };
+            unsafe { gl.delete_buffer(self.ebo_handle) };
             self.ebo_handle = 0;
         }
         let program = self.shader_provider.data().program;
