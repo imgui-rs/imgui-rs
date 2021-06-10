@@ -59,8 +59,7 @@ fn main() -> io::Result<()> {
             println!("cargo:DEFINE_{}={}", "IMGUI_ENABLE_FREETYPE", "");
 
             // imgui_freetype.cpp needs access to imgui.h
-            build.include(
-                manifest_dir.join("third-party/imgui/"));
+            build.include(manifest_dir.join("third-party/imgui/"));
         }
 
         let compiler = build.get_compiler();
