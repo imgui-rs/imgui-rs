@@ -49,7 +49,7 @@ fn main() -> io::Result<()> {
         }
 
         // Freetype font rasterizer feature
-        #[cfg(feature = "feature")]
+        #[cfg(feature = "freetype")]
         {
             let freetype = pkg_config::Config::new().find("freetype2").unwrap();
             for include in freetype.include_paths.iter() {
