@@ -1,6 +1,6 @@
 use std::{borrow::Cow, error::Error, fmt::Display, marker::PhantomData, mem::size_of};
 
-use imgui::{internal::RawWrapper, TextureId};
+use imgui::internal::RawWrapper;
 
 use crate::versions::{GlVersion, GlslVersion};
 
