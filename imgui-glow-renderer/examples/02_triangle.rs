@@ -52,9 +52,7 @@ fn main() {
                 }
 
                 let ui = imgui_context.frame();
-                // Safety: internally, this reference just gets passed as a
-                // pointer to imgui, which handles the null pointer properly.
-                ui.show_demo_window(unsafe { &mut *std::ptr::null_mut() });
+                ui.show_demo_window(&mut true);
 
                 winit_platform.prepare_render(&ui, window.window());
                 let draw_data = ui.render();
