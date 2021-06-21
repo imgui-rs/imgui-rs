@@ -250,7 +250,7 @@ where
     pub fn initialize(
         gl: &G,
         imgui_context: &mut imgui::Context,
-        texture_map: T,
+        mut texture_map: T,
         shader_provider: S,
         context_state_manager: C,
     ) -> Result<Self, InitError> {
@@ -286,7 +286,7 @@ where
         let mut context_state_manager = context_state_manager;
         context_state_manager.pre_init(gl, gl_version)?;
 
-        let font_atlas_texture = prepare_font_atlas(gl, imgui_context.fonts())?;
+        let font_atlas_texture = prepare_font_atlas(gl, imgui_context.fonts(), &mut texture_map)?;
 
         let mut shader_provider = shader_provider;
         shader_provider.initialize(gl, gl_version)?;
@@ -620,15 +620,35 @@ where
 
 pub trait TextureMap {
     fn gl_texture(&self, imgui_texture: imgui::TextureId) -> Option<glow::Texture>;
+
+    fn register(&mut self, gl_texture: glow::Texture) -> Option<imgui::TextureId>;
 }
 
+/// Texture map where the imgui texture ID is simply the OpenGL texture ID
 #[derive(Default)]
 pub struct TrivialTextureMap();
 
 impl TextureMap for TrivialTextureMap {
+    #[inline(always)]
     fn gl_texture(&self, imgui_texture: imgui::TextureId) -> Option<glow::Texture> {
         #[allow(clippy::cast_possible_truncation)]
         Some(imgui_texture.id() as _)
+    }
+
+    #[inline(always)]
+    fn register(&mut self, gl_texture: glow::Texture) -> Option<imgui::TextureId> {
+        Some(imgui::TextureId::new(gl_texture as _))
+    }
+}
+
+/// `Textures` from the `imgui` crate is a simple choice for a texture map
+impl TextureMap for imgui::Textures<glow::Texture> {
+    fn gl_texture(&self, imgui_texture: imgui::TextureId) -> Option<glow::Texture> {
+        self.get(imgui_texture).cloned()
+    }
+
+    fn register(&mut self, gl_texture: glow::Texture) -> Option<imgui::TextureId> {
+        Some(self.insert(gl_texture))
     }
 }
 
@@ -1166,6 +1186,7 @@ pub enum InitError {
     Shader(ShaderError),
     CreateBufferObject(String),
     CreateTexture(String),
+    RegisterTexture,
     UserError(String),
 }
 
@@ -1184,6 +1205,7 @@ impl Display for InitError {
             Self::Shader(error) => write!(f, "Shader initialisation error: {}", error),
             Self::CreateBufferObject(msg) => write!(f, "Error creating buffer object: {}", msg),
             Self::CreateTexture(msg) => write!(f, "Error creating texture object: {}", msg),
+            Self::RegisterTexture => write!(f, "Error registering texture in texture map"),
             Self::UserError(msg) => write!(f, "Initialization error: {}", msg),
         }
     }
@@ -1197,9 +1219,10 @@ impl From<ShaderError> for InitError {
 
 pub type RenderError = String;
 
-fn prepare_font_atlas<G: Gl>(
+fn prepare_font_atlas<G: Gl, T: TextureMap>(
     gl: &G,
     mut fonts: imgui::FontAtlasRefMut,
+    texture_map: &mut T,
 ) -> Result<G::Texture, InitError> {
     #![allow(clippy::cast_possible_wrap)]
 
@@ -1232,7 +1255,9 @@ fn prepare_font_atlas<G: Gl>(
         )
     }
 
-    fonts.tex_id = TextureId::new(gl_texture as _);
+    fonts.tex_id = texture_map
+        .register(gl_texture)
+        .ok_or(InitError::RegisterTexture)?;
 
     Ok(gl_texture)
 }
