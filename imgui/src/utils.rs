@@ -1,4 +1,4 @@
-#![allow(clippy::clippy::float_cmp)]
+#![allow(clippy::float_cmp)]
 use bitflags::bitflags;
 
 use crate::input::mouse::MouseButton;
