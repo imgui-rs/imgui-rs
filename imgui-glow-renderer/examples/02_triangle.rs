@@ -17,8 +17,7 @@ fn main() {
     let (mut winit_platform, mut imgui_context) = utils::imgui_init(&window);
     let gl = utils::glow_context(&window);
 
-    let mut ig_renderer = imgui_glow_renderer::RendererBuilder::new()
-        .build_owning(gl, &mut imgui_context)
+    let mut ig_renderer = imgui_glow_renderer::AutoRenderer::initialize(gl, &mut imgui_context)
         .expect("failed to create renderer");
     let tri_renderer = Triangler::new(ig_renderer.gl_context(), "#version 330");
 

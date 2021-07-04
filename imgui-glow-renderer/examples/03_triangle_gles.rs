@@ -18,9 +18,10 @@ fn main() {
     let (mut winit_platform, mut imgui_context) = utils::imgui_init(&window);
     let gl = utils::glow_context(&window);
 
-    let mut ig_renderer = imgui_glow_renderer::RendererBuilder::new()
-        .build_borrowing(&gl, &mut imgui_context)
-        .expect("failed to create renderer");
+    let mut texture_map = imgui_glow_renderer::SimpleTextureMap::default();
+    let mut ig_renderer =
+        imgui_glow_renderer::Renderer::initialize(&gl, &mut imgui_context, &mut texture_map)
+            .expect("failed to create renderer");
     // Note the shader header now needs a precision specifier
     let tri_renderer = Triangler::new(&gl, "#version 300 es\nprecision mediump float;");
 
@@ -51,7 +52,7 @@ fn main() {
                 winit_platform.prepare_render(&ui, window.window());
                 let draw_data = ui.render();
                 ig_renderer
-                    .render(&gl, &draw_data)
+                    .render(&gl, &texture_map, &draw_data)
                     .expect("error rendering imgui");
 
                 window.swap_buffers().unwrap();

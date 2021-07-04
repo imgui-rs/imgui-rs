@@ -1,4 +1,4 @@
-use std::{borrow::Cow, error::Error, fmt::Display, marker::PhantomData, mem::size_of};
+use std::{borrow::Cow, error::Error, fmt::Display, mem::size_of};
 
 use imgui::internal::RawWrapper;
 
@@ -38,106 +38,32 @@ impl<
 {
 }
 
-/// Convenience function to get you going quickly. In most larger programs
-/// you probably want to take more control (including ownership of the GL
-/// context). In those cases, construct an appropriate renderer with
-/// `[RendererBuilder]`.
-///
-/// By default, it constructs a renderer which owns the OpenGL context and
-/// attempts to backup the OpenGL state before rendering and restore it after
-/// rendering.
-///
-/// # Errors
-/// Any error initialising the OpenGL objects (including shaders) will
-/// result in an error.
-pub fn auto_renderer<G: Gl>(
-    gl: G,
-    imgui_context: &mut imgui::Context,
-) -> Result<OwningRenderer<G, TrivialTextureMap>, InitError> {
-    RendererBuilder::new().build_owning(gl, imgui_context)
-}
-
-pub struct RendererBuilder<G, T>
-where
-    G: Gl,
-    T: TextureMap,
-{
-    texture_map: T,
-    phantom_gl: PhantomData<G>,
-}
-
-impl<G: Gl> RendererBuilder<G, TrivialTextureMap> {
-    #[allow(clippy::new_without_default)]
-    #[must_use]
-    pub fn new() -> Self {
-        Self {
-            texture_map: TrivialTextureMap(),
-            phantom_gl: PhantomData::default(),
-        }
-    }
-}
-
-impl<G, T> RendererBuilder<G, T>
-where
-    G: Gl,
-    T: TextureMap,
-{
-    pub fn with_texture_map<T2: TextureMap>(self, texture_map: T2) -> RendererBuilder<G, T2> {
-        RendererBuilder {
-            texture_map,
-            phantom_gl: self.phantom_gl,
-        }
-    }
-
-    /// Build a renderer which owns the OpenGL context (which can be borrowed
-    /// from the renderer, but not taken).
-    ///
-    /// # Errors
-    /// Any error initialising the OpenGL objects (including shaders) will
-    /// result in an error.
-    pub fn build_owning(
-        self,
-        gl: G,
-        imgui_context: &mut imgui::Context,
-    ) -> Result<OwningRenderer<G, T>, InitError> {
-        let renderer = self.build_borrowing(&gl, imgui_context)?;
-        Ok(OwningRenderer::<G, T> { gl, renderer })
-    }
-
-    /// Build a renderer which needs to borrow a context in order to render.
-    ///
-    /// # Errors
-    /// Any error initialising the OpenGL objects (including shaders) will
-    /// result in an error.
-    pub fn build_borrowing(
-        self,
-        gl: &G,
-        imgui_context: &mut imgui::Context,
-    ) -> Result<Renderer<G, T>, InitError> {
-        Renderer::<G, T>::initialize(gl, imgui_context, self.texture_map)
-    }
-}
-
-/// Renderer which owns the OpenGL context. Useful for simple applications, but
-/// more complicated applications may prefer to keep control of their own
-/// OpenGL context, or even change that context at runtime.
+/// Renderer which owns the OpenGL context and handles textures itself.
+/// Useful for simple applications, but more complicated applications may prefer
+/// to use `[Renderer]`.
 ///
 /// OpenGL context is still available to the rest of the application through
 /// the `[gl_context]` method.
-pub struct OwningRenderer<G, T = TrivialTextureMap>
-where
-    G: Gl,
-    T: TextureMap,
-{
+pub struct AutoRenderer<G: Gl> {
     gl: G,
-    renderer: Renderer<G, T>,
+    texture_map: SimpleTextureMap,
+    renderer: Renderer<G>,
 }
 
-impl<G, T> OwningRenderer<G, T>
-where
-    G: Gl,
-    T: TextureMap,
-{
+impl<G: Gl> AutoRenderer<G> {
+    /// # Errors
+    /// Any error initialising the OpenGL objects (including shaders) will
+    /// result in an error.
+    pub fn initialize(gl: G, imgui_context: &mut imgui::Context) -> Result<Self, InitError> {
+        let mut texture_map = SimpleTextureMap::default();
+        let renderer = Renderer::initialize(&gl, imgui_context, &mut texture_map)?;
+        Ok(Self {
+            gl,
+            texture_map,
+            renderer,
+        })
+    }
+
     /// Note: no need to provide a `mut` version of this, as all methods on
     /// `[glow::HasContext]` are immutable.
     #[inline]
@@ -146,7 +72,17 @@ where
     }
 
     #[inline]
-    pub fn renderer(&self) -> &Renderer<G, T> {
+    pub fn texture_map(&self) -> &SimpleTextureMap {
+        &self.texture_map
+    }
+
+    #[inline]
+    pub fn texture_map_mut(&mut self) -> &mut SimpleTextureMap {
+        &mut self.texture_map
+    }
+
+    #[inline]
+    pub fn renderer(&self) -> &Renderer<G> {
         &self.renderer
     }
 
@@ -155,26 +91,17 @@ where
     /// however)
     #[inline]
     pub fn render(&mut self, draw_data: &imgui::DrawData) -> Result<(), RenderError> {
-        self.renderer.render(&self.gl, draw_data)
+        self.renderer.render(&self.gl, &self.texture_map, draw_data)
     }
 }
 
-impl<G, T> Drop for OwningRenderer<G, T>
-where
-    G: Gl,
-    T: TextureMap,
-{
+impl<G: Gl> Drop for AutoRenderer<G> {
     fn drop(&mut self) {
         self.renderer.destroy(&self.gl);
     }
 }
 
-pub struct Renderer<G, T = TrivialTextureMap>
-where
-    G: Gl,
-    T: TextureMap,
-{
-    pub texture_map: T,
+pub struct Renderer<G: Gl> {
     shaders: Shaders<G>,
     state_backup: GlStateBackup,
     pub vbo_handle: G::Buffer,
@@ -187,18 +114,14 @@ where
     pub is_destroyed: bool,
 }
 
-impl<G, T> Renderer<G, T>
-where
-    G: Gl,
-    T: TextureMap,
-{
+impl<G: Gl> Renderer<G> {
     /// # Errors
     /// Any error initialising the OpenGL objects (including shaders) will
     /// result in an error.
-    pub fn initialize(
+    pub fn initialize<T: TextureMap>(
         gl: &G,
         imgui_context: &mut imgui::Context,
-        mut texture_map: T,
+        texture_map: &mut T,
     ) -> Result<Self, InitError> {
         #![allow(
             clippy::similar_names,
@@ -232,7 +155,7 @@ where
         let mut state_backup = GlStateBackup::default();
         state_backup.pre_init(gl);
 
-        let font_atlas_texture = prepare_font_atlas(gl, imgui_context.fonts(), &mut texture_map)?;
+        let font_atlas_texture = prepare_font_atlas(gl, imgui_context.fonts(), texture_map)?;
 
         let shaders = Shaders::new(gl, gl_version)?;
         let vbo_handle = unsafe { gl.create_buffer() }.map_err(InitError::CreateBufferObject)?;
@@ -241,7 +164,6 @@ where
         state_backup.post_init(gl);
 
         let out = Self {
-            texture_map,
             shaders,
             state_backup,
             vbo_handle,
@@ -289,7 +211,12 @@ where
     /// # Errors
     /// Some OpenGL errors trigger an error (few are explicitly checked,
     /// however)
-    pub fn render(&mut self, gl: &G, draw_data: &imgui::DrawData) -> Result<(), RenderError> {
+    pub fn render<T: TextureMap>(
+        &mut self,
+        gl: &G,
+        texture_map: &T,
+        draw_data: &imgui::DrawData,
+    ) -> Result<(), RenderError> {
         if self.is_destroyed {
             return Err(Self::renderer_destroyed());
         }
@@ -323,9 +250,15 @@ where
             gl_debug_message(gl, "start loop over commands");
             for command in draw_list.commands() {
                 match command {
-                    imgui::DrawCmd::Elements { count, cmd_params } => {
-                        self.render_elements(gl, count, cmd_params, draw_data, fb_width, fb_height)
-                    }
+                    imgui::DrawCmd::Elements { count, cmd_params } => self.render_elements(
+                        gl,
+                        texture_map,
+                        count,
+                        cmd_params,
+                        draw_data,
+                        fb_width,
+                        fb_height,
+                    ),
                     imgui::DrawCmd::RawCallback { callback, raw_cmd } => unsafe {
                         callback(draw_list.raw(), raw_cmd)
                     },
@@ -467,9 +400,11 @@ where
         Ok(())
     }
 
-    fn render_elements(
+    #[allow(clippy::too_many_arguments)]
+    fn render_elements<T: TextureMap>(
         &self,
         gl: &G,
+        texture_map: &T,
         element_count: usize,
         element_params: imgui::DrawCmdParams,
         draw_data: &imgui::DrawData,
@@ -507,7 +442,7 @@ where
                 (clip_x2 - clip_x1) as i32,
                 (clip_y2 - clip_y1) as i32,
             );
-            gl.bind_texture(glow::TEXTURE_2D, self.texture_map.gl_texture(texture_id));
+            gl.bind_texture(glow::TEXTURE_2D, texture_map.gl_texture(texture_id));
 
             #[cfg(feature = "vertex_offset_support")]
             let with_offset = self.gl_version.vertex_offset_support();
@@ -560,9 +495,9 @@ pub trait TextureMap {
 
 /// Texture map where the imgui texture ID is simply the OpenGL texture ID
 #[derive(Default)]
-pub struct TrivialTextureMap();
+pub struct SimpleTextureMap();
 
-impl TextureMap for TrivialTextureMap {
+impl TextureMap for SimpleTextureMap {
     #[inline(always)]
     fn gl_texture(&self, imgui_texture: imgui::TextureId) -> Option<glow::Texture> {
         #[allow(clippy::cast_possible_truncation)]

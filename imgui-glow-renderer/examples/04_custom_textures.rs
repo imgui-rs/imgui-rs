@@ -6,7 +6,8 @@ use std::{io::Cursor, time::Instant};
 use glow::HasContext;
 use image::{jpeg::JpegDecoder, ImageDecoder};
 use imgui::{im_str, Condition};
-use imgui_glow_renderer::RendererBuilder;
+
+use imgui_glow_renderer::Renderer;
 
 #[allow(dead_code)]
 mod utils;
@@ -18,11 +19,10 @@ fn main() {
     let (mut winit_platform, mut imgui_context) = utils::imgui_init(&window);
     let gl = utils::glow_context(&window);
 
-    let mut ig_renderer = RendererBuilder::new()
-        .with_texture_map(imgui::Textures::<glow::Texture>::default())
-        .build_borrowing(&gl, &mut imgui_context)
+    let mut textures = imgui::Textures::<glow::Texture>::default();
+    let mut ig_renderer = Renderer::initialize(&gl, &mut imgui_context, &mut textures)
         .expect("failed to create renderer");
-    let textures_ui = TexturesUi::new(&gl, &mut ig_renderer.texture_map);
+    let textures_ui = TexturesUi::new(&gl, &mut textures);
 
     let mut last_frame = Instant::now();
     event_loop.run(move |event, _, control_flow| {
@@ -51,7 +51,7 @@ fn main() {
                 winit_platform.prepare_render(&ui, window.window());
                 let draw_data = ui.render();
                 ig_renderer
-                    .render(&gl, &draw_data)
+                    .render(&gl, &textures, &draw_data)
                     .expect("error rendering imgui");
 
                 window.swap_buffers().unwrap();
