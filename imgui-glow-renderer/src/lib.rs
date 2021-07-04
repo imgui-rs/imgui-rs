@@ -793,7 +793,7 @@ uniform mat4 matrix;
 out vec2 fragment_uv;
 out vec4 fragment_color;
 
-// Because imgui only specifies linear colors
+// Because imgui only specifies sRGB colors
 vec4 srgb_to_linear(vec4 srgb_color) {
     // Calcuation as documented by OpenGL
     vec3 srgb = srgb_color.rgb;
