@@ -53,51 +53,43 @@ impl<
 pub fn auto_renderer<G: Gl>(
     gl: G,
     imgui_context: &mut imgui::Context,
-) -> Result<OwningRenderer<G, TrivialTextureMap, AutoShaderProvider<G>, StateBackupCsm>, InitError>
-{
-    RendererBuilder::new()
-        .with_context_state_manager(StateBackupCsm::default())
-        .build_owning(gl, imgui_context)
+) -> Result<OwningRenderer<G, TrivialTextureMap, AutoShaderProvider<G>>, InitError> {
+    RendererBuilder::new().build_owning(gl, imgui_context)
 }
 
-pub struct RendererBuilder<G, T, S, C>
+pub struct RendererBuilder<G, T, S>
 where
     G: Gl,
     T: TextureMap,
     S: ShaderProvider<G>,
-    C: ContextStateManager<G>,
 {
     texture_map: T,
     shader_provider: S,
-    context_state_manager: C,
     phantom_gl: PhantomData<G>,
 }
 
-impl<G: Gl> RendererBuilder<G, TrivialTextureMap, AutoShaderProvider<G>, TrivialCsm> {
+impl<G: Gl> RendererBuilder<G, TrivialTextureMap, AutoShaderProvider<G>> {
     #[allow(clippy::new_without_default)]
     #[must_use]
     pub fn new() -> Self {
         Self {
             texture_map: TrivialTextureMap(),
             shader_provider: <AutoShaderProvider<G> as Default>::default(),
-            context_state_manager: TrivialCsm(),
             phantom_gl: PhantomData::default(),
         }
     }
 }
 
-impl<G, T, S, C> RendererBuilder<G, T, S, C>
+impl<G, T, S> RendererBuilder<G, T, S>
 where
     G: Gl,
     T: TextureMap,
     S: ShaderProvider<G>,
-    C: ContextStateManager<G>,
 {
-    pub fn with_texture_map<T2: TextureMap>(self, texture_map: T2) -> RendererBuilder<G, T2, S, C> {
+    pub fn with_texture_map<T2: TextureMap>(self, texture_map: T2) -> RendererBuilder<G, T2, S> {
         RendererBuilder {
             texture_map,
             shader_provider: self.shader_provider,
-            context_state_manager: self.context_state_manager,
             phantom_gl: self.phantom_gl,
         }
     }
@@ -105,26 +97,14 @@ where
     pub fn with_shader_provider<S2: ShaderProvider<G>>(
         self,
         shader_provider: S2,
-    ) -> RendererBuilder<G, T, S2, C> {
+    ) -> RendererBuilder<G, T, S2> {
         RendererBuilder {
             texture_map: self.texture_map,
             shader_provider,
-            context_state_manager: self.context_state_manager,
             phantom_gl: self.phantom_gl,
         }
     }
 
-    pub fn with_context_state_manager<C2: ContextStateManager<G>>(
-        self,
-        context_state_manager: C2,
-    ) -> RendererBuilder<G, T, S, C2> {
-        RendererBuilder {
-            texture_map: self.texture_map,
-            shader_provider: self.shader_provider,
-            context_state_manager,
-            phantom_gl: self.phantom_gl,
-        }
-    }
     /// Build a renderer which owns the OpenGL context (which can be borrowed
     /// from the renderer, but not taken).
     ///
@@ -135,9 +115,9 @@ where
         self,
         gl: G,
         imgui_context: &mut imgui::Context,
-    ) -> Result<OwningRenderer<G, T, S, C>, InitError> {
+    ) -> Result<OwningRenderer<G, T, S>, InitError> {
         let renderer = self.build_borrowing(&gl, imgui_context)?;
-        Ok(OwningRenderer::<G, T, S, C> { gl, renderer })
+        Ok(OwningRenderer::<G, T, S> { gl, renderer })
     }
 
     /// Build a renderer which needs to borrow a context in order to render.
@@ -149,14 +129,8 @@ where
         self,
         gl: &G,
         imgui_context: &mut imgui::Context,
-    ) -> Result<Renderer<G, T, S, C>, InitError> {
-        Renderer::<G, T, S, C>::initialize(
-            gl,
-            imgui_context,
-            self.texture_map,
-            self.shader_provider,
-            self.context_state_manager,
-        )
+    ) -> Result<Renderer<G, T, S>, InitError> {
+        Renderer::<G, T, S>::initialize(gl, imgui_context, self.texture_map, self.shader_provider)
     }
 }
 
@@ -166,23 +140,21 @@ where
 ///
 /// OpenGL context is still available to the rest of the application through
 /// the `[gl_context]` method.
-pub struct OwningRenderer<G, T = TrivialTextureMap, S = AutoShaderProvider<G>, C = TrivialCsm>
+pub struct OwningRenderer<G, T = TrivialTextureMap, S = AutoShaderProvider<G>>
 where
     G: Gl,
     T: TextureMap,
     S: ShaderProvider<G>,
-    C: ContextStateManager<G>,
 {
     gl: G,
-    renderer: Renderer<G, T, S, C>,
+    renderer: Renderer<G, T, S>,
 }
 
-impl<G, T, S, C> OwningRenderer<G, T, S, C>
+impl<G, T, S> OwningRenderer<G, T, S>
 where
     G: Gl,
     T: TextureMap,
     S: ShaderProvider<G>,
-    C: ContextStateManager<G>,
 {
     /// Note: no need to provide a `mut` version of this, as all methods on
     /// `[glow::HasContext]` are immutable.
@@ -192,7 +164,7 @@ where
     }
 
     #[inline]
-    pub fn renderer(&self) -> &Renderer<G, T, S, C> {
+    pub fn renderer(&self) -> &Renderer<G, T, S> {
         &self.renderer
     }
 
@@ -205,28 +177,26 @@ where
     }
 }
 
-impl<G, T, S, C> Drop for OwningRenderer<G, T, S, C>
+impl<G, T, S> Drop for OwningRenderer<G, T, S>
 where
     G: Gl,
     T: TextureMap,
     S: ShaderProvider<G>,
-    C: ContextStateManager<G>,
 {
     fn drop(&mut self) {
         self.renderer.destroy(&self.gl);
     }
 }
 
-pub struct Renderer<G, T = TrivialTextureMap, S = AutoShaderProvider<G>, C = TrivialCsm>
+pub struct Renderer<G, T = TrivialTextureMap, S = AutoShaderProvider<G>>
 where
     G: Gl,
     T: TextureMap,
     S: ShaderProvider<G>,
-    C: ContextStateManager<G>,
 {
     pub texture_map: T,
     pub shader_provider: S,
-    pub context_state_manager: C,
+    state_backup: GlStateBackup,
     pub vbo_handle: G::Buffer,
     pub ebo_handle: G::Buffer,
     pub font_atlas_texture: G::Texture,
@@ -237,12 +207,11 @@ where
     pub is_destroyed: bool,
 }
 
-impl<G, T, S, C> Renderer<G, T, S, C>
+impl<G, T, S> Renderer<G, T, S>
 where
     G: Gl,
     T: TextureMap,
     S: ShaderProvider<G>,
-    C: ContextStateManager<G>,
 {
     /// # Errors
     /// Any error initialising the OpenGL objects (including shaders) will
@@ -252,7 +221,6 @@ where
         imgui_context: &mut imgui::Context,
         mut texture_map: T,
         shader_provider: S,
-        context_state_manager: C,
     ) -> Result<Self, InitError> {
         #![allow(
             clippy::similar_names,
@@ -283,8 +251,8 @@ where
         #[cfg(not(feature = "clip_origin_support"))]
         let has_clip_origin_support = false;
 
-        let mut context_state_manager = context_state_manager;
-        context_state_manager.pre_init(gl, gl_version)?;
+        let mut state_backup = GlStateBackup::default();
+        state_backup.pre_init(gl);
 
         let font_atlas_texture = prepare_font_atlas(gl, imgui_context.fonts(), &mut texture_map)?;
 
@@ -293,12 +261,12 @@ where
         let vbo_handle = unsafe { gl.create_buffer() }.map_err(InitError::CreateBufferObject)?;
         let ebo_handle = unsafe { gl.create_buffer() }.map_err(InitError::CreateBufferObject)?;
 
-        context_state_manager.post_init(gl, gl_version)?;
+        state_backup.post_init(gl);
 
         let out = Self {
             texture_map,
             shader_provider,
-            context_state_manager,
+            state_backup,
             vbo_handle,
             ebo_handle,
             font_atlas_texture,
@@ -321,9 +289,6 @@ where
             return;
         }
 
-        let gl_version = self.gl_version;
-        self.context_state_manager.pre_destroy(gl, gl_version);
-
         if self.vbo_handle != 0 {
             unsafe { gl.delete_buffer(self.vbo_handle) };
             self.vbo_handle = 0;
@@ -340,8 +305,6 @@ where
             unsafe { gl.delete_texture(self.font_atlas_texture) };
             self.font_atlas_texture = 0;
         }
-
-        self.context_state_manager.post_destroy(gl, gl_version);
 
         self.is_destroyed = true;
     }
@@ -361,7 +324,7 @@ where
         }
 
         gl_debug_message(gl, "imgui-rs-glow: start render");
-        self.context_state_manager.pre_render(gl, self.gl_version)?;
+        self.state_backup.pre_render(gl, self.gl_version);
 
         self.set_up_render_state(gl, draw_data, fb_width, fb_height)?;
 
@@ -401,8 +364,7 @@ where
             unsafe { gl.delete_vertex_array(self.vertex_array_object) };
         }
 
-        self.context_state_manager
-            .post_render(gl, self.gl_version)?;
+        self.state_backup.post_render(gl, self.gl_version);
         gl_debug_message(gl, "imgui-rs-glow: complete render");
         Ok(())
     }
@@ -423,9 +385,6 @@ where
         if self.is_destroyed {
             return Err(Self::renderer_destroyed());
         }
-
-        self.context_state_manager
-            .pre_setup_render(gl, self.gl_version)?;
 
         unsafe {
             gl.active_texture(glow::TEXTURE0);
@@ -529,8 +488,7 @@ where
             );
         }
 
-        self.context_state_manager
-            .post_setup_render(gl, self.gl_version)
+        Ok(())
     }
 
     fn render_elements(
@@ -652,55 +610,20 @@ impl TextureMap for imgui::Textures<glow::Texture> {
     }
 }
 
-pub trait ContextStateManager<G: Gl> {
-    #![allow(unused_variables, clippy::missing_errors_doc)]
-
-    fn pre_init(&mut self, gl: &G, gl_version: GlVersion) -> Result<(), InitError> {
-        Ok(())
-    }
-
-    fn post_init(&mut self, gl: &G, gl_version: GlVersion) -> Result<(), InitError> {
-        Ok(())
-    }
-
-    fn pre_render(&mut self, gl: &G, gl_version: GlVersion) -> Result<(), RenderError> {
-        Ok(())
-    }
-
-    fn pre_setup_render(&mut self, gl: &G, gl_version: GlVersion) -> Result<(), RenderError> {
-        Ok(())
-    }
-
-    fn post_setup_render(&mut self, gl: &G, gl_version: GlVersion) -> Result<(), RenderError> {
-        Ok(())
-    }
-
-    fn post_render(&mut self, gl: &G, gl_version: GlVersion) -> Result<(), RenderError> {
-        Ok(())
-    }
-
-    fn pre_destroy(&mut self, gl: &G, gl_version: GlVersion) {}
-
-    fn post_destroy(&mut self, gl: &G, gl_version: GlVersion) {}
-}
-
-#[derive(Default)]
-pub struct TrivialCsm();
-
-impl<G: Gl> ContextStateManager<G> for TrivialCsm {}
-
-/// This `[ContextStateManager]` is based on the upstream OpenGL example from
+/// This OpenGL state backup is based on the upstream OpenGL example from
 /// imgui, where an attempt is made to save and restore the OpenGL context state
 /// before and after rendering.
 ///
 /// It is unlikely that any such attempt will be comprehensive for all possible
 /// applications, due to the complexity of OpenGL and the possibility of
 /// arbitrary extensions. However, it remains as a useful tool for quickly
-/// getting started, and a good example of how to use a `[ContextStateManager]` to
-/// customise the renderer.
+/// getting started. If your application needs more state to be backed up and
+/// restored, it is probably best to do this manually before/after calling
+/// the render method rather than opening an issue to add more to this
+/// struct.
 #[allow(clippy::struct_excessive_bools)]
 #[derive(Default)]
-pub struct StateBackupCsm {
+pub struct GlStateBackup {
     active_texture: i32,
     program: i32,
     texture: i32,
@@ -728,21 +651,19 @@ pub struct StateBackupCsm {
     vertex_array_object: Option<glow::VertexArray>,
 }
 
-impl<G: Gl> ContextStateManager<G> for StateBackupCsm {
-    fn pre_init(&mut self, gl: &G, _gl_version: GlVersion) -> Result<(), InitError> {
+impl GlStateBackup {
+    fn pre_init<G: Gl>(&mut self, gl: &G) {
         self.texture = unsafe { gl.get_parameter_i32(glow::TEXTURE_BINDING_2D) };
-        Ok(())
     }
 
-    fn post_init(&mut self, gl: &G, _gl_version: GlVersion) -> Result<(), InitError> {
-        #[allow(clippy::clippy::cast_sign_loss)]
+    fn post_init<G: Gl>(&mut self, gl: &G) {
+        #[allow(clippy::cast_sign_loss)]
         unsafe {
             gl.bind_texture(glow::TEXTURE_2D, Some(self.texture as _));
         }
-        Ok(())
     }
 
-    fn pre_render(&mut self, gl: &G, gl_version: GlVersion) -> Result<(), RenderError> {
+    fn pre_render<G: Gl>(&mut self, gl: &G, gl_version: GlVersion) {
         #[allow(clippy::cast_sign_loss)]
         unsafe {
             self.active_texture = gl.get_parameter_i32(glow::ACTIVE_TEXTURE);
@@ -791,10 +712,9 @@ impl<G: Gl> ContextStateManager<G> for StateBackupCsm {
                 self.primitive_restart_enabled = None;
             }
         }
-        Ok(())
     }
 
-    fn post_render(&mut self, gl: &G, _gl_version: GlVersion) -> Result<(), RenderError> {
+    fn post_render<G: Gl>(&mut self, gl: &G, _gl_version: GlVersion) {
         #![allow(clippy::cast_sign_loss)]
         unsafe {
             gl.use_program(Some(self.program as _));
@@ -869,7 +789,6 @@ impl<G: Gl> ContextStateManager<G> for StateBackupCsm {
                 self.scissor_box[3],
             );
         }
-        Ok(())
     }
 }
 

@@ -19,7 +19,6 @@ fn main() {
     let gl = utils::glow_context(&window);
 
     let mut ig_renderer = imgui_glow_renderer::RendererBuilder::new()
-        .with_context_state_manager(imgui_glow_renderer::StateBackupCsm::default())
         .build_borrowing(&gl, &mut imgui_context)
         .expect("failed to create renderer");
     // Note the shader header now needs a precision specifier

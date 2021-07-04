@@ -6,7 +6,7 @@ use std::{io::Cursor, time::Instant};
 use glow::HasContext;
 use image::{jpeg::JpegDecoder, ImageDecoder};
 use imgui::{im_str, Condition};
-use imgui_glow_renderer::{RendererBuilder, StateBackupCsm};
+use imgui_glow_renderer::RendererBuilder;
 
 pub mod utils;
 
@@ -18,7 +18,6 @@ fn main() {
     let gl = utils::glow_context(&window);
 
     let mut ig_renderer = RendererBuilder::new()
-        .with_context_state_manager(StateBackupCsm::default())
         .with_texture_map(imgui::Textures::<glow::Texture>::default())
         .build_borrowing(&gl, &mut imgui_context)
         .expect("failed to create renderer");
