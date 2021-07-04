@@ -614,6 +614,8 @@ impl TextureMap for imgui::Textures<glow::Texture> {
 /// imgui, where an attempt is made to save and restore the OpenGL context state
 /// before and after rendering.
 ///
+/// If you're writing your own renderer, you can likely streamline most of this.
+///
 /// It is unlikely that any such attempt will be comprehensive for all possible
 /// applications, due to the complexity of OpenGL and the possibility of
 /// arbitrary extensions. However, it remains as a useful tool for quickly
