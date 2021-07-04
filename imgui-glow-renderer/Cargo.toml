@@ -27,6 +27,7 @@ image = "0.23"
 # feature.
 default = [
   "gl_extensions_support",
+  "debug_message_insert_support",
   "bind_vertex_array_support",
   "vertex_offset_support",
   "clip_origin_support",
@@ -36,6 +37,8 @@ default = [
 ]
 # Enable checking for OpenGL extensions
 gl_extensions_support = []
+# Support for `glPrimitiveRestartIndex`
+debug_message_insert_support = []
 # Support for `glBindVertexArray`
 bind_vertex_array_support = []
 # Support for `glDrawElementsBaseVertex`

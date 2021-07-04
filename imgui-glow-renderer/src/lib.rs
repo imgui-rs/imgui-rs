@@ -1183,9 +1183,10 @@ fn prepare_font_atlas<G: Gl, T: TextureMap>(
     Ok(gl_texture)
 }
 
-fn gl_debug_message<G: glow::HasContext>(context: &G, message: impl AsRef<str>) {
+#[cfg(feature = "debug_message_insert_support")]
+fn gl_debug_message<G: glow::HasContext>(gl: &G, message: impl AsRef<str>) {
     unsafe {
-        context.debug_message_insert(
+        gl.debug_message_insert(
             glow::DEBUG_SOURCE_APPLICATION,
             glow::DEBUG_TYPE_MARKER,
             0,
@@ -1194,6 +1195,9 @@ fn gl_debug_message<G: glow::HasContext>(context: &G, message: impl AsRef<str>) 
         )
     };
 }
+
+#[cfg(not(feature = "debug_message_insert_support"))]
+fn gl_debug_message<G: glow::HasContext>(_gl: &G, _message: impl AsRef<str>) {}
 
 fn calculate_matrix(draw_data: &imgui::DrawData, clip_origin_is_lower_left: bool) -> [f32; 16] {
     #![allow(clippy::deprecated_cfg_attr)]

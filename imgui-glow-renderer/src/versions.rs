@@ -65,6 +65,13 @@ impl GlVersion {
         }
     }
 
+    /// Debug messages are provided by `glDebugMessageInsert`, which is only
+    /// present in OpenGL >= 4.3
+    #[cfg(feature = "debug_message_insert_support")]
+    pub fn debug_message_insert_support(self) -> bool {
+        self >= Self::gl(4, 3)
+    }
+
     /// Vertex array binding is provided by `glBindVertexArray`, which is
     /// not present in OpenGL (ES) <3.0
     #[cfg(feature = "bind_vertex_array_support")]
@@ -76,7 +83,7 @@ impl GlVersion {
     /// only present from OpenGL 3.2 and above.
     #[cfg(feature = "vertex_offset_support")]
     pub fn vertex_offset_support(self) -> bool {
-        !self.is_gles && self >= Self::gl(3, 2)
+        self >= Self::gl(3, 2)
     }
 
     /// Vertex arrays (e.g. `glBindVertexArray`) are supported from OpenGL 3.0
