@@ -53,54 +53,38 @@ impl<
 pub fn auto_renderer<G: Gl>(
     gl: G,
     imgui_context: &mut imgui::Context,
-) -> Result<OwningRenderer<G, TrivialTextureMap, AutoShaderProvider<G>>, InitError> {
+) -> Result<OwningRenderer<G, TrivialTextureMap>, InitError> {
     RendererBuilder::new().build_owning(gl, imgui_context)
 }
 
-pub struct RendererBuilder<G, T, S>
+pub struct RendererBuilder<G, T>
 where
     G: Gl,
     T: TextureMap,
-    S: ShaderProvider<G>,
 {
     texture_map: T,
-    shader_provider: S,
     phantom_gl: PhantomData<G>,
 }
 
-impl<G: Gl> RendererBuilder<G, TrivialTextureMap, AutoShaderProvider<G>> {
+impl<G: Gl> RendererBuilder<G, TrivialTextureMap> {
     #[allow(clippy::new_without_default)]
     #[must_use]
     pub fn new() -> Self {
         Self {
             texture_map: TrivialTextureMap(),
-            shader_provider: <AutoShaderProvider<G> as Default>::default(),
             phantom_gl: PhantomData::default(),
         }
     }
 }
 
-impl<G, T, S> RendererBuilder<G, T, S>
+impl<G, T> RendererBuilder<G, T>
 where
     G: Gl,
     T: TextureMap,
-    S: ShaderProvider<G>,
 {
-    pub fn with_texture_map<T2: TextureMap>(self, texture_map: T2) -> RendererBuilder<G, T2, S> {
+    pub fn with_texture_map<T2: TextureMap>(self, texture_map: T2) -> RendererBuilder<G, T2> {
         RendererBuilder {
             texture_map,
-            shader_provider: self.shader_provider,
-            phantom_gl: self.phantom_gl,
-        }
-    }
-
-    pub fn with_shader_provider<S2: ShaderProvider<G>>(
-        self,
-        shader_provider: S2,
-    ) -> RendererBuilder<G, T, S2> {
-        RendererBuilder {
-            texture_map: self.texture_map,
-            shader_provider,
             phantom_gl: self.phantom_gl,
         }
     }
@@ -115,9 +99,9 @@ where
         self,
         gl: G,
         imgui_context: &mut imgui::Context,
-    ) -> Result<OwningRenderer<G, T, S>, InitError> {
+    ) -> Result<OwningRenderer<G, T>, InitError> {
         let renderer = self.build_borrowing(&gl, imgui_context)?;
-        Ok(OwningRenderer::<G, T, S> { gl, renderer })
+        Ok(OwningRenderer::<G, T> { gl, renderer })
     }
 
     /// Build a renderer which needs to borrow a context in order to render.
@@ -129,8 +113,8 @@ where
         self,
         gl: &G,
         imgui_context: &mut imgui::Context,
-    ) -> Result<Renderer<G, T, S>, InitError> {
-        Renderer::<G, T, S>::initialize(gl, imgui_context, self.texture_map, self.shader_provider)
+    ) -> Result<Renderer<G, T>, InitError> {
+        Renderer::<G, T>::initialize(gl, imgui_context, self.texture_map)
     }
 }
 
@@ -140,21 +124,19 @@ where
 ///
 /// OpenGL context is still available to the rest of the application through
 /// the `[gl_context]` method.
-pub struct OwningRenderer<G, T = TrivialTextureMap, S = AutoShaderProvider<G>>
+pub struct OwningRenderer<G, T = TrivialTextureMap>
 where
     G: Gl,
     T: TextureMap,
-    S: ShaderProvider<G>,
 {
     gl: G,
-    renderer: Renderer<G, T, S>,
+    renderer: Renderer<G, T>,
 }
 
-impl<G, T, S> OwningRenderer<G, T, S>
+impl<G, T> OwningRenderer<G, T>
 where
     G: Gl,
     T: TextureMap,
-    S: ShaderProvider<G>,
 {
     /// Note: no need to provide a `mut` version of this, as all methods on
     /// `[glow::HasContext]` are immutable.
@@ -164,7 +146,7 @@ where
     }
 
     #[inline]
-    pub fn renderer(&self) -> &Renderer<G, T, S> {
+    pub fn renderer(&self) -> &Renderer<G, T> {
         &self.renderer
     }
 
@@ -177,25 +159,23 @@ where
     }
 }
 
-impl<G, T, S> Drop for OwningRenderer<G, T, S>
+impl<G, T> Drop for OwningRenderer<G, T>
 where
     G: Gl,
     T: TextureMap,
-    S: ShaderProvider<G>,
 {
     fn drop(&mut self) {
         self.renderer.destroy(&self.gl);
     }
 }
 
-pub struct Renderer<G, T = TrivialTextureMap, S = AutoShaderProvider<G>>
+pub struct Renderer<G, T = TrivialTextureMap>
 where
     G: Gl,
     T: TextureMap,
-    S: ShaderProvider<G>,
 {
     pub texture_map: T,
-    pub shader_provider: S,
+    shaders: Shaders<G>,
     state_backup: GlStateBackup,
     pub vbo_handle: G::Buffer,
     pub ebo_handle: G::Buffer,
@@ -207,11 +187,10 @@ where
     pub is_destroyed: bool,
 }
 
-impl<G, T, S> Renderer<G, T, S>
+impl<G, T> Renderer<G, T>
 where
     G: Gl,
     T: TextureMap,
-    S: ShaderProvider<G>,
 {
     /// # Errors
     /// Any error initialising the OpenGL objects (including shaders) will
@@ -220,7 +199,6 @@ where
         gl: &G,
         imgui_context: &mut imgui::Context,
         mut texture_map: T,
-        shader_provider: S,
     ) -> Result<Self, InitError> {
         #![allow(
             clippy::similar_names,
@@ -256,8 +234,7 @@ where
 
         let font_atlas_texture = prepare_font_atlas(gl, imgui_context.fonts(), &mut texture_map)?;
 
-        let mut shader_provider = shader_provider;
-        shader_provider.initialize(gl, gl_version)?;
+        let shaders = Shaders::new(gl, gl_version)?;
         let vbo_handle = unsafe { gl.create_buffer() }.map_err(InitError::CreateBufferObject)?;
         let ebo_handle = unsafe { gl.create_buffer() }.map_err(InitError::CreateBufferObject)?;
 
@@ -265,7 +242,7 @@ where
 
         let out = Self {
             texture_map,
-            shader_provider,
+            shaders,
             state_backup,
             vbo_handle,
             ebo_handle,
@@ -297,7 +274,7 @@ where
             unsafe { gl.delete_buffer(self.ebo_handle) };
             self.ebo_handle = 0;
         }
-        let program = self.shader_provider.data().program;
+        let program = self.shaders.program;
         if program != 0 {
             unsafe { gl.delete_program(program) };
         }
@@ -424,13 +401,12 @@ where
         let clip_origin_is_lower_left = true;
 
         let projection_matrix = calculate_matrix(draw_data, clip_origin_is_lower_left);
-        let shader_data = self.shader_provider.data();
 
         unsafe {
-            gl.use_program(Some(shader_data.program));
-            gl.uniform_1_i32(Some(&shader_data.texture_uniform_location), 0);
+            gl.use_program(Some(self.shaders.program));
+            gl.uniform_1_i32(Some(&self.shaders.texture_uniform_location), 0);
             gl.uniform_matrix_4_f32_slice(
-                Some(&shader_data.matrix_uniform_location),
+                Some(&self.shaders.matrix_uniform_location),
                 false,
                 &projection_matrix,
             );
@@ -459,27 +435,27 @@ where
         unsafe {
             gl.bind_buffer(glow::ARRAY_BUFFER, Some(self.vbo_handle));
             gl.bind_buffer(glow::ELEMENT_ARRAY_BUFFER, Some(self.ebo_handle));
-            gl.enable_vertex_attrib_array(shader_data.position_attribute_index);
+            gl.enable_vertex_attrib_array(self.shaders.position_attribute_index);
             gl.vertex_attrib_pointer_f32(
-                shader_data.position_attribute_index,
+                self.shaders.position_attribute_index,
                 2,
                 glow::FLOAT,
                 false,
                 size_of::<imgui::DrawVert>() as _,
                 position_field_offset,
             );
-            gl.enable_vertex_attrib_array(shader_data.uv_attribute_index);
+            gl.enable_vertex_attrib_array(self.shaders.uv_attribute_index);
             gl.vertex_attrib_pointer_f32(
-                shader_data.uv_attribute_index,
+                self.shaders.uv_attribute_index,
                 2,
                 glow::FLOAT,
                 false,
                 size_of::<imgui::DrawVert>() as _,
                 uv_field_offset,
             );
-            gl.enable_vertex_attrib_array(shader_data.color_attribute_index);
+            gl.enable_vertex_attrib_array(self.shaders.color_attribute_index);
             gl.vertex_attrib_pointer_f32(
-                shader_data.color_attribute_index,
+                self.shaders.color_attribute_index,
                 4,
                 glow::UNSIGNED_BYTE,
                 true,
@@ -794,32 +770,85 @@ impl GlStateBackup {
     }
 }
 
-pub trait ShaderProvider<G: Gl> {
-    /// Called during renderer initialization, before this call the shader
-    /// provide should be in a neutral state and have not interacted with the
-    /// OpenGL context.
-    ///
-    /// Implementors should use this opporunity to check whether the version of
-    /// the GL context (found with `[GlVersion::read]`) is compatible with the
-    /// shader they provide.
-    ///
-    /// # Errors
-    /// Any error creating the GL objects, compiling or linking or loading the
-    /// shaders, or an GL context with an incompatible OpenGL version will
-    /// result in an error.
-    fn initialize(&mut self, gl: &G, gl_version: GlVersion) -> Result<(), ShaderError>;
-
-    fn data(&self) -> &GenericShaderData<G>;
+/// Parses `GL_VERSION` and `GL_SHADING_LANGUAGE_VERSION` at runtime in order to
+/// generate shaders which should work on a wide variety of modern devices
+/// (GL >= 3.3 and GLES >= 2.0 are expected to work).
+struct Shaders<G: Gl> {
+    program: G::Program,
+    texture_uniform_location: G::UniformLocation,
+    matrix_uniform_location: G::UniformLocation,
+    position_attribute_index: u32,
+    uv_attribute_index: u32,
+    color_attribute_index: u32,
 }
 
-/// A generic shader provider that parses `GL_VERSION` and
-/// `GL_SHADING_LANGUAGE_VERSION` at runtime in order to generate shaders which
-/// should work on a wide variety of modern devices (GL >= 3.3 and GLES >= 2.0
-/// are expected to work).
-pub struct AutoShaderProvider<G: Gl>(GenericShaderData<G>);
+impl<G: Gl> Shaders<G> {
+    fn new(gl: &G, gl_version: GlVersion) -> Result<Self, ShaderError> {
+        let (vertex_source, fragment_source) = Self::get_shader_sources(gl, gl_version)?;
 
-impl<G: Gl> ShaderProvider<G> for AutoShaderProvider<G> {
-    fn initialize(&mut self, gl: &G, gl_version: GlVersion) -> Result<(), ShaderError> {
+        let vertex_shader =
+            unsafe { gl.create_shader(glow::VERTEX_SHADER) }.map_err(ShaderError::CreateShader)?;
+        unsafe {
+            gl.shader_source(vertex_shader, &vertex_source);
+            gl.compile_shader(vertex_shader);
+            if !gl.get_shader_compile_status(vertex_shader) {
+                return Err(ShaderError::CompileShader(
+                    gl.get_shader_info_log(vertex_shader),
+                ));
+            }
+        }
+
+        let fragment_shader = unsafe { gl.create_shader(glow::FRAGMENT_SHADER) }
+            .map_err(ShaderError::CreateShader)?;
+        unsafe {
+            gl.shader_source(fragment_shader, &fragment_source);
+            gl.compile_shader(fragment_shader);
+            if !gl.get_shader_compile_status(fragment_shader) {
+                return Err(ShaderError::CompileShader(
+                    gl.get_shader_info_log(fragment_shader),
+                ));
+            }
+        }
+
+        let program = unsafe { gl.create_program() }.map_err(ShaderError::CreateProgram)?;
+        unsafe {
+            gl.attach_shader(program, vertex_shader);
+            gl.attach_shader(program, fragment_shader);
+            gl.link_program(program);
+
+            if !gl.get_program_link_status(program) {
+                return Err(ShaderError::LinkProgram(gl.get_program_info_log(program)));
+            }
+
+            gl.detach_shader(program, vertex_shader);
+            gl.detach_shader(program, fragment_shader);
+            gl.delete_shader(vertex_shader);
+            gl.delete_shader(fragment_shader);
+        }
+
+        Ok(unsafe {
+            Self {
+                program,
+                texture_uniform_location: gl
+                    .get_uniform_location(program, "tex")
+                    .ok_or_else(|| ShaderError::UniformNotFound("tex".into()))?,
+                matrix_uniform_location: gl
+                    .get_uniform_location(program, "matrix")
+                    .ok_or_else(|| ShaderError::UniformNotFound("matrix".into()))?,
+                position_attribute_index: gl
+                    .get_attrib_location(program, "position")
+                    .ok_or_else(|| ShaderError::AttributeNotFound("position".into()))?,
+                uv_attribute_index: gl
+                    .get_attrib_location(program, "uv")
+                    .ok_or_else(|| ShaderError::AttributeNotFound("uv".into()))?,
+                color_attribute_index: gl
+                    .get_attrib_location(program, "color")
+                    .ok_or_else(|| ShaderError::AttributeNotFound("color".into()))?,
+            }
+        })
+    }
+
+    fn get_shader_sources(gl: &G, gl_version: GlVersion) -> Result<(String, String), ShaderError> {
         const VERTEX_BODY: &str = r#"
 layout (location = 0) in vec2 position;
 layout (location = 1) in vec2 uv;
@@ -897,170 +926,8 @@ void main() {
             body = FRAGMENT_BODY,
         );
 
-        create_shaders(&mut self.0, gl, &vertex_source, &fragment_source)
+        Ok((vertex_source, fragment_source))
     }
-
-    fn data(&self) -> &GenericShaderData<G> {
-        &self.0
-    }
-}
-
-impl<G: Gl> Default for AutoShaderProvider<G> {
-    fn default() -> Self {
-        Self(<GenericShaderData<G> as Default>::default())
-    }
-}
-
-/// A shader provider for specific shaders for OpenGL ES (GLSL ES) version(s)
-/// 3.0
-#[derive(Default)]
-pub struct Es3ShaderProvider<G: Gl>(GenericShaderData<G>);
-
-impl<G: Gl> ShaderProvider<G> for Es3ShaderProvider<G> {
-    fn initialize(&mut self, gl: &G, gl_version: GlVersion) -> Result<(), ShaderError> {
-        const VERTEX_SOURCE: &str = r#"#version 300 es
-precision mediump float;
-
-layout (location = 0) in vec2 position;
-layout (location = 1) in vec2 uv;
-layout (location = 2) in vec4 color;
-
-uniform mat4 matrix;
-out vec2 fragment_uv;
-out vec4 fragment_color;
-
-void main() {
-    fragment_uv = uv;
-    fragment_color = color;
-    gl_Position = matrix * vec4(position.xy, 0, 1);
-}
-"#;
-        const FRAGMENT_SOURCE: &str = r#"#version 300 es
-precision mediump float;
-
-in vec2 fragment_uv;
-in vec4 fragment_color;
-
-uniform sampler2D tex;
-layout (location = 0) out vec4 out_color;
-
-void main() {
-    out_color = fragment_color * texture(tex, fragment_uv.st);
-}
-"#;
-
-        if !gl_version.is_gles {
-            return Err(ShaderError::IncompatibleVersion(format!(
-                "A version of OpenGL ES is required for this shader, found: {}.{}",
-                gl_version.major, gl_version.minor
-            )));
-        }
-        if gl_version < GlVersion::gles(3, 0) {
-            return Err(ShaderError::IncompatibleVersion(format!(
-                "This shader requires OpenGL ES version 3.0 or higher, found: ES {}.{}",
-                gl_version.major, gl_version.minor
-            )));
-        }
-
-        create_shaders(&mut self.0, gl, VERTEX_SOURCE, FRAGMENT_SOURCE)
-    }
-
-    fn data(&self) -> &GenericShaderData<G> {
-        &self.0
-    }
-}
-
-pub struct GenericShaderData<G: Gl> {
-    pub program: G::Program,
-    pub texture_uniform_location: G::UniformLocation,
-    pub matrix_uniform_location: G::UniformLocation,
-    pub position_attribute_index: u32,
-    pub uv_attribute_index: u32,
-    pub color_attribute_index: u32,
-}
-
-impl<G: Gl> Default for GenericShaderData<G> {
-    fn default() -> Self {
-        Self {
-            program: Default::default(),
-            texture_uniform_location: Default::default(),
-            matrix_uniform_location: Default::default(),
-            position_attribute_index: Default::default(),
-            uv_attribute_index: Default::default(),
-            color_attribute_index: Default::default(),
-        }
-    }
-}
-
-/// # Errors
-/// Any error creating OpenGL objects, compiling, or linking the given shaders
-/// results in an error.
-pub fn create_shaders<G: Gl>(
-    data: &mut GenericShaderData<G>,
-    gl: &G,
-    vertex_source: &str,
-    fragment_source: &str,
-) -> Result<(), ShaderError> {
-    let vertex_shader =
-        unsafe { gl.create_shader(glow::VERTEX_SHADER) }.map_err(ShaderError::CreateShader)?;
-    unsafe {
-        gl.shader_source(vertex_shader, vertex_source);
-        gl.compile_shader(vertex_shader);
-        if !gl.get_shader_compile_status(vertex_shader) {
-            return Err(ShaderError::CompileShader(
-                gl.get_shader_info_log(vertex_shader),
-            ));
-        }
-    }
-
-    let fragment_shader =
-        unsafe { gl.create_shader(glow::FRAGMENT_SHADER) }.map_err(ShaderError::CreateShader)?;
-    unsafe {
-        gl.shader_source(fragment_shader, fragment_source);
-        gl.compile_shader(fragment_shader);
-        if !gl.get_shader_compile_status(fragment_shader) {
-            return Err(ShaderError::CompileShader(
-                gl.get_shader_info_log(fragment_shader),
-            ));
-        }
-    }
-
-    let program = unsafe { gl.create_program() }.map_err(ShaderError::CreateProgram)?;
-    unsafe {
-        gl.attach_shader(program, vertex_shader);
-        gl.attach_shader(program, fragment_shader);
-        gl.link_program(program);
-
-        if !gl.get_program_link_status(program) {
-            return Err(ShaderError::LinkProgram(gl.get_program_info_log(program)));
-        }
-
-        gl.detach_shader(program, vertex_shader);
-        gl.detach_shader(program, fragment_shader);
-        gl.delete_shader(vertex_shader);
-        gl.delete_shader(fragment_shader);
-    }
-
-    data.program = program;
-    unsafe {
-        data.texture_uniform_location = gl
-            .get_uniform_location(program, "tex")
-            .ok_or_else(|| ShaderError::UniformNotFound("tex".into()))?;
-        data.matrix_uniform_location = gl
-            .get_uniform_location(program, "matrix")
-            .ok_or_else(|| ShaderError::UniformNotFound("matrix".into()))?;
-        data.position_attribute_index = gl
-            .get_attrib_location(program, "position")
-            .ok_or_else(|| ShaderError::AttributeNotFound("position".into()))?;
-        data.uv_attribute_index = gl
-            .get_attrib_location(program, "uv")
-            .ok_or_else(|| ShaderError::AttributeNotFound("uv".into()))?;
-        data.color_attribute_index = gl
-            .get_attrib_location(program, "color")
-            .ok_or_else(|| ShaderError::AttributeNotFound("color".into()))?;
-    }
-
-    Ok(())
 }
 
 #[derive(Debug)]
