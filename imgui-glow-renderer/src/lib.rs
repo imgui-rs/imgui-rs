@@ -602,7 +602,7 @@ impl TextureMap for TrivialTextureMap {
 /// `Textures` from the `imgui` crate is a simple choice for a texture map
 impl TextureMap for imgui::Textures<glow::Texture> {
     fn gl_texture(&self, imgui_texture: imgui::TextureId) -> Option<glow::Texture> {
-        self.get(imgui_texture).cloned()
+        self.get(imgui_texture).copied()
     }
 
     fn register(&mut self, gl_texture: glow::Texture) -> Option<imgui::TextureId> {
