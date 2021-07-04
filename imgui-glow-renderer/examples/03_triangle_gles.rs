@@ -6,7 +6,7 @@
 
 use std::time::Instant;
 
-pub mod utils;
+mod utils;
 
 use utils::Triangler;
 

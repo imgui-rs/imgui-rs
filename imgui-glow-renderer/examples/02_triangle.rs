@@ -8,7 +8,7 @@ use std::time::Instant;
 
 use glow::HasContext;
 
-pub mod utils;
+mod utils;
 
 use utils::Triangler;
 

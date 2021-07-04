@@ -8,7 +8,8 @@ use image::{jpeg::JpegDecoder, ImageDecoder};
 use imgui::{im_str, Condition};
 use imgui_glow_renderer::RendererBuilder;
 
-pub mod utils;
+#[allow(dead_code)]
+mod utils;
 
 const LENNA_JPEG: &[u8] = include_bytes!("../../resources/Lenna.jpg");
 
