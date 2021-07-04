@@ -23,7 +23,11 @@ pub fn create_window(title: &str, gl_request: GlRequest) -> (EventLoop<()>, Wind
 }
 
 pub fn glow_context(window: &Window) -> glow::Context {
-    unsafe { glow::Context::from_loader_function(|s| window.get_proc_address(s).cast()) }
+    unsafe {
+        let gl = glow::Context::from_loader_function(|s| window.get_proc_address(s).cast());
+        gl.enable(glow::FRAMEBUFFER_SRGB);
+        gl
+    }
 }
 
 pub fn imgui_init(window: &Window) -> (WinitPlatform, imgui::Context) {
@@ -49,6 +53,7 @@ pub fn imgui_init(window: &Window) -> (WinitPlatform, imgui::Context) {
 pub struct Triangler {
     pub program: <glow::Context as HasContext>::Program,
     pub vertex_array: <glow::Context as HasContext>::VertexArray,
+    is_gles: bool,
 }
 
 impl Triangler {
@@ -61,18 +66,50 @@ const vec2 verts[3] = vec2[3](
 );
 
 out vec2 vert;
+out vec4 color;
+
+vec4 srgb_to_linear(vec4 srgb_color) {
+    // Calcuation as documented by OpenGL
+    vec3 srgb = srgb_color.rgb;
+    vec3 selector = ceil(srgb - 0.04045);
+    vec3 less_than_branch = srgb / 12.92;
+    vec3 greater_than_branch = pow((srgb + 0.055) / 1.055, vec3(2.4));
+    return vec4(
+        mix(less_than_branch, greater_than_branch, selector),
+        srgb_color.a
+    );
+}
 
 void main() {
     vert = verts[gl_VertexID];
+    color = srgb_to_linear(vec4(vert, 0.5, 1.0));
     gl_Position = vec4(vert - 0.5, 0.0, 1.0);
 }
 "#;
         const FRAGMENT_SHADER_SOURCE: &str = r#"
 in vec2 vert;
-out vec4 colour;
+in vec4 color;
+
+out vec4 frag_color;
+
+vec4 linear_to_srgb(vec4 linear_color) {
+#ifdef IS_GLES
+    vec3 linear = linear_color.rgb;
+    vec3 selector = ceil(linear - 0.0031308);
+    vec3 less_than_branch = linear * 12.92;
+    vec3 greater_than_branch = pow(linear, vec3(1.0/2.4)) * 1.055 - 0.055;
+    return vec4(
+        mix(less_than_branch, greater_than_branch, selector),
+        linear_color.a
+    );
+#else
+    // For non-GLES, GL_FRAMEBUFFER_SRGB handles this for free
+    return linear_color;
+#endif
+}
 
 void main() {
-    colour = vec4(vert, 0.5, 1.0);
+    frag_color = linear_to_srgb(color);
 }
 "#;
 
@@ -112,13 +149,21 @@ void main() {
             Self {
                 program,
                 vertex_array,
+                is_gles: imgui_glow_renderer::versions::GlVersion::read(gl).is_gles,
             }
         }
     }
 
     pub fn render(&self, gl: &glow::Context) {
         unsafe {
-            gl.clear_color(0.05, 0.05, 0.1, 1.0);
+            if self.is_gles {
+                // Specify clear color in sRGB space, since GL_FRAMEBUFFER_SRGB
+                // is not supported
+                gl.clear_color(0.05, 0.05, 0.1, 1.0);
+            } else {
+                // Specify clear color in linear space
+                gl.clear_color(0.004, 0.004, 0.01, 1.0);
+            }
             gl.clear(glow::COLOR_BUFFER_BIT);
             gl.use_program(Some(self.program));
             gl.bind_vertex_array(Some(self.vertex_array));

@@ -262,7 +262,7 @@ impl Lenna {
             gl.tex_image_2d(
                 glow::TEXTURE_2D,
                 0,
-                glow::RGB as _,
+                glow::SRGB as _,
                 width as _,
                 height as _,
                 0,

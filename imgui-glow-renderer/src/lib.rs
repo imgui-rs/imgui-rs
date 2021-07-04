@@ -793,9 +793,22 @@ uniform mat4 matrix;
 out vec2 fragment_uv;
 out vec4 fragment_color;
 
+// Because imgui only specifies linear colors
+vec4 srgb_to_linear(vec4 srgb_color) {
+    // Calcuation as documented by OpenGL
+    vec3 srgb = srgb_color.rgb;
+    vec3 selector = ceil(srgb - 0.04045);
+    vec3 less_than_branch = srgb / 12.92;
+    vec3 greater_than_branch = pow((srgb + 0.055) / 1.055, vec3(2.4));
+    return vec4(
+        mix(less_than_branch, greater_than_branch, selector),
+        srgb_color.a
+    );
+}
+
 void main() {
     fragment_uv = uv;
-    fragment_color = color;
+    fragment_color = srgb_to_linear(color);
     gl_Position = matrix * vec4(position.xy, 0, 1);
 }
 "#;
@@ -806,8 +819,24 @@ in vec4 fragment_color;
 uniform sampler2D tex;
 layout (location = 0) out vec4 out_color;
 
+vec4 linear_to_srgb(vec4 linear_color) {
+#ifdef IS_GLES
+    vec3 linear = linear_color.rgb;
+    vec3 selector = ceil(linear - 0.0031308);
+    vec3 less_than_branch = linear * 12.92;
+    vec3 greater_than_branch = pow(linear, vec3(1.0/2.4)) * 1.055 - 0.055;
+    return vec4(
+        mix(less_than_branch, greater_than_branch, selector),
+        linear_color.a
+    );
+#else
+    // For non-GLES, GL_FRAMEBUFFER_SRGB handles this for free
+    return linear_color;
+#endif
+}
+
 void main() {
-    out_color = fragment_color * texture(tex, fragment_uv.st);
+    out_color = linear_to_srgb(fragment_color * texture(tex, fragment_uv.st));
 }
 "#;
 
@@ -854,7 +883,7 @@ void main() {
             major = major,
             minor = minor * 10,
             es_extras = if is_gles {
-                " es\nprecision mediump float;"
+                " es\nprecision mediump float;\n#define IS_GLES"
             } else {
                 ""
             },
@@ -968,14 +997,14 @@ fn prepare_font_atlas<G: Gl, T: TextureMap>(
         gl.tex_image_2d(
             glow::TEXTURE_2D,
             0,
-            glow::RGBA as _,
+            glow::SRGB8_ALPHA8 as _,
             atlas_texture.width as _,
             atlas_texture.height as _,
             0,
             glow::RGBA,
             glow::UNSIGNED_BYTE,
             Some(atlas_texture.data),
-        )
+        );
     }
 
     fonts.tex_id = texture_map

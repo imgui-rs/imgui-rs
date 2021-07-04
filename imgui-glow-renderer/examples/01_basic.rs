@@ -20,6 +20,8 @@ fn main() {
 
     // OpenGL context from glow
     let gl = glow_context(&window);
+    // Outputting to screen, we want an sRGB framebuffer
+    unsafe { gl.enable(glow::FRAMEBUFFER_SRGB) };
 
     // OpenGL renderer from this crate
     let mut ig_renderer = imgui_glow_renderer::AutoRenderer::initialize(gl, &mut imgui_context)

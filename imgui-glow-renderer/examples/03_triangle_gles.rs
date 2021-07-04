@@ -12,7 +12,7 @@ use utils::Triangler;
 
 fn main() {
     let (event_loop, window) = utils::create_window(
-        "Hello, triangle!",
+        "Hello, triangle! (GLES 3.0)",
         glutin::GlRequest::Specific(glutin::Api::OpenGlEs, (3, 0)),
     );
     let (mut winit_platform, mut imgui_context) = utils::imgui_init(&window);
@@ -23,7 +23,10 @@ fn main() {
         imgui_glow_renderer::Renderer::initialize(&gl, &mut imgui_context, &mut texture_map)
             .expect("failed to create renderer");
     // Note the shader header now needs a precision specifier
-    let tri_renderer = Triangler::new(&gl, "#version 300 es\nprecision mediump float;");
+    let tri_renderer = Triangler::new(
+        &gl,
+        "#version 300 es\nprecision mediump float;\n#define IS_GLES",
+    );
 
     let mut last_frame = Instant::now();
     event_loop.run(move |event, _, control_flow| {
