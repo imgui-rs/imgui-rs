@@ -1,8 +1,4 @@
-//! A basic example showing imgui rendering together with some custom rendering.
-//!
-//! Note this example uses `RendererBuilder` rather than `auto_renderer` and
-//! (because we're using the default "trivial" `ContextStateManager`)
-//! therefore does not attempt to backup/restore OpenGL state.
+//! A basic example showing imgui rendering on top of a simple custom scene.
 
 use std::time::Instant;
 
@@ -40,21 +36,17 @@ fn main() {
                 window.window().request_redraw();
             }
             glutin::event::Event::RedrawRequested(_) => {
-                {
-                    let gl = ig_renderer.gl_context();
-                    // This is required because, without the `StateBackupCsm`
-                    // (which is provided by `auto_renderer` but not
-                    // `RendererBuilder` by default), the OpenGL context is left
-                    // in an arbitrary, dirty state
-                    unsafe { gl.disable(glow::SCISSOR_TEST) };
-                    tri_renderer.render(gl);
-                }
+                // Render your custom scene, note we need to borrow the OpenGL
+                // context from the `AutoRenderer`, which takes ownership of it.
+                tri_renderer.render(ig_renderer.gl_context());
 
                 let ui = imgui_context.frame();
                 ui.show_demo_window(&mut true);
 
                 winit_platform.prepare_render(&ui, window.window());
                 let draw_data = ui.render();
+
+                // Render imgui on top of it
                 ig_renderer
                     .render(&draw_data)
                     .expect("error rendering imgui");

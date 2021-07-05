@@ -1,7 +1,7 @@
-//! A basic example showing imgui rendering together with some custom rendering
+//! A basic example showing imgui rendering on top of a simple custom scene
 //! using OpenGL ES, rather than full-fat OpenGL.
 //!
-//! Note this example uses `Renderer` rather than `OwningRenderer` and
+//! Note this example uses `Renderer` rather than `AutoRenderer` and
 //! therefore requries more lifetime-management of the OpenGL context.
 
 use std::time::Instant;
@@ -18,15 +18,17 @@ fn main() {
     let (mut winit_platform, mut imgui_context) = utils::imgui_init(&window);
     let gl = utils::glow_context(&window);
 
+    // When using `Renderer`, we need to create a texture map
     let mut texture_map = imgui_glow_renderer::SimpleTextureMap::default();
+
+    // When using `Renderer`, we specify whether or not to output sRGB colors.
+    // Since we're drawing to screen and using OpenGL ES (which doesn't support
+    // `GL_FRAMEBUFFER_SRGB`) then we do need to convert to sRGB in the shader.
     let mut ig_renderer =
-        imgui_glow_renderer::Renderer::initialize(&gl, &mut imgui_context, &mut texture_map)
+        imgui_glow_renderer::Renderer::initialize(&gl, &mut imgui_context, &mut texture_map, true)
             .expect("failed to create renderer");
     // Note the shader header now needs a precision specifier
-    let tri_renderer = Triangler::new(
-        &gl,
-        "#version 300 es\nprecision mediump float;\n#define IS_GLES",
-    );
+    let tri_renderer = Triangler::new(&gl, "#version 300 es\nprecision mediump float;");
 
     let mut last_frame = Instant::now();
     event_loop.run(move |event, _, control_flow| {
@@ -47,6 +49,7 @@ fn main() {
                 window.window().request_redraw();
             }
             glutin::event::Event::RedrawRequested(_) => {
+                // Draw custom scene
                 tri_renderer.render(&gl);
 
                 let ui = imgui_context.frame();
@@ -54,6 +57,8 @@ fn main() {
 
                 winit_platform.prepare_render(&ui, window.window());
                 let draw_data = ui.render();
+
+                // Render imgui on top
                 ig_renderer
                     .render(&gl, &texture_map, &draw_data)
                     .expect("error rendering imgui");

@@ -1,5 +1,9 @@
 //! Example showing the same functionality as
 //! `imgui-examples/examples/custom_textures.rs`
+//!
+//! Not that the texture uses the internal format `glow::SRGB`, so that
+//! OpenGL automatically converts colors to linear space before the shaders.
+//! The renderer assumes you set this internal format correctly like this.
 
 use std::{io::Cursor, time::Instant};
 
@@ -18,9 +22,15 @@ fn main() {
     let (event_loop, window) = utils::create_window("Custom textures", glutin::GlRequest::Latest);
     let (mut winit_platform, mut imgui_context) = utils::imgui_init(&window);
     let gl = utils::glow_context(&window);
+    // This time, we tell OpenGL this is an sRGB framebuffer and OpenGL will
+    // do the conversion to sSGB space for us after the fragment shader.
+    unsafe { gl.enable(glow::FRAMEBUFFER_SRGB) };
 
     let mut textures = imgui::Textures::<glow::Texture>::default();
-    let mut ig_renderer = Renderer::initialize(&gl, &mut imgui_context, &mut textures)
+    // Note that `output_srgb` is `false`. This is because we set
+    // `glow::FRAMEBUFFER_SRGB` so we don't have to manually do the conversion
+    // in the shader.
+    let mut ig_renderer = Renderer::initialize(&gl, &mut imgui_context, &mut textures, false)
         .expect("failed to create renderer");
     let textures_ui = TexturesUi::new(&gl, &mut textures);
 
@@ -120,7 +130,7 @@ impl TexturesUi {
             gl.tex_image_2d(
                 glow::TEXTURE_2D,
                 0,
-                glow::RGB as _,
+                glow::RGB as _, // When generating a texture like this, you're probably working in linear color space
                 WIDTH as _,
                 HEIGHT as _,
                 0,
@@ -262,7 +272,7 @@ impl Lenna {
             gl.tex_image_2d(
                 glow::TEXTURE_2D,
                 0,
-                glow::SRGB as _,
+                glow::SRGB as _, // image file has sRGB encoded colors
                 width as _,
                 height as _,
                 0,

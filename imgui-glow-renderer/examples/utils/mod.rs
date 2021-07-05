@@ -23,11 +23,7 @@ pub fn create_window(title: &str, gl_request: GlRequest) -> (EventLoop<()>, Wind
 }
 
 pub fn glow_context(window: &Window) -> glow::Context {
-    unsafe {
-        let gl = glow::Context::from_loader_function(|s| window.get_proc_address(s).cast());
-        gl.enable(glow::FRAMEBUFFER_SRGB);
-        gl
-    }
+    unsafe { glow::Context::from_loader_function(|s| window.get_proc_address(s).cast()) }
 }
 
 pub fn imgui_init(window: &Window) -> (WinitPlatform, imgui::Context) {
@@ -53,7 +49,6 @@ pub fn imgui_init(window: &Window) -> (WinitPlatform, imgui::Context) {
 pub struct Triangler {
     pub program: <glow::Context as HasContext>::Program,
     pub vertex_array: <glow::Context as HasContext>::VertexArray,
-    is_gles: bool,
 }
 
 impl Triangler {
@@ -93,7 +88,6 @@ in vec4 color;
 out vec4 frag_color;
 
 vec4 linear_to_srgb(vec4 linear_color) {
-#ifdef IS_GLES
     vec3 linear = linear_color.rgb;
     vec3 selector = ceil(linear - 0.0031308);
     vec3 less_than_branch = linear * 12.92;
@@ -102,10 +96,6 @@ vec4 linear_to_srgb(vec4 linear_color) {
         mix(less_than_branch, greater_than_branch, selector),
         linear_color.a
     );
-#else
-    // For non-GLES, GL_FRAMEBUFFER_SRGB handles this for free
-    return linear_color;
-#endif
 }
 
 void main() {
@@ -149,21 +139,13 @@ void main() {
             Self {
                 program,
                 vertex_array,
-                is_gles: imgui_glow_renderer::versions::GlVersion::read(gl).is_gles,
             }
         }
     }
 
     pub fn render(&self, gl: &glow::Context) {
         unsafe {
-            if self.is_gles {
-                // Specify clear color in sRGB space, since GL_FRAMEBUFFER_SRGB
-                // is not supported
-                gl.clear_color(0.05, 0.05, 0.1, 1.0);
-            } else {
-                // Specify clear color in linear space
-                gl.clear_color(0.004, 0.004, 0.01, 1.0);
-            }
+            gl.clear_color(0.05, 0.05, 0.1, 1.0);
             gl.clear(glow::COLOR_BUFFER_BIT);
             gl.use_program(Some(self.program));
             gl.bind_vertex_array(Some(self.vertex_array));

@@ -1,3 +1,45 @@
+//! Renderer for `[imgui-rs]` using the `[glow]` library for OpenGL.
+//!
+//! This is heavily influenced by the
+//! [example from upstream](https://github.com/ocornut/imgui/blob/fe245914114588f272b0924538fdd43f6c127a26/backends/imgui_impl_opengl3.cpp).
+//!
+//! # Basic usage
+//!
+//! A few code examples are provided in the source.
+//!
+//! In short, create either an `[AutoRenderer]` (for basic usage) or `[Renderer]`
+//! (for slightly more customizable operation), then call the `render(...)`
+//! method with draw data from `imgui-rs`.
+//!
+//! # OpenGL (ES) versions
+//!
+//! This renderer is expected to work with OpenGL version 3.3 and above, and
+//! OpenGL ES version 3.0 or above. This should cover the vast majority of even
+//! fairly dated hardware. Please submit an issue for any incompatibilities
+//! found with these OpenGL versions, pull requests to extend support to earlier
+//! versions are welcomed.
+//!
+//! # Scope
+//!
+//! Consider this an example renderer. It is intended to be sufficent for simple
+//! applications running imgui-rs as the final rendering step. If your application
+//! has more specific needs, it's probably best to write your own renderer, in
+//! which case this can be a useful starting point.
+//!
+//! # sRGB
+//!
+//! When outputting colors to a screen, colors need to be converted from a
+//! linear color space to a non-linear space matching the monitor (e.g. sRGB).
+//! When using the `[AutoRenderer]`, this library will convert colors to sRGB
+//! as a step in the shader. When initialising a `[Renderer]`, you can choose
+//! whether or not to include this step in the shader or not when calling
+//! `[Renderer::initialize]`.
+//!
+//! This library also assumes that textures have their internal format
+//! set appropriately when uploaded to OpenGL. That is, assuming your texture
+//! is sRGB (if you don't know, it probably is) the `internal_format` is
+//! one of the `SRGB*` values.
+
 use std::{borrow::Cow, error::Error, fmt::Display, mem::size_of};
 
 use imgui::internal::RawWrapper;
@@ -38,9 +80,10 @@ impl<
 {
 }
 
-/// Renderer which owns the OpenGL context and handles textures itself.
-/// Useful for simple applications, but more complicated applications may prefer
-/// to use `[Renderer]`.
+/// Renderer which owns the OpenGL context and handles textures itself. Also
+/// converts all output colors to sRGB for display. Useful for simple applications,
+/// but more complicated applications may prefer to use `[Renderer]`, or even
+/// write their own renderer based on this code.
 ///
 /// OpenGL context is still available to the rest of the application through
 /// the `[gl_context]` method.
@@ -56,7 +99,7 @@ impl<G: Gl> AutoRenderer<G> {
     /// result in an error.
     pub fn initialize(gl: G, imgui_context: &mut imgui::Context) -> Result<Self, InitError> {
         let mut texture_map = SimpleTextureMap::default();
-        let renderer = Renderer::initialize(&gl, imgui_context, &mut texture_map)?;
+        let renderer = Renderer::initialize(&gl, imgui_context, &mut texture_map, true)?;
         Ok(Self {
             gl,
             texture_map,
@@ -101,6 +144,8 @@ impl<G: Gl> Drop for AutoRenderer<G> {
     }
 }
 
+/// Main renderer. Borrows the OpenGL context and [texture map](TextureMap)
+/// when required.
 pub struct Renderer<G: Gl> {
     shaders: Shaders<G>,
     state_backup: GlStateBackup,
@@ -115,6 +160,22 @@ pub struct Renderer<G: Gl> {
 }
 
 impl<G: Gl> Renderer<G> {
+    /// Create the renderer, initialising OpenGL objects and shaders.
+    ///
+    /// `output_srgb` controls whether the shader outputs sRGB colors, or linear
+    /// RGB colors. In short:
+    /// - If you're outputting to the screen and haven't specified the framebuffer
+    ///   is sRGB (e.g. with `gl.enable(glow::FRAMEBUFFER_SRGB)`), then you probably
+    ///   want `output_srgb=true`.
+    /// - If you're outputting to a screen with an sRGB framebuffer (e.g. with
+    ///   `gl.enable(glow::FRAMEBUFFER_SRGB)`), then you probably want
+    ///   `output_srgb=false`, as OpenGL will convert to sRGB itself.
+    /// - If you're not outputting to some intermediate framebuffer, then you
+    ///   probably want `output_srgb=false` to keep the colours in linear
+    ///   color space, and then convert them to sRGB at some later stage.
+    /// - OpenGL ES doesn't support sRGB framebuffers, so you almost always
+    ///   want `output_srgb=true`.
+    ///
     /// # Errors
     /// Any error initialising the OpenGL objects (including shaders) will
     /// result in an error.
@@ -122,6 +183,7 @@ impl<G: Gl> Renderer<G> {
         gl: &G,
         imgui_context: &mut imgui::Context,
         texture_map: &mut T,
+        output_srgb: bool,
     ) -> Result<Self, InitError> {
         #![allow(
             clippy::similar_names,
@@ -157,7 +219,7 @@ impl<G: Gl> Renderer<G> {
 
         let font_atlas_texture = prepare_font_atlas(gl, imgui_context.fonts(), texture_map)?;
 
-        let shaders = Shaders::new(gl, gl_version)?;
+        let shaders = Shaders::new(gl, gl_version, output_srgb)?;
         let vbo_handle = unsafe { gl.create_buffer() }.map_err(InitError::CreateBufferObject)?;
         let ebo_handle = unsafe { gl.create_buffer() }.map_err(InitError::CreateBufferObject)?;
 
@@ -183,6 +245,8 @@ impl<G: Gl> Renderer<G> {
         Ok(out)
     }
 
+    /// This must be called before being dropped to properly free OpenGL
+    /// resources.
     pub fn destroy(&mut self, gl: &G) {
         if self.is_destroyed {
             return;
@@ -487,37 +551,45 @@ impl<G: Gl> Renderer<G> {
     }
 }
 
+/// Trait for mapping imgui texture IDs to OpenGL textures.
+///
+/// `[register]` should be called after uploading a texture to OpenGL to get a
+/// `[imgui::TextureId]` corresponding to it.
+///
+/// Then `[gl_texture]` can be called to find the OpenGL texture corresponding to
+/// that `[imgui::TextureId]`.
 pub trait TextureMap {
-    fn gl_texture(&self, imgui_texture: imgui::TextureId) -> Option<glow::Texture>;
-
     fn register(&mut self, gl_texture: glow::Texture) -> Option<imgui::TextureId>;
+
+    fn gl_texture(&self, imgui_texture: imgui::TextureId) -> Option<glow::Texture>;
 }
 
-/// Texture map where the imgui texture ID is simply the OpenGL texture ID
+/// Texture map where the imgui texture ID is simply numerically equal to the
+/// OpenGL texture ID.
 #[derive(Default)]
 pub struct SimpleTextureMap();
 
 impl TextureMap for SimpleTextureMap {
     #[inline(always)]
+    fn register(&mut self, gl_texture: glow::Texture) -> Option<imgui::TextureId> {
+        Some(imgui::TextureId::new(gl_texture as _))
+    }
+
+    #[inline(always)]
     fn gl_texture(&self, imgui_texture: imgui::TextureId) -> Option<glow::Texture> {
         #[allow(clippy::cast_possible_truncation)]
         Some(imgui_texture.id() as _)
     }
-
-    #[inline(always)]
-    fn register(&mut self, gl_texture: glow::Texture) -> Option<imgui::TextureId> {
-        Some(imgui::TextureId::new(gl_texture as _))
-    }
 }
 
-/// `Textures` from the `imgui` crate is a simple choice for a texture map
+/// `[imgui::Textures]` is a simple choice for a texture map.
 impl TextureMap for imgui::Textures<glow::Texture> {
-    fn gl_texture(&self, imgui_texture: imgui::TextureId) -> Option<glow::Texture> {
-        self.get(imgui_texture).copied()
-    }
-
     fn register(&mut self, gl_texture: glow::Texture) -> Option<imgui::TextureId> {
         Some(self.insert(gl_texture))
+    }
+
+    fn gl_texture(&self, imgui_texture: imgui::TextureId) -> Option<glow::Texture> {
+        self.get(imgui_texture).copied()
     }
 }
 
@@ -718,8 +790,9 @@ struct Shaders<G: Gl> {
 }
 
 impl<G: Gl> Shaders<G> {
-    fn new(gl: &G, gl_version: GlVersion) -> Result<Self, ShaderError> {
-        let (vertex_source, fragment_source) = Self::get_shader_sources(gl, gl_version)?;
+    fn new(gl: &G, gl_version: GlVersion, output_srgb: bool) -> Result<Self, ShaderError> {
+        let (vertex_source, fragment_source) =
+            Self::get_shader_sources(gl, gl_version, output_srgb)?;
 
         let vertex_shader =
             unsafe { gl.create_shader(glow::VERTEX_SHADER) }.map_err(ShaderError::CreateShader)?;
@@ -783,7 +856,11 @@ impl<G: Gl> Shaders<G> {
         })
     }
 
-    fn get_shader_sources(gl: &G, gl_version: GlVersion) -> Result<(String, String), ShaderError> {
+    fn get_shader_sources(
+        gl: &G,
+        gl_version: GlVersion,
+        output_srgb: bool,
+    ) -> Result<(String, String), ShaderError> {
         const VERTEX_BODY: &str = r#"
 layout (location = 0) in vec2 position;
 layout (location = 1) in vec2 uv;
@@ -820,7 +897,6 @@ uniform sampler2D tex;
 layout (location = 0) out vec4 out_color;
 
 vec4 linear_to_srgb(vec4 linear_color) {
-#ifdef IS_GLES
     vec3 linear = linear_color.rgb;
     vec3 selector = ceil(linear - 0.0031308);
     vec3 less_than_branch = linear * 12.92;
@@ -829,14 +905,15 @@ vec4 linear_to_srgb(vec4 linear_color) {
         mix(less_than_branch, greater_than_branch, selector),
         linear_color.a
     );
-#else
-    // For non-GLES, GL_FRAMEBUFFER_SRGB handles this for free
-    return linear_color;
-#endif
 }
 
 void main() {
-    out_color = linear_to_srgb(fragment_color * texture(tex, fragment_uv.st));
+    vec4 linear_color = fragment_color * texture(tex, fragment_uv.st);
+#ifdef OUTPUT_SRGB
+    out_color = linear_to_srgb(linear_color);
+#else
+    out_color = linear_color;
+#endif
 }
 "#;
 
@@ -879,11 +956,16 @@ void main() {
             body = VERTEX_BODY,
         );
         let fragment_source = format!(
-            "#version {major}{minor}{es_extras}\n{body}",
+            "#version {major}{minor}{es_extras}{defines}\n{body}",
             major = major,
             minor = minor * 10,
             es_extras = if is_gles {
-                " es\nprecision mediump float;\n#define IS_GLES"
+                " es\nprecision mediump float;"
+            } else {
+                ""
+            },
+            defines = if output_srgb {
+                "\n#define OUTPUT_SRGB"
             } else {
                 ""
             },

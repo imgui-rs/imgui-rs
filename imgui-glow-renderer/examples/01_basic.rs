@@ -13,15 +13,13 @@ type Window = WindowedContext<glutin::PossiblyCurrent>;
 
 fn main() {
     // Common setup for creating a winit window and imgui context, not specifc
-    // to this renderer at all ecept that glutin is used to create the window
+    // to this renderer at all except that glutin is used to create the window
     // since it will give us access to a GL context
     let (event_loop, window) = create_window();
     let (mut winit_platform, mut imgui_context) = imgui_init(&window);
 
     // OpenGL context from glow
     let gl = glow_context(&window);
-    // Outputting to screen, we want an sRGB framebuffer
-    unsafe { gl.enable(glow::FRAMEBUFFER_SRGB) };
 
     // OpenGL renderer from this crate
     let mut ig_renderer = imgui_glow_renderer::AutoRenderer::initialize(gl, &mut imgui_context)
