@@ -64,7 +64,7 @@ pub fn init(title: &str) -> System {
     imgui.io_mut().font_global_scale = (1.0 / hidpi_factor) as f32;
 
     let render_sys = RenderSystem::init(&mut imgui, builder, &events_loop);
-    platform.attach_window(imgui.io_mut(), render_sys.window(), HiDpiMode::Rounded);
+    platform.attach_window(imgui.io_mut(), render_sys.window(), HiDpiMode::Default);
     System {
         events_loop,
         imgui,
