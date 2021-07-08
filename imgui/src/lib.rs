@@ -46,6 +46,7 @@ pub use self::widget::selectable::*;
 pub use self::widget::slider::*;
 pub use self::widget::tab::*;
 pub use self::widget::tree::*;
+pub use self::widget::misc::*;
 pub use self::window::child_window::*;
 pub use self::window::*;
 use internal::RawCast;
