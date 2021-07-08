@@ -2,8 +2,6 @@
 
 use std::time::Instant;
 
-use glow::HasContext;
-
 mod utils;
 
 use utils::Triangler;

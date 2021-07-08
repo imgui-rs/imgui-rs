@@ -164,17 +164,19 @@ impl<G: Gl> Renderer<G> {
     ///
     /// `output_srgb` controls whether the shader outputs sRGB colors, or linear
     /// RGB colors. In short:
-    /// - If you're outputting to the screen and haven't specified the framebuffer
+    /// - If you're outputting to a display and haven't specified the framebuffer
     ///   is sRGB (e.g. with `gl.enable(glow::FRAMEBUFFER_SRGB)`), then you probably
     ///   want `output_srgb=true`.
-    /// - If you're outputting to a screen with an sRGB framebuffer (e.g. with
+    /// - OpenGL ES doesn't support sRGB framebuffers, so you almost always
+    ///   want `output_srgb=true` if you're using OpenGL ES and you're outputting
+    ///   to a display.
+    /// - If you're outputting to a display with an sRGB framebuffer (e.g. with
     ///   `gl.enable(glow::FRAMEBUFFER_SRGB)`), then you probably want
     ///   `output_srgb=false`, as OpenGL will convert to sRGB itself.
-    /// - If you're not outputting to some intermediate framebuffer, then you
-    ///   probably want `output_srgb=false` to keep the colours in linear
-    ///   color space, and then convert them to sRGB at some later stage.
-    /// - OpenGL ES doesn't support sRGB framebuffers, so you almost always
-    ///   want `output_srgb=true`.
+    /// - If you're not outputting to a display, but instead to some intermediate
+    ///   framebuffer, then you probably want `output_srgb=false` to keep the
+    ///   colors in linear color space, and then convert them to sRGB at some
+    ///   later stage.
     ///
     /// # Errors
     /// Any error initialising the OpenGL objects (including shaders) will
