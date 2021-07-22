@@ -1,3 +1,4 @@
+pub mod button;
 pub mod color_editors;
 pub mod combo_box;
 pub mod drag;
