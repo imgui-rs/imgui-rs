@@ -9,23 +9,30 @@ use std::ffi::CString;
 /// # use imgui::*;
 /// # let mut imgui = Context::create();
 /// # let ui = imgui.frame();
-/// Button::new("Button Label", &50.0f32, &32.0f32);
+/// 
+/// Button::new("Button Label", &50.0f32, &32.0f32).build();
 /// ```
 #[derive(Copy, Clone, Debug)]
 #[must_use]
-pub struct Button
+pub struct Button<'a>
 {
-    
+    label: &'a str,
+    size_x: &'a f32,
+    size_y: &'a f32,
 }
 
-impl Button
+impl<'a> Button<'a>
 {
-    pub fn new(label: &str, size_x: &f32, size_y: &f32) -> bool
+    pub fn new(label: &'a str, size_x: &'a f32, size_y: &'a f32) -> Button<'a>
+    {
+        Button{label: label, size_x: size_x, size_y: size_y}
+    }
+
+    pub fn build(&self) -> bool
     {
         let mut result: bool = false;
-        let button_size: ImVec2 = ImVec2::new(*size_x,*size_y);
-        let button_label: CString = CString::new(label).expect("CString::new failed");
-        
+        let button_size: ImVec2 = ImVec2::new(*self.size_x, *self.size_y);
+        let button_label: CString = CString::new(self.label).expect("CString::new failed");
         unsafe
         {
             let label_pointer: *const i8 = button_label.as_ptr();
