@@ -30,7 +30,7 @@ impl<'a> Button<'a>
     {
         let mut result: bool = false;
         let button_size: ImVec2 = ImVec2::new(*self.size_x, *self.size_y);
-        let button_label: CString = CString::new(self.label).expect("CString::new failed");
+        let button_label: CString = CString::new(self.label).unwrap();
         unsafe
         {
             let label_pointer: *const i8 = button_label.as_ptr();
