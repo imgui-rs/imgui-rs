@@ -7,8 +7,6 @@ use std::ffi::CString;
 ///
 /// ```no_run
 /// # use imgui::*;
-/// # let mut imgui = Context::create();
-/// # let ui = imgui.frame();
 /// 
 /// Button::new("Button Label", &50.0f32, &32.0f32).build();
 /// ```
