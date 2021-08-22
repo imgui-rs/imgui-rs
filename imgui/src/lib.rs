@@ -21,7 +21,7 @@ pub use self::input::keyboard::*;
 pub use self::input::mouse::*;
 pub use self::input_widget::{
     InputFloat, InputFloat2, InputFloat3, InputFloat4, InputInt, InputInt2, InputInt3, InputInt4,
-    InputText, InputTextMultiline, InputTextFlags
+    InputText, InputTextFlags, InputTextMultiline,
 };
 pub use self::io::*;
 pub use self::layout::*;
@@ -41,12 +41,12 @@ pub use self::widget::drag::*;
 pub use self::widget::image::*;
 pub use self::widget::list_box::*;
 pub use self::widget::menu::*;
+pub use self::widget::misc::*;
 pub use self::widget::progress_bar::*;
 pub use self::widget::selectable::*;
 pub use self::widget::slider::*;
 pub use self::widget::tab::*;
 pub use self::widget::tree::*;
-pub use self::widget::misc::*;
 pub use self::window::child_window::*;
 pub use self::window::*;
 use internal::RawCast;
