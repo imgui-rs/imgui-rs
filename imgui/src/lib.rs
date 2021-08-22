@@ -21,7 +21,7 @@ pub use self::input::keyboard::*;
 pub use self::input::mouse::*;
 pub use self::input_widget::{
     InputFloat, InputFloat2, InputFloat3, InputFloat4, InputInt, InputInt2, InputInt3, InputInt4,
-    InputText, InputTextMultiline,
+    InputText, InputTextMultiline, InputTextFlags
 };
 pub use self::io::*;
 pub use self::layout::*;
