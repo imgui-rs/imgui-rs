@@ -11,20 +11,21 @@ jobs:
   clippy:
     name: Run linter
     runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        rust: ["1.48"]
+
     env:
       RUSTFLAGS: -D warnings
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-      - name: Checkout submodules
-        shell: bash
-        run: |
-          auth_header="$(git config --local --get http.https://github.com/.extraheader)"
-          git submodule sync --recursive
-          git -c "http.extraheader=$auth_header" -c protocol.version=2 submodule update --init --force --recursive --depth=1
+        with: {submodules: true}
       - uses: hecrj/setup-rust-action@v1
         with:
           components: clippy
+          rust-version: ${{ matrix.rust }}
       - name: Cache cargo directories
         uses: actions/cache@v2
         with:
@@ -55,19 +56,19 @@ jobs:
   rustfmt:
     name: Check rustfmt
     runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        rust: ["1.48"]
+
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-      # TODO: why not `with: {submodules: true}`
-      - name: Checkout submodules
-        shell: bash
-        run: |
-          auth_header="$(git config --local --get http.https://github.com/.extraheader)"
-          git submodule sync --recursive
-          git -c "http.extraheader=$auth_header" -c protocol.version=2 submodule update --init --force --recursive --depth=1
+        with: {submodules: true}
       - uses: hecrj/setup-rust-action@v1
         with:
           components: rustfmt
+          rust-version: ${{ matrix.rust }}
       - run: cargo fmt --all -- --check
 
   test:
@@ -82,6 +83,7 @@ jobs:
         rust:
           - stable
           - beta
+          - "1.48"
         os:
           - ubuntu-latest
           - macos-latest

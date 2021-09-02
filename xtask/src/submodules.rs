@@ -188,7 +188,11 @@ fn git_submodule_update_init_recursive() -> Result<()> {
     static NO_PROGRESS_FLAG: AtomicBool = AtomicBool::new(false);
 
     fn do_git_smu(with_progress_flag: bool) -> Result<()> {
-        let flag = with_progress_flag.then(|| "--progress");
+        let flag = if with_progress_flag {
+            Some("--progress")
+        } else {
+            None
+        };
         xshell::cmd!("git submodule update --init --recursive {flag...}")
             .echo_cmd(crate::verbose())
             .run()?;
