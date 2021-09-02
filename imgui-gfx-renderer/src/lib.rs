@@ -534,7 +534,7 @@ mod pipeline {
                         desc.color_targets[out.slot as usize] = Some(d);
                         out.slot += 1;
                     }
-                    Some(Err(fm)) => return Err(InitError::PixelExport(&"!known", Some(fm))),
+                    Some(Err(fm)) => return Err(InitError::PixelExport("!known", Some(fm))),
                     None => (),
                 }
             }

@@ -6,7 +6,7 @@ use crate::Direction;
 
 /// User interface style/colors
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Debug, Copy, Clone)]
 pub struct Style {
     /// Global alpha applies to everything
     pub alpha: f32,

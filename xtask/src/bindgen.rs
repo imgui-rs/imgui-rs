@@ -122,7 +122,7 @@ fn generate_binding_file(
     cmd.args(&["--ctypes-prefix", "cty"]);
 
     if let Some(name) = wasm_import_mod {
-        cmd.args(&["--wasm-import-module-name", &name]);
+        cmd.args(&["--wasm-import-module-name", name]);
     }
     for t in types {
         cmd.args(&["--whitelist-type", t]);

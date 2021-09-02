@@ -423,7 +423,7 @@ fn test_ini_load_save() {
 Pos=60,60
 Size=400,400
 Collapsed=0";
-    ctx.load_ini_settings(&data);
+    ctx.load_ini_settings(data);
     let mut buf = String::new();
     ctx.save_ini_settings(&mut buf);
     assert_eq!(data.trim(), buf.trim());
