@@ -39,7 +39,7 @@ impl GlVersion {
     ///
     /// Examples based on strings found in the wild:
     /// ```rust
-    /// # use glow_renderer::GlVersion;
+    /// # use imgui_glow_renderer::versions::GlVersion;
     /// let version = GlVersion::parse("4.6.0 NVIDIA 465.27");
     /// assert!(!version.is_gles);
     /// assert_eq!(version.major, 4);
@@ -153,7 +153,7 @@ impl GlslVersion {
     ///
     /// Examples based on strings found in the wild:
     /// ```rust
-    /// # use glow_renderer::GlslVersion;
+    /// # use imgui_glow_renderer::versions::GlslVersion;
     /// let version = GlslVersion::parse("4.60 NVIDIA");
     /// assert!(!version.is_gles);
     /// assert_eq!(version.major, 4);
