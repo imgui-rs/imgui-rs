@@ -1,10 +1,30 @@
 use bitflags::bitflags;
 use std::marker::PhantomData;
-use std::os::raw::{c_int, c_void};
+use std::ops::Range;
+use std::os::raw::{c_char, c_int, c_void};
 use std::ptr;
 
 use crate::sys;
 use crate::{ImStr, ImString, Ui};
+
+bitflags!(
+    /// Callback flags
+    pub struct InputTextCallback: u32 {
+        /// Call user function on pressing TAB (for completion handling)
+        const COMPLETION = sys::ImGuiInputTextFlags_CallbackCompletion;
+        /// Call user function on pressing Up/Down arrows (for history handling)
+        const HISTORY = sys::ImGuiInputTextFlags_CallbackHistory;
+        /// Call user function every time. User code may query cursor position, modify text buffer.
+        const ALWAYS = sys::ImGuiInputTextFlags_CallbackAlways;
+        /// Call user function to filter character.
+        const CHAR_FILTER = sys::ImGuiInputTextFlags_CallbackCharFilter;
+        /// Allow buffer capacity resize + notify when the string wants to be resized
+        const RESIZE = sys::ImGuiInputTextFlags_CallbackResize;
+        /// Callback on buffer edit (note that InputText already returns true on edit, the
+        /// callback is useful mainly to manipulate the underlying buffer while focus is active)
+        const EDIT = sys::ImGuiInputTextFlags_CallbackEdit;
+    }
+);
 
 bitflags!(
     /// Flags for text inputs
@@ -52,6 +72,308 @@ bitflags!(
     }
 );
 
+pub trait TextCallbackHandler {
+    /// Filters a char -- returning a `None` means that the char is removed,
+    /// and returning another char substitutes it out.
+    ///
+    /// The default implementation is a passthrough filter (ie, doesn't do anything).
+    fn char_filter(&mut self, c: char, _: &TextInformation<'_>) -> Option<char> {
+        Some(c)
+    }
+
+    /// Allows one to perform autocompletion work when the Tab key has been pressed.
+    fn on_completion(&mut self, _: &mut TextInformation<'_>) {}
+
+    /// A callback when one of the direction keys have been pressed.
+    fn on_history(&mut self, _: EventDirection, _: &mut TextInformation<'_>) {}
+
+    // fn on_always(&mut self, state: &mut TextCallbackState);
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub enum EventDirection {
+    Up,
+    Down,
+}
+
+pub struct TextInformation<'a> {
+    /// All of the flags that are POSSIBLY given in a callback.
+    pub flags: InputTextFlags,
+
+    /// The buffer itself. If you can access this mutably, you can
+    /// do things to the underlying buffer.
+    pub buf: TextCallbackBuffer<'a>,
+}
+
+#[repr(C)]
+pub struct UserData<'a> {
+    container: &'a mut ImString,
+    cback_handler: &'a mut dyn TextCallbackHandler,
+}
+
+struct CallbackData<'a> {
+    event_flag: InputTextCallback,
+    user_data: &'a mut UserData<'a>,
+}
+
+pub struct TextCallbackData<'a> {
+    pub event_flag: InputTextFlags,
+    pub flags: InputTextFlags,
+    pub user_data: UserData<'a>,
+    pub event_char: char,
+    pub event_key: EventDirection,
+    pub buf: TextCallbackBuffer<'a>,
+}
+
+pub struct TextCallbackBuffer<'a> {
+    buf: &'a mut str,
+    dirty: &'a mut bool,
+    cursor_pos: &'a mut i32,
+    selection_start: &'a mut i32,
+    selection_end: &'a mut i32,
+    callback_data: *mut sys::ImGuiInputTextCallbackData,
+}
+
+impl TextCallbackBuffer<'_> {
+    /// Get a reference to the text callback buffer's buf.
+    pub fn buf(&self) -> &str {
+        self.buf
+    }
+
+    /// Gives access to the underlying byte array MUTABLY.
+    /// This is very unsafe, and the following invariants must be
+    /// upheld:
+    /// 1. Keep the data utf8 valid.
+    /// 2. After editing the string, call [set_dirty].
+    ///
+    /// We present this string with a `str` interface immutably, which
+    /// actually somewhat weakens `trunc` operations on the string.
+    /// You can use [remove_chars] to handle this operation completely
+    /// safely for you. However, if this is still too limiting,
+    /// please submit an issue.
+    pub unsafe fn buf_mut(&mut self) -> &mut [u8] {
+        self.buf.as_bytes_mut()
+    }
+
+    /// Sets the dirty flag on the text to imgui, indicating that
+    /// it should reapply this string to its internal state.
+    ///
+    /// **NB:** You only need to use this method if you're using `[buf_mut]`.
+    /// If you use the helper methods [remove_chars] and [insert_chars],
+    /// this will be set for you. However, this is no downside to setting
+    /// the dirty flag spuriously except the minor CPU time imgui will spend.
+    pub fn set_dirty(&mut self) {
+        *self.dirty = true;
+    }
+
+    /// Gets a range of the selected text. See [selection_start_mut] and
+    /// [selection_end_mut] to mutably edit these values.
+    ///
+    /// This Range is given in `usize` so that it might be used in indexing
+    /// operations more easily. To quickly grab the selected text, use [selected].
+    pub fn selection(&self) -> Range<usize> {
+        *self.selection_start as usize..*self.selection_end as usize
+    }
+
+    /// Returns the selected text directly. Note that if no text is selected,
+    /// an empty str slice will be returned.
+    pub fn selected(&self) -> &str {
+        &self.buf[self.selection()]
+    }
+
+    /// Sets the cursor to select all. This is always a valid operation,
+    /// and so it takes an `&self`.
+    pub fn select_all(&self) {
+        unsafe {
+            sys::ImGuiInputTextCallbackData_SelectAll(self.callback_data);
+        }
+    }
+
+    /// Clears the selection. This is always a valid operation,
+    /// and so it takes an `&self`.
+    pub fn clear_selection(&self) {
+        unsafe {
+            sys::ImGuiInputTextCallbackData_ClearSelection(self.callback_data);
+        }
+    }
+
+    /// Checks if there is a selection within the text.
+    pub fn has_selection(&self) -> bool {
+        unsafe { sys::ImGuiInputTextCallbackData_HasSelection(self.callback_data) }
+    }
+
+    /// Inserts the given string at the given position. If this
+    /// would require the String to resize, it will be resized by calling the
+    /// Callback_Resize callback. This is automatically handled.
+    ///
+    /// ## Panics
+    /// Panics if the `pos` is not a char_boundary.
+    pub fn insert_chars(&mut self, pos: usize, s: &str) {
+        assert!(s.is_char_boundary(pos));
+        unsafe {
+            self.insert_chars_unsafe(pos, s);
+        }
+    }
+
+    /// Inserts the given string at the given position, unsafely. If this
+    /// would require the String to resize, it will be resized by calling the
+    /// Callback_Resize callback. This is automatically handled.
+    ///
+    /// It is up to the caller to confirm that the `pos` is a valid byte
+    /// position, or use [insert_chars] which will panic if it isn't.
+    pub unsafe fn insert_chars_unsafe(&mut self, pos: usize, s: &str) {
+        let start = s.as_ptr();
+        let end = start.add(s.len());
+
+        sys::ImGuiInputTextCallbackData_InsertChars(
+            self.callback_data,
+            pos as i32,
+            start as *const c_char,
+            end as *const c_char,
+        )
+    }
+
+    /// Removes the given number of characters from the string starting
+    /// at some byte pos.
+    ///
+    /// ## Panics
+    /// Panics if the `pos` is not a char boundary or if
+    /// there are not enough chars remaining.
+    pub fn remove_chars(&mut self, pos: usize, char_count: usize) {
+        let inner = &self.buf[pos..];
+        let byte_count = inner
+            .char_indices()
+            .nth(char_count)
+            .expect("not enough characters in string")
+            .0;
+
+        unsafe {
+            self.remove_chars_unchecked(pos, byte_count);
+        }
+    }
+
+    /// Removes the given number of bytes from the string starting
+    /// at some byte pos, without checking for utf8 validity. Use [remove_chars]
+    /// for a safe variant.
+    pub unsafe fn remove_chars_unchecked(&mut self, pos: usize, byte_count: usize) {
+        sys::ImGuiInputTextCallbackData_DeleteChars(
+            self.callback_data,
+            pos as i32,
+            byte_count as i32,
+        )
+    }
+
+    /// Get a reference to the text callback buffer's cursor pos.
+    pub fn cursor_pos(&self) -> usize {
+        *self.cursor_pos as usize
+    }
+
+    /// Set the text callback buffer's cursor pos.
+    pub fn set_cursor_pos(&mut self, cursor_pos: usize) {
+        *self.cursor_pos = cursor_pos as i32;
+    }
+
+    /// Get a mutable reference to the text callback buffer's selection start.
+    pub fn selection_start_mut(&mut self) -> &mut i32 {
+        self.selection_start
+    }
+
+    /// Get a mutable reference to the text callback buffer's selection start.
+    pub fn selection_end_mut(&mut self) -> &mut i32 {
+        self.selection_end
+    }
+}
+
+/// Currently, this might contain UB. We may be holdling two mutable pointers to the same
+/// data. Not sure yet though.
+extern "C" fn callback(data: *mut sys::ImGuiInputTextCallbackData) -> c_int {
+    // This is always safe to do because imgui promises that this is a valid pointer.
+    // let data = unsafe { *data };
+
+    // convert it to a friendlier type
+    let (mut text_info, callback_data) = unsafe {
+        let text_info = TextInformation {
+            flags: InputTextFlags::from_bits((*data).Flags as u32).unwrap(),
+            buf: TextCallbackBuffer {
+                buf: std::str::from_utf8_mut(std::slice::from_raw_parts_mut(
+                    (*data).Buf as *mut u8,
+                    (*data).BufSize as usize - 1,
+                ))
+                .expect("internal imgui error -- it boofed a utf8"),
+                dirty: &mut (*data).BufDirty,
+                cursor_pos: &mut (*data).CursorPos,
+                selection_start: &mut (*data).SelectionStart,
+                selection_end: &mut (*data).SelectionEnd,
+                callback_data: data,
+            },
+        };
+
+        let callback_data = CallbackData {
+            event_flag: InputTextCallback::from_bits((*data).EventFlag as u32).unwrap(),
+            user_data: &mut *((*data).UserData as *mut UserData),
+        };
+
+        (text_info, callback_data)
+    };
+
+    // check this callback.
+    match callback_data.event_flag {
+        InputTextCallback::ALWAYS => {
+            todo!()
+        }
+        InputTextCallback::RESIZE => {
+            unsafe {
+                let requested_size = (*data).BufSize as usize;
+                let buffer = &mut callback_data.user_data.container;
+                if requested_size > buffer.capacity_with_nul() {
+                    // Refresh the buffer's length to take into account changes made by dear imgui.
+                    buffer.refresh_len();
+                    buffer.reserve(requested_size - buffer.0.len());
+                    debug_assert!(buffer.capacity_with_nul() >= requested_size);
+                    (*data).Buf = buffer.as_mut_ptr();
+                    (*data).BufDirty = true;
+                }
+            }
+        }
+        InputTextCallback::CHAR_FILTER => {
+            let chr = unsafe { char::from_u32((*data).EventChar).unwrap() };
+            let new_data = match callback_data
+                .user_data
+                .cback_handler
+                .char_filter(chr, &text_info)
+            {
+                Some(value) => u32::from(value),
+                // 0 means "do not use this char" in imgui docs
+                None => 0,
+            };
+            // set the new char...
+            unsafe {
+                (*data).EventChar = new_data;
+            }
+        }
+        InputTextCallback::COMPLETION => {
+            // callback_data.user_data.cback_handler.on_completion(&mut)
+        }
+        InputTextCallback::HISTORY => {
+            let key = unsafe {
+                let key = (*data).EventKey as u32;
+                match key {
+                    sys::ImGuiKey_UpArrow => EventDirection::Up,
+                    sys::ImGuiKey_DownArrow => EventDirection::Down,
+                    _ => panic!("Unexpected key"),
+                }
+            };
+            callback_data
+                .user_data
+                .cback_handler
+                .on_history(key, &mut text_info);
+        }
+        _ => {}
+    }
+
+    0
+}
+
 macro_rules! impl_text_flags {
     ($InputType:ident) => {
         #[inline]
@@ -96,35 +418,35 @@ macro_rules! impl_text_flags {
             self
         }
 
-        #[inline]
-        pub fn callback_completion(mut self, value: bool) -> Self {
-            self.flags.set(InputTextFlags::CALLBACK_COMPLETION, value);
-            self
-        }
+        // #[inline]
+        // pub fn callback_completion(mut self, value: bool) -> Self {
+        //     self.flags.set(InputTextFlags::CALLBACK_COMPLETION, value);
+        //     self
+        // }
 
-        #[inline]
-        pub fn callback_history(mut self, value: bool) -> Self {
-            self.flags.set(InputTextFlags::CALLBACK_HISTORY, value);
-            self
-        }
+        // #[inline]
+        // pub fn callback_history(mut self, value: bool) -> Self {
+        //     self.flags.set(InputTextFlags::CALLBACK_HISTORY, value);
+        //     self
+        // }
 
-        #[inline]
-        pub fn callback_always(mut self, value: bool) -> Self {
-            self.flags.set(InputTextFlags::CALLBACK_ALWAYS, value);
-            self
-        }
+        // #[inline]
+        // pub fn callback_always(mut self, value: bool) -> Self {
+        //     self.flags.set(InputTextFlags::CALLBACK_ALWAYS, value);
+        //     self
+        // }
 
-        #[inline]
-        pub fn callback_char_filter(mut self, value: bool) -> Self {
-            self.flags.set(InputTextFlags::CALLBACK_CHAR_FILTER, value);
-            self
-        }
+        // #[inline]
+        // pub fn callback_char_filter(mut self, value: bool) -> Self {
+        //     self.flags.set(InputTextFlags::CALLBACK_CHAR_FILTER, value);
+        //     self
+        // }
 
-        #[inline]
-        pub fn resize_buffer(mut self, value: bool) -> Self {
-            self.flags.set(InputTextFlags::CALLBACK_RESIZE, value);
-            self
-        }
+        // #[inline]
+        // pub fn resize_buffer(mut self, value: bool) -> Self {
+        //     self.flags.set(InputTextFlags::CALLBACK_RESIZE, value);
+        //     self
+        // }
 
         #[inline]
         pub fn allow_tab_input(mut self, value: bool) -> Self {
@@ -187,30 +509,16 @@ macro_rules! impl_step_params {
     };
 }
 
-extern "C" fn resize_callback(data: *mut sys::ImGuiInputTextCallbackData) -> c_int {
-    unsafe {
-        if (*data).EventFlag == InputTextFlags::CALLBACK_RESIZE.bits() as i32 {
-            if let Some(buffer) = ((*data).UserData as *mut ImString).as_mut() {
-                let requested_size = (*data).BufSize as usize;
-                if requested_size > buffer.capacity_with_nul() {
-                    // Refresh the buffer's length to take into account changes made by dear imgui.
-                    buffer.refresh_len();
-                    buffer.reserve(requested_size - buffer.0.len());
-                    debug_assert!(buffer.capacity_with_nul() >= requested_size);
-                    (*data).Buf = buffer.as_mut_ptr();
-                    (*data).BufDirty = true;
-                }
-            }
-        }
-        0
-    }
-}
+static mut PASSTHROUGH_CALLBACK: PassthroughCallback = PassthroughCallback;
+pub struct PassthroughCallback;
+impl TextCallbackHandler for PassthroughCallback {}
 
 #[must_use]
 pub struct InputText<'ui, 'p> {
     label: &'p ImStr,
     hint: Option<&'p ImStr>,
     buf: &'p mut ImString,
+    callback_handler: &'p mut dyn TextCallbackHandler,
     flags: InputTextFlags,
     _phantom: PhantomData<&'ui Ui<'ui>>,
 }
@@ -220,8 +528,10 @@ impl<'ui, 'p> InputText<'ui, 'p> {
         InputText {
             label,
             hint: None,
+            // this is fine because no one else has access to this and imgui is single threaded.
+            callback_handler: unsafe { &mut PASSTHROUGH_CALLBACK },
             buf,
-            flags: InputTextFlags::empty(),
+            flags: InputTextFlags::CALLBACK_RESIZE,
             _phantom: PhantomData,
         }
     }
@@ -238,15 +548,36 @@ impl<'ui, 'p> InputText<'ui, 'p> {
     // TODO: boxed closure...?
     // pub fn callback(self) -> Self { }
 
+    #[inline]
+    pub fn callback(
+        mut self,
+        callbacks: InputTextCallback,
+        callback: &'p mut dyn TextCallbackHandler,
+    ) -> Self {
+        if callbacks.contains(InputTextCallback::COMPLETION) {
+            self.flags.insert(InputTextFlags::CALLBACK_COMPLETION);
+        }
+        if callbacks.contains(InputTextCallback::HISTORY) {
+            self.flags.insert(InputTextFlags::CALLBACK_HISTORY);
+        }
+        if callbacks.contains(InputTextCallback::ALWAYS) {
+            self.flags.insert(InputTextFlags::CALLBACK_ALWAYS);
+        }
+        if callbacks.contains(InputTextCallback::CHAR_FILTER) {
+            self.flags.insert(InputTextFlags::CALLBACK_CHAR_FILTER);
+        }
+        self.callback_handler = callback;
+        self
+    }
+
     pub fn build(self) -> bool {
         let (ptr, capacity) = (self.buf.as_mut_ptr(), self.buf.capacity_with_nul());
-        let (callback, data): (sys::ImGuiInputTextCallback, _) = {
-            if self.flags.contains(InputTextFlags::CALLBACK_RESIZE) {
-                (Some(resize_callback), self.buf as *mut _ as *mut c_void)
-            } else {
-                (None, ptr::null_mut())
-            }
+
+        let mut data = UserData {
+            container: self.buf,
+            cback_handler: self.callback_handler,
         };
+        let data = &mut data as *mut _ as *mut c_void;
 
         unsafe {
             let result = if let Some(hint) = self.hint {
@@ -256,7 +587,7 @@ impl<'ui, 'p> InputText<'ui, 'p> {
                     ptr,
                     capacity,
                     self.flags.bits() as i32,
-                    callback,
+                    Some(callback),
                     data,
                 )
             } else {
@@ -265,7 +596,7 @@ impl<'ui, 'p> InputText<'ui, 'p> {
                     ptr,
                     capacity,
                     self.flags.bits() as i32,
-                    callback,
+                    Some(callback),
                     data,
                 )
             };
@@ -304,7 +635,7 @@ impl<'ui, 'p> InputTextMultiline<'ui, 'p> {
         let (ptr, capacity) = (self.buf.as_mut_ptr(), self.buf.capacity_with_nul());
         let (callback, data): (sys::ImGuiInputTextCallback, _) = {
             if self.flags.contains(InputTextFlags::CALLBACK_RESIZE) {
-                (Some(resize_callback), self.buf as *mut _ as *mut c_void)
+                (Some(callback), self.buf as *mut _ as *mut c_void)
             } else {
                 (None, ptr::null_mut())
             }

@@ -81,7 +81,6 @@ fn main() {
                 // example, if you try to type into this input, the
                 // above interaction still counts the key presses.
                 ui.input_text(im_str!("##Dummy text input widget"), &mut text_buffer)
-                    .resize_buffer(true) // Auto-resize ImString as required
                     .hint(im_str!("Example text input"))
                     .build();
 
