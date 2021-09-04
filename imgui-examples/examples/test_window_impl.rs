@@ -377,7 +377,7 @@ fn show_test_window(ui: &Ui, state: &mut State, opened: &mut bool) {
             menu_bar.end();
         }
         ui.spacing();
-        if CollapsingHeader::new(im_str!("Help")).build(&ui) {
+        if CollapsingHeader::new(im_str!("Help")).build(ui) {
             ui.text_wrapped(im_str!(
                 "This window is being created by the show_test_window() \
                  function. Please refer to the code for programming \
@@ -386,7 +386,7 @@ fn show_test_window(ui: &Ui, state: &mut State, opened: &mut bool) {
             show_user_guide(ui);
         }
 
-        if CollapsingHeader::new(im_str!("Window options")).build(&ui) {
+        if CollapsingHeader::new(im_str!("Window options")).build(ui) {
             ui.checkbox(im_str!("No titlebar"), &mut state.no_titlebar);
             ui.same_line_with_pos(150.0);
             ui.checkbox(im_str!("No scrollbar"), &mut state.no_scrollbar);
@@ -399,14 +399,14 @@ fn show_test_window(ui: &Ui, state: &mut State, opened: &mut bool) {
             ui.checkbox(im_str!("No collapse"), &mut state.no_collapse);
             ui.checkbox(im_str!("No close"), &mut state.no_close);
 
-            TreeNode::new(im_str!("Style")).build(&ui, || {
+            TreeNode::new(im_str!("Style")).build(ui, || {
                 ui.show_default_style_editor();
             });
         }
-        if CollapsingHeader::new(im_str!("Widgets")).build(&ui) {
-            TreeNode::new(im_str!("Tree")).build(&ui, || {
+        if CollapsingHeader::new(im_str!("Widgets")).build(ui) {
+            TreeNode::new(im_str!("Tree")).build(ui, || {
                 for i in 0..5 {
-                    TreeNode::new(&im_str!("Child {}", i)).build(&ui, || {
+                    TreeNode::new(&im_str!("Child {}", i)).build(ui, || {
                         ui.text(im_str!("blah blah"));
                         ui.same_line();
                         if ui.small_button(im_str!("print")) {
@@ -416,7 +416,7 @@ fn show_test_window(ui: &Ui, state: &mut State, opened: &mut bool) {
                 }
             });
 
-            TreeNode::new(im_str!("Bullets")).build(&ui, || {
+            TreeNode::new(im_str!("Bullets")).build(ui, || {
                 ui.bullet_text(im_str!("Bullet point 1"));
                 ui.bullet_text(im_str!("Bullet point 2\nOn multiple lines"));
                 ui.bullet();
@@ -425,13 +425,13 @@ fn show_test_window(ui: &Ui, state: &mut State, opened: &mut bool) {
                 ui.bullet();
                 ui.small_button(im_str!("Button"));
             });
-            TreeNode::new(im_str!("Colored text")).build(&ui, || {
+            TreeNode::new(im_str!("Colored text")).build(ui, || {
                 ui.text_colored([1.0, 0.0, 1.0, 1.0], im_str!("Pink"));
                 ui.text_colored([1.0, 1.0, 0.0, 1.0], im_str!("Yellow"));
                 ui.text_disabled(im_str!("Disabled"));
             });
 
-            TreeNode::new(im_str!("Multi-line text")).build(&ui, || {
+            TreeNode::new(im_str!("Multi-line text")).build(ui, || {
                 ui.input_text_multiline(
                     im_str!("multiline"),
                     &mut state.text_multiline,
@@ -439,7 +439,7 @@ fn show_test_window(ui: &Ui, state: &mut State, opened: &mut bool) {
                 ).build();
             });
 
-            TreeNode::new(im_str!("Word wrapping")).build(&ui, || {
+            TreeNode::new(im_str!("Word wrapping")).build(ui, || {
                 ui.text_wrapped(im_str!(
                     "This text should automatically wrap on the edge of \
                      the window.The current implementation for text \
@@ -458,7 +458,7 @@ fn show_test_window(ui: &Ui, state: &mut State, opened: &mut bool) {
                 ui.text(im_str!("Test paragraph 2:"));
                 // TODO
             });
-            TreeNode::new(im_str!("UTF-8 Text")).build(&ui, || {
+            TreeNode::new(im_str!("UTF-8 Text")).build(ui, || {
                 ui.text_wrapped(im_str!(
                     "CJK text will only appear if the font was loaded \
                      with theappropriate CJK character ranges. Call \
@@ -551,7 +551,7 @@ fn show_test_window(ui: &Ui, state: &mut State, opened: &mut bool) {
             ColorEdit::new(im_str!("color 1"), &mut state.col1).build(ui);
             ColorEdit::new(im_str!("color 2"), &mut state.col2).build(ui);
 
-            TreeNode::new(im_str!("Multi-component Widgets")).build(&ui, || {
+            TreeNode::new(im_str!("Multi-component Widgets")).build(ui, || {
                 ui.input_float2(im_str!("input float2"), &mut state.vec2f)
                     .build();
                 ui.input_int2(im_str!("input int2"), &mut state.vec2i)
@@ -565,7 +565,7 @@ fn show_test_window(ui: &Ui, state: &mut State, opened: &mut bool) {
                 ui.spacing();
             });
 
-            TreeNode::new(im_str!("Color/Picker Widgets")).build(&ui, || {
+            TreeNode::new(im_str!("Color/Picker Widgets")).build(ui, || {
                 let s = &mut state.color_edit;
                 ui.checkbox(im_str!("With HDR"), &mut s.hdr);
                 ui.same_line();
@@ -667,26 +667,26 @@ CTRL+click on individual component to input value.\n",
             });
         }
 
-        if CollapsingHeader::new(im_str!("Layout")).build(&ui) {
-            TreeNode::new(im_str!("Tabs")).build(&ui, || {
-                TreeNode::new(im_str!("Basic")).build(&ui, || {
-                    TabBar::new(im_str!("basictabbar")).build(&ui, || {
-                        TabItem::new(im_str!("Avocado")).build(&ui, || {
+        if CollapsingHeader::new(im_str!("Layout")).build(ui) {
+            TreeNode::new(im_str!("Tabs")).build(ui, || {
+                TreeNode::new(im_str!("Basic")).build(ui, || {
+                    TabBar::new(im_str!("basictabbar")).build(ui, || {
+                        TabItem::new(im_str!("Avocado")).build(ui, || {
                             ui.text(im_str!("This is the Avocado tab!"));
                             ui.text(im_str!("blah blah blah blah blah"));
                         });
-                        TabItem::new(im_str!("Broccoli")).build(&ui, || {
+                        TabItem::new(im_str!("Broccoli")).build(ui, || {
                             ui.text(im_str!("This is the Broccoli tab!"));
                             ui.text(im_str!("blah blah blah blah blah"));
                         });
-                        TabItem::new(im_str!("Cucumber")).build(&ui, || {
+                        TabItem::new(im_str!("Cucumber")).build(ui, || {
                             ui.text(im_str!("This is the Cucumber tab!"));
                             ui.text(im_str!("blah blah blah blah blah"));
                         });
                     });
 
                 });
-                TreeNode::new(im_str!("Advanced & Close button")).build(&ui, || {
+                TreeNode::new(im_str!("Advanced & Close button")).build(ui, || {
 
                     ui.separator();
                     let s = &mut state.tabs;
@@ -722,17 +722,17 @@ CTRL+click on individual component to input value.\n",
                         f
                     };
 
-                    TabBar::new(im_str!("tabbar")).flags(flags).build(&ui, || {
-                        TabItem::new(im_str!("Artichoke")).opened(&mut s.artichoke_tab).build(&ui, || {
+                    TabBar::new(im_str!("tabbar")).flags(flags).build(ui, || {
+                        TabItem::new(im_str!("Artichoke")).opened(&mut s.artichoke_tab).build(ui, || {
                             ui.text(im_str!("This is the Artichoke tab!"));
                         });
-                        TabItem::new(im_str!("Beetroot")).opened(&mut s.beetroot_tab).build(&ui, || {
+                        TabItem::new(im_str!("Beetroot")).opened(&mut s.beetroot_tab).build(ui, || {
                             ui.text(im_str!("This is the Beetroot tab!"));
                         });
-                        TabItem::new(im_str!("Celery")).opened(&mut s.celery_tab).build(&ui, || {
+                        TabItem::new(im_str!("Celery")).opened(&mut s.celery_tab).build(ui, || {
                             ui.text(im_str!("This is the Celery tab!"));
                         });
-                        TabItem::new(im_str!("Daikon")).opened(&mut s.daikon_tab).build(&ui, || {
+                        TabItem::new(im_str!("Daikon")).opened(&mut s.daikon_tab).build(ui, || {
                             ui.text(im_str!("This is the Daikon tab!"));
                         });
                     });
@@ -740,8 +740,8 @@ CTRL+click on individual component to input value.\n",
                 });
             });
         }
-        if CollapsingHeader::new(im_str!("Popups & Modal windows")).build(&ui) {
-            TreeNode::new(im_str!("Popups")).build(&ui, || {
+        if CollapsingHeader::new(im_str!("Popups & Modal windows")).build(ui) {
+            TreeNode::new(im_str!("Popups")).build(ui, || {
                 ui.text_wrapped(im_str!(
                     "When a popup is active, it inhibits interacting \
                      with windows that are behind the popup. Clicking \
@@ -773,7 +773,7 @@ CTRL+click on individual component to input value.\n",
                 });
             });
 
-            TreeNode::new(im_str!("Modals")).build(&ui, || {
+            TreeNode::new(im_str!("Modals")).build(ui, || {
                 ui.text_wrapped(im_str!(
                     "Modal windows are like popups but the user cannot close \
                      them by clicking outside the window."

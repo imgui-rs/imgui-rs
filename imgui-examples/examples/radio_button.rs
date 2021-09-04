@@ -21,7 +21,7 @@ fn example_selector(run: &mut bool, ui: &mut Ui, state: &mut State) {
         .position([20.0, 20.0], Condition::Appearing)
         .size([700.0, 80.0], Condition::Appearing)
         .resizable(false);
-    w.build(&ui, || {
+    w.build(ui, || {
         let mut clicked = false;
         clicked |= ui.radio_button(
             im_str!("Example 1: Boolean radio buttons"),
@@ -39,7 +39,7 @@ fn example_1(ui: &Ui, state: &mut State) {
     let w = Window::new(im_str!("Example 1: Boolean radio buttons"))
         .size([700.0, 200.0], Condition::Appearing)
         .position([20.0, 120.0], Condition::Appearing);
-    w.build(&ui, || {
+    w.build(ui, || {
         ui.text_wrapped(im_str!(
             "Boolean radio buttons accept a boolean active state, which is passed as a value and \
              not as a mutable reference. This means that it's not updated automatically, so you \
@@ -65,7 +65,7 @@ fn example_2(ui: &Ui, state: &mut State) {
     let w = Window::new(im_str!("Example 2: Radio buttons"))
         .size([700.0, 300.0], Condition::Appearing)
         .position([20.0, 120.0], Condition::Appearing);
-    w.build(&ui, || {
+    w.build(ui, || {
         ui.text_wrapped(im_str!(
             "Normal radio buttons accept a mutable reference to state, and the value \
              corresponding to this button. They are very flexible, because the value can be any \

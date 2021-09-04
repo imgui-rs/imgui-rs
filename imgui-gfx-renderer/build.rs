@@ -39,7 +39,7 @@ mod hlsl_build {
         }
         fs::write(
             vertex_destination,
-            compile_shader(&src_data, &source_path, "VertexMain", "vs_4_0").unwrap_or_else(
+            compile_shader(&src_data, source_path, "VertexMain", "vs_4_0").unwrap_or_else(
                 |error_message| {
                     eprintln!("{}", error_message);
                     panic!("Vertex shader failed to compile");
@@ -53,7 +53,7 @@ mod hlsl_build {
         }
         fs::write(
             pixel_destination,
-            compile_shader(&src_data, &source_path, "PixelMain", "ps_4_0").unwrap_or_else(
+            compile_shader(&src_data, source_path, "PixelMain", "ps_4_0").unwrap_or_else(
                 |error_message| {
                     eprintln!("{}", error_message);
                     panic!("Pixel shader failed to compile");
