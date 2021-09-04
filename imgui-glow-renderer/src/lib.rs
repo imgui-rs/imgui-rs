@@ -45,40 +45,9 @@ use std::{borrow::Cow, error::Error, fmt::Display, mem::size_of};
 use imgui::internal::RawWrapper;
 
 use crate::versions::{GlVersion, GlslVersion};
+use glow::{Context, HasContext};
 
 pub mod versions;
-
-// TODO: document all the things!
-
-// This may be generics overkill, but I have to assume there's some reason that
-// `glow` hid the functions of `[glow::Context]` behind the `[glow::Context]`
-// trait. The specified types required here are necessary because otherwise
-// required initialisations or conversions in this crate can't be performed. In
-// any case, the OpenGL standard specifies these types, so there should be no
-// loss of generality.
-pub trait Gl:
-    glow::HasContext<
-    Texture = glow::Texture,
-    UniformLocation = glow::UniformLocation,
-    Program = glow::Program,
-    Buffer = glow::Buffer,
-    Sampler = glow::Sampler,
-    VertexArray = glow::VertexArray,
->
-{
-}
-impl<
-        G: glow::HasContext<
-            Texture = glow::Texture,
-            UniformLocation = glow::UniformLocation,
-            Program = glow::Program,
-            Buffer = glow::Buffer,
-            Sampler = glow::Sampler,
-            VertexArray = glow::VertexArray,
-        >,
-    > Gl for G
-{
-}
 
 /// Renderer which owns the OpenGL context and handles textures itself. Also
 /// converts all output colors to sRGB for display. Useful for simple applications,
@@ -87,17 +56,20 @@ impl<
 ///
 /// OpenGL context is still available to the rest of the application through
 /// the `[gl_context]` method.
-pub struct AutoRenderer<G: Gl> {
-    gl: G,
+pub struct AutoRenderer {
+    gl: glow::Context,
     texture_map: SimpleTextureMap,
-    renderer: Renderer<G>,
+    renderer: Renderer,
 }
 
-impl<G: Gl> AutoRenderer<G> {
+impl AutoRenderer {
     /// # Errors
     /// Any error initialising the OpenGL objects (including shaders) will
     /// result in an error.
-    pub fn initialize(gl: G, imgui_context: &mut imgui::Context) -> Result<Self, InitError> {
+    pub fn initialize(
+        gl: glow::Context,
+        imgui_context: &mut imgui::Context,
+    ) -> Result<Self, InitError> {
         let mut texture_map = SimpleTextureMap::default();
         let renderer = Renderer::initialize(&gl, imgui_context, &mut texture_map, true)?;
         Ok(Self {
@@ -110,7 +82,7 @@ impl<G: Gl> AutoRenderer<G> {
     /// Note: no need to provide a `mut` version of this, as all methods on
     /// `[glow::HasContext]` are immutable.
     #[inline]
-    pub fn gl_context(&self) -> &G {
+    pub fn gl_context(&self) -> &glow::Context {
         &self.gl
     }
 
@@ -125,7 +97,7 @@ impl<G: Gl> AutoRenderer<G> {
     }
 
     #[inline]
-    pub fn renderer(&self) -> &Renderer<G> {
+    pub fn renderer(&self) -> &Renderer {
         &self.renderer
     }
 
@@ -138,7 +110,7 @@ impl<G: Gl> AutoRenderer<G> {
     }
 }
 
-impl<G: Gl> Drop for AutoRenderer<G> {
+impl Drop for AutoRenderer {
     fn drop(&mut self) {
         self.renderer.destroy(&self.gl);
     }
@@ -146,20 +118,20 @@ impl<G: Gl> Drop for AutoRenderer<G> {
 
 /// Main renderer. Borrows the OpenGL context and [texture map](TextureMap)
 /// when required.
-pub struct Renderer<G: Gl> {
-    shaders: Shaders<G>,
+pub struct Renderer {
+    shaders: Shaders,
     state_backup: GlStateBackup,
-    pub vbo_handle: G::Buffer,
-    pub ebo_handle: G::Buffer,
-    pub font_atlas_texture: G::Texture,
+    pub vbo_handle: <Context as HasContext>::Buffer,
+    pub ebo_handle: <Context as HasContext>::Buffer,
+    pub font_atlas_texture: <Context as HasContext>::Texture,
     #[cfg(feature = "bind_vertex_array_support")]
-    pub vertex_array_object: G::VertexArray,
+    pub vertex_array_object: <Context as HasContext>::VertexArray,
     pub gl_version: GlVersion,
     pub has_clip_origin_support: bool,
     pub is_destroyed: bool,
 }
 
-impl<G: Gl> Renderer<G> {
+impl Renderer {
     /// Create the renderer, initialising OpenGL objects and shaders.
     ///
     /// `output_srgb` controls whether the shader outputs sRGB colors, or linear
@@ -182,7 +154,7 @@ impl<G: Gl> Renderer<G> {
     /// Any error initialising the OpenGL objects (including shaders) will
     /// result in an error.
     pub fn initialize<T: TextureMap>(
-        gl: &G,
+        gl: &Context,
         imgui_context: &mut imgui::Context,
         texture_map: &mut T,
         output_srgb: bool,
@@ -249,7 +221,7 @@ impl<G: Gl> Renderer<G> {
 
     /// This must be called before being dropped to properly free OpenGL
     /// resources.
-    pub fn destroy(&mut self, gl: &G) {
+    pub fn destroy(&mut self, gl: &Context) {
         if self.is_destroyed {
             return;
         }
@@ -279,7 +251,7 @@ impl<G: Gl> Renderer<G> {
     /// however)
     pub fn render<T: TextureMap>(
         &mut self,
-        gl: &G,
+        gl: &Context,
         texture_map: &T,
         draw_data: &imgui::DrawData,
     ) -> Result<(), RenderError> {
@@ -351,7 +323,7 @@ impl<G: Gl> Renderer<G> {
     /// result in an error.
     pub fn set_up_render_state(
         &mut self,
-        gl: &G,
+        gl: &Context,
         draw_data: &imgui::DrawData,
         fb_width: f32,
         fb_height: f32,
@@ -469,7 +441,7 @@ impl<G: Gl> Renderer<G> {
     #[allow(clippy::too_many_arguments)]
     fn render_elements<T: TextureMap>(
         &self,
-        gl: &G,
+        gl: &Context,
         texture_map: &T,
         element_count: usize,
         element_params: imgui::DrawCmdParams,
@@ -561,9 +533,15 @@ impl<G: Gl> Renderer<G> {
 /// Then `[gl_texture]` can be called to find the OpenGL texture corresponding to
 /// that `[imgui::TextureId]`.
 pub trait TextureMap {
-    fn register(&mut self, gl_texture: glow::Texture) -> Option<imgui::TextureId>;
+    fn register(
+        &mut self,
+        gl_texture: <Context as HasContext>::Texture,
+    ) -> Option<imgui::TextureId>;
 
-    fn gl_texture(&self, imgui_texture: imgui::TextureId) -> Option<glow::Texture>;
+    fn gl_texture(
+        &self,
+        imgui_texture: imgui::TextureId,
+    ) -> Option<<Context as HasContext>::Texture>;
 }
 
 /// Texture map where the imgui texture ID is simply numerically equal to the
@@ -639,18 +617,18 @@ pub struct GlStateBackup {
 }
 
 impl GlStateBackup {
-    fn pre_init<G: Gl>(&mut self, gl: &G) {
+    fn pre_init(&mut self, gl: &Context) {
         self.texture = unsafe { gl.get_parameter_i32(glow::TEXTURE_BINDING_2D) };
     }
 
-    fn post_init<G: Gl>(&mut self, gl: &G) {
+    fn post_init(&mut self, gl: &Context) {
         #[allow(clippy::cast_sign_loss)]
         unsafe {
             gl.bind_texture(glow::TEXTURE_2D, Some(self.texture as _));
         }
     }
 
-    fn pre_render<G: Gl>(&mut self, gl: &G, gl_version: GlVersion) {
+    fn pre_render(&mut self, gl: &Context, gl_version: GlVersion) {
         #[allow(clippy::cast_sign_loss)]
         unsafe {
             self.active_texture = gl.get_parameter_i32(glow::ACTIVE_TEXTURE);
@@ -701,7 +679,7 @@ impl GlStateBackup {
         }
     }
 
-    fn post_render<G: Gl>(&mut self, gl: &G, _gl_version: GlVersion) {
+    fn post_render(&mut self, gl: &Context, _gl_version: GlVersion) {
         #![allow(clippy::cast_sign_loss)]
         unsafe {
             gl.use_program(Some(self.program as _));
@@ -782,17 +760,17 @@ impl GlStateBackup {
 /// Parses `GL_VERSION` and `GL_SHADING_LANGUAGE_VERSION` at runtime in order to
 /// generate shaders which should work on a wide variety of modern devices
 /// (GL >= 3.3 and GLES >= 2.0 are expected to work).
-struct Shaders<G: Gl> {
-    program: G::Program,
-    texture_uniform_location: G::UniformLocation,
-    matrix_uniform_location: G::UniformLocation,
+struct Shaders {
+    program: <Context as HasContext>::Program,
+    texture_uniform_location: <Context as HasContext>::UniformLocation,
+    matrix_uniform_location: <Context as HasContext>::UniformLocation,
     position_attribute_index: u32,
     uv_attribute_index: u32,
     color_attribute_index: u32,
 }
 
-impl<G: Gl> Shaders<G> {
-    fn new(gl: &G, gl_version: GlVersion, output_srgb: bool) -> Result<Self, ShaderError> {
+impl Shaders {
+    fn new(gl: &Context, gl_version: GlVersion, output_srgb: bool) -> Result<Self, ShaderError> {
         let (vertex_source, fragment_source) =
             Self::get_shader_sources(gl, gl_version, output_srgb)?;
 
@@ -859,7 +837,7 @@ impl<G: Gl> Shaders<G> {
     }
 
     fn get_shader_sources(
-        gl: &G,
+        gl: &Context,
         gl_version: GlVersion,
         output_srgb: bool,
     ) -> Result<(String, String), ShaderError> {
@@ -1055,11 +1033,11 @@ impl From<ShaderError> for InitError {
 
 pub type RenderError = String;
 
-fn prepare_font_atlas<G: Gl, T: TextureMap>(
-    gl: &G,
+fn prepare_font_atlas<T: TextureMap>(
+    gl: &Context,
     mut fonts: imgui::FontAtlasRefMut,
     texture_map: &mut T,
-) -> Result<G::Texture, InitError> {
+) -> Result<<Context as HasContext>::Texture, InitError> {
     #![allow(clippy::cast_possible_wrap)]
 
     let atlas_texture = fonts.build_rgba32_texture();
