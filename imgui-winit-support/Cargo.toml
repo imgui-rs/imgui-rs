@@ -15,7 +15,7 @@ winit-19 = { version = ">= 0.16, < 0.20", package = "winit", optional = true }
 winit-20 = { version = ">= 0.20, < 0.22", package = "winit", optional = true }
 winit-22 = { version = "0.22", package = "winit", optional = true }
 winit-23 = { version = "0.23", package = "winit", optional = true }
-winit-24 = { version = "=0.24", package = "winit", optional = true }
+winit-24 = { version = "0.24", package = "winit", optional = true }
 winit-25 = { version = "0.25", package = "winit", optional = true }
 
 [features]

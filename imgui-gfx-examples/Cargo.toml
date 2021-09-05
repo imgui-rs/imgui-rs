@@ -22,7 +22,7 @@ glutin = "0.27"
 image = "0.23"
 imgui = { path = "../imgui" }
 imgui-gfx-renderer = { path = "../imgui-gfx-renderer" }
-imgui-winit-support = { path = "../imgui-winit-support", default-features = false, features = ["winit-24"] } # glutin still depends on winit 0.24
+imgui-winit-support = { path = "../imgui-winit-support" }
 old_school_gfx_glutin_ext = "0.27"
 
 [target.'cfg(windows)'.dev-dependencies]
