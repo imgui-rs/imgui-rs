@@ -102,8 +102,8 @@ Examples for the gfx backend are under the imgui-gfx-examples directory.
 cd imgui-gfx-examples
 cargo test
 
-cargo run --example hello_world
-cargo run --example test_window
+cargo run --example gfx_hello_world
+cargo run --example gfx_test_window
 ```
 
 Note to Windows users:  You will need to use the *MSVC ABI* version of the Rust
