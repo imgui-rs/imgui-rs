@@ -49,6 +49,12 @@ use glow::{Context, HasContext};
 
 pub mod versions;
 
+pub type GlBuffer = <Context as HasContext>::Buffer;
+pub type GlTexture = <Context as HasContext>::Texture;
+pub type GlVertexArray = <Context as HasContext>::VertexArray;
+type GlProgram = <Context as HasContext>::Program;
+type GlUniformLocation = <Context as HasContext>::Program;
+
 /// Renderer which owns the OpenGL context and handles textures itself. Also
 /// converts all output colors to sRGB for display. Useful for simple applications,
 /// but more complicated applications may prefer to use `[Renderer]`, or even
@@ -121,11 +127,11 @@ impl Drop for AutoRenderer {
 pub struct Renderer {
     shaders: Shaders,
     state_backup: GlStateBackup,
-    pub vbo_handle: <Context as HasContext>::Buffer,
-    pub ebo_handle: <Context as HasContext>::Buffer,
-    pub font_atlas_texture: <Context as HasContext>::Texture,
+    pub vbo_handle: GlBuffer,
+    pub ebo_handle: GlBuffer,
+    pub font_atlas_texture: GlTexture,
     #[cfg(feature = "bind_vertex_array_support")]
-    pub vertex_array_object: <Context as HasContext>::VertexArray,
+    pub vertex_array_object: GlVertexArray,
     pub gl_version: GlVersion,
     pub has_clip_origin_support: bool,
     pub is_destroyed: bool,
@@ -533,15 +539,9 @@ impl Renderer {
 /// Then `[gl_texture]` can be called to find the OpenGL texture corresponding to
 /// that `[imgui::TextureId]`.
 pub trait TextureMap {
-    fn register(
-        &mut self,
-        gl_texture: <Context as HasContext>::Texture,
-    ) -> Option<imgui::TextureId>;
+    fn register(&mut self, gl_texture: GlTexture) -> Option<imgui::TextureId>;
 
-    fn gl_texture(
-        &self,
-        imgui_texture: imgui::TextureId,
-    ) -> Option<<Context as HasContext>::Texture>;
+    fn gl_texture(&self, imgui_texture: imgui::TextureId) -> Option<GlTexture>;
 }
 
 /// Texture map where the imgui texture ID is simply numerically equal to the
@@ -761,9 +761,9 @@ impl GlStateBackup {
 /// generate shaders which should work on a wide variety of modern devices
 /// (GL >= 3.3 and GLES >= 2.0 are expected to work).
 struct Shaders {
-    program: <Context as HasContext>::Program,
-    texture_uniform_location: <Context as HasContext>::UniformLocation,
-    matrix_uniform_location: <Context as HasContext>::UniformLocation,
+    program: GlProgram,
+    texture_uniform_location: GlUniformLocation,
+    matrix_uniform_location: GlUniformLocation,
     position_attribute_index: u32,
     uv_attribute_index: u32,
     color_attribute_index: u32,
@@ -1037,7 +1037,7 @@ fn prepare_font_atlas<T: TextureMap>(
     gl: &Context,
     mut fonts: imgui::FontAtlasRefMut,
     texture_map: &mut T,
-) -> Result<<Context as HasContext>::Texture, InitError> {
+) -> Result<GlTexture, InitError> {
     #![allow(clippy::cast_possible_wrap)]
 
     let atlas_texture = fonts.build_rgba32_texture();
