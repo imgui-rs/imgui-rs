@@ -11,7 +11,7 @@ use imgui::*;
 mod support;
 
 fn main() {
-    let lots_of_words: Vec<String> = (0..10000).map(|x| format!("Line {}", x).into()).collect();
+    let lots_of_words: Vec<String> = (0..10000).map(|x| format!("Line {}", x)).collect();
 
     let system = support::init(file!());
     system.main_loop(move |_, ui| {
