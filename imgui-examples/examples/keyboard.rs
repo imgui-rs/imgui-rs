@@ -76,11 +76,23 @@ fn main() {
                     ctrl_a_counter
                 ));
 
+                struct Cback;
+                impl TextCallbackHandler for Cback {
+                    fn char_filter(&mut self, c: char, txt: &TextInformation<'_>) -> Option<char> {
+                        if c == 'a' {
+                            None
+                        } else {
+                            Some(c)
+                        }
+                    }
+                }
+
                 // Note that `is_key_released` gives the state of the
                 // key regardless of what widget has focus, for
                 // example, if you try to type into this input, the
                 // above interaction still counts the key presses.
                 ui.input_text(im_str!("##Dummy text input widget"), &mut text_buffer)
+                    .callback(InputTextCallback::CHAR_FILTER, &mut Cback)
                     .hint(im_str!("Example text input"))
                     .build();
 

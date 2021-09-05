@@ -116,14 +116,14 @@ struct CallbackData<'a> {
     user_data: &'a mut UserData<'a>,
 }
 
-pub struct TextCallbackData<'a> {
-    pub event_flag: InputTextFlags,
-    pub flags: InputTextFlags,
-    pub user_data: UserData<'a>,
-    pub event_char: char,
-    pub event_key: EventDirection,
-    pub buf: TextCallbackBuffer<'a>,
-}
+// pub struct TextCallbackData<'a> {
+//     pub event_flag: InputTextFlags,
+//     pub flags: InputTextFlags,
+//     pub user_data: UserData<'a>,
+//     pub event_char: char,
+//     pub event_key: EventDirection,
+//     pub buf: TextCallbackBuffer<'a>,
+// }
 
 pub struct TextCallbackBuffer<'a> {
     buf: &'a mut str,
@@ -295,10 +295,10 @@ extern "C" fn callback(data: *mut sys::ImGuiInputTextCallbackData) -> c_int {
         let text_info = TextInformation {
             flags: InputTextFlags::from_bits((*data).Flags as u32).unwrap(),
             buf: TextCallbackBuffer {
-                buf: std::str::from_utf8_mut(std::slice::from_raw_parts_mut(
+                buf: std::str::from_utf8_mut(dbg!(std::slice::from_raw_parts_mut(
                     (*data).Buf as *mut u8,
-                    (*data).BufSize as usize - 1,
-                ))
+                    (*data).BufSize as usize,
+                )))
                 .expect("internal imgui error -- it boofed a utf8"),
                 dirty: &mut (*data).BufDirty,
                 cursor_pos: &mut (*data).CursorPos,
