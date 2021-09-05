@@ -52,8 +52,8 @@ impl<'a, T: DataTypeKind> Slider<'a, T> {
     ///
     /// ```rust
     /// # use imgui::im_str;
-    /// imgui::Slider::new(im_str!("Example"))
-    ///     .range(i8::MIN, i8::MAX)
+    /// imgui::Slider::new(im_str!("Example"), i8::MIN, i8::MAX)
+    ///     .range(4, 8)
     ///     // Remember to call .build(&ui)
     ///     ;
     /// ```
@@ -131,6 +131,17 @@ pub struct VerticalSlider<'a, T: DataTypeKind + Copy> {
 
 impl<'a, T: DataTypeKind> VerticalSlider<'a, T> {
     /// Constructs a new vertical slider builder with the given size and range.
+    ///
+    /// ```rust
+    /// # use imgui::im_str;
+    /// imgui::VerticalSlider::new(im_str!("Example"), [20.0, 20.0], i8::MIN, i8::MAX)
+    ///     .range(4, 8)
+    ///     // Remember to call .build(&ui)
+    ///     ;
+    /// ```
+    ///
+    /// It is safe, though up to C++ Dear ImGui, on how to handle when
+    /// `min > max`.
     #[doc(alias = "VSliderScalar")]
     pub fn new(label: &ImStr, size: [f32; 2], min: T, max: T) -> VerticalSlider<T> {
         VerticalSlider {
@@ -143,11 +154,12 @@ impl<'a, T: DataTypeKind> VerticalSlider<'a, T> {
         }
     }
 
+    /// Sets the range for the vertical slider.
     ///
     /// ```rust
     /// # use imgui::im_str;
-    /// imgui::VerticalSlider::new(im_str!("Example"))
-    ///     .range(i8::MIN, i8::MAX)
+    /// imgui::VerticalSlider::new(im_str!("Example"), [20.0, 20.0], i8::MIN, i8::MAX)
+    ///     .range(4, 8)
     ///     // Remember to call .build(&ui)
     ///     ;
     /// ```
