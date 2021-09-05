@@ -1,7 +1,7 @@
 use std::os::raw::c_void;
 use std::ptr;
 
-use crate::internal::{DataTypeKind, InclusiveRangeBounds};
+use crate::internal::DataTypeKind;
 use crate::string::ImStr;
 use crate::sys;
 use crate::widget::slider::SliderFlags;
@@ -34,9 +34,9 @@ impl<'a, T: DataTypeKind> Drag<'a, T> {
     }
     /// Sets the range (inclusive)
     #[inline]
-    pub fn range<R: InclusiveRangeBounds<T>>(mut self, range: R) -> Self {
-        self.min = range.start_bound().copied();
-        self.max = range.end_bound().copied();
+    pub fn range(mut self, min: T, max: T) -> Self {
+        self.min = Some(min);
+        self.max = Some(max);
         self
     }
     /// Sets the value increment for a movement of one pixel.
@@ -140,9 +140,9 @@ impl<'a, T: DataTypeKind> DragRange<'a, T> {
         }
     }
     #[inline]
-    pub fn range<R: InclusiveRangeBounds<T>>(mut self, range: R) -> Self {
-        self.min = range.start_bound().copied();
-        self.max = range.end_bound().copied();
+    pub fn range(mut self, min: T, max: T) -> Self {
+        self.min = Some(min);
+        self.max = Some(max);
         self
     }
     /// Sets the value increment for a movement of one pixel.

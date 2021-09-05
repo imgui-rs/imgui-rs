@@ -2,7 +2,7 @@ use bitflags::bitflags;
 use std::os::raw::c_void;
 use std::ptr;
 
-use crate::internal::{DataTypeKind, InclusiveRangeBounds};
+use crate::internal::DataTypeKind;
 use crate::string::ImStr;
 use crate::sys;
 use crate::Ui;
@@ -38,42 +38,32 @@ pub struct Slider<'a, T: DataTypeKind> {
 impl<'a, T: DataTypeKind> Slider<'a, T> {
     /// Constructs a new slider builder with the given range.
     #[doc(alias = "SliderScalar", alias = "SliderScalarN")]
-    pub fn new(label: &ImStr) -> Slider<T> {
+    pub fn new(label: &ImStr, min: T, max: T) -> Slider<T> {
         Slider {
             label,
-            min: T::SLIDER_MIN,
-            max: T::SLIDER_MAX,
+            min,
+            max,
             display_format: None,
             flags: SliderFlags::empty(),
         }
     }
-    /// Sets the range (inclusive)
-    ///
-    /// The argument uses the standard Rust [`std::ops::Range`] syntax.
-    ///
-    /// For example, to set both the min and max values:
+    /// Sets the range inclusively, such that both values given
+    /// are valid values which the slider can be dragged to.
     ///
     /// ```rust
     /// # use imgui::im_str;
     /// imgui::Slider::new(im_str!("Example"))
-    ///     .range(1 ..= 10)
+    ///     .range(i8::MIN, i8::MAX)
     ///     // Remember to call .build(&ui)
     ///     ;
     /// ```
     ///
-    /// To set only the max value, using the default minimum value:
-    ///
-    /// ```rust
-    /// # use imgui::im_str;
-    /// imgui::Slider::new(im_str!("Example"))
-    ///     .range(..= 10)
-    ///     // Remember to call .build(&ui)
-    ///     ;
-    /// ```
+    /// It is safe, though up to C++ Dear ImGui, on how to handle when
+    /// `min > max`.
     #[inline]
-    pub fn range<R: InclusiveRangeBounds<T>>(mut self, range: R) -> Self {
-        self.min = range.start_bound().copied().unwrap_or(T::SLIDER_MIN);
-        self.max = range.end_bound().copied().unwrap_or(T::SLIDER_MAX);
+    pub fn range(mut self, min: T, max: T) -> Self {
+        self.min = min;
+        self.max = max;
         self
     }
     /// Sets the display format using *a C-style printf string*
@@ -142,21 +132,32 @@ pub struct VerticalSlider<'a, T: DataTypeKind + Copy> {
 impl<'a, T: DataTypeKind> VerticalSlider<'a, T> {
     /// Constructs a new vertical slider builder with the given size and range.
     #[doc(alias = "VSliderScalar")]
-    pub fn new(label: &ImStr, size: [f32; 2]) -> VerticalSlider<T> {
+    pub fn new(label: &ImStr, size: [f32; 2], min: T, max: T) -> VerticalSlider<T> {
         VerticalSlider {
             label,
             size,
-            min: T::SLIDER_MIN,
-            max: T::SLIDER_MAX,
+            min,
+            max,
             display_format: None,
             flags: SliderFlags::empty(),
         }
     }
-    /// Sets the range (inclusive)
+
+    ///
+    /// ```rust
+    /// # use imgui::im_str;
+    /// imgui::VerticalSlider::new(im_str!("Example"))
+    ///     .range(i8::MIN, i8::MAX)
+    ///     // Remember to call .build(&ui)
+    ///     ;
+    /// ```
+    ///
+    /// It is safe, though up to C++ Dear ImGui, on how to handle when
+    /// `min > max`.
     #[inline]
-    pub fn range<R: InclusiveRangeBounds<T>>(mut self, range: R) -> Self {
-        self.min = range.start_bound().copied().unwrap_or(T::SLIDER_MIN);
-        self.max = range.end_bound().copied().unwrap_or(T::SLIDER_MAX);
+    pub fn range(mut self, min: T, max: T) -> Self {
+        self.min = min;
+        self.max = max;
         self
     }
     /// Sets the display format using *a C-style printf string*
@@ -204,7 +205,8 @@ pub struct AngleSlider<'a> {
 }
 
 impl<'a> AngleSlider<'a> {
-    /// Constructs a new angle slider builder.
+    /// Constructs a new angle slider builder, where its minimum defaults to -360.0 and
+    /// maximum defaults to 360.0
     #[doc(alias = "SliderAngle")]
     pub fn new(label: &ImStr) -> AngleSlider {
         AngleSlider {
@@ -215,11 +217,21 @@ impl<'a> AngleSlider<'a> {
             flags: SliderFlags::empty(),
         }
     }
-    /// Sets the range (in degrees, inclusive)
+    /// Sets the range in degrees (inclusive)
+    /// ```rust
+    /// # use imgui::im_str;
+    /// imgui::AngleSlider::new(im_str!("Example"))
+    ///     .range_degrees(-20.0, 20.0)
+    ///     // Remember to call .build(&ui)
+    ///     ;
+    /// ```
+    ///
+    /// It is safe, though up to C++ Dear ImGui, on how to handle when
+    /// `min > max`.
     #[inline]
-    pub fn range_degrees<R: InclusiveRangeBounds<f32>>(mut self, range: R) -> Self {
-        self.min_degrees = range.start_bound().copied().unwrap_or(-360.0);
-        self.max_degrees = range.end_bound().copied().unwrap_or(360.0);
+    pub fn range_degrees(mut self, min_degrees: f32, max_degrees: f32) -> Self {
+        self.min_degrees = min_degrees;
+        self.max_degrees = max_degrees;
         self
     }
     /// Sets the minimum value (in degrees)
