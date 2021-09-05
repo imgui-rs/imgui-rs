@@ -141,6 +141,9 @@ impl TextCallbackBuffer<'_> {
     }
 
     /// Gives access to the underlying byte array MUTABLY.
+    ///
+    /// ## Safety
+    ///
     /// This is very unsafe, and the following invariants must be
     /// upheld:
     /// 1. Keep the data utf8 valid.
@@ -219,6 +222,8 @@ impl TextCallbackBuffer<'_> {
     /// would require the String to resize, it will be resized by calling the
     /// Callback_Resize callback. This is automatically handled.
     ///
+    /// ## Safety
+    ///
     /// It is up to the caller to confirm that the `pos` is a valid byte
     /// position, or use [insert_chars] which will panic if it isn't.
     pub unsafe fn insert_chars_unsafe(&mut self, pos: usize, s: &str) {
@@ -255,6 +260,11 @@ impl TextCallbackBuffer<'_> {
     /// Removes the given number of bytes from the string starting
     /// at some byte pos, without checking for utf8 validity. Use [remove_chars]
     /// for a safe variant.
+    ///
+    /// ## Safety
+    ///
+    /// It is up to the caller to ensure that the position is at a valid utf8 char_boundary
+    /// and that there are enough bytes within the string remaining.
     pub unsafe fn remove_chars_unchecked(&mut self, pos: usize, byte_count: usize) {
         sys::ImGuiInputTextCallbackData_DeleteChars(
             self.callback_data,
