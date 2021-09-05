@@ -386,10 +386,32 @@ impl<'a> CollapsingHeader<'a> {
         self.flags.set(TreeNodeFlags::FRAME_PADDING, value);
         self
     }
+
+    /// Begins the collapsing header.
+    ///
+    /// Returns true if the collapsing header is open and content should be rendered.
+    ///
+    /// This is the same as [build] but is provided for consistent naming.
+    #[must_use]
+    pub fn begin(self, ui: &Ui) -> bool {
+        self.build(ui)
+    }
+
+    /// Begins the collapsing header.
+    ///
+    /// Returns true if the collapsing header is open and content should be rendered.
+    ///
+    /// This is the same as [build_with_close_button] but is provided for consistent naming.
+    #[must_use]
+    pub fn begin_with_close_button(self, ui: &Ui, opened: &mut bool) -> bool {
+        self.build_with_close_button(ui, opened)
+    }
+
     /// Builds the collapsing header.
     ///
     /// Returns true if the collapsing header is open and content should be rendered.
     #[must_use]
+    #[inline]
     pub fn build(self, _: &Ui) -> bool {
         unsafe {
             sys::igCollapsingHeaderTreeNodeFlags(self.label.as_ptr(), self.flags.bits() as i32)
@@ -400,6 +422,7 @@ impl<'a> CollapsingHeader<'a> {
     ///
     /// Returns true if the collapsing header is open and content should be rendered.
     #[must_use]
+    #[inline]
     pub fn build_with_close_button(self, _: &Ui, opened: &mut bool) -> bool {
         unsafe {
             sys::igCollapsingHeaderBoolPtr(
@@ -408,5 +431,26 @@ impl<'a> CollapsingHeader<'a> {
                 self.flags.bits() as i32,
             )
         }
+    }
+}
+
+impl Ui<'_> {
+    /// Constructs a new collapsing header
+    #[doc(alias = "CollapsingHeader")]
+    pub fn collapsing_header(&self, label: &ImStr, flags: TreeNodeFlags) -> bool {
+        CollapsingHeader::new(label).flags(flags).build(self)
+    }
+
+    /// Constructs a new collapsing header
+    #[doc(alias = "CollapsingHeader")]
+    pub fn collapsing_header_with_close_button(
+        &self,
+        label: &ImStr,
+        flags: TreeNodeFlags,
+        opened: &mut bool,
+    ) -> bool {
+        CollapsingHeader::new(label)
+            .flags(flags)
+            .build_with_close_button(self, opened)
     }
 }
