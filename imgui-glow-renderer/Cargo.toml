@@ -1,0 +1,53 @@
+[package]
+name = "imgui-glow-renderer"
+version = "0.7.0"
+edition = "2018"
+authors = ["The imgui-rs Developers"]
+description = "glow renderer for the imgui crate"
+homepage = "https://github.com/imgui-rs/imgui-rs"
+repository = "https://github.com/imgui-rs/imgui-rs"
+license = "MIT/Apache-2.0"
+categories = ["gui", "rendering"]
+
+[dependencies]
+imgui = { version = "0.7.0", path = "../imgui" }
+glow = "0.10.0"
+memoffset = "0.6.4"
+
+[dev-dependencies]
+glutin = "0.26.0"
+imgui-winit-support = { version = "0.7.1", path = "../imgui-winit-support" }
+image = "0.23"
+
+[features]
+# Features here are used to opt-out of compiling code that depends on certain
+# OpenGL features. If the features are enabled, the renderer will check that the
+# feature is supported before attempting to use it. Only opt-out of any of these
+# if you are certain you will only target platforms that lack the corresponding
+# feature.
+default = [
+  "gl_extensions_support",
+  "debug_message_insert_support",
+  "bind_vertex_array_support",
+  "vertex_offset_support",
+  "clip_origin_support",
+  "bind_sampler_support",
+  "polygon_mode_support",
+  "primitive_restart_support",
+]
+# Enable checking for OpenGL extensions
+gl_extensions_support = []
+# Support for `glPrimitiveRestartIndex`
+debug_message_insert_support = []
+# Support for `glBindVertexArray`
+bind_vertex_array_support = []
+# Support for `glDrawElementsBaseVertex`
+vertex_offset_support = []
+# Support for `GL_CLIP_ORIGIN`
+clip_origin_support = []
+# Support for `glBindSampler`
+bind_sampler_support = []
+# Support for `glPolygonMode`
+polygon_mode_support = []
+# Support for `GL_PRIMITIVE_RESTART`
+primitive_restart_support = []

@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Added an `imgui-glow-renderer` which targets `glow 0.10`. Before release, this will be updated to target current `0.11` glow when further features are added. Thank you to @jmaargh for the work [implementing this here](https://github.com/imgui-rs/imgui-rs/pull/495)!
+
 - BREAKING: Reworked `.range` calls on `Slider`, `VerticalSlider`, and `Drag` to simply take two min and max values, and requires that they are provided in the constructor.
 
   - To update without changing behavior, use the range `T::MIN` and `T::MAX` for the given numerical type (such as `i8::MIN` and `i8::MAX`).
