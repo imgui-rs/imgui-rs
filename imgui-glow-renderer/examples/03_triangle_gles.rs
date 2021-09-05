@@ -60,7 +60,7 @@ fn main() {
 
                 // Render imgui on top
                 ig_renderer
-                    .render(&gl, &texture_map, &draw_data)
+                    .render(&gl, &texture_map, draw_data)
                     .expect("error rendering imgui");
 
                 window.swap_buffers().unwrap();

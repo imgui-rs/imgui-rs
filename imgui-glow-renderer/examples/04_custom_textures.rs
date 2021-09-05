@@ -61,7 +61,7 @@ fn main() {
                 winit_platform.prepare_render(&ui, window.window());
                 let draw_data = ui.render();
                 ig_renderer
-                    .render(&gl, &textures, &draw_data)
+                    .render(&gl, &textures, draw_data)
                     .expect("error rendering imgui");
 
                 window.swap_buffers().unwrap();

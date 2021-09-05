@@ -56,7 +56,7 @@ fn main() {
 
                 // This is the only extra render step to add
                 ig_renderer
-                    .render(&draw_data)
+                    .render(draw_data)
                     .expect("error rendering imgui");
 
                 window.swap_buffers().unwrap();
