@@ -79,10 +79,10 @@
 //!
 //! The following versions are supported, controlled by the listed feature.
 //!
-//! - The `winit-25` feature uses winit versions compatible with `0.25`.
-//! - The `winit-24` feature supports winit versions `0.24`. This is
+//! - The `winit-25` feature uses winit versions compatible with `0.25`. This is
 //!   on by default, so to use any other version you need to disable this crates
 //!   default features.
+//! - The `winit-24` feature supports winit versions `0.24`.
 //! - The `winit-23` feature uses winit versions compatible with `0.23`.
 //! - The `winit-22` feature uses winit versions compatible with `0.22`.
 //! - The `winit-20` feature should support winit either `0.20` or winit `0.21`.
@@ -95,7 +95,7 @@
 //! feature, fixing the configuration, or disabling `debug_assertions`.
 //!
 //! Conversely, if no `winit-*` features are enabled, we will fail to compile.
-//! This is not an issue generally, as by default we turn on `winit-24`.
+//! This is not an issue generally, as by default we turn on `winit-25`.
 //!
 //! All of this is in attempt to preserve the additive nature of features (while
 //! still helping users notice project configuration issues), however it's done
@@ -133,10 +133,10 @@
 //! - Changing the default feature to the new latest `winit` version is *not* a
 //!   breaking change.
 
-#[cfg(all(not(feature = "winit-24"), feature = "winit-25"))]
+#[cfg(feature = "winit-25")]
 use winit_25 as winit;
 
-#[cfg(feature = "winit-24")]
+#[cfg(all(not(feature = "winit-25"), feature = "winit-24"))]
 use winit_24 as winit;
 
 #[cfg(all(
@@ -194,22 +194,6 @@ use winit::{
     TouchPhase, VirtualKeyCode, Window, WindowEvent,
 };
 
-#[cfg(any(
-    feature = "winit-20",
-    feature = "winit-22",
-    feature = "winit-23",
-    feature = "winit-24",
-    feature = "winit-25"
-))]
-use winit::{
-    error::ExternalError,
-    event::{
-        DeviceEvent, ElementState, Event, KeyboardInput, MouseButton, MouseScrollDelta, TouchPhase,
-        VirtualKeyCode, WindowEvent,
-    },
-    window::{CursorIcon as MouseCursor, Window},
-};
-
 // Ensure at least one is enabled
 #[cfg(not(any(
     feature = "winit-19",
@@ -220,6 +204,15 @@ use winit::{
     feature = "winit-25",
 )))]
 compile_error!("Please enable at least one version of `winit` (see documentation for details).");
+
+use winit::{
+    error::ExternalError,
+    event::{
+        DeviceEvent, ElementState, Event, KeyboardInput, MouseButton, MouseScrollDelta, TouchPhase,
+        VirtualKeyCode, WindowEvent,
+    },
+    window::{CursorIcon as MouseCursor, Window},
+};
 
 // FIXME(thom): make updading winit and adding a new feature less of a hassle here.
 fn check_multiple_winits() {
@@ -258,8 +251,8 @@ fn check_multiple_winits() {
         (this likely indicates misconfiguration, see documentation for details)."
     );
     let feats = [
-        ("winit-25", cfg!(feature = "winit-25"), ""),
-        ("winit-24", cfg!(feature = "winit-24"), " (default)"),
+        ("winit-25", cfg!(feature = "winit-25"), " (default)"),
+        ("winit-24", cfg!(feature = "winit-24"), ""),
         ("winit-23", cfg!(feature = "winit-23"), ""),
         ("winit-22", cfg!(feature = "winit-22"), ""),
         ("winit-20", cfg!(feature = "winit-20"), ""),
@@ -270,7 +263,7 @@ fn check_multiple_winits() {
             let _ = writeln!(err, "    `feature = {:?}` is enabled{}", name, extra);
         }
     }
-    if cfg!(feature = "winit-24") && winits_enabled == 2 {
+    if cfg!(feature = "winit-25") && winits_enabled == 2 {
         let _ = writeln!(
             err,
             "    Perhaps you are missing a `default-features = false`?",

@@ -1,5 +1,5 @@
 [package]
-name = "examples"
+name = "imgui-examples"
 version = "0.0.0"
 edition = "2018"
 authors = ["The imgui-rs Developers"]
@@ -11,7 +11,7 @@ publish = false
 
 [dev-dependencies]
 clipboard = "0.5"
-glium = { version = "0.29", default-features = true }
+glium = { version = "0.30", default-features = true }
 image = "0.23"
 imgui = { path = "../imgui" }
 imgui-glium-renderer = { path = "../imgui-glium-renderer" }
