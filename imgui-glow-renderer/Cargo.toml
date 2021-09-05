@@ -15,7 +15,7 @@ glow = "0.10.0"
 memoffset = "0.6.4"
 
 [dev-dependencies]
-glutin = "0.26.0"
+glutin = "0.27.0"
 imgui-winit-support = { version = "0.7.1", path = "../imgui-winit-support" }
 image = "0.23"
 
