@@ -1,6 +1,5 @@
 //! Internal raw utilities (don't use unless you know what you're doing!)
 
-use std::ops::{RangeFrom, RangeInclusive, RangeToInclusive};
 use std::slice;
 
 /// A generic version of the raw imgui-sys ImVector struct types
@@ -127,94 +126,34 @@ pub enum DataType {
 /// representation in memory as the primitive value described by the associated `KIND` constant.
 pub unsafe trait DataTypeKind: Copy {
     const KIND: DataType;
-    const SLIDER_MIN: Self;
-    const SLIDER_MAX: Self;
 }
 unsafe impl DataTypeKind for i8 {
     const KIND: DataType = DataType::I8;
-    const SLIDER_MIN: Self = std::i8::MIN;
-    const SLIDER_MAX: Self = std::i8::MAX;
 }
 unsafe impl DataTypeKind for u8 {
     const KIND: DataType = DataType::U8;
-    const SLIDER_MIN: Self = std::u8::MIN;
-    const SLIDER_MAX: Self = std::u8::MAX;
 }
 unsafe impl DataTypeKind for i16 {
     const KIND: DataType = DataType::I16;
-    const SLIDER_MIN: Self = std::i16::MIN;
-    const SLIDER_MAX: Self = std::i16::MAX;
 }
 unsafe impl DataTypeKind for u16 {
     const KIND: DataType = DataType::U16;
-    const SLIDER_MIN: Self = std::u16::MIN;
-    const SLIDER_MAX: Self = std::u16::MAX;
 }
 unsafe impl DataTypeKind for i32 {
     const KIND: DataType = DataType::I32;
-    const SLIDER_MIN: Self = std::i32::MIN / 2;
-    const SLIDER_MAX: Self = std::i32::MAX / 2;
 }
 unsafe impl DataTypeKind for u32 {
     const KIND: DataType = DataType::U32;
-    const SLIDER_MIN: Self = std::u32::MIN / 2;
-    const SLIDER_MAX: Self = std::u32::MAX / 2;
 }
 unsafe impl DataTypeKind for i64 {
     const KIND: DataType = DataType::I64;
-    const SLIDER_MIN: Self = std::i64::MIN / 2;
-    const SLIDER_MAX: Self = std::i64::MAX / 2;
 }
 unsafe impl DataTypeKind for u64 {
     const KIND: DataType = DataType::U64;
-    const SLIDER_MIN: Self = std::u64::MIN / 2;
-    const SLIDER_MAX: Self = std::u64::MAX / 2;
 }
 unsafe impl DataTypeKind for f32 {
     const KIND: DataType = DataType::F32;
-    const SLIDER_MIN: Self = std::f32::MIN / 2.0;
-    const SLIDER_MAX: Self = std::f32::MAX / 2.0;
 }
 unsafe impl DataTypeKind for f64 {
     const KIND: DataType = DataType::F64;
-    const SLIDER_MIN: Self = std::f64::MIN / 2.0;
-    const SLIDER_MAX: Self = std::f64::MAX / 2.0;
-}
-
-pub trait InclusiveRangeBounds<T: Copy> {
-    fn start_bound(&self) -> Option<&T>;
-    fn end_bound(&self) -> Option<&T>;
-}
-
-impl<T: Copy> InclusiveRangeBounds<T> for RangeFrom<T> {
-    #[inline]
-    fn start_bound(&self) -> Option<&T> {
-        Some(&self.start)
-    }
-    #[inline]
-    fn end_bound(&self) -> Option<&T> {
-        None
-    }
-}
-
-impl<T: Copy> InclusiveRangeBounds<T> for RangeInclusive<T> {
-    #[inline]
-    fn start_bound(&self) -> Option<&T> {
-        Some(self.start())
-    }
-    #[inline]
-    fn end_bound(&self) -> Option<&T> {
-        Some(self.end())
-    }
-}
-
-impl<T: Copy> InclusiveRangeBounds<T> for RangeToInclusive<T> {
-    #[inline]
-    fn start_bound(&self) -> Option<&T> {
-        None
-    }
-    #[inline]
-    fn end_bound(&self) -> Option<&T> {
-        Some(&self.end)
-    }
 }
