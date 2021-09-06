@@ -1,7 +1,7 @@
 # imgui-rs: Rust bindings for Dear ImGui
 
 [![Build Status](https://github.com/imgui-rs/imgui-rs/workflows/ci/badge.svg)](https://github.com/imgui-rs/imgui-rs/actions)
-[![Latest release on crates.io](https://meritbadge.herokuapp.com/imgui)](https://crates.io/crates/imgui)
+[![Latest release on crates.io](https://img.shields.io/crates/v/imgui.svg)](https://crates.io/crates/imgui)
 [![Documentation on docs.rs](https://docs.rs/imgui/badge.svg)](https://docs.rs/imgui)
 [![Wrapped Dear ImGui Version](https://img.shields.io/badge/Dear%20ImGui%20Version-1.80-blue.svg)](https://github.com/ocornut/imgui)
 
@@ -128,8 +128,8 @@ build this libary and run the examples.
 
 Licensed under either of
 
- * Apache License, Version 2.0, ([LICENSE-APACHE](LICENSE-APACHE) or http://www.apache.org/licenses/LICENSE-2.0)
- * MIT license ([LICENSE-MIT](LICENSE-MIT) or http://opensource.org/licenses/MIT)
+ * Apache License, Version 2.0, ([LICENSE-APACHE](LICENSE-APACHE) or https://www.apache.org/licenses/LICENSE-2.0)
+ * MIT license ([LICENSE-MIT](LICENSE-MIT) or https://opensource.org/licenses/MIT)
 
 at your option.
 
