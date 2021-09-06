@@ -19,7 +19,7 @@ winit-24 = { version = "0.24", package = "winit", default-features = false, opti
 winit-25 = { version = "0.25", package = "winit", default-features = false, optional = true }
 
 [features]
-default = ["winit-24"] # TODO: Change to winit-25 when glutin has upgraded to it
+default = ["winit-25/default"]
 test = ["winit-23/default", "winit-24/default", "winit-25/default"]
 
 # This is phrased as a negative (unlike most features) so that it needs to be
