@@ -194,15 +194,13 @@ use winit::{
     TouchPhase, VirtualKeyCode, Window, WindowEvent,
 };
 
-#[cfg(
-    any(
-        feature = "winit-25",
-        feature = "winit-24",
-        feature = "winit-23",
-        feature = "winit-22",
-        feature = "winit-20"
-    )
-)]
+#[cfg(any(
+    feature = "winit-25",
+    feature = "winit-24",
+    feature = "winit-23",
+    feature = "winit-22",
+    feature = "winit-20"
+))]
 use winit::{
     error::ExternalError,
     event::{
