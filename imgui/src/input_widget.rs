@@ -46,6 +46,8 @@ bitflags!(
         const CALLBACK_COMPLETION = sys::ImGuiInputTextFlags_CallbackCompletion;
         /// Call user function on pressing Up/Down arrows (for history handling)
         const CALLBACK_HISTORY = sys::ImGuiInputTextFlags_CallbackHistory;
+        /// Call user function on pressing Up/Down arrows (for history handling)
+        const CALLBACK_EDIT = sys::ImGuiInputTextFlags_CallbackEdit;
         /// Call user function every time. User code may query cursor position, modify text buffer.
         const CALLBACK_ALWAYS = sys::ImGuiInputTextFlags_CallbackAlways;
         /// Call user function to filter character.
@@ -77,12 +79,15 @@ pub trait TextCallbackHandler {
     /// and returning another char substitutes it out.
     ///
     /// The default implementation is a passthrough filter (ie, doesn't do anything).
-    fn char_filter(&mut self, c: char, _: &TextInformation<'_>) -> Option<char> {
+    fn char_filter(&mut self, c: char) -> Option<char> {
         Some(c)
     }
 
     /// Allows one to perform autocompletion work when the Tab key has been pressed.
     fn on_completion(&mut self, _: &mut TextInformation<'_>) {}
+
+    /// Allows one to edit the inner buffer whenever the buffer has been changed.
+    fn on_edit(&mut self, _: &mut TextInformation<'_>) {}
 
     /// A callback when one of the direction keys have been pressed.
     fn on_history(&mut self, _: EventDirection, _: &mut TextInformation<'_>) {}
@@ -238,6 +243,13 @@ impl TextCallbackBuffer<'_> {
         )
     }
 
+    /// Clears the string.
+    pub fn clear(&mut self) {
+        unsafe {
+            self.remove_chars_unchecked(0, self.buf().len());
+        }
+    }
+
     /// Removes the given number of characters from the string starting
     /// at some byte pos.
     ///
@@ -298,18 +310,18 @@ impl TextCallbackBuffer<'_> {
 /// data. Not sure yet though.
 extern "C" fn callback(data: *mut sys::ImGuiInputTextCallbackData) -> c_int {
     // This is always safe to do because imgui promises that this is a valid pointer.
-    // let data = unsafe { *data };
-
-    // convert it to a friendlier type
     let (mut text_info, callback_data) = unsafe {
+        dbg!(*data);
+        // println!("the friggen CHAR is {}", im_str);
         let text_info = TextInformation {
             flags: InputTextFlags::from_bits((*data).Flags as u32).unwrap(),
             buf: TextCallbackBuffer {
-                buf: std::str::from_utf8_mut(dbg!(std::slice::from_raw_parts_mut(
+                buf: std::str::from_utf8_mut(std::slice::from_raw_parts_mut(
                     (*data).Buf as *mut u8,
-                    (*data).BufSize as usize,
-                )))
+                    (*data).BufTextLen as usize,
+                ))
                 .expect("internal imgui error -- it boofed a utf8"),
+
                 dirty: &mut (*data).BufDirty,
                 cursor_pos: &mut (*data).CursorPos,
                 selection_start: &mut (*data).SelectionStart,
@@ -327,7 +339,7 @@ extern "C" fn callback(data: *mut sys::ImGuiInputTextCallbackData) -> c_int {
     };
 
     // check this callback.
-    match callback_data.event_flag {
+    match dbg!(callback_data.event_flag) {
         InputTextCallback::ALWAYS => {
             todo!()
         }
@@ -347,11 +359,7 @@ extern "C" fn callback(data: *mut sys::ImGuiInputTextCallbackData) -> c_int {
         }
         InputTextCallback::CHAR_FILTER => {
             let chr = unsafe { char::from_u32((*data).EventChar).unwrap() };
-            let new_data = match callback_data
-                .user_data
-                .cback_handler
-                .char_filter(chr, &text_info)
-            {
+            let new_data = match callback_data.user_data.cback_handler.char_filter(chr) {
                 Some(value) => u32::from(value),
                 // 0 means "do not use this char" in imgui docs
                 None => 0,
@@ -362,7 +370,10 @@ extern "C" fn callback(data: *mut sys::ImGuiInputTextCallbackData) -> c_int {
             }
         }
         InputTextCallback::COMPLETION => {
-            // callback_data.user_data.cback_handler.on_completion(&mut)
+            callback_data
+                .user_data
+                .cback_handler
+                .on_completion(&mut text_info);
         }
         InputTextCallback::HISTORY => {
             let key = unsafe {
@@ -377,6 +388,12 @@ extern "C" fn callback(data: *mut sys::ImGuiInputTextCallbackData) -> c_int {
                 .user_data
                 .cback_handler
                 .on_history(key, &mut text_info);
+        }
+        InputTextCallback::EDIT => {
+            callback_data
+                .user_data
+                .cback_handler
+                .on_completion(&mut text_info);
         }
         _ => {}
     }
@@ -575,6 +592,9 @@ impl<'ui, 'p> InputText<'ui, 'p> {
         }
         if callbacks.contains(InputTextCallback::CHAR_FILTER) {
             self.flags.insert(InputTextFlags::CALLBACK_CHAR_FILTER);
+        }
+        if callbacks.contains(InputTextCallback::EDIT) {
+            self.flags.insert(InputTextFlags::CALLBACK_EDIT);
         }
         self.callback_handler = callback;
         self

@@ -11,7 +11,8 @@ fn main() {
     let mut uncaptured_counter = 0u32;
     let mut home_counter = 0u32;
     let mut f1_release_count = 0u32;
-    let mut text_buffer = ImString::new("");
+    let mut text_buffer = ImString::new("with some buffer");
+    text_buffer.reserve(100);
 
     system.main_loop(move |_, ui| {
         Window::new(im_str!("Means of accessing key state"))
@@ -78,11 +79,22 @@ fn main() {
 
                 struct Cback;
                 impl TextCallbackHandler for Cback {
-                    fn char_filter(&mut self, c: char, txt: &TextInformation<'_>) -> Option<char> {
+                    fn char_filter(&mut self, c: char) -> Option<char> {
                         if c == 'a' {
                             None
                         } else {
                             Some(c)
+                        }
+                    }
+
+                    fn on_completion(&mut self, info: &mut TextInformation<'_>) {
+                        println!("Completion txt was {:?}", info.buf.buf())
+                    }
+
+                    fn on_history(&mut self, dir: EventDirection, info: &mut TextInformation<'_>) {
+                        match dir {
+                            EventDirection::Up => info.buf.clear(),
+                            EventDirection::Down => info.buf.insert_chars(0, "Hello there"),
                         }
                     }
                 }
@@ -92,7 +104,12 @@ fn main() {
                 // example, if you try to type into this input, the
                 // above interaction still counts the key presses.
                 ui.input_text(im_str!("##Dummy text input widget"), &mut text_buffer)
-                    .callback(InputTextCallback::CHAR_FILTER, &mut Cback)
+                    .callback(
+                        InputTextCallback::CHAR_FILTER
+                            | InputTextCallback::COMPLETION
+                            | InputTextCallback::HISTORY,
+                        &mut Cback,
+                    )
                     .hint(im_str!("Example text input"))
                     .build();
 
