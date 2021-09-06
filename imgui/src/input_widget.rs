@@ -8,7 +8,8 @@ use crate::sys;
 use crate::{ImStr, ImString, Ui};
 
 bitflags!(
-    /// Callback flags
+    /// Callback flags for an `InputText` widget. These correspond to
+    /// the general textflags.
     pub struct InputTextCallback: u32 {
         /// Call user function on pressing TAB (for completion handling)
         const COMPLETION = sys::ImGuiInputTextFlags_CallbackCompletion;
@@ -18,8 +19,22 @@ bitflags!(
         const ALWAYS = sys::ImGuiInputTextFlags_CallbackAlways;
         /// Call user function to filter character.
         const CHAR_FILTER = sys::ImGuiInputTextFlags_CallbackCharFilter;
-        /// Allow buffer capacity resize + notify when the string wants to be resized
-        const RESIZE = sys::ImGuiInputTextFlags_CallbackResize;
+        /// Callback on buffer edit (note that InputText already returns true on edit, the
+        /// callback is useful mainly to manipulate the underlying buffer while focus is active)
+        const EDIT = sys::ImGuiInputTextFlags_CallbackEdit;
+    }
+);
+
+bitflags!(
+    /// Callback flags for an `InputTextMultiline` widget. These correspond to the
+    /// general textflags.
+    pub struct InputTextMultilineCallbacks: u32 {
+        /// Call user function on pressing TAB (for completion handling)
+        const COMPLETION = sys::ImGuiInputTextFlags_CallbackCompletion;
+        /// Call user function every time. User code may query cursor position, modify text buffer.
+        const ALWAYS = sys::ImGuiInputTextFlags_CallbackAlways;
+        /// Call user function to filter character.
+        const CHAR_FILTER = sys::ImGuiInputTextFlags_CallbackCharFilter;
         /// Callback on buffer edit (note that InputText already returns true on edit, the
         /// callback is useful mainly to manipulate the underlying buffer while focus is active)
         const EDIT = sys::ImGuiInputTextFlags_CallbackEdit;
@@ -78,21 +93,23 @@ pub trait TextCallbackHandler {
     /// Filters a char -- returning a `None` means that the char is removed,
     /// and returning another char substitutes it out.
     ///
-    /// The default implementation is a passthrough filter (ie, doesn't do anything).
+    /// Because of upstream ImGui choices, you do not have access to the buffer
+    /// during this callback (for some reason).
     fn char_filter(&mut self, c: char) -> Option<char> {
         Some(c)
     }
 
     /// Allows one to perform autocompletion work when the Tab key has been pressed.
-    fn on_completion(&mut self, _: &mut TextInformation<'_>) {}
+    fn on_completion(&mut self, _: TextInformation<'_>) {}
 
     /// Allows one to edit the inner buffer whenever the buffer has been changed.
-    fn on_edit(&mut self, _: &mut TextInformation<'_>) {}
+    fn on_edit(&mut self, _: TextInformation<'_>) {}
 
     /// A callback when one of the direction keys have been pressed.
-    fn on_history(&mut self, _: EventDirection, _: &mut TextInformation<'_>) {}
+    fn on_history(&mut self, _: EventDirection, _: TextInformation<'_>) {}
 
-    // fn on_always(&mut self, state: &mut TextCallbackState);
+    /// A callback which will always fire, each tick.
+    fn on_always(&mut self, _: TextInformation<'_>) {}
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -109,26 +126,6 @@ pub struct TextInformation<'a> {
     /// do things to the underlying buffer.
     pub buf: TextCallbackBuffer<'a>,
 }
-
-#[repr(C)]
-pub struct UserData<'a> {
-    container: &'a mut ImString,
-    cback_handler: &'a mut dyn TextCallbackHandler,
-}
-
-struct CallbackData<'a> {
-    event_flag: InputTextCallback,
-    user_data: &'a mut UserData<'a>,
-}
-
-// pub struct TextCallbackData<'a> {
-//     pub event_flag: InputTextFlags,
-//     pub flags: InputTextFlags,
-//     pub user_data: UserData<'a>,
-//     pub event_char: char,
-//     pub event_key: EventDirection,
-//     pub buf: TextCallbackBuffer<'a>,
-// }
 
 pub struct TextCallbackBuffer<'a> {
     buf: &'a mut str,
@@ -212,7 +209,7 @@ impl TextCallbackBuffer<'_> {
 
     /// Inserts the given string at the given position. If this
     /// would require the String to resize, it will be resized by calling the
-    /// Callback_Resize callback. This is automatically handled.
+    /// `CALLBACK_RESIZE` callback. This is automatically handled.
     ///
     /// ## Panics
     /// Panics if the `pos` is not a char_boundary.
@@ -306,44 +303,68 @@ impl TextCallbackBuffer<'_> {
     }
 }
 
+#[repr(C)]
+struct UserData<'a> {
+    container: &'a mut ImString,
+    cback_handler: &'a mut dyn TextCallbackHandler,
+}
+
 /// Currently, this might contain UB. We may be holdling two mutable pointers to the same
 /// data. Not sure yet though.
 extern "C" fn callback(data: *mut sys::ImGuiInputTextCallbackData) -> c_int {
-    // This is always safe to do because imgui promises that this is a valid pointer.
-    let (mut text_info, callback_data) = unsafe {
-        dbg!(*data);
-        // println!("the friggen CHAR is {}", im_str);
-        let text_info = TextInformation {
-            flags: InputTextFlags::from_bits((*data).Flags as u32).unwrap(),
-            buf: TextCallbackBuffer {
-                buf: std::str::from_utf8_mut(std::slice::from_raw_parts_mut(
-                    (*data).Buf as *mut u8,
-                    (*data).BufTextLen as usize,
-                ))
-                .expect("internal imgui error -- it boofed a utf8"),
+    struct CallbackData<'a> {
+        event_flag: InputTextFlags,
+        user_data: &'a mut UserData<'a>,
+    }
 
-                dirty: &mut (*data).BufDirty,
-                cursor_pos: &mut (*data).CursorPos,
-                selection_start: &mut (*data).SelectionStart,
-                selection_end: &mut (*data).SelectionEnd,
-                callback_data: data,
-            },
-        };
-
-        let callback_data = CallbackData {
-            event_flag: InputTextCallback::from_bits((*data).EventFlag as u32).unwrap(),
+    let callback_data = unsafe {
+        CallbackData {
+            event_flag: InputTextFlags::from_bits((*data).EventFlag as u32).unwrap(),
             user_data: &mut *((*data).UserData as *mut UserData),
-        };
+        }
+    };
 
-        (text_info, callback_data)
+    let make_txt_data = || {
+        // This safe in every callback EXCEPT RESIZE.
+        unsafe {
+            TextInformation {
+                flags: InputTextFlags::from_bits((*data).Flags as u32).unwrap(),
+                buf: TextCallbackBuffer {
+                    // specifically, this will bork in resize
+                    buf: std::str::from_utf8_mut(std::slice::from_raw_parts_mut(
+                        (*data).Buf as *mut u8,
+                        (*data).BufTextLen as usize,
+                    ))
+                    .expect("internal imgui error -- it boofed a utf8"),
+
+                    dirty: &mut (*data).BufDirty,
+                    cursor_pos: &mut (*data).CursorPos,
+                    selection_start: &mut (*data).SelectionStart,
+                    selection_end: &mut (*data).SelectionEnd,
+                    callback_data: data,
+                },
+            }
+        }
     };
 
     // check this callback.
-    match dbg!(callback_data.event_flag) {
-        InputTextCallback::ALWAYS => {
-            todo!()
+    match callback_data.event_flag {
+        InputTextFlags::CALLBACK_ALWAYS => {
+            let text_info = make_txt_data();
+            callback_data.user_data.cback_handler.on_always(text_info);
         }
-        InputTextCallback::RESIZE => {
+        InputTextFlags::CALLBACK_EDIT => {
+            let text_info = make_txt_data();
+            callback_data.user_data.cback_handler.on_edit(text_info);
+        }
+        InputTextFlags::CALLBACK_COMPLETION => {
+            let text_info = make_txt_data();
+            callback_data
+                .user_data
+                .cback_handler
+                .on_completion(text_info);
+        }
+        InputTextFlags::CALLBACK_RESIZE => {
             unsafe {
                 let requested_size = (*data).BufSize as usize;
                 let buffer = &mut callback_data.user_data.container;
@@ -357,7 +378,7 @@ extern "C" fn callback(data: *mut sys::ImGuiInputTextCallbackData) -> c_int {
                 }
             }
         }
-        InputTextCallback::CHAR_FILTER => {
+        InputTextFlags::CALLBACK_CHAR_FILTER => {
             let chr = unsafe { char::from_u32((*data).EventChar).unwrap() };
             let new_data = match callback_data.user_data.cback_handler.char_filter(chr) {
                 Some(value) => u32::from(value),
@@ -369,13 +390,7 @@ extern "C" fn callback(data: *mut sys::ImGuiInputTextCallbackData) -> c_int {
                 (*data).EventChar = new_data;
             }
         }
-        InputTextCallback::COMPLETION => {
-            callback_data
-                .user_data
-                .cback_handler
-                .on_completion(&mut text_info);
-        }
-        InputTextCallback::HISTORY => {
+        InputTextFlags::CALLBACK_HISTORY => {
             let key = unsafe {
                 let key = (*data).EventKey as u32;
                 match key {
@@ -384,17 +399,14 @@ extern "C" fn callback(data: *mut sys::ImGuiInputTextCallbackData) -> c_int {
                     _ => panic!("Unexpected key"),
                 }
             };
+            let text_info = make_txt_data();
+
             callback_data
                 .user_data
                 .cback_handler
-                .on_history(key, &mut text_info);
+                .on_history(key, text_info);
         }
-        InputTextCallback::EDIT => {
-            callback_data
-                .user_data
-                .cback_handler
-                .on_completion(&mut text_info);
-        }
+
         _ => {}
     }
 
@@ -444,36 +456,6 @@ macro_rules! impl_text_flags {
             self.flags.set(InputTextFlags::ENTER_RETURNS_TRUE, value);
             self
         }
-
-        // #[inline]
-        // pub fn callback_completion(mut self, value: bool) -> Self {
-        //     self.flags.set(InputTextFlags::CALLBACK_COMPLETION, value);
-        //     self
-        // }
-
-        // #[inline]
-        // pub fn callback_history(mut self, value: bool) -> Self {
-        //     self.flags.set(InputTextFlags::CALLBACK_HISTORY, value);
-        //     self
-        // }
-
-        // #[inline]
-        // pub fn callback_always(mut self, value: bool) -> Self {
-        //     self.flags.set(InputTextFlags::CALLBACK_ALWAYS, value);
-        //     self
-        // }
-
-        // #[inline]
-        // pub fn callback_char_filter(mut self, value: bool) -> Self {
-        //     self.flags.set(InputTextFlags::CALLBACK_CHAR_FILTER, value);
-        //     self
-        // }
-
-        // #[inline]
-        // pub fn resize_buffer(mut self, value: bool) -> Self {
-        //     self.flags.set(InputTextFlags::CALLBACK_RESIZE, value);
-        //     self
-        // }
 
         #[inline]
         pub fn allow_tab_input(mut self, value: bool) -> Self {
@@ -572,8 +554,16 @@ impl<'ui, 'p> InputText<'ui, 'p> {
 
     impl_text_flags!(InputText);
 
-    // TODO: boxed closure...?
-    // pub fn callback(self) -> Self { }
+    /// By default (as of 0.8.0), imgui-rs will automatically handle string resizes
+    /// for `InputText` and `InputTextMultiline`.
+    ///
+    /// If, for some reason, you don't want this, you can run this function to prevent this.
+    /// In that case, edits which would cause a resize will not occur.
+    #[inline]
+    pub fn do_not_resize(mut self) -> Self {
+        self.flags.remove(InputTextFlags::CALLBACK_RESIZE);
+        self
+    }
 
     #[inline]
     pub fn callback(
@@ -642,6 +632,7 @@ pub struct InputTextMultiline<'ui, 'p> {
     buf: &'p mut ImString,
     flags: InputTextFlags,
     size: [f32; 2],
+    callback_handler: &'p mut dyn TextCallbackHandler,
     _phantom: PhantomData<&'ui Ui<'ui>>,
 }
 
@@ -650,16 +641,51 @@ impl<'ui, 'p> InputTextMultiline<'ui, 'p> {
         InputTextMultiline {
             label,
             buf,
-            flags: InputTextFlags::empty(),
+            flags: InputTextFlags::CALLBACK_RESIZE,
             size,
+            // this is safe because
+            callback_handler: unsafe { &mut PASSTHROUGH_CALLBACK },
             _phantom: PhantomData,
         }
     }
 
     impl_text_flags!(InputText);
 
-    // TODO: boxed closure...?
-    // pub fn callback(self) -> Self { }
+    /// By default (as of 0.8.0), imgui-rs will automatically handle string resizes
+    /// for `InputText` and `InputTextMultiline`.
+    ///
+    /// If, for some reason, you don't want this, you can run this function to prevent this.
+    /// In that case, edits which would cause a resize will not occur.
+    #[inline]
+    pub fn do_not_resize(mut self) -> Self {
+        self.flags.remove(InputTextFlags::CALLBACK_RESIZE);
+        self
+    }
+
+    #[inline]
+    pub fn callback(
+        mut self,
+        callbacks: InputTextMultilineCallbacks,
+        callback: &'p mut dyn TextCallbackHandler,
+    ) -> Self {
+        if callbacks.contains(InputTextMultilineCallbacks::COMPLETION) {
+            self.flags.insert(InputTextFlags::CALLBACK_COMPLETION);
+        }
+        // if callbacks.contains(InputTextMultilineCallbacks::HISTORY) {
+        //     self.flags.insert(InputTextFlags::CALLBACK_HISTORY);
+        // }
+        if callbacks.contains(InputTextMultilineCallbacks::ALWAYS) {
+            self.flags.insert(InputTextFlags::CALLBACK_ALWAYS);
+        }
+        if callbacks.contains(InputTextMultilineCallbacks::CHAR_FILTER) {
+            self.flags.insert(InputTextFlags::CALLBACK_CHAR_FILTER);
+        }
+        if callbacks.contains(InputTextMultilineCallbacks::EDIT) {
+            self.flags.insert(InputTextFlags::CALLBACK_EDIT);
+        }
+        self.callback_handler = callback;
+        self
+    }
 
     pub fn build(self) -> bool {
         let (ptr, capacity) = (self.buf.as_mut_ptr(), self.buf.capacity_with_nul());

@@ -77,39 +77,12 @@ fn main() {
                     ctrl_a_counter
                 ));
 
-                struct Cback;
-                impl TextCallbackHandler for Cback {
-                    fn char_filter(&mut self, c: char) -> Option<char> {
-                        if c == 'a' {
-                            None
-                        } else {
-                            Some(c)
-                        }
-                    }
-
-                    fn on_completion(&mut self, info: &mut TextInformation<'_>) {
-                        println!("Completion txt was {:?}", info.buf.buf())
-                    }
-
-                    fn on_history(&mut self, dir: EventDirection, info: &mut TextInformation<'_>) {
-                        match dir {
-                            EventDirection::Up => info.buf.clear(),
-                            EventDirection::Down => info.buf.insert_chars(0, "Hello there"),
-                        }
-                    }
-                }
-
                 // Note that `is_key_released` gives the state of the
                 // key regardless of what widget has focus, for
                 // example, if you try to type into this input, the
                 // above interaction still counts the key presses.
                 ui.input_text(im_str!("##Dummy text input widget"), &mut text_buffer)
-                    .callback(
-                        InputTextCallback::CHAR_FILTER
-                            | InputTextCallback::COMPLETION
-                            | InputTextCallback::HISTORY,
-                        &mut Cback,
-                    )
+                    // .do_not_resize() if you pass this, then this won't resize!
                     .hint(im_str!("Example text input"))
                     .build();
 
