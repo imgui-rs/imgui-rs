@@ -194,6 +194,24 @@ use winit::{
     TouchPhase, VirtualKeyCode, Window, WindowEvent,
 };
 
+#[cfg(
+    any(
+        feature = "winit-25",
+        feature = "winit-24",
+        feature = "winit-23",
+        feature = "winit-22",
+        feature = "winit-20"
+    )
+)]
+use winit::{
+    error::ExternalError,
+    event::{
+        DeviceEvent, ElementState, Event, KeyboardInput, MouseButton, MouseScrollDelta, TouchPhase,
+        VirtualKeyCode, WindowEvent,
+    },
+    window::{CursorIcon as MouseCursor, Window},
+};
+
 // Ensure at least one is enabled
 #[cfg(not(any(
     feature = "winit-19",
@@ -204,15 +222,6 @@ use winit::{
     feature = "winit-25",
 )))]
 compile_error!("Please enable at least one version of `winit` (see documentation for details).");
-
-use winit::{
-    error::ExternalError,
-    event::{
-        DeviceEvent, ElementState, Event, KeyboardInput, MouseButton, MouseScrollDelta, TouchPhase,
-        VirtualKeyCode, WindowEvent,
-    },
-    window::{CursorIcon as MouseCursor, Window},
-};
 
 // FIXME(thom): make updading winit and adding a new feature less of a hassle here.
 fn check_multiple_winits() {
