@@ -27,7 +27,7 @@ bitflags!(
 bitflags!(
     /// Callback flags for an `InputTextMultiline` widget. These correspond to the
     /// general textflags.
-    pub struct InputTextMultilineCallbacks: u32 {
+    pub struct InputTextMultilineCallback: u32 {
         /// Call user function on pressing TAB (for completion handling)
         const COMPLETION = sys::ImGuiInputTextFlags_CallbackCompletion;
         /// Call user function every time. User code may query cursor position, modify text buffer.
@@ -99,31 +99,22 @@ pub trait TextCallbackHandler {
     }
 
     /// Allows one to perform autocompletion work when the Tab key has been pressed.
-    fn on_completion(&mut self, _: TextInformation<'_>) {}
+    fn on_completion(&mut self, _: TextCallbackBuffer<'_>) {}
 
     /// Allows one to edit the inner buffer whenever the buffer has been changed.
-    fn on_edit(&mut self, _: TextInformation<'_>) {}
+    fn on_edit(&mut self, _: TextCallbackBuffer<'_>) {}
 
     /// A callback when one of the direction keys have been pressed.
-    fn on_history(&mut self, _: EventDirection, _: TextInformation<'_>) {}
+    fn on_history(&mut self, _: EventDirection, _: TextCallbackBuffer<'_>) {}
 
     /// A callback which will always fire, each tick.
-    fn on_always(&mut self, _: TextInformation<'_>) {}
+    fn on_always(&mut self, _: TextCallbackBuffer<'_>) {}
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum EventDirection {
     Up,
     Down,
-}
-
-pub struct TextInformation<'a> {
-    /// All of the flags that are POSSIBLY given in a callback.
-    pub flags: InputTextFlags,
-
-    /// The buffer itself. If you can access this mutably, you can
-    /// do things to the underlying buffer.
-    pub buf: TextCallbackBuffer<'a>,
 }
 
 pub struct TextCallbackBuffer<'a> {
@@ -213,7 +204,7 @@ impl TextCallbackBuffer<'_> {
     /// ## Panics
     /// Panics if the `pos` is not a char_boundary.
     pub fn insert_chars(&mut self, pos: usize, s: &str) {
-        assert!(s.is_char_boundary(pos));
+        assert!(self.buf.is_char_boundary(pos));
         unsafe {
             self.insert_chars_unsafe(pos, s);
         }
@@ -326,22 +317,19 @@ extern "C" fn callback(data: *mut sys::ImGuiInputTextCallbackData) -> c_int {
     let make_txt_data = || {
         // This safe in every callback EXCEPT RESIZE.
         unsafe {
-            TextInformation {
-                flags: InputTextFlags::from_bits((*data).Flags as u32).unwrap(),
-                buf: TextCallbackBuffer {
-                    // specifically, this will bork in resize
-                    buf: std::str::from_utf8_mut(std::slice::from_raw_parts_mut(
-                        (*data).Buf as *mut u8,
-                        (*data).BufTextLen as usize,
-                    ))
-                    .expect("internal imgui error -- it boofed a utf8"),
+            TextCallbackBuffer {
+                // specifically, this will bork in resize
+                buf: std::str::from_utf8_mut(std::slice::from_raw_parts_mut(
+                    (*data).Buf as *mut u8,
+                    (*data).BufTextLen as usize,
+                ))
+                .expect("internal imgui error -- it boofed a utf8"),
 
-                    dirty: &mut (*data).BufDirty,
-                    cursor_pos: &mut (*data).CursorPos,
-                    selection_start: &mut (*data).SelectionStart,
-                    selection_end: &mut (*data).SelectionEnd,
-                    callback_data: data,
-                },
+                dirty: &mut (*data).BufDirty,
+                cursor_pos: &mut (*data).CursorPos,
+                selection_start: &mut (*data).SelectionStart,
+                selection_end: &mut (*data).SelectionEnd,
+                callback_data: data,
             }
         }
     };
@@ -664,22 +652,19 @@ impl<'ui, 'p> InputTextMultiline<'ui, 'p> {
     #[inline]
     pub fn callback(
         mut self,
-        callbacks: InputTextMultilineCallbacks,
+        callbacks: InputTextMultilineCallback,
         callback: &'p mut dyn TextCallbackHandler,
     ) -> Self {
-        if callbacks.contains(InputTextMultilineCallbacks::COMPLETION) {
+        if callbacks.contains(InputTextMultilineCallback::COMPLETION) {
             self.flags.insert(InputTextFlags::CALLBACK_COMPLETION);
         }
-        // if callbacks.contains(InputTextMultilineCallbacks::HISTORY) {
-        //     self.flags.insert(InputTextFlags::CALLBACK_HISTORY);
-        // }
-        if callbacks.contains(InputTextMultilineCallbacks::ALWAYS) {
+        if callbacks.contains(InputTextMultilineCallback::ALWAYS) {
             self.flags.insert(InputTextFlags::CALLBACK_ALWAYS);
         }
-        if callbacks.contains(InputTextMultilineCallbacks::CHAR_FILTER) {
+        if callbacks.contains(InputTextMultilineCallback::CHAR_FILTER) {
             self.flags.insert(InputTextFlags::CALLBACK_CHAR_FILTER);
         }
-        if callbacks.contains(InputTextMultilineCallbacks::EDIT) {
+        if callbacks.contains(InputTextMultilineCallback::EDIT) {
             self.flags.insert(InputTextFlags::CALLBACK_EDIT);
         }
         self.callback_handler = callback;

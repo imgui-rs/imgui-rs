@@ -19,11 +19,7 @@ pub use self::fonts::glyph::*;
 pub use self::fonts::glyph_ranges::*;
 pub use self::input::keyboard::*;
 pub use self::input::mouse::*;
-pub use self::input_widget::{
-    EventDirection, InputFloat, InputFloat2, InputFloat3, InputFloat4, InputInt, InputInt2,
-    InputInt3, InputInt4, InputText, InputTextCallback, InputTextMultiline, TextCallbackBuffer,
-    TextCallbackHandler, TextInformation, InputTextFlags
-};
+pub use self::input_widget::*;
 pub use self::io::*;
 pub use self::layout::*;
 pub use self::list_clipper::ListClipper;
