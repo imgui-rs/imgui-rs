@@ -41,7 +41,14 @@ fn lint_all() -> Result<()> {
         "cargo clippy --manifest-path imgui-winit-support/Cargo.toml --all-features --all-targets"
     )
     .run()?;
-    let winits = &["winit-19", "winit-20", "winit-22", "winit-23", "winit-24"];
+    let winits = &[
+        "winit-19",
+        "winit-20",
+        "winit-22",
+        "winit-23/default",
+        "winit-24/default",
+        "winit-25/default",
+    ];
     for &winit in winits {
         xshell::cmd!("cargo clippy --manifest-path imgui-winit-support/Cargo.toml --no-default-features --features {winit} --all-targets").run()?;
     }
@@ -52,7 +59,14 @@ fn lint_all() -> Result<()> {
 fn test_all() -> Result<()> {
     xshell::cmd!("cargo test --workspace --all-targets").run()?;
     xshell::cmd!("cargo test --workspace --doc").run()?;
-    let winits = &["winit-19", "winit-20", "winit-22", "winit-23", "winit-24"];
+    let winits = &[
+        "winit-19",
+        "winit-20",
+        "winit-22",
+        "winit-23/default",
+        "winit-24/default",
+        "winit-25/default",
+    ];
     for &winit in winits {
         xshell::cmd!("cargo test --manifest-path imgui-winit-support/Cargo.toml --no-default-features --features {winit} --all-targets").run()?;
     }

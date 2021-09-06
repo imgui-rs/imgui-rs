@@ -51,8 +51,9 @@ jobs:
       - run: cargo clippy --manifest-path imgui-winit-support/Cargo.toml --no-default-features --features winit-19 --all-targets
       - run: cargo clippy --manifest-path imgui-winit-support/Cargo.toml --no-default-features --features winit-20 --all-targets
       - run: cargo clippy --manifest-path imgui-winit-support/Cargo.toml --no-default-features --features winit-22 --all-targets
-      - run: cargo clippy --manifest-path imgui-winit-support/Cargo.toml --no-default-features --features winit-23 --all-targets
-      - run: cargo clippy --manifest-path imgui-winit-support/Cargo.toml --no-default-features --features winit-24 --all-targets
+      - run: cargo clippy --manifest-path imgui-winit-support/Cargo.toml --no-default-features --features winit-23/default --all-targets
+      - run: cargo clippy --manifest-path imgui-winit-support/Cargo.toml --no-default-features --features winit-24/default --all-targets
+      - run: cargo clippy --manifest-path imgui-winit-support/Cargo.toml --no-default-features --features winit-25/default --all-targets
   rustfmt:
     name: Check rustfmt
     runs-on: ubuntu-latest
@@ -138,8 +139,9 @@ jobs:
       - run: cargo test --manifest-path imgui-winit-support/Cargo.toml --no-default-features --features winit-19
       - run: cargo test --manifest-path imgui-winit-support/Cargo.toml --no-default-features --features winit-20
       - run: cargo test --manifest-path imgui-winit-support/Cargo.toml --no-default-features --features winit-22
-      - run: cargo test --manifest-path imgui-winit-support/Cargo.toml --no-default-features --features winit-23
-      - run: cargo test --manifest-path imgui-winit-support/Cargo.toml --no-default-features --features winit-24
+      - run: cargo test --manifest-path imgui-winit-support/Cargo.toml --no-default-features --features winit-23/default
+      - run: cargo test --manifest-path imgui-winit-support/Cargo.toml --no-default-features --features winit-24/default
+      - run: cargo test --manifest-path imgui-winit-support/Cargo.toml --no-default-features --features winit-25/default
       # Run unreasonably slow tests under release, but only the crates that have
       # them, and don't bother doing this on most platforms.
       - run: cargo test -p imgui --release -- --ignored

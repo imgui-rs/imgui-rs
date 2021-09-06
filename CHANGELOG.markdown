@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+- Removed automatically adding default features for `imgui-winit-support`
+with the exception of the current default winit feature/dep version. Additionally, that version was updated to 0.25. If you want to not have the default features of winit with 0.25, set `default-features = false` and add `winit-25` as a normal feature. Thank you to @dzil123 for the work [implementing this here](https://github.com/imgui-rs/imgui-rs/pull/477)!
+
 - Added an `imgui-glow-renderer` which targets `glow 0.10`. Before release, this will be updated to target current `0.11` glow when further features are added. Thank you to @jmaargh for the work [implementing this here](https://github.com/imgui-rs/imgui-rs/pull/495)!
 
 - BREAKING: Reworked `.range` calls on `Slider`, `VerticalSlider`, and `Drag` to simply take two min and max values, and requires that they are provided in the constructor.
