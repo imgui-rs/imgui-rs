@@ -2,7 +2,6 @@ use bitflags::bitflags;
 use std::marker::PhantomData;
 use std::ops::Range;
 use std::os::raw::{c_char, c_int, c_void};
-use std::ptr;
 
 use crate::sys;
 use crate::{ImStr, ImString, Ui};
@@ -689,13 +688,12 @@ impl<'ui, 'p> InputTextMultiline<'ui, 'p> {
 
     pub fn build(self) -> bool {
         let (ptr, capacity) = (self.buf.as_mut_ptr(), self.buf.capacity_with_nul());
-        let (callback, data): (sys::ImGuiInputTextCallback, _) = {
-            if self.flags.contains(InputTextFlags::CALLBACK_RESIZE) {
-                (Some(callback), self.buf as *mut _ as *mut c_void)
-            } else {
-                (None, ptr::null_mut())
-            }
+
+        let mut data = UserData {
+            container: self.buf,
+            cback_handler: self.callback_handler,
         };
+        let data = &mut data as *mut _ as *mut c_void;
 
         unsafe {
             let result = sys::igInputTextMultiline(
@@ -704,7 +702,7 @@ impl<'ui, 'p> InputTextMultiline<'ui, 'p> {
                 capacity,
                 self.size.into(),
                 self.flags.bits() as i32,
-                callback,
+                Some(callback),
                 data,
             );
             self.buf.refresh_len();
