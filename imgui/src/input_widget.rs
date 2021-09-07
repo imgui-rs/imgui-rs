@@ -404,7 +404,7 @@ extern "C" fn callback(data: *mut sys::ImGuiInputTextCallbackData) -> c_int {
             }
         }
         InputTextFlags::CALLBACK_CHAR_FILTER => {
-            let chr = unsafe { char::from_u32((*data).EventChar).unwrap() };
+            let chr = unsafe { std::char::from_u32((*data).EventChar).unwrap() };
             let new_data = match callback_data.user_data.cback_handler.char_filter(chr) {
                 Some(value) => u32::from(value),
                 // 0 means "do not use this char" in imgui docs
