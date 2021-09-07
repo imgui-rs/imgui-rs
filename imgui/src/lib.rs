@@ -120,6 +120,7 @@ impl Context {
 pub struct Ui<'ui> {
     ctx: &'ui Context,
     font_atlas: Option<cell::RefMut<'ui, SharedFontAtlas>>,
+    buffer: cell::RefCell<Vec<u8>>,
 }
 
 impl<'ui> Ui<'ui> {

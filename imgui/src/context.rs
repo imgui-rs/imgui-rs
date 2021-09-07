@@ -527,6 +527,7 @@ impl Context {
         Ui {
             ctx: self,
             font_atlas,
+            buffer: RefCell::new(Vec::new()),
         }
     }
 }
