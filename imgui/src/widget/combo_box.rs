@@ -1,6 +1,5 @@
 use bitflags::bitflags;
 use std::borrow::Cow;
-use std::ptr;
 
 use crate::sys;
 use crate::Ui;
@@ -55,16 +54,16 @@ pub struct ComboBoxFlags: u32 {
 /// Builder for a combo box widget
 #[derive(Copy, Clone, Debug)]
 #[must_use]
-pub struct ComboBox<'a> {
-    label: &'a ImStr,
-    preview_value: Option<&'a ImStr>,
+pub struct ComboBox<T, P = String> {
+    label: T,
+    preview_value: Option<P>,
     flags: ComboBoxFlags,
 }
 
-impl<'a> ComboBox<'a> {
+impl<'a, T: AsRef<str>, P: AsRef<str>> ComboBox<T, P> {
     /// Constructs a new combo box builder.
     #[doc(alias = "BeginCombo")]
-    pub const fn new(label: &'a ImStr) -> ComboBox<'a> {
+    pub fn new(label: T) -> Self {
         ComboBox {
             label,
             preview_value: None,
@@ -74,14 +73,14 @@ impl<'a> ComboBox<'a> {
 
     /// Sets the preview value displayed in the preview box (if visible).
     #[inline]
-    pub const fn preview_value(mut self, preview_value: &'a ImStr) -> Self {
+    pub fn preview_value(mut self, preview_value: P) -> Self {
         self.preview_value = Some(preview_value);
         self
     }
 
     /// Replaces all current settings with the given flags.
     #[inline]
-    pub const fn flags(mut self, flags: ComboBoxFlags) -> Self {
+    pub fn flags(mut self, flags: ComboBoxFlags) -> Self {
         self.flags = flags;
         self
     }
@@ -141,11 +140,13 @@ impl<'a> ComboBox<'a> {
     #[must_use]
     pub fn begin<'ui>(self, ui: &Ui<'ui>) -> Option<ComboBoxToken<'ui>> {
         let should_render = unsafe {
-            sys::igBeginCombo(
-                self.label.as_ptr(),
-                self.preview_value.map(ImStr::as_ptr).unwrap_or(ptr::null()),
-                self.flags.bits() as i32,
-            )
+            if let Some(preview_value) = self.preview_value {
+                let (ptr_one, ptr_two) = ui.scratch_txt_two(self.label, preview_value);
+                sys::igBeginCombo(ptr_one, ptr_two, self.flags.bits() as i32)
+            } else {
+                let ptr_one = ui.scratch_txt(self.label);
+                sys::igBeginCombo(ptr_one, std::ptr::null(), self.flags.bits() as i32)
+            }
         };
         if should_render {
             Some(ComboBoxToken::new(ui))
@@ -157,7 +158,7 @@ impl<'a> ComboBox<'a> {
     /// Returns the result of the closure, if it is called.
     ///
     /// Note: the closure is not called if the combo box is not open.
-    pub fn build<T, F: FnOnce() -> T>(self, ui: &Ui, f: F) -> Option<T> {
+    pub fn build<R, F: FnOnce() -> R>(self, ui: &Ui, f: F) -> Option<R> {
         self.begin(ui).map(|_combo| f())
     }
 }
@@ -172,29 +173,28 @@ create_token!(
 );
 
 /// # Convenience functions
-impl<'a> ComboBox<'a> {
+impl<'a, T: AsRef<str> + Clone> ComboBox<T, Cow<'a, str>> {
     /// Builds a simple combo box for choosing from a slice of values
     #[doc(alias = "BeginCombo")]
-    pub fn build_simple<T, L>(
-        self,
+    pub fn build_simple<V, L>(
+        mut self,
         ui: &Ui,
         current_item: &mut usize,
-        items: &[T],
+        items: &'a [V],
         label_fn: &L,
     ) -> bool
     where
-        for<'b> L: Fn(&'b T) -> Cow<'b, ImStr>,
+        for<'b> L: Fn(&'b V) -> Cow<'b, str>,
     {
         use crate::widget::selectable::Selectable;
         let mut result = false;
-        let mut cb = self;
         let preview_value = items.get(*current_item).map(label_fn);
-        if cb.preview_value.is_none() {
-            if let Some(preview_value) = preview_value.as_ref() {
-                cb = cb.preview_value(preview_value);
+        if self.preview_value.is_none() {
+            if let Some(preview_value) = preview_value {
+                self = self.preview_value(preview_value);
             }
         }
-        if let Some(_cb) = cb.begin(ui) {
+        if let Some(_cb) = self.begin(ui) {
             for (idx, item) in items.iter().enumerate() {
                 let text = label_fn(item);
                 let selected = idx == *current_item;
@@ -213,7 +213,7 @@ impl<'a> ComboBox<'a> {
     #[doc(alias = "BeginCombo")]
     pub fn build_simple_string<S>(self, ui: &Ui, current_item: &mut usize, items: &[&S]) -> bool
     where
-        S: AsRef<ImStr> + ?Sized,
+        S: AsRef<str> + ?Sized,
     {
         self.build_simple(ui, current_item, items, &|&s| s.as_ref().into())
     }

@@ -1,6 +1,5 @@
 use bitflags::bitflags;
 
-use crate::string::ImStr;
 use crate::sys;
 use crate::Ui;
 
@@ -25,7 +24,7 @@ bitflags!(
 #[derive(Copy, Clone, Debug)]
 #[must_use]
 pub struct Selectable<'a> {
-    label: &'a ImStr,
+    label: &'a str,
     selected: bool,
     flags: SelectableFlags,
     size: [f32; 2],
@@ -35,9 +34,9 @@ impl<'a> Selectable<'a> {
     /// Constructs a new selectable builder.
     #[inline]
     #[doc(alias = "Selectable")]
-    pub const fn new(label: &ImStr) -> Selectable {
+    pub fn new(label: &'a impl AsRef<str>) -> Selectable<'a> {
         Selectable {
-            label,
+            label: label.as_ref(),
             selected: false,
             flags: SelectableFlags::empty(),
             size: [0.0, 0.0],
@@ -108,10 +107,10 @@ impl<'a> Selectable<'a> {
     /// Builds the selectable.
     ///
     /// Returns true if the selectable was clicked.
-    pub fn build(self, _: &Ui) -> bool {
+    pub fn build(self, ui: &Ui) -> bool {
         unsafe {
             sys::igSelectableBool(
-                self.label.as_ptr(),
+                ui.scratch_txt(self.label),
                 self.selected,
                 self.flags.bits() as i32,
                 self.size.into(),

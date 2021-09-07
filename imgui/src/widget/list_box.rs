@@ -1,21 +1,20 @@
 use std::borrow::Cow;
 
-use crate::string::ImStr;
 use crate::sys;
 use crate::Ui;
 
 /// Builder for a list box widget
 #[derive(Copy, Clone, Debug)]
 #[must_use]
-pub struct ListBox<'a> {
-    label: &'a ImStr,
+pub struct ListBox<T> {
+    label: T,
     size: sys::ImVec2,
 }
 
-impl<'a> ListBox<'a> {
+impl<T: AsRef<str>> ListBox<T> {
     /// Constructs a new list box builder.
     #[doc(alias = "ListBoxHeaderVec2", alias = "ListBoxHeaderInt")]
-    pub const fn new(label: &'a ImStr) -> ListBox<'a> {
+    pub fn new(label: T) -> ListBox<T> {
         ListBox {
             label,
             size: sys::ImVec2::zero(),
@@ -29,7 +28,7 @@ impl<'a> ListBox<'a> {
     ///
     /// Default: [0.0, 0.0], in which case the combobox calculates a sensible width and height
     #[inline]
-    pub const fn size(mut self, size: [f32; 2]) -> Self {
+    pub fn size(mut self, size: [f32; 2]) -> Self {
         self.size = sys::ImVec2::new(size[0], size[1]);
         self
     }
@@ -41,7 +40,7 @@ impl<'a> ListBox<'a> {
     /// Returns `None` if the list box is not open and no content should be rendered.
     #[must_use]
     pub fn begin<'ui>(self, ui: &Ui<'ui>) -> Option<ListBoxToken<'ui>> {
-        let should_render = unsafe { sys::igBeginListBox(self.label.as_ptr(), self.size) };
+        let should_render = unsafe { sys::igBeginListBox(ui.scratch_txt(self.label), self.size) };
         if should_render {
             Some(ListBoxToken::new(ui))
         } else {
@@ -52,7 +51,7 @@ impl<'a> ListBox<'a> {
     /// Returns the result of the closure, if it is called.
     ///
     /// Note: the closure is not called if the list box is not open.
-    pub fn build<T, F: FnOnce() -> T>(self, ui: &Ui<'_>, f: F) -> Option<T> {
+    pub fn build<R, F: FnOnce() -> R>(self, ui: &Ui<'_>, f: F) -> Option<R> {
         self.begin(ui).map(|_list| f())
     }
 }
@@ -67,17 +66,17 @@ create_token!(
 );
 
 /// # Convenience functions
-impl<'a> ListBox<'a> {
+impl<T: AsRef<str>> ListBox<T> {
     /// Builds a simple list box for choosing from a slice of values
-    pub fn build_simple<T, L>(
+    pub fn build_simple<V, L>(
         self,
         ui: &Ui,
         current_item: &mut usize,
-        items: &[T],
+        items: &[V],
         label_fn: &L,
     ) -> bool
     where
-        for<'b> L: Fn(&'b T) -> Cow<'b, ImStr>,
+        for<'b> L: Fn(&'b V) -> Cow<'b, str>,
     {
         use crate::widget::selectable::Selectable;
         let mut result = false;
