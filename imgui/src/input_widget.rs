@@ -118,18 +118,58 @@ pub enum EventDirection {
 }
 
 pub struct TextCallbackBuffer<'a> {
-    buf: &'a mut str,
+    str: &'a mut str,
     dirty: &'a mut bool,
     cursor_pos: &'a mut i32,
+
     selection_start: &'a mut i32,
     selection_end: &'a mut i32,
     callback_data: *mut sys::ImGuiInputTextCallbackData,
+    buf_start: *const c_char,
+    buf_len: *const c_int,
 }
 
-impl TextCallbackBuffer<'_> {
+impl<'a> TextCallbackBuffer<'a> {
+    /// Creates the buffer.
+    unsafe fn new(data: &'a mut sys::ImGuiInputTextCallbackData) -> Self {
+        let ptr = data as *mut _;
+        let mut output = Self {
+            // specifically, this will bork in resize
+            str: std::str::from_utf8_mut(&mut []).unwrap(),
+            dirty: &mut data.BufDirty,
+            cursor_pos: &mut data.CursorPos,
+            selection_start: &mut data.SelectionStart,
+            selection_end: &mut data.SelectionEnd,
+            callback_data: ptr,
+            buf_start: (*data).Buf as *const _,
+            buf_len: &(*data).BufTextLen as *const i32,
+        };
+
+        output.refresh_str();
+
+        output
+    }
+
+    /// Refreshes the public facing `str`, such that it appears
+    /// to users as if we're working with a normal Rust string.
+    ///
+    /// You should only need to call this if you use [str_as_bytes_mut].
+    pub fn refresh_str(&mut self) {
+        // safety -- we never hand out mutable pointers to BufStart or BufLen,
+        // so this is always set by imgui, and imgui always is utf8,
+        // but we are more or less trusting that imgui won't boof this.
+        unsafe {
+            self.str = std::str::from_utf8_mut(std::slice::from_raw_parts_mut(
+                self.buf_start as *const _ as *mut _,
+                *self.buf_len as usize,
+            ))
+            .expect("internal imgui error -- it boofed a utf8")
+        }
+    }
+
     /// Get a reference to the text callback buffer's buf.
-    pub fn buf(&self) -> &str {
-        self.buf
+    pub fn str(&self) -> &str {
+        self.str
     }
 
     /// Gives access to the underlying byte array MUTABLY.
@@ -140,14 +180,15 @@ impl TextCallbackBuffer<'_> {
     /// upheld:
     /// 1. Keep the data utf8 valid.
     /// 2. After editing the string, call [set_dirty].
+    /// 3. Finally, call [refresh_str].
     ///
     /// We present this string with a `str` interface immutably, which
     /// actually somewhat weakens `trunc` operations on the string.
     /// You can use [remove_chars] to handle this operation completely
     /// safely for you. However, if this is still too limiting,
     /// please submit an issue.
-    pub unsafe fn buf_mut(&mut self) -> &mut [u8] {
-        self.buf.as_bytes_mut()
+    pub unsafe fn str_as_bytes_mut(&mut self) -> &mut [u8] {
+        self.str.as_bytes_mut()
     }
 
     /// Sets the dirty flag on the text to imgui, indicating that
@@ -173,7 +214,7 @@ impl TextCallbackBuffer<'_> {
     /// Returns the selected text directly. Note that if no text is selected,
     /// an empty str slice will be returned.
     pub fn selected(&self) -> &str {
-        &self.buf[self.selection()]
+        &self.str[self.selection()]
     }
 
     /// Sets the cursor to select all. This is always a valid operation,
@@ -197,6 +238,16 @@ impl TextCallbackBuffer<'_> {
         unsafe { sys::ImGuiInputTextCallbackData_HasSelection(self.callback_data) }
     }
 
+    /// Pushes the given str to the end of this buffer. If this
+    /// would require the String to resize, it will be resized by calling the
+    /// `CALLBACK_RESIZE` callback. This is automatically handled.
+    pub fn push_str(&mut self, s: &str) {
+        // this is safe because the ench of a self.str is a char_boundary.
+        unsafe {
+            self.insert_chars_unsafe(self.str.len(), s);
+        }
+    }
+
     /// Inserts the given string at the given position. If this
     /// would require the String to resize, it will be resized by calling the
     /// `CALLBACK_RESIZE` callback. This is automatically handled.
@@ -204,7 +255,7 @@ impl TextCallbackBuffer<'_> {
     /// ## Panics
     /// Panics if the `pos` is not a char_boundary.
     pub fn insert_chars(&mut self, pos: usize, s: &str) {
-        assert!(self.buf.is_char_boundary(pos));
+        assert!(self.str.is_char_boundary(pos));
         unsafe {
             self.insert_chars_unsafe(pos, s);
         }
@@ -227,13 +278,14 @@ impl TextCallbackBuffer<'_> {
             pos as i32,
             start as *const c_char,
             end as *const c_char,
-        )
+        );
+        self.refresh_str();
     }
 
-    /// Clears the string.
+    /// Clears the string to an empty buffer.
     pub fn clear(&mut self) {
         unsafe {
-            self.remove_chars_unchecked(0, self.buf().len());
+            self.remove_chars_unchecked(0, self.str.len());
         }
     }
 
@@ -244,7 +296,7 @@ impl TextCallbackBuffer<'_> {
     /// Panics if the `pos` is not a char boundary or if
     /// there are not enough chars remaining.
     pub fn remove_chars(&mut self, pos: usize, char_count: usize) {
-        let inner = &self.buf[pos..];
+        let inner = &self.str[pos..];
         let byte_count = inner
             .char_indices()
             .nth(char_count)
@@ -269,7 +321,8 @@ impl TextCallbackBuffer<'_> {
             self.callback_data,
             pos as i32,
             byte_count as i32,
-        )
+        );
+        self.refresh_str();
     }
 
     /// Get a reference to the text callback buffer's cursor pos.
@@ -316,22 +369,7 @@ extern "C" fn callback(data: *mut sys::ImGuiInputTextCallbackData) -> c_int {
 
     let make_txt_data = || {
         // This safe in every callback EXCEPT RESIZE.
-        unsafe {
-            TextCallbackBuffer {
-                // specifically, this will bork in resize
-                buf: std::str::from_utf8_mut(std::slice::from_raw_parts_mut(
-                    (*data).Buf as *mut u8,
-                    (*data).BufTextLen as usize,
-                ))
-                .expect("internal imgui error -- it boofed a utf8"),
-
-                dirty: &mut (*data).BufDirty,
-                cursor_pos: &mut (*data).CursorPos,
-                selection_start: &mut (*data).SelectionStart,
-                selection_end: &mut (*data).SelectionEnd,
-                callback_data: data,
-            }
-        }
+        unsafe { TextCallbackBuffer::new(&mut *data) }
     };
 
     // check this callback.
