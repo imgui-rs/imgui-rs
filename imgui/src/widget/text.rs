@@ -39,26 +39,13 @@ impl<'ui> Ui<'ui> {
     /// Renders text wrapped to the end of window (or column)
     #[doc(alias = "TextWrapperd")]
     pub fn text_wrapped(&self, text: impl AsRef<str>) {
-        let mut handle = self.buffer.borrow_mut();
-        handle.clear();
-        handle.extend(text.as_ref().as_bytes());
-        handle.push(b'\0');
-        unsafe { sys::igTextWrapped(fmt_ptr(), handle.as_ptr()) }
+        unsafe { sys::igTextWrapped(fmt_ptr(), self.scratch_txt(text)) }
     }
     /// Render a text + label combination aligned the same way as value+label widgets
     #[doc(alias = "LabelText")]
     pub fn label_text(&self, label: impl AsRef<str>, text: impl AsRef<str>) {
-        let mut handle = self.buffer.borrow_mut();
-        handle.clear();
-        handle.extend(label.as_ref().as_bytes());
-        handle.push(b'\0');
-        handle.extend(text.as_ref().as_bytes());
-        handle.push(b'\0');
-
-        let ptr_one = handle.as_ptr();
-        let ptr_two = unsafe { ptr_one.add(text.as_ref().len() + 1) };
-
-        unsafe { sys::igLabelText(ptr_one as *const _, fmt_ptr(), ptr_two as *const _) }
+        let (ptr_one, ptr_two) = self.scratch_txt_two(label, text);
+        unsafe { sys::igLabelText(ptr_one, fmt_ptr(), ptr_two) }
     }
     /// Renders text with a little bullet aligned to the typical tree node
     #[doc(alias = "BulletText")]

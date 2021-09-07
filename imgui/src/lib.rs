@@ -120,10 +120,43 @@ impl Context {
 pub struct Ui<'ui> {
     ctx: &'ui Context,
     font_atlas: Option<cell::RefMut<'ui, SharedFontAtlas>>,
-    buffer: cell::RefCell<Vec<u8>>,
+    // imgui isn't mutli-threaded -- so no one will ever access
+    buffer: cell::UnsafeCell<Vec<u8>>,
 }
 
 impl<'ui> Ui<'ui> {
+    /// Internal method to push a single text to our scratch buffer.
+    fn scratch_txt(&self, txt: impl AsRef<str>) -> *const sys::cty::c_char {
+        unsafe {
+            let handle = &mut *self.buffer.get();
+            handle.clear();
+            handle.extend(txt.as_ref().as_bytes());
+            handle.push(b'\0');
+
+            handle.as_ptr() as *const _
+        }
+    }
+
+    fn scratch_txt_two(
+        &self,
+        txt_0: impl AsRef<str>,
+        txt_1: impl AsRef<str>,
+    ) -> (*const sys::cty::c_char, *const sys::cty::c_char) {
+        unsafe {
+            let handle = &mut *self.buffer.get();
+            handle.clear();
+            handle.extend(txt_0.as_ref().as_bytes());
+            handle.push(b'\0');
+            handle.extend(txt_1.as_ref().as_bytes());
+            handle.push(b'\0');
+
+            (
+                handle.as_ptr() as *const _,
+                handle.as_ptr().add(txt_1.as_ref().len() + 1) as *const _,
+            )
+        }
+    }
+
     /// Returns an immutable reference to the inputs/outputs object
     #[doc(alias = "GetIO")]
     pub fn io(&self) -> &Io {

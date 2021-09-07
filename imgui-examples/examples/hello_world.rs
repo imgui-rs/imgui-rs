@@ -4,13 +4,20 @@ mod support;
 
 fn main() {
     let system = support::init(file!());
+    let mut value = 0;
+    let choices = ["test test this is 1", "test test this is 2"];
     system.main_loop(move |_, ui| {
         Window::new(im_str!("Hello world"))
             .size([300.0, 110.0], Condition::FirstUseEver)
             .build(ui, || {
-                ui.text(im_str!("Hello world!"));
-                ui.text(im_str!("こんにちは世界！"));
-                ui.text(im_str!("This...is...imgui-rs!"));
+                ui.text_wrapped("Hello world!");
+                ui.text_wrapped("こんにちは世界！");
+                if ui.button(choices[value]) {
+                    value += 1;
+                    value %= 2;
+                }
+                
+                ui.button("This...is...imgui-rs!");
                 ui.separator();
                 let mouse_pos = ui.io().mouse_pos;
                 ui.text(format!(

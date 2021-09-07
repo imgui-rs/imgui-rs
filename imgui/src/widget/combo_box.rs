@@ -2,7 +2,6 @@ use bitflags::bitflags;
 use std::borrow::Cow;
 use std::ptr;
 
-use crate::string::ImStr;
 use crate::sys;
 use crate::Ui;
 
