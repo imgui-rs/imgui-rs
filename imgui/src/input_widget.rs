@@ -552,7 +552,7 @@ pub trait TextCallbackHandler {
     /// during this callback (for some reason).
     ///
     /// To make ImGui run this callback, use [InputTextCallback::CHAR_FILTER] or
-    /// [InputTextMultilineCallback::CALLBACK].
+    /// [InputTextMultilineCallback::CHAR_FILTER].
     fn char_filter(&mut self, c: char) -> Option<char> {
         Some(c)
     }
@@ -590,8 +590,8 @@ pub enum HistoryDirection {
 }
 
 /// This struct provides methods to edit the underlying text buffer that
-/// Dear ImGui manipulates. Primarily, it gives [remove_chars], [insert_chars],
-/// and mutable access to what text is selected.
+/// Dear ImGui manipulates. Primarily, it gives [remove_chars](Self::remove_chars),
+/// [insert_chars](Self::insert_chars), and mutable access to what text is selected.
 pub struct TextCallbackData<'a>(&'a mut sys::ImGuiInputTextCallbackData);
 
 impl<'a> TextCallbackData<'a> {
@@ -625,6 +625,11 @@ impl<'a> TextCallbackData<'a> {
     ///
     /// This function should have highly limited usage, but could be for
     /// editing certain characters in the buffer based on some external condition.
+    ///
+    /// [remove_chars]: Self::remove_chars
+    /// [set_dirty]: Self::set_dirty
+    /// [insert_chars]: Self::insert_chars
+    /// [push_str]: Self::push_str
     pub unsafe fn str_as_bytes_mut(&mut self) -> &mut [u8] {
         let str = std::str::from_utf8_mut(std::slice::from_raw_parts_mut(
             self.0.Buf as *const _ as *mut _,
@@ -638,19 +643,23 @@ impl<'a> TextCallbackData<'a> {
     /// Sets the dirty flag on the text to imgui, indicating that
     /// it should reapply this string to its internal state.
     ///
-    /// **NB:** You only need to use this method if you're using `[buf_mut]`.
+    /// **NB:** You only need to use this method if you're using `[str_as_bytes_mut]`.
     /// If you use the helper methods [remove_chars] and [insert_chars],
     /// this will be set for you. However, this is no downside to setting
     /// the dirty flag spuriously except the minor CPU time imgui will spend.
+    ///
+    /// [str_as_bytes_mut]: Self::str_as_bytes_mut
+    /// [remove_chars]: Self::remove_chars
+    /// [insert_chars]: Self::insert_chars
     pub fn set_dirty(&mut self) {
         self.0.BufDirty = true;
     }
 
-    /// Gets a range of the selected text. See [selection_start_mut] and
-    /// [selection_end_mut] to mutably edit these values.
+    /// Gets a range of the selected text. See [selection_start_mut](Self::selection_start_mut)
+    /// and [selection_end_mut](Self::selection_end_mut) to mutably edit these values.
     ///
     /// This Range is given in `usize` so that it might be used in indexing
-    /// operations more easily. To quickly grab the selected text, use [selected].
+    /// operations more easily. To quickly grab the selected text, use [selected](Self::selected).
     pub fn selection(&self) -> Range<usize> {
         self.0.SelectionStart as usize..self.0.SelectionEnd as usize
     }
@@ -661,16 +670,14 @@ impl<'a> TextCallbackData<'a> {
         &self.str()[self.selection()]
     }
 
-    /// Sets the cursor to select all. This is always a valid operation,
-    /// and so it takes an `&self`.
+    /// Sets the cursor to select all.
     pub fn select_all(&mut self) {
         unsafe {
             sys::ImGuiInputTextCallbackData_SelectAll(self.0);
         }
     }
 
-    /// Clears the selection. This is always a valid operation,
-    /// and so it takes an `&self`.
+    /// Clears the selection.
     pub fn clear_selection(&mut self) {
         unsafe {
             sys::ImGuiInputTextCallbackData_ClearSelection(self.0);
@@ -683,8 +690,8 @@ impl<'a> TextCallbackData<'a> {
     }
 
     /// Pushes the given str to the end of this buffer. If this
-    /// would require the String to resize, it will be resized by calling the
-    /// `CALLBACK_RESIZE` callback. This is automatically handled.
+    /// would require the String to resize, it will be resized.
+    /// This is automatically handled.
     pub fn push_str(&mut self, s: &str) {
         // this is safe because the ench of a self.str is a char_boundary.
         unsafe {
@@ -693,8 +700,8 @@ impl<'a> TextCallbackData<'a> {
     }
 
     /// Inserts the given string at the given position. If this
-    /// would require the String to resize, it will be resized by calling the
-    /// `CALLBACK_RESIZE` callback. This is automatically handled.
+    /// would require the String to resize, it will be resized
+    /// automatically.
     ///
     /// ## Panics
     /// Panics if the `pos` is not a char_boundary.
@@ -706,13 +713,13 @@ impl<'a> TextCallbackData<'a> {
     }
 
     /// Inserts the given string at the given position, unsafely. If this
-    /// would require the String to resize, it will be resized by calling the
-    /// Callback_Resize callback. This is automatically handled.
+    /// would require the String to resize, it will be resized automatically.
     ///
     /// ## Safety
     ///
     /// It is up to the caller to confirm that the `pos` is a valid byte
-    /// position, or use [insert_chars] which will panic if it isn't.
+    /// position, or use [insert_chars](Self::insert_chars) which will panic
+    /// if it isn't.
     pub unsafe fn insert_chars_unsafe(&mut self, pos: usize, s: &str) {
         let start = s.as_ptr();
         let end = start.add(s.len());
@@ -752,8 +759,8 @@ impl<'a> TextCallbackData<'a> {
     }
 
     /// Removes the given number of bytes from the string starting
-    /// at some byte pos, without checking for utf8 validity. Use [remove_chars]
-    /// for a safe variant.
+    /// at some byte pos, without checking for utf8 validity. Use
+    /// [remove_chars](Self::remove_chars) for a safe variant.
     ///
     /// ## Safety
     ///

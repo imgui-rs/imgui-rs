@@ -134,8 +134,8 @@ impl<'p> PopupModal<'p> {
     /// Consume and draw the PopupModal.
     /// Construct a popup that can have any kind of content.
     ///
-    /// This should be called *per frame*, whereas [`open_popup`](Self::open_popup) should be called *once*
-    /// when you want to actual create the popup.
+    /// This should be called *per frame*, whereas [`Ui::open_popup`]
+    /// should be called *once* when you want to actual create the popup.
     #[doc(alias = "BeginPopupModal")]
     pub fn begin_popup<'ui>(self, ui: &Ui<'ui>) -> Option<PopupToken<'ui>> {
         let render = unsafe {
@@ -159,7 +159,7 @@ impl<'p> PopupModal<'p> {
 // Widgets: Popups
 impl<'ui> Ui<'ui> {
     /// Instructs ImGui to open a popup, which must be began with either [`begin_popup`](Self::begin_popup)
-    /// or [`popup`](Self::popup). You also use this function to begin [ModalPopups].
+    /// or [`popup`](Self::popup). You also use this function to begin [PopupModal].
     ///
     /// The confusing aspect to popups is that ImGui holds "control" over the popup fundamentally, so that ImGui
     /// can also force close a popup when a user clicks outside a popup. If you do not want users to be

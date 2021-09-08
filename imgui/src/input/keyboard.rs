@@ -110,7 +110,7 @@ impl<'ui> Ui<'ui> {
         self.is_key_index_down(key_index)
     }
 
-    /// Same as [`is_key_down`] but takes a key index. The meaning of
+    /// Same as [`is_key_down`](Self::is_key_down) but takes a key index. The meaning of
     /// index is defined by your backend implementation.
     #[inline]
     #[doc(alias = "IsKeyDown")]
@@ -128,7 +128,7 @@ impl<'ui> Ui<'ui> {
         self.is_key_index_pressed(key_index)
     }
 
-    /// Same as [`is_key_pressed`] but takes a key index.
+    /// Same as [`is_key_pressed`](Self::is_key_pressed) but takes a key index.
     ///
     /// The meaning of index is defined by your backend
     /// implementation.
@@ -148,7 +148,8 @@ impl<'ui> Ui<'ui> {
         self.is_key_index_pressed_no_repeat(key_index)
     }
 
-    /// Same as [`is_key_pressed_no_repeat`] but takes a key index.
+    /// Same as [`is_key_pressed_no_repeat`](Self::is_key_pressed_no_repeat)
+    /// but takes a key index.
     ///
     /// The meaning of index is defined by your backend
     /// implementation.
@@ -166,7 +167,7 @@ impl<'ui> Ui<'ui> {
         self.is_key_index_released(key_index)
     }
 
-    /// Same as [`is_key_released`] but takes a key index.
+    /// Same as [`is_key_released`](Self::is_key_released) but takes a key index.
     ///
     /// The meaning of index is defined by your backend
     /// implementation.
