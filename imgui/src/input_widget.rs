@@ -760,7 +760,7 @@ impl<'a> TextCallbackData<'a> {
             .char_indices()
             .nth(char_count)
             .map(|v| v.0)
-            .unwrap_or(inner.len());
+            .unwrap_or_else(|| inner.len());
 
         unsafe {
             self.remove_chars_unchecked(pos, byte_count);
