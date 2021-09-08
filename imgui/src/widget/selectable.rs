@@ -23,20 +23,20 @@ bitflags!(
 /// Builder for a selectable widget.
 #[derive(Copy, Clone, Debug)]
 #[must_use]
-pub struct Selectable<'a> {
-    label: &'a str,
+pub struct Selectable<T> {
+    label: T,
     selected: bool,
     flags: SelectableFlags,
     size: [f32; 2],
 }
 
-impl<'a> Selectable<'a> {
+impl<T: AsRef<str>> Selectable<T> {
     /// Constructs a new selectable builder.
     #[inline]
     #[doc(alias = "Selectable")]
-    pub fn new(label: &'a impl AsRef<str>) -> Selectable<'a> {
+    pub fn new(label: T) -> Self {
         Selectable {
-            label: label.as_ref(),
+            label,
             selected: false,
             flags: SelectableFlags::empty(),
             size: [0.0, 0.0],
@@ -117,10 +117,7 @@ impl<'a> Selectable<'a> {
             )
         }
     }
-}
 
-/// # Convenience functions
-impl<'a> Selectable<'a> {
     /// Builds the selectable using a mutable reference to selected state.
     pub fn build_with_ref(self, ui: &Ui, selected: &mut bool) -> bool {
         if self.selected(*selected).build(ui) {

@@ -137,6 +137,14 @@ impl<'ui> Ui<'ui> {
         }
     }
 
+    /// Internal method to push an option text to our scratch buffer.
+    fn scratch_txt_opt(&self, txt: Option<impl AsRef<str>>) -> *const sys::cty::c_char {
+        match txt {
+            Some(v) => self.scratch_txt(v),
+            None => std::ptr::null(),
+        }
+    }
+
     fn scratch_txt_two(
         &self,
         txt_0: impl AsRef<str>,

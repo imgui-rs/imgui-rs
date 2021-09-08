@@ -449,7 +449,7 @@ fn show_test_window(ui: &Ui, state: &mut State, opened: &mut bool) {
                 ui.spacing();
 
                 Slider::new(im_str!("Wrap width"), -20.0, 600.0)
-                    .display_format(im_str!("%.0f"))
+                    .display_format("%.0f")
                     .build(ui, &mut state.wrap_width);
 
                 ui.text(im_str!("Test paragraph 1:"));

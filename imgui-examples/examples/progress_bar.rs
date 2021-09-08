@@ -19,9 +19,7 @@ fn main() {
 
             ui.separator();
             ui.text("This progress bar uses overlay text:");
-            ProgressBar::new(0.8)
-                .overlay_text(im_str!("Lorem ipsum"))
-                .build(ui);
+            ProgressBar::new_with_overlay(0.8, "Lorem ipsum").build(ui);
         });
     });
 }

@@ -56,7 +56,7 @@ fn example_1(ui: &Ui, state: &mut State) {
         ui.separator();
         ui.text("Value formatting can be customized with a C-style printf string:");
         Slider::new(im_str!("f64 value with custom formatting"), -999_999_999.0, 999_999_999.0)
-            .display_format(im_str!("%09.0f"))
+            .display_format("%09.0f")
             .build(ui, &mut state.f64_formatted);
 
         ui.separator();

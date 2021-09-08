@@ -1,6 +1,6 @@
 use std::os::raw::c_char;
 
-use crate::string::ImStr;
+// use crate::string::ImStr;
 use crate::style::StyleColor;
 use crate::Ui;
 
@@ -49,7 +49,7 @@ impl<'ui> Ui<'ui> {
     }
     /// Renders text with a little bullet aligned to the typical tree node
     #[doc(alias = "BulletText")]
-    pub fn bullet_text(&self, text: &ImStr) {
-        unsafe { sys::igBulletText(fmt_ptr(), text.as_ptr()) }
+    pub fn bullet_text(&self, text: impl AsRef<str>) {
+        unsafe { sys::igBulletText(fmt_ptr(), self.scratch_txt(text)) }
     }
 }
