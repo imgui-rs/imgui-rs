@@ -310,11 +310,11 @@ impl<'ui, 'p, T: InputTextCallbackHandler> InputTextMultiline<'ui, 'p, T> {
     }
 
     #[inline]
-    pub fn callback(
+    pub fn callback<T2: InputTextCallbackHandler>(
         mut self,
         callbacks: InputTextMultilineCallback,
-        callback: T,
-    ) -> InputTextMultiline<'ui, 'p, T> {
+        callback_handler: T2,
+    ) -> InputTextMultiline<'ui, 'p, T2> {
         if callbacks.contains(InputTextMultilineCallback::COMPLETION) {
             self.flags.insert(InputTextFlags::CALLBACK_COMPLETION);
         }
@@ -327,8 +327,15 @@ impl<'ui, 'p, T: InputTextCallbackHandler> InputTextMultiline<'ui, 'p, T> {
         if callbacks.contains(InputTextMultilineCallback::EDIT) {
             self.flags.insert(InputTextFlags::CALLBACK_EDIT);
         }
-        self.callback_handler = callback;
-        self
+
+        InputTextMultiline {
+            label: self.label,
+            buf: self.buf,
+            flags: self.flags,
+            size: self.size,
+            callback_handler,
+            _phantom: self._phantom,
+        }
     }
 
     pub fn build(self) -> bool {
