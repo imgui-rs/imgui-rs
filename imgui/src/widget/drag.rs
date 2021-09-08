@@ -10,19 +10,19 @@ use crate::Ui;
 /// Builder for a drag slider widget.
 #[derive(Copy, Clone, Debug)]
 #[must_use]
-pub struct Drag<'a, T: DataTypeKind> {
-    label: &'a ImStr,
+pub struct Drag<'a, T, L> {
+    label: L,
     speed: f32,
     min: Option<T>,
     max: Option<T>,
-    display_format: Option<&'a ImStr>,
+    display_format: Option<&'a str>,
     flags: SliderFlags,
 }
 
-impl<'a, T: DataTypeKind> Drag<'a, T> {
+impl<'a, L: AsRef<str>, T: DataTypeKind> Drag<'a, T, L> {
     /// Constructs a new drag slider builder.
     #[doc(alias = "DragScalar", alias = "DragScalarN")]
-    pub fn new(label: &ImStr) -> Drag<T> {
+    pub fn new(label: L) -> Self {
         Drag {
             label,
             speed: 1.0,
@@ -49,7 +49,7 @@ impl<'a, T: DataTypeKind> Drag<'a, T> {
     }
     /// Sets the display format using *a C-style printf string*
     #[inline]
-    pub fn display_format(mut self, display_format: &'a ImStr) -> Self {
+    pub fn display_format(mut self, display_format: &'a str) -> Self {
         self.display_format = Some(display_format);
         self
     }
@@ -62,10 +62,12 @@ impl<'a, T: DataTypeKind> Drag<'a, T> {
     /// Builds a drag slider that is bound to the given value.
     ///
     /// Returns true if the slider value was changed.
-    pub fn build(self, _: &Ui, value: &mut T) -> bool {
+    pub fn build(self, ui: &Ui, value: &mut T) -> bool {
         unsafe {
+            let (one, two) = ui.scratch_txt_with_opt(self.label, self.display_format);
+
             sys::igDragScalar(
-                self.label.as_ptr(),
+                one,
                 T::KIND as i32,
                 value as *mut T as *mut c_void,
                 self.speed,
@@ -77,9 +79,7 @@ impl<'a, T: DataTypeKind> Drag<'a, T> {
                     .as_ref()
                     .map(|max| max as *const T)
                     .unwrap_or(ptr::null()) as *const c_void,
-                self.display_format
-                    .map(ImStr::as_ptr)
-                    .unwrap_or(ptr::null()),
+                two,
                 self.flags.bits() as i32,
             )
         }
@@ -87,10 +87,12 @@ impl<'a, T: DataTypeKind> Drag<'a, T> {
     /// Builds a horizontal array of multiple drag sliders attached to the given slice.
     ///
     /// Returns true if any slider value was changed.
-    pub fn build_array(self, _: &Ui, values: &mut [T]) -> bool {
+    pub fn build_array(self, ui: &Ui, values: &mut [T]) -> bool {
         unsafe {
+            let (one, two) = ui.scratch_txt_with_opt(self.label, self.display_format);
+
             sys::igDragScalarN(
-                self.label.as_ptr(),
+                one,
                 T::KIND as i32,
                 values.as_mut_ptr() as *mut c_void,
                 values.len() as i32,
@@ -103,9 +105,7 @@ impl<'a, T: DataTypeKind> Drag<'a, T> {
                     .as_ref()
                     .map(|max| max as *const T)
                     .unwrap_or(ptr::null()) as *const c_void,
-                self.display_format
-                    .map(ImStr::as_ptr)
-                    .unwrap_or(ptr::null()),
+                two,
                 self.flags.bits() as i32,
             )
         }

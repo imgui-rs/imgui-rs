@@ -480,7 +480,7 @@ fn show_test_window(ui: &Ui, state: &mut State, opened: &mut bool) {
 
             ui.separator();
             ui.label_text(im_str!("label"), im_str!("Value"));
-            ComboBox::new(&"combo").build_simple_string(ui,
+            ui.combo_simple_string("combo",
                 &mut state.item,
                 &[
                     im_str!("aaaa"),
@@ -502,8 +502,7 @@ fn show_test_window(ui: &Ui, state: &mut State, opened: &mut bool) {
                 im_str!("JJJJ"),
                 im_str!("KKKK"),
             ];
-            ComboBox::new(im_str!("combo scroll")).build_simple_string(ui, &mut state.item2, &items);
-
+            ui.combo_simple_string("combo scroll", &mut state.item2, &items);
             ui.list_box(im_str!("list"), &mut state.item3, &items, 8);
 
 
@@ -540,7 +539,7 @@ fn show_test_window(ui: &Ui, state: &mut State, opened: &mut bool) {
                 .hint(im_str!("enter text here"))
                 .build();
             ui.input_int(im_str!("input int"), &mut state.i0).build();
-            Drag::new(im_str!("drag int")).build(ui, &mut state.i0);
+            // Drag::new(im_str!("drag int")).build(ui, &mut state.i0);
             ui.input_float(im_str!("input float"), &mut state.f0)
                 .step(0.01)
                 .step_fast(1.0)
@@ -808,7 +807,7 @@ CTRL+click on individual component to input value.\n",
                     );
 
                     let items = &[im_str!("aaaa"), im_str!("bbbb"), im_str!("cccc"), im_str!("dddd"), im_str!("eeee")];
-                    ComboBox::new(im_str!("Combo")).build_simple_string(ui, &mut state.stacked_modals_item, items);
+                    ui.combo_simple_string("Combo", &mut state.stacked_modals_item, items);
 
                     ColorEdit::new(im_str!("color"), &mut state.stacked_modals_color).build(ui);
 
@@ -904,8 +903,8 @@ fn show_example_menu_file<'a>(ui: &Ui<'a>, state: &mut FileMenuState) {
         ui.input_float(im_str!("Input"), &mut state.f)
             .step(0.1)
             .build();
-        let items = [im_str!("Yes"), im_str!("No"), im_str!("Maybe")];
-        ComboBox::new(im_str!("Combo")).build_simple_string(ui, &mut state.n, &items);
+        let items = ["Yes", "No", "Maybe"];
+        ui.combo_simple_string("Combo", &mut state.n, &items);
         ui.checkbox(im_str!("Check"), &mut state.b);
         menu.end();
     }

@@ -157,6 +157,31 @@ impl<'ui> Ui<'ui> {
         }
     }
 
+    fn scratch_txt_with_opt(
+        &self,
+        txt_0: impl AsRef<str>,
+        txt_1: Option<impl AsRef<str>>,
+    ) -> (*const sys::cty::c_char, *const sys::cty::c_char) {
+        unsafe {
+            let handle = &mut *self.buffer.get();
+            handle.clear();
+            handle.extend(txt_0.as_ref().as_bytes());
+            handle.push(b'\0');
+
+            if let Some(txt_1) = txt_1 {
+                handle.extend(txt_1.as_ref().as_bytes());
+                handle.push(b'\0');
+
+                (
+                    handle.as_ptr() as *const _,
+                    handle.as_ptr().add(txt_1.as_ref().len() + 1) as *const _,
+                )
+            } else {
+                (handle.as_ptr() as *const _, std::ptr::null())
+            }
+        }
+    }
+
     /// Returns an immutable reference to the inputs/outputs object
     #[doc(alias = "GetIO")]
     pub fn io(&self) -> &Io {
