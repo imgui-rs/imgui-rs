@@ -80,10 +80,14 @@ fn main() {
                 // key regardless of what widget has focus, for
                 // example, if you try to type into this input, the
                 // above interaction still counts the key presses.
-                ui.input_text(im_str!("##Dummy text input widget"), &mut text_buffer)
-                    .resize_buffer(true) // Auto-resize ImString as required
-                    .hint(im_str!("Example text input"))
-                    .build();
+                ui.input_text_multiline(
+                    im_str!("##Dummy text input widget"),
+                    &mut text_buffer,
+                    [100.0, 100.0],
+                )
+                // .do_not_resize() if you pass this, then this won't resize!
+                // .hint(im_str!("Example text input"))
+                .build();
 
                 // If you want to check if a widget is capturing
                 // keyboard input, you can check

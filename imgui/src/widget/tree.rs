@@ -391,7 +391,7 @@ impl<'a> CollapsingHeader<'a> {
     ///
     /// Returns true if the collapsing header is open and content should be rendered.
     ///
-    /// This is the same as [build] but is provided for consistent naming.
+    /// This is the same as [build](Self::build) but is provided for consistent naming.
     #[must_use]
     pub fn begin(self, ui: &Ui) -> bool {
         self.build(ui)
@@ -401,7 +401,8 @@ impl<'a> CollapsingHeader<'a> {
     ///
     /// Returns true if the collapsing header is open and content should be rendered.
     ///
-    /// This is the same as [build_with_close_button] but is provided for consistent naming.
+    /// This is the same as [build_with_close_button](Self::build_with_close_button)
+    /// but is provided for consistent naming.
     #[must_use]
     pub fn begin_with_close_button(self, ui: &Ui, opened: &mut bool) -> bool {
         self.build_with_close_button(ui, opened)
