@@ -11,8 +11,7 @@ fn main() {
     let mut uncaptured_counter = 0u32;
     let mut home_counter = 0u32;
     let mut f1_release_count = 0u32;
-    let mut text_buffer = ImString::new("with some buffer");
-    text_buffer.reserve(100);
+    let mut text_buffer = ImString::new("");
 
     system.main_loop(move |_, ui| {
         Window::new(im_str!("Means of accessing key state"))

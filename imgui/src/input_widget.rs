@@ -183,7 +183,7 @@ impl<'ui, 'p> InputText<'ui, 'p, PassthroughCallback> {
     }
 }
 
-impl<'ui, 'p, T: TextCallbackHandler> InputText<'ui, 'p, T> {
+impl<'ui, 'p, T: InputTextCallbackHandler> InputText<'ui, 'p, T> {
     /// Sets the hint displayed in the input text background.
     #[inline]
     pub fn hint(mut self, hint: &'p ImStr) -> Self {
@@ -194,7 +194,7 @@ impl<'ui, 'p, T: TextCallbackHandler> InputText<'ui, 'p, T> {
     impl_text_flags!(InputText);
 
     /// By default (as of 0.8.0), imgui-rs will automatically handle string resizes
-    /// for `InputText` and `InputTextMultiline`.
+    /// for [InputText] and [InputTextMultiline].
     ///
     /// If, for some reason, you don't want this, you can run this function to prevent this.
     /// In that case, edits which would cause a resize will not occur.
@@ -205,7 +205,11 @@ impl<'ui, 'p, T: TextCallbackHandler> InputText<'ui, 'p, T> {
     }
 
     #[inline]
-    pub fn callback(mut self, callbacks: InputTextCallback, callback: T) -> InputText<'ui, 'p, T> {
+    pub fn callback<T2: InputTextCallbackHandler>(
+        mut self,
+        callbacks: InputTextCallback,
+        callback: T2,
+    ) -> InputText<'ui, 'p, T2> {
         if callbacks.contains(InputTextCallback::COMPLETION) {
             self.flags.insert(InputTextFlags::CALLBACK_COMPLETION);
         }
@@ -221,8 +225,14 @@ impl<'ui, 'p, T: TextCallbackHandler> InputText<'ui, 'p, T> {
         if callbacks.contains(InputTextCallback::EDIT) {
             self.flags.insert(InputTextFlags::CALLBACK_EDIT);
         }
-        self.callback_handler = callback;
-        self
+        InputText {
+            callback_handler: callback,
+            label: self.label,
+            hint: self.hint,
+            buf: self.buf,
+            flags: self.flags,
+            _phantom: self._phantom,
+        }
     }
 
     pub fn build(self) -> bool {
@@ -285,11 +295,11 @@ impl<'ui, 'p> InputTextMultiline<'ui, 'p, PassthroughCallback> {
     }
 }
 
-impl<'ui, 'p, T: TextCallbackHandler> InputTextMultiline<'ui, 'p, T> {
+impl<'ui, 'p, T: InputTextCallbackHandler> InputTextMultiline<'ui, 'p, T> {
     impl_text_flags!(InputText);
 
     /// By default (as of 0.8.0), imgui-rs will automatically handle string resizes
-    /// for `InputText` and `InputTextMultiline`.
+    /// for [InputText] and [InputTextMultiline].
     ///
     /// If, for some reason, you don't want this, you can run this function to prevent this.
     /// In that case, edits which would cause a resize will not occur.
@@ -544,7 +554,7 @@ bitflags!(
 ///
 /// Each method here lists the flag required to call it, and this module begins
 /// with an example of callbacks being used.
-pub trait TextCallbackHandler {
+pub trait InputTextCallbackHandler {
     /// Filters a char -- returning a `None` means that the char is removed,
     /// and returning another char substitutes it out.
     ///
@@ -743,15 +753,14 @@ impl<'a> TextCallbackData<'a> {
     /// at some byte pos.
     ///
     /// ## Panics
-    /// Panics if the `pos` is not a char boundary or if
-    /// there are not enough chars remaining.
+    /// Panics if the `pos` is not a char boundary.
     pub fn remove_chars(&mut self, pos: usize, char_count: usize) {
         let inner = &self.str()[pos..];
         let byte_count = inner
             .char_indices()
             .nth(char_count)
-            .expect("not enough characters in string")
-            .0;
+            .map(|v| v.0)
+            .unwrap_or(inner.len());
 
         unsafe {
             self.remove_chars_unchecked(pos, byte_count);
@@ -798,7 +807,7 @@ struct UserData<'a, T> {
 }
 
 /// This is our default callback.
-extern "C" fn callback<T: TextCallbackHandler>(
+extern "C" fn callback<T: InputTextCallbackHandler>(
     data: *mut sys::ImGuiInputTextCallbackData,
 ) -> c_int {
     struct CallbackData<'a, T> {
@@ -885,4 +894,4 @@ extern "C" fn callback<T: TextCallbackHandler>(
 /// If you do not set a callback handler, this will be used (but will never
 /// actually run, since you will not have pass imgui any flags).
 pub struct PassthroughCallback;
-impl TextCallbackHandler for PassthroughCallback {}
+impl InputTextCallbackHandler for PassthroughCallback {}
