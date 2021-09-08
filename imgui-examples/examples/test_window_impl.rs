@@ -837,23 +837,15 @@ fn show_example_app_main_menu_bar<'a>(ui: &Ui<'a>, state: &mut State) {
             menu.end();
         }
         if let Some(menu) = ui.begin_menu(im_str!("Edit")) {
-            MenuItem::new(im_str!("Undo"))
-                .shortcut(im_str!("CTRL+Z"))
-                .build(ui);
+            MenuItem::new(im_str!("Undo")).shortcut("CTRL+Z").build(ui);
             MenuItem::new(im_str!("Redo"))
-                .shortcut(im_str!("CTRL+Y"))
+                .shortcut("CTRL+Y")
                 .enabled(false)
                 .build(ui);
             ui.separator();
-            MenuItem::new(im_str!("Cut"))
-                .shortcut(im_str!("CTRL+X"))
-                .build(ui);
-            MenuItem::new(im_str!("Copy"))
-                .shortcut(im_str!("CTRL+C"))
-                .build(ui);
-            MenuItem::new(im_str!("Paste"))
-                .shortcut(im_str!("CTRL+V"))
-                .build(ui);
+            MenuItem::new(im_str!("Cut")).shortcut("CTRL+X").build(ui);
+            MenuItem::new(im_str!("Copy")).shortcut("CTRL+C").build(ui);
+            MenuItem::new(im_str!("Paste")).shortcut("CTRL+V").build(ui);
             menu.end();
         }
         menu_bar.end();
@@ -865,9 +857,7 @@ fn show_example_menu_file<'a>(ui: &Ui<'a>, state: &mut FileMenuState) {
         .enabled(false)
         .build(ui);
     MenuItem::new(im_str!("New")).build(ui);
-    MenuItem::new(im_str!("Open"))
-        .shortcut(im_str!("Ctrl+O"))
-        .build(ui);
+    MenuItem::new(im_str!("Open")).shortcut("Ctrl+O").build(ui);
     if let Some(menu) = ui.begin_menu(im_str!("Open Recent")) {
         MenuItem::new(im_str!("fish_hat.c")).build(ui);
         MenuItem::new(im_str!("fish_hat.inl")).build(ui);
@@ -884,7 +874,7 @@ fn show_example_menu_file<'a>(ui: &Ui<'a>, state: &mut FileMenuState) {
         menu.end();
     }
     MenuItem::new(im_str!("Save"))
-        .shortcut(im_str!("Ctrl+S"))
+        .shortcut("Ctrl+S")
         .build(ui);
     MenuItem::new(im_str!("Save As..")).build(ui);
     ui.separator();
@@ -919,7 +909,7 @@ fn show_example_menu_file<'a>(ui: &Ui<'a>, state: &mut FileMenuState) {
         .is_none());
     MenuItem::new(im_str!("Checked")).selected(true).build(ui);
     MenuItem::new(im_str!("Quit"))
-        .shortcut(im_str!("Alt+F4"))
+        .shortcut("Alt+F4")
         .build(ui);
 }
 
