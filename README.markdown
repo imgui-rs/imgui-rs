@@ -47,6 +47,7 @@ Window::new(im_str!("Hello world"))
   for more information and justification for this design.
 - Easy integration with Glium / pre-ll gfx (renderer)
 - Easy integration with winit (backend platform)
+- Optional support for the freetype font rasterizer
 
 ## Choosing a backend platform and a renderer
 

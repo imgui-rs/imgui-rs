@@ -61,6 +61,8 @@ with the exception of the current default winit feature/dep version. Additionall
       - If you're using `DEP_IMGUI_DEFINE_`s for this already, then no change is needed.
     - If you're using `.cargo/config` to apply a build script override and link against a prebuilt `Dear Imgui` (or something else along these lines), you need to ensure you link with a version that was built using `-DIMGUI_USE_WCHAR32`.
 
+- Support for the freetype font rasterizer. Enabled by the non-default `freetype` feature, e.g `imgui = {version = "...", features=["freetype"]})`
+
 ## [0.7.0] - 2021-02-04
 
 - Upgrade to [Dear ImGui v1.80](https://github.com/ocornut/imgui/releases/tag/v1.80). (Note that the new table functionality is not yet supported, however)
