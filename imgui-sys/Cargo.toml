@@ -18,7 +18,9 @@ chlorine = "1.0.7"
 
 [build-dependencies]
 cc = "1.0"
+pkg-config = { version="0.3", optional=true }
 
 [features]
 default = []
 wasm = []
+freetype = ["pkg-config"]
