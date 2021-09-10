@@ -63,6 +63,7 @@ bitflags! {
 
 bitflags! {
     #[repr(transparent)]
+    #[derive(Default)]
     pub struct TableColumnFlags: u32 {
         // Input configuration flags
         const NONE = sys::ImGuiTableColumnFlags_None;
@@ -93,43 +94,34 @@ bitflags! {
 bitflags! {
     #[repr(transparent)]
     pub struct TableBgTarget: u32 {
-    const NONE = sys::ImGuiTableBgTarget_None;
-    const ROW_BG0 = sys::ImGuiTableBgTarget_RowBg0;
-    const ROW_BG1 = sys::ImGuiTableBgTarget_RowBg1;
-    const CELL_BG = sys::ImGuiTableBgTarget_CellBg;
+        const NONE = sys::ImGuiTableBgTarget_None;
+        const ROW_BG0 = sys::ImGuiTableBgTarget_RowBg0;
+        const ROW_BG1 = sys::ImGuiTableBgTarget_RowBg1;
+        const CELL_BG = sys::ImGuiTableBgTarget_CellBg;
     }
 }
 
 impl<'ui> Ui<'ui> {
-    pub fn begin_table<'p>(&self, str_id: &'p ImStr, column: i32) -> bool {
-        self.begin_table_with_flags(str_id, column, TableFlags::NONE)
+    pub fn begin_table(&self, str_id: &ImStr, column_count: i32) -> Option<TableToken<'ui>> {
+        self.begin_table_with_flags(str_id, column_count, TableFlags::NONE)
     }
-    pub fn begin_table_with_flags<'p>(
+    pub fn begin_table_with_flags(
         &self,
-        str_id: &'p ImStr,
-        column: i32,
+        str_id: &ImStr,
+        column_count: i32,
         flags: TableFlags,
-    ) -> bool {
-        self.begin_table_with_outer_size(str_id, column, flags, [0.0, 0.0])
+    ) -> Option<TableToken<'ui>> {
+        self.begin_table_with_sizing(str_id, column_count, flags, [0.0, 0.0], 0.0)
     }
-    pub fn begin_table_with_outer_size<'p>(
+    pub fn begin_table_with_sizing(
         &self,
-        str_id: &'p ImStr,
-        column: i32,
-        flags: TableFlags,
-        outer_size: [f32; 2],
-    ) -> bool {
-        self.begin_table_with_inner_width(str_id, column, flags, outer_size, 0.0)
-    }
-    pub fn begin_table_with_inner_width<'p>(
-        &self,
-        str_id: &'p ImStr,
+        str_id: &ImStr,
         column: i32,
         flags: TableFlags,
         outer_size: [f32; 2],
         inner_width: f32,
-    ) -> bool {
-        unsafe {
+    ) -> Option<TableToken<'ui>> {
+        let should_render = unsafe {
             sys::igBeginTable(
                 str_id.as_ptr(),
                 column,
@@ -137,21 +129,61 @@ impl<'ui> Ui<'ui> {
                 outer_size.into(),
                 inner_width,
             )
-        }
+        };
+
+        should_render.then(|| TableToken::new(self))
     }
 
-    pub fn end_table(&self) {
-        unsafe {
-            sys::igEndTable();
-        }
+    pub fn begin_table_header<'a, const N: usize>(
+        &self,
+        str_id: &ImStr,
+        column_data: [TableHeader<'a>; N],
+    ) -> Option<TableToken<'ui>> {
+        self.begin_table_header_with_flags(str_id, column_data, TableFlags::NONE)
+    }
+    pub fn begin_table_header_with_flags<'a, const N: usize>(
+        &self,
+        str_id: &ImStr,
+        column_data: [TableHeader<'a>; N],
+        flags: TableFlags,
+    ) -> Option<TableToken<'ui>> {
+        self.begin_table_header_with_sizing(str_id, column_data, flags, [0.0, 0.0], 0.0)
+    }
+    pub fn begin_table_header_with_sizing<'a, const N: usize>(
+        &self,
+        str_id: &ImStr,
+        column_data: [TableHeader<'a>; N],
+        flags: TableFlags,
+        outer_size: [f32; 2],
+        inner_width: f32,
+    ) -> Option<TableToken<'ui>> {
+        self.begin_table_with_sizing(str_id, N as i32, flags, outer_size, inner_width)
+            .map(|data| {
+                for value in column_data {
+                    self.table_setup_column_with_id(
+                        value.name,
+                        value.flags,
+                        value.init_width_or_weight,
+                        value.user_id,
+                    );
+                }
+                self.table_headers_row();
+
+                data
+            })
     }
 
+    #[inline]
     pub fn table_next_row(&self) {
         self.table_next_row_with_flags(TableRowFlags::NONE);
     }
+
+    #[inline]
     pub fn table_next_row_with_flags(&self, flags: TableRowFlags) {
         self.table_next_row_with_height(flags, 0.0);
     }
+
+    #[inline]
     pub fn table_next_row_with_height(&self, flags: TableRowFlags, min_row_height: f32) {
         unsafe {
             sys::igTableNextRow(flags.bits() as i32, min_row_height);
@@ -161,27 +193,20 @@ impl<'ui> Ui<'ui> {
     pub fn table_next_column(&self) -> bool {
         unsafe { sys::igTableNextColumn() }
     }
-    pub fn table_set_column_index(&self, column_n: i32) -> bool {
-        unsafe { sys::igTableSetColumnIndex(column_n) }
+    pub fn table_set_column_index(&self, column_index: usize) -> bool {
+        unsafe { sys::igTableSetColumnIndex(column_index as i32) }
     }
 
-    pub fn table_setup_column<'p>(&self, str_id: &'p ImStr) {
+    pub fn table_setup_column(&self, str_id: &ImStr) {
         self.table_setup_column_with_flags(str_id, TableColumnFlags::NONE)
     }
-    pub fn table_setup_column_with_flags<'p>(&self, str_id: &'p ImStr, flags: TableColumnFlags) {
-        self.table_setup_column_with_weight(str_id, flags, 0.0)
+
+    pub fn table_setup_column_with_flags(&self, str_id: &ImStr, flags: TableColumnFlags) {
+        self.table_setup_column_with_id(str_id, flags, 0.0, Id::Int(0))
     }
-    pub fn table_setup_column_with_weight<'p>(
+    pub fn table_setup_column_with_id(
         &self,
-        str_id: &'p ImStr,
-        flags: TableColumnFlags,
-        init_width_or_weight: f32,
-    ) {
-        self.table_setup_column_with_id(str_id, flags, init_width_or_weight, Id::Int(0))
-    }
-    pub fn table_setup_column_with_id<'p>(
-        &self,
-        str_id: &'p ImStr,
+        str_id: &ImStr,
         flags: TableColumnFlags,
         init_width_or_weight: f32,
         user_id: Id,
@@ -196,9 +221,9 @@ impl<'ui> Ui<'ui> {
         }
     }
 
-    pub fn table_setup_scroll_freeze(&self, cols: i32, rows: i32) {
+    pub fn table_setup_scroll_freeze(&self, locked_columns: i32, locked_rows: i32) {
         unsafe {
-            sys::igTableSetupScrollFreeze(cols, rows);
+            sys::igTableSetupScrollFreeze(locked_columns, locked_rows);
         }
     }
     pub fn table_headers_row(&self) {
@@ -206,7 +231,7 @@ impl<'ui> Ui<'ui> {
             sys::igTableHeadersRow();
         }
     }
-    pub fn table_header<'p>(&self, label: &'p ImStr) {
+    pub fn table_header(&self, label: &ImStr) {
         unsafe {
             sys::igTableHeader(label.as_ptr());
         }
@@ -226,25 +251,12 @@ impl<'ui> Ui<'ui> {
         unsafe { sys::igTableGetRowIndex() }
     }
 
-    //pub fn table_get_column_name(&self) -> &str {
-    //    self.table_get_column_name_with_column(-1)
-    //}
-    //pub fn table_get_column_name_with_column(&self, column_n: i32) -> &str {
-    //    unsafe { sys::igTableGetColumnName(column_n); }
-    //}
-
     pub fn table_get_column_flags(&self) -> TableColumnFlags {
         self.table_get_column_flags_with_column(-1)
     }
     pub fn table_get_column_flags_with_column(&self, column_n: i32) -> TableColumnFlags {
         unsafe {
             TableColumnFlags::from_bits_unchecked(sys::igTableGetColumnFlags(column_n) as u32)
-        }
-    }
-
-    pub fn table_set_column_enabled(&self, column_n: i32, v: bool) {
-        unsafe {
-            sys::igTableSetColumnEnabled(column_n, v);
         }
     }
 
@@ -263,3 +275,39 @@ impl<'ui> Ui<'ui> {
         }
     }
 }
+
+pub struct TableHeader<'a> {
+    pub name: &'a ImStr,
+    pub flags: TableColumnFlags,
+    pub init_width_or_weight: f32,
+    pub user_id: Id<'a>,
+}
+
+impl<'a> TableHeader<'a> {
+    pub fn new(name: &'a ImStr) -> Self {
+        Self {
+            name,
+            ..Default::default()
+        }
+    }
+}
+
+impl<'a> Default for TableHeader<'a> {
+    fn default() -> Self {
+        Self {
+            name: Default::default(),
+            flags: Default::default(),
+            init_width_or_weight: Default::default(),
+            user_id: Id::Int(0),
+        }
+    }
+}
+
+create_token!(
+    /// Tracks a table which can be rendered onto, ending with `.end()`
+    /// or by dropping.
+    pub struct TableToken<'ui>;
+
+    /// Pops a change from the font stack.
+    drop { sys::igEndTable() }
+);
