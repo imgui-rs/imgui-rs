@@ -37,7 +37,7 @@ pub fn init(title: &str) -> System {
     imgui.set_ini_filename(None);
 
     if let Some(backend) = clipboard::init() {
-        imgui.set_clipboard_backend(Box::new(backend));
+        imgui.set_clipboard_backend(backend);
     } else {
         eprintln!("Failed to initialize clipboard");
     }

@@ -56,7 +56,7 @@ pub struct Context {
     log_filename: Option<ImString>,
     platform_name: Option<ImString>,
     renderer_name: Option<ImString>,
-    clipboard_ctx: Option<Box<ClipboardContext>>,
+    clipboard_ctx: Option<ClipboardContext>,
 }
 
 // This mutex needs to be used to guard all public functions that can affect the underlying
@@ -197,9 +197,9 @@ impl Context {
         buf.push_str(&data.to_string_lossy());
     }
     /// Sets the clipboard backend used for clipboard operations
-    pub fn set_clipboard_backend(&mut self, backend: Box<dyn ClipboardBackend>) {
+    pub fn set_clipboard_backend<T: ClipboardBackend>(&mut self, backend: T) {
         use std::borrow::BorrowMut;
-        let mut clipboard_ctx = Box::new(ClipboardContext::new(backend));
+        let mut clipboard_ctx = ClipboardContext::new(backend);
         let io = self.io_mut();
         io.set_clipboard_text_fn = Some(crate::clipboard::set_clipboard_text);
         io.get_clipboard_text_fn = Some(crate::clipboard::get_clipboard_text);

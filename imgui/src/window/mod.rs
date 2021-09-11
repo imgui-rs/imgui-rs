@@ -2,7 +2,6 @@ use bitflags::bitflags;
 use std::f32;
 use std::ptr;
 
-use crate::string::ImStr;
 use crate::sys;
 use crate::{Condition, Ui};
 
@@ -161,8 +160,8 @@ impl<'ui> Ui<'ui> {
 /// Builder for a window
 #[derive(Debug)]
 #[must_use]
-pub struct Window<'a> {
-    name: &'a ImStr,
+pub struct Window<'a, T> {
+    name: T,
     opened: Option<&'a mut bool>,
     flags: WindowFlags,
     pos: [f32; 2],
@@ -178,9 +177,9 @@ pub struct Window<'a> {
     bg_alpha: f32,
 }
 
-impl<'a> Window<'a> {
+impl<'a, T: AsRef<str>> Window<'a, T> {
     /// Creates a new window builder with the given name
-    pub fn new(name: &ImStr) -> Window {
+    pub fn new(name: T) -> Self {
         Window {
             name,
             opened: None,
@@ -526,7 +525,7 @@ impl<'a> Window<'a> {
         }
         let should_render = unsafe {
             sys::igBegin(
-                self.name.as_ptr(),
+                ui.scratch_txt(self.name),
                 self.opened
                     .map(|x| x as *mut bool)
                     .unwrap_or(ptr::null_mut()),
@@ -545,7 +544,7 @@ impl<'a> Window<'a> {
     ///
     /// Note: the closure is not called if no window content is visible (e.g. window is collapsed
     /// or fully clipped).
-    pub fn build<T, F: FnOnce() -> T>(self, ui: &Ui<'_>, f: F) -> Option<T> {
+    pub fn build<R, F: FnOnce() -> R>(self, ui: &Ui<'_>, f: F) -> Option<R> {
         self.begin(ui).map(|_window| f())
     }
 }
