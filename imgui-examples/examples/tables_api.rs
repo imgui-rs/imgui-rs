@@ -1,0 +1,134 @@
+use imgui::*;
+
+mod support;
+
+fn main() {
+    let system = support::init(file!());
+
+    let mut t2_flags = TableFlags::REORDERABLE
+        | TableFlags::HIDEABLE
+        | TableFlags::RESIZABLE
+        | TableFlags::NO_BORDERS_IN_BODY;
+
+    system.main_loop(move |_, ui| {
+        Window::new(im_str!("Input text callbacks"))
+            .size([800.0, 400.0], Condition::FirstUseEver)
+            .build(ui, || {
+                if let Some(_t) = ui.begin_table(im_str!("Basic-Table"), 3) {
+                    // we must also call `next_row` here, because we declined
+                    // to set up header rows. If we set up header rows ourselves,
+                    // we will call `table_header_rows` instead, and if we use
+                    // `begin_table_header`, then the initial call will be handled for us.
+
+                    ui.table_next_row();
+
+                    // note you MUST call `next_column` at least to START
+                    // Let's walk through a table like it's an iterator...
+                    ui.table_set_column_index(0);
+                    ui.text("x: 0, y: 0");
+
+                    ui.table_next_column();
+                    ui.text("x: 1, y: 0");
+
+                    ui.table_next_column();
+                    ui.text("x: 2, y: 0");
+
+                    // // calling next column again will wrap us around to 0-1,
+                    // // since we've exhausted our 3 columns.
+                    ui.table_next_column();
+                    ui.text("x: 0, y: 1");
+
+                    // // Let's do this manually now -- we can set each column ourselves...
+                    ui.table_set_column_index(1);
+                    ui.text("x: 1, y: 1");
+
+                    ui.table_set_column_index(2);
+                    ui.text("x: 2, y: 1");
+
+                    // you CAN go back...
+                    ui.table_set_column_index(1);
+                    // however, you should call `new_line`, since otherwise
+                    // we'd right on top of our `x: 1, y: 1` text.
+                    ui.new_line();
+                    ui.text("our of order txt");
+                }
+
+                ui.separator();
+                ui.text("Let's add some headers");
+                if let Some(_t) = ui.begin_table_header(
+                    im_str!("table-headers"),
+                    [
+                        TableColumnSetup::new(im_str!("Name")),
+                        TableColumnSetup::new(im_str!("Age")),
+                        TableColumnSetup::new(im_str!("Favorite fruit")),
+                    ],
+                ) {
+                    // note that we DON'T have to call "table_next_row" here -- that's taken care
+                    // of for us by `begin_table_header`, since it actually calls `table_headers_row`
+
+                    // but we DO need to call column!
+                    // but that's fine, we'll use a loop
+                    for i in 0..3 {
+                        let names = ["Joonas", "Thom", "Jack"];
+                        let fruit = ["Dutch", "Rice", "Mangoes"];
+
+                        ui.table_next_column();
+                        ui.text(names[i]);
+
+                        ui.table_next_column();
+                        ui.text((i * 9).to_string());
+
+                        ui.table_next_column();
+                        ui.text(fruit[i]);
+                    }
+                }
+
+                ui.separator();
+                ui.text("Let's do some context menus");
+                ui.text(
+                    "context menus are created, by default, from the flags passed\
+                while making the table, or each row.\n\
+                Notice how toggling these checkboxes changes the context menu.",
+                );
+
+                ui.checkbox_flags(
+                    im_str!("Reorderable"),
+                    &mut t2_flags,
+                    TableFlags::REORDERABLE,
+                );
+                ui.same_line();
+                ui.checkbox_flags(im_str!("Hideable"), &mut t2_flags, TableFlags::HIDEABLE);
+                ui.same_line();
+                ui.checkbox_flags(im_str!("Resizable"), &mut t2_flags, TableFlags::RESIZABLE);
+
+                if let Some(_t) = ui.begin_table_header_with_flags(
+                    im_str!("table-headers2"),
+                    [
+                        TableColumnSetup::new(im_str!("Name")),
+                        TableColumnSetup::new(im_str!("Age")),
+                        TableColumnSetup::new(im_str!("Favorite fruit")),
+                    ],
+                    t2_flags,
+                ) {
+                    // note that we DON'T have to call "table_next_row" here -- that's taken care
+                    // of for us by `begin_table_header`, since it actually calls `table_headers_row`
+
+                    // but we DO need to call column!
+                    // but that's fine, we'll use a loop
+                    for i in 0..3 {
+                        let names = ["Joonas", "Thom", "Jack"];
+                        let fruit = ["Dutch", "Rice", "Mangoes"];
+
+                        ui.table_next_column();
+                        ui.text(names[i]);
+
+                        ui.table_next_column();
+                        ui.text((i * 9).to_string());
+
+                        ui.table_next_column();
+                        ui.text(fruit[i]);
+                    }
+                }
+            });
+    });
+}
