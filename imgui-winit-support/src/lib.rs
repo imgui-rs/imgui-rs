@@ -174,7 +174,7 @@ use winit_20 as winit;
 ))]
 use winit_19 as winit;
 
-use imgui::{self, BackendFlags, ConfigFlags, Context, ImString, Io, Key, Ui};
+use imgui::{self, BackendFlags, ConfigFlags, Context, Io, Key, Ui};
 use std::cell::Cell;
 use std::cmp::Ordering;
 use winit::dpi::{LogicalPosition, LogicalSize};
@@ -459,10 +459,10 @@ impl WinitPlatform {
         io[Key::X] = VirtualKeyCode::X as _;
         io[Key::Y] = VirtualKeyCode::Y as _;
         io[Key::Z] = VirtualKeyCode::Z as _;
-        imgui.set_platform_name(Some(ImString::from(format!(
+        imgui.set_platform_name(Some(format!(
             "imgui-winit-support {}",
             env!("CARGO_PKG_VERSION")
-        ))));
+        )));
         WinitPlatform {
             hidpi_mode: ActiveHiDpiMode::Default,
             hidpi_factor: 1.0,

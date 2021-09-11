@@ -1,6 +1,6 @@
 use parking_lot::ReentrantMutex;
 use std::cell::RefCell;
-use std::ffi::CStr;
+use std::ffi::{CStr, CString};
 use std::ops::Drop;
 use std::path::PathBuf;
 use std::ptr;
@@ -9,7 +9,6 @@ use std::rc::Rc;
 use crate::clipboard::{ClipboardBackend, ClipboardContext};
 use crate::fonts::atlas::{FontAtlas, FontAtlasRefMut, FontId, SharedFontAtlas};
 use crate::io::Io;
-use crate::string::{ImStr, ImString};
 use crate::style::Style;
 use crate::sys;
 use crate::Ui;
@@ -52,10 +51,10 @@ use crate::Ui;
 pub struct Context {
     raw: *mut sys::ImGuiContext,
     shared_font_atlas: Option<Rc<RefCell<SharedFontAtlas>>>,
-    ini_filename: Option<ImString>,
-    log_filename: Option<ImString>,
-    platform_name: Option<ImString>,
-    renderer_name: Option<ImString>,
+    ini_filename: Option<CString>,
+    log_filename: Option<CString>,
+    platform_name: Option<CString>,
+    renderer_name: Option<CString>,
     clipboard_ctx: Option<ClipboardContext>,
 }
 
@@ -109,18 +108,17 @@ impl Context {
         if io.ini_filename.is_null() {
             None
         } else {
-            let s = unsafe { ImStr::from_ptr_unchecked(io.ini_filename) };
-            Some(PathBuf::from(s.to_str().to_owned()))
+            let s = unsafe { CStr::from_ptr(io.ini_filename) };
+            Some(PathBuf::from(s.to_str().ok()?))
         }
     }
     /// Sets the path to the ini file (default is "imgui.ini")
     ///
     /// Pass None to disable automatic .Ini saving.
     pub fn set_ini_filename<T: Into<Option<PathBuf>>>(&mut self, ini_filename: T) {
-        let ini_filename = ini_filename
-            .into()
-            .and_then(|path| path.to_str().map(str::to_owned))
-            .map(ImString::from);
+        let ini_filename: Option<PathBuf> = ini_filename.into();
+        let ini_filename = ini_filename.and_then(|v| CString::new(v.to_str()?).ok());
+
         self.io_mut().ini_filename = ini_filename
             .as_ref()
             .map(|x| x.as_ptr())
@@ -128,21 +126,22 @@ impl Context {
         self.ini_filename = ini_filename;
     }
     /// Returns the path to the log file, or None if not set
+    // TODO: why do we return an `Option<PathBuf>` instead of an `Option<&Path>`?
     pub fn log_filename(&self) -> Option<PathBuf> {
         let io = self.io();
         if io.log_filename.is_null() {
             None
         } else {
-            let s = unsafe { ImStr::from_ptr_unchecked(io.log_filename) };
-            Some(PathBuf::from(s.to_str().to_owned()))
+            let cstr = unsafe { CStr::from_ptr(io.log_filename) };
+            Some(PathBuf::from(cstr.to_str().ok()?))
         }
     }
     /// Sets the log filename (default is "imgui_log.txt").
     pub fn set_log_filename<T: Into<Option<PathBuf>>>(&mut self, log_filename: T) {
         let log_filename = log_filename
             .into()
-            .and_then(|path| path.to_str().map(str::to_owned))
-            .map(ImString::from);
+            .and_then(|v| CString::new(v.to_str()?).ok());
+
         self.io_mut().log_filename = log_filename
             .as_ref()
             .map(|x| x.as_ptr())
@@ -150,17 +149,19 @@ impl Context {
         self.log_filename = log_filename;
     }
     /// Returns the backend platform name, or None if not set
-    pub fn platform_name(&self) -> Option<&ImStr> {
+    pub fn platform_name(&self) -> Option<&str> {
         let io = self.io();
         if io.backend_platform_name.is_null() {
             None
         } else {
-            unsafe { Some(ImStr::from_ptr_unchecked(io.backend_platform_name)) }
+            let cstr = unsafe { CStr::from_ptr(io.backend_platform_name) };
+            cstr.to_str().ok()
         }
     }
     /// Sets the backend platform name
-    pub fn set_platform_name<T: Into<Option<ImString>>>(&mut self, platform_name: T) {
-        let platform_name = platform_name.into();
+    pub fn set_platform_name<T: Into<Option<String>>>(&mut self, platform_name: T) {
+        let platform_name: Option<CString> =
+            platform_name.into().and_then(|v| CString::new(v).ok());
         self.io_mut().backend_platform_name = platform_name
             .as_ref()
             .map(|x| x.as_ptr())
@@ -168,21 +169,25 @@ impl Context {
         self.platform_name = platform_name;
     }
     /// Returns the backend renderer name, or None if not set
-    pub fn renderer_name(&self) -> Option<&ImStr> {
+    pub fn renderer_name(&self) -> Option<&str> {
         let io = self.io();
         if io.backend_renderer_name.is_null() {
             None
         } else {
-            unsafe { Some(ImStr::from_ptr_unchecked(io.backend_renderer_name)) }
+            let cstr = unsafe { CStr::from_ptr(io.backend_renderer_name) };
+            cstr.to_str().ok()
         }
     }
     /// Sets the backend renderer name
-    pub fn set_renderer_name<T: Into<Option<ImString>>>(&mut self, renderer_name: T) {
-        let renderer_name = renderer_name.into();
+    pub fn set_renderer_name<T: Into<Option<String>>>(&mut self, renderer_name: T) {
+        let renderer_name: Option<CString> =
+            renderer_name.into().and_then(|v| CString::new(v).ok());
+
         self.io_mut().backend_renderer_name = renderer_name
             .as_ref()
             .map(|x| x.as_ptr())
             .unwrap_or(ptr::null());
+
         self.renderer_name = renderer_name;
     }
     /// Loads settings from a string slice containing settings in .Ini file format
@@ -527,7 +532,7 @@ impl Context {
         Ui {
             ctx: self,
             font_atlas,
-            buffer: Vec::new().into(),
+            buffer: crate::UiBuffer::new(1024).into(),
         }
     }
 }

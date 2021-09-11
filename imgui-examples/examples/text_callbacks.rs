@@ -4,11 +4,7 @@ mod support;
 
 fn main() {
     let system = support::init(file!());
-    let mut buffers = vec![
-        ImString::default(),
-        ImString::default(),
-        ImString::default(),
-    ];
+    let mut buffers = vec![String::default(), String::default(), String::default()];
 
     system.main_loop(move |_, ui| {
         Window::new(im_str!("Input text callbacks"))
@@ -70,13 +66,13 @@ fn main() {
                 ui.separator();
 
                 ui.text("You can also define a callback on structs with data.");
-                ui.text("Here we implement the callback handler on a wrapper around &mut ImString");
+                ui.text("Here we implement the callback handler on a wrapper around &mut String");
                 ui.text("to duplicate edits to buf0 on buf1");
 
-                struct Wrapper<'a>(&'a mut ImString);
+                struct Wrapper<'a>(&'a mut String);
                 impl<'a> InputTextCallbackHandler for Wrapper<'a> {
                     fn on_always(&mut self, data: TextCallbackData<'_>) {
-                        *self.0 = im_str!("{}", data.str());
+                        *self.0 = data.str().to_owned();
                     }
                 }
 
@@ -137,10 +133,7 @@ fn main() {
                 }
 
                 ui.input_text(im_str!("Wild buf2 editor"), buf2)
-                    .callback(
-                        InputTextCallback::HISTORY,
-                        Wrapper2(buf0.to_str(), buf1.to_str()),
-                    )
+                    .callback(InputTextCallback::HISTORY, Wrapper2(buf0, buf1))
                     .build();
 
                 ui.text(

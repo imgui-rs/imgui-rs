@@ -1,9 +1,77 @@
 use std::borrow::{Borrow, Cow};
 use std::ffi::CStr;
-use std::fmt;
 use std::ops::{Deref, Index, RangeFull};
 use std::os::raw::c_char;
 use std::str;
+use std::{fmt, ptr};
+
+/// this is the unsafe cell upon which we build our abstraction.
+pub(crate) struct UiBuffer {
+    buffer: Vec<u8>,
+    max_len: usize,
+}
+
+impl UiBuffer {
+    /// Creates a new max buffer with the given length.
+    pub fn new(max_len: usize) -> Self {
+        Self {
+            buffer: Vec::with_capacity(max_len),
+            max_len,
+        }
+    }
+
+    /// Internal method to push a single text to our scratch buffer.
+    pub fn scratch_txt(&mut self, txt: impl AsRef<str>) -> *const sys::cty::c_char {
+        self.refresh_buffer();
+        self.push(txt)
+    }
+
+    /// Internal method to push an option text to our scratch buffer.
+    pub fn scratch_txt_opt(&mut self, txt: Option<impl AsRef<str>>) -> *const sys::cty::c_char {
+        match txt {
+            Some(v) => self.scratch_txt(v),
+            None => ptr::null(),
+        }
+    }
+
+    pub fn scratch_txt_two(
+        &mut self,
+        txt_0: impl AsRef<str>,
+        txt_1: impl AsRef<str>,
+    ) -> (*const sys::cty::c_char, *const sys::cty::c_char) {
+        self.refresh_buffer();
+        (self.push(txt_0), self.push(txt_1))
+    }
+
+    pub fn scratch_txt_with_opt(
+        &mut self,
+        txt_0: impl AsRef<str>,
+        txt_1: Option<impl AsRef<str>>,
+    ) -> (*const sys::cty::c_char, *const sys::cty::c_char) {
+        match txt_1 {
+            Some(value) => self.scratch_txt_two(txt_0, value),
+            None => (self.scratch_txt(txt_0), ptr::null()),
+        }
+    }
+
+    /// Attempts to clear the buffer if it's over the maximum length allowed.
+    pub fn refresh_buffer(&mut self) {
+        if self.buffer.len() > self.max_len {
+            self.buffer.clear();
+        }
+    }
+
+    /// Pushes a new scratch sheet text, which means it's not handling any clearing at all.
+    pub fn push(&mut self, txt: impl AsRef<str>) -> *const sys::cty::c_char {
+        unsafe {
+            let len = self.buffer.len();
+            self.buffer.extend(txt.as_ref().as_bytes());
+            self.buffer.push(b'\0');
+
+            self.buffer.as_ptr().add(len) as *const _
+        }
+    }
+}
 
 #[macro_export]
 macro_rules! im_str {
@@ -277,6 +345,7 @@ impl fmt::Write for ImString {
 /// A UTF-8 encoded, implicitly nul-terminated string slice.
 #[derive(Hash, PartialEq, Eq, PartialOrd, Ord)]
 #[repr(transparent)]
+#[deprecated]
 pub struct ImStr([u8]);
 
 impl<'a> Default for &'a ImStr {

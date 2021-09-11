@@ -1,23 +1,22 @@
-use std::marker::PhantomData;
 use std::os::raw::c_float;
-use std::{f32, mem, ptr};
+use std::{f32, mem};
 
-use super::{ImStr, Ui};
+use super::Ui;
 
 #[must_use]
-pub struct PlotHistogram<'ui, 'p> {
-    label: &'p ImStr,
+pub struct PlotHistogram<'ui, 'p, Label, Overlay = &'static str> {
+    label: Label,
     values: &'p [f32],
     values_offset: usize,
-    overlay_text: Option<&'p ImStr>,
+    overlay_text: Option<Overlay>,
     scale_min: f32,
     scale_max: f32,
     graph_size: [f32; 2],
-    _phantom: PhantomData<&'ui Ui<'ui>>,
+    ui: &'ui Ui<'ui>,
 }
 
-impl<'ui, 'p> PlotHistogram<'ui, 'p> {
-    pub const fn new(_: &Ui<'ui>, label: &'p ImStr, values: &'p [f32]) -> Self {
+impl<'ui, 'p, Label: AsRef<str>> PlotHistogram<'ui, 'p, Label> {
+    pub fn new(ui: &'ui Ui<'ui>, label: Label, values: &'p [f32]) -> Self {
         PlotHistogram {
             label,
             values,
@@ -26,48 +25,58 @@ impl<'ui, 'p> PlotHistogram<'ui, 'p> {
             scale_min: f32::MAX,
             scale_max: f32::MAX,
             graph_size: [0.0, 0.0],
-            _phantom: PhantomData,
+            ui,
         }
     }
+}
 
-    #[inline]
-    pub const fn values_offset(mut self, values_offset: usize) -> Self {
+impl<'ui, 'p, Label: AsRef<str>, Overlay: AsRef<str>> PlotHistogram<'ui, 'p, Label, Overlay> {
+    pub fn values_offset(mut self, values_offset: usize) -> Self {
         self.values_offset = values_offset;
         self
     }
 
-    #[inline]
-    pub const fn overlay_text(mut self, overlay_text: &'p ImStr) -> Self {
-        self.overlay_text = Some(overlay_text);
-        self
+    pub fn overlay_text<NewOverlay: AsRef<str>>(
+        self,
+        overlay_text: NewOverlay,
+    ) -> PlotHistogram<'ui, 'p, Label, NewOverlay> {
+        PlotHistogram {
+            label: self.label,
+            values: self.values,
+            values_offset: self.values_offset,
+            overlay_text: Some(overlay_text),
+            scale_min: self.scale_min,
+            scale_max: self.scale_max,
+            graph_size: self.graph_size,
+            ui: self.ui,
+        }
     }
 
-    #[inline]
-    pub const fn scale_min(mut self, scale_min: f32) -> Self {
+    pub fn scale_min(mut self, scale_min: f32) -> Self {
         self.scale_min = scale_min;
         self
     }
 
-    #[inline]
-    pub const fn scale_max(mut self, scale_max: f32) -> Self {
+    pub fn scale_max(mut self, scale_max: f32) -> Self {
         self.scale_max = scale_max;
         self
     }
 
-    #[inline]
-    pub const fn graph_size(mut self, graph_size: [f32; 2]) -> Self {
+    pub fn graph_size(mut self, graph_size: [f32; 2]) -> Self {
         self.graph_size = graph_size;
         self
     }
 
     pub fn build(self) {
         unsafe {
+            let (label, overlay_text) = self.ui.scratch_txt_with_opt(self.label, self.overlay_text);
+
             sys::igPlotHistogramFloatPtr(
-                self.label.as_ptr(),
+                label,
                 self.values.as_ptr() as *const c_float,
                 self.values.len() as i32,
                 self.values_offset as i32,
-                self.overlay_text.map(|x| x.as_ptr()).unwrap_or(ptr::null()),
+                overlay_text,
                 self.scale_min,
                 self.scale_max,
                 self.graph_size.into(),

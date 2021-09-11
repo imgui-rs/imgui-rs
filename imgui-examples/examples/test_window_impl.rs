@@ -25,13 +25,13 @@ struct State {
     no_menu: bool,
     no_close: bool,
     wrap_width: f32,
-    buf: ImString,
+    buf: String,
     item: usize,
     item2: usize,
     item3: i32,
-    text: ImString,
-    text_with_hint: ImString,
-    text_multiline: ImString,
+    text: String,
+    text_with_hint: String,
+    text_multiline: String,
     i0: i32,
     f0: f32,
     vec2f: [f32; 2],
@@ -57,12 +57,12 @@ struct State {
 
 impl Default for State {
     fn default() -> Self {
-        let mut buf = ImString::with_capacity(32);
+        let mut buf = String::with_capacity(32);
         buf.push_str("日本語");
-        let mut text = ImString::with_capacity(128);
+        let mut text = String::with_capacity(128);
         text.push_str("Hello, world!");
-        let text_with_hint = ImString::with_capacity(128);
-        let mut text_multiline = ImString::with_capacity(128);
+        let text_with_hint = String::with_capacity(128);
+        let mut text_multiline = String::with_capacity(128);
         text_multiline.push_str("Hello, world!\nMultiline");
         State {
             show_app_main_menu_bar: false,
@@ -873,9 +873,7 @@ fn show_example_menu_file<'a>(ui: &Ui<'a>, state: &mut FileMenuState) {
         }
         menu.end();
     }
-    MenuItem::new(im_str!("Save"))
-        .shortcut("Ctrl+S")
-        .build(ui);
+    MenuItem::new(im_str!("Save")).shortcut("Ctrl+S").build(ui);
     MenuItem::new(im_str!("Save As..")).build(ui);
     ui.separator();
     if let Some(menu) = ui.begin_menu(im_str!("Options")) {
@@ -908,9 +906,7 @@ fn show_example_menu_file<'a>(ui: &Ui<'a>, state: &mut FileMenuState) {
         .begin_menu_with_enabled(im_str!("Disabled"), false)
         .is_none());
     MenuItem::new(im_str!("Checked")).selected(true).build(ui);
-    MenuItem::new(im_str!("Quit"))
-        .shortcut("Alt+F4")
-        .build(ui);
+    MenuItem::new(im_str!("Quit")).shortcut("Alt+F4").build(ui);
 }
 
 fn show_example_app_auto_resize(ui: &Ui, state: &mut AutoResizeState, opened: &mut bool) {

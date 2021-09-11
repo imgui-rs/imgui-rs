@@ -28,7 +28,7 @@
 //! For examples of each payload type, see [DragDropSource].
 use std::{any, ffi, marker::PhantomData};
 
-use crate::{sys, Condition, ImStr, Ui};
+use crate::{sys, Condition, Ui};
 use bitflags::bitflags;
 
 bitflags!(
@@ -92,18 +92,17 @@ bitflags!(
 /// will manage, and then give to a [DragDropTarget], which will received the payload. The
 /// simplest and safest Payload is the empty payload, created with [begin](Self::begin).
 #[derive(Debug)]
-pub struct DragDropSource<'a> {
-    name: &'a ImStr,
+pub struct DragDropSource<T> {
+    name: T,
     flags: DragDropFlags,
     cond: Condition,
 }
 
-impl<'a> DragDropSource<'a> {
+impl<T: AsRef<str>> DragDropSource<T> {
     /// Creates a new [DragDropSource] with no flags and the `Condition::Always` with the given name.
     /// ImGui refers to this `name` field as a `type`, but really it's just an identifier to match up
     /// Source/Target for DragDrop.
-    #[inline]
-    pub const fn new(name: &'a ImStr) -> Self {
+    pub fn new(name: T) -> Self {
         Self {
             name,
             flags: DragDropFlags::empty(),
@@ -116,14 +115,14 @@ impl<'a> DragDropSource<'a> {
     /// `SOURCE_EXTERN`, `SOURCE_AUTO_EXPIRE_PAYLOAD` make semantic sense, but any other flags will
     /// be accepted without panic.
     #[inline]
-    pub const fn flags(mut self, flags: DragDropFlags) -> Self {
+    pub fn flags(mut self, flags: DragDropFlags) -> Self {
         self.flags = flags;
         self
     }
 
     /// Sets the condition on the [DragDropSource]. Defaults to [Always](Condition::Always).
     #[inline]
-    pub const fn condition(mut self, cond: Condition) -> Self {
+    pub fn condition(mut self, cond: Condition) -> Self {
         self.cond = cond;
         self
     }
@@ -223,17 +222,17 @@ impl<'a> DragDropSource<'a> {
     /// }
     /// ```
     #[inline]
-    pub fn begin_payload<'ui, T: Copy + 'static>(
+    pub fn begin_payload<'ui, P: Copy + 'static>(
         self,
         ui: &Ui<'ui>,
-        payload: T,
+        payload: P,
     ) -> Option<DragDropSourceToolTip<'ui>> {
         unsafe {
             let payload = TypedPayload::new(payload);
             self.begin_payload_unchecked(
                 ui,
                 &payload as *const _ as *const ffi::c_void,
-                std::mem::size_of::<TypedPayload<T>>(),
+                std::mem::size_of::<TypedPayload<P>>(),
             )
         }
     }
@@ -267,14 +266,14 @@ impl<'a> DragDropSource<'a> {
     #[inline]
     pub unsafe fn begin_payload_unchecked<'ui>(
         &self,
-        _ui: &Ui<'ui>,
+        ui: &Ui<'ui>,
         ptr: *const ffi::c_void,
         size: usize,
     ) -> Option<DragDropSourceToolTip<'ui>> {
         let should_begin = sys::igBeginDragDropSource(self.flags.bits() as i32);
 
         if should_begin {
-            sys::igSetDragDropPayload(self.name.as_ptr(), ptr, size, self.cond as i32);
+            sys::igSetDragDropPayload(ui.scratch_txt(&self.name), ptr, size, self.cond as i32);
 
             Some(DragDropSourceToolTip::push())
         } else {
@@ -340,17 +339,17 @@ impl Drop for DragDropSourceToolTip<'_> {
 /// on this struct. Each of these methods will spit out a _Payload struct with an increasing
 /// amount of information on the Payload. The absolute safest solution is [accept_payload_empty](Self::accept_payload_empty).
 #[derive(Debug)]
-pub struct DragDropTarget<'ui>(PhantomData<Ui<'ui>>);
+pub struct DragDropTarget<'ui>(&'ui Ui<'ui>);
 
 impl<'ui> DragDropTarget<'ui> {
     /// Creates a new DragDropTarget, holding the [Ui]'s lifetime for the duration
     /// of its existence. This is required since this struct runs some code on its Drop
     /// to end the DragDropTarget code.
     #[doc(alias = "BeginDragDropTarget")]
-    pub fn new(_ui: &Ui<'_>) -> Option<Self> {
+    pub fn new(ui: &'ui Ui<'ui>) -> Option<Self> {
         let should_begin = unsafe { sys::igBeginDragDropTarget() };
         if should_begin {
-            Some(Self(PhantomData))
+            Some(Self(ui))
         } else {
             None
         }
@@ -364,12 +363,12 @@ impl<'ui> DragDropTarget<'ui> {
     /// to use this function. Use `accept_payload_unchecked` instead
     pub fn accept_payload_empty(
         &self,
-        name: &ImStr,
+        name: impl AsRef<str>,
         flags: DragDropFlags,
     ) -> Option<DragDropPayloadEmpty> {
-        self.accept_payload::<()>(name, flags)?
+        self.accept_payload(name, flags)?
             .ok()
-            .map(|payload_pod| DragDropPayloadEmpty {
+            .map(|payload_pod: DragDropPayloadPod<()>| DragDropPayloadEmpty {
                 preview: payload_pod.preview,
                 delivery: payload_pod.delivery,
             })
@@ -382,7 +381,7 @@ impl<'ui> DragDropTarget<'ui> {
     /// to use this function. Use `accept_payload_unchecked` instead
     pub fn accept_payload<T: 'static + Copy>(
         &self,
-        name: &ImStr,
+        name: impl AsRef<str>,
         flags: DragDropFlags,
     ) -> Option<Result<DragDropPayloadPod<T>, PayloadIsWrongType>> {
         let output = unsafe { self.accept_payload_unchecked(name, flags) };
@@ -435,10 +434,10 @@ impl<'ui> DragDropTarget<'ui> {
     /// of the various edge cases.
     pub unsafe fn accept_payload_unchecked(
         &self,
-        name: &ImStr,
+        name: impl AsRef<str>,
         flags: DragDropFlags,
     ) -> Option<DragDropPayload> {
-        let inner = sys::igAcceptDragDropPayload(name.as_ptr(), flags.bits() as i32);
+        let inner = sys::igAcceptDragDropPayload(self.0.scratch_txt(name), flags.bits() as i32);
         if inner.is_null() {
             None
         } else {

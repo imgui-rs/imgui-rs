@@ -1,10 +1,9 @@
 use bitflags::bitflags;
-use std::marker::PhantomData;
 use std::ops::Range;
 use std::os::raw::{c_char, c_int, c_void};
 
 use crate::sys;
-use crate::{ImStr, ImString, Ui};
+use crate::Ui;
 
 bitflags!(
     /// Flags for text inputs
@@ -160,17 +159,17 @@ macro_rules! impl_step_params {
 }
 
 #[must_use]
-pub struct InputText<'ui, 'p, T = PassthroughCallback> {
-    label: &'p ImStr,
-    hint: Option<&'p ImStr>,
-    buf: &'p mut ImString,
+pub struct InputText<'ui, 'p, L, H = &'static str, T = PassthroughCallback> {
+    label: L,
+    hint: Option<H>,
+    buf: &'p mut String,
     callback_handler: T,
     flags: InputTextFlags,
-    _phantom: PhantomData<&'ui Ui<'ui>>,
+    ui: &'ui Ui<'ui>,
 }
 
-impl<'ui, 'p> InputText<'ui, 'p, PassthroughCallback> {
-    pub fn new(_: &Ui<'ui>, label: &'p ImStr, buf: &'p mut ImString) -> Self {
+impl<'ui, 'p, L: AsRef<str>> InputText<'ui, 'p, L> {
+    pub fn new(ui: &'ui Ui<'ui>, label: L, buf: &'p mut String) -> Self {
         InputText {
             label,
             hint: None,
@@ -178,17 +177,28 @@ impl<'ui, 'p> InputText<'ui, 'p, PassthroughCallback> {
             callback_handler: PassthroughCallback,
             buf,
             flags: InputTextFlags::CALLBACK_RESIZE,
-            _phantom: PhantomData,
+            ui,
         }
     }
 }
 
-impl<'ui, 'p, T: InputTextCallbackHandler> InputText<'ui, 'p, T> {
+impl<'ui, 'p, T, L, H> InputText<'ui, 'p, L, H, T>
+where
+    L: AsRef<str>,
+    H: AsRef<str>,
+    T: InputTextCallbackHandler,
+{
     /// Sets the hint displayed in the input text background.
     #[inline]
-    pub fn hint(mut self, hint: &'p ImStr) -> Self {
-        self.hint = Some(hint);
-        self
+    pub fn hint<H2: AsRef<str>>(self, hint: H2) -> InputText<'ui, 'p, L, H2, T> {
+        InputText {
+            label: self.label,
+            hint: Some(hint),
+            buf: self.buf,
+            callback_handler: self.callback_handler,
+            flags: self.flags,
+            ui: self.ui,
+        }
     }
 
     impl_text_flags!(InputText);
@@ -209,7 +219,7 @@ impl<'ui, 'p, T: InputTextCallbackHandler> InputText<'ui, 'p, T> {
         mut self,
         callbacks: InputTextCallback,
         callback: T2,
-    ) -> InputText<'ui, 'p, T2> {
+    ) -> InputText<'ui, 'p, L, H, T2> {
         if callbacks.contains(InputTextCallback::COMPLETION) {
             self.flags.insert(InputTextFlags::CALLBACK_COMPLETION);
         }
@@ -231,12 +241,12 @@ impl<'ui, 'p, T: InputTextCallbackHandler> InputText<'ui, 'p, T> {
             hint: self.hint,
             buf: self.buf,
             flags: self.flags,
-            _phantom: self._phantom,
+            ui: self.ui,
         }
     }
 
     pub fn build(self) -> bool {
-        let (ptr, capacity) = (self.buf.as_mut_ptr(), self.buf.capacity_with_nul());
+        let (ptr, capacity) = (self.buf.as_mut_ptr(), self.buf.capacity());
 
         let mut data = UserData {
             container: self.buf,
@@ -245,57 +255,57 @@ impl<'ui, 'p, T: InputTextCallbackHandler> InputText<'ui, 'p, T> {
         let data = &mut data as *mut _ as *mut c_void;
 
         unsafe {
-            let result = if let Some(hint) = self.hint {
+            if let Some(hint) = self.hint {
+                let (label, hint) = self.ui.scratch_txt_two(self.label, hint);
                 sys::igInputTextWithHint(
-                    self.label.as_ptr(),
-                    hint.as_ptr(),
-                    ptr,
+                    label,
+                    hint,
+                    ptr as *mut sys::cty::c_char,
                     capacity,
                     self.flags.bits() as i32,
                     Some(callback::<T>),
                     data,
                 )
             } else {
+                let label = self.ui.scratch_txt(self.label);
+
                 sys::igInputText(
-                    self.label.as_ptr(),
-                    ptr,
+                    label,
+                    ptr as *mut sys::cty::c_char,
                     capacity,
                     self.flags.bits() as i32,
                     Some(callback::<T>),
                     data,
                 )
-            };
-            self.buf.refresh_len();
-            result
+            }
         }
     }
 }
 
 #[must_use]
-pub struct InputTextMultiline<'ui, 'p, T = PassthroughCallback> {
-    label: &'p ImStr,
-    buf: &'p mut ImString,
+pub struct InputTextMultiline<'ui, 'p, L, T = PassthroughCallback> {
+    label: L,
+    buf: &'p mut String,
     flags: InputTextFlags,
     size: [f32; 2],
     callback_handler: T,
-    _phantom: PhantomData<&'ui Ui<'ui>>,
+    ui: &'ui Ui<'ui>,
 }
 
-impl<'ui, 'p> InputTextMultiline<'ui, 'p, PassthroughCallback> {
-    pub fn new(_: &Ui<'ui>, label: &'p ImStr, buf: &'p mut ImString, size: [f32; 2]) -> Self {
+impl<'ui, 'p, L: AsRef<str>> InputTextMultiline<'ui, 'p, L, PassthroughCallback> {
+    pub fn new(ui: &'ui Ui<'ui>, label: L, buf: &'p mut String, size: [f32; 2]) -> Self {
         InputTextMultiline {
             label,
             buf,
             flags: InputTextFlags::CALLBACK_RESIZE,
             size,
-            // this is safe because
             callback_handler: PassthroughCallback,
-            _phantom: PhantomData,
+            ui,
         }
     }
 }
 
-impl<'ui, 'p, T: InputTextCallbackHandler> InputTextMultiline<'ui, 'p, T> {
+impl<'ui, 'p, T: InputTextCallbackHandler, L: AsRef<str>> InputTextMultiline<'ui, 'p, L, T> {
     impl_text_flags!(InputText);
 
     /// By default (as of 0.8.0), imgui-rs will automatically handle string resizes
@@ -314,7 +324,7 @@ impl<'ui, 'p, T: InputTextCallbackHandler> InputTextMultiline<'ui, 'p, T> {
         mut self,
         callbacks: InputTextMultilineCallback,
         callback_handler: T2,
-    ) -> InputTextMultiline<'ui, 'p, T2> {
+    ) -> InputTextMultiline<'ui, 'p, L, T2> {
         if callbacks.contains(InputTextMultilineCallback::COMPLETION) {
             self.flags.insert(InputTextFlags::CALLBACK_COMPLETION);
         }
@@ -334,12 +344,12 @@ impl<'ui, 'p, T: InputTextCallbackHandler> InputTextMultiline<'ui, 'p, T> {
             flags: self.flags,
             size: self.size,
             callback_handler,
-            _phantom: self._phantom,
+            ui: self.ui,
         }
     }
 
     pub fn build(self) -> bool {
-        let (ptr, capacity) = (self.buf.as_mut_ptr(), self.buf.capacity_with_nul());
+        let (ptr, capacity) = (self.buf.as_mut_ptr(), self.buf.capacity());
 
         let mut data = UserData {
             container: self.buf,
@@ -348,47 +358,45 @@ impl<'ui, 'p, T: InputTextCallbackHandler> InputTextMultiline<'ui, 'p, T> {
         let data = &mut data as *mut _ as *mut c_void;
 
         unsafe {
-            let result = sys::igInputTextMultiline(
-                self.label.as_ptr(),
-                ptr,
+            sys::igInputTextMultiline(
+                self.ui.scratch_txt(self.label),
+                ptr as *mut sys::cty::c_char,
                 capacity,
                 self.size.into(),
                 self.flags.bits() as i32,
                 Some(callback::<T>),
                 data,
-            );
-            self.buf.refresh_len();
-            result
+            )
         }
     }
 }
 
 #[must_use]
-pub struct InputInt<'ui, 'p> {
-    label: &'p ImStr,
+pub struct InputInt<'ui, 'p, L> {
+    label: L,
     value: &'p mut i32,
     step: i32,
     step_fast: i32,
     flags: InputTextFlags,
-    _phantom: PhantomData<&'ui Ui<'ui>>,
+    ui: &'ui Ui<'ui>,
 }
 
-impl<'ui, 'p> InputInt<'ui, 'p> {
-    pub fn new(_: &Ui<'ui>, label: &'p ImStr, value: &'p mut i32) -> Self {
+impl<'ui, 'p, L: AsRef<str>> InputInt<'ui, 'p, L> {
+    pub fn new(ui: &'ui Ui<'ui>, label: L, value: &'p mut i32) -> Self {
         InputInt {
             label,
             value,
             step: 1,
             step_fast: 100,
             flags: InputTextFlags::empty(),
-            _phantom: PhantomData,
+            ui,
         }
     }
 
     pub fn build(self) -> bool {
         unsafe {
             sys::igInputInt(
-                self.label.as_ptr(),
+                self.ui.scratch_txt(self.label),
                 self.value as *mut i32,
                 self.step,
                 self.step_fast,
@@ -402,31 +410,31 @@ impl<'ui, 'p> InputInt<'ui, 'p> {
 }
 
 #[must_use]
-pub struct InputFloat<'ui, 'p> {
-    label: &'p ImStr,
+pub struct InputFloat<'ui, 'p, L> {
+    label: L,
     value: &'p mut f32,
     step: f32,
     step_fast: f32,
     flags: InputTextFlags,
-    _phantom: PhantomData<&'ui Ui<'ui>>,
+    ui: &'ui Ui<'ui>,
 }
 
-impl<'ui, 'p> InputFloat<'ui, 'p> {
-    pub fn new(_: &Ui<'ui>, label: &'p ImStr, value: &'p mut f32) -> Self {
+impl<'ui, 'p, L: AsRef<str>> InputFloat<'ui, 'p, L> {
+    pub fn new(ui: &'ui Ui<'ui>, label: L, value: &'p mut f32) -> Self {
         InputFloat {
             label,
             value,
             step: 0.0,
             step_fast: 0.0,
             flags: InputTextFlags::empty(),
-            _phantom: PhantomData,
+            ui,
         }
     }
 
     pub fn build(self) -> bool {
         unsafe {
             sys::igInputFloat(
-                self.label.as_ptr(),
+                self.ui.scratch_txt(self.label),
                 self.value as *mut f32,
                 self.step,
                 self.step_fast,
@@ -443,27 +451,27 @@ impl<'ui, 'p> InputFloat<'ui, 'p> {
 macro_rules! impl_input_floatn {
     ($InputFloatN:ident, $N:expr, $igInputFloatN:ident) => {
         #[must_use]
-        pub struct $InputFloatN<'ui, 'p> {
-            label: &'p ImStr,
+        pub struct $InputFloatN<'ui, 'p, L> {
+            label: L,
             value: &'p mut [f32; $N],
             flags: InputTextFlags,
-            _phantom: PhantomData<&'ui Ui<'ui>>,
+            ui: &'ui Ui<'ui>,
         }
 
-        impl<'ui, 'p> $InputFloatN<'ui, 'p> {
-            pub fn new(_: &Ui<'ui>, label: &'p ImStr, value: &'p mut [f32; $N]) -> Self {
+        impl<'ui, 'p, L: AsRef<str>> $InputFloatN<'ui, 'p, L> {
+            pub fn new(ui: &'ui Ui<'ui>, label: L, value: &'p mut [f32; $N]) -> Self {
                 $InputFloatN {
                     label,
                     value,
                     flags: InputTextFlags::empty(),
-                    _phantom: PhantomData,
+                    ui,
                 }
             }
 
             pub fn build(self) -> bool {
                 unsafe {
                     sys::$igInputFloatN(
-                        self.label.as_ptr(),
+                        self.ui.scratch_txt(self.label),
                         self.value.as_mut_ptr(),
                         b"%.3f\0".as_ptr() as *const _,
                         self.flags.bits() as i32,
@@ -483,27 +491,27 @@ impl_input_floatn!(InputFloat4, 4, igInputFloat4);
 macro_rules! impl_input_intn {
     ($InputIntN:ident, $N:expr, $igInputIntN:ident) => {
         #[must_use]
-        pub struct $InputIntN<'ui, 'p> {
-            label: &'p ImStr,
+        pub struct $InputIntN<'ui, 'p, L> {
+            label: L,
             value: &'p mut [i32; $N],
             flags: InputTextFlags,
-            _phantom: PhantomData<&'ui Ui<'ui>>,
+            ui: &'ui Ui<'ui>,
         }
 
-        impl<'ui, 'p> $InputIntN<'ui, 'p> {
-            pub fn new(_: &Ui<'ui>, label: &'p ImStr, value: &'p mut [i32; $N]) -> Self {
+        impl<'ui, 'p, L: AsRef<str>> $InputIntN<'ui, 'p, L> {
+            pub fn new(ui: &'ui Ui<'ui>, label: L, value: &'p mut [i32; $N]) -> Self {
                 $InputIntN {
                     label,
                     value,
                     flags: InputTextFlags::empty(),
-                    _phantom: PhantomData,
+                    ui,
                 }
             }
 
             pub fn build(self) -> bool {
                 unsafe {
                     sys::$igInputIntN(
-                        self.label.as_ptr(),
+                        self.ui.scratch_txt(self.label),
                         self.value.as_mut_ptr(),
                         self.flags.bits() as i32,
                     )
@@ -809,7 +817,7 @@ impl<'a> TextCallbackData<'a> {
 
 #[repr(C)]
 struct UserData<'a, T> {
-    container: &'a mut ImString,
+    container: &'a mut String,
     cback_handler: T,
 }
 
@@ -851,14 +859,15 @@ extern "C" fn callback<T: InputTextCallbackHandler>(
             unsafe {
                 let requested_size = (*data).BufSize as usize;
                 let buffer = &mut callback_data.user_data.container;
-                if requested_size > buffer.capacity_with_nul() {
-                    // Refresh the buffer's length to take into account changes made by dear imgui.
-                    buffer.refresh_len();
-                    buffer.reserve(requested_size - buffer.0.len());
-                    debug_assert!(buffer.capacity_with_nul() >= requested_size);
-                    (*data).Buf = buffer.as_mut_ptr();
-                    (*data).BufDirty = true;
-                }
+                todo!()
+                // if requested_size > buffer.capacity_with_nul() {
+                //     // Refresh the buffer's length to take into account changes made by dear imgui.
+                //     buffer.refresh_len();
+                //     buffer.reserve(requested_size - buffer.0.len());
+                //     debug_assert!(buffer.capacity_with_nul() >= requested_size);
+                //     (*data).Buf = buffer.as_mut_ptr();
+                //     (*data).BufDirty = true;
+                // }
             }
         }
         InputTextFlags::CALLBACK_CHAR_FILTER => {

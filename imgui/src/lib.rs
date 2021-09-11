@@ -117,11 +117,12 @@ impl Context {
 }
 
 /// A temporary reference for building the user interface for one frame
+#[derive(Debug)]
 pub struct Ui<'ui> {
     ctx: &'ui Context,
     font_atlas: Option<cell::RefMut<'ui, SharedFontAtlas>>,
-    // imgui isn't mutli-threaded -- so no one will ever access
-    buffer: cell::UnsafeCell<Vec<u8>>,
+    // imgui isn't mutli-threaded -- so no one will ever access twice.
+    buffer: cell::UnsafeCell<string::UiBuffer>,
 }
 
 impl<'ui> Ui<'ui> {
@@ -129,19 +130,15 @@ impl<'ui> Ui<'ui> {
     fn scratch_txt(&self, txt: impl AsRef<str>) -> *const sys::cty::c_char {
         unsafe {
             let handle = &mut *self.buffer.get();
-            handle.clear();
-            handle.extend(txt.as_ref().as_bytes());
-            handle.push(b'\0');
-
-            handle.as_ptr() as *const _
+            handle.scratch_txt(txt)
         }
     }
 
     /// Internal method to push an option text to our scratch buffer.
     fn scratch_txt_opt(&self, txt: Option<impl AsRef<str>>) -> *const sys::cty::c_char {
-        match txt {
-            Some(v) => self.scratch_txt(v),
-            None => std::ptr::null(),
+        unsafe {
+            let handle = &mut *self.buffer.get();
+            handle.scratch_txt_opt(txt)
         }
     }
 
@@ -152,16 +149,7 @@ impl<'ui> Ui<'ui> {
     ) -> (*const sys::cty::c_char, *const sys::cty::c_char) {
         unsafe {
             let handle = &mut *self.buffer.get();
-            handle.clear();
-            handle.extend(txt_0.as_ref().as_bytes());
-            handle.push(b'\0');
-            handle.extend(txt_1.as_ref().as_bytes());
-            handle.push(b'\0');
-
-            (
-                handle.as_ptr() as *const _,
-                handle.as_ptr().add(txt_1.as_ref().len() + 1) as *const _,
-            )
+            handle.scratch_txt_two(txt_0, txt_1)
         }
     }
 
@@ -172,21 +160,7 @@ impl<'ui> Ui<'ui> {
     ) -> (*const sys::cty::c_char, *const sys::cty::c_char) {
         unsafe {
             let handle = &mut *self.buffer.get();
-            handle.clear();
-            handle.extend(txt_0.as_ref().as_bytes());
-            handle.push(b'\0');
-
-            if let Some(txt_1) = txt_1 {
-                handle.extend(txt_1.as_ref().as_bytes());
-                handle.push(b'\0');
-
-                (
-                    handle.as_ptr() as *const _,
-                    handle.as_ptr().add(txt_1.as_ref().len() + 1) as *const _,
-                )
-            } else {
-                (handle.as_ptr() as *const _, std::ptr::null())
-            }
+            handle.scratch_txt_with_opt(txt_0, txt_1)
         }
     }
 
@@ -317,59 +291,83 @@ impl<T> From<*mut T> for Id<'static> {
 // Widgets: Input
 impl<'ui> Ui<'ui> {
     #[doc(alias = "InputText", alias = "InputTextWithHint")]
-    pub fn input_text<'p>(&self, label: &'p ImStr, buf: &'p mut ImString) -> InputText<'ui, 'p> {
+    pub fn input_text<'p, L: AsRef<str>>(
+        &'ui self,
+        label: L,
+        buf: &'p mut String,
+    ) -> InputText<'ui, 'p, L> {
         InputText::new(self, label, buf)
     }
     #[doc(alias = "InputText", alias = "InputTextMultiline")]
-    pub fn input_text_multiline<'p>(
-        &self,
-        label: &'p ImStr,
-        buf: &'p mut ImString,
+    pub fn input_text_multiline<'p, L: AsRef<str>>(
+        &'ui self,
+        label: L,
+        buf: &'p mut String,
         size: [f32; 2],
-    ) -> InputTextMultiline<'ui, 'p> {
+    ) -> InputTextMultiline<'ui, 'p, L> {
         InputTextMultiline::new(self, label, buf, size)
     }
     #[doc(alias = "InputFloat2")]
-    pub fn input_float<'p>(&self, label: &'p ImStr, value: &'p mut f32) -> InputFloat<'ui, 'p> {
+    pub fn input_float<'p, L: AsRef<str>>(
+        &'ui self,
+        label: L,
+        value: &'p mut f32,
+    ) -> InputFloat<'ui, 'p, L> {
         InputFloat::new(self, label, value)
     }
-    pub fn input_float2<'p>(
-        &self,
-        label: &'p ImStr,
+    pub fn input_float2<'p, L: AsRef<str>>(
+        &'ui self,
+        label: L,
         value: &'p mut [f32; 2],
-    ) -> InputFloat2<'ui, 'p> {
+    ) -> InputFloat2<'ui, 'p, L> {
         InputFloat2::new(self, label, value)
     }
     #[doc(alias = "InputFloat3")]
-    pub fn input_float3<'p>(
-        &self,
-        label: &'p ImStr,
+    pub fn input_float3<'p, L: AsRef<str>>(
+        &'ui self,
+        label: L,
         value: &'p mut [f32; 3],
-    ) -> InputFloat3<'ui, 'p> {
+    ) -> InputFloat3<'ui, 'p, L> {
         InputFloat3::new(self, label, value)
     }
     #[doc(alias = "InputFloat4")]
-    pub fn input_float4<'p>(
-        &self,
-        label: &'p ImStr,
+    pub fn input_float4<'p, L: AsRef<str>>(
+        &'ui self,
+        label: L,
         value: &'p mut [f32; 4],
-    ) -> InputFloat4<'ui, 'p> {
+    ) -> InputFloat4<'ui, 'p, L> {
         InputFloat4::new(self, label, value)
     }
     #[doc(alias = "InputInt")]
-    pub fn input_int<'p>(&self, label: &'p ImStr, value: &'p mut i32) -> InputInt<'ui, 'p> {
+    pub fn input_int<'p, L: AsRef<str>>(
+        &'ui self,
+        label: L,
+        value: &'p mut i32,
+    ) -> InputInt<'ui, 'p, L> {
         InputInt::new(self, label, value)
     }
     #[doc(alias = "InputInt2")]
-    pub fn input_int2<'p>(&self, label: &'p ImStr, value: &'p mut [i32; 2]) -> InputInt2<'ui, 'p> {
+    pub fn input_int2<'p, L: AsRef<str>>(
+        &'ui self,
+        label: L,
+        value: &'p mut [i32; 2],
+    ) -> InputInt2<'ui, 'p, L> {
         InputInt2::new(self, label, value)
     }
     #[doc(alias = "InputInt3")]
-    pub fn input_int3<'p>(&self, label: &'p ImStr, value: &'p mut [i32; 3]) -> InputInt3<'ui, 'p> {
+    pub fn input_int3<'p, L: AsRef<str>>(
+        &'ui self,
+        label: L,
+        value: &'p mut [i32; 3],
+    ) -> InputInt3<'ui, 'p, L> {
         InputInt3::new(self, label, value)
     }
     #[doc(alias = "InputInt4")]
-    pub fn input_int4<'p>(&self, label: &'p ImStr, value: &'p mut [i32; 4]) -> InputInt4<'ui, 'p> {
+    pub fn input_int4<'p, L: AsRef<str>>(
+        &'ui self,
+        label: L,
+        value: &'p mut [i32; 4],
+    ) -> InputInt4<'ui, 'p, L> {
         InputInt4::new(self, label, value)
     }
 }
@@ -470,11 +468,11 @@ impl<'ui> Ui<'ui> {
 
 impl<'ui> Ui<'ui> {
     #[doc(alias = "PlotHistogram")]
-    pub fn plot_histogram<'p>(
-        &self,
-        label: &'p ImStr,
+    pub fn plot_histogram<'p, Label: AsRef<str>>(
+        &'ui self,
+        label: Label,
         values: &'p [f32],
-    ) -> PlotHistogram<'ui, 'p> {
+    ) -> PlotHistogram<'ui, 'p, Label> {
         PlotHistogram::new(self, label, values)
     }
 }
