@@ -438,18 +438,27 @@ impl<'ui> Ui<'ui> {
 // Widgets: ListBox
 impl<'ui> Ui<'ui> {
     #[doc(alias = "ListBox")]
-    pub fn list_box<'p, StringType: AsRef<ImStr> + ?Sized>(
+    pub fn list_box<'p, StringType: AsRef<str> + ?Sized>(
         &self,
-        label: &'p ImStr,
+        label: impl AsRef<str>,
         current_item: &mut i32,
         items: &'p [&'p StringType],
         height_in_items: i32,
     ) -> bool {
-        let items_inner: Vec<*const c_char> =
-            items.iter().map(|item| item.as_ref().as_ptr()).collect();
+        let (label_ptr, items_inner) = unsafe {
+            let handle = &mut *self.buffer.get();
+
+            handle.refresh_buffer();
+            let label_ptr = handle.push(label);
+
+            let items_inner: Vec<_> = items.iter().map(|&v| handle.push(v)).collect();
+
+            (label_ptr, items_inner)
+        };
+
         unsafe {
             sys::igListBoxStr_arr(
-                label.as_ptr(),
+                label_ptr,
                 current_item,
                 items_inner.as_ptr() as *mut *const c_char,
                 items_inner.len() as i32,
@@ -457,11 +466,50 @@ impl<'ui> Ui<'ui> {
             )
         }
     }
+
+    // written out for the future times...
+    // #[doc(alias = "ListBox")]
+    // pub fn list_box_const<'p, StringType: AsRef<str> + ?Sized, const N: usize>(
+    //     &self,
+    //     label: impl AsRef<str>,
+    //     current_item: &mut i32,
+    //     items: [&'p StringType; N],
+    //     height_in_items: i32,
+    // ) -> bool {
+    //     let (label_ptr, items_inner) = unsafe {
+    //         let handle = &mut *self.buffer.get();
+
+    //         handle.refresh_buffer();
+    //         let label_ptr = handle.push(label);
+
+    //         let mut items_inner: [*const i8; N] = [std::ptr::null(); N];
+
+    //         for (i, item) in items.iter().enumerate() {
+    //             items_inner[i] = handle.push(item);
+    //         }
+
+    //         (label_ptr, items_inner)
+    //     };
+
+    //     unsafe {
+    //         sys::igListBoxStr_arr(
+    //             label_ptr,
+    //             current_item,
+    //             items_inner.as_ptr() as *mut *const c_char,
+    //             items_inner.len() as i32,
+    //             height_in_items,
+    //         )
+    //     }
+    // }
 }
 
 impl<'ui> Ui<'ui> {
     #[doc(alias = "PlotLines")]
-    pub fn plot_lines<'p>(&self, label: &'p ImStr, values: &'p [f32]) -> PlotLines<'ui, 'p> {
+    pub fn plot_lines<'p, Label: AsRef<str>>(
+        &'ui self,
+        label: Label,
+        values: &'p [f32],
+    ) -> PlotLines<'ui, 'p, Label> {
         PlotLines::new(self, label, values)
     }
 }

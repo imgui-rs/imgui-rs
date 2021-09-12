@@ -2,16 +2,7 @@ use std::ptr;
 
 use crate::sys;
 use crate::window::WindowFlags;
-use crate::{ImStr, Ui};
-
-create_token!(
-    /// Tracks a popup token that can be ended with `end` or by dropping.
-    pub struct PopupToken<'ui>;
-
-    /// Drops the popup token manually. You can also just allow this token
-    /// to drop on its own.
-    drop { sys::igEndPopup() }
-);
+use crate::Ui;
 
 /// Create a modal pop-up.
 ///
@@ -31,14 +22,14 @@ create_token!(
 /// };
 /// ```
 #[must_use]
-pub struct PopupModal<'p> {
-    label: &'p ImStr,
+pub struct PopupModal<'p, Label> {
+    label: Label,
     opened: Option<&'p mut bool>,
     flags: WindowFlags,
 }
 
-impl<'p> PopupModal<'p> {
-    pub fn new(label: &'p ImStr) -> Self {
+impl<'p, Label: AsRef<str>> PopupModal<'p, Label> {
+    pub fn new(label: Label) -> Self {
         PopupModal {
             label,
             opened: None,
@@ -140,7 +131,7 @@ impl<'p> PopupModal<'p> {
     pub fn begin_popup<'ui>(self, ui: &Ui<'ui>) -> Option<PopupToken<'ui>> {
         let render = unsafe {
             sys::igBeginPopupModal(
-                self.label.as_ptr(),
+                ui.scratch_txt(self.label),
                 self.opened
                     .map(|x| x as *mut bool)
                     .unwrap_or(ptr::null_mut()),
@@ -165,8 +156,8 @@ impl<'ui> Ui<'ui> {
     /// can also force close a popup when a user clicks outside a popup. If you do not want users to be
     /// able to close a popup without selected an option, use [`PopupModal`].
     #[doc(alias = "OpenPopup")]
-    pub fn open_popup(&self, str_id: &ImStr) {
-        unsafe { sys::igOpenPopup(str_id.as_ptr(), 0) };
+    pub fn open_popup(&self, str_id: impl AsRef<str>) {
+        unsafe { sys::igOpenPopup(self.scratch_txt(str_id), 0) };
     }
 
     /// Construct a popup that can have any kind of content.
@@ -174,9 +165,10 @@ impl<'ui> Ui<'ui> {
     /// This should be called *per frame*, whereas [`open_popup`](Self::open_popup) should be called *once*
     /// when you want to actual create the popup.
     #[doc(alias = "BeginPopup")]
-    pub fn begin_popup(&self, str_id: &ImStr) -> Option<PopupToken<'_>> {
-        let render =
-            unsafe { sys::igBeginPopup(str_id.as_ptr(), WindowFlags::empty().bits() as i32) };
+    pub fn begin_popup(&self, str_id: impl AsRef<str>) -> Option<PopupToken<'_>> {
+        let render = unsafe {
+            sys::igBeginPopup(self.scratch_txt(str_id), WindowFlags::empty().bits() as i32)
+        };
 
         if render {
             Some(PopupToken::new(self))
@@ -190,21 +182,17 @@ impl<'ui> Ui<'ui> {
     /// This should be called *per frame*, whereas [`open_popup`](Self::open_popup) should be called *once*
     /// when you want to actual create the popup.
     #[doc(alias = "BeginPopup")]
-    pub fn popup<F>(&self, str_id: &ImStr, f: F)
+    pub fn popup<F>(&self, str_id: impl AsRef<str>, f: F)
     where
         F: FnOnce(),
     {
-        let render =
-            unsafe { sys::igBeginPopup(str_id.as_ptr(), WindowFlags::empty().bits() as i32) };
-        if render {
+        if let Some(_t) = self.begin_popup(str_id) {
             f();
-            unsafe { sys::igEndPopup() };
         }
     }
 
     /// Creates a PopupModal directly.
-    #[deprecated = "Please use PopupModal to create a modal popup."]
-    pub fn popup_modal<'p>(&self, str_id: &'p ImStr) -> PopupModal<'p> {
+    pub fn popup_modal<'p, Label: AsRef<str>>(&self, str_id: Label) -> PopupModal<'p, Label> {
         PopupModal::new(str_id)
     }
 
@@ -215,3 +203,12 @@ impl<'ui> Ui<'ui> {
         unsafe { sys::igCloseCurrentPopup() };
     }
 }
+
+create_token!(
+    /// Tracks a popup token that can be ended with `end` or by dropping.
+    pub struct PopupToken<'ui>;
+
+    /// Drops the popup token manually. You can also just allow this token
+    /// to drop on its own.
+    drop { sys::igEndPopup() }
+);

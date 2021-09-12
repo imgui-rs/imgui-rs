@@ -208,8 +208,14 @@ where
     ///
     /// If, for some reason, you don't want this, you can run this function to prevent this.
     /// In that case, edits which would cause a resize will not occur.
+    ///
+    /// # Safety
+    /// Importantly, we silently push and pop a `\0` to the string given here.
+    /// If you do not want mutable access (ie, do not want that string to resize),
+    /// you **must** make sure to null-terminate it yourself. This is janky, but ImGui
+    /// expects a null termination, and we didn't want to re-allocate an entire string per call.
     #[inline]
-    pub fn do_not_resize(mut self) -> Self {
+    pub unsafe fn do_not_resize(mut self) -> Self {
         self.flags.remove(InputTextFlags::CALLBACK_RESIZE);
         self
     }
@@ -246,6 +252,8 @@ where
     }
 
     pub fn build(self) -> bool {
+        // needs to be null-terminated!
+        self.buf.push('\0');
         let (ptr, capacity) = (self.buf.as_mut_ptr(), self.buf.capacity());
 
         let mut data = UserData {
@@ -254,7 +262,7 @@ where
         };
         let data = &mut data as *mut _ as *mut c_void;
 
-        unsafe {
+        let o = unsafe {
             if let Some(hint) = self.hint {
                 let (label, hint) = self.ui.scratch_txt_two(self.label, hint);
                 sys::igInputTextWithHint(
@@ -278,7 +286,14 @@ where
                     data,
                 )
             }
+        };
+
+        // it should always end with this \0.
+        if self.buf.ends_with('\0') {
+            self.buf.pop();
         }
+
+        o
     }
 }
 
@@ -349,6 +364,8 @@ impl<'ui, 'p, T: InputTextCallbackHandler, L: AsRef<str>> InputTextMultiline<'ui
     }
 
     pub fn build(self) -> bool {
+        // needs to be null-terminated!
+        self.buf.push('\0');
         let (ptr, capacity) = (self.buf.as_mut_ptr(), self.buf.capacity());
 
         let mut data = UserData {
@@ -357,7 +374,7 @@ impl<'ui, 'p, T: InputTextCallbackHandler, L: AsRef<str>> InputTextMultiline<'ui
         };
         let data = &mut data as *mut _ as *mut c_void;
 
-        unsafe {
+        let o = unsafe {
             sys::igInputTextMultiline(
                 self.ui.scratch_txt(self.label),
                 ptr as *mut sys::cty::c_char,
@@ -367,7 +384,14 @@ impl<'ui, 'p, T: InputTextCallbackHandler, L: AsRef<str>> InputTextMultiline<'ui
                 Some(callback::<T>),
                 data,
             )
+        };
+
+        // it should always end with this \0.
+        if self.buf.ends_with('\0') {
+            self.buf.pop();
         }
+
+        o
     }
 }
 
@@ -857,17 +881,24 @@ extern "C" fn callback<T: InputTextCallbackHandler>(
         }
         InputTextFlags::CALLBACK_RESIZE => {
             unsafe {
-                let requested_size = (*data).BufSize as usize;
-                let buffer = &mut callback_data.user_data.container;
-                todo!()
-                // if requested_size > buffer.capacity_with_nul() {
-                //     // Refresh the buffer's length to take into account changes made by dear imgui.
-                //     buffer.refresh_len();
-                //     buffer.reserve(requested_size - buffer.0.len());
-                //     debug_assert!(buffer.capacity_with_nul() >= requested_size);
-                //     (*data).Buf = buffer.as_mut_ptr();
-                //     (*data).BufDirty = true;
-                // }
+                let requested_size = (*data).BufTextLen as usize;
+
+                // just confirm that we ARE working with our string.
+                debug_assert_eq!(
+                    callback_data.user_data.container.as_ptr() as *const _,
+                    (*data).Buf
+                );
+
+                if requested_size > callback_data.user_data.container.capacity() {
+                    // reserve more data...
+                    callback_data
+                        .user_data
+                        .container
+                        .reserve(requested_size - callback_data.user_data.container.capacity());
+
+                    (*data).Buf = callback_data.user_data.container.as_mut_ptr() as *mut _;
+                    (*data).BufDirty = true;
+                }
             }
         }
         InputTextFlags::CALLBACK_CHAR_FILTER => {

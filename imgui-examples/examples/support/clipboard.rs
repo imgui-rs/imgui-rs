@@ -1,7 +1,7 @@
 use clipboard::{ClipboardContext, ClipboardProvider};
 use imgui::ClipboardBackend;
 
-pub struct ClipboardSupport(ClipboardContext);
+pub struct ClipboardSupport(pub ClipboardContext);
 
 pub fn init() -> Option<ClipboardSupport> {
     ClipboardContext::new().ok().map(ClipboardSupport)

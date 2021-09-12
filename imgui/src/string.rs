@@ -74,6 +74,7 @@ impl UiBuffer {
 }
 
 #[macro_export]
+#[deprecated = "all functions take AsRef<str> now -- use inline strings or `format` instead"]
 macro_rules! im_str {
     ($e:literal $(,)?) => {{
         const __INPUT: &str = concat!($e, "\0");
@@ -345,7 +346,6 @@ impl fmt::Write for ImString {
 /// A UTF-8 encoded, implicitly nul-terminated string slice.
 #[derive(Hash, PartialEq, Eq, PartialOrd, Ord)]
 #[repr(transparent)]
-#[deprecated]
 pub struct ImStr([u8]);
 
 impl<'a> Default for &'a ImStr {

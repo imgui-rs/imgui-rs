@@ -7,7 +7,7 @@ fn main() {
     let mut buffers = vec![String::default(), String::default(), String::default()];
 
     system.main_loop(move |_, ui| {
-        Window::new(im_str!("Input text callbacks"))
+        Window::new("Input text callbacks")
             .size([500.0, 300.0], Condition::FirstUseEver)
             .build(ui, || {
                 ui.text("You can make a variety of buffer callbacks on an Input Text");
@@ -24,9 +24,10 @@ fn main() {
                 ui.separator();
 
                 ui.text("No callbacks:");
-                ui.input_text(im_str!("buf0"), &mut buffers[0]).build();
-                ui.input_text(im_str!("buf0"), &mut buffers[1]).build();
-                ui.input_text(im_str!("buf0"), &mut buffers[2]).build();
+
+                ui.input_text("buf0", &mut buffers[0]).build();
+                ui.input_text("buf1", &mut buffers[1]).build();
+                ui.input_text("buf2", &mut buffers[2]).build();
 
                 ui.separator();
 
@@ -50,18 +51,15 @@ fn main() {
                         println!("History was fired by pressing {:?}", dir);
                     }
 
-                    fn on_always(&mut self, _: TextCallbackData<'_>) {
+                    fn on_always(&mut self, txt: TextCallbackData<'_>) {
                         // We don't actually print this out because it will flood your log a lot!
                         // println!("The always callback fired! It always fires.");
                     }
                 }
 
-                ui.input_text(
-                    im_str!("All Callbacks logging"),
-                    buffers.get_mut(0).unwrap(),
-                )
-                .callback(InputTextCallback::all(), AllCallback)
-                .build();
+                ui.input_text("All Callbacks logging", buffers.get_mut(0).unwrap())
+                    .callback(InputTextCallback::all(), AllCallback)
+                    .build();
 
                 ui.separator();
 
@@ -79,7 +77,7 @@ fn main() {
                 let (buf0, brwchk_dance) = buffers.split_first_mut().unwrap();
                 let buf1 = Wrapper(&mut brwchk_dance[0]);
 
-                ui.input_text(im_str!("Edits copied to buf1"), buf0)
+                ui.input_text("Edits copied to buf1", buf0)
                     .callback(InputTextCallback::ALWAYS, buf1)
                     .build();
 
@@ -132,7 +130,7 @@ fn main() {
                     }
                 }
 
-                ui.input_text(im_str!("Wild buf2 editor"), buf2)
+                ui.input_text("Wild buf2 editor", buf2)
                     .callback(InputTextCallback::HISTORY, Wrapper2(buf0, buf1))
                     .build();
 

@@ -1,5 +1,5 @@
 use parking_lot::ReentrantMutex;
-use std::cell::RefCell;
+use std::cell::{RefCell, UnsafeCell};
 use std::ffi::{CStr, CString};
 use std::ops::Drop;
 use std::path::PathBuf;
@@ -55,7 +55,11 @@ pub struct Context {
     log_filename: Option<CString>,
     platform_name: Option<CString>,
     renderer_name: Option<CString>,
-    clipboard_ctx: Option<ClipboardContext>,
+    // we need to box this because we hand imgui a pointer to it,
+    // and we don't want to deal with finding `clipboard_ctx`.
+    // we also put it in an unsafecell since we're going to give
+    // imgui a mutable pointer to it.
+    clipboard_ctx: Box<UnsafeCell<ClipboardContext>>,
 }
 
 // This mutex needs to be used to guard all public functions that can affect the underlying
@@ -203,13 +207,13 @@ impl Context {
     }
     /// Sets the clipboard backend used for clipboard operations
     pub fn set_clipboard_backend<T: ClipboardBackend>(&mut self, backend: T) {
-        use std::borrow::BorrowMut;
-        let mut clipboard_ctx = ClipboardContext::new(backend);
+        let clipboard_ctx: Box<UnsafeCell<_>> = Box::new(ClipboardContext::new(backend).into());
         let io = self.io_mut();
         io.set_clipboard_text_fn = Some(crate::clipboard::set_clipboard_text);
         io.get_clipboard_text_fn = Some(crate::clipboard::get_clipboard_text);
-        io.clipboard_user_data = clipboard_ctx.borrow_mut() as *mut ClipboardContext as *mut _;
-        self.clipboard_ctx.replace(clipboard_ctx);
+
+        io.clipboard_user_data = clipboard_ctx.get() as *mut _;
+        self.clipboard_ctx = clipboard_ctx;
     }
     fn create_internal(shared_font_atlas: Option<Rc<RefCell<SharedFontAtlas>>>) -> Self {
         let _guard = CTX_MUTEX.lock();
@@ -236,7 +240,7 @@ impl Context {
             log_filename: None,
             platform_name: None,
             renderer_name: None,
-            clipboard_ctx: None,
+            clipboard_ctx: Box::new(ClipboardContext::dummy().into()),
         }
     }
     fn is_current_context(&self) -> bool {
@@ -317,7 +321,7 @@ impl SuspendedContext {
             log_filename: None,
             platform_name: None,
             renderer_name: None,
-            clipboard_ctx: None,
+            clipboard_ctx: Box::new(ClipboardContext::dummy().into()),
         };
         if ctx.is_current_context() {
             // Oops, the context was activated -> deactivate

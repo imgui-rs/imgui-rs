@@ -32,6 +32,24 @@ impl ClipboardContext {
             last_value: CString::default(),
         }
     }
+
+    pub fn dummy() -> ClipboardContext {
+        Self {
+            backend: Box::new(DummyClipboardContext),
+            last_value: CString::default(),
+        }
+    }
+}
+
+pub struct DummyClipboardContext;
+impl ClipboardBackend for DummyClipboardContext {
+    fn get(&mut self) -> Option<String> {
+        None
+    }
+
+    fn set(&mut self, _: &str) {
+        // empty
+    }
 }
 
 impl fmt::Debug for ClipboardContext {
@@ -46,9 +64,14 @@ impl fmt::Debug for ClipboardContext {
 
 pub(crate) unsafe extern "C" fn get_clipboard_text(user_data: *mut c_void) -> *const c_char {
     let result = catch_unwind(|| {
+        println!("gettin!");
         let ctx = &mut *(user_data as *mut ClipboardContext);
+        println!("gettin!");
+
         match ctx.backend.get() {
             Some(text) => {
+                println!("gettin!");
+
                 ctx.last_value = CString::new(text).unwrap();
                 ctx.last_value.as_ptr()
             }
