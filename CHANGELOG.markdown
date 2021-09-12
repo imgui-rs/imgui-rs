@@ -4,6 +4,11 @@
 
 - BREAKING: MSRV is now **1.54**. This is gives us access to min-const-generics, which we use in a few places, but will gradually use more. Because this is the first time we've bumped MSRV intentionally, we have added a new feature `min-const-generics`, which is _enabled by default_. If you are pre-1.54, you can hang onto this update by disabling that feature. In our next update, this feature will be removed and we will commit to our MSRVs going forward.
 
+- **Removed ImStr and ImString from the API.** Currently `im_str!` is deprecated and **will be removed in 0.9.0**. To change your code:
+
+  - If you were just wrapping a string literal, like `im_str!("button")`, just use `"button"`.
+  - If you were formatting, like `&im_str!("My age is {}", 100)`, you can now just use format like `format!("My age is {}, 100)`. Notice that due to the trait bounds, you can pass the string in directly too.
+
 - Removed automatically adding default features for `imgui-winit-support`
   with the exception of the current default winit feature/dep version. Additionally, that version was updated to 0.25. If you want to not have the default features of winit with 0.25, set `default-features = false` and add `winit-25` as a normal feature. Thank you to @dzil123 for the work [implementing this here](https://github.com/imgui-rs/imgui-rs/pull/477)!
 

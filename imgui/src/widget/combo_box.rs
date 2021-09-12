@@ -296,13 +296,4 @@ impl<'ui> Ui<'ui> {
     ) -> bool {
         self.combo(label, current_item, items, |s| Cow::Borrowed(s.as_ref()))
     }
-
-    // /// Builds a simple combo box for choosing from a slice of strings
-    // #[doc(alias = "BeginCombo")]
-    // pub fn build_simple_string<S>(self, ui: &Ui, current_item: &mut usize, items: &[&S]) -> bool
-    // where
-    //     S: AsRef<str> + ?Sized,
-    // {
-    //     self.build_simple(ui, current_item, items, &|&s| s.as_ref().into())
-    // }
 }
