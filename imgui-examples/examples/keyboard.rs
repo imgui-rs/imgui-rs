@@ -14,7 +14,7 @@ fn main() {
     let mut text_buffer = String::new();
 
     system.main_loop(move |_, ui| {
-        Window::new(im_str!("Means of accessing key state"))
+        Window::new("Means of accessing key state")
             .size([500.0, 300.0], Condition::FirstUseEver)
             .build(ui, || {
                 // You can check if a key is currently held down
@@ -81,12 +81,12 @@ fn main() {
                 // example, if you try to type into this input, the
                 // above interaction still counts the key presses.
                 ui.input_text_multiline(
-                    im_str!("##Dummy text input widget"),
+                    "##Dummy text input widget",
                     &mut text_buffer,
                     [100.0, 100.0],
                 )
                 // .do_not_resize() if you pass this, then this won't resize!
-                // .hint(im_str!("Example text input"))
+                // .hint("Example text input")
                 .build();
 
                 // If you want to check if a widget is capturing

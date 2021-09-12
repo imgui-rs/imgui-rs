@@ -112,16 +112,16 @@ impl<'ui> Ui<'ui> {
 /// Builder for a menu item.
 #[derive(Copy, Clone, Debug)]
 #[must_use]
-pub struct MenuItem<'a, T> {
-    label: T,
-    shortcut: Option<&'a str>,
+pub struct MenuItem<Label, Shortcut = &'static str> {
+    label: Label,
+    shortcut: Option<Shortcut>,
     selected: bool,
     enabled: bool,
 }
 
-impl<'a, T: 'a + AsRef<str>> MenuItem<'a, T> {
+impl<Label: AsRef<str>> MenuItem<Label> {
     /// Construct a new menu item builder.
-    pub fn new(label: T) -> Self {
+    pub fn new(label: Label) -> Self {
         MenuItem {
             label,
             shortcut: None,
@@ -129,13 +129,23 @@ impl<'a, T: 'a + AsRef<str>> MenuItem<'a, T> {
             enabled: true,
         }
     }
+}
+
+impl<Label: AsRef<str>, Shortcut: AsRef<str>> MenuItem<Label, Shortcut> {
     /// Sets the menu item shortcut.
     ///
     /// Shortcuts are displayed for convenience only and are not automatically handled.
     #[inline]
-    pub fn shortcut(mut self, shortcut: &'a str) -> Self {
-        self.shortcut = Some(shortcut);
-        self
+    pub fn shortcut<Shortcut2: AsRef<str>>(
+        self,
+        shortcut: Shortcut2,
+    ) -> MenuItem<Label, Shortcut2> {
+        MenuItem {
+            label: self.label,
+            shortcut: Some(shortcut),
+            selected: self.selected,
+            enabled: self.enabled,
+        }
     }
     /// Sets the selected state of the menu item.
     ///

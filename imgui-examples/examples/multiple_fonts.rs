@@ -19,7 +19,7 @@ fn main() {
         .reload_font_texture(&mut system.imgui)
         .expect("Failed to reload fonts");
     system.main_loop(move |run, ui| {
-        Window::new(im_str!("Hello world"))
+        Window::new("Hello world")
             .opened(run)
             .build(ui, || {
                 ui.text("Hello, I'm the default font!");

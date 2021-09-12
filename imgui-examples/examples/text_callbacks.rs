@@ -51,7 +51,7 @@ fn main() {
                         println!("History was fired by pressing {:?}", dir);
                     }
 
-                    fn on_always(&mut self, txt: TextCallbackData<'_>) {
+                    fn on_always(&mut self, _: TextCallbackData<'_>) {
                         // We don't actually print this out because it will flood your log a lot!
                         // println!("The always callback fired! It always fires.");
                     }

@@ -5,7 +5,7 @@ mod support;
 fn main() {
     let system = support::init(file!());
     system.main_loop(move |run, ui| {
-        let w = Window::new(im_str!("Progress bar"))
+        let w = Window::new("Progress bar")
             .opened(run)
             .position([20.0, 20.0], Condition::Appearing)
             .size([700.0, 200.0], Condition::Appearing);

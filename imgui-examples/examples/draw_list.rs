@@ -7,7 +7,7 @@ fn draw_text_centered(
     ui: &Ui,
     draw_list: &DrawListMut,
     rect: [f32; 4],
-    text: &ImStr,
+    text: &str,
     color: [f32; 3],
 ) {
     let text_size = ui.calc_text_size(text);
@@ -37,7 +37,7 @@ fn main() {
                 ui,
                 &bg_draw_list,
                 [0.0, 0.0, 300.0, 300.0],
-                im_str!("background draw list"),
+                "background draw list",
                 [0.0, 0.0, 0.0],
             );
         }
@@ -52,16 +52,16 @@ fn main() {
                 ui,
                 &fg_draw_list,
                 [w - 300.0, h - 300.0, 300.0, 300.0],
-                im_str!("foreground draw list"),
+                "foreground draw list",
                 [1.0, 0.0, 0.0],
             );
         }
 
-        Window::new(im_str!("Draw list"))
+        Window::new("Draw list")
             .size([300.0, 110.0], Condition::FirstUseEver)
             .scroll_bar(false)
             .build(ui, || {
-                ui.button(im_str!("random button"));
+                ui.button("random button");
                 let draw_list = ui.get_window_draw_list();
                 let o = ui.cursor_screen_pos();
                 let ws = ui.content_region_avail();
@@ -89,7 +89,7 @@ fn main() {
                     ui,
                     &draw_list,
                     [o[0], o[1], ws[0], ws[1]],
-                    im_str!("window draw list"),
+                    "window draw list",
                     [1.0, 1.0, 1.0],
                 );
             });

@@ -25,15 +25,15 @@ bitflags!(
 /// Builder for a slider widget.
 #[derive(Copy, Clone, Debug)]
 #[must_use]
-pub struct Slider<'a, T, K: DataTypeKind> {
-    label: T,
-    min: K,
-    max: K,
-    display_format: Option<&'a str>,
+pub struct Slider<Label, Data, Format = &'static str> {
+    label: Label,
+    min: Data,
+    max: Data,
+    display_format: Option<Format>,
     flags: SliderFlags,
 }
 
-impl<'a, T: AsRef<str>, K: DataTypeKind> Slider<'a, T, K> {
+impl<T: AsRef<str>, K: DataTypeKind> Slider<T, K> {
     /// Constructs a new slider builder with the given range.
     #[doc(alias = "SliderScalar", alias = "SliderScalarN")]
     pub fn new(label: T, min: K, max: K) -> Self {
@@ -45,6 +45,14 @@ impl<'a, T: AsRef<str>, K: DataTypeKind> Slider<'a, T, K> {
             flags: SliderFlags::empty(),
         }
     }
+}
+
+impl<Label, Data, Format> Slider<Label, Data, Format>
+where
+    Label: AsRef<str>,
+    Data: DataTypeKind,
+    Format: AsRef<str>,
+{
     /// Sets the range inclusively, such that both values given
     /// are valid values which the slider can be dragged to.
     ///
@@ -59,16 +67,24 @@ impl<'a, T: AsRef<str>, K: DataTypeKind> Slider<'a, T, K> {
     /// It is safe, though up to C++ Dear ImGui, on how to handle when
     /// `min > max`.
     #[inline]
-    pub fn range(mut self, min: K, max: K) -> Self {
+    pub fn range(mut self, min: Data, max: Data) -> Self {
         self.min = min;
         self.max = max;
         self
     }
     /// Sets the display format using *a C-style printf string*
     #[inline]
-    pub fn display_format(mut self, display_format: &'a str) -> Self {
-        self.display_format = Some(display_format);
-        self
+    pub fn display_format<Format2: AsRef<str>>(
+        self,
+        display_format: Format2,
+    ) -> Slider<Label, Data, Format2> {
+        Slider {
+            label: self.label,
+            min: self.min,
+            max: self.max,
+            display_format: Some(display_format),
+            flags: self.flags,
+        }
     }
     /// Replaces all current settings with the given flags
     #[inline]
@@ -79,16 +95,16 @@ impl<'a, T: AsRef<str>, K: DataTypeKind> Slider<'a, T, K> {
     /// Builds a slider that is bound to the given value.
     ///
     /// Returns true if the slider value was changed.
-    pub fn build(self, ui: &Ui, value: &mut K) -> bool {
+    pub fn build(self, ui: &Ui, value: &mut Data) -> bool {
         unsafe {
             let (label, display_format) = ui.scratch_txt_with_opt(self.label, self.display_format);
 
             sys::igSliderScalar(
                 label,
-                K::KIND as i32,
-                value as *mut K as *mut c_void,
-                &self.min as *const K as *const c_void,
-                &self.max as *const K as *const c_void,
+                Data::KIND as i32,
+                value as *mut Data as *mut c_void,
+                &self.min as *const Data as *const c_void,
+                &self.max as *const Data as *const c_void,
                 display_format,
                 self.flags.bits() as i32,
             )
@@ -97,17 +113,17 @@ impl<'a, T: AsRef<str>, K: DataTypeKind> Slider<'a, T, K> {
     /// Builds a horizontal array of multiple sliders attached to the given slice.
     ///
     /// Returns true if any slider value was changed.
-    pub fn build_array(self, ui: &Ui, values: &mut [K]) -> bool {
+    pub fn build_array(self, ui: &Ui, values: &mut [Data]) -> bool {
         unsafe {
             let (label, display_format) = ui.scratch_txt_with_opt(self.label, self.display_format);
 
             sys::igSliderScalarN(
                 label,
-                K::KIND as i32,
+                Data::KIND as i32,
                 values.as_mut_ptr() as *mut c_void,
                 values.len() as i32,
-                &self.min as *const K as *const c_void,
-                &self.max as *const K as *const c_void,
+                &self.min as *const Data as *const c_void,
+                &self.max as *const Data as *const c_void,
                 display_format,
                 self.flags.bits() as i32,
             )
@@ -118,16 +134,20 @@ impl<'a, T: AsRef<str>, K: DataTypeKind> Slider<'a, T, K> {
 /// Builder for a vertical slider widget.
 #[derive(Clone, Debug)]
 #[must_use]
-pub struct VerticalSlider<'a, T, K: DataTypeKind> {
-    label: T,
+pub struct VerticalSlider<Label, Data, Format = &'static str> {
+    label: Label,
     size: [f32; 2],
-    min: K,
-    max: K,
-    display_format: Option<&'a str>,
+    min: Data,
+    max: Data,
+    display_format: Option<Format>,
     flags: SliderFlags,
 }
 
-impl<'a, T: AsRef<str>, K: DataTypeKind> VerticalSlider<'a, T, K> {
+impl<Label, Data> VerticalSlider<Label, Data>
+where
+    Label: AsRef<str>,
+    Data: DataTypeKind,
+{
     /// Constructs a new vertical slider builder with the given size and range.
     ///
     /// ```rust
@@ -141,7 +161,7 @@ impl<'a, T: AsRef<str>, K: DataTypeKind> VerticalSlider<'a, T, K> {
     /// It is safe, though up to C++ Dear ImGui, on how to handle when
     /// `min > max`.
     #[doc(alias = "VSliderScalar")]
-    pub fn new(label: T, size: [f32; 2], min: K, max: K) -> Self {
+    pub fn new(label: Label, size: [f32; 2], min: Data, max: Data) -> Self {
         VerticalSlider {
             label,
             size,
@@ -151,7 +171,14 @@ impl<'a, T: AsRef<str>, K: DataTypeKind> VerticalSlider<'a, T, K> {
             flags: SliderFlags::empty(),
         }
     }
+}
 
+impl<Label, Data, Format> VerticalSlider<Label, Data, Format>
+where
+    Label: AsRef<str>,
+    Data: DataTypeKind,
+    Format: AsRef<str>,
+{
     /// Sets the range for the vertical slider.
     ///
     /// ```rust
@@ -165,16 +192,25 @@ impl<'a, T: AsRef<str>, K: DataTypeKind> VerticalSlider<'a, T, K> {
     /// It is safe, though up to C++ Dear ImGui, on how to handle when
     /// `min > max`.
     #[inline]
-    pub fn range(mut self, min: K, max: K) -> Self {
+    pub fn range(mut self, min: Data, max: Data) -> Self {
         self.min = min;
         self.max = max;
         self
     }
     /// Sets the display format using *a C-style printf string*
     #[inline]
-    pub fn display_format(mut self, display_format: &'a str) -> Self {
-        self.display_format = Some(display_format);
-        self
+    pub fn display_format<Format2: AsRef<str>>(
+        self,
+        display_format: Format2,
+    ) -> VerticalSlider<Label, Data, Format2> {
+        VerticalSlider {
+            label: self.label,
+            size: self.size,
+            min: self.min,
+            max: self.max,
+            display_format: Some(display_format),
+            flags: self.flags,
+        }
     }
     /// Replaces all current settings with the given flags
     #[inline]
@@ -185,17 +221,17 @@ impl<'a, T: AsRef<str>, K: DataTypeKind> VerticalSlider<'a, T, K> {
     /// Builds a vertical slider that is bound to the given value.
     ///
     /// Returns true if the slider value was changed.
-    pub fn build(self, ui: &Ui, value: &mut K) -> bool {
+    pub fn build(self, ui: &Ui, value: &mut Data) -> bool {
         unsafe {
             let (label, display_format) = ui.scratch_txt_with_opt(self.label, self.display_format);
 
             sys::igVSliderScalar(
                 label,
                 self.size.into(),
-                K::KIND as i32,
-                value as *mut K as *mut c_void,
-                &self.min as *const K as *const c_void,
-                &self.max as *const K as *const c_void,
+                Data::KIND as i32,
+                value as *mut Data as *mut c_void,
+                &self.min as *const Data as *const c_void,
+                &self.max as *const Data as *const c_void,
                 display_format,
                 self.flags.bits() as i32,
             )
@@ -206,19 +242,22 @@ impl<'a, T: AsRef<str>, K: DataTypeKind> VerticalSlider<'a, T, K> {
 /// Builder for an angle slider widget.
 #[derive(Copy, Clone, Debug)]
 #[must_use]
-pub struct AngleSlider<'a, T> {
-    label: T,
+pub struct AngleSlider<Label, Format = &'static str> {
+    label: Label,
     min_degrees: f32,
     max_degrees: f32,
-    display_format: &'a str,
+    display_format: Format,
     flags: SliderFlags,
 }
 
-impl<'a, T: AsRef<str>> AngleSlider<'a, T> {
+impl<Label> AngleSlider<Label>
+where
+    Label: AsRef<str>,
+{
     /// Constructs a new angle slider builder, where its minimum defaults to -360.0 and
     /// maximum defaults to 360.0
     #[doc(alias = "SliderAngle")]
-    pub fn new(label: T) -> Self {
+    pub fn new(label: Label) -> Self {
         AngleSlider {
             label,
             min_degrees: -360.0,
@@ -227,6 +266,13 @@ impl<'a, T: AsRef<str>> AngleSlider<'a, T> {
             flags: SliderFlags::empty(),
         }
     }
+}
+
+impl<Label, Format> AngleSlider<Label, Format>
+where
+    Label: AsRef<str>,
+    Format: AsRef<str>,
+{
     /// Sets the range in degrees (inclusive)
     /// ```rust
     /// # use imgui::im_str;
@@ -258,9 +304,17 @@ impl<'a, T: AsRef<str>> AngleSlider<'a, T> {
     }
     /// Sets the display format using *a C-style printf string*
     #[inline]
-    pub fn display_format(mut self, display_format: &'a str) -> Self {
-        self.display_format = display_format;
-        self
+    pub fn display_format<Format2: AsRef<str>>(
+        self,
+        display_format: Format2,
+    ) -> AngleSlider<Label, Format2> {
+        AngleSlider {
+            label: self.label,
+            min_degrees: self.min_degrees,
+            max_degrees: self.max_degrees,
+            display_format,
+            flags: self.flags,
+        }
     }
     /// Replaces all current settings with the given flags
     #[inline]
