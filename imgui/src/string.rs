@@ -6,6 +6,7 @@ use std::str;
 use std::{fmt, ptr};
 
 /// this is the unsafe cell upon which we build our abstraction.
+#[derive(Debug)]
 pub(crate) struct UiBuffer {
     buffer: Vec<u8>,
     max_len: usize,
