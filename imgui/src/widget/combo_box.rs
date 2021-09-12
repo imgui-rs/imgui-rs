@@ -54,25 +54,37 @@ pub struct ComboBoxFlags: u32 {
 /// Builder for a combo box widget
 #[derive(Copy, Clone, Debug)]
 #[must_use]
-pub struct ComboBox<T, P> {
-    label: T,
-    preview_value: Option<P>,
+pub struct ComboBox<Label, Preview = &'static str> {
+    label: Label,
+    preview_value: Option<Preview>,
     flags: ComboBoxFlags,
 }
 
-impl<'a, T: AsRef<str>, P: AsRef<str>> ComboBox<T, P> {
+impl<Label: AsRef<str>> ComboBox<Label> {
     /// Constructs a new combo box builder.
     #[doc(alias = "BeginCombo")]
-    pub fn new(label: T, preview_value: Option<P>) -> Self {
+    pub fn new(label: Label) -> Self {
         ComboBox {
             label,
-            preview_value,
+            preview_value: None,
             flags: ComboBoxFlags::empty(),
+        }
+    }
+}
+
+impl<T: AsRef<str>, Preview: AsRef<str>> ComboBox<T, Preview> {
+    pub fn preview_value<Preview2: AsRef<str>>(
+        self,
+        preview_value: Preview2,
+    ) -> ComboBox<T, Preview2> {
+        ComboBox {
+            label: self.label,
+            preview_value: Some(preview_value),
+            flags: self.flags,
         }
     }
 
     /// Replaces all current settings with the given flags.
-    #[inline]
     pub fn flags(mut self, flags: ComboBoxFlags) -> Self {
         self.flags = flags;
         self
@@ -81,7 +93,6 @@ impl<'a, T: AsRef<str>, P: AsRef<str>> ComboBox<T, P> {
     /// Enables/disables aligning the combo box popup toward the left.
     ///
     /// Disabled by default.
-    #[inline]
     pub fn popup_align_left(mut self, popup_align_left: bool) -> Self {
         self.flags
             .set(ComboBoxFlags::POPUP_ALIGN_LEFT, popup_align_left);
