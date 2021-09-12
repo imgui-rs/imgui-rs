@@ -1,4 +1,5 @@
-#![allow(clippy::float_cmp)]
+#![cfg_attr(debug_assertions, allow(clippy::float_cmp))]
+#![deny(rustdoc::broken_intra_doc_links)]
 pub extern crate imgui_sys as sys;
 
 use std::cell;

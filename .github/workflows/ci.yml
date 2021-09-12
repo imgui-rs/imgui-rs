@@ -21,7 +21,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-        with: {submodules: true}
+        with: { submodules: true }
       - uses: hecrj/setup-rust-action@v1
         with:
           components: clippy
@@ -65,7 +65,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-        with: {submodules: true}
+        with: { submodules: true }
       - uses: hecrj/setup-rust-action@v1
         with:
           components: rustfmt
@@ -134,6 +134,8 @@ jobs:
             ${{ runner.os }}-target-test-${{ matrix.rust }}-
       - run: cargo test --workspace --all-targets
       - run: cargo test --workspace --doc
+      # run to check for lint problems
+      - run: cargo doc
       # - run: cargo test --manifest-path imgui-gfx-examples/Cargo.toml --no-default-features --features directx
       #   if: runner.os == 'Windows'
       - run: cargo test --manifest-path imgui-winit-support/Cargo.toml --no-default-features --features winit-19
