@@ -114,7 +114,7 @@ fn example_2(ui: &Ui) {
         ui.separator();
         ui.text_wrapped(
             "ColorPreview::Alpha uses a checkerboard pattern in the entire color area to \
-             illustrate the alpha component"
+             illustrate the alpha component",
         );
         ColorButton::new("Red + ColorPreview::Alpha", [1.0, 0.0, 0.0, 0.5])
             .preview(ColorPreview::Alpha)

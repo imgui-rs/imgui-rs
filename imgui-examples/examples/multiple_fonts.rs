@@ -19,18 +19,16 @@ fn main() {
         .reload_font_texture(&mut system.imgui)
         .expect("Failed to reload fonts");
     system.main_loop(move |run, ui| {
-        Window::new("Hello world")
-            .opened(run)
-            .build(ui, || {
-                ui.text("Hello, I'm the default font!");
-                let _roboto = ui.push_font(roboto);
-                ui.text("Hello, I'm Roboto Regular!");
-                let _dokdo = ui.push_font(dokdo);
-                ui.text("Hello, I'm Dokdo Regular!");
-                _dokdo.pop();
-                ui.text("Hello, I'm Roboto Regular again!");
-                _roboto.pop();
-                ui.text("Hello, I'm the default font again!");
-            });
+        Window::new("Hello world").opened(run).build(ui, || {
+            ui.text("Hello, I'm the default font!");
+            let _roboto = ui.push_font(roboto);
+            ui.text("Hello, I'm Roboto Regular!");
+            let _dokdo = ui.push_font(dokdo);
+            ui.text("Hello, I'm Dokdo Regular!");
+            _dokdo.pop();
+            ui.text("Hello, I'm Roboto Regular again!");
+            _roboto.pop();
+            ui.text("Hello, I'm the default font again!");
+        });
     });
 }
