@@ -196,7 +196,7 @@ impl Ui<'_> {
     ///
     /// By default, this doesn't pass an opened bool nor any flags. See [tab_item_with_opened]
     /// and [tab_item_with_flags] for more.
-    /// 
+    ///
     /// [tab_item_with_opened]: Self::tab_item_with_opened
     /// [tab_item_with_flags]: Self::tab_item_with_flags
     pub fn tab_item(&self, label: impl AsRef<str>) -> Option<TabItemToken<'_>> {
