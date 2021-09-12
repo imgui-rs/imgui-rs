@@ -12,18 +12,18 @@ use crate::Ui;
 /// # let ui = imgui.frame();
 /// ProgressBar::new(0.6)
 ///     .size([100.0, 12.0])
-///     .overlay_text(im_str!("Progress!"))
+///     .overlay_text("Progress!")
 ///     .build(&ui);
 /// ```
 #[derive(Copy, Clone, Debug)]
 #[must_use]
-pub struct ProgressBar<T> {
+pub struct ProgressBar<T = &'static str> {
     fraction: f32,
     size: [f32; 2],
     overlay_text: Option<T>,
 }
 
-impl ProgressBar<&'static str> {
+impl ProgressBar {
     /// Creates a progress bar with a given fraction showing
     /// the progress (0.0 = 0%, 1.0 = 100%).
     ///
@@ -41,17 +41,11 @@ impl ProgressBar<&'static str> {
 }
 
 impl<T: AsRef<str>> ProgressBar<T> {
-    /// Creates a progress bar with a given fraction showing
-    /// the progress (0.0 = 0%, 1.0 = 100%).
-    ///
-    /// The progress bar will be automatically sized to fill the entire width of the window if no
-    /// custom size is specified.
-    #[inline]
-    #[doc(alias = "ProgressBar")]
-    pub fn new_with_overlay(fraction: f32, overlay_text: T) -> Self {
+    /// Sets an optional text that will be drawn over the progress bar.
+    pub fn overlay_text<T2: AsRef<str>>(self, overlay_text: T2) -> ProgressBar<T2> {
         ProgressBar {
-            fraction,
-            size: [-1.0, 0.0],
+            fraction: self.fraction,
+            size: self.size,
             overlay_text: Some(overlay_text),
         }
     }

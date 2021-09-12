@@ -75,10 +75,10 @@ bitflags!(
 /// ```no_run
 /// # use imgui::*;
 /// fn show_ui(ui: &Ui<'_>) {
-///     ui.button(im_str!("Hello, I am a drag source!"));
+///     ui.button("Hello, I am a drag source!");
 ///     
 ///     // Creates an empty DragSource with no tooltip
-///     DragDropSource::new(im_str!("BUTTON_DRAG")).begin(ui);
+///     DragDropSource::new("BUTTON_DRAG").begin(ui);
 /// }
 /// ```
 ///
@@ -142,9 +142,9 @@ impl<T: AsRef<str>> DragDropSource<T> {
     /// ```no_run
     /// # use imgui::*;
     /// fn show_ui(ui: &Ui<'_>, drop_message: &mut Option<String>) {
-    ///     ui.button(im_str!("Drag me!"));
+    ///     ui.button("Drag me!");
     ///
-    ///     let drag_drop_name = im_str!("Test Drag");
+    ///     let drag_drop_name = "Test Drag";
     ///     
     ///     // drag drop SOURCE
     ///     if DragDropSource::new(drag_drop_name).begin(ui).is_some() {
@@ -154,7 +154,7 @@ impl<T: AsRef<str>> DragDropSource<T> {
     ///         *drop_message = Some("Test Payload".to_string());
     ///     }
     ///
-    ///     ui.button(im_str!("Target me!"));
+    ///     ui.button("Target me!");
     ///
     ///     // drag drop TARGET
     ///     if let Some(target) = imgui::DragDropTarget::new(ui) {
@@ -195,9 +195,9 @@ impl<T: AsRef<str>> DragDropSource<T> {
     /// ```no_run
     /// # use imgui::*;
     /// fn show_ui(ui: &Ui<'_>) {
-    ///     ui.button(im_str!("Drag me!"));
+    ///     ui.button("Drag me!");
     ///
-    ///     let drag_drop_name = im_str!("Test Drag");
+    ///     let drag_drop_name = "Test Drag";
     ///     let msg_to_send = "hello there sailor";
     ///     
     ///     // drag drop SOURCE
@@ -206,12 +206,12 @@ impl<T: AsRef<str>> DragDropSource<T> {
     ///         tooltip.end();
     ///     }
     ///
-    ///     ui.button(im_str!("Target me!"));
+    ///     ui.button("Target me!");
     ///
     ///     // drag drop TARGET
     ///     if let Some(target) = imgui::DragDropTarget::new(ui) {
     ///         if let Some(Ok(payload_data)) = target
-    ///             .accept_payload::<&'static str>(drag_drop_name, DragDropFlags::empty())
+    ///             .accept_payload::<&'static str, _>(drag_drop_name, DragDropFlags::empty())
     ///         {
     ///             let msg = payload_data.data;
     ///             assert_eq!(msg, msg_to_send);
@@ -312,18 +312,18 @@ impl Drop for DragDropSourceToolTip<'_> {
 /// # use imgui::*;
 /// fn show_ui(ui: &Ui<'_>) {
 ///     // Drop something on this button please!
-///     ui.button(im_str!("Hello, I am a drag Target!"));
+///     ui.button("Hello, I am a drag Target!");
 ///     
 ///     if let Some(target) = DragDropTarget::new(ui) {
 ///         // accepting an empty payload (which is really just raising an event)
-///         if let Some(_payload_data) = target.accept_payload_empty(im_str!("BUTTON_DRAG"), DragDropFlags::empty()) {
+///         if let Some(_payload_data) = target.accept_payload_empty("BUTTON_DRAG", DragDropFlags::empty()) {
 ///             println!("Nice job getting on the payload!");
 ///         }
 ///    
 ///         // and we can accept multiple, different types of payloads with one drop target.
 ///         // this is a good pattern for handling different kinds of drag/drop situations with
 ///         // different kinds of data in them.
-///         if let Some(Ok(payload_data)) = target.accept_payload::<usize>(im_str!("BUTTON_ID"), DragDropFlags::empty()) {
+///         if let Some(Ok(payload_data)) = target.accept_payload::<usize, _>("BUTTON_ID", DragDropFlags::empty()) {
 ///             println!("Our payload's data was {}", payload_data.data);
 ///         }
 ///     }
@@ -379,9 +379,9 @@ impl<'ui> DragDropTarget<'ui> {
     ///
     /// Note: If you began this operation with `begin_payload_unchecked` it always incorrect
     /// to use this function. Use `accept_payload_unchecked` instead
-    pub fn accept_payload<T: 'static + Copy>(
+    pub fn accept_payload<T: 'static + Copy, Name: AsRef<str>>(
         &self,
-        name: impl AsRef<str>,
+        name: Name,
         flags: DragDropFlags,
     ) -> Option<Result<DragDropPayloadPod<T>, PayloadIsWrongType>> {
         let output = unsafe { self.accept_payload_unchecked(name, flags) };
