@@ -169,13 +169,13 @@ create_token!(
 impl<'ui> Ui<'ui> {
     /// Creates a combo box which can be appended to with `Selectable::new`.
     ///
-    /// If you do not want to provide a preview, use [begin_combo_no_preview]. If you want
-    /// to pass flags, use [begin_combo_with_flags].
-    ///
-    /// Returns `Some(ComboBoxToken)` if the combo box is open. After content has been
-    /// rendered, the token must be ended by calling `.end()`.
+    /// If you do not want to provide a preview, use [`begin_combo_no_preview`]. If you want
+    /// to pass flags, use [`begin_combo_with_flags`].
     ///
     /// Returns `None` if the combo box is not open and no content should be rendered.
+    ///
+    /// [`begin_combo_no_preview`]: Ui::begin_combo_no_preview
+    /// [`begin_combo_with_flags`]: Ui::begin_combo_with_flags
     #[must_use]
     #[doc(alias = "BeginCombo")]
     pub fn begin_combo(
@@ -193,6 +193,8 @@ impl<'ui> Ui<'ui> {
     /// rendered, the token must be ended by calling `.end()`.
     ///
     /// Returns `None` if the combo box is not open and no content should be rendered.
+    ///
+    /// [begin_combo_no_preview]: Ui::begin_combo_no_preview
     #[must_use]
     #[doc(alias = "BeginCombo")]
     pub fn begin_combo_with_flags(
@@ -213,6 +215,9 @@ impl<'ui> Ui<'ui> {
     /// rendered, the token must be ended by calling `.end()`.
     ///
     /// Returns `None` if the combo box is not open and no content should be rendered.
+    ///
+    /// [begin_combo]: Ui::begin_combo
+    /// [begin_combo_no_preview_with_flags]: Ui::begin_combo_no_preview_with_flags
     #[must_use]
     #[doc(alias = "BeginCombo")]
     pub fn begin_combo_no_preview(&self, label: impl AsRef<str>) -> Option<ComboBoxToken<'ui>> {
@@ -226,6 +231,8 @@ impl<'ui> Ui<'ui> {
     /// rendered, the token must be ended by calling `.end()`.
     ///
     /// Returns `None` if the combo box is not open and no content should be rendered.
+    ///
+    /// [begin_combo_no_preview]: Ui::begin_combo_no_preview
     #[must_use]
     #[doc(alias = "BeginCombo")]
     pub fn begin_combo_no_preview_with_flags(

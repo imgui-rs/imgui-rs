@@ -169,7 +169,7 @@ create_token!(
 impl Ui<'_> {
     /// Creates a tab bar and returns a tab bar token, allowing you to append
     /// Tab items afterwards. This passes no flags. To pass flags explicitly,
-    /// use [tab_bar_with_flags].
+    /// use [tab_bar_with_flags](Self::tab_bar_with_flags).
     pub fn tab_bar(&self, id: impl AsRef<str>) -> Option<TabBarToken<'_>> {
         self.tab_bar_with_flags(id, TabBarFlags::empty())
     }
@@ -195,7 +195,10 @@ impl Ui<'_> {
     /// Creates a new tab item and returns a token if its contents are visible.
     ///
     /// By default, this doesn't pass an opened bool nor any flags. See [tab_item_with_opened]
-    /// and `[tab_item_with_flags]` for more.
+    /// and [tab_item_with_flags] for more.
+    /// 
+    /// [tab_item_with_opened]: Self::tab_item_with_opened
+    /// [tab_item_with_flags]: Self::tab_item_with_flags
     pub fn tab_item(&self, label: impl AsRef<str>) -> Option<TabItemToken<'_>> {
         self.tab_item_with_flags(label, None, TabItemFlags::empty())
     }
