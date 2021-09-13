@@ -208,7 +208,7 @@ impl<'a> Drop for Ui<'a> {
 impl<'ui> Ui<'ui> {
     /// Renders a demo window (previously called a test window), which demonstrates most
     /// Dear Imgui features.
-    #[doc(alias = "SnowDemoWindow")]
+    #[doc(alias = "ShowDemoWindow")]
     pub fn show_demo_window(&self, opened: &mut bool) {
         unsafe {
             sys::igShowDemoWindow(opened);
