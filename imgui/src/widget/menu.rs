@@ -170,7 +170,7 @@ impl<Label: AsRef<str>, Shortcut: AsRef<str>> MenuItem<Label, Shortcut> {
     pub fn build(self, ui: &Ui) -> bool {
         unsafe {
             let (label, shortcut) = ui.scratch_txt_with_opt(self.label, self.shortcut);
-            sys::igMenuItemBool(label, shortcut, self.selected, self.enabled)
+            sys::igMenuItem_Bool(label, shortcut, self.selected, self.enabled)
         }
     }
 
