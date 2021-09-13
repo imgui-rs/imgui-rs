@@ -435,6 +435,82 @@ impl<'ui> Ui<'ui> {
     }
 }
 
+create_token!(
+    /// Starts a scope where interaction is disabled. Ends be calling `.end()` or when the token is dropped.
+    pub struct DisabledToken<'ui>;
+
+    /// Drops the layout tooltip manually. You can also just allow this token
+    /// to drop on its own.
+    drop { sys::igEndDisabled() }
+);
+
+/// # Disabling widgets
+///
+/// imgui can disable widgets so they don't react to mouse/keyboard
+/// inputs, and are displayed differently (currently dimmed by an
+/// amount set in [`Style::disabled_alpha`])
+impl<'ui> Ui<'ui> {
+    /// Creates a scope where interactions are disabled.
+    ///
+    /// Scope ends when returned token is dropped, or `.end()` is
+    /// explicitly called
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use imgui::*;
+    /// fn user_interface(ui: &Ui) {
+    ///     let disable_buttons = true;
+    ///     let _d = ui.begin_disabled(disable_buttons);
+    ///     ui.button(im_str!("Dangerous button"));
+    /// }
+    /// ```
+
+    #[doc(alias = "BeginDisabled")]
+    pub fn begin_disabled(&self, disabled: bool) -> DisabledToken<'_> {
+        unsafe { sys::igBeginDisabled(disabled) };
+        DisabledToken::new(self)
+    }
+
+    /// Identical to [`Ui::begin_disabled`] but exists to allow avoiding a
+    /// double-negative, for example `begin_enabled(enable_buttons)`
+    /// instead of `begin_disabled(!enable_buttons)`)
+    #[doc(alias = "BeginDisabled")]
+    pub fn begin_enabled(&self, enabled: bool) -> DisabledToken<'_> {
+        self.begin_disabled(!enabled)
+    }
+
+    /// Helper to create a disabled section of widgets
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use imgui::*;
+    /// fn user_interface(ui: &Ui) {
+    ///     let safe_mode = true;
+    ///     ui.disabled(safe_mode, || {
+    ///         ui.button(im_str!("Dangerous button"));
+    ///     });
+    /// }
+    /// ```
+    #[doc(alias = "BeginDisabled", alias = "EndDisabled")]
+    pub fn disabled<F: FnOnce()>(&self, disabled: bool, f: F) {
+        unsafe { sys::igBeginDisabled(disabled) };
+        f();
+        unsafe { sys::igEndDisabled() };
+    }
+
+    /// Same as [`Ui::disabled`] but with logic reversed. See
+    /// [`Ui::begin_enabled`].
+    #[doc(alias = "BeginDisabled", alias = "EndDisabled")]
+    pub fn enabled<F: FnOnce()>(&self, enabled: bool, f: F) {
+        unsafe { sys::igBeginDisabled(!enabled) };
+        f();
+        unsafe { sys::igEndDisabled() };
+    }
+}
+
+
 // Widgets: ListBox
 impl<'ui> Ui<'ui> {
     #[doc(alias = "ListBox")]
