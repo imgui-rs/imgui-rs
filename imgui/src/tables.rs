@@ -1,3 +1,5 @@
+use std::marker::PhantomData;
+
 use bitflags::bitflags;
 
 use crate::sys;
@@ -240,6 +242,12 @@ bitflags! {
     }
 }
 
+#[derive(Copy, Clone, Debug, Eq, PartialEq, PartialOrd, Ord)]
+pub enum TableSortDirection {
+    Ascending,
+    Descending,
+}
+
 impl<'ui> Ui<'ui> {
     /// Begins a table with no flags and with standard sizing contraints.
     ///
@@ -294,13 +302,19 @@ impl<'ui> Ui<'ui> {
             )
         };
 
-        should_render.then(|| TableToken::new(self))
+        // todo: once msrv is 1.54, convert this to .then(||)
+        if should_render {
+            Some(TableToken::new(self))
+        } else {
+            None
+        }
     }
 
     /// Begins a table with no flags and with standard sizing contraints.
     ///
     /// Takes an array of table header information, the length of which determines
     /// how many columns will be created.
+    #[cfg(feature = "min-const-generics")]
     pub fn begin_table_header<'a, const N: usize>(
         &self,
         str_id: &ImStr,
@@ -313,6 +327,7 @@ impl<'ui> Ui<'ui> {
     ///
     /// Takes an array of table header information, the length of which determines
     /// how many columns will be created.
+    #[cfg(feature = "min-const-generics")]
     pub fn begin_table_header_with_flags<'a, const N: usize>(
         &self,
         str_id: &ImStr,
@@ -326,6 +341,7 @@ impl<'ui> Ui<'ui> {
     /// and gives users the most flexibility.
     /// Takes an array of table header information, the length of which determines
     /// how many columns will be created.
+    #[cfg(feature = "min-const-generics")]
     pub fn begin_table_header_with_sizing<'a, const N: usize>(
         &self,
         str_id: &ImStr,
@@ -562,18 +578,16 @@ impl<'ui> Ui<'ui> {
         }
     }
 
-    /// Use this function to manually declare a column cell to be a header. You generally should
-    /// avoid using this outside of specific cases, such as custom widgets. Instead,
-    /// use [table_headers_row](Self::table_headers_row) and [table_setup_column](Self::table_setup_column).
+    /// Use this function to manually declare a column cell to be a header.
+    ///
+    /// You generally should avoid using this outside of specific cases,
+    /// such as custom widgets. Instead, use [table_headers_row](Self::table_headers_row)
+    /// and [table_setup_column](Self::table_setup_column).
     pub fn table_header(&self, label: &ImStr) {
         unsafe {
             sys::igTableHeader(label.as_ptr());
         }
     }
-
-    // pub fn table_get_sort_specs(&self) -> &TableSortSpecs {
-    //    unsafe { sys::igTableGetSortSpecs() }
-    // }
 
     /// Gets the numbers of columns in the current table.
     pub fn table_column_count(&self) -> usize {
@@ -588,6 +602,23 @@ impl<'ui> Ui<'ui> {
     /// Gets the current row index in the current table.
     pub fn table_row_index(&self) -> usize {
         unsafe { sys::igTableGetRowIndex() as usize }
+    }
+
+    /// Gets the name of the current column. If there is no currently bound name
+    /// for this column, we will return an empty string.
+    ///
+    /// Use [table_column_name_with_column](Self::table_column_name_with_column)
+    /// for arbitrary indices.
+    pub fn table_column_name(&mut self) -> &ImStr {
+        unsafe { ImStr::from_ptr_unchecked(sys::igTableGetColumnName(-1)) }
+    }
+
+    /// Gets the name of a given column. If there is no currently bound name
+    /// for this column, we will return an empty string.
+    ///
+    /// Use [table_column_name](Self::table_column_name) for the current column.
+    pub fn table_column_name_with_column(&mut self, column: usize) -> &ImStr {
+        unsafe { ImStr::from_ptr_unchecked(sys::igTableGetColumnName(column as i32)) }
     }
 
     /// Gets the flags on the current column in the current table.
@@ -606,23 +637,6 @@ impl<'ui> Ui<'ui> {
             TableColumnFlags::from_bits(sys::igTableGetColumnFlags(column_n as i32) as u32)
                 .expect("bad column flags")
         }
-    }
-
-    /// Gets the name of the current column. If there is no currently bound name
-    /// for this column, we will return an empty string.
-    ///
-    /// Use [table_column_name_with_column](Self::table_column_name_with_column)
-    /// for arbitrary indices.
-    pub fn table_column_name(&mut self) -> &ImStr {
-        unsafe { ImStr::from_ptr_unchecked(sys::igTableGetColumnName(-1)) }
-    }
-
-    /// Gets the name of a given column. If there is no currently bound name
-    /// for this column, we will return an empty string.
-    ///
-    /// Use [table_column_name](Self::table_column_name) for the current column.
-    pub fn table_column_name_with_column(&mut self, column: usize) -> &ImStr {
-        unsafe { ImStr::from_ptr_unchecked(sys::igTableGetColumnName(column as i32)) }
     }
 
     /// Sets the given background color for this column. See [TableBgTarget]
@@ -652,6 +666,18 @@ impl<'ui> Ui<'ui> {
                 color.into().into(),
                 column_index as i32,
             );
+        }
+    }
+
+    /// Gets the sorting data for a table. This will be `None` when not sorting.
+    pub fn table_sort_specs_mut(&self) -> Option<TableSortSpecsMut<'_>> {
+        unsafe {
+            let value = sys::igTableGetSortSpecs();
+            if value.is_null() {
+                None
+            } else {
+                Some(TableSortSpecsMut(value, PhantomData))
+            }
         }
     }
 }
@@ -685,6 +711,102 @@ impl<'a> Default for TableColumnSetup<'a> {
             flags: TableColumnFlags::empty(),
             init_width_or_weight: 0.0,
             user_id: Id::Int(0),
+        }
+    }
+}
+
+/// A wrapper around table sort specs.
+///
+/// To use this simply, use `conditional_sort` and provide a closure --
+/// if you should sort your data, then the closure will be ran and imgui
+/// will be informed that your data is sorted.
+///
+/// For manual control (such as if sorting can fail), use [should_sort] to
+/// check if you should sort your data, sort your data using [specs] for information
+/// on how to sort it, and then [set_sorted] to indicate that the data is sorted.
+pub struct TableSortSpecsMut<'ui>(*mut sys::ImGuiTableSortSpecs, PhantomData<Ui<'ui>>);
+
+impl TableSortSpecsMut<'_> {
+    /// Gets the specs for a given sort. In most scenarios, this will be a slice of 1 entry.
+    pub fn specs(&self) -> Specs<'_> {
+        let value =
+            unsafe { std::slice::from_raw_parts((*self.0).Specs, (*self.0).SpecsCount as usize) };
+
+        Specs(value)
+    }
+
+    /// Returns true if the data should be sorted.
+    pub fn should_sort(&self) -> bool {
+        unsafe { (*self.0).SpecsDirty }
+    }
+
+    /// Sets the internal flag that the data has been sorted.
+    pub fn set_sorted(&mut self) {
+        unsafe {
+            (*self.0).SpecsDirty = false;
+        }
+    }
+
+    /// Provide a closure, which will receive the Specs for a sort.
+    ///
+    /// If you should sort the data, the closure will run, and ImGui will be
+    /// told that the data has been sorted.
+    ///
+    /// If you need manual control over sorting, consider using [should_sort], [specs],
+    /// and [set_sorted] youself.
+    pub fn conditional_sort(mut self, mut f: impl FnMut(Specs<'_>)) {
+        let is_dirty = self.should_sort();
+
+        if is_dirty {
+            f(self.specs());
+        }
+
+        self.set_sorted();
+    }
+}
+
+/// A wrapper around a slice of [TableColumnSortSpecs].
+///
+/// This slice may be 0 if [SORT_TRISTATE] is true, may be > 1 is [SORT_MULTI] is true,
+/// but is generally == 1.
+///
+/// Consume this struct as an iterator.
+pub struct Specs<'a>(&'a [sys::ImGuiTableColumnSortSpecs]);
+
+impl<'a> Specs<'a> {
+    pub fn iter(self) -> impl Iterator<Item = TableColumnSortSpecs<'a>> {
+        self.0.iter().map(|v| TableColumnSortSpecs(v))
+    }
+}
+
+pub struct TableColumnSortSpecs<'a>(&'a sys::ImGuiTableColumnSortSpecs);
+impl<'a> TableColumnSortSpecs<'a> {
+    /// User id of the column (if specified by a TableSetupColumn() call)
+    pub fn column_user_id(&self) -> sys::ImGuiID {
+        self.0.ColumnUserID
+    }
+
+    /// Index of the column
+    pub fn column_idx(&self) -> usize {
+        self.0.ColumnIndex as usize
+    }
+
+    /// Index within parent [Specs] slice where this was found -- always stored in order starting
+    /// from 0, tables sorted on a single criteria will always have a 0 here.
+    ///
+    /// Generally, you don't need to access this, as it's the same as calling `specs.iter().enumerate()`.
+    pub fn sort_order(&self) -> usize {
+        self.0.SortOrder as usize
+    }
+
+    /// Gets the sort direction for the given column. This will nearly always be `Some` if you
+    /// can access it.
+    pub fn sort_direction(&self) -> Option<TableSortDirection> {
+        match self.0.SortDirection() {
+            0 => None,
+            1 => Some(TableSortDirection::Ascending),
+            2 => Some(TableSortDirection::Descending),
+            _ => unimplemented!(),
         }
     }
 }

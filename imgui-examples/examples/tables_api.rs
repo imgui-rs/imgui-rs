@@ -5,6 +5,24 @@ mod support;
 fn main() {
     let system = support::init(file!());
 
+    let mut humans = vec![
+        HumanData {
+            name: "Joonas",
+            favorite_number: 102,
+            favorite_fruit_maybe: "Dutch",
+        },
+        HumanData {
+            name: "Thom",
+            favorite_number: 314,
+            favorite_fruit_maybe: "Rice",
+        },
+        HumanData {
+            name: "Jack",
+            favorite_number: 611,
+            favorite_fruit_maybe: "Mangoes",
+        },
+    ];
+
     let mut t2_flags = TableFlags::REORDERABLE
         | TableFlags::HIDEABLE
         | TableFlags::RESIZABLE
@@ -129,6 +147,70 @@ fn main() {
                         ui.text(fruit[i]);
                     }
                 }
+
+                ui.separator();
+
+                ui.text("Here's a table you can sort!");
+                ui.text("Check the code to see the two methods of doing it.");
+
+                if let Some(_t) = ui.begin_table_header_with_flags(
+                    im_str!("table-headers3"),
+                    [
+                        TableColumnSetup::new(im_str!("Name")),
+                        TableColumnSetup::new(im_str!("Favorite Number")),
+                        TableColumnSetup::new(im_str!("Favorite fruit")),
+                    ],
+                    TableFlags::SORTABLE,
+                ) {
+                    if let Some(mut sort_data) = ui.table_sort_specs_mut() {
+                        sort_data
+                            .conditional_sort(|specs| HumanData::sort_humans(&mut humans, specs));
+
+                        // Can also sort this other way...
+                        // if sort_data.should_sort() {
+                        //     HumanData::sort_humans(&mut humans, sort_data.specs());
+                        //     sort_data.set_sorted();
+                        // }
+                    }
+
+                    for i in 0..3 {
+                        ui.table_next_column();
+                        ui.text(humans[i].name);
+
+                        ui.table_next_column();
+                        ui.text(humans[i].favorite_number.to_string());
+
+                        ui.table_next_column();
+                        ui.text(humans[i].favorite_fruit_maybe);
+                    }
+                }
             });
     });
+}
+struct HumanData {
+    name: &'static str,
+    favorite_number: usize,
+    favorite_fruit_maybe: &'static str,
+}
+
+impl HumanData {
+    pub fn sort_humans(humans: &mut Vec<Self>, specs: Specs<'_>) {
+        let spec = specs.iter().next().unwrap();
+        if let Some(kind) = spec.sort_direction() {
+            match kind {
+                TableSortDirection::Ascending => match spec.column_idx() {
+                    0 => humans.sort_by_key(|h| h.name),
+                    1 => humans.sort_by_key(|h| h.favorite_number),
+                    2 => humans.sort_by_key(|h| h.favorite_fruit_maybe),
+                    _ => unimplemented!(),
+                },
+                TableSortDirection::Descending => match spec.column_idx() {
+                    0 => humans.sort_by_key(|h| std::cmp::Reverse(h.name)),
+                    1 => humans.sort_by_key(|h| std::cmp::Reverse(h.favorite_number)),
+                    2 => humans.sort_by_key(|h| std::cmp::Reverse(h.favorite_fruit_maybe)),
+                    _ => unimplemented!(),
+                },
+            }
+        }
+    }
 }
