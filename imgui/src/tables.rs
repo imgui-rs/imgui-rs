@@ -1,9 +1,10 @@
+use std::ffi::CStr;
 use std::marker::PhantomData;
 
 use bitflags::bitflags;
 
 use crate::sys;
-use crate::{Id, ImColor32, ImStr, Ui};
+use crate::{Id, ImColor32, Ui};
 
 bitflags! {
     /// Flags passed to `begin_table` methods.
@@ -258,7 +259,11 @@ impl<'ui> Ui<'ui> {
     /// **NB:** after you begin a table (and after setting up )
     #[inline]
     #[must_use = "if return is dropped immediately, table is ended immediately."]
-    pub fn begin_table(&self, str_id: &ImStr, column_count: i32) -> Option<TableToken<'ui>> {
+    pub fn begin_table(
+        &self,
+        str_id: impl AsRef<str>,
+        column_count: i32,
+    ) -> Option<TableToken<'ui>> {
         self.begin_table_with_flags(str_id, column_count, TableFlags::empty())
     }
 
@@ -270,7 +275,7 @@ impl<'ui> Ui<'ui> {
     #[inline]
     pub fn begin_table_with_flags(
         &self,
-        str_id: &ImStr,
+        str_id: impl AsRef<str>,
         column_count: i32,
         flags: TableFlags,
     ) -> Option<TableToken<'ui>> {
@@ -286,7 +291,7 @@ impl<'ui> Ui<'ui> {
     #[inline]
     pub fn begin_table_with_sizing(
         &self,
-        str_id: &ImStr,
+        str_id: impl AsRef<str>,
         column: i32,
         flags: TableFlags,
         outer_size: [f32; 2],
@@ -294,7 +299,7 @@ impl<'ui> Ui<'ui> {
     ) -> Option<TableToken<'ui>> {
         let should_render = unsafe {
             sys::igBeginTable(
-                str_id.as_ptr(),
+                self.scratch_txt(str_id),
                 column,
                 flags.bits() as i32,
                 outer_size.into(),
@@ -315,10 +320,10 @@ impl<'ui> Ui<'ui> {
     /// Takes an array of table header information, the length of which determines
     /// how many columns will be created.
     #[cfg(feature = "min-const-generics")]
-    pub fn begin_table_header<'a, const N: usize>(
+    pub fn begin_table_header<'a, Name: AsRef<str>, const N: usize>(
         &self,
-        str_id: &ImStr,
-        column_data: [TableColumnSetup<'a>; N],
+        str_id: impl AsRef<str>,
+        column_data: [TableColumnSetup<'a, Name>; N],
     ) -> Option<TableToken<'ui>> {
         self.begin_table_header_with_flags(str_id, column_data, TableFlags::empty())
     }
@@ -328,10 +333,10 @@ impl<'ui> Ui<'ui> {
     /// Takes an array of table header information, the length of which determines
     /// how many columns will be created.
     #[cfg(feature = "min-const-generics")]
-    pub fn begin_table_header_with_flags<'a, const N: usize>(
+    pub fn begin_table_header_with_flags<'a, Name: AsRef<str>, const N: usize>(
         &self,
-        str_id: &ImStr,
-        column_data: [TableColumnSetup<'a>; N],
+        str_id: impl AsRef<str>,
+        column_data: [TableColumnSetup<'a, Name>; N],
         flags: TableFlags,
     ) -> Option<TableToken<'ui>> {
         self.begin_table_header_with_sizing(str_id, column_data, flags, [0.0, 0.0], 0.0)
@@ -342,10 +347,10 @@ impl<'ui> Ui<'ui> {
     /// Takes an array of table header information, the length of which determines
     /// how many columns will be created.
     #[cfg(feature = "min-const-generics")]
-    pub fn begin_table_header_with_sizing<'a, const N: usize>(
+    pub fn begin_table_header_with_sizing<'a, Name: AsRef<str>, const N: usize>(
         &self,
-        str_id: &ImStr,
-        column_data: [TableColumnSetup<'a>; N],
+        str_id: impl AsRef<str>,
+        column_data: [TableColumnSetup<'a, Name>; N],
         flags: TableFlags,
         outer_size: [f32; 2],
         inner_width: f32,
@@ -509,7 +514,7 @@ impl<'ui> Ui<'ui> {
     /// row and automatically submit a table header for each column.
     /// Headers are required to perform: reordering, sorting, and opening the context menu (though,
     /// the context menu can also be made available in columns body using [TableFlags::CONTEXT_MENU_IN_BODY].
-    pub fn table_setup_column(&self, str_id: &ImStr) {
+    pub fn table_setup_column(&self, str_id: impl AsRef<str>) {
         self.table_setup_column_with(TableColumnSetup::new(str_id))
     }
 
@@ -523,10 +528,10 @@ impl<'ui> Ui<'ui> {
     /// row and automatically submit a table header for each column.
     /// Headers are required to perform: reordering, sorting, and opening the context menu (though,
     /// the context menu can also be made available in columns body using [TableFlags::CONTEXT_MENU_IN_BODY].
-    pub fn table_setup_column_with(&self, data: TableColumnSetup<'_>) {
+    pub fn table_setup_column_with<N: AsRef<str>>(&self, data: TableColumnSetup<'_, N>) {
         unsafe {
             sys::igTableSetupColumn(
-                data.name.as_ptr(),
+                self.scratch_txt(data.name),
                 data.flags.bits() as i32,
                 data.init_width_or_weight,
                 data.user_id.as_imgui_id(),
@@ -583,9 +588,9 @@ impl<'ui> Ui<'ui> {
     /// You generally should avoid using this outside of specific cases,
     /// such as custom widgets. Instead, use [table_headers_row](Self::table_headers_row)
     /// and [table_setup_column](Self::table_setup_column).
-    pub fn table_header(&self, label: &ImStr) {
+    pub fn table_header(&self, label: impl AsRef<str>) {
         unsafe {
-            sys::igTableHeader(label.as_ptr());
+            sys::igTableHeader(self.scratch_txt(label));
         }
     }
 
@@ -609,16 +614,26 @@ impl<'ui> Ui<'ui> {
     ///
     /// Use [table_column_name_with_column](Self::table_column_name_with_column)
     /// for arbitrary indices.
-    pub fn table_column_name(&mut self) -> &ImStr {
-        unsafe { ImStr::from_ptr_unchecked(sys::igTableGetColumnName(-1)) }
+    pub fn table_column_name(&mut self) -> &str {
+        unsafe {
+            // imgui uses utf8...though that is a continuous process there.
+            CStr::from_ptr(sys::igTableGetColumnName(-1))
+                .to_str()
+                .unwrap()
+        }
     }
 
     /// Gets the name of a given column. If there is no currently bound name
     /// for this column, we will return an empty string.
     ///
     /// Use [table_column_name](Self::table_column_name) for the current column.
-    pub fn table_column_name_with_column(&mut self, column: usize) -> &ImStr {
-        unsafe { ImStr::from_ptr_unchecked(sys::igTableGetColumnName(column as i32)) }
+    pub fn table_column_name_with_column(&mut self, column: usize) -> &str {
+        unsafe {
+            // imgui uses utf8...though that is a continuous process there.
+            CStr::from_ptr(sys::igTableGetColumnName(column as i32))
+                .to_str()
+                .unwrap()
+        }
     }
 
     /// Gets the flags on the current column in the current table.
@@ -684,9 +699,10 @@ impl<'ui> Ui<'ui> {
 
 /// A struct containing all the data needed to setup a table column header
 /// via [begin_table_header](Ui::begin_table_header) or [table_setup_column](Ui::table_setup_column).
-pub struct TableColumnSetup<'a> {
+#[derive(Debug, Default)]
+pub struct TableColumnSetup<'a, Name> {
     /// The name of column to be displayed to users.
-    pub name: &'a ImStr,
+    pub name: Name,
     /// The flags this column will have.
     pub flags: TableColumnFlags,
     /// The width or weight of the given column.
@@ -695,19 +711,10 @@ pub struct TableColumnSetup<'a> {
     pub user_id: Id<'a>,
 }
 
-impl<'a> TableColumnSetup<'a> {
-    pub fn new(name: &'a ImStr) -> Self {
+impl<'a, Name: AsRef<str>> TableColumnSetup<'a, Name> {
+    pub fn new(name: Name) -> Self {
         Self {
             name,
-            ..Default::default()
-        }
-    }
-}
-
-impl<'a> Default for TableColumnSetup<'a> {
-    fn default() -> Self {
-        Self {
-            name: Default::default(),
             flags: TableColumnFlags::empty(),
             init_width_or_weight: 0.0,
             user_id: Id::Int(0),
