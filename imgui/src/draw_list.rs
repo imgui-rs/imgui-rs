@@ -79,9 +79,12 @@ pub struct DrawListMut<'ui> {
 }
 
 // Lock for each variant of draw list. See https://github.com/imgui-rs/imgui-rs/issues/488
-static DRAW_LIST_LOADED_WINDOW: std::sync::atomic::AtomicBool = std::sync::atomic::AtomicBool::new(false);
-static DRAW_LIST_LOADED_BACKGROUND: std::sync::atomic::AtomicBool = std::sync::atomic::AtomicBool::new(false);
-static DRAW_LIST_LOADED_FOREGROUND: std::sync::atomic::AtomicBool = std::sync::atomic::AtomicBool::new(false);
+static DRAW_LIST_LOADED_WINDOW: std::sync::atomic::AtomicBool =
+    std::sync::atomic::AtomicBool::new(false);
+static DRAW_LIST_LOADED_BACKGROUND: std::sync::atomic::AtomicBool =
+    std::sync::atomic::AtomicBool::new(false);
+static DRAW_LIST_LOADED_FOREGROUND: std::sync::atomic::AtomicBool =
+    std::sync::atomic::AtomicBool::new(false);
 
 impl<'ui> Drop for DrawListMut<'ui> {
     fn drop(&mut self) {
@@ -89,7 +92,8 @@ impl<'ui> Drop for DrawListMut<'ui> {
             DrawListType::Window => &DRAW_LIST_LOADED_WINDOW,
             DrawListType::Background => &DRAW_LIST_LOADED_BACKGROUND,
             DrawListType::Foreground => &DRAW_LIST_LOADED_FOREGROUND,
-        }.store(false, std::sync::atomic::Ordering::Release);
+        }
+        .store(false, std::sync::atomic::Ordering::Release);
     }
 }
 

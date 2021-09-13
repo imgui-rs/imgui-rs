@@ -19,7 +19,6 @@ fn draw_text_centered(
 fn main() {
     let system = support::init(file!());
     system.main_loop(move |_, ui| {
-
         // Get access to draw FG and BG draw lists.
         let bg_draw_list = ui.get_background_draw_list();
         let fg_draw_list = ui.get_foreground_draw_list();
