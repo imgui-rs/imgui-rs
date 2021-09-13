@@ -29,10 +29,10 @@ fn main() {
         | TableFlags::NO_BORDERS_IN_BODY;
 
     system.main_loop(move |_, ui| {
-        Window::new(im_str!("Input text callbacks"))
+        Window::new("Input text callbacks")
             .size([800.0, 400.0], Condition::FirstUseEver)
             .build(ui, || {
-                if let Some(_t) = ui.begin_table(im_str!("Basic-Table"), 3) {
+                if let Some(_t) = ui.begin_table("Basic-Table", 3) {
                     // we must also call `next_row` here, because we declined
                     // to set up header rows. If we set up header rows ourselves,
                     // we will call `table_header_rows` instead, and if we use
@@ -74,11 +74,11 @@ fn main() {
                 ui.separator();
                 ui.text("Let's add some headers");
                 if let Some(_t) = ui.begin_table_header(
-                    im_str!("table-headers"),
+                    "table-headers",
                     [
-                        TableColumnSetup::new(im_str!("Name")),
-                        TableColumnSetup::new(im_str!("Age")),
-                        TableColumnSetup::new(im_str!("Favorite fruit")),
+                        TableColumnSetup::new("Name"),
+                        TableColumnSetup::new("Age"),
+                        TableColumnSetup::new("Favorite fruit"),
                     ],
                 ) {
                     // note that we DON'T have to call "table_next_row" here -- that's taken care
@@ -109,22 +109,18 @@ fn main() {
                 Notice how toggling these checkboxes changes the context menu.",
                 );
 
-                ui.checkbox_flags(
-                    im_str!("Reorderable"),
-                    &mut t2_flags,
-                    TableFlags::REORDERABLE,
-                );
+                ui.checkbox_flags("Reorderable", &mut t2_flags, TableFlags::REORDERABLE);
                 ui.same_line();
-                ui.checkbox_flags(im_str!("Hideable"), &mut t2_flags, TableFlags::HIDEABLE);
+                ui.checkbox_flags("Hideable", &mut t2_flags, TableFlags::HIDEABLE);
                 ui.same_line();
-                ui.checkbox_flags(im_str!("Resizable"), &mut t2_flags, TableFlags::RESIZABLE);
+                ui.checkbox_flags("Resizable", &mut t2_flags, TableFlags::RESIZABLE);
 
                 if let Some(_t) = ui.begin_table_header_with_flags(
-                    im_str!("table-headers2"),
+                    "table-headers2",
                     [
-                        TableColumnSetup::new(im_str!("Name")),
-                        TableColumnSetup::new(im_str!("Age")),
-                        TableColumnSetup::new(im_str!("Favorite fruit")),
+                        TableColumnSetup::new("Name"),
+                        TableColumnSetup::new("Age"),
+                        TableColumnSetup::new("Favorite fruit"),
                     ],
                     t2_flags,
                 ) {
@@ -154,11 +150,11 @@ fn main() {
                 ui.text("Check the code to see the two methods of doing it.");
 
                 if let Some(_t) = ui.begin_table_header_with_flags(
-                    im_str!("table-headers3"),
+                    "table-headers3",
                     [
-                        TableColumnSetup::new(im_str!("Name")),
-                        TableColumnSetup::new(im_str!("Favorite Number")),
-                        TableColumnSetup::new(im_str!("Favorite fruit")),
+                        TableColumnSetup::new("Name"),
+                        TableColumnSetup::new("Favorite Number"),
+                        TableColumnSetup::new("Favorite fruit"),
                     ],
                     TableFlags::SORTABLE,
                 ) {

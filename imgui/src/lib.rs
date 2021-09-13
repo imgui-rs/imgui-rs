@@ -309,6 +309,12 @@ impl<'a> Id<'a> {
     }
 }
 
+impl<'a> Default for Id<'a> {
+    fn default() -> Self {
+        Self::Int(0)
+    }
+}
+
 // Widgets: Input
 impl<'ui> Ui<'ui> {
     #[doc(alias = "InputText", alias = "InputTextWithHint")]
