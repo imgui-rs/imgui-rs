@@ -252,7 +252,7 @@ impl<'ui> Ui<'ui> {
     /// Begins a table with no flags and with standard sizing contraints.
     ///
     /// This does no work on styling the headers (the top row) -- see either
-    /// [begin_table_with_headers](Self::begin_table_with_headers) or the more complex
+    /// [begin_table_header](Self::begin_table_header) or the more complex
     /// [table_setup_column](Self::table_setup_column).
     ///
     /// **NB:** after you begin a table (and after setting up )
@@ -265,7 +265,7 @@ impl<'ui> Ui<'ui> {
     /// Begins a table with flags and standard sizing contraints.
     ///
     /// This does no work on styling the headers (the top row) -- see either
-    /// [begin_table_with_headers](Self::begin_table_with_headers) or the more complex
+    /// [begin_table_header](Self::begin_table_header) or the more complex
     /// [table_setup_column](Self::table_setup_column).
     #[inline]
     pub fn begin_table_with_flags(
@@ -383,8 +383,8 @@ impl<'ui> Ui<'ui> {
     /// Setting a flag here will make the next row a "header" now, which may
     /// require setup of column data.
     ///
-    /// See [table_next_row] for information on how moving rows work. To set the row
-    /// with a given height, see [table_next_row_with_height].
+    /// See [table_next_row](Self::table_next_row) for information on how moving rows work. To set the row
+    /// with a given height, see [table_next_row_with_height](Self::table_next_row_with_height).
     #[inline]
     pub fn table_next_row_with_flags(&self, flags: TableRowFlags) {
         self.table_next_row_with_height(flags, 0.0);
@@ -393,7 +393,7 @@ impl<'ui> Ui<'ui> {
     /// Moves a  table to the next row (ie, down), with the given flags,
     /// and with the given minimum height.
     ///
-    /// See [table_next_row] for information on how moving rows work.
+    /// See [table_next_row](Self::table_next_row) for information on how moving rows work.
     #[inline]
     pub fn table_next_row_with_height(&self, flags: TableRowFlags, min_row_height: f32) {
         unsafe {
@@ -487,7 +487,7 @@ impl<'ui> Ui<'ui> {
     }
 
     /// Specify label per column, with no flags and default sizing. You can avoid calling
-    /// this method entirely by using [begin_table_header].
+    /// this method entirely by using [begin_table_header](Self::begin_table_header).
     ///
     /// # Example
     /// ```rs
@@ -508,13 +508,13 @@ impl<'ui> Ui<'ui> {
     /// Along with [table_headers_row](Self::table_headers_row), this method is used to create a header
     /// row and automatically submit a table header for each column.
     /// Headers are required to perform: reordering, sorting, and opening the context menu (though,
-    /// the context menu can also be made available in columns body using [TableFlags::ContextMenuInBody].
+    /// the context menu can also be made available in columns body using [TableFlags::CONTEXT_MENU_IN_BODY].
     pub fn table_setup_column(&self, str_id: &ImStr) {
         self.table_setup_column_with(TableColumnSetup::new(str_id))
     }
 
     /// Specify label per column, with data given in [TableColumnSetup]. You can avoid calling
-    /// this method entirely by using [begin_table_header].
+    /// this method entirely by using [begin_table_header](Self::begin_table_header).
     ///
     /// See [table_setup_column](Self::table_setup_column) for an example of how to setup columns
     /// yourself.
@@ -522,7 +522,7 @@ impl<'ui> Ui<'ui> {
     /// Along with [table_headers_row](Self::table_headers_row), this method is used to create a header
     /// row and automatically submit a table header for each column.
     /// Headers are required to perform: reordering, sorting, and opening the context menu (though,
-    /// the context menu can also be made available in columns body using [TableFlags::ContextMenuInBody].
+    /// the context menu can also be made available in columns body using [TableFlags::CONTEXT_MENU_IN_BODY].
     pub fn table_setup_column_with(&self, data: TableColumnSetup<'_>) {
         unsafe {
             sys::igTableSetupColumn(
@@ -536,7 +536,7 @@ impl<'ui> Ui<'ui> {
 
     /// Locks columns/rows so they stay visible when scrolled. Generally, you will be calling this
     /// so that the header column is always visible (though go wild if you want). You can avoid
-    /// calling this entirely by passing `true` to [begin_table_header].
+    /// calling this entirely by passing `true` to [begin_table_header](Self::begin_table_header).
     ///
     /// # Example
     /// ```rs
@@ -564,7 +564,7 @@ impl<'ui> Ui<'ui> {
     /// For an example of using this method, see [table_setup_column](Self::table_setup_column).
     ///
     /// Headers are required to perform: reordering, sorting, and opening the context menu (though,
-    /// the context menu can also be made available in columns body using [TableFlags::ContextMenuInBody].
+    /// the context menu can also be made available in columns body using [TableFlags::CONTEXT_MENU_IN_BODY].
     ///
     /// You may manually submit headers using [table_next_column] + [table_header] calls, but this is
     ///  only useful in some advanced use cases (e.g. adding custom widgets in header row).
@@ -717,13 +717,18 @@ impl<'a> Default for TableColumnSetup<'a> {
 
 /// A wrapper around table sort specs.
 ///
-/// To use this simply, use `conditional_sort` and provide a closure --
+/// To use this simply, use [conditional_sort] and provide a closure --
 /// if you should sort your data, then the closure will be ran and imgui
 /// will be informed that your data is sorted.
 ///
 /// For manual control (such as if sorting can fail), use [should_sort] to
 /// check if you should sort your data, sort your data using [specs] for information
 /// on how to sort it, and then [set_sorted] to indicate that the data is sorted.
+///
+/// [conditional_sort]: Self::conditional_sort
+/// [should_sort]: Self::should_sort
+/// [specs]: Self::specs
+/// [set_sorted]: Self::set_sorted
 pub struct TableSortSpecsMut<'ui>(*mut sys::ImGuiTableSortSpecs, PhantomData<Ui<'ui>>);
 
 impl TableSortSpecsMut<'_> {
@@ -754,6 +759,10 @@ impl TableSortSpecsMut<'_> {
     ///
     /// If you need manual control over sorting, consider using [should_sort], [specs],
     /// and [set_sorted] youself.
+    ///
+    /// [should_sort]: Self::should_sort
+    /// [specs]: Self::specs
+    /// [set_sorted]: Self::set_sorted
     pub fn conditional_sort(mut self, mut f: impl FnMut(Specs<'_>)) {
         let is_dirty = self.should_sort();
 
@@ -767,7 +776,7 @@ impl TableSortSpecsMut<'_> {
 
 /// A wrapper around a slice of [TableColumnSortSpecs].
 ///
-/// This slice may be 0 if [SORT_TRISTATE] is true, may be > 1 is [SORT_MULTI] is true,
+/// This slice may be 0 if [TableFlags::SORT_TRISTATE] is true, may be > 1 is [TableFlags::SORT_MULTI] is true,
 /// but is generally == 1.
 ///
 /// Consume this struct as an iterator.
