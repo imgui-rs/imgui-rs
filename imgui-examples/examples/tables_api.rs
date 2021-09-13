@@ -162,7 +162,7 @@ fn main() {
                     ],
                     TableFlags::SORTABLE,
                 ) {
-                    if let Some(mut sort_data) = ui.table_sort_specs_mut() {
+                    if let Some(sort_data) = ui.table_sort_specs_mut() {
                         sort_data
                             .conditional_sort(|specs| HumanData::sort_humans(&mut humans, specs));
 
@@ -173,15 +173,15 @@ fn main() {
                         // }
                     }
 
-                    for i in 0..3 {
+                    for human in humans.iter() {
                         ui.table_next_column();
-                        ui.text(humans[i].name);
+                        ui.text(human.name);
 
                         ui.table_next_column();
-                        ui.text(humans[i].favorite_number.to_string());
+                        ui.text(human.favorite_number.to_string());
 
                         ui.table_next_column();
-                        ui.text(humans[i].favorite_fruit_maybe);
+                        ui.text(human.favorite_fruit_maybe);
                     }
                 }
             });
