@@ -61,27 +61,51 @@ bitflags!(
     }
 );
 
+enum DrawListType {
+    Window,
+    Background,
+    Foreground,
+}
+
 /// Object implementing the custom draw API.
 ///
 /// Called from [`Ui::get_window_draw_list`], [`Ui::get_background_draw_list`] or [`Ui::get_foreground_draw_list`].
 /// No more than one instance of this structure can live in a program at the same time.
 /// The program will panic on creating a second instance.
 pub struct DrawListMut<'ui> {
+    draw_list_type: DrawListType,
     draw_list: *mut ImDrawList,
     _phantom: PhantomData<&'ui Ui<'ui>>,
 }
 
-static DRAW_LIST_LOADED: std::sync::atomic::AtomicBool = std::sync::atomic::AtomicBool::new(false);
+// Lock for each variant of draw list. See https://github.com/imgui-rs/imgui-rs/issues/488
+static DRAW_LIST_LOADED_WINDOW: std::sync::atomic::AtomicBool =
+    std::sync::atomic::AtomicBool::new(false);
+static DRAW_LIST_LOADED_BACKGROUND: std::sync::atomic::AtomicBool =
+    std::sync::atomic::AtomicBool::new(false);
+static DRAW_LIST_LOADED_FOREGROUND: std::sync::atomic::AtomicBool =
+    std::sync::atomic::AtomicBool::new(false);
 
 impl<'ui> Drop for DrawListMut<'ui> {
     fn drop(&mut self) {
-        DRAW_LIST_LOADED.store(false, std::sync::atomic::Ordering::Release);
+        match self.draw_list_type {
+            DrawListType::Window => &DRAW_LIST_LOADED_WINDOW,
+            DrawListType::Background => &DRAW_LIST_LOADED_BACKGROUND,
+            DrawListType::Foreground => &DRAW_LIST_LOADED_FOREGROUND,
+        }
+        .store(false, std::sync::atomic::Ordering::Release);
     }
 }
 
 impl<'ui> DrawListMut<'ui> {
-    fn lock_draw_list() {
-        let already_loaded = DRAW_LIST_LOADED
+    fn lock_draw_list(t: DrawListType) {
+        let lock = match t {
+            DrawListType::Window => &DRAW_LIST_LOADED_WINDOW,
+            DrawListType::Background => &DRAW_LIST_LOADED_BACKGROUND,
+            DrawListType::Foreground => &DRAW_LIST_LOADED_FOREGROUND,
+        };
+
+        let already_loaded = lock
             .compare_exchange(
                 false,
                 true,
@@ -90,33 +114,42 @@ impl<'ui> DrawListMut<'ui> {
             )
             .is_err();
         if already_loaded {
-            panic!("DrawListMut is already loaded! You can only load one instance of it!")
+            let name = match t {
+                DrawListType::Window => "window",
+                DrawListType::Background => "background",
+                DrawListType::Foreground => "foreground",
+            };
+            panic!("The DrawListMut instance for the {} draw list is already loaded! You can only load one instance of it!", name)
         }
     }
 
     #[doc(alias = "GetWindowDrawList")]
     pub(crate) fn window(_: &Ui<'ui>) -> Self {
-        Self::lock_draw_list();
+        Self::lock_draw_list(DrawListType::Window);
+
         Self {
             draw_list: unsafe { sys::igGetWindowDrawList() },
+            draw_list_type: DrawListType::Window,
             _phantom: PhantomData,
         }
     }
 
     #[doc(alias = "GetBackgroundDrawList")]
     pub(crate) fn background(_: &Ui<'ui>) -> Self {
-        Self::lock_draw_list();
+        Self::lock_draw_list(DrawListType::Background);
         Self {
             draw_list: unsafe { sys::igGetBackgroundDrawList() },
+            draw_list_type: DrawListType::Background,
             _phantom: PhantomData,
         }
     }
 
     #[doc(alias = "GetForegroundDrawList")]
     pub(crate) fn foreground(_: &Ui<'ui>) -> Self {
-        Self::lock_draw_list();
+        Self::lock_draw_list(DrawListType::Foreground);
         Self {
             draw_list: unsafe { sys::igGetForegroundDrawList() },
+            draw_list_type: DrawListType::Foreground,
             _phantom: PhantomData,
         }
     }
