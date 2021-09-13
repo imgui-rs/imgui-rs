@@ -2,8 +2,10 @@
 
 ## [Unreleased]
 
+- BREAKING: MSRV is now **1.54**. This is gives us access to min-const-generics, which we use in a few places, but will gradually use more. Because this is the first time we've bumped MSRV intentionally, we have added a new feature `min-const-generics`, which is _enabled by default_. If you are pre-1.54, you can hang onto this update by disabling that feature. In our next update, this feature will be removed and we will commit to our MSRVs going forward.
+
 - Removed automatically adding default features for `imgui-winit-support`
-with the exception of the current default winit feature/dep version. Additionally, that version was updated to 0.25. If you want to not have the default features of winit with 0.25, set `default-features = false` and add `winit-25` as a normal feature. Thank you to @dzil123 for the work [implementing this here](https://github.com/imgui-rs/imgui-rs/pull/477)!
+  with the exception of the current default winit feature/dep version. Additionally, that version was updated to 0.25. If you want to not have the default features of winit with 0.25, set `default-features = false` and add `winit-25` as a normal feature. Thank you to @dzil123 for the work [implementing this here](https://github.com/imgui-rs/imgui-rs/pull/477)!
 
 - Added an `imgui-glow-renderer` which targets `glow 0.10`. Before release, this will be updated to target current `0.11` glow when further features are added. Thank you to @jmaargh for the work [implementing this here](https://github.com/imgui-rs/imgui-rs/pull/495)!
 
@@ -52,6 +54,7 @@ with the exception of the current default winit feature/dep version. Additionall
   - For example `ui.is_key_released(imgui::Key::A)` is same as `ui.is_key_index_released(winit::events::VirtualKeyCode::A as i32)` when using the winit backend
 
 - Full (32-bit) unicode support is enabled in Dear Imgui (e.g. `-DIMGUI_USE_WCHAR32` is enabled now). Previously UTF-16 was used internally.
+
   - BREAKING: Some parts of the font atlas code now use `char` (or `u32`) instead of `u16` to reflect this.
     - Note: `u32` is used over `char` in some situations, such as when surrogates are allowed
   - BREAKING (sorta): Dear Imgui now will use 32 bits for character data internally. This impacts the ABI, including sizes of structs and such, and can break some low level or advanced use cases:

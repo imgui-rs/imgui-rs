@@ -18,8 +18,11 @@ imgui-sys = { version = "0.7.0", path = "../imgui-sys" }
 parking_lot = "0.11"
 
 [features]
+default = ["min-const-generics"]
+
 wasm = ["imgui-sys/wasm"]
 freetype = ["imgui-sys/freetype"]
+min-const-generics = []
 
 [dev-dependencies]
 memoffset = "0.6"
