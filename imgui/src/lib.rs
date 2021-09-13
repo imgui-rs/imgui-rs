@@ -303,8 +303,7 @@ impl<'a> Id<'a> {
                 Id::Int(i) => {
                     let p = *i as *const std::os::raw::c_void;
                     sys::igGetIDPtr(p)
-                }
-                // Id::ImGuiID(n) => *n,
+                } // Id::ImGuiID(n) => *n,
             }
         }
     }
