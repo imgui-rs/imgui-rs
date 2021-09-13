@@ -1,7 +1,7 @@
 use bitflags::bitflags;
 use std::os::raw::{c_char, c_void};
 
-use crate::string::ImStr;
+// use crate::string::ImStr;
 use crate::sys;
 use crate::{Condition, Ui};
 
@@ -61,27 +61,26 @@ fn fmt_ptr() -> *const c_char {
 
 /// Unique ID used by tree nodes
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
-pub enum TreeNodeId<'a> {
-    Str(&'a ImStr),
+pub enum TreeNodeId<T> {
+    Str(T),
     Ptr(*const c_void),
 }
 
-impl<'a, T: ?Sized + AsRef<ImStr>> From<&'a T> for TreeNodeId<'a> {
-    #[inline]
-    fn from(s: &'a T) -> Self {
-        TreeNodeId::Str(s.as_ref())
+impl<T: AsRef<str>> From<T> for TreeNodeId<T> {
+    fn from(s: T) -> Self {
+        TreeNodeId::Str(s)
     }
 }
 
-impl<T> From<*const T> for TreeNodeId<'static> {
-    #[inline]
+// this is a bit wonky here using the T param...
+impl<T> From<*const T> for TreeNodeId<T> {
     fn from(p: *const T) -> Self {
         TreeNodeId::Ptr(p as *const c_void)
     }
 }
 
-impl<T> From<*mut T> for TreeNodeId<'static> {
-    #[inline]
+// this is a bit wonky here using the T param...
+impl<T> From<*mut T> for TreeNodeId<T> {
     fn from(p: *mut T) -> Self {
         TreeNodeId::Ptr(p as *const T as *const c_void)
     }
@@ -90,17 +89,17 @@ impl<T> From<*mut T> for TreeNodeId<'static> {
 /// Builder for a tree node widget
 #[derive(Copy, Clone, Debug)]
 #[must_use]
-pub struct TreeNode<'a> {
-    id: TreeNodeId<'a>,
-    label: Option<&'a ImStr>,
+pub struct TreeNode<T, L = &'static str> {
+    id: TreeNodeId<T>,
+    label: Option<L>,
     opened: bool,
     opened_cond: Condition,
     flags: TreeNodeFlags,
 }
 
-impl<'a> TreeNode<'a> {
+impl<T: AsRef<str>> TreeNode<T, &'static str> {
     /// Constructs a new tree node builder
-    pub fn new<I: Into<TreeNodeId<'a>>>(id: I) -> TreeNode<'a> {
+    pub fn new<I: Into<TreeNodeId<T>>>(id: I) -> TreeNode<T, &'static str> {
         TreeNode {
             id: id.into(),
             label: None,
@@ -109,125 +108,133 @@ impl<'a> TreeNode<'a> {
             flags: TreeNodeFlags::empty(),
         }
     }
+}
+
+impl<T: AsRef<str>, L: AsRef<str>> TreeNode<T, L> {
     /// Sets the tree node label
-    #[inline]
-    pub fn label(mut self, label: &'a ImStr) -> Self {
-        self.label = Some(label);
-        self
+    pub fn label<I: Into<TreeNodeId<L2>>, L2: AsRef<str>>(self, label: L2) -> TreeNode<T, L2> {
+        TreeNode {
+            label: Some(label),
+            id: self.id,
+            opened: self.opened,
+            opened_cond: self.opened_cond,
+            flags: self.flags,
+        }
     }
+
     /// Sets the opened state of the tree node, which is applied based on the given condition value
-    #[inline]
     pub fn opened(mut self, opened: bool, cond: Condition) -> Self {
         self.opened = opened;
         self.opened_cond = cond;
         self
     }
+
     /// Replaces all current settings with the given flags.
-    #[inline]
     pub fn flags(mut self, flags: TreeNodeFlags) -> Self {
         self.flags = flags;
         self
     }
+
     /// Enables/disables drawing the tree node in selected state.
     ///
     /// Disabled by default.
-    #[inline]
     pub fn selected(mut self, value: bool) -> Self {
         self.flags.set(TreeNodeFlags::SELECTED, value);
         self
     }
+
     /// Enables/disables full-colored frame.
     ///
     /// Disabled by default.
-    #[inline]
     pub fn framed(mut self, value: bool) -> Self {
         self.flags.set(TreeNodeFlags::FRAMED, value);
         self
     }
+
     /// Enables/disables allowing the tree node to overlap subsequent widgets.
     ///
     /// Disabled by default.
-    #[inline]
     pub fn allow_item_overlap(mut self, value: bool) -> Self {
         self.flags.set(TreeNodeFlags::ALLOW_ITEM_OVERLAP, value);
         self
     }
+
     /// Enables/disables automatic tree push when the tree node is open (= adds extra indentation
     /// and pushes to the ID stack).
     ///
     /// Enabled by default.
-    #[inline]
     pub fn tree_push_on_open(mut self, value: bool) -> Self {
         self.flags.set(TreeNodeFlags::NO_TREE_PUSH_ON_OPEN, !value);
         self
     }
+
     /// Enables/disables automatic opening of the tree node when logging is active.
     ///
     /// By default, logging will automatically open all tree nodes.
     ///
     /// Enabled by default.
-    #[inline]
     pub fn auto_open_on_log(mut self, value: bool) -> Self {
         self.flags.set(TreeNodeFlags::NO_AUTO_OPEN_ON_LOG, !value);
         self
     }
+
     /// Sets the default open state for the tree node.
     ///
     /// Tree nodes are closed by default.
-    #[inline]
     pub fn default_open(mut self, value: bool) -> Self {
         self.flags.set(TreeNodeFlags::DEFAULT_OPEN, value);
         self
     }
+
     /// Only open when the tree node is double-clicked.
     ///
     /// Disabled by default.
-    #[inline]
     pub fn open_on_double_click(mut self, value: bool) -> Self {
         self.flags.set(TreeNodeFlags::OPEN_ON_DOUBLE_CLICK, value);
         self
     }
+
     /// Only open when clicking the arrow part of the tree node.
     ///
     /// Disabled by default.
-    #[inline]
     pub fn open_on_arrow(mut self, value: bool) -> Self {
         self.flags.set(TreeNodeFlags::OPEN_ON_ARROW, value);
         self
     }
+
     /// Enable/disables leaf mode (no collapsing, no arrow).
     ///
     /// Disabled by default.
-    #[inline]
     pub fn leaf(mut self, value: bool) -> Self {
         self.flags.set(TreeNodeFlags::LEAF, value);
         self
     }
+
     /// Display a bullet instead of arrow.
     ///
     /// Disabled by default.
-    #[inline]
     pub fn bullet(mut self, value: bool) -> Self {
         self.flags.set(TreeNodeFlags::BULLET, value);
         self
     }
+
     /// Use `frame_padding` to vertically align text baseline to regular widget height.
     ///
     /// Disabled by default.
-    #[inline]
     pub fn frame_padding(mut self, value: bool) -> Self {
         self.flags.set(TreeNodeFlags::FRAME_PADDING, value);
         self
     }
+
     /// Left direction may move to this tree node from any of its child.
     ///
     /// Disabled by default.
-    #[inline]
     pub fn nav_left_jumps_back_here(mut self, value: bool) -> Self {
         self.flags
             .set(TreeNodeFlags::NAV_LEFT_JUMPS_BACK_HERE, value);
         self
     }
+
     /// Pushes a tree node and starts appending to it.
     ///
     /// Returns `Some(TreeNodeToken)` if the tree node is open. After content has been
@@ -240,17 +247,25 @@ impl<'a> TreeNode<'a> {
                 sys::igSetNextItemOpen(self.opened, self.opened_cond as i32);
             }
             match self.id {
-                TreeNodeId::Str(id) => sys::igTreeNodeExStrStr(
-                    id.as_ptr(),
-                    self.flags.bits() as i32,
-                    fmt_ptr(),
-                    self.label.unwrap_or(id).as_ptr(),
-                ),
+                TreeNodeId::Str(id) => {
+                    let (id, label) = match self.label {
+                        Some(label) => ui.scratch_txt_two(id, label),
+                        None => {
+                            let v = ui.scratch_txt(id);
+                            (v, v)
+                        }
+                    };
+
+                    sys::igTreeNodeExStrStr(id, self.flags.bits() as i32, fmt_ptr(), label)
+                }
                 TreeNodeId::Ptr(id) => sys::igTreeNodeExPtr(
                     id,
                     self.flags.bits() as i32,
                     fmt_ptr(),
-                    self.label.unwrap_or_default().as_ptr(),
+                    match self.label {
+                        Some(v) => ui.scratch_txt(v),
+                        None => ui.scratch_txt(""),
+                    },
                 ),
             }
         };
@@ -267,7 +282,7 @@ impl<'a> TreeNode<'a> {
     /// Returns the result of the closure, if it is called.
     ///
     /// Note: the closure is not called if the tree node is not open.
-    pub fn build<T, F: FnOnce() -> T>(self, ui: &Ui<'_>, f: F) -> Option<T> {
+    pub fn build<R, F: FnOnce() -> R>(self, ui: &Ui<'_>, f: F) -> Option<R> {
         self.push(ui).map(|_node| f())
     }
 }
@@ -310,15 +325,15 @@ impl Drop for TreeNodeToken<'_> {
 /// Builder for a collapsing header widget
 #[derive(Copy, Clone, Debug)]
 #[must_use]
-pub struct CollapsingHeader<'a> {
-    label: &'a ImStr,
+pub struct CollapsingHeader<T> {
+    label: T,
     flags: TreeNodeFlags,
 }
 
-impl<'a> CollapsingHeader<'a> {
+impl<T: AsRef<str>> CollapsingHeader<T> {
     /// Constructs a new collapsing header builder
     #[doc(alias = "CollapsingHeader")]
-    pub fn new(label: &ImStr) -> CollapsingHeader {
+    pub fn new(label: T) -> CollapsingHeader<T> {
         CollapsingHeader {
             label,
             flags: TreeNodeFlags::empty(),
@@ -413,9 +428,12 @@ impl<'a> CollapsingHeader<'a> {
     /// Returns true if the collapsing header is open and content should be rendered.
     #[must_use]
     #[inline]
-    pub fn build(self, _: &Ui) -> bool {
+    pub fn build(self, ui: &Ui) -> bool {
         unsafe {
-            sys::igCollapsingHeaderTreeNodeFlags(self.label.as_ptr(), self.flags.bits() as i32)
+            sys::igCollapsingHeaderTreeNodeFlags(
+                ui.scratch_txt(self.label),
+                self.flags.bits() as i32,
+            )
         }
     }
     /// Builds the collapsing header, and adds an additional close button that changes the value of
@@ -424,10 +442,10 @@ impl<'a> CollapsingHeader<'a> {
     /// Returns true if the collapsing header is open and content should be rendered.
     #[must_use]
     #[inline]
-    pub fn build_with_close_button(self, _: &Ui, opened: &mut bool) -> bool {
+    pub fn build_with_close_button(self, ui: &Ui, opened: &mut bool) -> bool {
         unsafe {
             sys::igCollapsingHeaderBoolPtr(
-                self.label.as_ptr(),
+                ui.scratch_txt(self.label),
                 opened as *mut bool,
                 self.flags.bits() as i32,
             )
@@ -438,7 +456,7 @@ impl<'a> CollapsingHeader<'a> {
 impl Ui<'_> {
     /// Constructs a new collapsing header
     #[doc(alias = "CollapsingHeader")]
-    pub fn collapsing_header(&self, label: &ImStr, flags: TreeNodeFlags) -> bool {
+    pub fn collapsing_header(&self, label: impl AsRef<str>, flags: TreeNodeFlags) -> bool {
         CollapsingHeader::new(label).flags(flags).build(self)
     }
 
@@ -446,7 +464,7 @@ impl Ui<'_> {
     #[doc(alias = "CollapsingHeader")]
     pub fn collapsing_header_with_close_button(
         &self,
-        label: &ImStr,
+        label: impl AsRef<str>,
         flags: TreeNodeFlags,
         opened: &mut bool,
     ) -> bool {

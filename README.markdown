@@ -10,12 +10,12 @@
 ![Hello world](hello_world.png)
 
 ```rust
-Window::new(im_str!("Hello world"))
+Window::new("Hello world")
     .size([300.0, 100.0], Condition::FirstUseEver)
     .build(&ui, || {
-        ui.text(im_str!("Hello world!"));
-        ui.text(im_str!("こんにちは世界！"));
-        ui.text(im_str!("This...is...imgui-rs!"));
+        ui.text("Hello world!");
+        ui.text("こんにちは世界！");
+        ui.text("This...is...imgui-rs!");
         ui.separator();
         let mouse_pos = ui.io().mouse_pos;
         ui.text(format!(
@@ -41,10 +41,6 @@ Window::new(im_str!("Hello world"))
   is not 100%, but will keep improving over time.
 - Builder structs for use cases where the original C++ library uses optional
   function parameters
-- `&ImStr` / `ImString` types and `im_str!` macro for defining and passing
-  null-terminated UTF-8 to Dear ImGui, which doesn't accept Rust `&str` /
-  `String` values. See [issue #7](https://github.com/Gekkio/imgui-rs/issues/7)
-  for more information and justification for this design.
 - Easy integration with Glium / pre-ll gfx (renderer)
 - Easy integration with winit (backend platform)
 - Optional support for the freetype font rasterizer

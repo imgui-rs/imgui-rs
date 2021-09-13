@@ -8,19 +8,19 @@ fn main() {
     };
     let system = support::init(file!());
     system.main_loop(move |run, ui| {
-        let w = Window::new(im_str!("Collapsing header"))
+        let w = Window::new("Collapsing header")
             .opened(run)
             .position([20.0, 20.0], Condition::Appearing)
             .size([700.0, 500.0], Condition::Appearing);
         w.build(ui, || {
-            if CollapsingHeader::new(im_str!("I'm a collapsing header. Click me!")).build(ui) {
+            if CollapsingHeader::new("I'm a collapsing header. Click me!").build(ui) {
                 ui.text(
                     "A collapsing header can be used to toggle rendering of a group of widgets",
                 );
             }
 
             ui.spacing();
-            if CollapsingHeader::new(im_str!("I'm open by default"))
+            if CollapsingHeader::new("I'm open by default")
                 .default_open(true)
                 .build(ui)
             {
@@ -28,7 +28,7 @@ fn main() {
             }
 
             ui.spacing();
-            if CollapsingHeader::new(im_str!("I only open with double-click"))
+            if CollapsingHeader::new("I only open with double-click")
                 .open_on_double_click(true)
                 .build(ui)
             {
@@ -36,7 +36,7 @@ fn main() {
             }
 
             ui.spacing();
-            if CollapsingHeader::new(im_str!("I don't have an arrow"))
+            if CollapsingHeader::new("I don't have an arrow")
                 .bullet(true)
                 .build(ui)
             {
@@ -44,7 +44,7 @@ fn main() {
             }
 
             ui.spacing();
-            if CollapsingHeader::new(im_str!("I only open if you click the arrow"))
+            if CollapsingHeader::new("I only open if you click the arrow")
                 .open_on_arrow(true)
                 .build(ui)
             {
@@ -53,10 +53,10 @@ fn main() {
 
             ui.spacing();
             ui.checkbox(
-                im_str!("Toggle rendering of the next example"),
+                "Toggle rendering of the next example",
                 &mut state.render_closable,
             );
-            if CollapsingHeader::new(im_str!("I've got a separate close button"))
+            if CollapsingHeader::new("I've got a separate close button")
                 .build_with_close_button(ui, &mut state.render_closable)
             {
                 ui.text("I've got contents just like any other collapsing header");

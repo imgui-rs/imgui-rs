@@ -1,6 +1,6 @@
 use std::os::raw::c_char;
 
-use crate::string::ImStr;
+// use crate::string::ImStr;
 use crate::style::StyleColor;
 use crate::Ui;
 
@@ -38,17 +38,18 @@ impl<'ui> Ui<'ui> {
     }
     /// Renders text wrapped to the end of window (or column)
     #[doc(alias = "TextWrapperd")]
-    pub fn text_wrapped(&self, text: &ImStr) {
-        unsafe { sys::igTextWrapped(fmt_ptr(), text.as_ptr()) }
+    pub fn text_wrapped(&self, text: impl AsRef<str>) {
+        unsafe { sys::igTextWrapped(fmt_ptr(), self.scratch_txt(text)) }
     }
     /// Render a text + label combination aligned the same way as value+label widgets
     #[doc(alias = "LabelText")]
-    pub fn label_text(&self, label: &ImStr, text: &ImStr) {
-        unsafe { sys::igLabelText(label.as_ptr(), fmt_ptr(), text.as_ptr()) }
+    pub fn label_text(&self, label: impl AsRef<str>, text: impl AsRef<str>) {
+        let (ptr_one, ptr_two) = self.scratch_txt_two(label, text);
+        unsafe { sys::igLabelText(ptr_one, fmt_ptr(), ptr_two) }
     }
     /// Renders text with a little bullet aligned to the typical tree node
     #[doc(alias = "BulletText")]
-    pub fn bullet_text(&self, text: &ImStr) {
-        unsafe { sys::igBulletText(fmt_ptr(), text.as_ptr()) }
+    pub fn bullet_text(&self, text: impl AsRef<str>) {
+        unsafe { sys::igBulletText(fmt_ptr(), self.scratch_txt(text)) }
     }
 }

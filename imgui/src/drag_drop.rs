@@ -28,7 +28,7 @@
 //! For examples of each payload type, see [DragDropSource].
 use std::{any, ffi, marker::PhantomData};
 
-use crate::{sys, Condition, ImStr, Ui};
+use crate::{sys, Condition, Ui};
 use bitflags::bitflags;
 
 bitflags!(
@@ -75,10 +75,10 @@ bitflags!(
 /// ```no_run
 /// # use imgui::*;
 /// fn show_ui(ui: &Ui<'_>) {
-///     ui.button(im_str!("Hello, I am a drag source!"));
+///     ui.button("Hello, I am a drag source!");
 ///     
 ///     // Creates an empty DragSource with no tooltip
-///     DragDropSource::new(im_str!("BUTTON_DRAG")).begin(ui);
+///     DragDropSource::new("BUTTON_DRAG").begin(ui);
 /// }
 /// ```
 ///
@@ -92,18 +92,17 @@ bitflags!(
 /// will manage, and then give to a [DragDropTarget], which will received the payload. The
 /// simplest and safest Payload is the empty payload, created with [begin](Self::begin).
 #[derive(Debug)]
-pub struct DragDropSource<'a> {
-    name: &'a ImStr,
+pub struct DragDropSource<T> {
+    name: T,
     flags: DragDropFlags,
     cond: Condition,
 }
 
-impl<'a> DragDropSource<'a> {
+impl<T: AsRef<str>> DragDropSource<T> {
     /// Creates a new [DragDropSource] with no flags and the `Condition::Always` with the given name.
     /// ImGui refers to this `name` field as a `type`, but really it's just an identifier to match up
     /// Source/Target for DragDrop.
-    #[inline]
-    pub const fn new(name: &'a ImStr) -> Self {
+    pub fn new(name: T) -> Self {
         Self {
             name,
             flags: DragDropFlags::empty(),
@@ -116,14 +115,14 @@ impl<'a> DragDropSource<'a> {
     /// `SOURCE_EXTERN`, `SOURCE_AUTO_EXPIRE_PAYLOAD` make semantic sense, but any other flags will
     /// be accepted without panic.
     #[inline]
-    pub const fn flags(mut self, flags: DragDropFlags) -> Self {
+    pub fn flags(mut self, flags: DragDropFlags) -> Self {
         self.flags = flags;
         self
     }
 
     /// Sets the condition on the [DragDropSource]. Defaults to [Always](Condition::Always).
     #[inline]
-    pub const fn condition(mut self, cond: Condition) -> Self {
+    pub fn condition(mut self, cond: Condition) -> Self {
         self.cond = cond;
         self
     }
@@ -143,9 +142,9 @@ impl<'a> DragDropSource<'a> {
     /// ```no_run
     /// # use imgui::*;
     /// fn show_ui(ui: &Ui<'_>, drop_message: &mut Option<String>) {
-    ///     ui.button(im_str!("Drag me!"));
+    ///     ui.button("Drag me!");
     ///
-    ///     let drag_drop_name = im_str!("Test Drag");
+    ///     let drag_drop_name = "Test Drag";
     ///     
     ///     // drag drop SOURCE
     ///     if DragDropSource::new(drag_drop_name).begin(ui).is_some() {
@@ -155,7 +154,7 @@ impl<'a> DragDropSource<'a> {
     ///         *drop_message = Some("Test Payload".to_string());
     ///     }
     ///
-    ///     ui.button(im_str!("Target me!"));
+    ///     ui.button("Target me!");
     ///
     ///     // drag drop TARGET
     ///     if let Some(target) = imgui::DragDropTarget::new(ui) {
@@ -196,9 +195,9 @@ impl<'a> DragDropSource<'a> {
     /// ```no_run
     /// # use imgui::*;
     /// fn show_ui(ui: &Ui<'_>) {
-    ///     ui.button(im_str!("Drag me!"));
+    ///     ui.button("Drag me!");
     ///
-    ///     let drag_drop_name = im_str!("Test Drag");
+    ///     let drag_drop_name = "Test Drag";
     ///     let msg_to_send = "hello there sailor";
     ///     
     ///     // drag drop SOURCE
@@ -207,12 +206,12 @@ impl<'a> DragDropSource<'a> {
     ///         tooltip.end();
     ///     }
     ///
-    ///     ui.button(im_str!("Target me!"));
+    ///     ui.button("Target me!");
     ///
     ///     // drag drop TARGET
     ///     if let Some(target) = imgui::DragDropTarget::new(ui) {
     ///         if let Some(Ok(payload_data)) = target
-    ///             .accept_payload::<&'static str>(drag_drop_name, DragDropFlags::empty())
+    ///             .accept_payload::<&'static str, _>(drag_drop_name, DragDropFlags::empty())
     ///         {
     ///             let msg = payload_data.data;
     ///             assert_eq!(msg, msg_to_send);
@@ -223,17 +222,17 @@ impl<'a> DragDropSource<'a> {
     /// }
     /// ```
     #[inline]
-    pub fn begin_payload<'ui, T: Copy + 'static>(
+    pub fn begin_payload<'ui, P: Copy + 'static>(
         self,
         ui: &Ui<'ui>,
-        payload: T,
+        payload: P,
     ) -> Option<DragDropSourceToolTip<'ui>> {
         unsafe {
             let payload = TypedPayload::new(payload);
             self.begin_payload_unchecked(
                 ui,
                 &payload as *const _ as *const ffi::c_void,
-                std::mem::size_of::<TypedPayload<T>>(),
+                std::mem::size_of::<TypedPayload<P>>(),
             )
         }
     }
@@ -267,14 +266,14 @@ impl<'a> DragDropSource<'a> {
     #[inline]
     pub unsafe fn begin_payload_unchecked<'ui>(
         &self,
-        _ui: &Ui<'ui>,
+        ui: &Ui<'ui>,
         ptr: *const ffi::c_void,
         size: usize,
     ) -> Option<DragDropSourceToolTip<'ui>> {
         let should_begin = sys::igBeginDragDropSource(self.flags.bits() as i32);
 
         if should_begin {
-            sys::igSetDragDropPayload(self.name.as_ptr(), ptr, size, self.cond as i32);
+            sys::igSetDragDropPayload(ui.scratch_txt(&self.name), ptr, size, self.cond as i32);
 
             Some(DragDropSourceToolTip::push())
         } else {
@@ -313,18 +312,18 @@ impl Drop for DragDropSourceToolTip<'_> {
 /// # use imgui::*;
 /// fn show_ui(ui: &Ui<'_>) {
 ///     // Drop something on this button please!
-///     ui.button(im_str!("Hello, I am a drag Target!"));
+///     ui.button("Hello, I am a drag Target!");
 ///     
 ///     if let Some(target) = DragDropTarget::new(ui) {
 ///         // accepting an empty payload (which is really just raising an event)
-///         if let Some(_payload_data) = target.accept_payload_empty(im_str!("BUTTON_DRAG"), DragDropFlags::empty()) {
+///         if let Some(_payload_data) = target.accept_payload_empty("BUTTON_DRAG", DragDropFlags::empty()) {
 ///             println!("Nice job getting on the payload!");
 ///         }
 ///    
 ///         // and we can accept multiple, different types of payloads with one drop target.
 ///         // this is a good pattern for handling different kinds of drag/drop situations with
 ///         // different kinds of data in them.
-///         if let Some(Ok(payload_data)) = target.accept_payload::<usize>(im_str!("BUTTON_ID"), DragDropFlags::empty()) {
+///         if let Some(Ok(payload_data)) = target.accept_payload::<usize, _>("BUTTON_ID", DragDropFlags::empty()) {
 ///             println!("Our payload's data was {}", payload_data.data);
 ///         }
 ///     }
@@ -340,17 +339,17 @@ impl Drop for DragDropSourceToolTip<'_> {
 /// on this struct. Each of these methods will spit out a _Payload struct with an increasing
 /// amount of information on the Payload. The absolute safest solution is [accept_payload_empty](Self::accept_payload_empty).
 #[derive(Debug)]
-pub struct DragDropTarget<'ui>(PhantomData<Ui<'ui>>);
+pub struct DragDropTarget<'ui>(&'ui Ui<'ui>);
 
 impl<'ui> DragDropTarget<'ui> {
     /// Creates a new DragDropTarget, holding the [Ui]'s lifetime for the duration
     /// of its existence. This is required since this struct runs some code on its Drop
     /// to end the DragDropTarget code.
     #[doc(alias = "BeginDragDropTarget")]
-    pub fn new(_ui: &Ui<'_>) -> Option<Self> {
+    pub fn new(ui: &'ui Ui<'ui>) -> Option<Self> {
         let should_begin = unsafe { sys::igBeginDragDropTarget() };
         if should_begin {
-            Some(Self(PhantomData))
+            Some(Self(ui))
         } else {
             None
         }
@@ -364,12 +363,12 @@ impl<'ui> DragDropTarget<'ui> {
     /// to use this function. Use `accept_payload_unchecked` instead
     pub fn accept_payload_empty(
         &self,
-        name: &ImStr,
+        name: impl AsRef<str>,
         flags: DragDropFlags,
     ) -> Option<DragDropPayloadEmpty> {
-        self.accept_payload::<()>(name, flags)?
+        self.accept_payload(name, flags)?
             .ok()
-            .map(|payload_pod| DragDropPayloadEmpty {
+            .map(|payload_pod: DragDropPayloadPod<()>| DragDropPayloadEmpty {
                 preview: payload_pod.preview,
                 delivery: payload_pod.delivery,
             })
@@ -380,9 +379,9 @@ impl<'ui> DragDropTarget<'ui> {
     ///
     /// Note: If you began this operation with `begin_payload_unchecked` it always incorrect
     /// to use this function. Use `accept_payload_unchecked` instead
-    pub fn accept_payload<T: 'static + Copy>(
+    pub fn accept_payload<T: 'static + Copy, Name: AsRef<str>>(
         &self,
-        name: &ImStr,
+        name: Name,
         flags: DragDropFlags,
     ) -> Option<Result<DragDropPayloadPod<T>, PayloadIsWrongType>> {
         let output = unsafe { self.accept_payload_unchecked(name, flags) };
@@ -435,10 +434,10 @@ impl<'ui> DragDropTarget<'ui> {
     /// of the various edge cases.
     pub unsafe fn accept_payload_unchecked(
         &self,
-        name: &ImStr,
+        name: impl AsRef<str>,
         flags: DragDropFlags,
     ) -> Option<DragDropPayload> {
-        let inner = sys::igAcceptDragDropPayload(name.as_ptr(), flags.bits() as i32);
+        let inner = sys::igAcceptDragDropPayload(self.0.scratch_txt(name), flags.bits() as i32);
         if inner.is_null() {
             None
         } else {

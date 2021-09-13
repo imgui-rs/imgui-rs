@@ -13,7 +13,7 @@ use glium::{
     Surface, Texture2d, VertexBuffer,
 };
 use imgui::internal::RawWrapper;
-use imgui::{BackendFlags, DrawCmd, DrawCmdParams, DrawData, ImString, TextureId, Textures};
+use imgui::{BackendFlags, DrawCmd, DrawCmdParams, DrawData, TextureId, Textures};
 use std::borrow::Cow;
 use std::error::Error;
 use std::fmt;
@@ -143,10 +143,10 @@ impl Renderer {
     ) -> Result<Renderer, RendererError> {
         let program = compile_default_program(facade)?;
         let font_texture = upload_font_texture(ctx.fonts(), facade.get_context())?;
-        ctx.set_renderer_name(Some(ImString::from(format!(
+        ctx.set_renderer_name(Some(format!(
             "imgui-glium-renderer {}",
             env!("CARGO_PKG_VERSION")
-        ))));
+        )));
         ctx.io_mut()
             .backend_flags
             .insert(BackendFlags::RENDERER_HAS_VTX_OFFSET);

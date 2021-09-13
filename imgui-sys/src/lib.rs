@@ -18,7 +18,7 @@
 //
 // ¹ The exception to this is that `std::os::raw` isn't there for `no_std`, and
 // `libc` has potentially undesirable linking impacts on windows.
-extern crate chlorine as cty;
+pub extern crate chlorine as cty;
 
 #[cfg(feature = "wasm")]
 mod wasm_bindings;

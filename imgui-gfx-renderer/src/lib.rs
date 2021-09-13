@@ -10,9 +10,7 @@ use gfx::texture::{FilterMethod, SamplerInfo, WrapMode};
 use gfx::traits::FactoryExt;
 use gfx::{CommandBuffer, Encoder, Factory, IntoIndexBuffer, Rect, Resources, Slice};
 use imgui::internal::RawWrapper;
-use imgui::{
-    BackendFlags, DrawCmd, DrawCmdParams, DrawData, DrawIdx, ImString, TextureId, Textures,
-};
+use imgui::{BackendFlags, DrawCmd, DrawCmdParams, DrawData, DrawIdx, TextureId, Textures};
 use std::error::Error;
 use std::fmt;
 use std::usize;
@@ -178,10 +176,10 @@ where
             instances: None,
             buffer: index_buffer.clone().into_index_buffer(factory),
         };
-        ctx.set_renderer_name(Some(ImString::from(format!(
+        ctx.set_renderer_name(Some(format!(
             "imgui-gfx-renderer {}",
             env!("CARGO_PKG_VERSION")
-        ))));
+        )));
         ctx.io_mut()
             .backend_flags
             .insert(BackendFlags::RENDERER_HAS_VTX_OFFSET);

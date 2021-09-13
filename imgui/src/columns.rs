@@ -1,12 +1,11 @@
-use crate::string::ImStr;
 use crate::sys;
 use crate::Ui;
 
 /// # Columns
 impl<'ui> Ui<'ui> {
     #[doc(alias = "Columns")]
-    pub fn columns(&self, count: i32, id: &ImStr, border: bool) {
-        unsafe { sys::igColumns(count, id.as_ptr(), border) }
+    pub fn columns(&self, count: i32, id: impl AsRef<str>, border: bool) {
+        unsafe { sys::igColumns(count, self.scratch_txt(id), border) }
     }
     /// Switches to the next column.
     ///

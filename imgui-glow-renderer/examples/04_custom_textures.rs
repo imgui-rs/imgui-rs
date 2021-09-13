@@ -9,7 +9,7 @@ use std::{io::Cursor, time::Instant};
 
 use glow::HasContext;
 use image::{jpeg::JpegDecoder, ImageDecoder};
-use imgui::{im_str, Condition};
+use imgui::Condition;
 
 use imgui_glow_renderer::Renderer;
 
@@ -144,10 +144,10 @@ impl TexturesUi {
     }
 
     fn show(&self, ui: &imgui::Ui) {
-        imgui::Window::new(im_str!("Hello textures"))
+        imgui::Window::new("Hello textures")
             .size([400.0, 400.0], Condition::FirstUseEver)
             .build(ui, || {
-                ui.text(im_str!("Hello textures!"));
+                ui.text("Hello textures!");
                 ui.text("Some generated texture");
                 imgui::Image::new(self.generated_texture, [100.0, 100.0]).build(ui);
 
@@ -157,7 +157,7 @@ impl TexturesUi {
                 // Example of using custom textures on a button
                 ui.text("The Lenna buttons");
                 {
-                    ui.invisible_button(im_str!("Boring Button"), [100.0, 100.0]);
+                    ui.invisible_button("Boring Button", [100.0, 100.0]);
                     // See also `imgui::Ui::style_color`
                     let tint_none = [1.0, 1.0, 1.0, 1.0];
                     let tint_green = [0.5, 1.0, 0.5, 1.0];
@@ -187,7 +187,7 @@ impl TexturesUi {
                     ui.same_line();
 
                     // Button using quad positioned image
-                    ui.invisible_button(im_str!("Exciting Button"), [100.0, 100.0]);
+                    ui.invisible_button("Exciting Button", [100.0, 100.0]);
 
                     // Button bounds
                     let min = ui.item_rect_min();
@@ -214,7 +214,7 @@ impl TexturesUi {
                 // Rounded image
                 {
                     ui.same_line();
-                    ui.invisible_button(im_str!("Smooth Button"), [100.0, 100.0]);
+                    ui.invisible_button("Smooth Button", [100.0, 100.0]);
 
                     let draw_list = ui.get_window_draw_list();
                     draw_list

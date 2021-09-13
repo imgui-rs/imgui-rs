@@ -513,9 +513,10 @@ impl Renderer {
     }
 
     fn configure_imgui_context(&self, imgui_context: &mut imgui::Context) {
-        imgui_context.set_renderer_name(Some(
-            format!("imgui-rs-glow-render {}", env!("CARGO_PKG_VERSION")).into(),
-        ));
+        imgui_context.set_renderer_name(Some(format!(
+            "imgui-rs-glow-render {}",
+            env!("CARGO_PKG_VERSION")
+        )));
 
         #[cfg(feature = "vertex_offset_support")]
         if self.gl_version.vertex_offset_support() {

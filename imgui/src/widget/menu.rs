@@ -1,6 +1,4 @@
-use std::ptr;
-
-use crate::string::ImStr;
+// use crate::string::ImStr;
 use crate::sys;
 use crate::Ui;
 
@@ -66,7 +64,7 @@ impl<'ui> Ui<'ui> {
     /// with `enabled` set to `true`.
     #[must_use]
     #[doc(alias = "BeginMenu")]
-    pub fn begin_menu(&self, label: &ImStr) -> Option<MenuToken<'_>> {
+    pub fn begin_menu(&self, label: impl AsRef<str>) -> Option<MenuToken<'_>> {
         self.begin_menu_with_enabled(label, true)
     }
 
@@ -78,8 +76,12 @@ impl<'ui> Ui<'ui> {
     /// Returns `None` if the menu is not visible and no content should be rendered.
     #[must_use]
     #[doc(alias = "BeginMenu")]
-    pub fn begin_menu_with_enabled(&self, label: &ImStr, enabled: bool) -> Option<MenuToken<'_>> {
-        if unsafe { sys::igBeginMenu(label.as_ptr(), enabled) } {
+    pub fn begin_menu_with_enabled(
+        &self,
+        label: impl AsRef<str>,
+        enabled: bool,
+    ) -> Option<MenuToken<'_>> {
+        if unsafe { sys::igBeginMenu(self.scratch_txt(label), enabled) } {
             Some(MenuToken::new(self))
         } else {
             None
@@ -92,7 +94,7 @@ impl<'ui> Ui<'ui> {
     /// This is the equivalent of [menu_with_enabled](Self::menu_with_enabled)
     /// with `enabled` set to `true`.
     #[doc(alias = "BeginMenu")]
-    pub fn menu<F: FnOnce()>(&self, label: &ImStr, f: F) {
+    pub fn menu<F: FnOnce()>(&self, label: impl AsRef<str>, f: F) {
         self.menu_with_enabled(label, true, f);
     }
 
@@ -100,7 +102,7 @@ impl<'ui> Ui<'ui> {
     ///
     /// Note: the closure is not called if the menu is not visible.
     #[doc(alias = "BeginMenu")]
-    pub fn menu_with_enabled<F: FnOnce()>(&self, label: &ImStr, enabled: bool, f: F) {
+    pub fn menu_with_enabled<F: FnOnce()>(&self, label: impl AsRef<str>, enabled: bool, f: F) {
         if let Some(_menu) = self.begin_menu_with_enabled(label, enabled) {
             f();
         }
@@ -110,16 +112,16 @@ impl<'ui> Ui<'ui> {
 /// Builder for a menu item.
 #[derive(Copy, Clone, Debug)]
 #[must_use]
-pub struct MenuItem<'a> {
-    label: &'a ImStr,
-    shortcut: Option<&'a ImStr>,
+pub struct MenuItem<Label, Shortcut = &'static str> {
+    label: Label,
+    shortcut: Option<Shortcut>,
     selected: bool,
     enabled: bool,
 }
 
-impl<'a> MenuItem<'a> {
+impl<Label: AsRef<str>> MenuItem<Label> {
     /// Construct a new menu item builder.
-    pub fn new(label: &ImStr) -> MenuItem {
+    pub fn new(label: Label) -> Self {
         MenuItem {
             label,
             shortcut: None,
@@ -127,13 +129,23 @@ impl<'a> MenuItem<'a> {
             enabled: true,
         }
     }
+}
+
+impl<Label: AsRef<str>, Shortcut: AsRef<str>> MenuItem<Label, Shortcut> {
     /// Sets the menu item shortcut.
     ///
     /// Shortcuts are displayed for convenience only and are not automatically handled.
     #[inline]
-    pub fn shortcut(mut self, shortcut: &'a ImStr) -> Self {
-        self.shortcut = Some(shortcut);
-        self
+    pub fn shortcut<Shortcut2: AsRef<str>>(
+        self,
+        shortcut: Shortcut2,
+    ) -> MenuItem<Label, Shortcut2> {
+        MenuItem {
+            label: self.label,
+            shortcut: Some(shortcut),
+            selected: self.selected,
+            enabled: self.enabled,
+        }
     }
     /// Sets the selected state of the menu item.
     ///
@@ -155,20 +167,14 @@ impl<'a> MenuItem<'a> {
     ///
     /// Returns true if the menu item is activated.
     #[doc(alias = "MenuItemBool")]
-    pub fn build(self, _: &Ui) -> bool {
+    pub fn build(self, ui: &Ui) -> bool {
         unsafe {
-            sys::igMenuItemBool(
-                self.label.as_ptr(),
-                self.shortcut.map(ImStr::as_ptr).unwrap_or(ptr::null()),
-                self.selected,
-                self.enabled,
-            )
+            let (label, shortcut) = ui.scratch_txt_with_opt(self.label, self.shortcut);
+            sys::igMenuItemBool(label, shortcut, self.selected, self.enabled)
         }
     }
-}
 
-/// # Convenience functions
-impl<'a> MenuItem<'a> {
+    #[doc(alias = "MenuItemBool")]
     /// Builds the menu item using a mutable reference to selected state.
     pub fn build_with_ref(self, ui: &Ui, selected: &mut bool) -> bool {
         if self.selected(*selected).build(ui) {

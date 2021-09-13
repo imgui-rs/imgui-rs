@@ -2,7 +2,6 @@ use std::os::raw::c_void;
 use std::ptr;
 
 use crate::internal::DataTypeKind;
-use crate::string::ImStr;
 use crate::sys;
 use crate::widget::slider::SliderFlags;
 use crate::Ui;
@@ -10,19 +9,19 @@ use crate::Ui;
 /// Builder for a drag slider widget.
 #[derive(Copy, Clone, Debug)]
 #[must_use]
-pub struct Drag<'a, T: DataTypeKind> {
-    label: &'a ImStr,
+pub struct Drag<T, L, F = &'static str> {
+    label: L,
     speed: f32,
     min: Option<T>,
     max: Option<T>,
-    display_format: Option<&'a ImStr>,
+    display_format: Option<F>,
     flags: SliderFlags,
 }
 
-impl<'a, T: DataTypeKind> Drag<'a, T> {
+impl<L: AsRef<str>, T: DataTypeKind> Drag<T, L> {
     /// Constructs a new drag slider builder.
     #[doc(alias = "DragScalar", alias = "DragScalarN")]
-    pub fn new(label: &ImStr) -> Drag<T> {
+    pub fn new(label: L) -> Self {
         Drag {
             label,
             speed: 1.0,
@@ -32,8 +31,10 @@ impl<'a, T: DataTypeKind> Drag<'a, T> {
             flags: SliderFlags::empty(),
         }
     }
+}
+
+impl<L: AsRef<str>, T: DataTypeKind, F: AsRef<str>> Drag<T, L, F> {
     /// Sets the range (inclusive)
-    #[inline]
     pub fn range(mut self, min: T, max: T) -> Self {
         self.min = Some(min);
         self.max = Some(max);
@@ -42,19 +43,22 @@ impl<'a, T: DataTypeKind> Drag<'a, T> {
     /// Sets the value increment for a movement of one pixel.
     ///
     /// Example: speed=0.2 means mouse needs to move 5 pixels to increase the slider value by 1
-    #[inline]
     pub fn speed(mut self, speed: f32) -> Self {
         self.speed = speed;
         self
     }
     /// Sets the display format using *a C-style printf string*
-    #[inline]
-    pub fn display_format(mut self, display_format: &'a ImStr) -> Self {
-        self.display_format = Some(display_format);
-        self
+    pub fn display_format<F2: AsRef<str>>(self, display_format: F2) -> Drag<T, L, F2> {
+        Drag {
+            label: self.label,
+            speed: self.speed,
+            min: self.min,
+            max: self.max,
+            display_format: Some(display_format),
+            flags: self.flags,
+        }
     }
     /// Replaces all current settings with the given flags
-    #[inline]
     pub fn flags(mut self, flags: SliderFlags) -> Self {
         self.flags = flags;
         self
@@ -62,10 +66,12 @@ impl<'a, T: DataTypeKind> Drag<'a, T> {
     /// Builds a drag slider that is bound to the given value.
     ///
     /// Returns true if the slider value was changed.
-    pub fn build(self, _: &Ui, value: &mut T) -> bool {
+    pub fn build(self, ui: &Ui, value: &mut T) -> bool {
         unsafe {
+            let (one, two) = ui.scratch_txt_with_opt(self.label, self.display_format);
+
             sys::igDragScalar(
-                self.label.as_ptr(),
+                one,
                 T::KIND as i32,
                 value as *mut T as *mut c_void,
                 self.speed,
@@ -77,9 +83,7 @@ impl<'a, T: DataTypeKind> Drag<'a, T> {
                     .as_ref()
                     .map(|max| max as *const T)
                     .unwrap_or(ptr::null()) as *const c_void,
-                self.display_format
-                    .map(ImStr::as_ptr)
-                    .unwrap_or(ptr::null()),
+                two,
                 self.flags.bits() as i32,
             )
         }
@@ -87,10 +91,12 @@ impl<'a, T: DataTypeKind> Drag<'a, T> {
     /// Builds a horizontal array of multiple drag sliders attached to the given slice.
     ///
     /// Returns true if any slider value was changed.
-    pub fn build_array(self, _: &Ui, values: &mut [T]) -> bool {
+    pub fn build_array(self, ui: &Ui, values: &mut [T]) -> bool {
         unsafe {
+            let (one, two) = ui.scratch_txt_with_opt(self.label, self.display_format);
+
             sys::igDragScalarN(
-                self.label.as_ptr(),
+                one,
                 T::KIND as i32,
                 values.as_mut_ptr() as *mut c_void,
                 values.len() as i32,
@@ -103,9 +109,7 @@ impl<'a, T: DataTypeKind> Drag<'a, T> {
                     .as_ref()
                     .map(|max| max as *const T)
                     .unwrap_or(ptr::null()) as *const c_void,
-                self.display_format
-                    .map(ImStr::as_ptr)
-                    .unwrap_or(ptr::null()),
+                two,
                 self.flags.bits() as i32,
             )
         }
@@ -115,20 +119,20 @@ impl<'a, T: DataTypeKind> Drag<'a, T> {
 /// Builder for a drag slider widget.
 #[derive(Copy, Clone, Debug)]
 #[must_use]
-pub struct DragRange<'a, T: DataTypeKind> {
-    label: &'a ImStr,
+pub struct DragRange<T, L, F = &'static str, M = &'static str> {
+    label: L,
     speed: f32,
     min: Option<T>,
     max: Option<T>,
-    display_format: Option<&'a ImStr>,
-    max_display_format: Option<&'a ImStr>,
+    display_format: Option<F>,
+    max_display_format: Option<M>,
     flags: SliderFlags,
 }
 
-impl<'a, T: DataTypeKind> DragRange<'a, T> {
+impl<T: DataTypeKind, L: AsRef<str>> DragRange<T, L> {
     /// Constructs a new drag slider builder.
     #[doc(alias = "DragIntRange2", alias = "DragFloatRange2")]
-    pub fn new(label: &ImStr) -> DragRange<T> {
+    pub fn new(label: L) -> DragRange<T, L> {
         DragRange {
             label,
             speed: 1.0,
@@ -139,7 +143,15 @@ impl<'a, T: DataTypeKind> DragRange<'a, T> {
             flags: SliderFlags::empty(),
         }
     }
-    #[inline]
+}
+
+impl<T, L, F, M> DragRange<T, L, F, M>
+where
+    T: DataTypeKind,
+    L: AsRef<str>,
+    F: AsRef<str>,
+    M: AsRef<str>,
+{
     pub fn range(mut self, min: T, max: T) -> Self {
         self.min = Some(min);
         self.max = Some(max);
@@ -148,77 +160,124 @@ impl<'a, T: DataTypeKind> DragRange<'a, T> {
     /// Sets the value increment for a movement of one pixel.
     ///
     /// Example: speed=0.2 means mouse needs to move 5 pixels to increase the slider value by 1
-    #[inline]
     pub fn speed(mut self, speed: f32) -> Self {
         self.speed = speed;
         self
     }
     /// Sets the display format using *a C-style printf string*
-    #[inline]
-    pub fn display_format(mut self, display_format: &'a ImStr) -> Self {
-        self.display_format = Some(display_format);
-        self
+    pub fn display_format<F2: AsRef<str>>(self, display_format: F2) -> DragRange<T, L, F2, M> {
+        DragRange {
+            label: self.label,
+            speed: self.speed,
+            min: self.min,
+            max: self.max,
+            display_format: Some(display_format),
+            max_display_format: self.max_display_format,
+            flags: self.flags,
+        }
     }
     /// Sets the display format for the max value using *a C-style printf string*
-    #[inline]
-    pub fn max_display_format(mut self, max_display_format: &'a ImStr) -> Self {
-        self.max_display_format = Some(max_display_format);
-        self
+    pub fn max_display_format<M2: AsRef<str>>(
+        self,
+        max_display_format: M2,
+    ) -> DragRange<T, L, F, M2> {
+        DragRange {
+            label: self.label,
+            speed: self.speed,
+            min: self.min,
+            max: self.max,
+            display_format: self.display_format,
+            max_display_format: Some(max_display_format),
+            flags: self.flags,
+        }
     }
     /// Replaces all current settings with the given flags
-    #[inline]
     pub fn flags(mut self, flags: SliderFlags) -> Self {
         self.flags = flags;
         self
     }
 }
 
-impl<'a> DragRange<'a, f32> {
+impl<L, F, M> DragRange<f32, L, F, M>
+where
+    L: AsRef<str>,
+    F: AsRef<str>,
+    M: AsRef<str>,
+{
     /// Builds a drag range slider that is bound to the given min/max values.
     ///
     /// Returns true if the slider value was changed.
     #[doc(alias = "DragFloatRange2")]
-    pub fn build(self, _: &Ui, min: &mut f32, max: &mut f32) -> bool {
+    pub fn build(self, ui: &Ui, min: &mut f32, max: &mut f32) -> bool {
+        let label;
+        let mut display_format = std::ptr::null();
+        let mut max_display_format = std::ptr::null();
+
+        // we do this ourselves the long way...
         unsafe {
+            let buffer = &mut *ui.buffer.get();
+            buffer.refresh_buffer();
+
+            label = buffer.push(self.label);
+            if let Some(v) = self.display_format {
+                display_format = buffer.push(v);
+            }
+            if let Some(v) = self.max_display_format {
+                max_display_format = buffer.push(v);
+            }
+
             sys::igDragFloatRange2(
-                self.label.as_ptr(),
+                label,
                 min as *mut f32,
                 max as *mut f32,
                 self.speed,
                 self.min.unwrap_or(0.0),
                 self.max.unwrap_or(0.0),
-                self.display_format
-                    .map(ImStr::as_ptr)
-                    .unwrap_or(ptr::null()),
-                self.max_display_format
-                    .map(ImStr::as_ptr)
-                    .unwrap_or(ptr::null()),
+                display_format,
+                max_display_format,
                 self.flags.bits() as i32,
             )
         }
     }
 }
 
-impl<'a> DragRange<'a, i32> {
+impl<L, F, M> DragRange<i32, L, F, M>
+where
+    L: AsRef<str>,
+    F: AsRef<str>,
+    M: AsRef<str>,
+{
     /// Builds a drag range slider that is bound to the given min/max values.
     ///
     /// Returns true if the slider value was changed.
     #[doc(alias = "DragIntRange2")]
-    pub fn build(self, _: &Ui, min: &mut i32, max: &mut i32) -> bool {
+    pub fn build(self, ui: &Ui, min: &mut i32, max: &mut i32) -> bool {
         unsafe {
+            let label;
+            let mut display_format = std::ptr::null();
+            let mut max_display_format = std::ptr::null();
+
+            // we do this ourselves the long way...
+            let buffer = &mut *ui.buffer.get();
+            buffer.refresh_buffer();
+
+            label = buffer.push(self.label);
+            if let Some(v) = self.display_format {
+                display_format = buffer.push(v);
+            }
+            if let Some(v) = self.max_display_format {
+                max_display_format = buffer.push(v);
+            }
+
             sys::igDragIntRange2(
-                self.label.as_ptr(),
+                label,
                 min as *mut i32,
                 max as *mut i32,
                 self.speed,
                 self.min.unwrap_or(0),
                 self.max.unwrap_or(0),
-                self.display_format
-                    .map(ImStr::as_ptr)
-                    .unwrap_or(ptr::null()),
-                self.max_display_format
-                    .map(ImStr::as_ptr)
-                    .unwrap_or(ptr::null()),
+                display_format,
+                max_display_format,
                 self.flags.bits() as i32,
             )
         }

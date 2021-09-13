@@ -1,7 +1,6 @@
 use bitflags::bitflags;
 use std::ptr;
 
-use crate::string::ImStr;
 use crate::sys;
 use crate::Ui;
 
@@ -184,16 +183,16 @@ bitflags! {
 /// ```
 #[derive(Debug)]
 #[must_use]
-pub struct ColorEdit<'a> {
-    label: &'a ImStr,
+pub struct ColorEdit<'a, T: AsRef<str> + 'a> {
+    label: T,
     value: EditableColor<'a>,
     flags: ColorEditFlags,
 }
 
-impl<'a> ColorEdit<'a> {
+impl<'a, T: AsRef<str> + 'a> ColorEdit<'a, T> {
     /// Constructs a new color editor builder.
     #[doc(alias = "ColorEdit3", alias = "ColorEdit4")]
-    pub fn new<T: Into<EditableColor<'a>>>(label: &'a ImStr, value: T) -> ColorEdit<'a> {
+    pub fn new(label: T, value: impl Into<EditableColor<'a>>) -> ColorEdit<'a, T> {
         ColorEdit {
             label,
             value: value.into(),
@@ -319,21 +318,21 @@ impl<'a> ColorEdit<'a> {
     /// Builds the color editor.
     ///
     /// Returns true if the color value was changed.
-    pub fn build(mut self, _: &Ui) -> bool {
+    pub fn build(mut self, ui: &Ui) -> bool {
         if let EditableColor::Float3(_) = self.value {
             self.flags.insert(ColorEditFlags::NO_ALPHA);
         }
         match self.value {
             EditableColor::Float3(value) => unsafe {
                 sys::igColorEdit3(
-                    self.label.as_ptr(),
+                    ui.scratch_txt(self.label),
                     value.as_mut_ptr(),
                     self.flags.bits() as _,
                 )
             },
             EditableColor::Float4(value) => unsafe {
                 sys::igColorEdit4(
-                    self.label.as_ptr(),
+                    ui.scratch_txt(self.label),
                     value.as_mut_ptr(),
                     self.flags.bits() as _,
                 )
@@ -358,17 +357,17 @@ impl<'a> ColorEdit<'a> {
 /// ```
 #[derive(Debug)]
 #[must_use]
-pub struct ColorPicker<'a> {
-    label: &'a ImStr,
+pub struct ColorPicker<'a, T: AsRef<str> + 'a> {
+    label: T,
     value: EditableColor<'a>,
     flags: ColorEditFlags,
     ref_color: Option<&'a [f32; 4]>,
 }
 
-impl<'a> ColorPicker<'a> {
+impl<'a, T: AsRef<str>> ColorPicker<'a, T> {
     /// Constructs a new color picker builder.
     #[doc(alias = "ColorButton")]
-    pub fn new<T: Into<EditableColor<'a>>>(label: &'a ImStr, value: T) -> ColorPicker<'a> {
+    pub fn new(label: T, value: impl Into<EditableColor<'a>>) -> Self {
         ColorPicker {
             label,
             value: value.into(),
@@ -507,14 +506,14 @@ impl<'a> ColorPicker<'a> {
     /// Builds the color picker.
     ///
     /// Returns true if the color value was changed.
-    pub fn build(mut self, _: &Ui) -> bool {
+    pub fn build(mut self, ui: &Ui) -> bool {
         if let EditableColor::Float3(_) = self.value {
             self.flags.insert(ColorEditFlags::NO_ALPHA);
         }
         let ref_color = self.ref_color.map(|c| c.as_ptr()).unwrap_or(ptr::null());
         unsafe {
             sys::igColorPicker4(
-                self.label.as_ptr(),
+                ui.scratch_txt(self.label),
                 self.value.as_mut_ptr(),
                 self.flags.bits() as _,
                 ref_color,
@@ -536,16 +535,16 @@ impl<'a> ColorPicker<'a> {
 /// ```
 #[derive(Copy, Clone, Debug)]
 #[must_use]
-pub struct ColorButton<'a> {
-    desc_id: &'a ImStr,
+pub struct ColorButton<T> {
+    desc_id: T,
     color: [f32; 4],
     flags: ColorEditFlags,
     size: [f32; 2],
 }
 
-impl<'a> ColorButton<'a> {
+impl<T: AsRef<str>> ColorButton<T> {
     /// Constructs a new color button builder.
-    pub fn new(desc_id: &ImStr, color: [f32; 4]) -> ColorButton {
+    pub fn new(desc_id: T, color: [f32; 4]) -> Self {
         ColorButton {
             desc_id,
             color,
@@ -622,10 +621,10 @@ impl<'a> ColorButton<'a> {
     /// Builds the color button.
     ///
     /// Returns true if this color button was clicked.
-    pub fn build(self, _: &Ui) -> bool {
+    pub fn build(self, ui: &Ui) -> bool {
         unsafe {
             sys::igColorButton(
-                self.desc_id.as_ptr(),
+                ui.scratch_txt(self.desc_id),
                 self.color.into(),
                 self.flags.bits() as _,
                 self.size.into(),

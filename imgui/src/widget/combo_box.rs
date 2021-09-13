@@ -1,8 +1,6 @@
 use bitflags::bitflags;
 use std::borrow::Cow;
-use std::ptr;
 
-use crate::string::ImStr;
 use crate::sys;
 use crate::Ui;
 
@@ -56,33 +54,38 @@ pub struct ComboBoxFlags: u32 {
 /// Builder for a combo box widget
 #[derive(Copy, Clone, Debug)]
 #[must_use]
-pub struct ComboBox<'a> {
-    label: &'a ImStr,
-    preview_value: Option<&'a ImStr>,
+pub struct ComboBox<Label, Preview = &'static str> {
+    label: Label,
+    preview_value: Option<Preview>,
     flags: ComboBoxFlags,
 }
 
-impl<'a> ComboBox<'a> {
+impl<Label: AsRef<str>> ComboBox<Label> {
     /// Constructs a new combo box builder.
     #[doc(alias = "BeginCombo")]
-    pub const fn new(label: &'a ImStr) -> ComboBox<'a> {
+    pub fn new(label: Label) -> Self {
         ComboBox {
             label,
             preview_value: None,
             flags: ComboBoxFlags::empty(),
         }
     }
+}
 
-    /// Sets the preview value displayed in the preview box (if visible).
-    #[inline]
-    pub const fn preview_value(mut self, preview_value: &'a ImStr) -> Self {
-        self.preview_value = Some(preview_value);
-        self
+impl<T: AsRef<str>, Preview: AsRef<str>> ComboBox<T, Preview> {
+    pub fn preview_value<Preview2: AsRef<str>>(
+        self,
+        preview_value: Preview2,
+    ) -> ComboBox<T, Preview2> {
+        ComboBox {
+            label: self.label,
+            preview_value: Some(preview_value),
+            flags: self.flags,
+        }
     }
 
     /// Replaces all current settings with the given flags.
-    #[inline]
-    pub const fn flags(mut self, flags: ComboBoxFlags) -> Self {
+    pub fn flags(mut self, flags: ComboBoxFlags) -> Self {
         self.flags = flags;
         self
     }
@@ -90,7 +93,6 @@ impl<'a> ComboBox<'a> {
     /// Enables/disables aligning the combo box popup toward the left.
     ///
     /// Disabled by default.
-    #[inline]
     pub fn popup_align_left(mut self, popup_align_left: bool) -> Self {
         self.flags
             .set(ComboBoxFlags::POPUP_ALIGN_LEFT, popup_align_left);
@@ -142,11 +144,13 @@ impl<'a> ComboBox<'a> {
     #[must_use]
     pub fn begin<'ui>(self, ui: &Ui<'ui>) -> Option<ComboBoxToken<'ui>> {
         let should_render = unsafe {
-            sys::igBeginCombo(
-                self.label.as_ptr(),
-                self.preview_value.map(ImStr::as_ptr).unwrap_or(ptr::null()),
-                self.flags.bits() as i32,
-            )
+            if let Some(preview_value) = self.preview_value {
+                let (ptr_one, ptr_two) = ui.scratch_txt_two(self.label, preview_value);
+                sys::igBeginCombo(ptr_one, ptr_two, self.flags.bits() as i32)
+            } else {
+                let ptr_one = ui.scratch_txt(self.label);
+                sys::igBeginCombo(ptr_one, std::ptr::null(), self.flags.bits() as i32)
+            }
         };
         if should_render {
             Some(ComboBoxToken::new(ui))
@@ -158,7 +162,7 @@ impl<'a> ComboBox<'a> {
     /// Returns the result of the closure, if it is called.
     ///
     /// Note: the closure is not called if the combo box is not open.
-    pub fn build<T, F: FnOnce() -> T>(self, ui: &Ui, f: F) -> Option<T> {
+    pub fn build<R, F: FnOnce() -> R>(self, ui: &Ui, f: F) -> Option<R> {
         self.begin(ui).map(|_combo| f())
     }
 }
@@ -173,49 +177,141 @@ create_token!(
 );
 
 /// # Convenience functions
-impl<'a> ComboBox<'a> {
-    /// Builds a simple combo box for choosing from a slice of values
+impl<'ui> Ui<'ui> {
+    /// Creates a combo box which can be appended to with `Selectable::new`.
+    ///
+    /// If you do not want to provide a preview, use [`begin_combo_no_preview`]. If you want
+    /// to pass flags, use [`begin_combo_with_flags`].
+    ///
+    /// Returns `None` if the combo box is not open and no content should be rendered.
+    ///
+    /// [`begin_combo_no_preview`]: Ui::begin_combo_no_preview
+    /// [`begin_combo_with_flags`]: Ui::begin_combo_with_flags
+    #[must_use]
     #[doc(alias = "BeginCombo")]
-    pub fn build_simple<T, L>(
-        self,
-        ui: &Ui,
+    pub fn begin_combo(
+        &self,
+        label: impl AsRef<str>,
+        preview_value: impl AsRef<str>,
+    ) -> Option<ComboBoxToken<'ui>> {
+        self.begin_combo_with_flags(label, preview_value, ComboBoxFlags::empty())
+    }
+
+    /// Creates a combo box which can be appended to with `Selectable::new`.
+    ///
+    /// If you do not want to provide a preview, use [begin_combo_no_preview].
+    /// Returns `Some(ComboBoxToken)` if the combo box is open. After content has been
+    /// rendered, the token must be ended by calling `.end()`.
+    ///
+    /// Returns `None` if the combo box is not open and no content should be rendered.
+    ///
+    /// [begin_combo_no_preview]: Ui::begin_combo_no_preview
+    #[must_use]
+    #[doc(alias = "BeginCombo")]
+    pub fn begin_combo_with_flags(
+        &self,
+        label: impl AsRef<str>,
+        preview_value: impl AsRef<str>,
+        flags: ComboBoxFlags,
+    ) -> Option<ComboBoxToken<'ui>> {
+        self._begin_combo(label, Some(preview_value), flags)
+    }
+
+    /// Creates a combo box which can be appended to with `Selectable::new`.
+    ///
+    /// If you want to provide a preview, use [begin_combo]. If you want
+    /// to pass flags, use [begin_combo_no_preview_with_flags].
+    ///
+    /// Returns `Some(ComboBoxToken)` if the combo box is open. After content has been
+    /// rendered, the token must be ended by calling `.end()`.
+    ///
+    /// Returns `None` if the combo box is not open and no content should be rendered.
+    ///
+    /// [begin_combo]: Ui::begin_combo
+    /// [begin_combo_no_preview_with_flags]: Ui::begin_combo_no_preview_with_flags
+    #[must_use]
+    #[doc(alias = "BeginCombo")]
+    pub fn begin_combo_no_preview(&self, label: impl AsRef<str>) -> Option<ComboBoxToken<'ui>> {
+        self.begin_combo_no_preview_with_flags(label, ComboBoxFlags::empty())
+    }
+
+    /// Creates a combo box which can be appended to with `Selectable::new`.
+    ///
+    /// If you do not want to provide a preview, use [begin_combo_no_preview].
+    /// Returns `Some(ComboBoxToken)` if the combo box is open. After content has been
+    /// rendered, the token must be ended by calling `.end()`.
+    ///
+    /// Returns `None` if the combo box is not open and no content should be rendered.
+    ///
+    /// [begin_combo_no_preview]: Ui::begin_combo_no_preview
+    #[must_use]
+    #[doc(alias = "BeginCombo")]
+    pub fn begin_combo_no_preview_with_flags(
+        &self,
+        label: impl AsRef<str>,
+        flags: ComboBoxFlags,
+    ) -> Option<ComboBoxToken<'ui>> {
+        self._begin_combo(label, Option::<&'static str>::None, flags)
+    }
+
+    /// This is the internal begin combo method that they all...eventually call.
+    fn _begin_combo(
+        &self,
+        label: impl AsRef<str>,
+        preview_value: Option<impl AsRef<str>>,
+        flags: ComboBoxFlags,
+    ) -> Option<ComboBoxToken<'ui>> {
+        let should_render = unsafe {
+            let (ptr_one, ptr_two) = self.scratch_txt_with_opt(label, preview_value);
+            sys::igBeginCombo(ptr_one, ptr_two, flags.bits() as i32)
+        };
+        if should_render {
+            Some(ComboBoxToken::new(self))
+        } else {
+            None
+        }
+    }
+    /// Builds a simple combo box for choosing from a slice of values
+    #[doc(alias = "Combo")]
+    pub fn combo<V, L>(
+        &self,
+        label: impl AsRef<str>,
         current_item: &mut usize,
-        items: &[T],
-        label_fn: &L,
+        items: &[V],
+        label_fn: L,
     ) -> bool
     where
-        for<'b> L: Fn(&'b T) -> Cow<'b, ImStr>,
+        for<'b> L: Fn(&'b V) -> Cow<'b, str>,
     {
         use crate::widget::selectable::Selectable;
+        let label_fn = &label_fn;
         let mut result = false;
-        let mut cb = self;
         let preview_value = items.get(*current_item).map(label_fn);
-        if cb.preview_value.is_none() {
-            if let Some(preview_value) = preview_value.as_ref() {
-                cb = cb.preview_value(preview_value);
-            }
-        }
-        if let Some(_cb) = cb.begin(ui) {
+
+        if let Some(_cb) = self._begin_combo(label, preview_value, ComboBoxFlags::empty()) {
             for (idx, item) in items.iter().enumerate() {
                 let text = label_fn(item);
                 let selected = idx == *current_item;
-                if Selectable::new(&text).selected(selected).build(ui) {
+                if Selectable::new(&text).selected(selected).build(self) {
                     *current_item = idx;
                     result = true;
                 }
                 if selected {
-                    ui.set_item_default_focus();
+                    self.set_item_default_focus();
                 }
             }
         }
         result
     }
-    /// Builds a simple combo box for choosing from a slice of strings
-    #[doc(alias = "BeginCombo")]
-    pub fn build_simple_string<S>(self, ui: &Ui, current_item: &mut usize, items: &[&S]) -> bool
-    where
-        S: AsRef<ImStr> + ?Sized,
-    {
-        self.build_simple(ui, current_item, items, &|&s| s.as_ref().into())
+
+    /// Builds a simple combo box for choosing from a slice of values
+    #[doc(alias = "Combo")]
+    pub fn combo_simple_string(
+        &self,
+        label: impl AsRef<str>,
+        current_item: &mut usize,
+        items: &[impl AsRef<str>],
+    ) -> bool {
+        self.combo(label, current_item, items, |s| Cow::Borrowed(s.as_ref()))
     }
 }

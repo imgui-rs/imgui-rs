@@ -1,5 +1,3 @@
-//! Safe wrapper around imgui-sys for tab menu.
-//!
 //!   # Examples
 //
 //! ```no_run
@@ -19,7 +17,6 @@
 //! ```
 //!
 //! See `test_window_impl.rs` for a more complicated example.
-use crate::string::ImStr;
 use crate::sys;
 use crate::Ui;
 use bitflags::bitflags;
@@ -56,15 +53,15 @@ bitflags! {
 }
 
 /// Builder for a tab bar.
-pub struct TabBar<'a> {
-    id: &'a ImStr,
+pub struct TabBar<T> {
+    id: T,
     flags: TabBarFlags,
 }
 
-impl<'a> TabBar<'a> {
+impl<T: AsRef<str>> TabBar<T> {
     #[inline]
     #[doc(alias = "BeginTabBar")]
-    pub const fn new(id: &'a ImStr) -> Self {
+    pub fn new(id: T) -> Self {
         Self {
             id,
             flags: TabBarFlags::empty(),
@@ -90,23 +87,15 @@ impl<'a> TabBar<'a> {
     }
 
     #[must_use]
-    pub fn begin<'ui>(self, ui: &Ui<'ui>) -> Option<TabBarToken<'ui>> {
-        let should_render =
-            unsafe { sys::igBeginTabBar(self.id.as_ptr(), self.flags.bits() as i32) };
-
-        if should_render {
-            Some(TabBarToken::new(ui))
-        } else {
-            unsafe { sys::igEndTabBar() };
-            None
-        }
+    pub fn begin<'ui>(self, ui: &'ui Ui<'_>) -> Option<TabBarToken<'ui>> {
+        ui.tab_bar_with_flags(self.id, self.flags)
     }
 
     /// Creates a tab bar and runs a closure to construct the contents.
     /// Returns the result of the closure, if it is called.
     ///
     /// Note: the closure is not called if no tabbar content is visible
-    pub fn build<T, F: FnOnce() -> T>(self, ui: &Ui<'_>, f: F) -> Option<T> {
+    pub fn build<R, F: FnOnce() -> R>(self, ui: &Ui<'_>, f: F) -> Option<R> {
         self.begin(ui).map(|_tab| f())
     }
 }
@@ -120,23 +109,23 @@ create_token!(
     drop { sys::igEndTabBar() }
 );
 
-pub struct TabItem<'a> {
-    name: &'a ImStr,
+pub struct TabItem<'a, T> {
+    label: T,
     opened: Option<&'a mut bool>,
     flags: TabItemFlags,
 }
 
-impl<'a> TabItem<'a> {
+impl<'a, T: AsRef<str>> TabItem<'a, T> {
     #[doc(alias = "BeginTabItem")]
-    pub fn new(name: &'a ImStr) -> Self {
+    pub fn new(name: T) -> Self {
         Self {
-            name,
+            label: name,
             opened: None,
             flags: TabItemFlags::empty(),
         }
     }
 
-    /// Will open or close the tab.\
+    /// Will open or close the tab.
     ///
     /// True to display the tab. Tab item is visible by default.
     #[inline]
@@ -155,29 +144,15 @@ impl<'a> TabItem<'a> {
     }
 
     #[must_use]
-    pub fn begin<'ui>(self, ui: &Ui<'ui>) -> Option<TabItemToken<'ui>> {
-        let should_render = unsafe {
-            sys::igBeginTabItem(
-                self.name.as_ptr(),
-                self.opened
-                    .map(|x| x as *mut bool)
-                    .unwrap_or(ptr::null_mut()),
-                self.flags.bits() as i32,
-            )
-        };
-
-        if should_render {
-            Some(TabItemToken::new(ui))
-        } else {
-            None
-        }
+    pub fn begin<'ui>(self, ui: &'ui Ui<'_>) -> Option<TabItemToken<'ui>> {
+        ui.tab_item_with_flags(self.label, self.opened, self.flags)
     }
 
     /// Creates a tab item and runs a closure to construct the contents.
     /// Returns the result of the closure, if it is called.
     ///
     /// Note: the closure is not called if the tab item is not selected
-    pub fn build<T, F: FnOnce() -> T>(self, ui: &Ui<'_>, f: F) -> Option<T> {
+    pub fn build<R, F: FnOnce() -> R>(self, ui: &Ui<'_>, f: F) -> Option<R> {
         self.begin(ui).map(|_tab| f())
     }
 }
@@ -190,3 +165,74 @@ create_token!(
     /// Ends a tab bar item.
     drop { sys::igEndTabItem() }
 );
+
+impl Ui<'_> {
+    /// Creates a tab bar and returns a tab bar token, allowing you to append
+    /// Tab items afterwards. This passes no flags. To pass flags explicitly,
+    /// use [tab_bar_with_flags](Self::tab_bar_with_flags).
+    pub fn tab_bar(&self, id: impl AsRef<str>) -> Option<TabBarToken<'_>> {
+        self.tab_bar_with_flags(id, TabBarFlags::empty())
+    }
+    //
+    /// Creates a tab bar and returns a tab bar token, allowing you to append
+    /// Tab items afterwards.
+    pub fn tab_bar_with_flags(
+        &self,
+        id: impl AsRef<str>,
+        flags: TabBarFlags,
+    ) -> Option<TabBarToken<'_>> {
+        let should_render =
+            unsafe { sys::igBeginTabBar(self.scratch_txt(id), flags.bits() as i32) };
+
+        if should_render {
+            Some(TabBarToken::new(self))
+        } else {
+            unsafe { sys::igEndTabBar() };
+            None
+        }
+    }
+
+    /// Creates a new tab item and returns a token if its contents are visible.
+    ///
+    /// By default, this doesn't pass an opened bool nor any flags. See [tab_item_with_opened]
+    /// and [tab_item_with_flags] for more.
+    ///
+    /// [tab_item_with_opened]: Self::tab_item_with_opened
+    /// [tab_item_with_flags]: Self::tab_item_with_flags
+    pub fn tab_item(&self, label: impl AsRef<str>) -> Option<TabItemToken<'_>> {
+        self.tab_item_with_flags(label, None, TabItemFlags::empty())
+    }
+
+    /// Creates a new tab item and returns a token if its contents are visible.
+    ///
+    /// By default, this doesn't pass any flags. See `[tab_item_with_flags]` for more.
+    pub fn tab_item_with_opened(
+        &self,
+        label: impl AsRef<str>,
+        opened: &mut bool,
+    ) -> Option<TabItemToken<'_>> {
+        self.tab_item_with_flags(label, Some(opened), TabItemFlags::empty())
+    }
+
+    /// Creates a new tab item and returns a token if its contents are visible.
+    pub fn tab_item_with_flags(
+        &self,
+        label: impl AsRef<str>,
+        opened: Option<&mut bool>,
+        flags: TabItemFlags,
+    ) -> Option<TabItemToken<'_>> {
+        let should_render = unsafe {
+            sys::igBeginTabItem(
+                self.scratch_txt(label),
+                opened.map(|x| x as *mut bool).unwrap_or(ptr::null_mut()),
+                flags.bits() as i32,
+            )
+        };
+
+        if should_render {
+            Some(TabItemToken::new(self))
+        } else {
+            None
+        }
+    }
+}

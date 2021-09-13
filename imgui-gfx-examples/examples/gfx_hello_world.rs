@@ -6,18 +6,18 @@ fn main() {
     let system = support::init(file!());
 
     let window_title = if cfg!(all(feature = "directx", windows)) {
-        im_str!("Hello world (OpenGL)")
+        "Hello world (OpenGL)"
     } else {
-        im_str!("Hello world (DirectX)")
+        "Hello world (DirectX)"
     };
 
     system.main_loop(|_, ui| {
         Window::new(window_title)
             .size([300.0, 100.0], Condition::FirstUseEver)
             .build(ui, || {
-                ui.text(im_str!("Hello world!"));
-                ui.text(im_str!("こんにちは世界！"));
-                ui.text(im_str!("This...is...imgui-rs!"));
+                ui.text("Hello world!");
+                ui.text("こんにちは世界！");
+                ui.text("This...is...imgui-rs!");
                 ui.separator();
                 let mouse_pos = ui.io().mouse_pos;
                 ui.text(format!(
