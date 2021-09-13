@@ -30,7 +30,7 @@ fn main() {
                 }
 
                 // Disable dangerous buttons when in safe mode
-                ui.disabled(safe_mode, ||{
+                ui.disabled(safe_mode, || {
                     let _red = ui.push_style_color(StyleColor::Button, [1.0, 0.0, 0.0, 1.0]);
                     if ui.button(im_str!("Dangerous button!")) {
                         click_count -= 1;
