@@ -1,5 +1,4 @@
 use std::mem;
-use std::os::raw::{c_char, c_void};
 use std::ptr;
 use std::thread;
 
@@ -8,7 +7,7 @@ use crate::fonts::atlas::FontId;
 use crate::internal::RawCast;
 use crate::style::{StyleColor, StyleVar};
 use crate::sys;
-use crate::{Id, Ui};
+use crate::Ui;
 
 /// # Parameter stacks (shared)
 impl<'ui> Ui<'ui> {
@@ -446,19 +445,9 @@ impl<'ui> Ui<'ui> {
     /// Returns an `IdStackToken` that can be popped by calling `.end()`
     /// or by dropping manually.
     #[doc(alias = "PushId")]
-    pub fn push_id<'a, I: Into<Id<'a>>>(&self, id: I) -> IdStackToken<'ui> {
-        let id = id.into();
-
+    pub fn push_id<'a, I: AsRef<str>>(&self, id: I) -> IdStackToken<'ui> {
         unsafe {
-            match id {
-                Id::Int(i) => sys::igPushIDInt(i),
-                Id::Str(s) => {
-                    let start = s.as_ptr() as *const c_char;
-                    let end = start.add(s.len());
-                    sys::igPushIDStrStr(start, end)
-                }
-                Id::Ptr(p) => sys::igPushIDPtr(p as *const c_void),
-            }
+            sys::igPushIDStr(self.scratch_txt(id));
         }
         IdStackToken::new(self)
     }

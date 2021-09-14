@@ -3,7 +3,7 @@ pub extern crate imgui_sys as sys;
 
 use std::cell;
 use std::ffi::CStr;
-use std::os::raw::{c_char, c_void};
+use std::os::raw::c_char;
 use std::ptr;
 use std::str;
 use std::thread;
@@ -249,42 +249,6 @@ impl<'ui> Ui<'ui> {
     #[doc(alias = "ShowUserGuide")]
     pub fn show_user_guide(&self) {
         unsafe { sys::igShowUserGuide() };
-    }
-}
-
-/// Unique ID used by widgets
-#[derive(Copy, Clone, Debug, Eq, PartialEq)]
-pub enum Id<'a> {
-    Int(i32),
-    Str(&'a str),
-    Ptr(*const c_void),
-}
-
-impl From<i32> for Id<'static> {
-    #[inline]
-    fn from(i: i32) -> Self {
-        Id::Int(i)
-    }
-}
-
-impl<'a, T: ?Sized + AsRef<str>> From<&'a T> for Id<'a> {
-    #[inline]
-    fn from(s: &'a T) -> Self {
-        Id::Str(s.as_ref())
-    }
-}
-
-impl<T> From<*const T> for Id<'static> {
-    #[inline]
-    fn from(p: *const T) -> Self {
-        Id::Ptr(p as *const c_void)
-    }
-}
-
-impl<T> From<*mut T> for Id<'static> {
-    #[inline]
-    fn from(p: *mut T) -> Self {
-        Id::Ptr(p as *const T as *const c_void)
     }
 }
 
