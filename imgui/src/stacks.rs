@@ -445,7 +445,7 @@ impl<'ui> Ui<'ui> {
     /// Returns an `IdStackToken` that can be popped by calling `.end()`
     /// or by dropping manually.
     #[doc(alias = "PushId")]
-    pub fn push_id<'a, I: AsRef<str>>(&self, id: I) -> IdStackToken<'ui> {
+    pub fn push_id<I: AsRef<str>>(&self, id: I) -> IdStackToken<'ui> {
         unsafe {
             sys::igPushIDStr(self.scratch_txt(id));
         }
