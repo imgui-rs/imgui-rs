@@ -59,7 +59,7 @@ The process is much the same to build imgui-rs for a tagged release (as shown) a
 
   This step generates `imgui-sys/src/bindings.rs` which is used by `imgui/src/*`
 
-8. Run `cargo build` and fix any errors from upstream.
+8. Run `cargo build` and fix any errors caused by changes upstream (see next section)
 
 9. Run the tests with `cargo test`.
 

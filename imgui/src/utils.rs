@@ -144,12 +144,12 @@ impl<'ui> Ui<'ui> {
     /// Returns `true` if the rectangle (of given size, starting from cursor position) is visible
     #[doc(alias = "IsRectVisibleNil")]
     pub fn is_cursor_rect_visible(&self, size: [f32; 2]) -> bool {
-        unsafe { sys::igIsRectVisibleNil(size.into()) }
+        unsafe { sys::igIsRectVisible_Nil(size.into()) }
     }
     /// Returns `true` if the rectangle (in screen coordinates) is visible
     #[doc(alias = "IsRectVisibleNilVec2")]
     pub fn is_rect_visible(&self, rect_min: [f32; 2], rect_max: [f32; 2]) -> bool {
-        unsafe { sys::igIsRectVisibleVec2(rect_min.into(), rect_max.into()) }
+        unsafe { sys::igIsRectVisible_Vec2(rect_min.into(), rect_max.into()) }
     }
     /// Returns the global imgui-rs time.
     ///

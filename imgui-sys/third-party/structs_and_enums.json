@@ -575,27 +575,27 @@
       },
       {
         "calc_value": 177209344,
-        "name": "ImGuiColorEditFlags__OptionsDefault",
+        "name": "ImGuiColorEditFlags_DefaultOptions_",
         "value": "ImGuiColorEditFlags_Uint8 | ImGuiColorEditFlags_DisplayRGB | ImGuiColorEditFlags_InputRGB | ImGuiColorEditFlags_PickerHueBar"
       },
       {
         "calc_value": 7340032,
-        "name": "ImGuiColorEditFlags__DisplayMask",
+        "name": "ImGuiColorEditFlags_DisplayMask_",
         "value": "ImGuiColorEditFlags_DisplayRGB | ImGuiColorEditFlags_DisplayHSV | ImGuiColorEditFlags_DisplayHex"
       },
       {
         "calc_value": 25165824,
-        "name": "ImGuiColorEditFlags__DataTypeMask",
+        "name": "ImGuiColorEditFlags_DataTypeMask_",
         "value": "ImGuiColorEditFlags_Uint8 | ImGuiColorEditFlags_Float"
       },
       {
         "calc_value": 100663296,
-        "name": "ImGuiColorEditFlags__PickerMask",
+        "name": "ImGuiColorEditFlags_PickerMask_",
         "value": "ImGuiColorEditFlags_PickerHueWheel | ImGuiColorEditFlags_PickerHueBar"
       },
       {
         "calc_value": 402653184,
-        "name": "ImGuiColorEditFlags__InputMask",
+        "name": "ImGuiColorEditFlags_InputMask_",
         "value": "ImGuiColorEditFlags_InputRGB | ImGuiColorEditFlags_InputHSV"
       }
     ],
@@ -1050,16 +1050,6 @@
         "calc_value": 524288,
         "name": "ImGuiInputTextFlags_CallbackEdit",
         "value": "1 << 19"
-      },
-      {
-        "calc_value": 1048576,
-        "name": "ImGuiInputTextFlags_Multiline",
-        "value": "1 << 20"
-      },
-      {
-        "calc_value": 2097152,
-        "name": "ImGuiInputTextFlags_NoMarkEdited",
-        "value": "1 << 21"
       }
     ],
     "ImGuiKeyModFlags_": [
@@ -1368,38 +1358,33 @@
       },
       {
         "calc_value": 16,
-        "name": "ImGuiNavInput_KeyMenu_",
+        "name": "ImGuiNavInput_KeyLeft_",
         "value": "16"
       },
       {
         "calc_value": 17,
-        "name": "ImGuiNavInput_KeyLeft_",
+        "name": "ImGuiNavInput_KeyRight_",
         "value": "17"
       },
       {
         "calc_value": 18,
-        "name": "ImGuiNavInput_KeyRight_",
+        "name": "ImGuiNavInput_KeyUp_",
         "value": "18"
       },
       {
         "calc_value": 19,
-        "name": "ImGuiNavInput_KeyUp_",
+        "name": "ImGuiNavInput_KeyDown_",
         "value": "19"
       },
       {
         "calc_value": 20,
-        "name": "ImGuiNavInput_KeyDown_",
-        "value": "20"
-      },
-      {
-        "calc_value": 21,
         "name": "ImGuiNavInput_COUNT",
-        "value": "21"
+        "value": "20"
       },
       {
         "calc_value": 16,
         "name": "ImGuiNavInput_InternalStart_",
-        "value": "ImGuiNavInput_KeyMenu_"
+        "value": "ImGuiNavInput_KeyLeft_"
       }
     ],
     "ImGuiPopupFlags_": [
@@ -1548,123 +1533,128 @@
       },
       {
         "calc_value": 1,
-        "name": "ImGuiStyleVar_WindowPadding",
+        "name": "ImGuiStyleVar_DisabledAlpha",
         "value": "1"
       },
       {
         "calc_value": 2,
-        "name": "ImGuiStyleVar_WindowRounding",
+        "name": "ImGuiStyleVar_WindowPadding",
         "value": "2"
       },
       {
         "calc_value": 3,
-        "name": "ImGuiStyleVar_WindowBorderSize",
+        "name": "ImGuiStyleVar_WindowRounding",
         "value": "3"
       },
       {
         "calc_value": 4,
-        "name": "ImGuiStyleVar_WindowMinSize",
+        "name": "ImGuiStyleVar_WindowBorderSize",
         "value": "4"
       },
       {
         "calc_value": 5,
-        "name": "ImGuiStyleVar_WindowTitleAlign",
+        "name": "ImGuiStyleVar_WindowMinSize",
         "value": "5"
       },
       {
         "calc_value": 6,
-        "name": "ImGuiStyleVar_ChildRounding",
+        "name": "ImGuiStyleVar_WindowTitleAlign",
         "value": "6"
       },
       {
         "calc_value": 7,
-        "name": "ImGuiStyleVar_ChildBorderSize",
+        "name": "ImGuiStyleVar_ChildRounding",
         "value": "7"
       },
       {
         "calc_value": 8,
-        "name": "ImGuiStyleVar_PopupRounding",
+        "name": "ImGuiStyleVar_ChildBorderSize",
         "value": "8"
       },
       {
         "calc_value": 9,
-        "name": "ImGuiStyleVar_PopupBorderSize",
+        "name": "ImGuiStyleVar_PopupRounding",
         "value": "9"
       },
       {
         "calc_value": 10,
-        "name": "ImGuiStyleVar_FramePadding",
+        "name": "ImGuiStyleVar_PopupBorderSize",
         "value": "10"
       },
       {
         "calc_value": 11,
-        "name": "ImGuiStyleVar_FrameRounding",
+        "name": "ImGuiStyleVar_FramePadding",
         "value": "11"
       },
       {
         "calc_value": 12,
-        "name": "ImGuiStyleVar_FrameBorderSize",
+        "name": "ImGuiStyleVar_FrameRounding",
         "value": "12"
       },
       {
         "calc_value": 13,
-        "name": "ImGuiStyleVar_ItemSpacing",
+        "name": "ImGuiStyleVar_FrameBorderSize",
         "value": "13"
       },
       {
         "calc_value": 14,
-        "name": "ImGuiStyleVar_ItemInnerSpacing",
+        "name": "ImGuiStyleVar_ItemSpacing",
         "value": "14"
       },
       {
         "calc_value": 15,
-        "name": "ImGuiStyleVar_IndentSpacing",
+        "name": "ImGuiStyleVar_ItemInnerSpacing",
         "value": "15"
       },
       {
         "calc_value": 16,
-        "name": "ImGuiStyleVar_CellPadding",
+        "name": "ImGuiStyleVar_IndentSpacing",
         "value": "16"
       },
       {
         "calc_value": 17,
-        "name": "ImGuiStyleVar_ScrollbarSize",
+        "name": "ImGuiStyleVar_CellPadding",
         "value": "17"
       },
       {
         "calc_value": 18,
-        "name": "ImGuiStyleVar_ScrollbarRounding",
+        "name": "ImGuiStyleVar_ScrollbarSize",
         "value": "18"
       },
       {
         "calc_value": 19,
-        "name": "ImGuiStyleVar_GrabMinSize",
+        "name": "ImGuiStyleVar_ScrollbarRounding",
         "value": "19"
       },
       {
         "calc_value": 20,
-        "name": "ImGuiStyleVar_GrabRounding",
+        "name": "ImGuiStyleVar_GrabMinSize",
         "value": "20"
       },
       {
         "calc_value": 21,
-        "name": "ImGuiStyleVar_TabRounding",
+        "name": "ImGuiStyleVar_GrabRounding",
         "value": "21"
       },
       {
         "calc_value": 22,
-        "name": "ImGuiStyleVar_ButtonTextAlign",
+        "name": "ImGuiStyleVar_TabRounding",
         "value": "22"
       },
       {
         "calc_value": 23,
-        "name": "ImGuiStyleVar_SelectableTextAlign",
+        "name": "ImGuiStyleVar_ButtonTextAlign",
         "value": "23"
       },
       {
         "calc_value": 24,
-        "name": "ImGuiStyleVar_COUNT",
+        "name": "ImGuiStyleVar_SelectableTextAlign",
         "value": "24"
+      },
+      {
+        "calc_value": 25,
+        "name": "ImGuiStyleVar_COUNT",
+        "value": "25"
       }
     ],
     "ImGuiTabBarFlags_": [
@@ -1801,116 +1791,126 @@
       },
       {
         "calc_value": 1,
-        "name": "ImGuiTableColumnFlags_DefaultHide",
+        "name": "ImGuiTableColumnFlags_Disabled",
         "value": "1 << 0"
       },
       {
         "calc_value": 2,
-        "name": "ImGuiTableColumnFlags_DefaultSort",
+        "name": "ImGuiTableColumnFlags_DefaultHide",
         "value": "1 << 1"
       },
       {
         "calc_value": 4,
-        "name": "ImGuiTableColumnFlags_WidthStretch",
+        "name": "ImGuiTableColumnFlags_DefaultSort",
         "value": "1 << 2"
       },
       {
         "calc_value": 8,
-        "name": "ImGuiTableColumnFlags_WidthFixed",
+        "name": "ImGuiTableColumnFlags_WidthStretch",
         "value": "1 << 3"
       },
       {
         "calc_value": 16,
-        "name": "ImGuiTableColumnFlags_NoResize",
+        "name": "ImGuiTableColumnFlags_WidthFixed",
         "value": "1 << 4"
       },
       {
         "calc_value": 32,
-        "name": "ImGuiTableColumnFlags_NoReorder",
+        "name": "ImGuiTableColumnFlags_NoResize",
         "value": "1 << 5"
       },
       {
         "calc_value": 64,
-        "name": "ImGuiTableColumnFlags_NoHide",
+        "name": "ImGuiTableColumnFlags_NoReorder",
         "value": "1 << 6"
       },
       {
         "calc_value": 128,
-        "name": "ImGuiTableColumnFlags_NoClip",
+        "name": "ImGuiTableColumnFlags_NoHide",
         "value": "1 << 7"
       },
       {
         "calc_value": 256,
-        "name": "ImGuiTableColumnFlags_NoSort",
+        "name": "ImGuiTableColumnFlags_NoClip",
         "value": "1 << 8"
       },
       {
         "calc_value": 512,
-        "name": "ImGuiTableColumnFlags_NoSortAscending",
+        "name": "ImGuiTableColumnFlags_NoSort",
         "value": "1 << 9"
       },
       {
         "calc_value": 1024,
-        "name": "ImGuiTableColumnFlags_NoSortDescending",
+        "name": "ImGuiTableColumnFlags_NoSortAscending",
         "value": "1 << 10"
       },
       {
         "calc_value": 2048,
-        "name": "ImGuiTableColumnFlags_NoHeaderWidth",
+        "name": "ImGuiTableColumnFlags_NoSortDescending",
         "value": "1 << 11"
       },
       {
         "calc_value": 4096,
-        "name": "ImGuiTableColumnFlags_PreferSortAscending",
+        "name": "ImGuiTableColumnFlags_NoHeaderLabel",
         "value": "1 << 12"
       },
       {
         "calc_value": 8192,
-        "name": "ImGuiTableColumnFlags_PreferSortDescending",
+        "name": "ImGuiTableColumnFlags_NoHeaderWidth",
         "value": "1 << 13"
       },
       {
         "calc_value": 16384,
-        "name": "ImGuiTableColumnFlags_IndentEnable",
+        "name": "ImGuiTableColumnFlags_PreferSortAscending",
         "value": "1 << 14"
       },
       {
         "calc_value": 32768,
-        "name": "ImGuiTableColumnFlags_IndentDisable",
+        "name": "ImGuiTableColumnFlags_PreferSortDescending",
         "value": "1 << 15"
       },
       {
-        "calc_value": 1048576,
+        "calc_value": 65536,
+        "name": "ImGuiTableColumnFlags_IndentEnable",
+        "value": "1 << 16"
+      },
+      {
+        "calc_value": 131072,
+        "name": "ImGuiTableColumnFlags_IndentDisable",
+        "value": "1 << 17"
+      },
+      {
+        "calc_value": 16777216,
         "name": "ImGuiTableColumnFlags_IsEnabled",
-        "value": "1 << 20"
+        "value": "1 << 24"
       },
       {
-        "calc_value": 2097152,
+        "calc_value": 33554432,
         "name": "ImGuiTableColumnFlags_IsVisible",
-        "value": "1 << 21"
+        "value": "1 << 25"
       },
       {
-        "calc_value": 4194304,
+        "calc_value": 67108864,
         "name": "ImGuiTableColumnFlags_IsSorted",
-        "value": "1 << 22"
+        "value": "1 << 26"
       },
       {
-        "calc_value": 8388608,
+        "calc_value": 134217728,
         "name": "ImGuiTableColumnFlags_IsHovered",
-        "value": "1 << 23"
+        "value": "1 << 27"
       },
       {
-        "calc_value": 12,
+        "calc_value": 24,
         "name": "ImGuiTableColumnFlags_WidthMask_",
         "value": "ImGuiTableColumnFlags_WidthStretch | ImGuiTableColumnFlags_WidthFixed"
       },
       {
-        "calc_value": 49152,
+        "calc_value": 196608,
         "name": "ImGuiTableColumnFlags_IndentMask_",
         "value": "ImGuiTableColumnFlags_IndentEnable | ImGuiTableColumnFlags_IndentDisable"
       },
       {
-        "calc_value": 15728640,
+        "calc_value": 251658240,
         "name": "ImGuiTableColumnFlags_StatusMask_",
         "value": "ImGuiTableColumnFlags_IsEnabled | ImGuiTableColumnFlags_IsVisible | ImGuiTableColumnFlags_IsSorted | ImGuiTableColumnFlags_IsHovered"
       },
@@ -2373,72 +2373,72 @@
   },
   "enumtypes": [],
   "locations": {
-    "ImColor": "imgui:2167",
-    "ImDrawChannel": "imgui:2261",
-    "ImDrawCmd": "imgui:2216",
-    "ImDrawCmdHeader": "imgui:2253",
-    "ImDrawData": "imgui:2450",
-    "ImDrawFlags_": "imgui:2287",
-    "ImDrawList": "imgui:2325",
-    "ImDrawListFlags_": "imgui:2307",
-    "ImDrawListSplitter": "imgui:2270",
-    "ImDrawVert": "imgui:2238",
-    "ImFont": "imgui:2667",
-    "ImFontAtlas": "imgui:2566",
-    "ImFontAtlasCustomRect": "imgui:2528",
-    "ImFontAtlasFlags_": "imgui:2541",
-    "ImFontConfig": "imgui:2472",
-    "ImFontGlyph": "imgui:2501",
-    "ImFontGlyphRangesBuilder": "imgui:2513",
-    "ImGuiBackendFlags_": "imgui:1384",
-    "ImGuiButtonFlags_": "imgui:1490",
-    "ImGuiCol_": "imgui:1394",
-    "ImGuiColorEditFlags_": "imgui:1503",
-    "ImGuiComboFlags_": "imgui:1023",
-    "ImGuiCond_": "imgui:1595",
-    "ImGuiConfigFlags_": "imgui:1368",
-    "ImGuiDataType_": "imgui:1260",
-    "ImGuiDir_": "imgui:1276",
-    "ImGuiDragDropFlags_": "imgui:1238",
-    "ImGuiFocusedFlags_": "imgui:1210",
-    "ImGuiHoveredFlags_": "imgui:1222",
-    "ImGuiIO": "imgui:1755",
-    "ImGuiInputTextCallbackData": "imgui:1897",
-    "ImGuiInputTextFlags_": "imgui:933",
-    "ImGuiKeyModFlags_": "imgui:1323",
-    "ImGuiKey_": "imgui:1295",
-    "ImGuiListClipper": "imgui:2118",
-    "ImGuiMouseButton_": "imgui:1567",
-    "ImGuiMouseCursor_": "imgui:1577",
-    "ImGuiNavInput_": "imgui:1336",
-    "ImGuiOnceUponAFrame": "imgui:1996",
-    "ImGuiPayload": "imgui:1937",
-    "ImGuiPopupFlags_": "imgui:996",
-    "ImGuiSelectableFlags_": "imgui:1012",
-    "ImGuiSizeCallbackData": "imgui:1928",
-    "ImGuiSliderFlags_": "imgui:1550",
-    "ImGuiSortDirection_": "imgui:1287",
-    "ImGuiStorage": "imgui:2058",
-    "ImGuiStoragePair": "imgui:2061",
-    "ImGuiStyle": "imgui:1701",
-    "ImGuiStyleVar_": "imgui:1459",
-    "ImGuiTabBarFlags_": "imgui:1037",
-    "ImGuiTabItemFlags_": "imgui:1053",
-    "ImGuiTableBgTarget_": "imgui:1201",
-    "ImGuiTableColumnFlags_": "imgui:1146",
-    "ImGuiTableColumnSortSpecs": "imgui:1959",
-    "ImGuiTableFlags_": "imgui:1089",
-    "ImGuiTableRowFlags_": "imgui:1186",
-    "ImGuiTableSortSpecs": "imgui:1973",
-    "ImGuiTextBuffer": "imgui:2031",
-    "ImGuiTextFilter": "imgui:2004",
-    "ImGuiTextRange": "imgui:2014",
-    "ImGuiTreeNodeFlags_": "imgui:967",
-    "ImGuiViewport": "imgui:2738",
-    "ImGuiViewportFlags_": "imgui:2723",
-    "ImGuiWindowFlags_": "imgui:893",
-    "ImVec2": "imgui:230",
-    "ImVec4": "imgui:243"
+    "ImColor": "imgui:2226",
+    "ImDrawChannel": "imgui:2316",
+    "ImDrawCmd": "imgui:2275",
+    "ImDrawCmdHeader": "imgui:2308",
+    "ImDrawData": "imgui:2506",
+    "ImDrawFlags_": "imgui:2342",
+    "ImDrawList": "imgui:2380",
+    "ImDrawListFlags_": "imgui:2362",
+    "ImDrawListSplitter": "imgui:2325",
+    "ImDrawVert": "imgui:2293",
+    "ImFont": "imgui:2724",
+    "ImFontAtlas": "imgui:2622",
+    "ImFontAtlasCustomRect": "imgui:2584",
+    "ImFontAtlasFlags_": "imgui:2597",
+    "ImFontConfig": "imgui:2528",
+    "ImFontGlyph": "imgui:2557",
+    "ImFontGlyphRangesBuilder": "imgui:2569",
+    "ImGuiBackendFlags_": "imgui:1434",
+    "ImGuiButtonFlags_": "imgui:1541",
+    "ImGuiCol_": "imgui:1444",
+    "ImGuiColorEditFlags_": "imgui:1554",
+    "ImGuiComboFlags_": "imgui:1072",
+    "ImGuiCond_": "imgui:1646",
+    "ImGuiConfigFlags_": "imgui:1418",
+    "ImGuiDataType_": "imgui:1311",
+    "ImGuiDir_": "imgui:1327",
+    "ImGuiDragDropFlags_": "imgui:1289",
+    "ImGuiFocusedFlags_": "imgui:1261",
+    "ImGuiHoveredFlags_": "imgui:1273",
+    "ImGuiIO": "imgui:1812",
+    "ImGuiInputTextCallbackData": "imgui:1956",
+    "ImGuiInputTextFlags_": "imgui:985",
+    "ImGuiKeyModFlags_": "imgui:1374",
+    "ImGuiKey_": "imgui:1346",
+    "ImGuiListClipper": "imgui:2177",
+    "ImGuiMouseButton_": "imgui:1618",
+    "ImGuiMouseCursor_": "imgui:1628",
+    "ImGuiNavInput_": "imgui:1387",
+    "ImGuiOnceUponAFrame": "imgui:2055",
+    "ImGuiPayload": "imgui:1996",
+    "ImGuiPopupFlags_": "imgui:1045",
+    "ImGuiSelectableFlags_": "imgui:1061",
+    "ImGuiSizeCallbackData": "imgui:1987",
+    "ImGuiSliderFlags_": "imgui:1601",
+    "ImGuiSortDirection_": "imgui:1338",
+    "ImGuiStorage": "imgui:2117",
+    "ImGuiStoragePair": "imgui:2120",
+    "ImGuiStyle": "imgui:1757",
+    "ImGuiStyleVar_": "imgui:1509",
+    "ImGuiTabBarFlags_": "imgui:1086",
+    "ImGuiTabItemFlags_": "imgui:1102",
+    "ImGuiTableBgTarget_": "imgui:1252",
+    "ImGuiTableColumnFlags_": "imgui:1195",
+    "ImGuiTableColumnSortSpecs": "imgui:2018",
+    "ImGuiTableFlags_": "imgui:1138",
+    "ImGuiTableRowFlags_": "imgui:1237",
+    "ImGuiTableSortSpecs": "imgui:2032",
+    "ImGuiTextBuffer": "imgui:2090",
+    "ImGuiTextFilter": "imgui:2063",
+    "ImGuiTextRange": "imgui:2073",
+    "ImGuiTreeNodeFlags_": "imgui:1016",
+    "ImGuiViewport": "imgui:2795",
+    "ImGuiViewportFlags_": "imgui:2780",
+    "ImGuiWindowFlags_": "imgui:945",
+    "ImVec2": "imgui:256",
+    "ImVec4": "imgui:269"
   },
   "structs": {
     "ImColor": [
@@ -2683,6 +2683,10 @@
         "type": "ImWchar"
       },
       {
+        "name": "DotChar",
+        "type": "ImWchar"
+      },
+      {
         "name": "DirtyLookupTables",
         "type": "bool"
       },
@@ -2727,6 +2731,10 @@
       },
       {
         "name": "Locked",
+        "type": "bool"
+      },
+      {
+        "name": "TexReady",
         "type": "bool"
       },
       {
@@ -3153,7 +3161,7 @@
       },
       {
         "name": "NavInputs[ImGuiNavInput_COUNT]",
-        "size": 21,
+        "size": 20,
         "type": "float"
       },
       {
@@ -3214,6 +3222,10 @@
       },
       {
         "name": "KeyMods",
+        "type": "ImGuiKeyModFlags"
+      },
+      {
+        "name": "KeyModsPrev",
         "type": "ImGuiKeyModFlags"
       },
       {
@@ -3287,12 +3299,12 @@
       },
       {
         "name": "NavInputsDownDuration[ImGuiNavInput_COUNT]",
-        "size": 21,
+        "size": 20,
         "type": "float"
       },
       {
         "name": "NavInputsDownDurationPrev[ImGuiNavInput_COUNT]",
-        "size": 21,
+        "size": 20,
         "type": "float"
       },
       {
@@ -3468,6 +3480,10 @@
     "ImGuiStyle": [
       {
         "name": "Alpha",
+        "type": "float"
+      },
+      {
+        "name": "DisabledAlpha",
         "type": "float"
       },
       {

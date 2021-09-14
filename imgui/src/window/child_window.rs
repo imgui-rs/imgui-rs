@@ -257,17 +257,17 @@ impl<'a> ChildWindow<'a> {
         }
         let id = unsafe {
             match self.id {
-                Id::Int(i) => sys::igGetIDPtr(i as *const c_void),
-                Id::Ptr(p) => sys::igGetIDPtr(p),
+                Id::Int(i) => sys::igGetID_Ptr(i as *const c_void),
+                Id::Ptr(p) => sys::igGetID_Ptr(p),
                 Id::Str(s) => {
                     let start = s.as_ptr() as *const c_char;
                     let end = start.add(s.len());
-                    sys::igGetIDStrStr(start, end)
+                    sys::igGetID_StrStr(start, end)
                 }
             }
         };
         let should_render = unsafe {
-            sys::igBeginChildID(id, self.size.into(), self.border, self.flags.bits() as i32)
+            sys::igBeginChild_ID(id, self.size.into(), self.border, self.flags.bits() as i32)
         };
         if should_render {
             Some(ChildWindowToken::new(ui))

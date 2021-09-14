@@ -19,6 +19,7 @@ pub struct Font {
     pub config_data_count: i16,
     pub fallback_char: sys::ImWchar,
     pub ellipsis_char: sys::ImWchar,
+    pub dot_char: sys::ImWchar,
     pub dirty_lookup_tables: bool,
     pub scale: f32,
     pub ascent: f32,
