@@ -666,15 +666,20 @@ impl<'ui> Ui<'ui> {
 pub enum Condition {
     /// Never apply the setting
     Never = -1,
-    /// Always apply the setting
+
+    /// Apply the setting every frame
     Always = sys::ImGuiCond_Always as i8,
-    /// Apply the setting once per runtime session (only the first call will succeed)
+
+    /// Apply the setting once per runtime session (only the first
+    /// call will succeed). Will ignore any setting saved in `.ini`
     Once = sys::ImGuiCond_Once as i8,
-    /// Apply the setting if the object/window has no persistently saved data (no entry in .ini
-    /// file)
+
+    /// Apply the setting if the object/window has no persistently
+    /// saved data (but otherwise use the setting from the .ini file)
     FirstUseEver = sys::ImGuiCond_FirstUseEver as i8,
-    /// Apply the setting if the object/window is appearing after being hidden/inactive (or the
-    /// first time)
+
+    /// Apply the setting if the object/window is appearing after
+    /// being hidden/inactive (or the first time)
     Appearing = sys::ImGuiCond_Appearing as i8,
 }
 
