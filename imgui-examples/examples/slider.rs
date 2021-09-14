@@ -67,7 +67,7 @@ fn example_1(ui: &Ui, state: &mut State) {
 }
 
 fn example_2(ui: &Ui, state: &mut State) {
-    let w = ui.widnow("Example 2: Slider arrays")
+    let w = ui.window("Example 2: Slider arrays")
         .size([700.0, 260.0], Condition::Appearing)
         .position([20.0, 120.0], Condition::Appearing);
     w.build(|| {
