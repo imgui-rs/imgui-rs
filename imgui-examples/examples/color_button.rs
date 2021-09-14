@@ -17,7 +17,8 @@ fn main() {
 }
 
 fn example_selector(run: &mut bool, ui: &mut Ui, state: &mut State) {
-    let w = ui.window("Color button examples")
+    let w = ui
+        .window("Color button examples")
         .opened(run)
         .position([20.0, 20.0], Condition::Appearing)
         .size([700.0, 100.0], Condition::Appearing)
@@ -33,7 +34,8 @@ fn example_selector(run: &mut bool, ui: &mut Ui, state: &mut State) {
 }
 
 fn example_1(ui: &Ui, state: &mut State) {
-    let w = ui.window("Example 1: Basics")
+    let w = ui
+        .window("Example 1: Basics")
         .size([700.0, 300.0], Condition::Appearing)
         .position([20.0, 140.0], Condition::Appearing);
     w.build(|| {
@@ -73,7 +75,8 @@ fn example_1(ui: &Ui, state: &mut State) {
 }
 
 fn example_2(ui: &Ui) {
-    let w = ui.window("Example 2: Alpha component")
+    let w = ui
+        .window("Example 2: Alpha component")
         .size([700.0, 320.0], Condition::Appearing)
         .position([20.0, 140.0], Condition::Appearing);
     w.build(|| {
@@ -123,7 +126,8 @@ fn example_2(ui: &Ui) {
 }
 
 fn example_3(ui: &Ui) {
-    let w = ui.window("Example 3: Input format")
+    let w = ui
+        .window("Example 3: Input format")
         .size([700.0, 320.0], Condition::Appearing)
         .position([20.0, 140.0], Condition::Appearing);
     w.build(|| {

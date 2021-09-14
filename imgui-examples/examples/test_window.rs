@@ -1,6 +1,5 @@
 /// Shows the "Demo Window" provided by the Dear ImGui library. See
 /// `test_window_impl` example for Rust implementation.
-
 mod support;
 
 fn main() {

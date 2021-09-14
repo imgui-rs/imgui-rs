@@ -1,5 +1,4 @@
 /// An (incomplete) Rust implemention of the Dear ImGui demo window.
-
 use imgui::*;
 
 mod support;
@@ -319,7 +318,8 @@ fn show_test_window(ui: &Ui, state: &mut State, opened: &mut bool) {
         show_app_log(ui, &mut state.app_log);
     }
 
-    let mut window = ui.window("ImGui Demo")
+    let mut window = ui
+        .window("ImGui Demo")
         .title_bar(!state.no_titlebar)
         .resizable(!state.no_resize)
         .movable(!state.no_move)

@@ -16,7 +16,8 @@ fn main() {
 }
 
 fn example_selector(run: &mut bool, ui: &mut Ui, state: &mut State) {
-    let w = ui.window("Slider examples")
+    let w = ui
+        .window("Slider examples")
         .opened(run)
         .position([20.0, 20.0], Condition::Appearing)
         .size([700.0, 80.0], Condition::Appearing)
@@ -32,7 +33,8 @@ fn example_selector(run: &mut bool, ui: &mut Ui, state: &mut State) {
 }
 
 fn example_1(ui: &Ui, state: &mut State) {
-    let w = ui.window("Example 1: Basic sliders")
+    let w = ui
+        .window("Example 1: Basic sliders")
         .size([700.0, 340.0], Condition::Appearing)
         .position([20.0, 120.0], Condition::Appearing);
     w.build(|| {
@@ -67,7 +69,8 @@ fn example_1(ui: &Ui, state: &mut State) {
 }
 
 fn example_2(ui: &Ui, state: &mut State) {
-    let w = ui.window("Example 2: Slider arrays")
+    let w = ui
+        .window("Example 2: Slider arrays")
         .size([700.0, 260.0], Condition::Appearing)
         .position([20.0, 120.0], Condition::Appearing);
     w.build(|| {

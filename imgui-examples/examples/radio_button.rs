@@ -16,7 +16,8 @@ fn main() {
 }
 
 fn example_selector(run: &mut bool, ui: &mut Ui, state: &mut State) {
-    let w = ui.window("Radio button examples")
+    let w = ui
+        .window("Radio button examples")
         .opened(run)
         .position([20.0, 20.0], Condition::Appearing)
         .size([700.0, 80.0], Condition::Appearing)
@@ -32,7 +33,8 @@ fn example_selector(run: &mut bool, ui: &mut Ui, state: &mut State) {
 }
 
 fn example_1(ui: &Ui, state: &mut State) {
-    let w = ui.window("Example 1: Boolean radio buttons")
+    let w = ui
+        .window("Example 1: Boolean radio buttons")
         .size([700.0, 200.0], Condition::Appearing)
         .position([20.0, 120.0], Condition::Appearing);
     w.build(|| {
@@ -58,7 +60,8 @@ fn example_1(ui: &Ui, state: &mut State) {
 }
 
 fn example_2(ui: &Ui, state: &mut State) {
-    let w = ui.window("Example 2: Radio buttons")
+    let w = ui
+        .window("Example 2: Radio buttons")
         .size([700.0, 300.0], Condition::Appearing)
         .position([20.0, 120.0], Condition::Appearing);
     w.build(|| {

@@ -261,7 +261,7 @@ impl<'ui, Label: AsRef<str>> ChildWindow<'ui, Label> {
                 self.ui.scratch_txt(self.name),
                 self.size.into(),
                 self.border,
-                self.flags.bits() as i32
+                self.flags.bits() as i32,
             )
         };
         if should_render {
