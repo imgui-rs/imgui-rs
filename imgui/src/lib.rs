@@ -265,10 +265,11 @@ impl<'ui> Ui<'ui> {
     /// # Examples
     ///
     /// Create a window using the closure based [`Window::build`]:
-    /// ```
-    /// # let ui = imgui::Context::create().frame();
+    /// ```no_run
+    /// # let mut ctx = imgui::Context::create();
+    /// # let ui = ctx.frame();
     /// ui.window("Example Window")
-    ///     .size([100.0, 50.0])
+    ///     .size([100.0, 50.0], imgui::Condition::FirstUseEver)
     ///     .build(|| {
     ///         ui.text("An example");
     ///     });
@@ -277,12 +278,15 @@ impl<'ui> Ui<'ui> {
     /// Same but using the "token based" `.begin()`
     /// ```
     /// fn example(ui: &imgui::Ui) {
-    ///     let _wt = ui.window("Example Window")
+    ///     let wt = ui.window("Example Window")
     ///         .size([100.0, 50.0], imgui::Condition::FirstUseEver)
     ///         .begin();
-    ///     ui.text("An example");
-    ///     // Note: _wt is dropped here, or you could call
-    ///    _wt.end()
+    ///     if wt.is_some() {
+    ///         ui.text("Window is visible");
+    ///     }
+    ///     // Window ends where where wt is dropped,
+    ///     // or you could call
+    ///     wt.unwrap().end()
     /// }
     /// ```
 
