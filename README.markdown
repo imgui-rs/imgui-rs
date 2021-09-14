@@ -10,7 +10,7 @@
 ![Hello world](hello_world.png)
 
 ```rust
-Window::new("Hello world")
+ui.window("Hello world")
     .size([300.0, 100.0], Condition::FirstUseEver)
     .build(&ui, || {
         ui.text("Hello world!");
