@@ -7,9 +7,9 @@ fn main() {
     let mut value = 0;
     let choices = ["test test this is 1", "test test this is 2"];
     system.main_loop(move |_, ui| {
-        Window::new("Hello world")
+        ui.window("Hello world")
             .size([300.0, 110.0], Condition::FirstUseEver)
-            .build(ui, || {
+            .build(|| {
                 ui.text_wrapped("Hello world!");
                 ui.text_wrapped("こんにちは世界！");
                 if ui.button(choices[value]) {

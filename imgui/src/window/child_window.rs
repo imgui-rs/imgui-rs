@@ -1,15 +1,15 @@
 use std::f32;
-use std::os::raw::{c_char, c_void};
 
 use crate::sys;
 use crate::window::WindowFlags;
-use crate::{Id, Ui};
+use crate::Ui;
 
 /// Builder for a child window
 #[derive(Copy, Clone, Debug)]
 #[must_use]
-pub struct ChildWindow<'a> {
-    id: Id<'a>,
+pub struct ChildWindow<'ui, Label> {
+    ui: &'ui Ui<'ui>,
+    name: Label,
     flags: WindowFlags,
     size: [f32; 2],
     content_size: [f32; 2],
@@ -18,12 +18,13 @@ pub struct ChildWindow<'a> {
     border: bool,
 }
 
-impl<'a> ChildWindow<'a> {
+impl<'ui, Label: AsRef<str>> ChildWindow<'ui, Label> {
     /// Creates a new child window builder with the given ID
     #[doc(alias = "BeginChildID")]
-    pub fn new<T: Into<Id<'a>>>(id: T) -> ChildWindow<'a> {
+    pub fn new(ui: &'ui Ui<'ui>, name: Label) -> ChildWindow<'ui, Label> {
         ChildWindow {
-            id: id.into(),
+            ui,
+            name,
             flags: WindowFlags::empty(),
             size: [0.0, 0.0],
             content_size: [0.0, 0.0],
@@ -245,7 +246,7 @@ impl<'a> ChildWindow<'a> {
     /// rendered, the token must be ended by calling `.end()`.
     ///
     /// Returns `None` if the window is not visible and no content should be rendered.
-    pub fn begin<'ui>(self, ui: &Ui<'ui>) -> Option<ChildWindowToken<'ui>> {
+    pub fn begin(self) -> Option<ChildWindowToken<'ui>> {
         if self.content_size[0] != 0.0 || self.content_size[1] != 0.0 {
             unsafe { sys::igSetNextWindowContentSize(self.content_size.into()) };
         }
@@ -255,22 +256,16 @@ impl<'a> ChildWindow<'a> {
         if self.bg_alpha.is_finite() {
             unsafe { sys::igSetNextWindowBgAlpha(self.bg_alpha) };
         }
-        let id = unsafe {
-            match self.id {
-                Id::Int(i) => sys::igGetIDPtr(i as *const c_void),
-                Id::Ptr(p) => sys::igGetIDPtr(p),
-                Id::Str(s) => {
-                    let start = s.as_ptr() as *const c_char;
-                    let end = start.add(s.len());
-                    sys::igGetIDStrStr(start, end)
-                }
-            }
-        };
         let should_render = unsafe {
-            sys::igBeginChildID(id, self.size.into(), self.border, self.flags.bits() as i32)
+            sys::igBeginChildStr(
+                self.ui.scratch_txt(self.name),
+                self.size.into(),
+                self.border,
+                self.flags.bits() as i32
+            )
         };
         if should_render {
-            Some(ChildWindowToken::new(ui))
+            Some(ChildWindowToken::new(self.ui))
         } else {
             unsafe { sys::igEndChild() };
             None
@@ -281,8 +276,8 @@ impl<'a> ChildWindow<'a> {
     ///
     /// Note: the closure is not called if no window content is visible (e.g. window is collapsed
     /// or fully clipped).
-    pub fn build<T, F: FnOnce() -> T>(self, ui: &Ui<'_>, f: F) -> Option<T> {
-        self.begin(ui).map(|_window| f())
+    pub fn build<T, F: FnOnce() -> T>(self, f: F) -> Option<T> {
+        self.begin().map(|_window| f())
     }
 }
 

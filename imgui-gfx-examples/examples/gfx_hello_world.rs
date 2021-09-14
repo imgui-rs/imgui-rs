@@ -12,9 +12,9 @@ fn main() {
     };
 
     system.main_loop(|_, ui| {
-        Window::new(window_title)
+        ui.window(window_title)
             .size([300.0, 100.0], Condition::FirstUseEver)
-            .build(ui, || {
+            .build(|| {
                 ui.text("Hello world!");
                 ui.text("こんにちは世界！");
                 ui.text("This...is...imgui-rs!");

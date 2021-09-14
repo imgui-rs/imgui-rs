@@ -1,3 +1,5 @@
+/// An (incomplete) Rust implemention of the Dear ImGui demo window.
+
 use imgui::*;
 
 mod support;
@@ -286,15 +288,15 @@ fn show_test_window(ui: &Ui, state: &mut State, opened: &mut bool) {
         ui.show_metrics_window(&mut state.show_app_metrics);
     }
     if state.show_app_style_editor {
-        Window::new("Style Editor")
+        ui.window("Style Editor")
             .opened(&mut state.show_app_style_editor)
-            .build(ui, || ui.show_default_style_editor());
+            .build(|| ui.show_default_style_editor());
     }
     if state.show_app_about {
-        Window::new("About ImGui")
+        ui.window("About ImGui")
             .always_auto_resize(true)
             .opened(&mut state.show_app_about)
-            .build(ui, || {
+            .build(|| {
                 ui.text(format!("dear imgui, {}", imgui::dear_imgui_version()));
                 ui.separator();
                 ui.text("By Omar Cornut and all github contributors.");
@@ -317,7 +319,7 @@ fn show_test_window(ui: &Ui, state: &mut State, opened: &mut bool) {
         show_app_log(ui, &mut state.app_log);
     }
 
-    let mut window = Window::new("ImGui Demo")
+    let mut window = ui.window("ImGui Demo")
         .title_bar(!state.no_titlebar)
         .resizable(!state.no_resize)
         .movable(!state.no_move)
@@ -328,7 +330,7 @@ fn show_test_window(ui: &Ui, state: &mut State, opened: &mut bool) {
     if !state.no_close {
         window = window.opened(opened)
     }
-    window.build(ui, || {
+    window.build(|| {
         ui.push_item_width(-140.0);
         ui.text(format!("dear imgui says hello. ({})", imgui::dear_imgui_version()));
         if let Some(menu_bar) = ui.begin_menu_bar() {
@@ -872,10 +874,10 @@ fn show_example_menu_file<'a>(ui: &Ui<'a>, state: &mut FileMenuState) {
     ui.separator();
     if let Some(menu) = ui.begin_menu("Options") {
         MenuItem::new("Enabled").build_with_ref(ui, &mut state.enabled);
-        ChildWindow::new("child")
+        ui.child_window("child")
             .size([0.0, 60.0])
             .border(true)
-            .build(ui, || {
+            .build(|| {
                 for i in 0..10 {
                     ui.text(format!("Scrolling Text {}", i));
                 }
@@ -900,10 +902,10 @@ fn show_example_menu_file<'a>(ui: &Ui<'a>, state: &mut FileMenuState) {
 }
 
 fn show_example_app_auto_resize(ui: &Ui, state: &mut AutoResizeState, opened: &mut bool) {
-    Window::new("Example: Auto-resizing window")
+    ui.window("Example: Auto-resizing window")
         .opened(opened)
         .always_auto_resize(true)
-        .build(ui, || {
+        .build(|| {
             ui.text(
                 "Window will resize every-ui to the size of its content.
 Note that you probably don't want to query the window size to
@@ -920,7 +922,7 @@ fn show_example_app_fixed_overlay(ui: &Ui, opened: &mut bool) {
     const DISTANCE: f32 = 10.0;
     let window_pos = [DISTANCE, DISTANCE];
     let style = ui.push_style_color(StyleColor::WindowBg, [0.0, 0.0, 0.0, 0.3]);
-    Window::new("Example: Fixed Overlay")
+    ui.window("Example: Fixed Overlay")
         .opened(opened)
         .position(window_pos, Condition::Always)
         .title_bar(false)
@@ -928,7 +930,7 @@ fn show_example_app_fixed_overlay(ui: &Ui, opened: &mut bool) {
         .always_auto_resize(true)
         .movable(false)
         .save_settings(false)
-        .build(ui, || {
+        .build(|| {
             ui.text(
                 "Simple overlay\nin the corner of the screen.\n(right-click to change position)",
             );
@@ -943,17 +945,17 @@ fn show_example_app_fixed_overlay(ui: &Ui, opened: &mut bool) {
 }
 
 fn show_example_app_manipulating_window_title(ui: &Ui) {
-    Window::new("Same title as another window##1")
+    ui.window("Same title as another window##1")
         .position([100.0, 100.0], Condition::FirstUseEver)
-        .build(ui, || {
+        .build(|| {
             ui.text(
                 "This is window 1.
 My title is the same as window 2, but my identifier is unique.",
             );
         });
-    Window::new("Same title as another window##2")
+    ui.window("Same title as another window##2")
         .position([100.0, 200.0], Condition::FirstUseEver)
-        .build(ui, || {
+        .build(|| {
             ui.text(
                 "This is window 2.
 My title is the same as window 1, but my identifier is unique.",
@@ -963,16 +965,16 @@ My title is the same as window 1, but my identifier is unique.",
     let ch_idx = (ui.time() / 0.25) as usize & 3;
     let num = ui.frame_count(); // The C++ version uses rand() here
     let title = format!("Animated title {} {}###AnimatedTitle", chars[ch_idx], num);
-    Window::new(title)
+    ui.window(title)
         .position([100.0, 300.0], Condition::FirstUseEver)
-        .build(ui, || ui.text("This window has a changing title"));
+        .build(|| ui.text("This window has a changing title"));
 }
 
 fn show_example_app_custom_rendering(ui: &Ui, state: &mut CustomRenderingState, opened: &mut bool) {
-    Window::new("Example: Custom rendering")
+    ui.window("Example: Custom rendering")
         .size([350.0, 560.0], Condition::FirstUseEver)
         .opened(opened)
-        .build(ui, || {
+        .build(|| {
             ui.text("Primitives");
             // TODO: Add DragFloat to change value of sz
             ColorEdit::new("Color", &mut state.col).build(ui);
@@ -1217,9 +1219,9 @@ fn show_example_app_custom_rendering(ui: &Ui, state: &mut CustomRenderingState, 
 }
 
 fn show_app_log(ui: &Ui, app_log: &mut Vec<String>) {
-    Window::new("Example: Log")
+    ui.window("Example: Log")
         .size([500.0, 400.0], Condition::FirstUseEver)
-        .build(ui, || {
+        .build(|| {
             if ui.small_button("[Debug] Add 5 entries") {
                 let categories = ["info", "warn", "error"];
                 let words = [
@@ -1251,9 +1253,9 @@ fn show_app_log(ui: &Ui, app_log: &mut Vec<String>) {
                 ui.set_clipboard_text(&ImString::from(app_log.join("\n")));
             }
             ui.separator();
-            ChildWindow::new("logwindow")
+            ui.child_window("logwindow")
                 .flags(WindowFlags::HORIZONTAL_SCROLLBAR)
-                .build(ui, || {
+                .build(|| {
                     if !app_log.is_empty() {
                         let mut clipper = ListClipper::new(app_log.len() as i32).begin(ui);
                         while clipper.step() {
