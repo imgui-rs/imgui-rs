@@ -294,15 +294,15 @@ impl<'a> Id<'a> {
     fn as_imgui_id(&self) -> sys::ImGuiID {
         unsafe {
             match self {
-                Id::Ptr(p) => sys::igGetIDPtr(*p),
+                Id::Ptr(p) => sys::igGetID_Ptr(*p),
                 Id::Str(s) => {
                     let s1 = s.as_ptr() as *const std::os::raw::c_char;
                     let s2 = s1.add(s.len());
-                    sys::igGetIDStrStr(s1, s2)
+                    sys::igGetID_StrStr(s1, s2)
                 }
                 Id::Int(i) => {
                     let p = *i as *const std::os::raw::c_void;
-                    sys::igGetIDPtr(p)
+                    sys::igGetID_Ptr(p)
                 } // Id::ImGuiID(n) => *n,
             }
         }

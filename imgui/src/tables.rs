@@ -684,7 +684,30 @@ impl<'ui> Ui<'ui> {
         }
     }
 
+    /// Change user accessible enabled/disabled state of the current column.
+    ///
+    /// Set to false to hide the column. Users can use the context menu to change
+    /// this themselves by right-clicking in headers, or right-clicking in columns body
+    /// if [TableFlags::CONTEXT_MENU_IN_BODY].
+    ///
+    /// Use [table_set_enabled_with_column](Self::table_set_enabled_with_column) to set
+    /// for arbitrary indices.
+    pub fn table_set_enabled(&self, enabled: bool) {
+        unsafe { sys::igTableSetColumnEnabled(-1, enabled) }
+    }
+
+    /// Change user accessible enabled/disabled state of the current column.
+    ///
+    /// Set to false to hide the column. Users can use the context menu to change
+    /// this themselves by right-clicking in headers, or right-clicking in columns body
+    /// if [TableFlags::CONTEXT_MENU_IN_BODY].
+    pub fn table_set_enabled_with_column(&self, enabled: bool, column_idx: usize) {
+        unsafe { sys::igTableSetColumnEnabled(column_idx as i32, enabled) }
+    }
+
     /// Gets the sorting data for a table. This will be `None` when not sorting.
+    ///
+    /// See the examples folder for how to use the sorting API.
     pub fn table_sort_specs_mut(&self) -> Option<TableSortSpecsMut<'_>> {
         unsafe {
             let value = sys::igTableGetSortSpecs();
