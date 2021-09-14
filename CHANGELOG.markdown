@@ -42,6 +42,13 @@
 
 - BREAKING: `PopupModal`'s `new` was reworked so that it didn't take `Ui` until `build` was called. This is a breaking change if you were invoking it directly. Simply move your `ui` call to `build` or `begin`.
 
+- BREAKING: Window and ChildWindow are now created via methods in `Ui`
+
+  - For example `imgui::Window::new("Example").build(ui, ||{...})` becomes `ui.window("Example").build(||{...})`
+  - All builder methods are unchanged, only the `new()` and `build` + `begin` change, e.g `imgui::Window::new(...).size(...)` remains the same `ui.window("Example").size(...)`
+
+- BREAKING: `Ui::push_id` now only takes a string identifier (consistent with all other items like windows, buttons), and thus `imgui::Id` has been removed.
+
 - Upgrade to from v1.80 to [Dear ImGui v1.82](https://github.com/ocornut/imgui/releases/tag/v1.82) (see also the [Dear ImGui v1.81](https://github.com/ocornut/imgui/releases/tag/v1.81) release notes)
 
   - BREAKING: `imgui::ListBox::calculate_size(items_count: ..., height_in_items: ...)` has been removed as the function backing it has been marked as obsolete. The recommended approach is to calculate the size yourself and use `.size(...)` (or use the default auto-calculated size)
