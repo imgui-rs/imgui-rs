@@ -1,5 +1,7 @@
 #![cfg_attr(test, allow(clippy::float_cmp))]
 #![deny(rust_2018_idioms)]
+// #![deny(missing_docs)]
+
 pub extern crate imgui_sys as sys;
 
 use std::cell;
