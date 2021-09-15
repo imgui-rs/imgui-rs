@@ -1,4 +1,4 @@
-#![cfg_attr(debug_assertions, allow(clippy::float_cmp))]
+#![cfg_attr(test, allow(clippy::float_cmp))]
 pub extern crate imgui_sys as sys;
 
 use std::cell;
@@ -106,7 +106,7 @@ impl Context {
     ///
     /// Incremented by Io::delta_time every frame.
     #[doc(alias = "GetTime")]
-    pub fn time(&self) -> f64 {
+    pub fn time(&self, input: f64) -> f64 {
         unsafe { sys::igGetTime() }
     }
     /// Returns the global imgui-rs frame count.
