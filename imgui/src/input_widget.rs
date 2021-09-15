@@ -280,8 +280,9 @@ where
     /// 3. Truncations by ImGui appear to be done primarily by insertions of `\0` to the truncation point.
     /// We will handle this for you and edit the string "properly" too, but this might show up in callbacks.
     pub fn build(self) -> bool {
-        // needs to be null-terminated!
+        // needs to be null-terminated! this is a hack!
         self.buf.push('\0');
+
         let (ptr, capacity) = (self.buf.as_mut_ptr(), self.buf.capacity());
 
         let mut data = UserData {
@@ -316,10 +317,18 @@ where
             }
         };
 
-        // it should always end with one (or more if characters were deleted)
-        // null terminators
-        while self.buf.ends_with('\0') {
+        // first, pop our end buffer...
+        if self.buf.ends_with('\0') {
             self.buf.pop();
+        }
+
+        if o {
+            // if a truncation occured, we'll find another one too on the end.
+            // this might end up deleting user `\0` though!
+            // this hack is working but WOW is it hacky!
+            if let Some(null_terminator_position) = self.buf.rfind('\0') {
+                self.buf.truncate(null_terminator_position);
+            }
         }
 
         o
@@ -426,7 +435,7 @@ impl<'ui, 'p, T: InputTextCallbackHandler, L: AsRef<str>> InputTextMultiline<'ui
     /// 3. Truncations by ImGui appear to be done primarily by insertions of `\0` to the truncation point.
     /// We will handle this for you and edit the string "properly" too, but this might show up in callbacks.
     pub fn build(self) -> bool {
-        // needs to be null-terminated!
+        // needs to be null-terminated! this is a hack!
         self.buf.push('\0');
         let (ptr, capacity) = (self.buf.as_mut_ptr(), self.buf.capacity());
 
@@ -448,10 +457,17 @@ impl<'ui, 'p, T: InputTextCallbackHandler, L: AsRef<str>> InputTextMultiline<'ui
             )
         };
 
-        // it should always end with one (or more if characters were deleted)
-        // null terminators
-        while self.buf.ends_with('\0') {
+        // first, pop our end buffer...
+        if self.buf.ends_with('\0') {
             self.buf.pop();
+        }
+
+        if o {
+            // if a truncation occured, we'll find another one too on the end.
+            // this might end up deleting user `\0` though!
+            if let Some(null_terminator_position) = self.buf.rfind('\0') {
+                self.buf.truncate(null_terminator_position);
+            }
         }
 
         o
