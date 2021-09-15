@@ -288,8 +288,9 @@ where
             }
         };
 
-        // it should always end with this \0.
-        if self.buf.ends_with('\0') {
+        // it should always end with one (or more if characters were deleted)
+        // null terminators
+        while self.buf.ends_with('\0') {
             self.buf.pop();
         }
 
@@ -386,8 +387,9 @@ impl<'ui, 'p, T: InputTextCallbackHandler, L: AsRef<str>> InputTextMultiline<'ui
             )
         };
 
-        // it should always end with this \0.
-        if self.buf.ends_with('\0') {
+        // it should always end with one (or more if characters were deleted)
+        // null terminators
+        while self.buf.ends_with('\0') {
             self.buf.pop();
         }
 
