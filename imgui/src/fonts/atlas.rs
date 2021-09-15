@@ -70,7 +70,7 @@ unsafe impl RawCast<sys::ImFontAtlas> for FontAtlas {}
 
 impl FontAtlas {
     #[doc(alias = "AddFontDefault", alias = "AddFont")]
-    pub fn add_font(&mut self, font_sources: &[FontSource]) -> FontId {
+    pub fn add_font(&mut self, font_sources: &[FontSource<'_>]) -> FontId {
         let (head, tail) = font_sources.split_first().unwrap();
         let font_id = self.add_font_internal(head, false);
         for font in tail {
@@ -78,7 +78,7 @@ impl FontAtlas {
         }
         font_id
     }
-    fn add_font_internal(&mut self, font_source: &FontSource, merge_mode: bool) -> FontId {
+    fn add_font_internal(&mut self, font_source: &FontSource<'_>, merge_mode: bool) -> FontId {
         let mut raw_config = sys_font_config_default();
         raw_config.MergeMode = merge_mode;
         let raw_font = match font_source {
@@ -141,7 +141,7 @@ impl FontAtlas {
     }
     /// Builds a 1 byte per-pixel font atlas texture
     #[doc(alias = "GetTextDataAsAlpha8")]
-    pub fn build_alpha8_texture(&mut self) -> FontAtlasTexture {
+    pub fn build_alpha8_texture(&mut self) -> FontAtlasTexture<'_> {
         let mut pixels: *mut c_uchar = ptr::null_mut();
         let mut width: c_int = 0;
         let mut height: c_int = 0;
@@ -175,7 +175,7 @@ impl FontAtlas {
     }
     /// Builds a 4 byte per-pixel font atlas texture
     #[doc(alias = "GetTextDataAsRGBA32")]
-    pub fn build_rgba32_texture(&mut self) -> FontAtlasTexture {
+    pub fn build_rgba32_texture(&mut self) -> FontAtlasTexture<'_> {
         let mut pixels: *mut c_uchar = ptr::null_mut();
         let mut width: c_int = 0;
         let mut height: c_int = 0;

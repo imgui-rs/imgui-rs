@@ -859,7 +859,7 @@ extern "C" fn callback<T: InputTextCallbackHandler>(
     let callback_data = unsafe {
         CallbackData {
             event_flag: InputTextFlags::from_bits((*data).EventFlag as u32).unwrap(),
-            user_data: &mut *((*data).UserData as *mut UserData<T>),
+            user_data: &mut *((*data).UserData as *mut UserData<'_, T>),
         }
     };
 

@@ -70,7 +70,7 @@ impl<T: AsRef<str>> ListBox<T> {
     /// Builds a simple list box for choosing from a slice of values
     pub fn build_simple<V, L>(
         self,
-        ui: &Ui,
+        ui: &Ui<'_>,
         current_item: &mut usize,
         items: &[V],
         label_fn: &L,

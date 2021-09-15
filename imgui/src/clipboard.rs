@@ -53,7 +53,7 @@ impl ClipboardBackend for DummyClipboardContext {
 }
 
 impl fmt::Debug for ClipboardContext {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("ClipboardContext")
             // beautiful code, no?
             .field("backend", &(&(*self.backend) as *const _))

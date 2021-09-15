@@ -95,7 +95,7 @@ where
     /// Builds a slider that is bound to the given value.
     ///
     /// Returns true if the slider value was changed.
-    pub fn build(self, ui: &Ui, value: &mut Data) -> bool {
+    pub fn build(self, ui: &Ui<'_>, value: &mut Data) -> bool {
         unsafe {
             let (label, display_format) = ui.scratch_txt_with_opt(self.label, self.display_format);
 
@@ -113,7 +113,7 @@ where
     /// Builds a horizontal array of multiple sliders attached to the given slice.
     ///
     /// Returns true if any slider value was changed.
-    pub fn build_array(self, ui: &Ui, values: &mut [Data]) -> bool {
+    pub fn build_array(self, ui: &Ui<'_>, values: &mut [Data]) -> bool {
         unsafe {
             let (label, display_format) = ui.scratch_txt_with_opt(self.label, self.display_format);
 
@@ -221,7 +221,7 @@ where
     /// Builds a vertical slider that is bound to the given value.
     ///
     /// Returns true if the slider value was changed.
-    pub fn build(self, ui: &Ui, value: &mut Data) -> bool {
+    pub fn build(self, ui: &Ui<'_>, value: &mut Data) -> bool {
         unsafe {
             let (label, display_format) = ui.scratch_txt_with_opt(self.label, self.display_format);
 
@@ -325,7 +325,7 @@ where
     /// Builds an angle slider that is bound to the given value (in radians).
     ///
     /// Returns true if the slider value was changed.
-    pub fn build(self, ui: &Ui, value_rad: &mut f32) -> bool {
+    pub fn build(self, ui: &Ui<'_>, value_rad: &mut f32) -> bool {
         unsafe {
             let (label, display_format) = ui.scratch_txt_two(self.label, self.display_format);
 

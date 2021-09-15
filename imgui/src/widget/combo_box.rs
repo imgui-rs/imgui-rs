@@ -162,7 +162,7 @@ impl<T: AsRef<str>, Preview: AsRef<str>> ComboBox<T, Preview> {
     /// Returns the result of the closure, if it is called.
     ///
     /// Note: the closure is not called if the combo box is not open.
-    pub fn build<R, F: FnOnce() -> R>(self, ui: &Ui, f: F) -> Option<R> {
+    pub fn build<R, F: FnOnce() -> R>(self, ui: &Ui<'_>, f: F) -> Option<R> {
         self.begin(ui).map(|_combo| f())
     }
 }

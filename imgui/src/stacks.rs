@@ -59,7 +59,7 @@ impl<'ui> Ui<'ui> {
     /// color.pop();
     /// ```
     #[doc(alias = "PushStyleColorVec4")]
-    pub fn push_style_color(&self, style_color: StyleColor, color: [f32; 4]) -> ColorStackToken {
+    pub fn push_style_color(&self, style_color: StyleColor, color: [f32; 4]) -> ColorStackToken<'_> {
         unsafe { sys::igPushStyleColor_Vec4(style_color as i32, color.into()) };
         ColorStackToken::new(self)
     }
@@ -115,7 +115,7 @@ impl<'ui> Ui<'ui> {
     /// style.pop();
     /// ```
     #[doc(alias = "PushStyleVar")]
-    pub fn push_style_var(&self, style_var: StyleVar) -> StyleStackToken {
+    pub fn push_style_var(&self, style_var: StyleVar) -> StyleStackToken<'_> {
         unsafe { push_style_var(style_var) };
         StyleStackToken::new(self)
     }
@@ -196,7 +196,7 @@ pub struct MultiColorStackToken {
 impl MultiColorStackToken {
     /// Pops changes from the color stack
     #[doc(alias = "PopStyleColor")]
-    pub fn pop(mut self, _: &Ui) {
+    pub fn pop(mut self, _: &Ui<'_>) {
         self.ctx = ptr::null();
         unsafe { sys::igPopStyleColor(self.count as i32) };
     }
@@ -236,7 +236,7 @@ pub struct MultiStyleStackToken {
 impl MultiStyleStackToken {
     /// Pops changes from the style stack
     #[doc(alias = "PopStyleVar")]
-    pub fn pop(mut self, _: &Ui) {
+    pub fn pop(mut self, _: &Ui<'_>) {
         self.ctx = ptr::null();
         unsafe { sys::igPopStyleVar(self.count as i32) };
     }
@@ -380,7 +380,7 @@ pub struct ItemWidthStackToken {
 impl ItemWidthStackToken {
     /// Pops a change from the item width stack
     #[doc(alias = "PopItemWidth")]
-    pub fn pop(mut self, _: &Ui) {
+    pub fn pop(mut self, _: &Ui<'_>) {
         self._ctx = ptr::null();
         unsafe { sys::igPopItemWidth() };
     }
@@ -394,7 +394,7 @@ pub struct TextWrapPosStackToken {
 impl TextWrapPosStackToken {
     /// Pops a change from the text wrap position stack
     #[doc(alias = "PopTextWrapPos")]
-    pub fn pop(mut self, _: &Ui) {
+    pub fn pop(mut self, _: &Ui<'_>) {
         self._ctx = ptr::null();
         unsafe { sys::igPopTextWrapPos() };
     }
@@ -410,7 +410,7 @@ impl ItemFlagsStackToken {
     /// Pops a change from the item flags stack
 
     #[doc(alias = "PopAllowKeyboardFocus", alias = "PopButtonRepeat")]
-    pub fn pop(mut self, _: &Ui) {
+    pub fn pop(mut self, _: &Ui<'_>) {
         self._ctx = ptr::null();
         const ALLOW_KEYBOARD_FOCUS: ItemFlag = ItemFlag::AllowKeyboardFocus(true);
         const BUTTON_REPEAT: ItemFlag = ItemFlag::ButtonRepeat(true);

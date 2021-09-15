@@ -1,4 +1,5 @@
 #![cfg_attr(test, allow(clippy::float_cmp))]
+#![deny(rust_2018_idioms)]
 pub extern crate imgui_sys as sys;
 
 use std::cell;
@@ -95,18 +96,12 @@ pub fn dear_imgui_version() -> &'static str {
     }
 }
 
-#[test]
-fn test_version() {
-    // TODO: what's the point of this test?
-    assert!(dear_imgui_version().starts_with("1."));
-}
-
 impl Context {
     /// Returns the global imgui-rs time.
     ///
     /// Incremented by Io::delta_time every frame.
     #[doc(alias = "GetTime")]
-    pub fn time(&self, input: f64) -> f64 {
+    pub fn time(&self) -> f64 {
         unsafe { sys::igGetTime() }
     }
     /// Returns the global imgui-rs frame count.
@@ -171,8 +166,9 @@ impl<'ui> Ui<'ui> {
     pub fn io(&self) -> &Io {
         unsafe { &*(sys::igGetIO() as *const Io) }
     }
+
     /// Returns an immutable reference to the font atlas
-    pub fn fonts(&self) -> FontAtlasRef {
+    pub fn fonts(&self) -> FontAtlasRef<'_> {
         match self.font_atlas {
             Some(ref font_atlas) => FontAtlasRef::Shared(font_atlas),
             None => unsafe {
