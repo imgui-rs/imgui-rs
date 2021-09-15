@@ -59,7 +59,11 @@ impl<'ui> Ui<'ui> {
     /// color.pop();
     /// ```
     #[doc(alias = "PushStyleColorVec4")]
-    pub fn push_style_color(&self, style_color: StyleColor, color: [f32; 4]) -> ColorStackToken<'_> {
+    pub fn push_style_color(
+        &self,
+        style_color: StyleColor,
+        color: [f32; 4],
+    ) -> ColorStackToken<'_> {
         unsafe { sys::igPushStyleColor_Vec4(style_color as i32, color.into()) };
         ColorStackToken::new(self)
     }

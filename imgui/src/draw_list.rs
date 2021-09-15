@@ -373,7 +373,12 @@ impl<'ui> DrawListMut<'ui> {
     ///         .build();
     /// }
     /// ```
-    pub fn add_image(&'ui self, texture_id: TextureId, p_min: [f32; 2], p_max: [f32; 2]) -> Image<'_> {
+    pub fn add_image(
+        &'ui self,
+        texture_id: TextureId,
+        p_min: [f32; 2],
+        p_max: [f32; 2],
+    ) -> Image<'_> {
         Image::new(self, texture_id, p_min, p_max)
     }
 
@@ -562,7 +567,13 @@ pub struct Triangle<'ui> {
 }
 
 impl<'ui> Triangle<'ui> {
-    fn new<C>(draw_list: &'ui DrawListMut<'_>, p1: [f32; 2], p2: [f32; 2], p3: [f32; 2], c: C) -> Self
+    fn new<C>(
+        draw_list: &'ui DrawListMut<'_>,
+        p1: [f32; 2],
+        p2: [f32; 2],
+        p3: [f32; 2],
+        c: C,
+    ) -> Self
     where
         C: Into<ImColor32>,
     {

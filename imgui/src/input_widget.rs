@@ -169,6 +169,20 @@ pub struct InputText<'ui, 'p, L, H = &'static str, T = PassthroughCallback> {
 }
 
 impl<'ui, 'p, L: AsRef<str>> InputText<'ui, 'p, L> {
+    /// Creates a new input text widget to edit the given string.
+    ///
+    /// # String Editing
+    ///
+    /// Please note, ImGui requires this string to be null-terminated. We accomplish this
+    /// by appending and then removing a null terminator (`\0`) from the String you pass in.
+    /// This has several consequences:
+    /// 1. The string's backing buffer may be resized and relocated even without edits as result
+    /// of this pushed char.
+    /// 2. **The string will appear truncated if the string contains `\0` inside it.** This will not
+    /// cause memory *unsafety*, but it will limit your usage. If that's the case, please pre-process
+    /// your string.
+    /// 3. Truncations by ImGui appear to be done primarily by insertions of `\0` to the truncation point.
+    /// We will handle this for you and edit the string "properly" too, but this might show up in callbacks.
     pub fn new(ui: &'ui Ui<'ui>, label: L, buf: &'p mut String) -> Self {
         InputText {
             label,
@@ -203,22 +217,22 @@ where
 
     impl_text_flags!(InputText);
 
-    /// By default (as of 0.8.0), imgui-rs will automatically handle string resizes
-    /// for [InputText] and [InputTextMultiline].
-    ///
-    /// If, for some reason, you don't want this, you can run this function to prevent this.
-    /// In that case, edits which would cause a resize will not occur.
-    ///
-    /// # Safety
-    /// Importantly, we silently push and pop a `\0` to the string given here.
-    /// If you do not want mutable access (ie, do not want that string to resize),
-    /// you **must** make sure to null-terminate it yourself. This is janky, but ImGui
-    /// expects a null termination, and we didn't want to re-allocate an entire string per call.
-    #[inline]
-    pub unsafe fn do_not_resize(mut self) -> Self {
-        self.flags.remove(InputTextFlags::CALLBACK_RESIZE);
-        self
-    }
+    // I am commenting this ability out for now -- because we need to push `\0` for imgui,
+    // we may resize the buffer no matter what, and we must do that.
+    // The solution for this will be, I suspect, to build a second api channel that takes
+    // an `&mut CStr`, which is ugly! I suspect few to none will want no-resizing, so I'm deferring
+    // fixing the problem. -- sanbox-irl 09/15/2021, see #523 for more
+    //
+    // /// By default (as of 0.8.0), imgui-rs will automatically handle string resizes
+    // /// for [InputText] and [InputTextMultiline].
+    // ///
+    // /// If, for some reason, you don't want this, you can run this function to prevent this.
+    // /// In that case, edits which would cause a resize will not occur.
+    // /// #[inline]
+    // pub unsafe fn do_not_resize(mut self) -> Self {
+    //     self.flags.remove(InputTextFlags::CALLBACK_RESIZE);
+    //     self
+    // }
 
     #[inline]
     pub fn callback<T2: InputTextCallbackHandler>(
@@ -251,6 +265,20 @@ where
         }
     }
 
+    /// Builds the string editor, performing string editing operations.
+    ///
+    /// # String Editing
+    ///
+    /// Please note, ImGui requires this string to be null-terminated. We accomplish this
+    /// by appending and then removing a null terminator (`\0`) from the String you pass in.
+    /// This has several consequences:
+    /// 1. The string's backing buffer may be resized and relocated even without edits as result
+    /// of this pushed char.
+    /// 2. **The string will appear truncated if the string contains `\0` inside it.** This will not
+    /// cause memory *unsafety*, but it will limit your usage. If that's the case, please pre-process
+    /// your string.
+    /// 3. Truncations by ImGui appear to be done primarily by insertions of `\0` to the truncation point.
+    /// We will handle this for you and edit the string "properly" too, but this might show up in callbacks.
     pub fn build(self) -> bool {
         // needs to be null-terminated!
         self.buf.push('\0');
@@ -309,6 +337,20 @@ pub struct InputTextMultiline<'ui, 'p, L, T = PassthroughCallback> {
 }
 
 impl<'ui, 'p, L: AsRef<str>> InputTextMultiline<'ui, 'p, L, PassthroughCallback> {
+    /// Creates a new input text widget to edit the given string.
+    ///
+    /// # String Editing
+    ///
+    /// Please note, ImGui requires this string to be null-terminated. We accomplish this
+    /// by appending and then removing a null terminator (`\0`) from the String you pass in.
+    /// This has several consequences:
+    /// 1. The string's backing buffer may be resized and relocated even without edits as result
+    /// of this pushed char.
+    /// 2. **The string will appear truncated if the string contains `\0` inside it.** This will not
+    /// cause memory *unsafety*, but it will limit your usage. If that's the case, please pre-process
+    /// your string.
+    /// 3. Truncations by ImGui appear to be done primarily by insertions of `\0` to the truncation point.
+    /// We will handle this for you and edit the string "properly" too, but this might show up in callbacks.
     pub fn new(ui: &'ui Ui<'ui>, label: L, buf: &'p mut String, size: [f32; 2]) -> Self {
         InputTextMultiline {
             label,
@@ -324,16 +366,21 @@ impl<'ui, 'p, L: AsRef<str>> InputTextMultiline<'ui, 'p, L, PassthroughCallback>
 impl<'ui, 'p, T: InputTextCallbackHandler, L: AsRef<str>> InputTextMultiline<'ui, 'p, L, T> {
     impl_text_flags!(InputText);
 
-    /// By default (as of 0.8.0), imgui-rs will automatically handle string resizes
-    /// for [InputText] and [InputTextMultiline].
-    ///
-    /// If, for some reason, you don't want this, you can run this function to prevent this.
-    /// In that case, edits which would cause a resize will not occur.
-    #[inline]
-    pub fn do_not_resize(mut self) -> Self {
-        self.flags.remove(InputTextFlags::CALLBACK_RESIZE);
-        self
-    }
+    // I am commenting this ability out for now -- because we need to push `\0` for imgui,
+    // we may resize the buffer no matter what, and we must do that.
+    // The solution for this will be, I suspect, to build a second api channel that takes
+    // an `&mut CStr`, which is ugly! I suspect few to none will want no-resizing, so I'm deferring
+    // fixing the problem. -- sanbox-irl 09/15/2021, see #523 for more
+    // /// By default (as of 0.8.0), imgui-rs will automatically handle string resizes
+    // /// for [InputText] and [InputTextMultiline].
+    // ///
+    // /// If, for some reason, you don't want this, you can run this function to prevent this.
+    // /// In that case, edits which would cause a resize will not occur.
+    // #[inline]
+    // pub fn do_not_resize(mut self) -> Self {
+    //     self.flags.remove(InputTextFlags::CALLBACK_RESIZE);
+    //     self
+    // }
 
     #[inline]
     pub fn callback<T2: InputTextCallbackHandler>(
@@ -364,6 +411,20 @@ impl<'ui, 'p, T: InputTextCallbackHandler, L: AsRef<str>> InputTextMultiline<'ui
         }
     }
 
+    /// Builds the string editor, performing string editing operations.
+    ///
+    /// # String Editing
+    ///
+    /// Please note, ImGui requires this string to be null-terminated. We accomplish this
+    /// by appending and then removing a null terminator (`\0`) from the String you pass in.
+    /// This has several consequences:
+    /// 1. The string's backing buffer may be resized and relocated even without edits as result
+    /// of this pushed char.
+    /// 2. **The string will appear truncated if the string contains `\0` inside it.** This will not
+    /// cause memory *unsafety*, but it will limit your usage. If that's the case, please pre-process
+    /// your string.
+    /// 3. Truncations by ImGui appear to be done primarily by insertions of `\0` to the truncation point.
+    /// We will handle this for you and edit the string "properly" too, but this might show up in callbacks.
     pub fn build(self) -> bool {
         // needs to be null-terminated!
         self.buf.push('\0');
