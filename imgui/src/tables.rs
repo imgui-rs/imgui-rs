@@ -256,13 +256,13 @@ impl<'ui> Ui<'ui> {
     /// [begin_table_header](Self::begin_table_header) or the more complex
     /// [table_setup_column](Self::table_setup_column).
     ///
-    /// **NB:** after you begin a table (and after setting up )
-    #[inline]
+    /// Nb: we take `column` as a usize, but it will be converted with `as i32` to an i32.
+    /// If this makes a difference to you, you are probably trying to make too many columns.
     #[must_use = "if return is dropped immediately, table is ended immediately."]
     pub fn begin_table(
         &self,
         str_id: impl AsRef<str>,
-        column_count: i32,
+        column_count: usize,
     ) -> Option<TableToken<'ui>> {
         self.begin_table_with_flags(str_id, column_count, TableFlags::empty())
     }
@@ -272,11 +272,14 @@ impl<'ui> Ui<'ui> {
     /// This does no work on styling the headers (the top row) -- see either
     /// [begin_table_header](Self::begin_table_header) or the more complex
     /// [table_setup_column](Self::table_setup_column).
-    #[inline]
+    ///
+    /// Nb: we take `column` as a usize, but it will be converted with `as i32` to an i32.
+    /// If this makes a difference to you, you are probably trying to make too many columns.
+    #[must_use = "if return is dropped immediately, table is ended immediately."]
     pub fn begin_table_with_flags(
         &self,
         str_id: impl AsRef<str>,
-        column_count: i32,
+        column_count: usize,
         flags: TableFlags,
     ) -> Option<TableToken<'ui>> {
         self.begin_table_with_sizing(str_id, column_count, flags, [0.0, 0.0], 0.0)
@@ -288,11 +291,14 @@ impl<'ui> Ui<'ui> {
     /// This does no work on styling the headers (the top row) -- see either
     /// [begin_table_header](Self::begin_table_header) or the more complex
     /// [table_setup_column](Self::table_setup_column).
-    #[inline]
+    ///
+    /// Nb: we take `column` as a usize, but it will be converted with `as i32` to an i32.
+    /// If this makes a difference to you, you are probably trying to make too many columns.
+    #[must_use = "if return is dropped immediately, table is ended immediately."]
     pub fn begin_table_with_sizing(
         &self,
         str_id: impl AsRef<str>,
-        column: i32,
+        column: usize,
         flags: TableFlags,
         outer_size: [f32; 2],
         inner_width: f32,
@@ -300,7 +306,7 @@ impl<'ui> Ui<'ui> {
         let should_render = unsafe {
             sys::igBeginTable(
                 self.scratch_txt(str_id),
-                column,
+                column as i32,
                 flags.bits() as i32,
                 outer_size.into(),
                 inner_width,
@@ -320,6 +326,7 @@ impl<'ui> Ui<'ui> {
     /// Takes an array of table header information, the length of which determines
     /// how many columns will be created.
     #[cfg(feature = "min-const-generics")]
+    #[must_use = "if return is dropped immediately, table is ended immediately."]
     pub fn begin_table_header<'a, Name: AsRef<str>, const N: usize>(
         &self,
         str_id: impl AsRef<str>,
@@ -333,6 +340,7 @@ impl<'ui> Ui<'ui> {
     /// Takes an array of table header information, the length of which determines
     /// how many columns will be created.
     #[cfg(feature = "min-const-generics")]
+    #[must_use = "if return is dropped immediately, table is ended immediately."]
     pub fn begin_table_header_with_flags<'a, Name: AsRef<str>, const N: usize>(
         &self,
         str_id: impl AsRef<str>,
@@ -347,6 +355,7 @@ impl<'ui> Ui<'ui> {
     /// Takes an array of table header information, the length of which determines
     /// how many columns will be created.
     #[cfg(feature = "min-const-generics")]
+    #[must_use = "if return is dropped immediately, table is ended immediately."]
     pub fn begin_table_header_with_sizing<'a, Name: AsRef<str>, const N: usize>(
         &self,
         str_id: impl AsRef<str>,
@@ -355,7 +364,7 @@ impl<'ui> Ui<'ui> {
         outer_size: [f32; 2],
         inner_width: f32,
     ) -> Option<TableToken<'ui>> {
-        self.begin_table_with_sizing(str_id, N as i32, flags, outer_size, inner_width)
+        self.begin_table_with_sizing(str_id, N, flags, outer_size, inner_width)
             .map(|data| {
                 for value in column_data {
                     self.table_setup_column_with(value);
@@ -410,9 +419,10 @@ impl<'ui> Ui<'ui> {
     /// In this way, you can use this function as an iterator over each cell in the table.
     ///
     /// # Example
-    /// ```rs
-    /// ### let ui: Ui<'static> = unimplemented!();
-    /// if let Some(_t) = ui.begin_table(im_str!("Basic-Table"), 2) {
+    /// ```no_run
+    /// # let mut ctx = imgui::Context::create();
+    /// # { let ui = ctx.frame();
+    /// if let Some(_t) = ui.begin_table("Basic-Table", 2) {
     ///     // we have to call next_row because we didn't make headers..
     ///     ui.table_next_row();
     ///
@@ -431,6 +441,7 @@ impl<'ui> Ui<'ui> {
     ///     ui.table_next_column();
     ///     ui.text("x: 1, y: 1");
     /// }
+    /// # };
     /// ```
     ///
     /// This functions returns true if the given column is **visible.** It is not
@@ -443,9 +454,10 @@ impl<'ui> Ui<'ui> {
     /// Moves onto the given column.
     ///
     /// # Example
-    /// ```rs
-    /// ### let ui: Ui<'static> = unimplemented!();
-    /// if let Some(_t) = ui.begin_table(im_str!("Basic-Table"), 2) {
+    /// ```no_run
+    /// # let mut ctx = imgui::Context::create();
+    /// # { let ui = ctx.frame();
+    /// if let Some(_t) = ui.begin_table("Basic-Table", 2) {
     ///     // we have to call next_row because we didn't make headers..
     ///     ui.table_next_row();
     ///
@@ -465,6 +477,7 @@ impl<'ui> Ui<'ui> {
     ///
     ///     // imgui will understand this and row spacing will be adjusted automatically.
     /// }
+    /// # };
     /// ```
     ///
     /// This functions returns true if the given column is **visible.** It is not
@@ -495,19 +508,20 @@ impl<'ui> Ui<'ui> {
     /// this method entirely by using [begin_table_header](Self::begin_table_header).
     ///
     /// # Example
-    /// ```rs
-    /// let ui: Ui<'static> = unimplemented!();
-    ///
-    /// if let Some(_t) = ui.begin_table(im_str!("My Table"), 2) {
-    ///     ui.table_setup_column(im_str!("One"));
-    ///     ui.table_setup_column(im_str!("Two"));
-    ///     ui.table_setup_column(im_str!("Three"));
+    /// ```no_run
+    /// # let mut ctx = imgui::Context::create();
+    /// # { let ui = ctx.frame();
+    /// if let Some(_t) = ui.begin_table("My Table", 2) {
+    ///     ui.table_setup_column("One");
+    ///     ui.table_setup_column("Two");
+    ///     ui.table_setup_column("Three");
     ///     ui.table_headers_row();
     ///
     ///     // call next_column/set_column_index and proceed like normal.
     ///     // the above code is the equivalent of just using `begin_table_header`
     ///     // but does allow for some columns to have headers and others to not
     /// }
+    /// # };
     /// ```
     ///
     /// Along with [table_headers_row](Self::table_headers_row), this method is used to create a header
@@ -544,22 +558,27 @@ impl<'ui> Ui<'ui> {
     /// calling this entirely by passing `true` to [begin_table_header](Self::begin_table_header).
     ///
     /// # Example
-    /// ```rs
-    /// let ui: Ui<'static> = unimplemented!();
-    ///
+    /// ```no_run
+    /// # let mut ctx = imgui::Context::create();
+    /// # { let ui = ctx.frame();
     /// const COLUMN_COUNT: usize = 3;
-    /// if let Some(_t) = ui.begin_table(im_str!("scroll-freeze-example"), COLUMN_COUNT) {
+    /// if let Some(_t) = ui.begin_table("scroll-freeze-example", COLUMN_COUNT) {
     ///     // locks the header row. Notice how we need to call it BEFORE `table_headers_row`.
     ///     ui.table_setup_scroll_freeze(1, COLUMN_COUNT);
-    ///     ui.table_setup_column(im_str!("One"));
-    ///     ui.table_setup_column(im_str!("Two"));
-    ///     ui.table_setup_column(im_str!("Three"));
+    ///     ui.table_setup_column("One");
+    ///     ui.table_setup_column("Two");
+    ///     ui.table_setup_column("Three");
     ///     ui.table_headers_row();
     /// }
+    /// # };
     /// ```
-    pub fn table_setup_scroll_freeze(&self, locked_columns: i32, locked_rows: i32) {
+    ///
+    /// Nb: we take `locked_columns` and `locked_rows` as a `usize`, but it will be converted
+    /// with `as i32` to an i32. If this makes a difference to you, you are probably
+    /// trying to make too many columns.
+    pub fn table_setup_scroll_freeze(&self, locked_columns: usize, locked_rows: usize) {
         unsafe {
-            sys::igTableSetupScrollFreeze(locked_columns, locked_rows);
+            sys::igTableSetupScrollFreeze(locked_columns as i32, locked_rows as i32);
         }
     }
 
