@@ -14,6 +14,9 @@ opengl = []
 directx = []
 default = ["opengl"]
 
+[badges]
+maintenance = { status = "deprecated" }
+
 [dependencies]
 gfx = "0.18"
 imgui = { version = "0.8.0", path = "../imgui" }
