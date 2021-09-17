@@ -23,6 +23,9 @@ default = ["min-const-generics"]
 wasm = ["imgui-sys/wasm"]
 freetype = ["imgui-sys/freetype"]
 min-const-generics = []
+# this api is in beta in the upstream imgui crate. See issue #524 for more info.
+# it should be stable and fine to use though.
+tables-api = []
 
 [dev-dependencies]
 memoffset = "0.6"
