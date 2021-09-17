@@ -34,6 +34,8 @@ pub use self::render::renderer::*;
 pub use self::stacks::*;
 pub use self::string::*;
 pub use self::style::*;
+
+#[cfg(feature = "tables-api")]
 pub use self::tables::*;
 pub use self::utils::*;
 pub use self::widget::color_editors::*;
@@ -77,6 +79,7 @@ mod popups;
 mod render;
 mod stacks;
 mod style;
+#[cfg(feature = "tables-api")]
 mod tables;
 #[cfg(test)]
 mod test;
@@ -289,6 +292,9 @@ impl<T> From<*mut T> for Id<'static> {
 }
 
 impl<'a> Id<'a> {
+    // this is used in the tables-api and possibly elsewhere,
+    // but not with just default features...
+    #[allow(dead_code)]
     fn as_imgui_id(&self) -> sys::ImGuiID {
         unsafe {
             match self {
