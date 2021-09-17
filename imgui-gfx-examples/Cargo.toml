@@ -9,6 +9,9 @@ repository = "https://github.com/imgui-rs/imgui-rs"
 license = "MIT/Apache-2.0"
 publish = false
 
+[badges]
+maintenance = { status = "deprecated" }
+
 [features]
 opengl = ["imgui-gfx-renderer/opengl"]
 # FIXME
