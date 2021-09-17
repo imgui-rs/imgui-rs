@@ -6,7 +6,7 @@ Welcome to the `0.8.0` update. This is one of the largest updates imgui-rs has e
 
 - **Removed ImStr and ImString from the API.** Currently `im_str!` is deprecated and **will be removed in 0.9.0**. To change your code:
 
-  - If you were just wrapping a string literal, like `im_str!("button")`, just use `"button"`. (hint: the regex `im_str!\("((?:(?=(\\?))\2.)*?)"\)`, replacing matches with `$1` can get the majority of these quickly.);
+  - If you were just wrapping a string literal, like `im_str!("button")`, just use `"button"`. (Help: the regex `im_str!\("((?:(?=(\\?))\2.)*?)"\)`, replacing matches with `"$1"`, can get the majority of these quickly.);
   - If you were formatting, like `&im_str!("My age is {}", 100)`, you can now just use format like `format!("My age is {}, 100)`. Notice that due to the trait bounds, you can pass the string in directly too.
 
 - BREAKING: Most tokens through the repository (eg. `WindowToken`, `TabBarToken`, `FontStackToken`, etc) now allow for permissive dropping -- i.e, you don't need to actually call the `.end()` method on them anymore. In exchange, these tokens have taken on a lifetime, which allows them to be safe. This could make some patterns impossible. Please file an issue if this causes a problem.
