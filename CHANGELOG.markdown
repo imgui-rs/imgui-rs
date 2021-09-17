@@ -23,9 +23,14 @@ if let Some(_t) = ui.begin_popup("example") {
 
   - The most likely breaking changes users will see is `button` and `same_line` now take one fewer parameter -- if you were calling `button` with `[0.0, 0.0]`, simply delete that -- otherwise, call `button_with_size`. Similarly, for `same_line`, if you were passing in `0.0.` simply delete that argument. Otherwise, call `same_line_with_pos`.
 
-- Added an `imgui-glow-renderer` which targets `glow 0.10`. Before release, this will be updated to target current `0.11` glow when further features are added. Thank you to @jmaargh for the work [implementing this here](https://github.com/imgui-rs/imgui-rs/pull/495)!
+- ADDED: support for the `tables` API which was added in dear imgui `1.80`. We currently have this _feature gated_ behind `tables-api`. You should feel safe to use this in stable production, but be aware of two things:
 
-- Upgrade from v1.80 to [Dear ImGui v1.84.2](https://github.com/ocornut/imgui/releases/tag/v1.84.2) See the [Dear ImGui v1.84](https://github.com/ocornut/imgui/releases/tag/v1.84) release notes for more information. Thank you to @dbr for doing the work (twice actually) of [upgrading the repository](https://github.com/imgui-rs/imgui-rs/pull/519).
+  1. The tables API is marked as "beta" meaning that it may change with fewer stability promises. This is unlikely and it seems fairly settled.
+  2. There are a few cases where the tables API will segfault by dereferencing a `NULL` where it should instead `ASSERT` and crash. This is simply annoying because you won't get a stacktrace. [See here for more info on that.](https://github.com/imgui-rs/imgui-rs/issues/524). If this is fixed upstream, we will issue a patch.
+
+- ADDED: an `imgui-glow-renderer` which targets `glow 0.10`. Before release, this will be updated to target current `0.11` glow when further features are added. Thank you to @jmaargh for the work [implementing this here](https://github.com/imgui-rs/imgui-rs/pull/495)!
+
+- UPGRADED: from v1.80 to [Dear ImGui v1.84.2](https://github.com/ocornut/imgui/releases/tag/v1.84.2) See the [Dear ImGui v1.84](https://github.com/ocornut/imgui/releases/tag/v1.84) release notes for more information. Thank you to @dbr for doing the work (twice actually) of [upgrading the repository](https://github.com/imgui-rs/imgui-rs/pull/519).
 
 - BREAKING: Reworked how callbacks on `InputText` and `InputTextMultiline` work.
 
@@ -35,7 +40,7 @@ if let Some(_t) = ui.begin_popup("example") {
   - To see how to create an InputText callback, see `examples/text_callback.rs`.
   - Finally, please note that editing an `&mut String` which contains `\0` within it will produce _surprising_ truncation within ImGui. If you need to edit such a string, please pre-process it.
 
-- Added `begin_disable` and `begin_enable` methods. These add (finally) support for disabling _any_ widget. Thank you to @dbr for [implementing this here](https://github.com/imgui-rs/imgui-rs/pull/519).
+- ADDED: `begin_disable` and `begin_enable` methods. These add (finally) support for disabling _any_ widget. Thank you to @dbr for [implementing this here](https://github.com/imgui-rs/imgui-rs/pull/519).
 
 - BREAKING: MSRV is now **1.54**. This is gives us access to min-const-generics, which we use in a few places, but will gradually use more. Because this is the first time we've bumped MSRV intentionally, we have added a new feature `min-const-generics`, which is _enabled by default_. If you are pre-1.54, you can hang onto this update by disabling that feature. In our next update, this feature will be removed and we will commit to our MSRVs going forward. Thank you to @dbr for changing our CI infrastructure to support better MSRVs [here](https://github.com/imgui-rs/imgui-rs/pull/512).
 
@@ -44,12 +49,12 @@ if let Some(_t) = ui.begin_popup("example") {
   - Removed automatically adding default features for `imgui-winit-support`
     with the exception of the current default winit feature/dep version. If you want to not have the default features of winit with 0.25, set `default-features = false` and add `winit-25` as a normal feature. Thank you to @dzil123 for the work [implementing this here](https://github.com/imgui-rs/imgui-rs/pull/477)!
 
-- Support for the freetype font rasterizer. Enabled by the non-default `freetype` feature, e.g `imgui = {version = "...", features=["freetype"]})`
+- ADDED: Support for the freetype font rasterizer. Enabled by the non-default `freetype` feature, e.g `imgui = {version = "...", features=["freetype"]})`
   Thank you to @dbr for this work [implementing this here](https://github.com/imgui-rs/imgui-rs/pull/496).
 
-- Added `doc alias` support throughout the repository. You can now, [inside the docs](https://docs.rs/imgui), search for `imgui-rs` functions by their `Dear ImGui` C++ names. For example, searching for `InputText` will pull up `Ui::input_text`. This was quite a lot of documentation and effort, so thank you to @toyboot4e [for implementing this here](https://github.com/imgui-rs/imgui-rs/pull/458).
+- ADDED: `doc alias` support throughout the repository. You can now, [inside the docs](https://docs.rs/imgui), search for `imgui-rs` functions by their `Dear ImGui` C++ names. For example, searching for `InputText` will pull up `Ui::input_text`. This was quite a lot of documentation and effort, so thank you to @toyboot4e [for implementing this here](https://github.com/imgui-rs/imgui-rs/pull/458).
 
-- Added text hinting into `InputText`. Thank you to @lwiklendt [for implementing this here](https://github.com/imgui-rs/imgui-rs/pull/449).
+- ADDED: text hinting into `InputText`. Thank you to @lwiklendt [for implementing this here](https://github.com/imgui-rs/imgui-rs/pull/449).
 
 - BREAKING: Reworked `.range` calls on `Slider`, `VerticalSlider`, and `Drag` to simply take two min and max values, and requires that they are provided in the constructor.
 
@@ -63,11 +68,11 @@ if let Some(_t) = ui.begin_popup("example") {
   - Finally, we have relaxed the limits around having multiple draw lists such that you can have multiple mutable draw lists of different kinds (ie, a `foreground` and a `background` at the same time.).
   - Thank you to @dbr for [implementing these changes](https://github.com/imgui-rs/imgui-rs/pull/445).
 
-- Exposed the `ButtonFlags` which previously prevented `invisible_button` from being usable. Thank you to @dbr for [implementing this change here](https://github.com/imgui-rs/imgui-rs/pull/509).
+- ADDED: the `ButtonFlags` which previously prevented `invisible_button` from being usable. Thank you to @dbr for [implementing this change here](https://github.com/imgui-rs/imgui-rs/pull/509).
 
 - BREAKING: `PopupModal`'s `new` was reworked so that it didn't take `Ui` until `build` was called. This is a breaking change if you were invoking it directly. Simply move your `ui` call to `build` or `begin`.
 
-- Restored methods to access keyboard based on backend-defined keyboard map indexes. These allow access to most keys, not just those defined in the small subset of `imgui::Keys` (note the available keys may be expanded in future by [imgui PR #2625](https://github.com/ocornut/imgui/pull/2625))
+- BREAKING: Restored methods to access keyboard based on backend-defined keyboard map indexes. These allow access to most keys, not just those defined in the small subset of `imgui::Keys` (note the available keys may be expanded in future by [imgui PR #2625](https://github.com/ocornut/imgui/pull/2625))
 
   - The new methods on `imgui::Ui` are `is_key_index_down`, `is_key_index_pressed`, `is_key_index_pressed_no_repeat`, `is_key_index_released`, `is_key_index_released`
   - For example `ui.is_key_released(imgui::Key::A)` is same as `ui.is_key_index_released(winit::events::VirtualKeyCode::A as i32)` when using the winit backend
