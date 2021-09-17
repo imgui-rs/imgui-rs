@@ -1,6 +1,6 @@
 [package]
 name = "imgui-winit-support"
-version = "0.7.1"
+version = "0.8.0"
 edition = "2018"
 authors = ["The imgui-rs Developers"]
 description = "winit support code for the imgui crate"
@@ -10,7 +10,7 @@ license = "MIT/Apache-2.0"
 categories = ["gui"]
 
 [dependencies]
-imgui = { version = "0.7.0", path = "../imgui" }
+imgui = { version = "0.8.0", path = "../imgui" }
 winit-19 = { version = ">= 0.16, < 0.20", package = "winit", optional = true }
 winit-20 = { version = ">= 0.20, < 0.22", package = "winit", optional = true }
 winit-22 = { version = "0.22", package = "winit", optional = true }
