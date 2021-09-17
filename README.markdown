@@ -3,7 +3,7 @@
 [![Build Status](https://github.com/imgui-rs/imgui-rs/workflows/ci/badge.svg)](https://github.com/imgui-rs/imgui-rs/actions)
 [![Latest release on crates.io](https://img.shields.io/crates/v/imgui.svg)](https://crates.io/crates/imgui)
 [![Documentation on docs.rs](https://docs.rs/imgui/badge.svg)](https://docs.rs/imgui)
-[![Wrapped Dear ImGui Version](https://img.shields.io/badge/Dear%20ImGui%20Version-1.80-blue.svg)](https://github.com/ocornut/imgui)
+[![Wrapped Dear ImGui Version](https://img.shields.io/badge/Dear%20ImGui%20Version-1.84.2-blue.svg)](https://github.com/ocornut/imgui)
 
 (Recently under new maintenance, things subject to change)
 
@@ -28,12 +28,16 @@ Window::new("Hello world")
 ## Main library crates
 
 - imgui: High-level safe API
-- imgui-glium-renderer: Renderer implementation that uses the `glium` crate
-- imgui-gfx-renderer: Renderer implementation that uses the `gfx` crate (_not
-  the new gfx-hal crate_)
 - imgui-winit-support: Backend platform implementation that uses the `winit`
   crate (latest by default, but earlier versions are supported via feature flags)
+- imgui-glow-renderer: Renderer implementation that uses the `imgui` crate
+- imgui-glium-renderer: Renderer implementation that uses the `glium` crate
 - imgui-sys: Low-level unsafe API (automatically generated)
+
+Additionally, the following are no longer maintained, but might work still:
+
+- imgui-gfx-renderer: Renderer implementation that uses the `gfx` crate (_not
+  the new gfx-hal crate_)
 
 ## Features
 
@@ -41,7 +45,7 @@ Window::new("Hello world")
   is not 100%, but will keep improving over time.
 - Builder structs for use cases where the original C++ library uses optional
   function parameters
-- Easy integration with Glium / pre-ll gfx (renderer)
+- Easy integration with `glow`/ `glium`
 - Easy integration with winit (backend platform)
 - Optional support for the freetype font rasterizer
 
@@ -72,10 +76,10 @@ responsibilities include the following:
 
 The most tested platform/renderer combination is `imgui-glium-renderer` +
 `glium` + `imgui-winit-support` + `winit`, but this is not the only possible
-combination. There's also `imgui-gfx-renderer`, and you can find additional 3rd
-party crates that provide a wider support for more libraries (e.g. raw OpenGL,
-SDL2). You can also write your own support code if you have a more advanced use
-case, because **imgui-rs is not tied to any specific graphics / OS API**.
+combination. There's also `imgui-glow-renderer`, which will increasingly replace
+`glium`, and you can find additional 3rd party crates that provide a wider
+support for more libraries (e.g. raw OpenGL, SDL2). You can also write your own
+support code if you have a more advanced use case, because **imgui-rs is not tied to any specific graphics / OS API**.
 
 ## Compiling and running the demos
 
@@ -85,7 +89,7 @@ cd imgui-rs
 git submodule update --init --recursive
 ```
 
-Main examples are located in the imgui-examples directory.
+Main examples are located in the `imgui-examples` directory.
 
 ```bash
 # At the reposity root
