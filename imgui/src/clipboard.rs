@@ -64,14 +64,10 @@ impl fmt::Debug for ClipboardContext {
 
 pub(crate) unsafe extern "C" fn get_clipboard_text(user_data: *mut c_void) -> *const c_char {
     let result = catch_unwind(|| {
-        println!("gettin!");
         let ctx = &mut *(user_data as *mut ClipboardContext);
-        println!("gettin!");
 
         match ctx.backend.get() {
             Some(text) => {
-                println!("gettin!");
-
                 ctx.last_value = CString::new(text).unwrap();
                 ctx.last_value.as_ptr()
             }
@@ -79,7 +75,6 @@ pub(crate) unsafe extern "C" fn get_clipboard_text(user_data: *mut c_void) -> *c
         }
     });
     result.unwrap_or_else(|_| {
-        eprintln!("Clipboard getter panicked");
         process::abort();
     })
 }
@@ -91,7 +86,6 @@ pub(crate) unsafe extern "C" fn set_clipboard_text(user_data: *mut c_void, text:
         ctx.backend.set(text.to_str().unwrap());
     });
     result.unwrap_or_else(|_| {
-        eprintln!("Clipboard setter panicked");
         process::abort();
     });
 }
