@@ -1,6 +1,6 @@
 [package]
 name = "imgui-sys"
-version = "0.8.0"
+version = "0.8.1-alpha.0"
 edition = "2018"
 authors = ["The imgui-rs Developers"]
 description = "Raw FFI bindings to dear imgui"
