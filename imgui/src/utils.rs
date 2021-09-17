@@ -3,8 +3,8 @@ use bitflags::bitflags;
 
 use crate::input::mouse::MouseButton;
 use crate::style::StyleColor;
-use crate::sys;
 use crate::Ui;
+use crate::{sys, Direction};
 
 bitflags! {
     /// Item hover check option flags
@@ -172,5 +172,205 @@ impl<'ui> Ui<'ui> {
     #[doc(alias = "GetStyle")]
     pub fn style_color(&self, style_color: StyleColor) -> [f32; 4] {
         self.ctx.style()[style_color]
+    }
+    /// Returns the current [`Style::alpha`](crate::Style::alpha).
+    #[doc(alias = "GetStyle")]
+    pub fn style_alpha(&self) -> f32 {
+        self.ctx.style().alpha
+    }
+    /// Returns the current [`Style::disabled_alpha`](crate::Style::disabled_alpha).
+    #[doc(alias = "GetStyle")]
+    pub fn style_disabled_alpha(&self) -> f32 {
+        self.ctx.style().disabled_alpha
+    }
+    /// Returns the current [`Style::window_padding`](crate::Style::window_padding).
+    #[doc(alias = "GetStyle")]
+    pub fn style_window_padding(&self) -> [f32; 2] {
+        self.ctx.style().window_padding
+    }
+    /// Returns the current [`Style::window_rounding`](crate::Style::window_rounding).
+    #[doc(alias = "GetStyle")]
+    pub fn style_window_rounding(&self) -> f32 {
+        self.ctx.style().window_rounding
+    }
+    /// Returns the current [`Style::window_border_size`](crate::Style::window_border_size).
+    #[doc(alias = "GetStyle")]
+    pub fn style_window_border_size(&self) -> f32 {
+        self.ctx.style().window_border_size
+    }
+    /// Returns the current [`Style::window_min_size`](crate::Style::window_min_size).
+    #[doc(alias = "GetStyle")]
+    pub fn style_window_min_size(&self) -> [f32; 2] {
+        self.ctx.style().window_min_size
+    }
+    /// Returns the current [`Style::window_title_align`](crate::Style::window_title_align).
+    #[doc(alias = "GetStyle")]
+    pub fn style_window_title_align(&self) -> [f32; 2] {
+        self.ctx.style().window_title_align
+    }
+    /// Returns the current [`Style::window_menu_button_position`](crate::Style::window_menu_button_position).
+    #[doc(alias = "GetStyle")]
+    pub fn style_window_menu_button_position(&self) -> Direction {
+        self.ctx.style().window_menu_button_position
+    }
+    /// Returns the current [`Style::child_rounding`](crate::Style::child_rounding).
+    #[doc(alias = "GetStyle")]
+    pub fn style_child_rounding(&self) -> f32 {
+        self.ctx.style().child_rounding
+    }
+    /// Returns the current [`Style::child_border_size`](crate::Style::child_border_size).
+    #[doc(alias = "GetStyle")]
+    pub fn style_child_border_size(&self) -> f32 {
+        self.ctx.style().child_border_size
+    }
+    /// Returns the current [`Style::popup_rounding`](crate::Style::popup_rounding).
+    #[doc(alias = "GetStyle")]
+    pub fn style_popup_rounding(&self) -> f32 {
+        self.ctx.style().popup_rounding
+    }
+    /// Returns the current [`Style::popup_border_size`](crate::Style::popup_border_size).
+    #[doc(alias = "GetStyle")]
+    pub fn style_popup_border_size(&self) -> f32 {
+        self.ctx.style().popup_border_size
+    }
+    /// Returns the current [`Style::frame_padding`](crate::Style::frame_padding).
+    #[doc(alias = "GetStyle")]
+    pub fn style_frame_padding(&self) -> [f32; 2] {
+        self.ctx.style().frame_padding
+    }
+    /// Returns the current [`Style::frame_rounding`](crate::Style::frame_rounding).
+    #[doc(alias = "GetStyle")]
+    pub fn style_frame_rounding(&self) -> f32 {
+        self.ctx.style().frame_rounding
+    }
+    /// Returns the current [`Style::frame_border_size`](crate::Style::frame_border_size).
+    #[doc(alias = "GetStyle")]
+    pub fn style_frame_border_size(&self) -> f32 {
+        self.ctx.style().frame_border_size
+    }
+    /// Returns the current [`Style::item_spacing`](crate::Style::item_spacing).
+    #[doc(alias = "GetStyle")]
+    pub fn style_item_spacing(&self) -> [f32; 2] {
+        self.ctx.style().item_spacing
+    }
+    /// Returns the current [`Style::item_inner_spacing`](crate::Style::item_inner_spacing).
+    #[doc(alias = "GetStyle")]
+    pub fn style_item_inner_spacing(&self) -> [f32; 2] {
+        self.ctx.style().item_inner_spacing
+    }
+    /// Returns the current [`Style::cell_padding`](crate::Style::cell_padding).
+    #[doc(alias = "GetStyle")]
+    pub fn style_cell_padding(&self) -> [f32; 2] {
+        self.ctx.style().cell_padding
+    }
+    /// Returns the current [`Style::touch_extra_padding`](crate::Style::touch_extra_padding).
+    #[doc(alias = "GetStyle")]
+    pub fn style_touch_extra_padding(&self) -> [f32; 2] {
+        self.ctx.style().touch_extra_padding
+    }
+    /// Returns the current [`Style::indent_spacing`](crate::Style::indent_spacing).
+    #[doc(alias = "GetStyle")]
+    pub fn style_indent_spacing(&self) -> f32 {
+        self.ctx.style().indent_spacing
+    }
+    /// Returns the current [`Style::columns_min_spacing`](crate::Style::columns_min_spacing).
+    #[doc(alias = "GetStyle")]
+    pub fn style_columns_min_spacing(&self) -> f32 {
+        self.ctx.style().columns_min_spacing
+    }
+    /// Returns the current [`Style::scrollbar_size`](crate::Style::scrollbar_size).
+    #[doc(alias = "GetStyle")]
+    pub fn style_scrollbar_size(&self) -> f32 {
+        self.ctx.style().scrollbar_size
+    }
+    /// Returns the current [`Style::scrollbar_rounding`](crate::Style::scrollbar_rounding).
+    #[doc(alias = "GetStyle")]
+    pub fn style_scrollbar_rounding(&self) -> f32 {
+        self.ctx.style().scrollbar_rounding
+    }
+    /// Returns the current [`Style::grab_min_size`](crate::Style::grab_min_size).
+    #[doc(alias = "GetStyle")]
+    pub fn style_grab_min_size(&self) -> f32 {
+        self.ctx.style().grab_min_size
+    }
+    /// Returns the current [`Style::grab_rounding`](crate::Style::grab_rounding).
+    #[doc(alias = "GetStyle")]
+    pub fn style_grab_rounding(&self) -> f32 {
+        self.ctx.style().grab_rounding
+    }
+    /// Returns the current [`Style::log_slider_deadzone`](crate::Style::log_slider_deadzone).
+    #[doc(alias = "GetStyle")]
+    pub fn style_log_slider_deadzone(&self) -> f32 {
+        self.ctx.style().log_slider_deadzone
+    }
+    /// Returns the current [`Style::tab_rounding`](crate::Style::tab_rounding).
+    #[doc(alias = "GetStyle")]
+    pub fn style_tab_rounding(&self) -> f32 {
+        self.ctx.style().tab_rounding
+    }
+    /// Returns the current [`Style::tab_border_size`](crate::Style::tab_border_size).
+    #[doc(alias = "GetStyle")]
+    pub fn style_tab_border_size(&self) -> f32 {
+        self.ctx.style().tab_border_size
+    }
+    /// Returns the current [`Style::tab_min_width_for_close_button`](crate::Style::tab_min_width_for_close_button).
+    #[doc(alias = "GetStyle")]
+    pub fn style_tab_min_width_for_close_button(&self) -> f32 {
+        self.ctx.style().tab_min_width_for_close_button
+    }
+    /// Returns the current [`Style::color_button_position`](crate::Style::color_button_position).
+    #[doc(alias = "GetStyle")]
+    pub fn style_color_button_position(&self) -> Direction {
+        self.ctx.style().color_button_position
+    }
+    /// Returns the current [`Style::button_text_align`](crate::Style::button_text_align).
+    #[doc(alias = "GetStyle")]
+    pub fn style_button_text_align(&self) -> [f32; 2] {
+        self.ctx.style().button_text_align
+    }
+    /// Returns the current [`Style::selectable_text_align`](crate::Style::selectable_text_align).
+    #[doc(alias = "GetStyle")]
+    pub fn style_selectable_text_align(&self) -> [f32; 2] {
+        self.ctx.style().selectable_text_align
+    }
+    /// Returns the current [`Style::display_window_padding`](crate::Style::display_window_padding).
+    #[doc(alias = "GetStyle")]
+    pub fn style_display_window_padding(&self) -> [f32; 2] {
+        self.ctx.style().display_window_padding
+    }
+    /// Returns the current [`Style::display_safe_area_padding`](crate::Style::display_safe_area_padding).
+    #[doc(alias = "GetStyle")]
+    pub fn style_display_safe_area_padding(&self) -> [f32; 2] {
+        self.ctx.style().display_safe_area_padding
+    }
+    /// Returns the current [`Style::mouse_cursor_scale`](crate::Style::mouse_cursor_scale).
+    #[doc(alias = "GetStyle")]
+    pub fn style_mouse_cursor_scale(&self) -> f32 {
+        self.ctx.style().mouse_cursor_scale
+    }
+    /// Returns the current [`Style::anti_aliased_lines`](crate::Style::anti_aliased_lines).
+    #[doc(alias = "GetStyle")]
+    pub fn style_anti_aliased_lines(&self) -> bool {
+        self.ctx.style().anti_aliased_lines
+    }
+    /// Returns the current [`Style::anti_aliased_lines_use_tex`](crate::Style::anti_aliased_lines_use_tex).
+    #[doc(alias = "GetStyle")]
+    pub fn style_anti_aliased_lines_use_tex(&self) -> bool {
+        self.ctx.style().anti_aliased_lines_use_tex
+    }
+    /// Returns the current [`Style::anti_aliased_fill`](crate::Style::anti_aliased_fill).
+    #[doc(alias = "GetStyle")]
+    pub fn style_anti_aliased_fill(&self) -> bool {
+        self.ctx.style().anti_aliased_fill
+    }
+    /// Returns the current [`Style::curve_tessellation_tol`](crate::Style::curve_tessellation_tol).
+    #[doc(alias = "GetStyle")]
+    pub fn style_curve_tessellation_tol(&self) -> f32 {
+        self.ctx.style().curve_tessellation_tol
+    }
+    /// Returns the current [`Style::circle_tesselation_max_error`](crate::Style::circle_tesselation_max_error).
+    #[doc(alias = "GetStyle")]
+    pub fn style_circle_tesselation_max_error(&self) -> f32 {
+        self.ctx.style().circle_tesselation_max_error
     }
 }
