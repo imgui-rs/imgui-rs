@@ -1,29 +1,81 @@
 # Change Log
 
-## [Unreleased]
+## [0.8.0] - 2021-09-17
 
-- BREAKING: MSRV is now **1.54**. This is gives us access to min-const-generics, which we use in a few places, but will gradually use more. Because this is the first time we've bumped MSRV intentionally, we have added a new feature `min-const-generics`, which is _enabled by default_. If you are pre-1.54, you can hang onto this update by disabling that feature. In our next update, this feature will be removed and we will commit to our MSRVs going forward.
+Welcome to the `0.8.0` update. This is one of the largest updates imgui-rs has ever seen; it will generate errors in a `0.7` project, but hopefully it should be both quick to fix, and enjoyable to update. See our [release page](https://github.com/imgui-rs/imgui-rs/releases/tag/v0.8.0) for more information and a list of contributors to this cycle. Thank you to everyone who uses `imgui-rs`, files issues, and spend their time and effort to PR new changes into the codebase. Because of all that effort, this is by far the best `imgui-rs` has looked!
 
 - **Removed ImStr and ImString from the API.** Currently `im_str!` is deprecated and **will be removed in 0.9.0**. To change your code:
 
-  - If you were just wrapping a string literal, like `im_str!("button")`, just use `"button"`.
+  - If you were just wrapping a string literal, like `im_str!("button")`, just use `"button"`. (hint: the regex `im_str!\("((?:(?=(\\?))\2.)*?)"\)`, replacing matches with `$1` can get the majority of these quickly.);
   - If you were formatting, like `&im_str!("My age is {}", 100)`, you can now just use format like `format!("My age is {}, 100)`. Notice that due to the trait bounds, you can pass the string in directly too.
 
-- Removed automatically adding default features for `imgui-winit-support`
-  with the exception of the current default winit feature/dep version. Additionally, that version was updated to 0.25. If you want to not have the default features of winit with 0.25, set `default-features = false` and add `winit-25` as a normal feature. Thank you to @dzil123 for the work [implementing this here](https://github.com/imgui-rs/imgui-rs/pull/477)!
+- BREAKING: Most tokens through the repository (eg. `WindowToken`, `TabBarToken`, `FontStackToken`, etc) now allow for permissive dropping -- i.e, you don't need to actually call the `.end()` method on them anymore. In exchange, these tokens have taken on a lifetime, which allows them to be safe. This could make some patterns impossible. Please file an issue if this causes a problem.
+
+  - `end()` no longer takes `Ui`. This is a breaking change, but hopefully should be trivial (and perhaps nice) for users to fix. Simply delete the argument, or add a `_` before the token's binding name and allow it to be dropped on its own. In our code, we tend to write these now like:
+
+```rs
+if let Some(_t) = ui.begin_popup("example") {
+  // your code here
+}
+```
+
+- BREAKING: Created `with_x` variants for most functions which previously took multiple parameters where some had default arguments in the C++. This makes calling most functions simpler and more similar to the C++.
+
+  - The most likely breaking changes users will see is `button` and `same_line` now take one fewer parameter -- if you were calling `button` with `[0.0, 0.0]`, simply delete that -- otherwise, call `button_with_size`. Similarly, for `same_line`, if you were passing in `0.0.` simply delete that argument. Otherwise, call `same_line_with_pos`.
 
 - Added an `imgui-glow-renderer` which targets `glow 0.10`. Before release, this will be updated to target current `0.11` glow when further features are added. Thank you to @jmaargh for the work [implementing this here](https://github.com/imgui-rs/imgui-rs/pull/495)!
+
+- Upgrade from v1.80 to [Dear ImGui v1.84.2](https://github.com/ocornut/imgui/releases/tag/v1.84.2) See the [Dear ImGui v1.84](https://github.com/ocornut/imgui/releases/tag/v1.84) release notes for more information. Thank you to @dbr for doing the work (twice actually) of [upgrading the repository](https://github.com/imgui-rs/imgui-rs/pull/519).
+
+- BREAKING: Reworked how callbacks on `InputText` and `InputTextMultiline` work.
+
+  - REMOVED `.callback_name()` methods in favor of one method: `.callback(FLAGS, CallbackStruct)`.
+  - Wrapped callback kinds into their own enums, `InputTextCallback` and `InputTextCallbackMultiline`.
+  - Created a trait, `InputTextCallbackHandler`.
+  - To see how to create an InputText callback, see `examples/text_callback.rs`.
+  - Finally, please note that editing an `&mut String` which contains `\0` within it will produce _surprising_ truncation within ImGui. If you need to edit such a string, please pre-process it.
+
+- Added `begin_disable` and `begin_enable` methods. These add (finally) support for disabling _any_ widget. Thank you to @dbr for [implementing this here](https://github.com/imgui-rs/imgui-rs/pull/519).
+
+- BREAKING: MSRV is now **1.54**. This is gives us access to min-const-generics, which we use in a few places, but will gradually use more. Because this is the first time we've bumped MSRV intentionally, we have added a new feature `min-const-generics`, which is _enabled by default_. If you are pre-1.54, you can hang onto this update by disabling that feature. In our next update, this feature will be removed and we will commit to our MSRVs going forward. Thank you to @dbr for changing our CI infrastructure to support better MSRVs [here](https://github.com/imgui-rs/imgui-rs/pull/512).
+
+- BREAKING: Changed default version of Winit in `imgui-winit-support` to `winit 0.25`. Thank you to @repi [for implementing this here](https://github.com/imgui-rs/imgui-rs/pull/485).
+
+  - Removed automatically adding default features for `imgui-winit-support`
+    with the exception of the current default winit feature/dep version. If you want to not have the default features of winit with 0.25, set `default-features = false` and add `winit-25` as a normal feature. Thank you to @dzil123 for the work [implementing this here](https://github.com/imgui-rs/imgui-rs/pull/477)!
+
+- Support for the freetype font rasterizer. Enabled by the non-default `freetype` feature, e.g `imgui = {version = "...", features=["freetype"]})`
+  Thank you to @dbr for this work [implementing this here](https://github.com/imgui-rs/imgui-rs/pull/496).
+
+- Added `doc alias` support throughout the repository. You can now, [inside the docs](https://docs.rs/imgui), search for `imgui-rs` functions by their `Dear ImGui` C++ names. For example, searching for `InputText` will pull up `Ui::input_text`. This was quite a lot of documentation and effort, so thank you to @toyboot4e [for implementing this here](https://github.com/imgui-rs/imgui-rs/pull/458).
+
+- Added text hinting into `InputText`. Thank you to @lwiklendt [for implementing this here](https://github.com/imgui-rs/imgui-rs/pull/449).
 
 - BREAKING: Reworked `.range` calls on `Slider`, `VerticalSlider`, and `Drag` to simply take two min and max values, and requires that they are provided in the constructor.
 
   - To update without changing behavior, use the range `T::MIN` and `T::MAX` for the given numerical type (such as `i8::MIN` and `i8::MAX`).
   - Using `.range` is still maintained for simplicity, but will likely be deprecated in 0.9 and removed in 0.10!
 
-- BREAKING: Modifies `build` style methods to allow the provide closure to return a value. The build call will then return Some(value) if the closure is called, and None if it isn't.
-- The most likely breaking changes users will see is that they will need to add semicolons after calling `build`, because these function no longer return `()`.
+- `DrawListMut` has new methods to draw images
 
-- BREAKING: Created `with_x` variants for most functions which previously took multiple parameters where some had default arguments in the C++. This makes calling most functions simpler and more similar to the C++.
-- The most likely breaking changes users will see is `button` and `same_line` now take one fewer parameter -- if you were calling `button` with `[0.0, 0.0]`, simply delete that -- otherwise, call `button_with_size`. Similarly, for `same_line`, if you were passing in `0.0.` simply delete that parameter. Otherwise, call `same_line_with_pos`.
+  - The methods are `add_image`, `add_image_quad`, and `add_image_rounded`. The `imgui-examples/examples/custom_textures.rs` has been updated to show their usage.
+  - Additionally the `imgui::draw_list` module is now public, which contains the various draw list objects. While the `add_*` methods are preferred, `imgui::draw_list::Circle::new(&draw_list_mut, ...).build()` is equivalent
+  - Finally, we have relaxed the limits around having multiple draw lists such that you can have multiple mutable draw lists of different kinds (ie, a `foreground` and a `background` at the same time.).
+  - Thank you to @dbr for [implementing these changes](https://github.com/imgui-rs/imgui-rs/pull/445).
+
+- Exposed the `ButtonFlags` which previously prevented `invisible_button` from being usable. Thank you to @dbr for [implementing this change here](https://github.com/imgui-rs/imgui-rs/pull/509).
+
+- BREAKING: `PopupModal`'s `new` was reworked so that it didn't take `Ui` until `build` was called. This is a breaking change if you were invoking it directly. Simply move your `ui` call to `build` or `begin`.
+
+- Restored methods to access keyboard based on backend-defined keyboard map indexes. These allow access to most keys, not just those defined in the small subset of `imgui::Keys` (note the available keys may be expanded in future by [imgui PR #2625](https://github.com/ocornut/imgui/pull/2625))
+
+  - The new methods on `imgui::Ui` are `is_key_index_down`, `is_key_index_pressed`, `is_key_index_pressed_no_repeat`, `is_key_index_released`, `is_key_index_released`
+  - For example `ui.is_key_released(imgui::Key::A)` is same as `ui.is_key_index_released(winit::events::VirtualKeyCode::A as i32)` when using the winit backend
+
+- BREAKING: Modifies `build` style methods to allow the provide closure to return a value. The build call will then return Some(value) if the closure is called, and None if it isn't.
+
+  - The most likely breaking changes users will see is that they will need to add semicolons after calling `build`, because these function no longer return `()`.
+  - Thank you to @AngelOfSol for [implementing this here](https://github.com/imgui-rs/imgui-rs/pull/468).
 
 - BREAKING: Removed `imgui::legacy` which contained the old style of flags. The remaining flags in `imgui::legacy` have been updated to be consistent with other flags in the project.
 
@@ -31,32 +83,6 @@
   - `imgui::legacy::ImGuiInputTextFlags` is now `imgui::input_widgets::InputTextFlags`
   - `imgui::legacy::ImGuiTreeNodeFlags` is now `imgui::widget::tree::TreeNodeFlags`
   - `imgui::legacy::ImDrawListFlags` is now `imgui::draw_list::DrawListFlags`
-
-- `DrawListMut` has new methods to draw images
-
-  - The methods are `add_image`, `add_image_quad`, and `add_image_rounded`. The `imgui-examples/examples/custom_textures.rs` has been updated to show their usage.
-  - Additionally the `imgui::draw_list` module is now public, which contains the various draw list objects. While the `add_*` methods are preferred, `imgui::draw_list::Circle::new(&draw_list_mut, ...).build()` is equivalent
-
-- BREAKING: Most tokens through the repository (eg. `WindowToken`, `TabBarToken`, `FontStackToken`, etc) now allow for permissive dropping -- i.e, you don't need to actually call the `.end()` method on them anymore. In exchange, these tokens have taken on a lifetime, which allows them to be safe. This could make some patterns impossible. Please file an issue if this causes a problem.
-- `end()` no longer takes `Ui`. This is a breaking change, but hopefully should be trivial (and perhaps nice) for users to fix. Simply delete the argument, or add a `_` before the token's binding name and allow it to be dropped on its own.
-
-- BREAKING: `PopupModal`'s `new` was reworked so that it didn't take `Ui` until `build` was called. This is a breaking change if you were invoking it directly. Simply move your `ui` call to `build` or `begin`.
-
-- Upgrade to from v1.80 to [Dear ImGui v1.82](https://github.com/ocornut/imgui/releases/tag/v1.82) (see also the [Dear ImGui v1.81](https://github.com/ocornut/imgui/releases/tag/v1.81) release notes)
-
-  - BREAKING: `imgui::ListBox::calculate_size(items_count: ..., height_in_items: ...)` has been removed as the function backing it has been marked as obsolete. The recommended approach is to calculate the size yourself and use `.size(...)` (or use the default auto-calculated size)
-  - BREAKING: `draw_list::CornerFlags` has been renamed to `draw_list::DrawFlags` to match the upstream change, and refle. However, the only draw flags that are useful to Rust currently are still the ones reflecting corner rounding.
-    - Similarly, the flag names have been updated so that `CornerFlags::$WHERE` has become `DrawFlags::ROUND_CORNERS_$WHERE`, for ecample `CornerFlags::TOP_LEFT` => `DrawFlags::ROUND_CORNERS_TOP_LEFT`.
-    - Importantly, `CornerFlags::NONE` became `DrawFlags::ROUND_CORNERS_NONE` (following the patter) and **not** `DrawFlags::NONE` which does exist now, and is a separate value.
-  - BREAKING: `InputTextFlags::ALWAYS_INSERT_MODE` is renamed to `InputTextFlags::
-    - However, the `always_insert_mode` funcitons on the various input builders remain as a (non-deprecated) alias, as the C++ code has kept an equivalent inline stub.
-  - BREAKING: `Style::circle_segment_max_error` is no more. `Style::circle_tesselation_max_error` behaves very similarly, but `circle_segment_max_error` values are not equivalent to `circle_tesselation_max_error` values.
-    - For example, the default `circle_segment_max_error` was 1.6, but the default `circle_tesselation_max_error` is 0.3. In practice, it's unlikely to matter much either way, though.
-
-- Restored methods to access keyboard based on backend-defined keyboard map indexes. These allow access to most keys, not just those defined in the small subset of `imgui::Keys` (note the available keys may be expanded in future by [imgui PR #2625](https://github.com/ocornut/imgui/pull/2625))
-
-  - The new methods on `imgui::Ui` are `is_key_index_down`, `is_key_index_pressed`, `is_key_index_pressed_no_repeat`, `is_key_index_released`, `is_key_index_released`
-  - For example `ui.is_key_released(imgui::Key::A)` is same as `ui.is_key_index_released(winit::events::VirtualKeyCode::A as i32)` when using the winit backend
 
 - Full (32-bit) unicode support is enabled in Dear Imgui (e.g. `-DIMGUI_USE_WCHAR32` is enabled now). Previously UTF-16 was used internally.
 
@@ -68,8 +94,6 @@
     - If you're using `features="wasm"` to "link" against emscripten-compiled Dear Imgui, you need to ensure you use `-DIMGUI_USE_WCHAR32` when compile the C and C++ code.
       - If you're using `DEP_IMGUI_DEFINE_`s for this already, then no change is needed.
     - If you're using `.cargo/config` to apply a build script override and link against a prebuilt `Dear Imgui` (or something else along these lines), you need to ensure you link with a version that was built using `-DIMGUI_USE_WCHAR32`.
-
-- Support for the freetype font rasterizer. Enabled by the non-default `freetype` feature, e.g `imgui = {version = "...", features=["freetype"]})`
 
 ## [0.7.0] - 2021-02-04
 
