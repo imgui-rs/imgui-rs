@@ -5,7 +5,9 @@
 //!
 //! # Basic usage
 //!
-//! A few code examples are provided in the source.
+//! A few code [examples] are provided in the source.
+//!
+//! [examples]: https://github.com/imgui-rs/imgui-rs/tree/main/imgui-glow-renderer/examples
 //!
 //! In short, create either an [`AutoRenderer`] (for basic usage) or [`Renderer`]
 //! (for slightly more customizable operation), then call the `render(...)`
