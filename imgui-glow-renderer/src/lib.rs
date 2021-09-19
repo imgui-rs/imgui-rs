@@ -1,15 +1,17 @@
-//! Renderer for `[imgui-rs]` using the `[glow]` library for OpenGL.
+//! Renderer for [`imgui-rs`][imgui] using the [`glow`] library for OpenGL.
 //!
 //! This is heavily influenced by the
 //! [example from upstream](https://github.com/ocornut/imgui/blob/fe245914114588f272b0924538fdd43f6c127a26/backends/imgui_impl_opengl3.cpp).
 //!
 //! # Basic usage
 //!
-//! A few code examples are provided in the source.
+//! A few code [examples] are provided in the source.
 //!
-//! In short, create either an `[AutoRenderer]` (for basic usage) or `[Renderer]`
+//! [examples]: https://github.com/imgui-rs/imgui-rs/tree/main/imgui-glow-renderer/examples
+//!
+//! In short, create either an [`AutoRenderer`] (for basic usage) or [`Renderer`]
 //! (for slightly more customizable operation), then call the `render(...)`
-//! method with draw data from `imgui-rs`.
+//! method with draw data from [`imgui`].
 //!
 //! # OpenGL (ES) versions
 //!
@@ -30,10 +32,10 @@
 //!
 //! When outputting colors to a screen, colors need to be converted from a
 //! linear color space to a non-linear space matching the monitor (e.g. sRGB).
-//! When using the `[AutoRenderer]`, this library will convert colors to sRGB
-//! as a step in the shader. When initialising a `[Renderer]`, you can choose
+//! When using the [`AutoRenderer`], this library will convert colors to sRGB
+//! as a step in the shader. When initialising a [`Renderer`], you can choose
 //! whether or not to include this step in the shader or not when calling
-//! `[Renderer::initialize]`.
+//! [`Renderer::initialize`].
 //!
 //! This library also assumes that textures have their internal format
 //! set appropriately when uploaded to OpenGL. That is, assuming your texture
@@ -57,11 +59,11 @@ type GlUniformLocation = <Context as HasContext>::Program;
 
 /// Renderer which owns the OpenGL context and handles textures itself. Also
 /// converts all output colors to sRGB for display. Useful for simple applications,
-/// but more complicated applications may prefer to use `[Renderer]`, or even
+/// but more complicated applications may prefer to use [`Renderer`], or even
 /// write their own renderer based on this code.
 ///
 /// OpenGL context is still available to the rest of the application through
-/// the `[gl_context]` method.
+/// the [`gl_context`](Self::gl_context) method.
 pub struct AutoRenderer {
     gl: glow::Context,
     texture_map: SimpleTextureMap,
@@ -86,7 +88,7 @@ impl AutoRenderer {
     }
 
     /// Note: no need to provide a `mut` version of this, as all methods on
-    /// `[glow::HasContext]` are immutable.
+    /// [`glow::HasContext`] are immutable.
     #[inline]
     pub fn gl_context(&self) -> &glow::Context {
         &self.gl
@@ -534,11 +536,15 @@ impl Renderer {
 
 /// Trait for mapping imgui texture IDs to OpenGL textures.
 ///
-/// `[register]` should be called after uploading a texture to OpenGL to get a
-/// `[imgui::TextureId]` corresponding to it.
+/// [`register`] should be called after uploading a texture to OpenGL to get a
+/// [`imgui::TextureId`] corresponding to it.
 ///
-/// Then `[gl_texture]` can be called to find the OpenGL texture corresponding to
-/// that `[imgui::TextureId]`.
+/// [`register`]: Self::register
+///
+/// Then [`gl_texture`] can be called to find the OpenGL texture corresponding to
+/// that [`imgui::TextureId`].
+///
+/// [`gl_texture`]: Self::gl_texture
 pub trait TextureMap {
     fn register(&mut self, gl_texture: GlTexture) -> Option<imgui::TextureId>;
 
@@ -563,7 +569,7 @@ impl TextureMap for SimpleTextureMap {
     }
 }
 
-/// `[imgui::Textures]` is a simple choice for a texture map.
+/// [`imgui::Textures`] is a simple choice for a texture map.
 impl TextureMap for imgui::Textures<glow::Texture> {
     fn register(&mut self, gl_texture: glow::Texture) -> Option<imgui::TextureId> {
         Some(self.insert(gl_texture))
