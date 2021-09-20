@@ -37,7 +37,7 @@ default = [
 ]
 # Enable checking for OpenGL extensions
 gl_extensions_support = []
-# Support for `glPrimitiveRestartIndex`
+# Support for `gl.debug_message_insert`
 debug_message_insert_support = []
 # Support for `glBindVertexArray`
 bind_vertex_array_support = []
