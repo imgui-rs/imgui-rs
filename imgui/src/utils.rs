@@ -2,7 +2,7 @@
 use bitflags::bitflags;
 
 use crate::input::mouse::MouseButton;
-use crate::style::StyleColor;
+use crate::style::{Style, StyleColor};
 use crate::sys;
 use crate::Ui;
 
@@ -172,5 +172,20 @@ impl<'ui> Ui<'ui> {
     #[doc(alias = "GetStyle")]
     pub fn style_color(&self, style_color: StyleColor) -> [f32; 4] {
         self.ctx.style()[style_color]
+    }
+    /// Returns a shared reference to the current [`Style`].
+    ///
+    /// ## Safety
+    ///
+    /// This function is tagged as `unsafe` because pushing via
+    /// [`push_style_color`](crate::Ui::push_style_color) or
+    /// [`push_style_var`](crate::Ui::push_style_var) or popping via
+    /// [`ColorStackToken::pop`](crate::ColorStackToken::pop) or
+    /// [`StyleStackToken::pop`](crate::StyleStackToken::pop) will modify the values in the returned
+    /// shared reference. Therefore, you should not retain this reference across calls to push and
+    /// pop. The [`clone_style`](Ui::clone_style) version may instead be used to avoid `unsafe`.
+    #[doc(alias = "GetStyle")]
+    pub unsafe fn style(&self) -> &Style {
+        self.ctx.style()
     }
 }
