@@ -4,12 +4,7 @@
 
 pub extern crate imgui_sys as sys;
 
-use std::cell;
-use std::ffi::CStr;
 use std::os::raw::{c_char, c_void};
-use std::ptr;
-use std::str;
-use std::thread;
 
 pub use self::clipboard::*;
 pub use self::color::ImColor32;
@@ -96,8 +91,8 @@ pub use core as __core;
 #[doc(alias = "GetVersion")]
 pub fn dear_imgui_version() -> &'static str {
     unsafe {
-        let bytes = CStr::from_ptr(sys::igGetVersion()).to_bytes();
-        str::from_utf8_unchecked(bytes)
+        let bytes = std::ffi::CStr::from_ptr(sys::igGetVersion()).to_bytes();
+        std::str::from_utf8_unchecked(bytes)
     }
 }
 
@@ -122,9 +117,9 @@ impl Context {
 #[derive(Debug)]
 pub struct Ui<'ui> {
     ctx: &'ui Context,
-    font_atlas: Option<cell::RefMut<'ui, SharedFontAtlas>>,
+    font_atlas: Option<std::cell::RefMut<'ui, SharedFontAtlas>>,
     // imgui isn't mutli-threaded -- so no one will ever access twice.
-    buffer: cell::UnsafeCell<string::UiBuffer>,
+    buffer: std::cell::UnsafeCell<string::UiBuffer>,
 }
 
 impl<'ui> Ui<'ui> {
@@ -199,7 +194,7 @@ impl<'ui> Ui<'ui> {
 impl<'a> Drop for Ui<'a> {
     #[doc(alias = "EndFrame")]
     fn drop(&mut self) {
-        if !thread::panicking() {
+        if !std::thread::panicking() {
             unsafe {
                 sys::igEndFrame();
             }
@@ -246,7 +241,7 @@ impl<'ui> Ui<'ui> {
     /// Renders a style editor block (not a window) for the currently active style
     #[doc(alias = "ShowStyleEditor")]
     pub fn show_default_style_editor(&self) {
-        unsafe { sys::igShowStyleEditor(ptr::null_mut()) };
+        unsafe { sys::igShowStyleEditor(std::ptr::null_mut()) };
     }
     /// Renders a basic help/info block (not a window)
     #[doc(alias = "ShowUserGuide")]
