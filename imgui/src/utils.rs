@@ -3,8 +3,8 @@ use bitflags::bitflags;
 
 use crate::input::mouse::MouseButton;
 use crate::style::{Style, StyleColor};
-use crate::sys;
 use crate::Ui;
+use crate::sys;
 
 bitflags! {
     /// Item hover check option flags
