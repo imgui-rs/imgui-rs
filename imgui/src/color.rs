@@ -5,7 +5,7 @@
 /// bytes). For clarity: we don't support an equivalent to the
 /// `IMGUI_USE_BGRA_PACKED_COLOR` define.
 ///
-/// This used to be named `ImColor32`, but was renamed to avoid confusion with
+/// This used to be named `ImColor`, but was renamed to avoid confusion with
 /// the type with that name in the C++ API (which uses 32 bits per channel).
 ///
 /// While it doesn't provide methods to access the fields, they can be accessed
