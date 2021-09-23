@@ -26,7 +26,6 @@ impl<'ui> Ui<'ui> {
     /// This is the equivalent of [button_with_size](Self::button_with_size)
     /// with `size` set to `[0.0, 0.0]`, which will size the button to the
     /// label's width in the current style.
-    /// the current style.
     #[doc(alias = "Button")]
     pub fn button(&self, label: impl AsRef<str>) -> bool {
         self.button_with_size(label, [0.0, 0.0])
