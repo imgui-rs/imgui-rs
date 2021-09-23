@@ -81,6 +81,7 @@ mod test;
 mod utils;
 mod widget;
 mod window;
+mod math;
 
 // Used by macros. Underscores are just to make it clear it's not part of the
 // public API.
