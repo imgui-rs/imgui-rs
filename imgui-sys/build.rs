@@ -27,8 +27,6 @@ fn assert_file_exists(path: &str) -> io::Result<()> {
 }
 
 fn main() -> io::Result<()> {
-    let manifest_dir = Path::new(env!("CARGO_MANIFEST_DIR"));
-
     // Output define args for compiler
     for (key, value) in DEFINES.iter() {
         println!("cargo:DEFINE_{}={}", key, value.unwrap_or(""));
@@ -59,16 +57,11 @@ fn main() -> io::Result<()> {
             build.include(manifest_dir.join("third-party/imgui/"));
         }
 
-        let imgui_cpp = if cfg!(target = "docking") {
-            build.include(manifest_dir.join("third-party/imgui-docking/"));
+        #[cfg(feature = "docking")]
+        let imgui_cpp = "include_imgui_docking.cpp";
+        #[cfg(not(feature = "docking"))]
+        let imgui_cpp = "include_imgui_master.cpp";
 
-            "include_imgui_docking.cpp"
-        } else {
-            build.include(manifest_dir.join("third-party/imgui-master/"));
-
-            "include_imgui_master.cpp"
-        };
-            
         let compiler = build.get_compiler();
 
         // Avoid the if-supported flag functions for easy cases, as they're

@@ -17,7 +17,7 @@ impl Bindgen {
             .unwrap_or_else(|| "imgui-sys-v0".to_string());
 
         for variant in ["master", "docking"] {
-            let cimgui_output = root.join(&format!("imgui-sys/third-party/cimgui-{}", variant));
+            let cimgui_output = root.join(&format!("imgui-sys/third-party/imgui-{}", variant));
 
             let types = get_types(&cimgui_output.join("structs_and_enums.json"))?;
             let funcs = get_definitions(&cimgui_output.join("definitions.json"))?;
