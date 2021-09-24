@@ -22,8 +22,8 @@ rm ${CIMGUI_DIR}/imgui || echo "..."
 # Link to C++ code contained in imgui-rs, not whatever if in cimgui's repo
 ln -s ${SCRIPT_DIR}/imgui ${CIMGUI_DIR}/imgui
 
-# Run the generator
-luajit generator.lua gcc false -DIMGUI_USE_WCHAR32
+# Run the generator (note addition of "internal" as most docking functionality is in there currently)
+luajit generator.lua gcc "internal" -DIMGUI_USE_WCHAR32
 
 # Tidy up
 rm ${CIMGUI_DIR}/imgui # Remove symlink (no recursive rm)
