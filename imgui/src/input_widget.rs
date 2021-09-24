@@ -553,9 +553,9 @@ impl<'ui, 'p, L: AsRef<str>> InputFloat<'ui, 'p, L> {
 }
 
 macro_rules! impl_input_floatn {
-    ($InputFloatN:ident, $MINT_TARGET:ident, $N:expr, $igInputFloatN:ident) => {
+    ($InputFloatN:ident, $MINT_TARGET:ty, $N:expr, $igInputFloatN:ident) => {
         #[must_use]
-        pub struct $InputFloatN<'ui, 'p, L, T = [f32; $N]> {
+        pub struct $InputFloatN<'ui, 'p, L, T> {
             label: L,
             value: &'p mut T,
             flags: InputTextFlags,
@@ -565,8 +565,8 @@ macro_rules! impl_input_floatn {
         impl<'ui, 'p, L, T> $InputFloatN<'ui, 'p, L, T>
         where
             L: AsRef<str>,
-            T: From<$MINT_TARGET> + Copy,
-            $MINT_TARGET: From<T>,
+            T: Copy + Into<$MINT_TARGET>,
+            $MINT_TARGET: Into<T> + Into<[f32; $N]>,
         {
             pub fn new(ui: &'ui Ui<'ui>, label: L, value: &'p mut T) -> Self {
                 $InputFloatN {
@@ -578,7 +578,7 @@ macro_rules! impl_input_floatn {
             }
 
             pub fn build(self) -> bool {
-                let value: $MINT_TARGET = $MINT_TARGET::from(*self.value);
+                let value: $MINT_TARGET = (*self.value).into();
                 let mut value: [f32; $N] = value.into();
 
                 let changed = unsafe {
@@ -620,8 +620,8 @@ macro_rules! impl_input_intn {
         impl<'ui, 'p, L, T> $InputIntN<'ui, 'p, L, T>
         where
             L: AsRef<str>,
-            T: From<$MINT_TARGET> + Copy,
-            $MINT_TARGET: From<T>,
+            T: Copy + Into<$MINT_TARGET>,
+            $MINT_TARGET: Into<T> + Into<[i32; $N]>,
         {
             pub fn new(ui: &'ui Ui<'ui>, label: L, value: &'p mut T) -> Self {
                 $InputIntN {
@@ -633,7 +633,7 @@ macro_rules! impl_input_intn {
             }
 
             pub fn build(self) -> bool {
-                let value: $MINT_TARGET = $MINT_TARGET::from(*self.value);
+                let value: $MINT_TARGET = (*self.value).into();
                 let mut value: [i32; $N] = value.into();
 
                 let changed = unsafe {

@@ -397,8 +397,8 @@ impl<'ui> Ui<'ui> {
     ) -> InputFloat2<'ui, 'p, L, T>
     where
         L: AsRef<str>,
-        T: From<MintVec2> + Copy,
-        MintVec2: From<T>,
+        T: Copy + Into<MintVec2>,
+        MintVec2: Into<T> + Into<[f32; 2]>,
     {
         InputFloat2::new(self, label, value)
     }
@@ -410,8 +410,8 @@ impl<'ui> Ui<'ui> {
     ) -> InputFloat3<'ui, 'p, L, T>
     where
         L: AsRef<str>,
-        T: From<MintVec3> + Copy,
-        MintVec3: From<T>,
+        T: Copy + Into<MintVec3>,
+        MintVec3: Into<T> + Into<[f32; 3]>,
     {
         InputFloat3::new(self, label, value)
     }
@@ -423,8 +423,8 @@ impl<'ui> Ui<'ui> {
     ) -> InputFloat4<'ui, 'p, L, T>
     where
         L: AsRef<str>,
-        T: From<MintVec4> + Copy,
-        MintVec4: From<T>,
+        T: Copy + Into<MintVec4>,
+        MintVec4: Into<T> + Into<[f32; 4]>,
     {
         InputFloat4::new(self, label, value)
     }
@@ -440,8 +440,8 @@ impl<'ui> Ui<'ui> {
     pub fn input_int2<'p, L, T>(&'ui self, label: L, value: &'p mut T) -> InputInt2<'ui, 'p, L, T>
     where
         L: AsRef<str>,
-        T: From<MintIVec2> + Copy,
-        MintIVec2: From<T>,
+        T: Copy + Into<MintIVec2>,
+        MintIVec2: Into<T> + Into<[i32; 2]>,
     {
         InputInt2::new(self, label, value)
     }
@@ -449,8 +449,8 @@ impl<'ui> Ui<'ui> {
     pub fn input_int3<'p, L, T>(&'ui self, label: L, value: &'p mut T) -> InputInt3<'ui, 'p, L, T>
     where
         L: AsRef<str>,
-        T: From<MintIVec3> + Copy,
-        MintIVec3: From<T>,
+        T: Copy + Into<MintIVec3>,
+        MintIVec3: Into<T> + Into<[i32; 3]>,
     {
         InputInt3::new(self, label, value)
     }
@@ -458,8 +458,8 @@ impl<'ui> Ui<'ui> {
     pub fn input_int4<'p, L, T>(&'ui self, label: L, value: &'p mut T) -> InputInt4<'ui, 'p, L, T>
     where
         L: AsRef<str>,
-        T: From<MintIVec4> + Copy,
-        MintIVec4: From<T>,
+        T: Copy + Into<MintIVec4>,
+        MintIVec4: Into<T> + Into<[i32; 4]>,
     {
         InputInt4::new(self, label, value)
     }

@@ -195,8 +195,8 @@ pub struct ColorEdit3<'a, T, C> {
 impl<'a, T, C> ColorEdit3<'a, T, C>
 where
     T: AsRef<str>,
-    MintVec3: From<C>,
-    C: From<MintVec3> + Copy,
+    C: Copy + Into<MintVec3>,
+    MintVec3: Into<C> + Into<[f32; 3]>,
 {
     /// Constructs a new color editor builder.
     #[doc(alias = "ColorEdit3")]
@@ -377,8 +377,8 @@ pub struct ColorEdit4<'a, T, C> {
 impl<'a, T, C> ColorEdit4<'a, T, C>
 where
     T: AsRef<str>,
-    MintVec4: From<C>,
-    C: From<MintVec4> + Copy,
+    C: Copy + Into<MintVec4>,
+    MintVec4: Into<C> + Into<[f32; 4]>,
 {
     /// Constructs a new color editor builder.
     #[doc(alias = "ColorEdit4")]
@@ -556,8 +556,8 @@ pub struct ColorPicker3<'a, Label, Color> {
 impl<'a, Label, Color> ColorPicker3<'a, Label, Color>
 where
     Label: AsRef<str>,
-    MintVec3: From<Color>,
-    Color: From<MintVec3> + Copy,
+    Color: Copy + Into<MintVec3>,
+    MintVec3: Into<Color> + Into<[f32; 3]>,
 {
     /// Constructs a new color picker builder.
     #[doc(alias = "ColorPicker3")]
@@ -696,7 +696,7 @@ where
     /// Returns true if the color value was changed.
     pub fn build(mut self, ui: &Ui<'_>) -> bool {
         self.flags.insert(ColorEditFlags::NO_ALPHA);
-        let mut value: [f32; 3] = MintVec3::from(*self.value).into();
+        let mut value: [f32; 3] = (*self.value).into().into();
         let changed = unsafe {
             sys::igColorPicker3(
                 ui.scratch_txt(self.label),
@@ -741,8 +741,8 @@ pub struct ColorPicker4<'a, Label, Color> {
 impl<'a, Label, Color> ColorPicker4<'a, Label, Color>
 where
     Label: AsRef<str>,
-    MintVec4: From<Color>,
-    Color: From<MintVec4> + Copy,
+    Color: Copy + Into<MintVec4>,
+    MintVec4: Into<Color> + Into<[f32; 4]>,
 {
     /// Constructs a new color picker builder.
     #[doc(alias = "ColorPicker4")]
@@ -888,7 +888,7 @@ where
     /// Returns true if the color value was changed.
     pub fn build(mut self, ui: &Ui<'_>) -> bool {
         self.flags.insert(ColorEditFlags::NO_ALPHA);
-        let mut value: [f32; 4] = MintVec4::from(*self.value).into();
+        let mut value: [f32; 4] = (*self.value).into().into();
         let ref_color = self.ref_color.map(|c| c.as_ptr()).unwrap_or(ptr::null());
 
         let changed = unsafe {
