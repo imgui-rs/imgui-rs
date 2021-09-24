@@ -257,7 +257,7 @@ impl<'ui, Label: AsRef<str>> ChildWindow<'ui, Label> {
             unsafe { sys::igSetNextWindowBgAlpha(self.bg_alpha) };
         }
         let should_render = unsafe {
-            sys::igBeginChildStr(
+            sys::igBeginChild_Str(
                 self.ui.scratch_txt(self.name),
                 self.size.into(),
                 self.border,

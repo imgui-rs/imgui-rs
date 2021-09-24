@@ -453,7 +453,7 @@ impl<'ui> Ui<'ui> {
     #[doc(alias = "PushId")]
     pub fn push_id<I: AsRef<str>>(&self, id: I) -> IdStackToken<'ui> {
         unsafe {
-            sys::igPushIDStr(self.scratch_txt(id));
+            sys::igPushID_Str(self.scratch_txt(id));
         }
         IdStackToken::new(self)
     }

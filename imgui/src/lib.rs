@@ -4,7 +4,7 @@
 
 pub extern crate imgui_sys as sys;
 
-use std::os::raw::{c_char, c_void};
+use std::os::raw::c_char;
 
 pub use self::clipboard::*;
 pub use self::color::ImColor32;
@@ -294,34 +294,6 @@ impl<'ui> Ui<'ui> {
 
     pub fn child_window<Label: AsRef<str>>(&'ui self, name: Label) -> ChildWindow<'ui, Label> {
         ChildWindow::new(self, name)
-    }
-}
-
-impl<'a> Id<'a> {
-    // this is used in the tables-api and possibly elsewhere,
-    // but not with just default features...
-    #[allow(dead_code)]
-    fn as_imgui_id(&self) -> sys::ImGuiID {
-        unsafe {
-            match self {
-                Id::Ptr(p) => sys::igGetID_Ptr(*p),
-                Id::Str(s) => {
-                    let s1 = s.as_ptr() as *const std::os::raw::c_char;
-                    let s2 = s1.add(s.len());
-                    sys::igGetID_StrStr(s1, s2)
-                }
-                Id::Int(i) => {
-                    let p = *i as *const std::os::raw::c_void;
-                    sys::igGetID_Ptr(p)
-                } // Id::ImGuiID(n) => *n,
-            }
-        }
-    }
-}
-
-impl<'a> Default for Id<'a> {
-    fn default() -> Self {
-        Self::Int(0)
     }
 }
 

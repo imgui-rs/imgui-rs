@@ -29,9 +29,9 @@ fn main() {
         | TableFlags::NO_BORDERS_IN_BODY;
 
     system.main_loop(move |_, ui| {
-        Window::new("Input text callbacks")
+        ui.window("Input text callbacks")
             .size([800.0, 400.0], Condition::FirstUseEver)
-            .build(ui, || {
+            .build(|| {
                 if let Some(_t) = ui.begin_table("Basic-Table", 3) {
                     // we must also call `next_row` here, because we declined
                     // to set up header rows. If we set up header rows ourselves,

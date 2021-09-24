@@ -11,9 +11,9 @@ fn main() {
     let mut click_count = 0;
 
     system.main_loop(move |_, ui| {
-        Window::new("Disabling widgets")
+        ui.window("Disabling widgets")
             .size([300.0, 200.0], Condition::FirstUseEver)
-            .build(ui, || {
+            .build(|| {
                 ui.checkbox("Edit mode", &mut edit_mode);
                 ui.checkbox("Safe mode", &mut safe_mode);
 

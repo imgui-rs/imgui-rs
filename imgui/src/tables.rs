@@ -1,10 +1,80 @@
 use std::ffi::CStr;
 use std::marker::PhantomData;
 
+use std::os::raw::c_void;
+use std::str;
+
+
 use bitflags::bitflags;
 
 use crate::sys;
-use crate::{Id, ImColor32, Ui};
+use crate::{ImColor32, Ui};
+
+/// Unique ID used by widgets
+#[derive(Copy, Clone, Debug, Eq, PartialEq)]
+pub enum Id<'a> {
+    Int(i32),
+    Str(&'a str),
+    Ptr(*const c_void),
+}
+
+impl<'a> Id<'a> {
+    // this is used in the tables-api and possibly elsewhere,
+    // but not with just default features...
+    #[allow(dead_code)]
+    fn as_imgui_id(&self) -> sys::ImGuiID {
+        unsafe {
+            match self {
+                Id::Ptr(p) => sys::igGetID_Ptr(*p),
+                Id::Str(s) => {
+                    let s1 = s.as_ptr() as *const std::os::raw::c_char;
+                    let s2 = s1.add(s.len());
+                    sys::igGetID_StrStr(s1, s2)
+                }
+                Id::Int(i) => {
+                    let p = *i as *const std::os::raw::c_void;
+                    sys::igGetID_Ptr(p)
+                } // Id::ImGuiID(n) => *n,
+            }
+        }
+    }
+}
+
+impl<'a> Default for Id<'a> {
+    fn default() -> Self {
+        Self::Int(0)
+    }
+}
+
+impl From<i32> for Id<'static> {
+    #[inline]
+    fn from(i: i32) -> Self {
+        Id::Int(i)
+    }
+}
+
+impl<'a, T: ?Sized + AsRef<str>> From<&'a T> for Id<'a> {
+    #[inline]
+    fn from(s: &'a T) -> Self {
+        Id::Str(s.as_ref())
+    }
+}
+
+impl<T> From<*const T> for Id<'static> {
+    #[inline]
+    fn from(p: *const T) -> Self {
+        Id::Ptr(p as *const c_void)
+    }
+}
+
+impl<T> From<*mut T> for Id<'static> {
+    #[inline]
+    fn from(p: *mut T) -> Self {
+        Id::Ptr(p as *const T as *const c_void)
+    }
+}
+
+
 
 bitflags! {
     /// Flags passed to `begin_table` methods.
