@@ -58,8 +58,12 @@ impl<'ui> Ui<'ui> {
     /// color.pop();
     /// ```
     #[doc(alias = "PushStyleColorVec4")]
-    pub fn push_style_color(&self, style_color: StyleColor, color: [f32; 4]) -> ColorStackToken {
-        unsafe { sys::igPushStyleColorVec4(style_color as i32, color.into()) };
+    pub fn push_style_color(
+        &self,
+        style_color: StyleColor,
+        color: [f32; 4],
+    ) -> ColorStackToken<'_> {
+        unsafe { sys::igPushStyleColor_Vec4(style_color as i32, color.into()) };
         ColorStackToken::new(self)
     }
 
@@ -90,7 +94,7 @@ impl<'ui> Ui<'ui> {
     {
         let mut count = 0;
         for &(style_color, color) in style_colors {
-            unsafe { sys::igPushStyleColorVec4(style_color as i32, color.into()) };
+            unsafe { sys::igPushStyleColor_Vec4(style_color as i32, color.into()) };
             count += 1;
         }
         MultiColorStackToken {
@@ -114,7 +118,7 @@ impl<'ui> Ui<'ui> {
     /// style.pop();
     /// ```
     #[doc(alias = "PushStyleVar")]
-    pub fn push_style_var(&self, style_var: StyleVar) -> StyleStackToken {
+    pub fn push_style_var(&self, style_var: StyleVar) -> StyleStackToken<'_> {
         unsafe { push_style_var(style_var) };
         StyleStackToken::new(self)
     }
@@ -195,7 +199,7 @@ pub struct MultiColorStackToken {
 impl MultiColorStackToken {
     /// Pops changes from the color stack
     #[doc(alias = "PopStyleColor")]
-    pub fn pop(mut self, _: &Ui) {
+    pub fn pop(mut self, _: &Ui<'_>) {
         self.ctx = ptr::null();
         unsafe { sys::igPopStyleColor(self.count as i32) };
     }
@@ -235,7 +239,7 @@ pub struct MultiStyleStackToken {
 impl MultiStyleStackToken {
     /// Pops changes from the style stack
     #[doc(alias = "PopStyleVar")]
-    pub fn pop(mut self, _: &Ui) {
+    pub fn pop(mut self, _: &Ui<'_>) {
         self.ctx = ptr::null();
         unsafe { sys::igPopStyleVar(self.count as i32) };
     }
@@ -252,38 +256,40 @@ impl Drop for MultiStyleStackToken {
 #[inline]
 unsafe fn push_style_var(style_var: StyleVar) {
     use crate::style::StyleVar::*;
-    use crate::sys::{igPushStyleVarFloat, igPushStyleVarVec2};
+    use crate::sys::{igPushStyleVar_Float, igPushStyleVar_Vec2};
     match style_var {
-        Alpha(v) => igPushStyleVarFloat(sys::ImGuiStyleVar_Alpha as i32, v),
-        WindowPadding(v) => igPushStyleVarVec2(sys::ImGuiStyleVar_WindowPadding as i32, v.into()),
-        WindowRounding(v) => igPushStyleVarFloat(sys::ImGuiStyleVar_WindowRounding as i32, v),
-        WindowBorderSize(v) => igPushStyleVarFloat(sys::ImGuiStyleVar_WindowBorderSize as i32, v),
-        WindowMinSize(v) => igPushStyleVarVec2(sys::ImGuiStyleVar_WindowMinSize as i32, v.into()),
+        Alpha(v) => igPushStyleVar_Float(sys::ImGuiStyleVar_Alpha as i32, v),
+        WindowPadding(v) => igPushStyleVar_Vec2(sys::ImGuiStyleVar_WindowPadding as i32, v.into()),
+        WindowRounding(v) => igPushStyleVar_Float(sys::ImGuiStyleVar_WindowRounding as i32, v),
+        WindowBorderSize(v) => igPushStyleVar_Float(sys::ImGuiStyleVar_WindowBorderSize as i32, v),
+        WindowMinSize(v) => igPushStyleVar_Vec2(sys::ImGuiStyleVar_WindowMinSize as i32, v.into()),
         WindowTitleAlign(v) => {
-            igPushStyleVarVec2(sys::ImGuiStyleVar_WindowTitleAlign as i32, v.into())
+            igPushStyleVar_Vec2(sys::ImGuiStyleVar_WindowTitleAlign as i32, v.into())
         }
-        ChildRounding(v) => igPushStyleVarFloat(sys::ImGuiStyleVar_ChildRounding as i32, v),
-        ChildBorderSize(v) => igPushStyleVarFloat(sys::ImGuiStyleVar_ChildBorderSize as i32, v),
-        PopupRounding(v) => igPushStyleVarFloat(sys::ImGuiStyleVar_PopupRounding as i32, v),
-        PopupBorderSize(v) => igPushStyleVarFloat(sys::ImGuiStyleVar_PopupBorderSize as i32, v),
-        FramePadding(v) => igPushStyleVarVec2(sys::ImGuiStyleVar_FramePadding as i32, v.into()),
-        FrameRounding(v) => igPushStyleVarFloat(sys::ImGuiStyleVar_FrameRounding as i32, v),
-        FrameBorderSize(v) => igPushStyleVarFloat(sys::ImGuiStyleVar_FrameBorderSize as i32, v),
-        ItemSpacing(v) => igPushStyleVarVec2(sys::ImGuiStyleVar_ItemSpacing as i32, v.into()),
+        ChildRounding(v) => igPushStyleVar_Float(sys::ImGuiStyleVar_ChildRounding as i32, v),
+        ChildBorderSize(v) => igPushStyleVar_Float(sys::ImGuiStyleVar_ChildBorderSize as i32, v),
+        PopupRounding(v) => igPushStyleVar_Float(sys::ImGuiStyleVar_PopupRounding as i32, v),
+        PopupBorderSize(v) => igPushStyleVar_Float(sys::ImGuiStyleVar_PopupBorderSize as i32, v),
+        FramePadding(v) => igPushStyleVar_Vec2(sys::ImGuiStyleVar_FramePadding as i32, v.into()),
+        FrameRounding(v) => igPushStyleVar_Float(sys::ImGuiStyleVar_FrameRounding as i32, v),
+        FrameBorderSize(v) => igPushStyleVar_Float(sys::ImGuiStyleVar_FrameBorderSize as i32, v),
+        ItemSpacing(v) => igPushStyleVar_Vec2(sys::ImGuiStyleVar_ItemSpacing as i32, v.into()),
         ItemInnerSpacing(v) => {
-            igPushStyleVarVec2(sys::ImGuiStyleVar_ItemInnerSpacing as i32, v.into())
+            igPushStyleVar_Vec2(sys::ImGuiStyleVar_ItemInnerSpacing as i32, v.into())
         }
-        IndentSpacing(v) => igPushStyleVarFloat(sys::ImGuiStyleVar_IndentSpacing as i32, v),
-        ScrollbarSize(v) => igPushStyleVarFloat(sys::ImGuiStyleVar_ScrollbarSize as i32, v),
-        ScrollbarRounding(v) => igPushStyleVarFloat(sys::ImGuiStyleVar_ScrollbarRounding as i32, v),
-        GrabMinSize(v) => igPushStyleVarFloat(sys::ImGuiStyleVar_GrabMinSize as i32, v),
-        GrabRounding(v) => igPushStyleVarFloat(sys::ImGuiStyleVar_GrabRounding as i32, v),
-        TabRounding(v) => igPushStyleVarFloat(sys::ImGuiStyleVar_TabRounding as i32, v),
+        IndentSpacing(v) => igPushStyleVar_Float(sys::ImGuiStyleVar_IndentSpacing as i32, v),
+        ScrollbarSize(v) => igPushStyleVar_Float(sys::ImGuiStyleVar_ScrollbarSize as i32, v),
+        ScrollbarRounding(v) => {
+            igPushStyleVar_Float(sys::ImGuiStyleVar_ScrollbarRounding as i32, v)
+        }
+        GrabMinSize(v) => igPushStyleVar_Float(sys::ImGuiStyleVar_GrabMinSize as i32, v),
+        GrabRounding(v) => igPushStyleVar_Float(sys::ImGuiStyleVar_GrabRounding as i32, v),
+        TabRounding(v) => igPushStyleVar_Float(sys::ImGuiStyleVar_TabRounding as i32, v),
         ButtonTextAlign(v) => {
-            igPushStyleVarVec2(sys::ImGuiStyleVar_ButtonTextAlign as i32, v.into())
+            igPushStyleVar_Vec2(sys::ImGuiStyleVar_ButtonTextAlign as i32, v.into())
         }
         SelectableTextAlign(v) => {
-            igPushStyleVarVec2(sys::ImGuiStyleVar_SelectableTextAlign as i32, v.into())
+            igPushStyleVar_Vec2(sys::ImGuiStyleVar_SelectableTextAlign as i32, v.into())
         }
     }
 }
@@ -377,7 +383,7 @@ pub struct ItemWidthStackToken {
 impl ItemWidthStackToken {
     /// Pops a change from the item width stack
     #[doc(alias = "PopItemWidth")]
-    pub fn pop(mut self, _: &Ui) {
+    pub fn pop(mut self, _: &Ui<'_>) {
         self._ctx = ptr::null();
         unsafe { sys::igPopItemWidth() };
     }
@@ -391,7 +397,7 @@ pub struct TextWrapPosStackToken {
 impl TextWrapPosStackToken {
     /// Pops a change from the text wrap position stack
     #[doc(alias = "PopTextWrapPos")]
-    pub fn pop(mut self, _: &Ui) {
+    pub fn pop(mut self, _: &Ui<'_>) {
         self._ctx = ptr::null();
         unsafe { sys::igPopTextWrapPos() };
     }
@@ -407,7 +413,7 @@ impl ItemFlagsStackToken {
     /// Pops a change from the item flags stack
 
     #[doc(alias = "PopAllowKeyboardFocus", alias = "PopButtonRepeat")]
-    pub fn pop(mut self, _: &Ui) {
+    pub fn pop(mut self, _: &Ui<'_>) {
         self._ctx = ptr::null();
         const ALLOW_KEYBOARD_FOCUS: ItemFlag = ItemFlag::AllowKeyboardFocus(true);
         const BUTTON_REPEAT: ItemFlag = ItemFlag::ButtonRepeat(true);

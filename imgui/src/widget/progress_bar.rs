@@ -61,7 +61,7 @@ impl<T: AsRef<str>> ProgressBar<T> {
     }
 
     /// Builds the progress bar
-    pub fn build(self, ui: &Ui) {
+    pub fn build(self, ui: &Ui<'_>) {
         unsafe {
             sys::igProgressBar(
                 self.fraction,

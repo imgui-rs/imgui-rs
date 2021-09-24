@@ -107,9 +107,9 @@ impl<T: AsRef<str>> Selectable<T> {
     /// Builds the selectable.
     ///
     /// Returns true if the selectable was clicked.
-    pub fn build(self, ui: &Ui) -> bool {
+    pub fn build(self, ui: &Ui<'_>) -> bool {
         unsafe {
-            sys::igSelectableBool(
+            sys::igSelectable_Bool(
                 ui.scratch_txt(self.label),
                 self.selected,
                 self.flags.bits() as i32,
@@ -119,7 +119,7 @@ impl<T: AsRef<str>> Selectable<T> {
     }
 
     /// Builds the selectable using a mutable reference to selected state.
-    pub fn build_with_ref(self, ui: &Ui, selected: &mut bool) -> bool {
+    pub fn build_with_ref(self, ui: &Ui<'_>, selected: &mut bool) -> bool {
         if self.selected(*selected).build(ui) {
             *selected = !*selected;
             true

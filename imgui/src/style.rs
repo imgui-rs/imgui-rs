@@ -10,6 +10,8 @@ use crate::Direction;
 pub struct Style {
     /// Global alpha applies to everything
     pub alpha: f32,
+    /// Additional alpha multiplier applied to disabled elements. Multiplies over current value of [`Style::alpha`].
+    pub disabled_alpha: f32,
     /// Padding within a window
     pub window_padding: [f32; 2],
     /// Rounding radius of window corners.

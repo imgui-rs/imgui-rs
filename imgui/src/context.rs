@@ -502,7 +502,7 @@ impl Context {
     /// # Panics
     ///
     /// Panics if the context uses a shared font atlas that is already borrowed
-    pub fn fonts(&mut self) -> FontAtlasRefMut {
+    pub fn fonts(&mut self) -> FontAtlasRefMut<'_> {
         match self.shared_font_atlas {
             Some(ref font_atlas) => FontAtlasRefMut::Shared(font_atlas.borrow_mut()),
             None => unsafe {
@@ -518,7 +518,7 @@ impl Context {
     ///
     /// Panics if the context uses a shared font atlas that is already borrowed
     #[doc(alias = "NewFame")]
-    pub fn frame(&mut self) -> Ui {
+    pub fn frame(&mut self) -> Ui<'_> {
         // Clear default font if it no longer exists. This could be an error in the future
         let default_font = self.io().font_default;
         if !default_font.is_null() && self.fonts().get_font(FontId(default_font)).is_none() {

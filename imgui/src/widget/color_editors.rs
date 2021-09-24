@@ -318,7 +318,7 @@ impl<'a, T: AsRef<str> + 'a> ColorEdit<'a, T> {
     /// Builds the color editor.
     ///
     /// Returns true if the color value was changed.
-    pub fn build(mut self, ui: &Ui) -> bool {
+    pub fn build(mut self, ui: &Ui<'_>) -> bool {
         if let EditableColor::Float3(_) = self.value {
             self.flags.insert(ColorEditFlags::NO_ALPHA);
         }
@@ -506,7 +506,7 @@ impl<'a, T: AsRef<str>> ColorPicker<'a, T> {
     /// Builds the color picker.
     ///
     /// Returns true if the color value was changed.
-    pub fn build(mut self, ui: &Ui) -> bool {
+    pub fn build(mut self, ui: &Ui<'_>) -> bool {
         if let EditableColor::Float3(_) = self.value {
             self.flags.insert(ColorEditFlags::NO_ALPHA);
         }
@@ -621,7 +621,7 @@ impl<T: AsRef<str>> ColorButton<T> {
     /// Builds the color button.
     ///
     /// Returns true if this color button was clicked.
-    pub fn build(self, ui: &Ui) -> bool {
+    pub fn build(self, ui: &Ui<'_>) -> bool {
         unsafe {
             sys::igColorButton(
                 ui.scratch_txt(self.desc_id),

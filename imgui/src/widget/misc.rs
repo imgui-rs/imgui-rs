@@ -26,7 +26,6 @@ impl<'ui> Ui<'ui> {
     /// This is the equivalent of [button_with_size](Self::button_with_size)
     /// with `size` set to `[0.0, 0.0]`, which will size the button to the
     /// label's width in the current style.
-    /// the current style.
     #[doc(alias = "Button")]
     pub fn button(&self, label: impl AsRef<str>) -> bool {
         self.button_with_size(label, [0.0, 0.0])
@@ -105,7 +104,7 @@ impl<'ui> Ui<'ui> {
     /// Returns true if this radio button was clicked.
     #[doc(alias = "RadioButtonBool")]
     pub fn radio_button_bool(&self, label: impl AsRef<str>, active: bool) -> bool {
-        unsafe { sys::igRadioButtonBool(self.scratch_txt(label), active) }
+        unsafe { sys::igRadioButton_Bool(self.scratch_txt(label), active) }
     }
     /// Renders a radio button suitable for choosing an arbitrary value.
     ///

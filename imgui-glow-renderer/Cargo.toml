@@ -1,8 +1,8 @@
 [package]
 name = "imgui-glow-renderer"
-version = "0.7.0"
+version = "0.8.1-alpha.0"
 edition = "2018"
-authors = ["The imgui-rs Developers"]
+authors = ["jmaargh and the imgui-rs Developers"]
 description = "glow renderer for the imgui crate"
 homepage = "https://github.com/imgui-rs/imgui-rs"
 repository = "https://github.com/imgui-rs/imgui-rs"
@@ -10,13 +10,13 @@ license = "MIT/Apache-2.0"
 categories = ["gui", "rendering"]
 
 [dependencies]
-imgui = { version = "0.7.0", path = "../imgui" }
+imgui = { version = "0.8.1-alpha.0", path = "../imgui" }
 glow = "0.10.0"
 memoffset = "0.6.4"
 
 [dev-dependencies]
 glutin = "0.27.0"
-imgui-winit-support = { version = "0.7.1", path = "../imgui-winit-support" }
+imgui-winit-support = { version = "0.8.1-alpha.0", path = "../imgui-winit-support" }
 image = "0.23"
 
 [features]
@@ -37,7 +37,7 @@ default = [
 ]
 # Enable checking for OpenGL extensions
 gl_extensions_support = []
-# Support for `glPrimitiveRestartIndex`
+# Support for `gl.debug_message_insert`
 debug_message_insert_support = []
 # Support for `glBindVertexArray`
 bind_vertex_array_support = []
