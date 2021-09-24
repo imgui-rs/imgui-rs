@@ -4,7 +4,6 @@ use std::marker::PhantomData;
 use std::os::raw::c_void;
 use std::str;
 
-
 use bitflags::bitflags;
 
 use crate::sys;
@@ -73,8 +72,6 @@ impl<T> From<*mut T> for Id<'static> {
         Id::Ptr(p as *const T as *const c_void)
     }
 }
-
-
 
 bitflags! {
     /// Flags passed to `begin_table` methods.
