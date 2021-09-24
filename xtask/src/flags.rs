@@ -23,9 +23,9 @@ xflags::args_parser! {
             /// Print help information.
             optional -h, --help
         }
-        /// Run lints the way we'd run it in CI
+        /// Run lints the way we run it in CI
         cmd lint {}
-        /// Run tests the way we'd run them in CI
+        /// Run tests the way we run them in CI
         cmd test {}
         /// magically wrangle the submodules if needed
         cmd modfix {}
