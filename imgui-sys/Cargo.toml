@@ -24,3 +24,4 @@ pkg-config = { version="0.3", optional=true }
 default = []
 wasm = []
 freetype = ["pkg-config"]
+docking = []
