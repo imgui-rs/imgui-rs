@@ -5,6 +5,7 @@ use std::ptr;
 use crate::context::Context;
 use crate::fonts::atlas::FontId;
 use crate::internal::RawCast;
+use crate::math::MintVec4;
 use crate::style::{StyleColor, StyleVar};
 use crate::sys;
 use crate::{Id, Ui};
@@ -61,9 +62,9 @@ impl<'ui> Ui<'ui> {
     pub fn push_style_color(
         &self,
         style_color: StyleColor,
-        color: [f32; 4],
+        color: impl Into<MintVec4>,
     ) -> ColorStackToken<'_> {
-        unsafe { sys::igPushStyleColor_Vec4(style_color as i32, color.into()) };
+        unsafe { sys::igPushStyleColor_Vec4(style_color as i32, color.into().into()) };
         ColorStackToken::new(self)
     }
 

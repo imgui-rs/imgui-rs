@@ -77,6 +77,17 @@ impl From<mint::Vector2<f32>> for ImVec2 {
     }
 }
 
+impl From<mint::Vector4<f32>> for ImVec4 {
+    fn from(o: mint::Vector4<f32>) -> Self {
+        Self {
+            x: o.x,
+            y: o.y,
+            z: o.z,
+            w: o.w,
+        }
+    }
+}
+
 impl ImVec4 {
     #[inline]
     pub const fn new(x: f32, y: f32, z: f32, w: f32) -> ImVec4 {

@@ -8,7 +8,7 @@ use crate::Ui;
 #[must_use]
 pub struct ListBox<T> {
     label: T,
-    size: sys::ImVec2,
+    size: [f32; 2],
 }
 
 impl<T: AsRef<str>> ListBox<T> {
@@ -17,7 +17,7 @@ impl<T: AsRef<str>> ListBox<T> {
     pub fn new(label: T) -> ListBox<T> {
         ListBox {
             label,
-            size: sys::ImVec2::zero(),
+            size: [0.0, 0.0],
         }
     }
 
@@ -28,8 +28,8 @@ impl<T: AsRef<str>> ListBox<T> {
     ///
     /// Default: [0.0, 0.0], in which case the combobox calculates a sensible width and height
     #[inline]
-    pub fn size(mut self, size: [f32; 2]) -> Self {
-        self.size = sys::ImVec2::new(size[0], size[1]);
+    pub fn size(mut self, size: impl Into<crate::math::MintVec2>) -> Self {
+        self.size = size.into().into();
         self
     }
     /// Creates a list box and starts appending to it.
@@ -40,7 +40,8 @@ impl<T: AsRef<str>> ListBox<T> {
     /// Returns `None` if the list box is not open and no content should be rendered.
     #[must_use]
     pub fn begin<'ui>(self, ui: &Ui<'ui>) -> Option<ListBoxToken<'ui>> {
-        let should_render = unsafe { sys::igBeginListBox(ui.scratch_txt(self.label), self.size) };
+        let should_render =
+            unsafe { sys::igBeginListBox(ui.scratch_txt(self.label), self.size.into()) };
         if should_render {
             Some(ListBoxToken::new(ui))
         } else {

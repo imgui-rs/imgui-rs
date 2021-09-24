@@ -1,5 +1,6 @@
 use std::f32;
 
+use crate::math::MintVec2;
 use crate::sys;
 use crate::window::WindowFlags;
 use crate::Ui;
@@ -47,8 +48,8 @@ impl<'ui, Label: AsRef<str>> ChildWindow<'ui, Label> {
     /// - `= 0.0`: use remaining host window size
     /// - `< 0.0`: use remaining host window size minus abs(size)
     #[inline]
-    pub fn size(mut self, size: [f32; 2]) -> Self {
-        self.size = size;
+    pub fn size(mut self, size: impl Into<MintVec2>) -> Self {
+        self.size = size.into().into();
         self
     }
     /// Sets the window content size, which can be used to enforce scrollbars.
@@ -57,8 +58,8 @@ impl<'ui, Label: AsRef<str>> ChildWindow<'ui, Label> {
     /// 0.0 to leave the size automatic.
     #[inline]
     #[doc(alias = "SetNextWindowContentSize")]
-    pub fn content_size(mut self, size: [f32; 2]) -> Self {
-        self.content_size = size;
+    pub fn content_size(mut self, size: impl Into<MintVec2>) -> Self {
+        self.content_size = size.into().into();
         self
     }
     /// Sets the window focused state, which can be used to bring the window to front

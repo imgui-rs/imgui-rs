@@ -2,6 +2,7 @@ use bitflags::bitflags;
 use std::os::raw::c_void;
 
 use crate::internal::DataTypeKind;
+use crate::math::MintVec2;
 use crate::sys;
 use crate::Ui;
 
@@ -161,10 +162,10 @@ where
     /// It is safe, though up to C++ Dear ImGui, on how to handle when
     /// `min > max`.
     #[doc(alias = "VSliderScalar")]
-    pub fn new(label: Label, size: [f32; 2], min: Data, max: Data) -> Self {
+    pub fn new(label: Label, size: impl Into<MintVec2>, min: Data, max: Data) -> Self {
         VerticalSlider {
             label,
-            size,
+            size: size.into().into(),
             min,
             max,
             display_format: None,

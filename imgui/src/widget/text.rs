@@ -1,5 +1,6 @@
 use std::os::raw::c_char;
 
+use crate::math::MintVec4;
 // use crate::string::ImStr;
 use crate::style::StyleColor;
 use crate::Ui;
@@ -24,7 +25,7 @@ impl<'ui> Ui<'ui> {
         }
     }
     /// Renders simple text using the given text color
-    pub fn text_colored<T: AsRef<str>>(&self, color: [f32; 4], text: T) {
+    pub fn text_colored<T: AsRef<str>>(&self, color: impl Into<MintVec4>, text: T) {
         let style = self.push_style_color(StyleColor::Text, color);
         self.text(text);
         style.end();

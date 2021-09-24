@@ -1,3 +1,5 @@
+use crate::math::MintVec4;
+
 /// Wraps u32 that represents a packed RGBA color. Mostly used by types in the
 /// low level custom drawing API, such as [`DrawListMut`](crate::DrawListMut).
 ///
@@ -217,6 +219,12 @@ impl From<u32> for ImColor32 {
     #[inline]
     fn from(color: u32) -> Self {
         ImColor32(color)
+    }
+}
+
+impl From<MintVec4> for ImColor32 {
+    fn from(v: MintVec4) -> Self {
+        Self::from_rgba_f32s(v.x, v.y, v.z, v.w)
     }
 }
 
