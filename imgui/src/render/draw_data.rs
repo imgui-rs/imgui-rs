@@ -1,6 +1,7 @@
 use std::slice;
 
 use crate::internal::{RawCast, RawWrapper};
+use crate::math::MintVec2;
 use crate::render::renderer::TextureId;
 use crate::sys;
 
@@ -72,7 +73,7 @@ impl DrawData {
     /// Can be used if your final output buffer is at a different scale than imgui-rs expects, or
     /// if there is a difference between your window resolution and framebuffer resolution.
     #[doc(alias = "ScaleClipRects")]
-    pub fn scale_clip_rects(&mut self, fb_scale: [f32; 2]) {
+    pub fn scale_clip_rects(&mut self, fb_scale: MintVec2) {
         unsafe {
             sys::ImDrawData_ScaleClipRects(self.raw_mut(), fb_scale.into());
         }

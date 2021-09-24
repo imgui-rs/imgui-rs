@@ -1,5 +1,6 @@
 use std::ptr;
 
+use crate::math::MintVec2;
 use crate::sys;
 use crate::Ui;
 
@@ -133,8 +134,12 @@ impl<'ui> Ui<'ui> {
     ///
     /// Clipped by current clipping settings, but disregards other factors like focus, window
     /// ordering, modal popup blocking.
-    pub fn is_mouse_hovering_rect(&self, r_min: [f32; 2], r_max: [f32; 2]) -> bool {
-        unsafe { sys::igIsMouseHoveringRect(r_min.into(), r_max.into(), true) }
+    pub fn is_mouse_hovering_rect(
+        &self,
+        r_min: impl Into<MintVec2>,
+        r_max: impl Into<MintVec2>,
+    ) -> bool {
+        unsafe { sys::igIsMouseHoveringRect(r_min.into().into(), r_max.into().into(), true) }
     }
     /// Returns the mouse position backed up at the time of opening a popup
     #[doc(alias = "GetMousePosOnOpeningCurrentPopup")]
@@ -221,8 +226,8 @@ impl<'ui> Ui<'ui> {
         unsafe { sys::igIsMousePosValid(ptr::null()) }
     }
     #[doc(alias = "IsMousePosValid")]
-    pub fn is_mouse_pos_valid(&self, mouse_pos: [f32; 2]) -> bool {
-        unsafe { sys::igIsMousePosValid(&mouse_pos.into()) }
+    pub fn is_mouse_pos_valid(&self, mouse_pos: impl Into<MintVec2>) -> bool {
+        unsafe { sys::igIsMousePosValid(&mouse_pos.into().into()) }
     }
 }
 

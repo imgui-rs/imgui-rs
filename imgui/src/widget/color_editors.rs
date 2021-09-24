@@ -1,41 +1,44 @@
 use bitflags::bitflags;
 use std::ptr;
 
+use crate::math::MintVec2;
+use crate::math::MintVec3;
+use crate::math::MintVec4;
 use crate::sys;
 use crate::Ui;
 
-/// Mutable reference to an editable color value.
-#[derive(Debug)]
-pub enum EditableColor<'a> {
-    /// Color value with three float components (e.g. RGB).
-    Float3(&'a mut [f32; 3]),
-    /// Color value with four float components (e.g. RGBA).
-    Float4(&'a mut [f32; 4]),
-}
+// /// Mutable reference to an editable color value.
+// #[derive(Debug)]
+// pub enum EditableColor<'a, T> {
+//     /// Color value with three float components (e.g. RGB).
+//     Float3(&'a mut T),
+//     /// Color value with four float components (e.g. RGBA).
+//     Float4(&'a mut T),
+// }
 
-impl<'a> EditableColor<'a> {
-    /// Returns an unsafe mutable pointer to the color slice's buffer.
-    fn as_mut_ptr(&mut self) -> *mut f32 {
-        match *self {
-            EditableColor::Float3(ref mut value) => value.as_mut_ptr(),
-            EditableColor::Float4(ref mut value) => value.as_mut_ptr(),
-        }
-    }
-}
+// impl<'a> EditableColor<'a> {
+//     /// Returns an unsafe mutable pointer to the color slice's buffer.
+//     fn as_mut_ptr(&mut self) -> *mut f32 {
+//         match *self {
+//             EditableColor::Float3(ref mut value) => value.as_mut_ptr(),
+//             EditableColor::Float4(ref mut value) => value.as_mut_ptr(),
+//         }
+//     }
+// }
 
-impl<'a> From<&'a mut [f32; 3]> for EditableColor<'a> {
-    #[inline]
-    fn from(value: &'a mut [f32; 3]) -> EditableColor<'a> {
-        EditableColor::Float3(value)
-    }
-}
+// impl<'a> From<&'a mut [f32; 3]> for EditableColor<'a> {
+//     #[inline]
+//     fn from(value: &'a mut [f32; 3]) -> EditableColor<'a> {
+//         EditableColor::Float3(value)
+//     }
+// }
 
-impl<'a> From<&'a mut [f32; 4]> for EditableColor<'a> {
-    #[inline]
-    fn from(value: &'a mut [f32; 4]) -> EditableColor<'a> {
-        EditableColor::Float4(value)
-    }
-}
+// impl<'a> From<&'a mut [f32; 4]> for EditableColor<'a> {
+//     #[inline]
+//     fn from(value: &'a mut [f32; 4]) -> EditableColor<'a> {
+//         EditableColor::Float4(value)
+//     }
+// }
 
 /// Color editor input mode.
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
@@ -183,19 +186,24 @@ bitflags! {
 /// ```
 #[derive(Debug)]
 #[must_use]
-pub struct ColorEdit<'a, T: AsRef<str> + 'a> {
+pub struct ColorEdit3<'a, T, C> {
     label: T,
-    value: EditableColor<'a>,
+    value: &'a mut C,
     flags: ColorEditFlags,
 }
 
-impl<'a, T: AsRef<str> + 'a> ColorEdit<'a, T> {
+impl<'a, T, C> ColorEdit3<'a, T, C>
+where
+    T: AsRef<str>,
+    MintVec3: From<C>,
+    C: From<MintVec3> + Copy,
+{
     /// Constructs a new color editor builder.
-    #[doc(alias = "ColorEdit3", alias = "ColorEdit4")]
-    pub fn new(label: T, value: impl Into<EditableColor<'a>>) -> ColorEdit<'a, T> {
-        ColorEdit {
+    #[doc(alias = "ColorEdit3")]
+    pub fn new(label: T, value: &'a mut C) -> Self {
+        ColorEdit3 {
             label,
-            value: value.into(),
+            value,
             flags: ColorEditFlags::empty(),
         }
     }
@@ -319,25 +327,207 @@ impl<'a, T: AsRef<str> + 'a> ColorEdit<'a, T> {
     ///
     /// Returns true if the color value was changed.
     pub fn build(mut self, ui: &Ui<'_>) -> bool {
-        if let EditableColor::Float3(_) = self.value {
-            self.flags.insert(ColorEditFlags::NO_ALPHA);
+        // if let EditableColor::Float3(_) = self.value {
+        self.flags.insert(ColorEditFlags::NO_ALPHA);
+
+        let as_vec3: MintVec3 = (*self.value).into();
+        let mut as_vec3: [f32; 3] = as_vec3.into();
+
+        let changed = unsafe {
+            sys::igColorEdit3(
+                ui.scratch_txt(self.label),
+                as_vec3.as_mut_ptr(),
+                self.flags.bits() as _,
+            )
+        };
+
+        // and go backwards...
+        if changed {
+            let as_vec3: MintVec3 = as_vec3.into();
+
+            *self.value = as_vec3.into();
         }
-        match self.value {
-            EditableColor::Float3(value) => unsafe {
-                sys::igColorEdit3(
-                    ui.scratch_txt(self.label),
-                    value.as_mut_ptr(),
-                    self.flags.bits() as _,
-                )
-            },
-            EditableColor::Float4(value) => unsafe {
-                sys::igColorEdit4(
-                    ui.scratch_txt(self.label),
-                    value.as_mut_ptr(),
-                    self.flags.bits() as _,
-                )
-            },
+
+        changed
+    }
+}
+
+/// Builder for a color editor widget.
+///
+/// # Examples
+///
+/// ```no_run
+/// # use imgui::*;
+/// # let mut imgui = Context::create();
+/// # let ui = imgui.frame();
+/// # let mut color = [0.0, 0.0, 0.0, 1.0];
+/// let ce = ColorEdit::new(im_str!("color_edit"), &mut color);
+/// if ce.build(&ui) {
+///   println!("The color was changed");
+/// }
+/// ```
+#[derive(Debug)]
+#[must_use]
+pub struct ColorEdit4<'a, T, C> {
+    label: T,
+    value: &'a mut C,
+    flags: ColorEditFlags,
+}
+
+impl<'a, T, C> ColorEdit4<'a, T, C>
+where
+    T: AsRef<str>,
+    MintVec4: From<C>,
+    C: From<MintVec4> + Copy,
+{
+    /// Constructs a new color editor builder.
+    #[doc(alias = "ColorEdit4")]
+    pub fn new(label: T, value: &'a mut C) -> Self {
+        Self {
+            label,
+            value,
+            flags: ColorEditFlags::empty(),
         }
+    }
+    /// Replaces all current settings with the given flags.
+    #[inline]
+    pub fn flags(mut self, flags: ColorEditFlags) -> Self {
+        self.flags = flags;
+        self
+    }
+    /// Enables/disables the use of the alpha component.
+    #[inline]
+    pub fn alpha(mut self, value: bool) -> Self {
+        self.flags.set(ColorEditFlags::NO_ALPHA, !value);
+        self
+    }
+    /// Enables/disables the picker that appears when clicking on colored square.
+    #[inline]
+    pub fn picker(mut self, value: bool) -> Self {
+        self.flags.set(ColorEditFlags::NO_PICKER, !value);
+        self
+    }
+    /// Enables/disables toggling of the options menu when right-clicking on inputs or the small
+    /// preview.
+    #[inline]
+    pub fn options(mut self, value: bool) -> Self {
+        self.flags.set(ColorEditFlags::NO_OPTIONS, !value);
+        self
+    }
+    /// Enables/disables the colored square preview next to the inputs.
+    #[inline]
+    pub fn small_preview(mut self, value: bool) -> Self {
+        self.flags.set(ColorEditFlags::NO_SMALL_PREVIEW, !value);
+        self
+    }
+    /// Enables/disables the input sliders/text widgets.
+    #[inline]
+    pub fn inputs(mut self, value: bool) -> Self {
+        self.flags.set(ColorEditFlags::NO_INPUTS, !value);
+        self
+    }
+    /// Enables/disables the tooltip that appears when hovering the preview.
+    #[inline]
+    pub fn tooltip(mut self, value: bool) -> Self {
+        self.flags.set(ColorEditFlags::NO_TOOLTIP, !value);
+        self
+    }
+    /// Enables/disables display of the inline text label (the label is in any case forwarded to
+    /// the tooltip and picker).
+    #[inline]
+    pub fn label(mut self, value: bool) -> Self {
+        self.flags.set(ColorEditFlags::NO_LABEL, !value);
+        self
+    }
+    /// Enables/disables the vertical alpha bar/gradient in the color picker.
+    #[inline]
+    pub fn alpha_bar(mut self, value: bool) -> Self {
+        self.flags.set(ColorEditFlags::ALPHA_BAR, value);
+        self
+    }
+    /// Sets the preview style.
+    #[inline]
+    pub fn preview(mut self, preview: ColorPreview) -> Self {
+        self.flags.set(
+            ColorEditFlags::ALPHA_PREVIEW_HALF,
+            preview == ColorPreview::HalfAlpha,
+        );
+        self.flags.set(
+            ColorEditFlags::ALPHA_PREVIEW,
+            preview == ColorPreview::Alpha,
+        );
+        self
+    }
+    /// (WIP) Currently only disables 0.0..1.0 limits in RGBA edition.
+    ///
+    /// Note: you probably want to use ColorFormat::Float as well.
+    #[inline]
+    pub fn hdr(mut self, value: bool) -> Self {
+        self.flags.set(ColorEditFlags::HDR, value);
+        self
+    }
+    /// Sets the data format for input and output data.
+    #[inline]
+    pub fn input_mode(mut self, input_mode: ColorEditInputMode) -> Self {
+        self.flags.set(
+            ColorEditFlags::INPUT_RGB,
+            input_mode == ColorEditInputMode::RGB,
+        );
+        self.flags.set(
+            ColorEditFlags::INPUT_HSV,
+            input_mode == ColorEditInputMode::HSV,
+        );
+        self
+    }
+    /// Sets the color editor display mode.
+    #[inline]
+    pub fn display_mode(mut self, mode: ColorEditDisplayMode) -> Self {
+        self.flags.set(
+            ColorEditFlags::DISPLAY_RGB,
+            mode == ColorEditDisplayMode::RGB,
+        );
+        self.flags.set(
+            ColorEditFlags::DISPLAY_HSV,
+            mode == ColorEditDisplayMode::HSV,
+        );
+        self.flags.set(
+            ColorEditFlags::DISPLAY_HEX,
+            mode == ColorEditDisplayMode::HEX,
+        );
+        self
+    }
+    /// Sets the formatting style of color components.
+    #[inline]
+    pub fn format(mut self, format: ColorFormat) -> Self {
+        self.flags
+            .set(ColorEditFlags::UINT8, format == ColorFormat::U8);
+        self.flags
+            .set(ColorEditFlags::FLOAT, format == ColorFormat::Float);
+        self
+    }
+    /// Builds the color editor.
+    ///
+    /// Returns true if the color value was changed.
+    pub fn build(self, ui: &Ui<'_>) -> bool {
+        let as_vec4: MintVec4 = (*self.value).into();
+        let mut as_vec4: [f32; 4] = as_vec4.into();
+
+        let changed = unsafe {
+            sys::igColorEdit4(
+                ui.scratch_txt(self.label),
+                as_vec4.as_mut_ptr(),
+                self.flags.bits() as _,
+            )
+        };
+
+        // and go backwards...
+        if changed {
+            let as_vec4: MintVec4 = as_vec4.into();
+
+            *self.value = as_vec4.into();
+        }
+
+        changed
     }
 }
 
@@ -357,20 +547,209 @@ impl<'a, T: AsRef<str> + 'a> ColorEdit<'a, T> {
 /// ```
 #[derive(Debug)]
 #[must_use]
-pub struct ColorPicker<'a, T: AsRef<str> + 'a> {
-    label: T,
-    value: EditableColor<'a>,
+pub struct ColorPicker3<'a, Label, Color> {
+    label: Label,
+    value: &'a mut Color,
     flags: ColorEditFlags,
-    ref_color: Option<&'a [f32; 4]>,
 }
 
-impl<'a, T: AsRef<str>> ColorPicker<'a, T> {
+impl<'a, Label, Color> ColorPicker3<'a, Label, Color>
+where
+    Label: AsRef<str>,
+    MintVec3: From<Color>,
+    Color: From<MintVec3> + Copy,
+{
     /// Constructs a new color picker builder.
-    #[doc(alias = "ColorButton")]
-    pub fn new(label: T, value: impl Into<EditableColor<'a>>) -> Self {
-        ColorPicker {
+    #[doc(alias = "ColorPicker3")]
+    pub fn new(label: Label, value: &'a mut Color) -> Self {
+        ColorPicker3 {
             label,
-            value: value.into(),
+            value,
+            flags: ColorEditFlags::empty(),
+        }
+    }
+    /// Replaces all current settings with the given flags.
+    #[inline]
+    pub fn flags(mut self, flags: ColorEditFlags) -> Self {
+        self.flags = flags;
+        self
+    }
+    /// Enables/disables the use of the alpha component.
+    #[inline]
+    pub fn alpha(mut self, value: bool) -> Self {
+        self.flags.set(ColorEditFlags::NO_ALPHA, !value);
+        self
+    }
+    /// Enables/disables toggling of the options menu when right-clicking on inputs or the small
+    /// preview.
+    #[inline]
+    pub fn options(mut self, value: bool) -> Self {
+        self.flags.set(ColorEditFlags::NO_OPTIONS, !value);
+        self
+    }
+    /// Enables/disables the colored square preview next to the inputs.
+    #[inline]
+    pub fn small_preview(mut self, value: bool) -> Self {
+        self.flags.set(ColorEditFlags::NO_SMALL_PREVIEW, !value);
+        self
+    }
+    /// Enables/disables the input sliders/text widgets.
+    #[inline]
+    pub fn inputs(mut self, value: bool) -> Self {
+        self.flags.set(ColorEditFlags::NO_INPUTS, !value);
+        self
+    }
+    /// Enables/disables the tooltip that appears when hovering the preview.
+    #[inline]
+    pub fn tooltip(mut self, value: bool) -> Self {
+        self.flags.set(ColorEditFlags::NO_TOOLTIP, !value);
+        self
+    }
+    /// Enables/disables display of the inline text label (the label is in any case forwarded to
+    /// the tooltip and picker).
+    #[inline]
+    pub fn label(mut self, value: bool) -> Self {
+        self.flags.set(ColorEditFlags::NO_LABEL, !value);
+        self
+    }
+    /// Enables/disables the bigger color preview on the right side of the picker.
+    #[inline]
+    pub fn side_preview(mut self, value: bool) -> Self {
+        self.flags.set(ColorEditFlags::NO_SIDE_PREVIEW, !value);
+        self
+    }
+    /// Enables/disables the vertical alpha bar/gradient in the color picker.
+    #[inline]
+    pub fn alpha_bar(mut self, value: bool) -> Self {
+        self.flags.set(ColorEditFlags::ALPHA_BAR, value);
+        self
+    }
+    /// Sets the preview style.
+    #[inline]
+    pub fn preview(mut self, preview: ColorPreview) -> Self {
+        self.flags.set(
+            ColorEditFlags::ALPHA_PREVIEW_HALF,
+            preview == ColorPreview::HalfAlpha,
+        );
+        self.flags.set(
+            ColorEditFlags::ALPHA_PREVIEW,
+            preview == ColorPreview::Alpha,
+        );
+        self
+    }
+    /// Sets the data format for input and output data.
+    #[inline]
+    pub fn input_mode(mut self, input_mode: ColorEditInputMode) -> Self {
+        self.flags.set(
+            ColorEditFlags::INPUT_RGB,
+            input_mode == ColorEditInputMode::RGB,
+        );
+        self.flags.set(
+            ColorEditFlags::INPUT_HSV,
+            input_mode == ColorEditInputMode::HSV,
+        );
+        self
+    }
+    /// Enables/disables displaying the value as RGB.
+    #[inline]
+    pub fn display_rgb(mut self, value: bool) -> Self {
+        self.flags.set(ColorEditFlags::DISPLAY_RGB, value);
+        self
+    }
+    /// Enables/disables displaying the value as HSV.
+    #[inline]
+    pub fn display_hsv(mut self, value: bool) -> Self {
+        self.flags.set(ColorEditFlags::DISPLAY_HSV, value);
+        self
+    }
+    /// Enables/disables displaying the value as hex.
+    #[inline]
+    pub fn display_hex(mut self, value: bool) -> Self {
+        self.flags.set(ColorEditFlags::DISPLAY_HEX, value);
+        self
+    }
+    /// Sets the hue/saturation/value editor mode.
+    #[inline]
+    pub fn mode(mut self, mode: ColorPickerMode) -> Self {
+        self.flags.set(
+            ColorEditFlags::PICKER_HUE_BAR,
+            mode == ColorPickerMode::HueBar,
+        );
+        self.flags.set(
+            ColorEditFlags::PICKER_HUE_WHEEL,
+            mode == ColorPickerMode::HueWheel,
+        );
+        self
+    }
+    /// Sets the formatting style of color components.
+    #[inline]
+    pub fn format(mut self, format: ColorFormat) -> Self {
+        self.flags
+            .set(ColorEditFlags::UINT8, format == ColorFormat::U8);
+        self.flags
+            .set(ColorEditFlags::FLOAT, format == ColorFormat::Float);
+        self
+    }
+
+    /// Builds the color picker.
+    ///
+    /// Returns true if the color value was changed.
+    pub fn build(mut self, ui: &Ui<'_>) -> bool {
+        self.flags.insert(ColorEditFlags::NO_ALPHA);
+        let mut value: [f32; 3] = MintVec3::from(*self.value).into();
+        let changed = unsafe {
+            sys::igColorPicker3(
+                ui.scratch_txt(self.label),
+                value.as_mut_ptr(),
+                self.flags.bits() as _,
+            )
+        };
+
+        if changed {
+            let as_vec3: MintVec3 = value.into();
+
+            *self.value = as_vec3.into();
+        }
+
+        changed
+    }
+}
+
+// Builder for a color picker widget.
+///
+/// # Examples
+///
+/// ```no_run
+/// # use imgui::*;
+/// # let mut imgui = Context::create();
+/// # let ui = imgui.frame();
+/// # let mut color = [0.0, 0.0, 0.0, 1.0];
+/// let cp = ColorPicker::new(im_str!("color_picker"), &mut color);
+/// if cp.build(&ui) {
+///   println!("A color was picked");
+/// }
+/// ```
+#[derive(Debug)]
+#[must_use]
+pub struct ColorPicker4<'a, Label, Color> {
+    label: Label,
+    value: &'a mut Color,
+    flags: ColorEditFlags,
+    ref_color: Option<[f32; 4]>,
+}
+
+impl<'a, Label, Color> ColorPicker4<'a, Label, Color>
+where
+    Label: AsRef<str>,
+    MintVec4: From<Color>,
+    Color: From<MintVec4> + Copy,
+{
+    /// Constructs a new color picker builder.
+    #[doc(alias = "ColorPicker4")]
+    pub fn new(label: Label, value: &'a mut Color) -> Self {
+        Self {
+            label,
+            value,
             flags: ColorEditFlags::empty(),
             ref_color: None,
         }
@@ -499,26 +878,35 @@ impl<'a, T: AsRef<str>> ColorPicker<'a, T> {
     }
     /// Sets the shown reference color.
     #[inline]
-    pub fn reference_color(mut self, ref_color: &'a [f32; 4]) -> Self {
-        self.ref_color = Some(ref_color);
+    pub fn reference_color(mut self, ref_color: impl Into<MintVec4>) -> Self {
+        self.ref_color = Some(ref_color.into().into());
         self
     }
+
     /// Builds the color picker.
     ///
     /// Returns true if the color value was changed.
     pub fn build(mut self, ui: &Ui<'_>) -> bool {
-        if let EditableColor::Float3(_) = self.value {
-            self.flags.insert(ColorEditFlags::NO_ALPHA);
-        }
+        self.flags.insert(ColorEditFlags::NO_ALPHA);
+        let mut value: [f32; 4] = MintVec4::from(*self.value).into();
         let ref_color = self.ref_color.map(|c| c.as_ptr()).unwrap_or(ptr::null());
-        unsafe {
+
+        let changed = unsafe {
             sys::igColorPicker4(
                 ui.scratch_txt(self.label),
-                self.value.as_mut_ptr(),
+                value.as_mut_ptr(),
                 self.flags.bits() as _,
                 ref_color,
             )
+        };
+
+        if changed {
+            let as_vec3: MintVec4 = value.into();
+
+            *self.value = as_vec3.into();
         }
+
+        changed
     }
 }
 
@@ -544,10 +932,10 @@ pub struct ColorButton<T> {
 
 impl<T: AsRef<str>> ColorButton<T> {
     /// Constructs a new color button builder.
-    pub fn new(desc_id: T, color: [f32; 4]) -> Self {
+    pub fn new(desc_id: T, color: impl Into<MintVec4>) -> Self {
         ColorButton {
             desc_id,
-            color,
+            color: color.into().into(),
             flags: ColorEditFlags::empty(),
             size: [0.0, 0.0],
         }
@@ -614,8 +1002,8 @@ impl<T: AsRef<str>> ColorButton<T> {
     ///
     /// Use 0.0 for width and/or height to use the default size.
     #[inline]
-    pub fn size(mut self, size: [f32; 2]) -> Self {
-        self.size = size;
+    pub fn size(mut self, size: impl Into<MintVec2>) -> Self {
+        self.size = size.into().into();
         self
     }
     /// Builds the color button.
