@@ -9404,15 +9404,14 @@
           "type": "ImGuiSliderFlags"
         }
       ],
-      "argsoriginal": "(const char* label,ImGuiDataType data_type,void* p_data,float v_speed=1.0f,const void* p_min=((void*)0),const void* p_max=((void*)0),const char* format=((void*)0),ImGuiSliderFlags flags=0)",
+      "argsoriginal": "(const char* label,ImGuiDataType data_type,void* p_data,float v_speed,const void* p_min=((void*)0),const void* p_max=((void*)0),const char* format=((void*)0),ImGuiSliderFlags flags=0)",
       "call_args": "(label,data_type,p_data,v_speed,p_min,p_max,format,flags)",
       "cimguiname": "igDragScalar",
       "defaults": {
         "flags": "0",
         "format": "NULL",
         "p_max": "NULL",
-        "p_min": "NULL",
-        "v_speed": "1.0f"
+        "p_min": "NULL"
       },
       "funcname": "DragScalar",
       "location": "imgui:510",
@@ -9464,15 +9463,14 @@
           "type": "ImGuiSliderFlags"
         }
       ],
-      "argsoriginal": "(const char* label,ImGuiDataType data_type,void* p_data,int components,float v_speed=1.0f,const void* p_min=((void*)0),const void* p_max=((void*)0),const char* format=((void*)0),ImGuiSliderFlags flags=0)",
+      "argsoriginal": "(const char* label,ImGuiDataType data_type,void* p_data,int components,float v_speed,const void* p_min=((void*)0),const void* p_max=((void*)0),const char* format=((void*)0),ImGuiSliderFlags flags=0)",
       "call_args": "(label,data_type,p_data,components,v_speed,p_min,p_max,format,flags)",
       "cimguiname": "igDragScalarN",
       "defaults": {
         "flags": "0",
         "format": "NULL",
         "p_max": "NULL",
-        "p_min": "NULL",
-        "v_speed": "1.0f"
+        "p_min": "NULL"
       },
       "funcname": "DragScalarN",
       "location": "imgui:511",
@@ -13096,7 +13094,7 @@
           "type": "int"
         }
       ],
-      "argsoriginal": "(const char* label,const float* values,int values_count,int values_offset=0,const char* overlay_text=((void*)0),float scale_min=3.40282347e+38F,float scale_max=3.40282347e+38F,ImVec2 graph_size=ImVec2(0,0),int stride=sizeof(float))",
+      "argsoriginal": "(const char* label,const float* values,int values_count,int values_offset=0,const char* overlay_text=((void*)0),float scale_min=3.40282346638528859811704183484516925e+38F,float scale_max=3.40282346638528859811704183484516925e+38F,ImVec2 graph_size=ImVec2(0,0),int stride=sizeof(float))",
       "call_args": "(label,values,values_count,values_offset,overlay_text,scale_min,scale_max,graph_size,stride)",
       "cimguiname": "igPlotHistogram",
       "defaults": {
@@ -13157,7 +13155,7 @@
           "type": "ImVec2"
         }
       ],
-      "argsoriginal": "(const char* label,float(*values_getter)(void* data,int idx),void* data,int values_count,int values_offset=0,const char* overlay_text=((void*)0),float scale_min=3.40282347e+38F,float scale_max=3.40282347e+38F,ImVec2 graph_size=ImVec2(0,0))",
+      "argsoriginal": "(const char* label,float(*values_getter)(void* data,int idx),void* data,int values_count,int values_offset=0,const char* overlay_text=((void*)0),float scale_min=3.40282346638528859811704183484516925e+38F,float scale_max=3.40282346638528859811704183484516925e+38F,ImVec2 graph_size=ImVec2(0,0))",
       "call_args": "(label,values_getter,data,values_count,values_offset,overlay_text,scale_min,scale_max,graph_size)",
       "cimguiname": "igPlotHistogram",
       "defaults": {
@@ -13217,7 +13215,7 @@
           "type": "int"
         }
       ],
-      "argsoriginal": "(const char* label,const float* values,int values_count,int values_offset=0,const char* overlay_text=((void*)0),float scale_min=3.40282347e+38F,float scale_max=3.40282347e+38F,ImVec2 graph_size=ImVec2(0,0),int stride=sizeof(float))",
+      "argsoriginal": "(const char* label,const float* values,int values_count,int values_offset=0,const char* overlay_text=((void*)0),float scale_min=3.40282346638528859811704183484516925e+38F,float scale_max=3.40282346638528859811704183484516925e+38F,ImVec2 graph_size=ImVec2(0,0),int stride=sizeof(float))",
       "call_args": "(label,values,values_count,values_offset,overlay_text,scale_min,scale_max,graph_size,stride)",
       "cimguiname": "igPlotLines",
       "defaults": {
@@ -13278,7 +13276,7 @@
           "type": "ImVec2"
         }
       ],
-      "argsoriginal": "(const char* label,float(*values_getter)(void* data,int idx),void* data,int values_count,int values_offset=0,const char* overlay_text=((void*)0),float scale_min=3.40282347e+38F,float scale_max=3.40282347e+38F,ImVec2 graph_size=ImVec2(0,0))",
+      "argsoriginal": "(const char* label,float(*values_getter)(void* data,int idx),void* data,int values_count,int values_offset=0,const char* overlay_text=((void*)0),float scale_min=3.40282346638528859811704183484516925e+38F,float scale_max=3.40282346638528859811704183484516925e+38F,ImVec2 graph_size=ImVec2(0,0))",
       "call_args": "(label,values_getter,data,values_count,values_offset,overlay_text,scale_min,scale_max,graph_size)",
       "cimguiname": "igPlotLines",
       "defaults": {
@@ -13481,7 +13479,7 @@
           "type": "const char*"
         }
       ],
-      "argsoriginal": "(float fraction,const ImVec2& size_arg=ImVec2(-1.17549435e-38F,0),const char* overlay=((void*)0))",
+      "argsoriginal": "(float fraction,const ImVec2& size_arg=ImVec2(-1.17549435082228750796873653722224568e-38F,0),const char* overlay=((void*)0))",
       "call_args": "(fraction,size_arg,overlay)",
       "cimguiname": "igProgressBar",
       "defaults": {
