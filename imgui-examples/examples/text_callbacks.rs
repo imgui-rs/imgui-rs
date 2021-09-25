@@ -7,9 +7,9 @@ fn main() {
     let mut buffers = vec![String::default(), String::default(), String::default()];
 
     system.main_loop(move |_, ui| {
-        Window::new("Input text callbacks")
+        ui.window("Input text callbacks")
             .size([500.0, 300.0], Condition::FirstUseEver)
-            .build(ui, || {
+            .build(|| {
                 ui.text("You can make a variety of buffer callbacks on an Input Text");
                 ui.text(
                     "or on an InputTextMultiline. In this example, we'll use \

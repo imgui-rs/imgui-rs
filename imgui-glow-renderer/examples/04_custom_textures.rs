@@ -144,9 +144,9 @@ impl TexturesUi {
     }
 
     fn show(&self, ui: &imgui::Ui) {
-        imgui::Window::new("Hello textures")
+        ui.window("Hello textures")
             .size([400.0, 400.0], Condition::FirstUseEver)
-            .build(ui, || {
+            .build(|| {
                 ui.text("Hello textures!");
                 ui.text("Some generated texture");
                 imgui::Image::new(self.generated_texture, [100.0, 100.0]).build(ui);
