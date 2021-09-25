@@ -160,7 +160,7 @@ impl<'ui> Ui<'ui> {
         unsafe {
             cfg_if::cfg_if! {
                 if #[cfg(feature = "docking")] {
-                    sys::igOpenPopupID(self.scratch_txt(str_id), 0)
+                    sys::igOpenPopupStr(self.scratch_txt(str_id), 0)
                 } else {
                     sys::igOpenPopup(self.scratch_txt(str_id), 0)
                 }
