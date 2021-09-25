@@ -68,41 +68,7 @@ impl<'ui> Ui<'ui> {
         ColorStackToken::new(self)
     }
 
-    /// Changes style colors by pushing several changes to the color stack.
-    ///
-    /// Returns a `ColorStackToken` that must be popped by calling `.pop()`
-    ///
-    /// # Examples
-    ///
-    /// ```no_run
-    /// # use imgui::*;
-    /// # let mut ctx = Context::create();
-    /// # let ui = ctx.frame();
-    /// const RED: [f32; 4] = [1.0, 0.0, 0.0, 1.0];
-    /// const GREEN: [f32; 4] = [0.0, 1.0, 0.0, 1.0];
-    /// let colors = ui.push_style_colors(&[
-    ///     (StyleColor::Text, RED),
-    ///     (StyleColor::TextDisabled, GREEN),
-    /// ]);
-    /// ui.text("I'm red!");
-    /// ui.text_disabled("I'm green!");
-    /// colors.pop(&ui);
-    /// ```
-    #[deprecated = "deprecated in 0.7.0. Use `push_style_color` multiple times for similar effect."]
-    pub fn push_style_colors<'a, I>(&self, style_colors: I) -> MultiColorStackToken
-    where
-        I: IntoIterator<Item = &'a (StyleColor, [f32; 4])>,
-    {
-        let mut count = 0;
-        for &(style_color, color) in style_colors {
-            unsafe { sys::igPushStyleColor_Vec4(style_color as i32, color.into()) };
-            count += 1;
-        }
-        MultiColorStackToken {
-            count,
-            ctx: self.ctx,
-        }
-    }
+
     /// Changes a style variable by pushing a change to the style stack.
     ///
     /// Returns a `StyleStackToken` that can be popped by calling `.end()`

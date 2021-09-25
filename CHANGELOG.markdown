@@ -4,6 +4,8 @@
 
 - MSRV is now **1.54**. We soft-updated to this in 0.8.0 with a feature `min-const-generics`, which has now been removed (and as such, we resume having no default features).
 
+- BREAKING: Removed `push_style_colors`. Instead, use `push_style_color` in a loop. This was deprecated in `0.7.0` and should have been removed in `0.8.0`.
+
 ## [0.8.0] - 2021-09-17
 
 Welcome to the `0.8.0` update. This is one of the largest updates imgui-rs has ever seen; it will generate errors in a `0.7` project, but hopefully it should be both quick to fix, and enjoyable to update. See our [release page](https://github.com/imgui-rs/imgui-rs/releases/tag/v0.8.0) for more information and a list of contributors to this cycle. Thank you to everyone who uses `imgui-rs`, files issues, and spend their time and effort to PR new changes into the codebase. Because of all that effort, this is by far the best `imgui-rs` has looked!
