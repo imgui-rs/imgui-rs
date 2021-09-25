@@ -561,7 +561,7 @@ impl<'ui> Ui<'ui> {
         };
 
         unsafe {
-            sys::igListBox_Str_arr(
+            sys::igListBoxStr_arr(
                 label_ptr,
                 current_item,
                 items_inner.as_ptr() as *mut *const c_char,

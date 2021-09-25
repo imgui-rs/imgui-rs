@@ -104,7 +104,7 @@ impl<'ui> Ui<'ui> {
     /// Returns true if this radio button was clicked.
     #[doc(alias = "RadioButtonBool")]
     pub fn radio_button_bool(&self, label: impl AsRef<str>, active: bool) -> bool {
-        unsafe { sys::igRadioButton_Bool(self.scratch_txt(label), active) }
+        unsafe { sys::igRadioButtonBool(self.scratch_txt(label), active) }
     }
     /// Renders a radio button suitable for choosing an arbitrary value.
     ///

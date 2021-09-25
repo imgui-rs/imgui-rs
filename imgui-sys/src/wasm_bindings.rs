@@ -132,7 +132,14 @@ pub type ImGuiTreeNodeFlags = cty::c_int;
 pub type ImGuiViewportFlags = cty::c_int;
 pub type ImGuiWindowFlags = cty::c_int;
 pub type ImTextureID = *mut cty::c_void;
+pub type ImDrawIdx = cty::c_ushort;
 pub type ImGuiID = cty::c_uint;
+pub type ImU8 = cty::c_uchar;
+pub type ImS16 = cty::c_short;
+pub type ImU32 = cty::c_uint;
+pub type ImWchar16 = cty::c_ushort;
+pub type ImWchar32 = cty::c_uint;
+pub type ImWchar = ImWchar32;
 pub type ImGuiInputTextCallback = ::core::option::Option<
     unsafe extern "C" fn(data: *mut ImGuiInputTextCallbackData) -> cty::c_int,
 >;
@@ -144,16 +151,9 @@ pub type ImGuiMemAllocFunc = ::core::option::Option<
 pub type ImGuiMemFreeFunc = ::core::option::Option<
     unsafe extern "C" fn(ptr: *mut cty::c_void, user_data: *mut cty::c_void),
 >;
-pub type ImWchar16 = cty::c_ushort;
-pub type ImWchar32 = cty::c_uint;
-pub type ImWchar = ImWchar32;
-pub type ImU8 = cty::c_uchar;
-pub type ImS16 = cty::c_short;
-pub type ImU32 = cty::c_uint;
 pub type ImDrawCallback = ::core::option::Option<
     unsafe extern "C" fn(parent_list: *const ImDrawList, cmd: *const ImDrawCmd),
 >;
-pub type ImDrawIdx = cty::c_ushort;
 #[repr(C)]
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
 pub struct ImVector_ImDrawChannel {
@@ -492,8 +492,6 @@ pub const ImGuiInputTextFlags_NoUndoRedo: ImGuiInputTextFlags_ = 65536;
 pub const ImGuiInputTextFlags_CharsScientific: ImGuiInputTextFlags_ = 131072;
 pub const ImGuiInputTextFlags_CallbackResize: ImGuiInputTextFlags_ = 262144;
 pub const ImGuiInputTextFlags_CallbackEdit: ImGuiInputTextFlags_ = 524288;
-pub const ImGuiInputTextFlags_Multiline: ImGuiInputTextFlags_ = 1048576;
-pub const ImGuiInputTextFlags_NoMarkEdited: ImGuiInputTextFlags_ = 2097152;
 pub type ImGuiInputTextFlags_ = cty::c_uint;
 pub const ImGuiTreeNodeFlags_None: ImGuiTreeNodeFlags_ = 0;
 pub const ImGuiTreeNodeFlags_Selected: ImGuiTreeNodeFlags_ = 1;
@@ -601,29 +599,31 @@ pub const ImGuiTableFlags_SortTristate: ImGuiTableFlags_ = 134217728;
 pub const ImGuiTableFlags_SizingMask_: ImGuiTableFlags_ = 57344;
 pub type ImGuiTableFlags_ = cty::c_uint;
 pub const ImGuiTableColumnFlags_None: ImGuiTableColumnFlags_ = 0;
-pub const ImGuiTableColumnFlags_DefaultHide: ImGuiTableColumnFlags_ = 1;
-pub const ImGuiTableColumnFlags_DefaultSort: ImGuiTableColumnFlags_ = 2;
-pub const ImGuiTableColumnFlags_WidthStretch: ImGuiTableColumnFlags_ = 4;
-pub const ImGuiTableColumnFlags_WidthFixed: ImGuiTableColumnFlags_ = 8;
-pub const ImGuiTableColumnFlags_NoResize: ImGuiTableColumnFlags_ = 16;
-pub const ImGuiTableColumnFlags_NoReorder: ImGuiTableColumnFlags_ = 32;
-pub const ImGuiTableColumnFlags_NoHide: ImGuiTableColumnFlags_ = 64;
-pub const ImGuiTableColumnFlags_NoClip: ImGuiTableColumnFlags_ = 128;
-pub const ImGuiTableColumnFlags_NoSort: ImGuiTableColumnFlags_ = 256;
-pub const ImGuiTableColumnFlags_NoSortAscending: ImGuiTableColumnFlags_ = 512;
-pub const ImGuiTableColumnFlags_NoSortDescending: ImGuiTableColumnFlags_ = 1024;
-pub const ImGuiTableColumnFlags_NoHeaderWidth: ImGuiTableColumnFlags_ = 2048;
-pub const ImGuiTableColumnFlags_PreferSortAscending: ImGuiTableColumnFlags_ = 4096;
-pub const ImGuiTableColumnFlags_PreferSortDescending: ImGuiTableColumnFlags_ = 8192;
-pub const ImGuiTableColumnFlags_IndentEnable: ImGuiTableColumnFlags_ = 16384;
-pub const ImGuiTableColumnFlags_IndentDisable: ImGuiTableColumnFlags_ = 32768;
-pub const ImGuiTableColumnFlags_IsEnabled: ImGuiTableColumnFlags_ = 1048576;
-pub const ImGuiTableColumnFlags_IsVisible: ImGuiTableColumnFlags_ = 2097152;
-pub const ImGuiTableColumnFlags_IsSorted: ImGuiTableColumnFlags_ = 4194304;
-pub const ImGuiTableColumnFlags_IsHovered: ImGuiTableColumnFlags_ = 8388608;
-pub const ImGuiTableColumnFlags_WidthMask_: ImGuiTableColumnFlags_ = 12;
-pub const ImGuiTableColumnFlags_IndentMask_: ImGuiTableColumnFlags_ = 49152;
-pub const ImGuiTableColumnFlags_StatusMask_: ImGuiTableColumnFlags_ = 15728640;
+pub const ImGuiTableColumnFlags_Disabled: ImGuiTableColumnFlags_ = 1;
+pub const ImGuiTableColumnFlags_DefaultHide: ImGuiTableColumnFlags_ = 2;
+pub const ImGuiTableColumnFlags_DefaultSort: ImGuiTableColumnFlags_ = 4;
+pub const ImGuiTableColumnFlags_WidthStretch: ImGuiTableColumnFlags_ = 8;
+pub const ImGuiTableColumnFlags_WidthFixed: ImGuiTableColumnFlags_ = 16;
+pub const ImGuiTableColumnFlags_NoResize: ImGuiTableColumnFlags_ = 32;
+pub const ImGuiTableColumnFlags_NoReorder: ImGuiTableColumnFlags_ = 64;
+pub const ImGuiTableColumnFlags_NoHide: ImGuiTableColumnFlags_ = 128;
+pub const ImGuiTableColumnFlags_NoClip: ImGuiTableColumnFlags_ = 256;
+pub const ImGuiTableColumnFlags_NoSort: ImGuiTableColumnFlags_ = 512;
+pub const ImGuiTableColumnFlags_NoSortAscending: ImGuiTableColumnFlags_ = 1024;
+pub const ImGuiTableColumnFlags_NoSortDescending: ImGuiTableColumnFlags_ = 2048;
+pub const ImGuiTableColumnFlags_NoHeaderLabel: ImGuiTableColumnFlags_ = 4096;
+pub const ImGuiTableColumnFlags_NoHeaderWidth: ImGuiTableColumnFlags_ = 8192;
+pub const ImGuiTableColumnFlags_PreferSortAscending: ImGuiTableColumnFlags_ = 16384;
+pub const ImGuiTableColumnFlags_PreferSortDescending: ImGuiTableColumnFlags_ = 32768;
+pub const ImGuiTableColumnFlags_IndentEnable: ImGuiTableColumnFlags_ = 65536;
+pub const ImGuiTableColumnFlags_IndentDisable: ImGuiTableColumnFlags_ = 131072;
+pub const ImGuiTableColumnFlags_IsEnabled: ImGuiTableColumnFlags_ = 16777216;
+pub const ImGuiTableColumnFlags_IsVisible: ImGuiTableColumnFlags_ = 33554432;
+pub const ImGuiTableColumnFlags_IsSorted: ImGuiTableColumnFlags_ = 67108864;
+pub const ImGuiTableColumnFlags_IsHovered: ImGuiTableColumnFlags_ = 134217728;
+pub const ImGuiTableColumnFlags_WidthMask_: ImGuiTableColumnFlags_ = 24;
+pub const ImGuiTableColumnFlags_IndentMask_: ImGuiTableColumnFlags_ = 196608;
+pub const ImGuiTableColumnFlags_StatusMask_: ImGuiTableColumnFlags_ = 251658240;
 pub const ImGuiTableColumnFlags_NoDirectResize_: ImGuiTableColumnFlags_ = 1073741824;
 pub type ImGuiTableColumnFlags_ = cty::c_uint;
 pub const ImGuiTableRowFlags_None: ImGuiTableRowFlags_ = 0;
@@ -732,12 +732,11 @@ pub const ImGuiNavInput_FocusPrev: ImGuiNavInput_ = 12;
 pub const ImGuiNavInput_FocusNext: ImGuiNavInput_ = 13;
 pub const ImGuiNavInput_TweakSlow: ImGuiNavInput_ = 14;
 pub const ImGuiNavInput_TweakFast: ImGuiNavInput_ = 15;
-pub const ImGuiNavInput_KeyMenu_: ImGuiNavInput_ = 16;
-pub const ImGuiNavInput_KeyLeft_: ImGuiNavInput_ = 17;
-pub const ImGuiNavInput_KeyRight_: ImGuiNavInput_ = 18;
-pub const ImGuiNavInput_KeyUp_: ImGuiNavInput_ = 19;
-pub const ImGuiNavInput_KeyDown_: ImGuiNavInput_ = 20;
-pub const ImGuiNavInput_COUNT: ImGuiNavInput_ = 21;
+pub const ImGuiNavInput_KeyLeft_: ImGuiNavInput_ = 16;
+pub const ImGuiNavInput_KeyRight_: ImGuiNavInput_ = 17;
+pub const ImGuiNavInput_KeyUp_: ImGuiNavInput_ = 18;
+pub const ImGuiNavInput_KeyDown_: ImGuiNavInput_ = 19;
+pub const ImGuiNavInput_COUNT: ImGuiNavInput_ = 20;
 pub const ImGuiNavInput_InternalStart_: ImGuiNavInput_ = 16;
 pub type ImGuiNavInput_ = cty::c_uint;
 pub const ImGuiConfigFlags_None: ImGuiConfigFlags_ = 0;
@@ -812,30 +811,31 @@ pub const ImGuiCol_ModalWindowDimBg: ImGuiCol_ = 52;
 pub const ImGuiCol_COUNT: ImGuiCol_ = 53;
 pub type ImGuiCol_ = cty::c_uint;
 pub const ImGuiStyleVar_Alpha: ImGuiStyleVar_ = 0;
-pub const ImGuiStyleVar_WindowPadding: ImGuiStyleVar_ = 1;
-pub const ImGuiStyleVar_WindowRounding: ImGuiStyleVar_ = 2;
-pub const ImGuiStyleVar_WindowBorderSize: ImGuiStyleVar_ = 3;
-pub const ImGuiStyleVar_WindowMinSize: ImGuiStyleVar_ = 4;
-pub const ImGuiStyleVar_WindowTitleAlign: ImGuiStyleVar_ = 5;
-pub const ImGuiStyleVar_ChildRounding: ImGuiStyleVar_ = 6;
-pub const ImGuiStyleVar_ChildBorderSize: ImGuiStyleVar_ = 7;
-pub const ImGuiStyleVar_PopupRounding: ImGuiStyleVar_ = 8;
-pub const ImGuiStyleVar_PopupBorderSize: ImGuiStyleVar_ = 9;
-pub const ImGuiStyleVar_FramePadding: ImGuiStyleVar_ = 10;
-pub const ImGuiStyleVar_FrameRounding: ImGuiStyleVar_ = 11;
-pub const ImGuiStyleVar_FrameBorderSize: ImGuiStyleVar_ = 12;
-pub const ImGuiStyleVar_ItemSpacing: ImGuiStyleVar_ = 13;
-pub const ImGuiStyleVar_ItemInnerSpacing: ImGuiStyleVar_ = 14;
-pub const ImGuiStyleVar_IndentSpacing: ImGuiStyleVar_ = 15;
-pub const ImGuiStyleVar_CellPadding: ImGuiStyleVar_ = 16;
-pub const ImGuiStyleVar_ScrollbarSize: ImGuiStyleVar_ = 17;
-pub const ImGuiStyleVar_ScrollbarRounding: ImGuiStyleVar_ = 18;
-pub const ImGuiStyleVar_GrabMinSize: ImGuiStyleVar_ = 19;
-pub const ImGuiStyleVar_GrabRounding: ImGuiStyleVar_ = 20;
-pub const ImGuiStyleVar_TabRounding: ImGuiStyleVar_ = 21;
-pub const ImGuiStyleVar_ButtonTextAlign: ImGuiStyleVar_ = 22;
-pub const ImGuiStyleVar_SelectableTextAlign: ImGuiStyleVar_ = 23;
-pub const ImGuiStyleVar_COUNT: ImGuiStyleVar_ = 24;
+pub const ImGuiStyleVar_DisabledAlpha: ImGuiStyleVar_ = 1;
+pub const ImGuiStyleVar_WindowPadding: ImGuiStyleVar_ = 2;
+pub const ImGuiStyleVar_WindowRounding: ImGuiStyleVar_ = 3;
+pub const ImGuiStyleVar_WindowBorderSize: ImGuiStyleVar_ = 4;
+pub const ImGuiStyleVar_WindowMinSize: ImGuiStyleVar_ = 5;
+pub const ImGuiStyleVar_WindowTitleAlign: ImGuiStyleVar_ = 6;
+pub const ImGuiStyleVar_ChildRounding: ImGuiStyleVar_ = 7;
+pub const ImGuiStyleVar_ChildBorderSize: ImGuiStyleVar_ = 8;
+pub const ImGuiStyleVar_PopupRounding: ImGuiStyleVar_ = 9;
+pub const ImGuiStyleVar_PopupBorderSize: ImGuiStyleVar_ = 10;
+pub const ImGuiStyleVar_FramePadding: ImGuiStyleVar_ = 11;
+pub const ImGuiStyleVar_FrameRounding: ImGuiStyleVar_ = 12;
+pub const ImGuiStyleVar_FrameBorderSize: ImGuiStyleVar_ = 13;
+pub const ImGuiStyleVar_ItemSpacing: ImGuiStyleVar_ = 14;
+pub const ImGuiStyleVar_ItemInnerSpacing: ImGuiStyleVar_ = 15;
+pub const ImGuiStyleVar_IndentSpacing: ImGuiStyleVar_ = 16;
+pub const ImGuiStyleVar_CellPadding: ImGuiStyleVar_ = 17;
+pub const ImGuiStyleVar_ScrollbarSize: ImGuiStyleVar_ = 18;
+pub const ImGuiStyleVar_ScrollbarRounding: ImGuiStyleVar_ = 19;
+pub const ImGuiStyleVar_GrabMinSize: ImGuiStyleVar_ = 20;
+pub const ImGuiStyleVar_GrabRounding: ImGuiStyleVar_ = 21;
+pub const ImGuiStyleVar_TabRounding: ImGuiStyleVar_ = 22;
+pub const ImGuiStyleVar_ButtonTextAlign: ImGuiStyleVar_ = 23;
+pub const ImGuiStyleVar_SelectableTextAlign: ImGuiStyleVar_ = 24;
+pub const ImGuiStyleVar_COUNT: ImGuiStyleVar_ = 25;
 pub type ImGuiStyleVar_ = cty::c_uint;
 pub const ImGuiButtonFlags_None: ImGuiButtonFlags_ = 0;
 pub const ImGuiButtonFlags_MouseButtonLeft: ImGuiButtonFlags_ = 1;
@@ -868,11 +868,11 @@ pub const ImGuiColorEditFlags_PickerHueBar: ImGuiColorEditFlags_ = 33554432;
 pub const ImGuiColorEditFlags_PickerHueWheel: ImGuiColorEditFlags_ = 67108864;
 pub const ImGuiColorEditFlags_InputRGB: ImGuiColorEditFlags_ = 134217728;
 pub const ImGuiColorEditFlags_InputHSV: ImGuiColorEditFlags_ = 268435456;
-pub const ImGuiColorEditFlags__OptionsDefault: ImGuiColorEditFlags_ = 177209344;
-pub const ImGuiColorEditFlags__DisplayMask: ImGuiColorEditFlags_ = 7340032;
-pub const ImGuiColorEditFlags__DataTypeMask: ImGuiColorEditFlags_ = 25165824;
-pub const ImGuiColorEditFlags__PickerMask: ImGuiColorEditFlags_ = 100663296;
-pub const ImGuiColorEditFlags__InputMask: ImGuiColorEditFlags_ = 402653184;
+pub const ImGuiColorEditFlags_DefaultOptions_: ImGuiColorEditFlags_ = 177209344;
+pub const ImGuiColorEditFlags_DisplayMask_: ImGuiColorEditFlags_ = 7340032;
+pub const ImGuiColorEditFlags_DataTypeMask_: ImGuiColorEditFlags_ = 25165824;
+pub const ImGuiColorEditFlags_PickerMask_: ImGuiColorEditFlags_ = 100663296;
+pub const ImGuiColorEditFlags_InputMask_: ImGuiColorEditFlags_ = 402653184;
 pub type ImGuiColorEditFlags_ = cty::c_uint;
 pub const ImGuiSliderFlags_None: ImGuiSliderFlags_ = 0;
 pub const ImGuiSliderFlags_AlwaysClamp: ImGuiSliderFlags_ = 16;
@@ -908,6 +908,7 @@ pub type ImGuiCond_ = cty::c_uint;
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub struct ImGuiStyle {
     pub Alpha: f32,
+    pub DisabledAlpha: f32,
     pub WindowPadding: ImVec2,
     pub WindowRounding: f32,
     pub WindowBorderSize: f32,
@@ -1010,7 +1011,7 @@ pub struct ImGuiIO {
     pub KeyAlt: bool,
     pub KeySuper: bool,
     pub KeysDown: [bool; 512usize],
-    pub NavInputs: [f32; 21usize],
+    pub NavInputs: [f32; 20usize],
     pub WantCaptureMouse: bool,
     pub WantCaptureKeyboard: bool,
     pub WantTextInput: bool,
@@ -1026,6 +1027,7 @@ pub struct ImGuiIO {
     pub MetricsActiveAllocations: cty::c_int,
     pub MouseDelta: ImVec2,
     pub KeyMods: ImGuiKeyModFlags,
+    pub KeyModsPrev: ImGuiKeyModFlags,
     pub MousePosPrev: ImVec2,
     pub MouseClickedPos: [ImVec2; 5usize],
     pub MouseClickedTime: [f64; 5usize],
@@ -1040,8 +1042,8 @@ pub struct ImGuiIO {
     pub MouseDragMaxDistanceSqr: [f32; 5usize],
     pub KeysDownDuration: [f32; 512usize],
     pub KeysDownDurationPrev: [f32; 512usize],
-    pub NavInputsDownDuration: [f32; 21usize],
-    pub NavInputsDownDurationPrev: [f32; 21usize],
+    pub NavInputsDownDuration: [f32; 20usize],
+    pub NavInputsDownDurationPrev: [f32; 20usize],
     pub PenPressure: f32,
     pub InputQueueSurrogate: ImWchar16,
     pub InputQueueCharacters: ImVector_ImWchar,
@@ -1588,6 +1590,7 @@ pub struct ImFontAtlas {
     pub TexDesiredWidth: cty::c_int,
     pub TexGlyphPadding: cty::c_int,
     pub Locked: bool,
+    pub TexReady: bool,
     pub TexPixelsUseColors: bool,
     pub TexPixelsAlpha8: *mut cty::c_uchar,
     pub TexPixelsRGBA32: *mut cty::c_uint,
@@ -1627,6 +1630,7 @@ pub struct ImFont {
     pub ConfigDataCount: cty::c_short,
     pub FallbackChar: ImWchar,
     pub EllipsisChar: ImWchar,
+    pub DotChar: ImWchar,
     pub DirtyLookupTables: bool,
     pub Scale: f32,
     pub Ascent: f32,
@@ -3113,7 +3117,11 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igOpenPopup(str_id: *const cty::c_char, popup_flags: ImGuiPopupFlags);
+    pub fn igOpenPopupStr(str_id: *const cty::c_char, popup_flags: ImGuiPopupFlags);
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
+    pub fn igOpenPopupID(id: ImGuiID, popup_flags: ImGuiPopupFlags);
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
@@ -3218,6 +3226,10 @@ extern "C" {
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igTableGetColumnFlags(column_n: cty::c_int) -> ImGuiTableColumnFlags;
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
+    pub fn igTableSetColumnEnabled(column_n: cty::c_int, v: bool);
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
@@ -3338,6 +3350,14 @@ extern "C" {
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igGetDragDropPayload() -> *const ImGuiPayload;
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
+    pub fn igBeginDisabled(disabled: bool);
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
+    pub fn igEndDisabled();
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
@@ -3700,6 +3720,10 @@ extern "C" {
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImGuiIO_ClearInputCharacters(self_: *mut ImGuiIO);
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
+    pub fn ImGuiIO_AddFocusEvent(self_: *mut ImGuiIO, focused: bool);
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
@@ -4076,6 +4100,10 @@ extern "C" {
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImDrawCmd_destroy(self_: *mut ImDrawCmd);
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
+    pub fn ImDrawCmd_GetTexID(self_: *mut ImDrawCmd) -> ImTextureID;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
@@ -4571,6 +4599,10 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
+    pub fn ImDrawList__TryMergeDrawCmds(self_: *mut ImDrawList);
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
     pub fn ImDrawList__OnChangedClipRect(self_: *mut ImDrawList);
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
@@ -5002,10 +5034,6 @@ extern "C" {
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImFont_SetGlyphVisible(self_: *mut ImFont, c: ImWchar, visible: bool);
-}
-#[link(wasm_import_module = "imgui-sys-v0")]
-extern "C" {
-    pub fn ImFont_SetFallbackChar(self_: *mut ImFont, c: ImWchar);
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {

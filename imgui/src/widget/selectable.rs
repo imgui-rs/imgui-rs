@@ -109,7 +109,7 @@ impl<T: AsRef<str>> Selectable<T> {
     /// Returns true if the selectable was clicked.
     pub fn build(self, ui: &Ui<'_>) -> bool {
         unsafe {
-            sys::igSelectable_Bool(
+            sys::igSelectableBool(
                 ui.scratch_txt(self.label),
                 self.selected,
                 self.flags.bits() as i32,
