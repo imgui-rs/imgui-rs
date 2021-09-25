@@ -79,6 +79,9 @@ mod utils;
 mod widget;
 mod window;
 
+#[cfg(feature = "docking")]
+mod docking;
+
 // Used by macros. Underscores are just to make it clear it's not part of the
 // public API.
 #[doc(hidden)]
