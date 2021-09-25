@@ -314,6 +314,53 @@ impl<'a> Default for Id<'a> {
     }
 }
 
+impl<'ui> Ui<'ui> {
+    /// # Windows
+    /// Start constructing a window.
+    ///
+    /// This, like many objects in the library, uses the builder
+    /// pattern to set optional arguments (like window size, flags,
+    /// etc). Once all desired options are set, you must call either
+    /// [`Window::build`] or [`Window::begin`] must be called to
+    /// actually create the window.
+    ///
+    /// # Examples
+    ///
+    /// Create a window using the closure based [`Window::build`]:
+    /// ```no_run
+    /// # let mut ctx = imgui::Context::create();
+    /// # let ui = ctx.frame();
+    /// ui.window("Example Window")
+    ///     .size([100.0, 50.0], imgui::Condition::FirstUseEver)
+    ///     .build(|| {
+    ///         ui.text("An example");
+    ///     });
+    /// ```
+    pub fn window<Label: AsRef<str>>(&'ui self, name: Label) -> Window<'ui, '_, Label> {
+        Window::new(self, name)
+    }
+
+    /// Same as [`Ui::window`] but using the "token based" `.begin()` approach.
+    ///
+    /// ```
+    /// fn example(ui: &imgui::Ui) {
+    ///     let wt = ui.window("Example Window")
+    ///         .size([100.0, 50.0], imgui::Condition::FirstUseEver)
+    ///         .begin();
+    ///     if wt.is_some() {
+    ///         ui.text("Window is visible");
+    ///     }
+    ///     // Window ends where where wt is dropped,
+    ///     // or you could call
+    ///     wt.unwrap().end()
+    /// }
+    /// ```
+    pub fn child_window<Label: AsRef<str>>(&'ui self, name: Label) -> ChildWindow<'ui, Label> {
+        ChildWindow::new(self, name)
+    }
+}
+
+
 // Widgets: Input
 impl<'ui> Ui<'ui> {
     #[doc(alias = "InputText", alias = "InputTextWithHint")]

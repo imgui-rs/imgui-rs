@@ -160,8 +160,9 @@ impl<'ui> Ui<'ui> {
 /// Builder for a window
 #[derive(Debug)]
 #[must_use]
-pub struct Window<'a, T> {
-    name: T,
+pub struct Window<'ui, 'a, Label> {
+    ui: &'ui Ui<'ui>,
+    name: Label,
     opened: Option<&'a mut bool>,
     flags: WindowFlags,
     pos: [f32; 2],
@@ -177,10 +178,11 @@ pub struct Window<'a, T> {
     bg_alpha: f32,
 }
 
-impl<'a, T: AsRef<str>> Window<'a, T> {
-    /// Creates a new window builder with the given name
-    pub fn new(name: T) -> Self {
+impl<'ui, 'a, Label: AsRef<str>> Window<'ui, 'a, Label> {
+    /// Typically created via [`Ui::window`]
+    pub fn new(ui: &'ui Ui<'ui>, name: Label) -> Self {
         Window {
+            ui,
             name,
             opened: None,
             flags: WindowFlags::empty(),
@@ -487,7 +489,7 @@ impl<'a, T: AsRef<str>> Window<'a, T> {
     ///
     /// Returns `None` if the window is not visible and no content should be rendered.
     #[must_use]
-    pub fn begin<'ui>(self, ui: &Ui<'ui>) -> Option<WindowToken<'ui>> {
+    pub fn begin(self) -> Option<WindowToken<'ui>> {
         if self.pos_cond != Condition::Never {
             unsafe {
                 sys::igSetNextWindowPos(
@@ -525,7 +527,7 @@ impl<'a, T: AsRef<str>> Window<'a, T> {
         }
         let should_render = unsafe {
             sys::igBegin(
-                ui.scratch_txt(self.name),
+                self.ui.scratch_txt(self.name),
                 self.opened
                     .map(|x| x as *mut bool)
                     .unwrap_or(ptr::null_mut()),
@@ -533,7 +535,7 @@ impl<'a, T: AsRef<str>> Window<'a, T> {
             )
         };
         if should_render {
-            Some(WindowToken::new(ui))
+            Some(WindowToken::new(self.ui))
         } else {
             unsafe { sys::igEnd() };
             None
@@ -542,10 +544,10 @@ impl<'a, T: AsRef<str>> Window<'a, T> {
     /// Creates a window and runs a closure to construct the contents.
     /// Returns the result of the closure, if it is called.
     ///
-    /// Note: the closure is not called if no window content is visible (e.g. window is collapsed
-    /// or fully clipped).
-    pub fn build<R, F: FnOnce() -> R>(self, ui: &Ui<'_>, f: F) -> Option<R> {
-        self.begin(ui).map(|_window| f())
+    /// Note: the closure is only called if the window content is
+    /// visible (e.g. will not run if window is collapsed).
+    pub fn build<R, F: FnOnce() -> R>(self, f: F) -> Option<R> {
+        self.begin().map(|_window| f())
     }
 }
 
