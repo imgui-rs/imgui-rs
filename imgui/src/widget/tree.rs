@@ -256,9 +256,9 @@ impl<T: AsRef<str>, L: AsRef<str>> TreeNode<T, L> {
                         }
                     };
 
-                    sys::igTreeNodeExStrStr(id, self.flags.bits() as i32, fmt_ptr(), label)
+                    sys::igTreeNodeEx_StrStr(id, self.flags.bits() as i32, fmt_ptr(), label)
                 }
-                TreeNodeId::Ptr(id) => sys::igTreeNodeExPtr(
+                TreeNodeId::Ptr(id) => sys::igTreeNodeEx_Ptr(
                     id,
                     self.flags.bits() as i32,
                     fmt_ptr(),
@@ -408,7 +408,7 @@ impl<T: AsRef<str>> CollapsingHeader<T> {
     ///
     /// This is the same as [build](Self::build) but is provided for consistent naming.
     #[must_use]
-    pub fn begin(self, ui: &Ui) -> bool {
+    pub fn begin(self, ui: &Ui<'_>) -> bool {
         self.build(ui)
     }
 
@@ -419,7 +419,7 @@ impl<T: AsRef<str>> CollapsingHeader<T> {
     /// This is the same as [build_with_close_button](Self::build_with_close_button)
     /// but is provided for consistent naming.
     #[must_use]
-    pub fn begin_with_close_button(self, ui: &Ui, opened: &mut bool) -> bool {
+    pub fn begin_with_close_button(self, ui: &Ui<'_>, opened: &mut bool) -> bool {
         self.build_with_close_button(ui, opened)
     }
 
@@ -428,9 +428,9 @@ impl<T: AsRef<str>> CollapsingHeader<T> {
     /// Returns true if the collapsing header is open and content should be rendered.
     #[must_use]
     #[inline]
-    pub fn build(self, ui: &Ui) -> bool {
+    pub fn build(self, ui: &Ui<'_>) -> bool {
         unsafe {
-            sys::igCollapsingHeaderTreeNodeFlags(
+            sys::igCollapsingHeader_TreeNodeFlags(
                 ui.scratch_txt(self.label),
                 self.flags.bits() as i32,
             )
@@ -442,9 +442,9 @@ impl<T: AsRef<str>> CollapsingHeader<T> {
     /// Returns true if the collapsing header is open and content should be rendered.
     #[must_use]
     #[inline]
-    pub fn build_with_close_button(self, ui: &Ui, opened: &mut bool) -> bool {
+    pub fn build_with_close_button(self, ui: &Ui<'_>, opened: &mut bool) -> bool {
         unsafe {
-            sys::igCollapsingHeaderBoolPtr(
+            sys::igCollapsingHeader_BoolPtr(
                 ui.scratch_txt(self.label),
                 opened as *mut bool,
                 self.flags.bits() as i32,

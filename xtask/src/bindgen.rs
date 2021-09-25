@@ -138,7 +138,7 @@ fn generate_binding_file(
     cmd.arg(header);
     cmd.args(&["--", "-DCIMGUI_DEFINE_ENUMS_AND_STRUCTS=1"]);
     eprintln!("Executing bindgen [output = {}]", output.display());
-    let status = cmd.status().context("Failed to exacute bindgen")?;
+    let status = cmd.status().context("Failed to execute bindgen")?;
     if !status.success() {
         anyhow!(
             "Failed to execute bindgen: {}, see output for details",

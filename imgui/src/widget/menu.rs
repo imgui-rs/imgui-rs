@@ -167,16 +167,16 @@ impl<Label: AsRef<str>, Shortcut: AsRef<str>> MenuItem<Label, Shortcut> {
     ///
     /// Returns true if the menu item is activated.
     #[doc(alias = "MenuItemBool")]
-    pub fn build(self, ui: &Ui) -> bool {
+    pub fn build(self, ui: &Ui<'_>) -> bool {
         unsafe {
             let (label, shortcut) = ui.scratch_txt_with_opt(self.label, self.shortcut);
-            sys::igMenuItemBool(label, shortcut, self.selected, self.enabled)
+            sys::igMenuItem_Bool(label, shortcut, self.selected, self.enabled)
         }
     }
 
     #[doc(alias = "MenuItemBool")]
     /// Builds the menu item using a mutable reference to selected state.
-    pub fn build_with_ref(self, ui: &Ui, selected: &mut bool) -> bool {
+    pub fn build_with_ref(self, ui: &Ui<'_>, selected: &mut bool) -> bool {
         if self.selected(*selected).build(ui) {
             *selected = !*selected;
             true

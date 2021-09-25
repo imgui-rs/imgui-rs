@@ -37,7 +37,7 @@ unsafe impl RawCast<sys::ImDrawData> for DrawData {}
 impl DrawData {
     /// Returns an iterator over the draw lists included in the draw data.
     #[inline]
-    pub fn draw_lists(&self) -> DrawListIterator {
+    pub fn draw_lists(&self) -> DrawListIterator<'_> {
         unsafe {
             DrawListIterator {
                 iter: self.cmd_lists().iter(),
@@ -181,7 +181,7 @@ impl DrawList {
     }
 
     #[inline]
-    pub fn commands(&self) -> DrawCmdIterator {
+    pub fn commands(&self) -> DrawCmdIterator<'_> {
         unsafe {
             DrawCmdIterator {
                 iter: self.cmd_buffer().iter(),

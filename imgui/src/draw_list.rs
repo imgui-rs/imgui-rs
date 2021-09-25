@@ -192,7 +192,7 @@ impl<'ui> DrawListMut<'ui> {
     /// }
     /// ```
     #[doc(alias = "ChannelsSplit")]
-    pub fn channels_split<F: FnOnce(&ChannelsSplit)>(&self, channels_count: u32, f: F) {
+    pub fn channels_split<F: FnOnce(&ChannelsSplit<'_>)>(&self, channels_count: u32, f: F) {
         unsafe { sys::ImDrawList_ChannelsSplit(self.draw_list, channels_count as i32) };
         f(&ChannelsSplit {
             draw_list: self,
@@ -320,7 +320,7 @@ impl<'ui> DrawListMut<'ui> {
         unsafe {
             let start = text.as_ptr() as *const c_char;
             let end = (start as usize + text.len()) as *const c_char;
-            sys::ImDrawList_AddTextVec2(self.draw_list, pos.into(), col.into().into(), start, end)
+            sys::ImDrawList_AddText_Vec2(self.draw_list, pos.into(), col.into().into(), start, end)
         }
     }
 
@@ -391,7 +391,12 @@ impl<'ui> DrawListMut<'ui> {
     ///         .build();
     /// }
     /// ```
-    pub fn add_image(&'ui self, texture_id: TextureId, p_min: [f32; 2], p_max: [f32; 2]) -> Image {
+    pub fn add_image(
+        &'ui self,
+        texture_id: TextureId,
+        p_min: [f32; 2],
+        p_max: [f32; 2],
+    ) -> Image<'_> {
         Image::new(self, texture_id, p_min, p_max)
     }
 
@@ -405,7 +410,7 @@ impl<'ui> DrawListMut<'ui> {
         p2: [f32; 2],
         p3: [f32; 2],
         p4: [f32; 2],
-    ) -> ImageQuad {
+    ) -> ImageQuad<'_> {
         ImageQuad::new(self, texture_id, p1, p2, p3, p4)
     }
 
@@ -416,7 +421,7 @@ impl<'ui> DrawListMut<'ui> {
         p_min: [f32; 2],
         p_max: [f32; 2],
         rounding: f32,
-    ) -> ImageRounded {
+    ) -> ImageRounded<'_> {
         ImageRounded::new(self, texture_id, p_min, p_max, rounding)
     }
 }
@@ -432,7 +437,7 @@ pub struct Line<'ui> {
 }
 
 impl<'ui> Line<'ui> {
-    fn new<C>(draw_list: &'ui DrawListMut, p1: [f32; 2], p2: [f32; 2], c: C) -> Self
+    fn new<C>(draw_list: &'ui DrawListMut<'_>, p1: [f32; 2], p2: [f32; 2], c: C) -> Self
     where
         C: Into<ImColor32>,
     {
@@ -479,7 +484,7 @@ pub struct Rect<'ui> {
 }
 
 impl<'ui> Rect<'ui> {
-    fn new<C>(draw_list: &'ui DrawListMut, p1: [f32; 2], p2: [f32; 2], c: C) -> Self
+    fn new<C>(draw_list: &'ui DrawListMut<'_>, p1: [f32; 2], p2: [f32; 2], c: C) -> Self
     where
         C: Into<ImColor32>,
     {
@@ -580,7 +585,13 @@ pub struct Triangle<'ui> {
 }
 
 impl<'ui> Triangle<'ui> {
-    fn new<C>(draw_list: &'ui DrawListMut, p1: [f32; 2], p2: [f32; 2], p3: [f32; 2], c: C) -> Self
+    fn new<C>(
+        draw_list: &'ui DrawListMut<'_>,
+        p1: [f32; 2],
+        p2: [f32; 2],
+        p3: [f32; 2],
+        c: C,
+    ) -> Self
     where
         C: Into<ImColor32>,
     {
@@ -648,7 +659,7 @@ pub struct Circle<'ui> {
 
 impl<'ui> Circle<'ui> {
     /// Typically constructed by [`DrawListMut::add_circle`]
-    pub fn new<C>(draw_list: &'ui DrawListMut, center: [f32; 2], radius: f32, color: C) -> Self
+    pub fn new<C>(draw_list: &'ui DrawListMut<'_>, center: [f32; 2], radius: f32, color: C) -> Self
     where
         C: Into<ImColor32>,
     {
@@ -726,7 +737,7 @@ pub struct BezierCurve<'ui> {
 impl<'ui> BezierCurve<'ui> {
     /// Typically constructed by [`DrawListMut::add_bezier_curve`]
     pub fn new<C>(
-        draw_list: &'ui DrawListMut,
+        draw_list: &'ui DrawListMut<'_>,
         pos0: [f32; 2],
         cp0: [f32; 2],
         cp1: [f32; 2],
@@ -794,7 +805,7 @@ pub struct Image<'ui> {
 impl<'ui> Image<'ui> {
     /// Typically constructed by [`DrawListMut::add_image`]
     pub fn new(
-        draw_list: &'ui DrawListMut,
+        draw_list: &'ui DrawListMut<'_>,
         texture_id: TextureId,
         p_min: [f32; 2],
         p_max: [f32; 2],
@@ -867,7 +878,7 @@ pub struct ImageQuad<'ui> {
 impl<'ui> ImageQuad<'ui> {
     /// Typically constructed by [`DrawListMut::add_image_quad`]
     pub fn new(
-        draw_list: &'ui DrawListMut,
+        draw_list: &'ui DrawListMut<'_>,
         texture_id: TextureId,
         p1: [f32; 2],
         p2: [f32; 2],
@@ -954,7 +965,7 @@ pub struct ImageRounded<'ui> {
 impl<'ui> ImageRounded<'ui> {
     /// Typically constructed by [`DrawListMut::add_image_rounded`]
     pub fn new(
-        draw_list: &'ui DrawListMut,
+        draw_list: &'ui DrawListMut<'_>,
         texture_id: TextureId,
         p_min: [f32; 2],
         p_max: [f32; 2],

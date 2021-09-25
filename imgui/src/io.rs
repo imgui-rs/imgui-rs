@@ -116,17 +116,8 @@ impl NavInput {
         NavInput::TweakSlow,
         NavInput::TweakFast,
     ];
-
-    cfg_if::cfg_if! {
-        if #[cfg(feature = "docking")] {
-            // Docking branch removed internal "ImGuiNavInput_KeyMenu_"
-            /// Amount of internal/hidden variants (not exposed by imgui-rs)
-            const INTERNAL_COUNT: usize = 4;
-        } else {
-            /// Amount of internal/hidden variants (not exposed by imgui-rs)
-            const INTERNAL_COUNT: usize = 5;
-        }
-    }
+    /// Amount of internal/hidden variants (not exposed by imgui-rs)
+    const INTERNAL_COUNT: usize = 4;
     /// Total count of `NavInput` variants
     pub const COUNT: usize = sys::ImGuiNavInput_COUNT as usize - NavInput::INTERNAL_COUNT;
 }
@@ -303,6 +294,7 @@ pub struct Io {
     pub mouse_delta: [f32; 2],
 
     key_mods: sys::ImGuiKeyModFlags,
+    key_mods_prev: sys::ImGuiKeyModFlags,
     mouse_pos_prev: [f32; 2],
     mouse_clicked_pos: [[f32; 2]; 5],
     mouse_clicked_time: [f64; 5],

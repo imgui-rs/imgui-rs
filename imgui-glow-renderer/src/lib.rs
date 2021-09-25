@@ -1,15 +1,17 @@
-//! Renderer for `[imgui-rs]` using the `[glow]` library for OpenGL.
+//! Renderer for [`imgui-rs`][imgui] using the [`glow`] library for OpenGL.
 //!
 //! This is heavily influenced by the
 //! [example from upstream](https://github.com/ocornut/imgui/blob/fe245914114588f272b0924538fdd43f6c127a26/backends/imgui_impl_opengl3.cpp).
 //!
 //! # Basic usage
 //!
-//! A few code examples are provided in the source.
+//! A few code [examples] are provided in the source.
 //!
-//! In short, create either an `[AutoRenderer]` (for basic usage) or `[Renderer]`
+//! [examples]: https://github.com/imgui-rs/imgui-rs/tree/main/imgui-glow-renderer/examples
+//!
+//! In short, create either an [`AutoRenderer`] (for basic usage) or [`Renderer`]
 //! (for slightly more customizable operation), then call the `render(...)`
-//! method with draw data from `imgui-rs`.
+//! method with draw data from [`imgui`].
 //!
 //! # OpenGL (ES) versions
 //!
@@ -30,10 +32,10 @@
 //!
 //! When outputting colors to a screen, colors need to be converted from a
 //! linear color space to a non-linear space matching the monitor (e.g. sRGB).
-//! When using the `[AutoRenderer]`, this library will convert colors to sRGB
-//! as a step in the shader. When initialising a `[Renderer]`, you can choose
+//! When using the [`AutoRenderer`], this library will convert colors to sRGB
+//! as a step in the shader. When initialising a [`Renderer`], you can choose
 //! whether or not to include this step in the shader or not when calling
-//! `[Renderer::initialize]`.
+//! [`Renderer::initialize`].
 //!
 //! This library also assumes that textures have their internal format
 //! set appropriately when uploaded to OpenGL. That is, assuming your texture
@@ -42,7 +44,7 @@
 
 use std::{borrow::Cow, error::Error, fmt::Display, mem::size_of};
 
-use imgui::internal::RawWrapper;
+use imgui::{internal::RawWrapper, DrawCmd, DrawData, DrawVert};
 
 use crate::versions::{GlVersion, GlslVersion};
 use glow::{Context, HasContext};
@@ -57,11 +59,11 @@ type GlUniformLocation = <Context as HasContext>::Program;
 
 /// Renderer which owns the OpenGL context and handles textures itself. Also
 /// converts all output colors to sRGB for display. Useful for simple applications,
-/// but more complicated applications may prefer to use `[Renderer]`, or even
+/// but more complicated applications may prefer to use [`Renderer`], or even
 /// write their own renderer based on this code.
 ///
 /// OpenGL context is still available to the rest of the application through
-/// the `[gl_context]` method.
+/// the [`gl_context`](Self::gl_context) method.
 pub struct AutoRenderer {
     gl: glow::Context,
     texture_map: SimpleTextureMap,
@@ -86,7 +88,7 @@ impl AutoRenderer {
     }
 
     /// Note: no need to provide a `mut` version of this, as all methods on
-    /// `[glow::HasContext]` are immutable.
+    /// [`glow::HasContext`] are immutable.
     #[inline]
     pub fn gl_context(&self) -> &glow::Context {
         &self.gl
@@ -111,7 +113,7 @@ impl AutoRenderer {
     /// Some OpenGL errors trigger an error (few are explicitly checked,
     /// however)
     #[inline]
-    pub fn render(&mut self, draw_data: &imgui::DrawData) -> Result<(), RenderError> {
+    pub fn render(&mut self, draw_data: &DrawData) -> Result<(), RenderError> {
         self.renderer.render(&self.gl, &self.texture_map, draw_data)
     }
 }
@@ -259,7 +261,7 @@ impl Renderer {
         &mut self,
         gl: &Context,
         texture_map: &T,
-        draw_data: &imgui::DrawData,
+        draw_data: &DrawData,
     ) -> Result<(), RenderError> {
         if self.is_destroyed {
             return Err(Self::renderer_destroyed());
@@ -294,7 +296,7 @@ impl Renderer {
             gl_debug_message(gl, "start loop over commands");
             for command in draw_list.commands() {
                 match command {
-                    imgui::DrawCmd::Elements { count, cmd_params } => self.render_elements(
+                    DrawCmd::Elements { count, cmd_params } => self.render_elements(
                         gl,
                         texture_map,
                         count,
@@ -303,10 +305,10 @@ impl Renderer {
                         fb_width,
                         fb_height,
                     ),
-                    imgui::DrawCmd::RawCallback { callback, raw_cmd } => unsafe {
+                    DrawCmd::RawCallback { callback, raw_cmd } => unsafe {
                         callback(draw_list.raw(), raw_cmd)
                     },
-                    imgui::DrawCmd::ResetRenderState => {
+                    DrawCmd::ResetRenderState => {
                         self.set_up_render_state(gl, draw_data, fb_width, fb_height)?
                     }
                 }
@@ -330,7 +332,7 @@ impl Renderer {
     pub fn set_up_render_state(
         &mut self,
         gl: &Context,
-        draw_data: &imgui::DrawData,
+        draw_data: &DrawData,
         fb_width: f32,
         fb_height: f32,
     ) -> Result<(), RenderError> {
@@ -405,9 +407,9 @@ impl Renderer {
         }
 
         // TODO: soon it should be possible for these to be `const` functions
-        let position_field_offset = memoffset::offset_of!(imgui::DrawVert, pos) as _;
-        let uv_field_offset = memoffset::offset_of!(imgui::DrawVert, uv) as _;
-        let color_field_offset = memoffset::offset_of!(imgui::DrawVert, col) as _;
+        let position_field_offset = memoffset::offset_of!(DrawVert, pos) as _;
+        let uv_field_offset = memoffset::offset_of!(DrawVert, uv) as _;
+        let color_field_offset = memoffset::offset_of!(DrawVert, col) as _;
 
         unsafe {
             gl.bind_buffer(glow::ARRAY_BUFFER, Some(self.vbo_handle));
@@ -451,7 +453,7 @@ impl Renderer {
         texture_map: &T,
         element_count: usize,
         element_params: imgui::DrawCmdParams,
-        draw_data: &imgui::DrawData,
+        draw_data: &DrawData,
         fb_width: f32,
         fb_height: f32,
     ) {
@@ -534,11 +536,15 @@ impl Renderer {
 
 /// Trait for mapping imgui texture IDs to OpenGL textures.
 ///
-/// `[register]` should be called after uploading a texture to OpenGL to get a
-/// `[imgui::TextureId]` corresponding to it.
+/// [`register`] should be called after uploading a texture to OpenGL to get a
+/// [`imgui::TextureId`] corresponding to it.
 ///
-/// Then `[gl_texture]` can be called to find the OpenGL texture corresponding to
-/// that `[imgui::TextureId]`.
+/// [`register`]: Self::register
+///
+/// Then [`gl_texture`] can be called to find the OpenGL texture corresponding to
+/// that [`imgui::TextureId`].
+///
+/// [`gl_texture`]: Self::gl_texture
 pub trait TextureMap {
     fn register(&mut self, gl_texture: GlTexture) -> Option<imgui::TextureId>;
 
@@ -563,7 +569,7 @@ impl TextureMap for SimpleTextureMap {
     }
 }
 
-/// `[imgui::Textures]` is a simple choice for a texture map.
+/// [`imgui::Textures`] is a simple choice for a texture map.
 impl TextureMap for imgui::Textures<glow::Texture> {
     fn register(&mut self, gl_texture: glow::Texture) -> Option<imgui::TextureId> {
         Some(self.insert(gl_texture))
@@ -1077,7 +1083,8 @@ fn prepare_font_atlas<T: TextureMap>(
     Ok(gl_texture)
 }
 
-#[cfg(feature = "debug_message_insert_support")]
+// this CFG guard disables apple usage of this function -- apple only has supported up to opengl 3.3
+#[cfg(all(not(target_vendor = "apple"), feature = "debug_message_insert_support"))]
 fn gl_debug_message<G: glow::HasContext>(gl: &G, message: impl AsRef<str>) {
     unsafe {
         gl.debug_message_insert(
@@ -1090,10 +1097,10 @@ fn gl_debug_message<G: glow::HasContext>(gl: &G, message: impl AsRef<str>) {
     };
 }
 
-#[cfg(not(feature = "debug_message_insert_support"))]
+#[cfg(any(target_vendor = "apple", not(feature = "debug_message_insert_support")))]
 fn gl_debug_message<G: glow::HasContext>(_gl: &G, _message: impl AsRef<str>) {}
 
-fn calculate_matrix(draw_data: &imgui::DrawData, clip_origin_is_lower_left: bool) -> [f32; 16] {
+fn calculate_matrix(draw_data: &DrawData, clip_origin_is_lower_left: bool) -> [f32; 16] {
     #![allow(clippy::deprecated_cfg_attr)]
 
     let left = draw_data.display_pos[0];

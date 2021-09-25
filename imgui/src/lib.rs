@@ -1,12 +1,10 @@
-#![cfg_attr(debug_assertions, allow(clippy::float_cmp))]
+#![cfg_attr(test, allow(clippy::float_cmp))]
+#![deny(rust_2018_idioms)]
+// #![deny(missing_docs)]
+
 pub extern crate imgui_sys as sys;
 
-use std::cell;
-use std::ffi::CStr;
 use std::os::raw::{c_char, c_void};
-use std::ptr;
-use std::str;
-use std::thread;
 
 pub use self::clipboard::*;
 pub use self::color::ImColor32;
@@ -31,6 +29,9 @@ pub use self::render::renderer::*;
 pub use self::stacks::*;
 pub use self::string::*;
 pub use self::style::*;
+
+#[cfg(feature = "tables-api")]
+pub use self::tables::*;
 pub use self::utils::*;
 pub use self::widget::color_editors::*;
 pub use self::widget::combo_box::*;
@@ -73,6 +74,8 @@ mod popups;
 mod render;
 mod stacks;
 mod style;
+#[cfg(feature = "tables-api")]
+mod tables;
 #[cfg(test)]
 mod test;
 mod utils;
@@ -91,15 +94,9 @@ pub use core as __core;
 #[doc(alias = "GetVersion")]
 pub fn dear_imgui_version() -> &'static str {
     unsafe {
-        let bytes = CStr::from_ptr(sys::igGetVersion()).to_bytes();
-        str::from_utf8_unchecked(bytes)
+        let bytes = std::ffi::CStr::from_ptr(sys::igGetVersion()).to_bytes();
+        std::str::from_utf8_unchecked(bytes)
     }
-}
-
-#[test]
-fn test_version() {
-    // TODO: what's the point of this test?
-    assert_eq!(dear_imgui_version(), "1.82");
 }
 
 impl Context {
@@ -123,9 +120,9 @@ impl Context {
 #[derive(Debug)]
 pub struct Ui<'ui> {
     ctx: &'ui Context,
-    font_atlas: Option<cell::RefMut<'ui, SharedFontAtlas>>,
+    font_atlas: Option<std::cell::RefMut<'ui, SharedFontAtlas>>,
     // imgui isn't mutli-threaded -- so no one will ever access twice.
-    buffer: cell::UnsafeCell<string::UiBuffer>,
+    buffer: std::cell::UnsafeCell<string::UiBuffer>,
 }
 
 impl<'ui> Ui<'ui> {
@@ -172,8 +169,9 @@ impl<'ui> Ui<'ui> {
     pub fn io(&self) -> &Io {
         unsafe { &*(sys::igGetIO() as *const Io) }
     }
+
     /// Returns an immutable reference to the font atlas
-    pub fn fonts(&self) -> FontAtlasRef {
+    pub fn fonts(&self) -> FontAtlasRef<'_> {
         match self.font_atlas {
             Some(ref font_atlas) => FontAtlasRef::Shared(font_atlas),
             None => unsafe {
@@ -199,7 +197,7 @@ impl<'ui> Ui<'ui> {
 impl<'a> Drop for Ui<'a> {
     #[doc(alias = "EndFrame")]
     fn drop(&mut self) {
-        if !thread::panicking() {
+        if !std::thread::panicking() {
             unsafe {
                 sys::igEndFrame();
             }
@@ -211,7 +209,7 @@ impl<'a> Drop for Ui<'a> {
 impl<'ui> Ui<'ui> {
     /// Renders a demo window (previously called a test window), which demonstrates most
     /// Dear Imgui features.
-    #[doc(alias = "SnowDemoWindow")]
+    #[doc(alias = "ShowDemoWindow")]
     pub fn show_demo_window(&self, opened: &mut bool) {
         unsafe {
             sys::igShowDemoWindow(opened);
@@ -246,7 +244,7 @@ impl<'ui> Ui<'ui> {
     /// Renders a style editor block (not a window) for the currently active style
     #[doc(alias = "ShowStyleEditor")]
     pub fn show_default_style_editor(&self) {
-        unsafe { sys::igShowStyleEditor(ptr::null_mut()) };
+        unsafe { sys::igShowStyleEditor(std::ptr::null_mut()) };
     }
     /// Renders a basic help/info block (not a window)
     #[doc(alias = "ShowUserGuide")]
@@ -288,6 +286,34 @@ impl<T> From<*mut T> for Id<'static> {
     #[inline]
     fn from(p: *mut T) -> Self {
         Id::Ptr(p as *const T as *const c_void)
+    }
+}
+
+impl<'a> Id<'a> {
+    // this is used in the tables-api and possibly elsewhere,
+    // but not with just default features...
+    #[allow(dead_code)]
+    fn as_imgui_id(&self) -> sys::ImGuiID {
+        unsafe {
+            match self {
+                Id::Ptr(p) => sys::igGetID_Ptr(*p),
+                Id::Str(s) => {
+                    let s1 = s.as_ptr() as *const std::os::raw::c_char;
+                    let s2 = s1.add(s.len());
+                    sys::igGetID_StrStr(s1, s2)
+                }
+                Id::Int(i) => {
+                    let p = *i as *const std::os::raw::c_void;
+                    sys::igGetID_Ptr(p)
+                } // Id::ImGuiID(n) => *n,
+            }
+        }
+    }
+}
+
+impl<'a> Default for Id<'a> {
+    fn default() -> Self {
+        Self::Int(0)
     }
 }
 
@@ -438,6 +464,81 @@ impl<'ui> Ui<'ui> {
     }
 }
 
+create_token!(
+    /// Starts a scope where interaction is disabled. Ends be calling `.end()` or when the token is dropped.
+    pub struct DisabledToken<'ui>;
+
+    /// Drops the layout tooltip manually. You can also just allow this token
+    /// to drop on its own.
+    drop { sys::igEndDisabled() }
+);
+
+/// # Disabling widgets
+///
+/// imgui can disable widgets so they don't react to mouse/keyboard
+/// inputs, and are displayed differently (currently dimmed by an
+/// amount set in [`Style::disabled_alpha`])
+impl<'ui> Ui<'ui> {
+    /// Creates a scope where interactions are disabled.
+    ///
+    /// Scope ends when returned token is dropped, or `.end()` is
+    /// explicitly called
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use imgui::*;
+    /// fn user_interface(ui: &Ui) {
+    ///     let disable_buttons = true;
+    ///     let _d = ui.begin_disabled(disable_buttons);
+    ///     ui.button(im_str!("Dangerous button"));
+    /// }
+    /// ```
+
+    #[doc(alias = "BeginDisabled")]
+    pub fn begin_disabled(&self, disabled: bool) -> DisabledToken<'_> {
+        unsafe { sys::igBeginDisabled(disabled) };
+        DisabledToken::new(self)
+    }
+
+    /// Identical to [`Ui::begin_disabled`] but exists to allow avoiding a
+    /// double-negative, for example `begin_enabled(enable_buttons)`
+    /// instead of `begin_disabled(!enable_buttons)`)
+    #[doc(alias = "BeginDisabled")]
+    pub fn begin_enabled(&self, enabled: bool) -> DisabledToken<'_> {
+        self.begin_disabled(!enabled)
+    }
+
+    /// Helper to create a disabled section of widgets
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use imgui::*;
+    /// fn user_interface(ui: &Ui) {
+    ///     let safe_mode = true;
+    ///     ui.disabled(safe_mode, || {
+    ///         ui.button(im_str!("Dangerous button"));
+    ///     });
+    /// }
+    /// ```
+    #[doc(alias = "BeginDisabled", alias = "EndDisabled")]
+    pub fn disabled<F: FnOnce()>(&self, disabled: bool, f: F) {
+        unsafe { sys::igBeginDisabled(disabled) };
+        f();
+        unsafe { sys::igEndDisabled() };
+    }
+
+    /// Same as [`Ui::disabled`] but with logic reversed. See
+    /// [`Ui::begin_enabled`].
+    #[doc(alias = "BeginDisabled", alias = "EndDisabled")]
+    pub fn enabled<F: FnOnce()>(&self, enabled: bool, f: F) {
+        unsafe { sys::igBeginDisabled(!enabled) };
+        f();
+        unsafe { sys::igEndDisabled() };
+    }
+}
+
 // Widgets: ListBox
 impl<'ui> Ui<'ui> {
     #[doc(alias = "ListBox")]
@@ -460,7 +561,7 @@ impl<'ui> Ui<'ui> {
         };
 
         unsafe {
-            sys::igListBoxStr_arr(
+            sys::igListBox_Str_arr(
                 label_ptr,
                 current_item,
                 items_inner.as_ptr() as *mut *const c_char,
