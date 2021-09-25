@@ -303,7 +303,7 @@ impl<'ui> Ui<'ui> {
         outer_size: [f32; 2],
         inner_width: f32,
     ) -> Option<TableToken<'ui>> {
-        let should_render = unsafe {
+        unsafe {
             sys::igBeginTable(
                 self.scratch_txt(str_id),
                 column as i32,
@@ -311,13 +311,7 @@ impl<'ui> Ui<'ui> {
                 outer_size.into(),
                 inner_width,
             )
-        };
-
-        // todo: once msrv is 1.54, convert this to .then(||)
-        if should_render {
-            Some(TableToken::new(self))
-        } else {
-            None
+            .then(|| TableToken::new(self))
         }
     }
 
@@ -325,7 +319,6 @@ impl<'ui> Ui<'ui> {
     ///
     /// Takes an array of table header information, the length of which determines
     /// how many columns will be created.
-    #[cfg(feature = "min-const-generics")]
     #[must_use = "if return is dropped immediately, table is ended immediately."]
     pub fn begin_table_header<'a, Name: AsRef<str>, const N: usize>(
         &self,
@@ -339,7 +332,6 @@ impl<'ui> Ui<'ui> {
     ///
     /// Takes an array of table header information, the length of which determines
     /// how many columns will be created.
-    #[cfg(feature = "min-const-generics")]
     #[must_use = "if return is dropped immediately, table is ended immediately."]
     pub fn begin_table_header_with_flags<'a, Name: AsRef<str>, const N: usize>(
         &self,
@@ -354,7 +346,6 @@ impl<'ui> Ui<'ui> {
     /// and gives users the most flexibility.
     /// Takes an array of table header information, the length of which determines
     /// how many columns will be created.
-    #[cfg(feature = "min-const-generics")]
     #[must_use = "if return is dropped immediately, table is ended immediately."]
     pub fn begin_table_header_with_sizing<'a, Name: AsRef<str>, const N: usize>(
         &self,
