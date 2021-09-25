@@ -1,7 +1,6 @@
 use std::mem;
 use std::os::raw::{c_char, c_void};
 use std::ptr;
-use std::thread;
 
 use crate::context::Context;
 use crate::fonts::atlas::FontId;
@@ -68,7 +67,6 @@ impl<'ui> Ui<'ui> {
         ColorStackToken::new(self)
     }
 
-
     /// Changes a style variable by pushing a change to the style stack.
     ///
     /// Returns a `StyleStackToken` that can be popped by calling `.end()`
@@ -88,39 +86,6 @@ impl<'ui> Ui<'ui> {
     pub fn push_style_var(&self, style_var: StyleVar) -> StyleStackToken<'_> {
         unsafe { push_style_var(style_var) };
         StyleStackToken::new(self)
-    }
-    /// Changes style variables by pushing several changes to the style stack.
-    ///
-    /// Returns a `StyleStackToken` that must be popped by calling `.pop()`
-    ///
-    /// # Examples
-    ///
-    /// ```no_run
-    /// # use imgui::*;
-    /// # let mut ctx = Context::create();
-    /// # let ui = ctx.frame();
-    /// let styles = ui.push_style_vars(&[
-    ///     StyleVar::Alpha(0.2),
-    ///     StyleVar::ItemSpacing([50.0, 50.0])
-    /// ]);
-    /// ui.text("We're transparent...");
-    /// ui.text("...with large spacing as well");
-    /// styles.pop(&ui);
-    /// ```
-    #[deprecated = "deprecated in 0.7.0. Use `push_style_var` multiple times for similar effect."]
-    pub fn push_style_vars<'a, I>(&self, style_vars: I) -> MultiStyleStackToken
-    where
-        I: IntoIterator<Item = &'a StyleVar>,
-    {
-        let mut count = 0;
-        for &style_var in style_vars {
-            unsafe { push_style_var(style_var) };
-            count += 1;
-        }
-        MultiStyleStackToken {
-            count,
-            ctx: self.ctx,
-        }
     }
 }
 
@@ -156,30 +121,6 @@ impl ColorStackToken<'_> {
     }
 }
 
-/// Tracks one or more changes pushed to the color stack that must be popped by calling `.pop()`
-#[must_use]
-pub struct MultiColorStackToken {
-    count: usize,
-    ctx: *const Context,
-}
-
-impl MultiColorStackToken {
-    /// Pops changes from the color stack
-    #[doc(alias = "PopStyleColor")]
-    pub fn pop(mut self, _: &Ui<'_>) {
-        self.ctx = ptr::null();
-        unsafe { sys::igPopStyleColor(self.count as i32) };
-    }
-}
-
-impl Drop for MultiColorStackToken {
-    fn drop(&mut self) {
-        if !self.ctx.is_null() && !thread::panicking() {
-            panic!("A ColorStackToken was leaked. Did you call .pop()?");
-        }
-    }
-}
-
 create_token!(
     /// Tracks a style pushed to the style stack that can be popped by calling `.end()`
     /// or by dropping.
@@ -193,30 +134,6 @@ impl StyleStackToken<'_> {
     /// Pops a change from the style stack.
     pub fn pop(self) {
         self.end()
-    }
-}
-
-/// Tracks one or more changes pushed to the style stack that must be popped by calling `.pop()`
-#[must_use]
-pub struct MultiStyleStackToken {
-    count: usize,
-    ctx: *const Context,
-}
-
-impl MultiStyleStackToken {
-    /// Pops changes from the style stack
-    #[doc(alias = "PopStyleVar")]
-    pub fn pop(mut self, _: &Ui<'_>) {
-        self.ctx = ptr::null();
-        unsafe { sys::igPopStyleVar(self.count as i32) };
-    }
-}
-
-impl Drop for MultiStyleStackToken {
-    fn drop(&mut self) {
-        if !self.ctx.is_null() && !thread::panicking() {
-            panic!("A StyleStackToken was leaked. Did you call .pop()?");
-        }
     }
 }
 
