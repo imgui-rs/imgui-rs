@@ -448,9 +448,81 @@ impl IdStackToken<'_> {
 /// # ID stack
 impl<'ui> Ui<'ui> {
     /// Pushes an identifier to the ID stack.
+    /// This can be called with an integer, a string, or a pointer.
     ///
     /// Returns an `IdStackToken` that can be popped by calling `.end()`
     /// or by dropping manually.
+    ///
+    /// # Examples
+    /// Dear ImGui uses labels to uniquely identify widgets. For a good explaination, see this part of the [Dear ImGui FAQ][faq]
+    ///
+    /// [faq]: https://github.com/ocornut/imgui/blob/v1.84.2/docs/FAQ.md#q-why-is-my-widget-not-reacting-when-i-click-on-it
+    ///
+    /// In `imgui-rs` the same applies, we can manually specify labels with the `##` syntax:
+    ///
+    /// ```no_run
+    /// # let mut imgui = imgui::Context::create();
+    /// # let ui = imgui.frame();
+    ///
+    /// ui.button("Click##button1");
+    /// ui.button("Click##button2");
+    /// ```
+    ///
+    /// Here `Click` is the label used for both buttons, and everything after `##` is used as the identifier.
+    ///
+    /// However when you either have many items (say, created in a loop), we can use our loop number as an item in the "ID stack":
+    ///
+    /// ```no_run
+    /// # let mut imgui = imgui::Context::create();
+    /// # let ui = imgui.frame();
+    ///
+    /// ui.window("Example").build(|| {
+    ///     // The window adds "Example" to the token stack.
+    ///     for num in 0..10 {
+    ///         // And now we add the loop number to the stack too,
+    ///         // to make our buttons unique within this window.
+    ///         let _id = ui.push_id(num);
+    ///         if ui.button("Click!") {
+    ///             println!("Button {} clicked", num);
+    ///         }
+    ///     }
+    /// });
+    /// ```
+    ///
+    /// We don't have to use numbers - strings also work:
+    /// 
+    /// ```no_run
+    /// # let mut imgui = imgui::Context::create();
+    /// # let ui = imgui.frame();
+    ///
+    /// fn callback1(ui: &imgui::Ui) {
+    ///     if ui.button("Click") {
+    ///         println!("First button clicked")
+    ///     }
+    /// }
+    /// 
+    /// fn callback2(ui: &imgui::Ui) {
+    ///     if ui.button("Click") {
+    ///         println!("Second button clicked")
+    ///     }
+    /// }
+    /// 
+    /// ui.window("Example")
+    /// .build(||{
+    ///     {
+    ///         // Since we don't know what callback1 might do, we create
+    ///         // a unique ID stack by pushing (a hash of) "first" to the ID stack:
+    ///         let _id1 = ui.push_id("first");
+    ///         callback1(&ui);
+    ///     }
+    ///     {
+    ///         // Same for second callback. If we didn't do this, clicking the "Click" button
+    ///         // would trigger both println statements!
+    ///         let _id2 = ui.push_id("second");
+    ///         callback2(&ui);
+    ///     }
+    /// });
+    /// ```
     #[doc(alias = "PushId")]
     pub fn push_id<'a, I: Into<Id<'a>>>(&self, id: I) -> IdStackToken<'ui> {
         let id = id.into();
