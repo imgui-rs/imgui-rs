@@ -360,7 +360,6 @@ impl<'ui> Ui<'ui> {
     }
 }
 
-
 // Widgets: Input
 impl<'ui> Ui<'ui> {
     #[doc(alias = "InputText", alias = "InputTextWithHint")]

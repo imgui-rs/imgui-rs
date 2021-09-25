@@ -490,7 +490,7 @@ impl<'ui> Ui<'ui> {
     /// ```
     ///
     /// We don't have to use numbers - strings also work:
-    /// 
+    ///
     /// ```no_run
     /// # let mut imgui = imgui::Context::create();
     /// # let ui = imgui.frame();
@@ -500,13 +500,13 @@ impl<'ui> Ui<'ui> {
     ///         println!("First button clicked")
     ///     }
     /// }
-    /// 
+    ///
     /// fn callback2(ui: &imgui::Ui) {
     ///     if ui.button("Click") {
     ///         println!("Second button clicked")
     ///     }
     /// }
-    /// 
+    ///
     /// ui.window("Example")
     /// .build(||{
     ///     {

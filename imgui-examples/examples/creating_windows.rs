@@ -12,8 +12,7 @@ fn main() {
         // imgui-rs has two main methods of creating windows (and these same approaches
         // apply to many other widgets). First, callback based:
 
-        ui.window("My window via callback")
-        .build(||{
+        ui.window("My window via callback").build(|| {
             ui.text("This content appears in a window");
 
             // Everything in this callback appears in the window, like this button:
@@ -24,7 +23,7 @@ fn main() {
         // In this case, there is the "token based" approach. You call a method and get a "window token",
         // everything that happens until the token is dropped is included in the window this is more-or-less how
         // the Dear ImGui C++ API works)
-        
+
         // Here we (maybe) get a window token:
         let window_token = ui.window("Token based window").begin();
         if let Some(_t) = window_token {
@@ -34,36 +33,35 @@ fn main() {
 
         // Here we create a window with a specific size, and force it to always have a vertical scrollbar visible
         ui.window("Big complex window")
-        .size([200.0, 100.0], imgui::Condition::FirstUseEver)
-        .always_vertical_scrollbar(true)
-        .build(||{
-            ui.text("Imagine something complicated here..");
+            .size([200.0, 100.0], imgui::Condition::FirstUseEver)
+            .always_vertical_scrollbar(true)
+            .build(|| {
+                ui.text("Imagine something complicated here..");
 
-            // Note you can create windows inside other windows, however, they both appear as separate windows.
-            // For example, somewhere deep inside a complex window, we can quickly create a widget to display a
-            // variable, like a graphical "debug print"
-            ui.window("Confusion").build(||{
-                ui.text(format!("Some variable: {:?}", ui.io().mouse_pos))
-            })
-        });
+                // Note you can create windows inside other windows, however, they both appear as separate windows.
+                // For example, somewhere deep inside a complex window, we can quickly create a widget to display a
+                // variable, like a graphical "debug print"
+                ui.window("Confusion")
+                    .build(|| ui.text(format!("Some variable: {:?}", ui.io().mouse_pos)))
+            });
 
         // If you want to nest windows inside other windows, you can a "child window".
         // This is essentially a scrollable area, with all the same properties as a regular window
-        ui.window("Parent window").build(||{
+        ui.window("Parent window").build(|| {
             ui.child_window("Child window")
-            .size([100.0, 100.0])
-            .build(||{
-                for _ in 0..10 {
-                    ui.text("Lines and");
-                }
-            });
+                .size([100.0, 100.0])
+                .build(|| {
+                    for _ in 0..10 {
+                        ui.text("Lines and");
+                    }
+                });
             ui.child_window("Second child window")
-            .size([100.0, 100.0])
-            .build(||{
-                for _ in 0..10 {
-                    ui.text("More and");
-                }
-            });
+                .size([100.0, 100.0])
+                .build(|| {
+                    for _ in 0..10 {
+                        ui.text("More and");
+                    }
+                });
         });
     });
 }
