@@ -174,6 +174,21 @@ pub struct Io {
     /// framebuffer coordinates
     pub display_framebuffer_scale: [f32; 2],
 
+    #[cfg(feature = "docking")]
+    pub config_docking_no_split: bool,
+    #[cfg(feature = "docking")]
+    pub config_docking_always_tab_bar: bool,
+    #[cfg(feature = "docking")]
+    pub config_docking_transparent_payload: bool,
+    #[cfg(feature = "docking")]
+    pub config_viewports_no_auto_merge: bool,
+    #[cfg(feature = "docking")]
+    pub config_viewports_notask_bar_icon: bool,
+    #[cfg(feature = "docking")]
+    pub config_viewports_no_decoration: bool,
+    #[cfg(feature = "docking")]
+    pub config_viewports_no_default_parent: bool,
+
     /// Request imgui-rs to draw a mouse cursor for you
     pub mouse_draw_cursor: bool,
     /// macOS-style input behavior.
@@ -234,6 +249,8 @@ pub struct Io {
     /// Most users don't have a mouse with a horizontal wheel, and may not be filled by all
     /// backends.
     pub mouse_wheel_h: f32,
+    #[cfg(feature = "docking")]
+    pub mouse_hovered_viewport: sys::ImGuiID,
     /// Keyboard modifier pressed: Control
     pub key_ctrl: bool,
     /// Keyboard modifier pressed: Shift
@@ -293,6 +310,9 @@ pub struct Io {
     /// f32::MAX]), so a disappearing/reappearing mouse won't have a huge delta.
     pub mouse_delta: [f32; 2],
 
+    #[cfg(feature = "docking")]
+    pub want_capture_mouse_unless_popup_close: bool,
+
     key_mods: sys::ImGuiKeyModFlags,
     key_mods_prev: sys::ImGuiKeyModFlags,
     mouse_pos_prev: [f32; 2],
@@ -302,6 +322,8 @@ pub struct Io {
     mouse_double_clicked: [bool; 5],
     mouse_released: [bool; 5],
     mouse_down_owned: [bool; 5],
+    #[cfg(feature = "docking")]
+    mouse_down_owned_unless_popup_close: [bool; 5],
     mouse_down_was_double_click: [bool; 5],
     mouse_down_duration: [f32; 5],
     mouse_down_duration_prev: [f32; 5],
@@ -312,6 +334,8 @@ pub struct Io {
     nav_inputs_down_duration: [f32; NavInput::COUNT + NavInput::INTERNAL_COUNT],
     nav_inputs_down_duration_prev: [f32; NavInput::COUNT + NavInput::INTERNAL_COUNT],
     pen_pressure: f32,
+    #[cfg(feature = "docking")]
+    app_focus_lost: bool,
     input_queue_surrogate: sys::ImWchar16,
     input_queue_characters: ImVector<sys::ImWchar>,
 }
