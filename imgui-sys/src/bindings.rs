@@ -132,7 +132,14 @@ pub type ImGuiTreeNodeFlags = cty::c_int;
 pub type ImGuiViewportFlags = cty::c_int;
 pub type ImGuiWindowFlags = cty::c_int;
 pub type ImTextureID = *mut cty::c_void;
+pub type ImDrawIdx = cty::c_ushort;
 pub type ImGuiID = cty::c_uint;
+pub type ImU8 = cty::c_uchar;
+pub type ImS16 = cty::c_short;
+pub type ImU32 = cty::c_uint;
+pub type ImWchar16 = cty::c_ushort;
+pub type ImWchar32 = cty::c_uint;
+pub type ImWchar = ImWchar32;
 pub type ImGuiInputTextCallback = ::core::option::Option<
     unsafe extern "C" fn(data: *mut ImGuiInputTextCallbackData) -> cty::c_int,
 >;
@@ -144,16 +151,9 @@ pub type ImGuiMemAllocFunc = ::core::option::Option<
 pub type ImGuiMemFreeFunc = ::core::option::Option<
     unsafe extern "C" fn(ptr: *mut cty::c_void, user_data: *mut cty::c_void),
 >;
-pub type ImWchar16 = cty::c_ushort;
-pub type ImWchar32 = cty::c_uint;
-pub type ImWchar = ImWchar32;
-pub type ImU8 = cty::c_uchar;
-pub type ImS16 = cty::c_short;
-pub type ImU32 = cty::c_uint;
 pub type ImDrawCallback = ::core::option::Option<
     unsafe extern "C" fn(parent_list: *const ImDrawList, cmd: *const ImDrawCmd),
 >;
-pub type ImDrawIdx = cty::c_ushort;
 #[repr(C)]
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
 pub struct ImVector_ImDrawChannel {
@@ -492,8 +492,6 @@ pub const ImGuiInputTextFlags_NoUndoRedo: ImGuiInputTextFlags_ = 65536;
 pub const ImGuiInputTextFlags_CharsScientific: ImGuiInputTextFlags_ = 131072;
 pub const ImGuiInputTextFlags_CallbackResize: ImGuiInputTextFlags_ = 262144;
 pub const ImGuiInputTextFlags_CallbackEdit: ImGuiInputTextFlags_ = 524288;
-pub const ImGuiInputTextFlags_Multiline: ImGuiInputTextFlags_ = 1048576;
-pub const ImGuiInputTextFlags_NoMarkEdited: ImGuiInputTextFlags_ = 2097152;
 pub type ImGuiInputTextFlags_ = cty::c_uint;
 pub const ImGuiTreeNodeFlags_None: ImGuiTreeNodeFlags_ = 0;
 pub const ImGuiTreeNodeFlags_Selected: ImGuiTreeNodeFlags_ = 1;
@@ -601,29 +599,31 @@ pub const ImGuiTableFlags_SortTristate: ImGuiTableFlags_ = 134217728;
 pub const ImGuiTableFlags_SizingMask_: ImGuiTableFlags_ = 57344;
 pub type ImGuiTableFlags_ = cty::c_uint;
 pub const ImGuiTableColumnFlags_None: ImGuiTableColumnFlags_ = 0;
-pub const ImGuiTableColumnFlags_DefaultHide: ImGuiTableColumnFlags_ = 1;
-pub const ImGuiTableColumnFlags_DefaultSort: ImGuiTableColumnFlags_ = 2;
-pub const ImGuiTableColumnFlags_WidthStretch: ImGuiTableColumnFlags_ = 4;
-pub const ImGuiTableColumnFlags_WidthFixed: ImGuiTableColumnFlags_ = 8;
-pub const ImGuiTableColumnFlags_NoResize: ImGuiTableColumnFlags_ = 16;
-pub const ImGuiTableColumnFlags_NoReorder: ImGuiTableColumnFlags_ = 32;
-pub const ImGuiTableColumnFlags_NoHide: ImGuiTableColumnFlags_ = 64;
-pub const ImGuiTableColumnFlags_NoClip: ImGuiTableColumnFlags_ = 128;
-pub const ImGuiTableColumnFlags_NoSort: ImGuiTableColumnFlags_ = 256;
-pub const ImGuiTableColumnFlags_NoSortAscending: ImGuiTableColumnFlags_ = 512;
-pub const ImGuiTableColumnFlags_NoSortDescending: ImGuiTableColumnFlags_ = 1024;
-pub const ImGuiTableColumnFlags_NoHeaderWidth: ImGuiTableColumnFlags_ = 2048;
-pub const ImGuiTableColumnFlags_PreferSortAscending: ImGuiTableColumnFlags_ = 4096;
-pub const ImGuiTableColumnFlags_PreferSortDescending: ImGuiTableColumnFlags_ = 8192;
-pub const ImGuiTableColumnFlags_IndentEnable: ImGuiTableColumnFlags_ = 16384;
-pub const ImGuiTableColumnFlags_IndentDisable: ImGuiTableColumnFlags_ = 32768;
-pub const ImGuiTableColumnFlags_IsEnabled: ImGuiTableColumnFlags_ = 1048576;
-pub const ImGuiTableColumnFlags_IsVisible: ImGuiTableColumnFlags_ = 2097152;
-pub const ImGuiTableColumnFlags_IsSorted: ImGuiTableColumnFlags_ = 4194304;
-pub const ImGuiTableColumnFlags_IsHovered: ImGuiTableColumnFlags_ = 8388608;
-pub const ImGuiTableColumnFlags_WidthMask_: ImGuiTableColumnFlags_ = 12;
-pub const ImGuiTableColumnFlags_IndentMask_: ImGuiTableColumnFlags_ = 49152;
-pub const ImGuiTableColumnFlags_StatusMask_: ImGuiTableColumnFlags_ = 15728640;
+pub const ImGuiTableColumnFlags_Disabled: ImGuiTableColumnFlags_ = 1;
+pub const ImGuiTableColumnFlags_DefaultHide: ImGuiTableColumnFlags_ = 2;
+pub const ImGuiTableColumnFlags_DefaultSort: ImGuiTableColumnFlags_ = 4;
+pub const ImGuiTableColumnFlags_WidthStretch: ImGuiTableColumnFlags_ = 8;
+pub const ImGuiTableColumnFlags_WidthFixed: ImGuiTableColumnFlags_ = 16;
+pub const ImGuiTableColumnFlags_NoResize: ImGuiTableColumnFlags_ = 32;
+pub const ImGuiTableColumnFlags_NoReorder: ImGuiTableColumnFlags_ = 64;
+pub const ImGuiTableColumnFlags_NoHide: ImGuiTableColumnFlags_ = 128;
+pub const ImGuiTableColumnFlags_NoClip: ImGuiTableColumnFlags_ = 256;
+pub const ImGuiTableColumnFlags_NoSort: ImGuiTableColumnFlags_ = 512;
+pub const ImGuiTableColumnFlags_NoSortAscending: ImGuiTableColumnFlags_ = 1024;
+pub const ImGuiTableColumnFlags_NoSortDescending: ImGuiTableColumnFlags_ = 2048;
+pub const ImGuiTableColumnFlags_NoHeaderLabel: ImGuiTableColumnFlags_ = 4096;
+pub const ImGuiTableColumnFlags_NoHeaderWidth: ImGuiTableColumnFlags_ = 8192;
+pub const ImGuiTableColumnFlags_PreferSortAscending: ImGuiTableColumnFlags_ = 16384;
+pub const ImGuiTableColumnFlags_PreferSortDescending: ImGuiTableColumnFlags_ = 32768;
+pub const ImGuiTableColumnFlags_IndentEnable: ImGuiTableColumnFlags_ = 65536;
+pub const ImGuiTableColumnFlags_IndentDisable: ImGuiTableColumnFlags_ = 131072;
+pub const ImGuiTableColumnFlags_IsEnabled: ImGuiTableColumnFlags_ = 16777216;
+pub const ImGuiTableColumnFlags_IsVisible: ImGuiTableColumnFlags_ = 33554432;
+pub const ImGuiTableColumnFlags_IsSorted: ImGuiTableColumnFlags_ = 67108864;
+pub const ImGuiTableColumnFlags_IsHovered: ImGuiTableColumnFlags_ = 134217728;
+pub const ImGuiTableColumnFlags_WidthMask_: ImGuiTableColumnFlags_ = 24;
+pub const ImGuiTableColumnFlags_IndentMask_: ImGuiTableColumnFlags_ = 196608;
+pub const ImGuiTableColumnFlags_StatusMask_: ImGuiTableColumnFlags_ = 251658240;
 pub const ImGuiTableColumnFlags_NoDirectResize_: ImGuiTableColumnFlags_ = 1073741824;
 pub type ImGuiTableColumnFlags_ = cty::c_uint;
 pub const ImGuiTableRowFlags_None: ImGuiTableRowFlags_ = 0;
@@ -732,12 +732,11 @@ pub const ImGuiNavInput_FocusPrev: ImGuiNavInput_ = 12;
 pub const ImGuiNavInput_FocusNext: ImGuiNavInput_ = 13;
 pub const ImGuiNavInput_TweakSlow: ImGuiNavInput_ = 14;
 pub const ImGuiNavInput_TweakFast: ImGuiNavInput_ = 15;
-pub const ImGuiNavInput_KeyMenu_: ImGuiNavInput_ = 16;
-pub const ImGuiNavInput_KeyLeft_: ImGuiNavInput_ = 17;
-pub const ImGuiNavInput_KeyRight_: ImGuiNavInput_ = 18;
-pub const ImGuiNavInput_KeyUp_: ImGuiNavInput_ = 19;
-pub const ImGuiNavInput_KeyDown_: ImGuiNavInput_ = 20;
-pub const ImGuiNavInput_COUNT: ImGuiNavInput_ = 21;
+pub const ImGuiNavInput_KeyLeft_: ImGuiNavInput_ = 16;
+pub const ImGuiNavInput_KeyRight_: ImGuiNavInput_ = 17;
+pub const ImGuiNavInput_KeyUp_: ImGuiNavInput_ = 18;
+pub const ImGuiNavInput_KeyDown_: ImGuiNavInput_ = 19;
+pub const ImGuiNavInput_COUNT: ImGuiNavInput_ = 20;
 pub const ImGuiNavInput_InternalStart_: ImGuiNavInput_ = 16;
 pub type ImGuiNavInput_ = cty::c_uint;
 pub const ImGuiConfigFlags_None: ImGuiConfigFlags_ = 0;
@@ -812,30 +811,31 @@ pub const ImGuiCol_ModalWindowDimBg: ImGuiCol_ = 52;
 pub const ImGuiCol_COUNT: ImGuiCol_ = 53;
 pub type ImGuiCol_ = cty::c_uint;
 pub const ImGuiStyleVar_Alpha: ImGuiStyleVar_ = 0;
-pub const ImGuiStyleVar_WindowPadding: ImGuiStyleVar_ = 1;
-pub const ImGuiStyleVar_WindowRounding: ImGuiStyleVar_ = 2;
-pub const ImGuiStyleVar_WindowBorderSize: ImGuiStyleVar_ = 3;
-pub const ImGuiStyleVar_WindowMinSize: ImGuiStyleVar_ = 4;
-pub const ImGuiStyleVar_WindowTitleAlign: ImGuiStyleVar_ = 5;
-pub const ImGuiStyleVar_ChildRounding: ImGuiStyleVar_ = 6;
-pub const ImGuiStyleVar_ChildBorderSize: ImGuiStyleVar_ = 7;
-pub const ImGuiStyleVar_PopupRounding: ImGuiStyleVar_ = 8;
-pub const ImGuiStyleVar_PopupBorderSize: ImGuiStyleVar_ = 9;
-pub const ImGuiStyleVar_FramePadding: ImGuiStyleVar_ = 10;
-pub const ImGuiStyleVar_FrameRounding: ImGuiStyleVar_ = 11;
-pub const ImGuiStyleVar_FrameBorderSize: ImGuiStyleVar_ = 12;
-pub const ImGuiStyleVar_ItemSpacing: ImGuiStyleVar_ = 13;
-pub const ImGuiStyleVar_ItemInnerSpacing: ImGuiStyleVar_ = 14;
-pub const ImGuiStyleVar_IndentSpacing: ImGuiStyleVar_ = 15;
-pub const ImGuiStyleVar_CellPadding: ImGuiStyleVar_ = 16;
-pub const ImGuiStyleVar_ScrollbarSize: ImGuiStyleVar_ = 17;
-pub const ImGuiStyleVar_ScrollbarRounding: ImGuiStyleVar_ = 18;
-pub const ImGuiStyleVar_GrabMinSize: ImGuiStyleVar_ = 19;
-pub const ImGuiStyleVar_GrabRounding: ImGuiStyleVar_ = 20;
-pub const ImGuiStyleVar_TabRounding: ImGuiStyleVar_ = 21;
-pub const ImGuiStyleVar_ButtonTextAlign: ImGuiStyleVar_ = 22;
-pub const ImGuiStyleVar_SelectableTextAlign: ImGuiStyleVar_ = 23;
-pub const ImGuiStyleVar_COUNT: ImGuiStyleVar_ = 24;
+pub const ImGuiStyleVar_DisabledAlpha: ImGuiStyleVar_ = 1;
+pub const ImGuiStyleVar_WindowPadding: ImGuiStyleVar_ = 2;
+pub const ImGuiStyleVar_WindowRounding: ImGuiStyleVar_ = 3;
+pub const ImGuiStyleVar_WindowBorderSize: ImGuiStyleVar_ = 4;
+pub const ImGuiStyleVar_WindowMinSize: ImGuiStyleVar_ = 5;
+pub const ImGuiStyleVar_WindowTitleAlign: ImGuiStyleVar_ = 6;
+pub const ImGuiStyleVar_ChildRounding: ImGuiStyleVar_ = 7;
+pub const ImGuiStyleVar_ChildBorderSize: ImGuiStyleVar_ = 8;
+pub const ImGuiStyleVar_PopupRounding: ImGuiStyleVar_ = 9;
+pub const ImGuiStyleVar_PopupBorderSize: ImGuiStyleVar_ = 10;
+pub const ImGuiStyleVar_FramePadding: ImGuiStyleVar_ = 11;
+pub const ImGuiStyleVar_FrameRounding: ImGuiStyleVar_ = 12;
+pub const ImGuiStyleVar_FrameBorderSize: ImGuiStyleVar_ = 13;
+pub const ImGuiStyleVar_ItemSpacing: ImGuiStyleVar_ = 14;
+pub const ImGuiStyleVar_ItemInnerSpacing: ImGuiStyleVar_ = 15;
+pub const ImGuiStyleVar_IndentSpacing: ImGuiStyleVar_ = 16;
+pub const ImGuiStyleVar_CellPadding: ImGuiStyleVar_ = 17;
+pub const ImGuiStyleVar_ScrollbarSize: ImGuiStyleVar_ = 18;
+pub const ImGuiStyleVar_ScrollbarRounding: ImGuiStyleVar_ = 19;
+pub const ImGuiStyleVar_GrabMinSize: ImGuiStyleVar_ = 20;
+pub const ImGuiStyleVar_GrabRounding: ImGuiStyleVar_ = 21;
+pub const ImGuiStyleVar_TabRounding: ImGuiStyleVar_ = 22;
+pub const ImGuiStyleVar_ButtonTextAlign: ImGuiStyleVar_ = 23;
+pub const ImGuiStyleVar_SelectableTextAlign: ImGuiStyleVar_ = 24;
+pub const ImGuiStyleVar_COUNT: ImGuiStyleVar_ = 25;
 pub type ImGuiStyleVar_ = cty::c_uint;
 pub const ImGuiButtonFlags_None: ImGuiButtonFlags_ = 0;
 pub const ImGuiButtonFlags_MouseButtonLeft: ImGuiButtonFlags_ = 1;
@@ -868,11 +868,11 @@ pub const ImGuiColorEditFlags_PickerHueBar: ImGuiColorEditFlags_ = 33554432;
 pub const ImGuiColorEditFlags_PickerHueWheel: ImGuiColorEditFlags_ = 67108864;
 pub const ImGuiColorEditFlags_InputRGB: ImGuiColorEditFlags_ = 134217728;
 pub const ImGuiColorEditFlags_InputHSV: ImGuiColorEditFlags_ = 268435456;
-pub const ImGuiColorEditFlags__OptionsDefault: ImGuiColorEditFlags_ = 177209344;
-pub const ImGuiColorEditFlags__DisplayMask: ImGuiColorEditFlags_ = 7340032;
-pub const ImGuiColorEditFlags__DataTypeMask: ImGuiColorEditFlags_ = 25165824;
-pub const ImGuiColorEditFlags__PickerMask: ImGuiColorEditFlags_ = 100663296;
-pub const ImGuiColorEditFlags__InputMask: ImGuiColorEditFlags_ = 402653184;
+pub const ImGuiColorEditFlags_DefaultOptions_: ImGuiColorEditFlags_ = 177209344;
+pub const ImGuiColorEditFlags_DisplayMask_: ImGuiColorEditFlags_ = 7340032;
+pub const ImGuiColorEditFlags_DataTypeMask_: ImGuiColorEditFlags_ = 25165824;
+pub const ImGuiColorEditFlags_PickerMask_: ImGuiColorEditFlags_ = 100663296;
+pub const ImGuiColorEditFlags_InputMask_: ImGuiColorEditFlags_ = 402653184;
 pub type ImGuiColorEditFlags_ = cty::c_uint;
 pub const ImGuiSliderFlags_None: ImGuiSliderFlags_ = 0;
 pub const ImGuiSliderFlags_AlwaysClamp: ImGuiSliderFlags_ = 16;
@@ -908,6 +908,7 @@ pub type ImGuiCond_ = cty::c_uint;
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub struct ImGuiStyle {
     pub Alpha: f32,
+    pub DisabledAlpha: f32,
     pub WindowPadding: ImVec2,
     pub WindowRounding: f32,
     pub WindowBorderSize: f32,
@@ -1010,7 +1011,7 @@ pub struct ImGuiIO {
     pub KeyAlt: bool,
     pub KeySuper: bool,
     pub KeysDown: [bool; 512usize],
-    pub NavInputs: [f32; 21usize],
+    pub NavInputs: [f32; 20usize],
     pub WantCaptureMouse: bool,
     pub WantCaptureKeyboard: bool,
     pub WantTextInput: bool,
@@ -1026,6 +1027,7 @@ pub struct ImGuiIO {
     pub MetricsActiveAllocations: cty::c_int,
     pub MouseDelta: ImVec2,
     pub KeyMods: ImGuiKeyModFlags,
+    pub KeyModsPrev: ImGuiKeyModFlags,
     pub MousePosPrev: ImVec2,
     pub MouseClickedPos: [ImVec2; 5usize],
     pub MouseClickedTime: [f64; 5usize],
@@ -1040,8 +1042,8 @@ pub struct ImGuiIO {
     pub MouseDragMaxDistanceSqr: [f32; 5usize],
     pub KeysDownDuration: [f32; 512usize],
     pub KeysDownDurationPrev: [f32; 512usize],
-    pub NavInputsDownDuration: [f32; 21usize],
-    pub NavInputsDownDurationPrev: [f32; 21usize],
+    pub NavInputsDownDuration: [f32; 20usize],
+    pub NavInputsDownDurationPrev: [f32; 20usize],
     pub PenPressure: f32,
     pub InputQueueSurrogate: ImWchar16,
     pub InputQueueCharacters: ImVector_ImWchar,
@@ -1588,6 +1590,7 @@ pub struct ImFontAtlas {
     pub TexDesiredWidth: cty::c_int,
     pub TexGlyphPadding: cty::c_int,
     pub Locked: bool,
+    pub TexReady: bool,
     pub TexPixelsUseColors: bool,
     pub TexPixelsAlpha8: *mut cty::c_uchar,
     pub TexPixelsRGBA32: *mut cty::c_uint,
@@ -1627,6 +1630,7 @@ pub struct ImFont {
     pub ConfigDataCount: cty::c_short,
     pub FallbackChar: ImWchar,
     pub EllipsisChar: ImWchar,
+    pub DotChar: ImWchar,
     pub DirtyLookupTables: bool,
     pub Scale: f32,
     pub Ascent: f32,
@@ -1658,22 +1662,22 @@ pub struct ImGuiViewport {
     pub WorkSize: ImVec2,
 }
 extern "C" {
-    pub fn ImVec2_ImVec2Nil() -> *mut ImVec2;
+    pub fn ImVec2_ImVec2_Nil() -> *mut ImVec2;
 }
 extern "C" {
     pub fn ImVec2_destroy(self_: *mut ImVec2);
 }
 extern "C" {
-    pub fn ImVec2_ImVec2Float(_x: f32, _y: f32) -> *mut ImVec2;
+    pub fn ImVec2_ImVec2_Float(_x: f32, _y: f32) -> *mut ImVec2;
 }
 extern "C" {
-    pub fn ImVec4_ImVec4Nil() -> *mut ImVec4;
+    pub fn ImVec4_ImVec4_Nil() -> *mut ImVec4;
 }
 extern "C" {
     pub fn ImVec4_destroy(self_: *mut ImVec4);
 }
 extern "C" {
-    pub fn ImVec4_ImVec4Float(_x: f32, _y: f32, _z: f32, _w: f32) -> *mut ImVec4;
+    pub fn ImVec4_ImVec4_Float(_x: f32, _y: f32, _z: f32, _w: f32) -> *mut ImVec4;
 }
 extern "C" {
     pub fn igCreateContext(shared_font_atlas: *mut ImFontAtlas) -> *mut ImGuiContext;
@@ -1745,7 +1749,7 @@ extern "C" {
     pub fn igEnd();
 }
 extern "C" {
-    pub fn igBeginChildStr(
+    pub fn igBeginChild_Str(
         str_id: *const cty::c_char,
         size: ImVec2,
         border: bool,
@@ -1753,8 +1757,12 @@ extern "C" {
     ) -> bool;
 }
 extern "C" {
-    pub fn igBeginChildID(id: ImGuiID, size: ImVec2, border: bool, flags: ImGuiWindowFlags)
-        -> bool;
+    pub fn igBeginChild_ID(
+        id: ImGuiID,
+        size: ImVec2,
+        border: bool,
+        flags: ImGuiWindowFlags,
+    ) -> bool;
 }
 extern "C" {
     pub fn igEndChild();
@@ -1813,31 +1821,31 @@ extern "C" {
     pub fn igSetNextWindowBgAlpha(alpha: f32);
 }
 extern "C" {
-    pub fn igSetWindowPosVec2(pos: ImVec2, cond: ImGuiCond);
+    pub fn igSetWindowPos_Vec2(pos: ImVec2, cond: ImGuiCond);
 }
 extern "C" {
-    pub fn igSetWindowSizeVec2(size: ImVec2, cond: ImGuiCond);
+    pub fn igSetWindowSize_Vec2(size: ImVec2, cond: ImGuiCond);
 }
 extern "C" {
-    pub fn igSetWindowCollapsedBool(collapsed: bool, cond: ImGuiCond);
+    pub fn igSetWindowCollapsed_Bool(collapsed: bool, cond: ImGuiCond);
 }
 extern "C" {
-    pub fn igSetWindowFocusNil();
+    pub fn igSetWindowFocus_Nil();
 }
 extern "C" {
     pub fn igSetWindowFontScale(scale: f32);
 }
 extern "C" {
-    pub fn igSetWindowPosStr(name: *const cty::c_char, pos: ImVec2, cond: ImGuiCond);
+    pub fn igSetWindowPos_Str(name: *const cty::c_char, pos: ImVec2, cond: ImGuiCond);
 }
 extern "C" {
-    pub fn igSetWindowSizeStr(name: *const cty::c_char, size: ImVec2, cond: ImGuiCond);
+    pub fn igSetWindowSize_Str(name: *const cty::c_char, size: ImVec2, cond: ImGuiCond);
 }
 extern "C" {
-    pub fn igSetWindowCollapsedStr(name: *const cty::c_char, collapsed: bool, cond: ImGuiCond);
+    pub fn igSetWindowCollapsed_Str(name: *const cty::c_char, collapsed: bool, cond: ImGuiCond);
 }
 extern "C" {
-    pub fn igSetWindowFocusStr(name: *const cty::c_char);
+    pub fn igSetWindowFocus_Str(name: *const cty::c_char);
 }
 extern "C" {
     pub fn igGetContentRegionAvail(pOut: *mut ImVec2);
@@ -1891,19 +1899,19 @@ extern "C" {
     pub fn igPopFont();
 }
 extern "C" {
-    pub fn igPushStyleColorU32(idx: ImGuiCol, col: ImU32);
+    pub fn igPushStyleColor_U32(idx: ImGuiCol, col: ImU32);
 }
 extern "C" {
-    pub fn igPushStyleColorVec4(idx: ImGuiCol, col: ImVec4);
+    pub fn igPushStyleColor_Vec4(idx: ImGuiCol, col: ImVec4);
 }
 extern "C" {
     pub fn igPopStyleColor(count: cty::c_int);
 }
 extern "C" {
-    pub fn igPushStyleVarFloat(idx: ImGuiStyleVar, val: f32);
+    pub fn igPushStyleVar_Float(idx: ImGuiStyleVar, val: f32);
 }
 extern "C" {
-    pub fn igPushStyleVarVec2(idx: ImGuiStyleVar, val: ImVec2);
+    pub fn igPushStyleVar_Vec2(idx: ImGuiStyleVar, val: ImVec2);
 }
 extern "C" {
     pub fn igPopStyleVar(count: cty::c_int);
@@ -1948,13 +1956,13 @@ extern "C" {
     pub fn igGetFontTexUvWhitePixel(pOut: *mut ImVec2);
 }
 extern "C" {
-    pub fn igGetColorU32Col(idx: ImGuiCol, alpha_mul: f32) -> ImU32;
+    pub fn igGetColorU32_Col(idx: ImGuiCol, alpha_mul: f32) -> ImU32;
 }
 extern "C" {
-    pub fn igGetColorU32Vec4(col: ImVec4) -> ImU32;
+    pub fn igGetColorU32_Vec4(col: ImVec4) -> ImU32;
 }
 extern "C" {
-    pub fn igGetColorU32U32(col: ImU32) -> ImU32;
+    pub fn igGetColorU32_U32(col: ImU32) -> ImU32;
 }
 extern "C" {
     pub fn igGetStyleColorVec4(idx: ImGuiCol) -> *const ImVec4;
@@ -2029,31 +2037,31 @@ extern "C" {
     pub fn igGetFrameHeightWithSpacing() -> f32;
 }
 extern "C" {
-    pub fn igPushIDStr(str_id: *const cty::c_char);
+    pub fn igPushID_Str(str_id: *const cty::c_char);
 }
 extern "C" {
-    pub fn igPushIDStrStr(str_id_begin: *const cty::c_char, str_id_end: *const cty::c_char);
+    pub fn igPushID_StrStr(str_id_begin: *const cty::c_char, str_id_end: *const cty::c_char);
 }
 extern "C" {
-    pub fn igPushIDPtr(ptr_id: *const cty::c_void);
+    pub fn igPushID_Ptr(ptr_id: *const cty::c_void);
 }
 extern "C" {
-    pub fn igPushIDInt(int_id: cty::c_int);
+    pub fn igPushID_Int(int_id: cty::c_int);
 }
 extern "C" {
     pub fn igPopID();
 }
 extern "C" {
-    pub fn igGetIDStr(str_id: *const cty::c_char) -> ImGuiID;
+    pub fn igGetID_Str(str_id: *const cty::c_char) -> ImGuiID;
 }
 extern "C" {
-    pub fn igGetIDStrStr(
+    pub fn igGetID_StrStr(
         str_id_begin: *const cty::c_char,
         str_id_end: *const cty::c_char,
     ) -> ImGuiID;
 }
 extern "C" {
-    pub fn igGetIDPtr(ptr_id: *const cty::c_void) -> ImGuiID;
+    pub fn igGetID_Ptr(ptr_id: *const cty::c_void) -> ImGuiID;
 }
 extern "C" {
     pub fn igTextUnformatted(text: *const cty::c_char, text_end: *const cty::c_char);
@@ -2117,24 +2125,24 @@ extern "C" {
     pub fn igCheckbox(label: *const cty::c_char, v: *mut bool) -> bool;
 }
 extern "C" {
-    pub fn igCheckboxFlagsIntPtr(
+    pub fn igCheckboxFlags_IntPtr(
         label: *const cty::c_char,
         flags: *mut cty::c_int,
         flags_value: cty::c_int,
     ) -> bool;
 }
 extern "C" {
-    pub fn igCheckboxFlagsUintPtr(
+    pub fn igCheckboxFlags_UintPtr(
         label: *const cty::c_char,
         flags: *mut cty::c_uint,
         flags_value: cty::c_uint,
     ) -> bool;
 }
 extern "C" {
-    pub fn igRadioButtonBool(label: *const cty::c_char, active: bool) -> bool;
+    pub fn igRadioButton_Bool(label: *const cty::c_char, active: bool) -> bool;
 }
 extern "C" {
-    pub fn igRadioButtonIntPtr(
+    pub fn igRadioButton_IntPtr(
         label: *const cty::c_char,
         v: *mut cty::c_int,
         v_button: cty::c_int,
@@ -2157,7 +2165,7 @@ extern "C" {
     pub fn igEndCombo();
 }
 extern "C" {
-    pub fn igComboStr_arr(
+    pub fn igCombo_Str_arr(
         label: *const cty::c_char,
         current_item: *mut cty::c_int,
         items: *const *const cty::c_char,
@@ -2166,7 +2174,7 @@ extern "C" {
     ) -> bool;
 }
 extern "C" {
-    pub fn igComboStr(
+    pub fn igCombo_Str(
         label: *const cty::c_char,
         current_item: *mut cty::c_int,
         items_separated_by_zeros: *const cty::c_char,
@@ -2174,7 +2182,7 @@ extern "C" {
     ) -> bool;
 }
 extern "C" {
-    pub fn igComboFnBoolPtr(
+    pub fn igCombo_FnBoolPtr(
         label: *const cty::c_char,
         current_item: *mut cty::c_int,
         items_getter: ::core::option::Option<
@@ -2645,19 +2653,19 @@ extern "C" {
     pub fn igSetColorEditOptions(flags: ImGuiColorEditFlags);
 }
 extern "C" {
-    pub fn igTreeNodeStr(label: *const cty::c_char) -> bool;
+    pub fn igTreeNode_Str(label: *const cty::c_char) -> bool;
 }
 extern "C" {
-    pub fn igTreeNodeStrStr(str_id: *const cty::c_char, fmt: *const cty::c_char, ...) -> bool;
+    pub fn igTreeNode_StrStr(str_id: *const cty::c_char, fmt: *const cty::c_char, ...) -> bool;
 }
 extern "C" {
-    pub fn igTreeNodePtr(ptr_id: *const cty::c_void, fmt: *const cty::c_char, ...) -> bool;
+    pub fn igTreeNode_Ptr(ptr_id: *const cty::c_void, fmt: *const cty::c_char, ...) -> bool;
 }
 extern "C" {
-    pub fn igTreeNodeExStr(label: *const cty::c_char, flags: ImGuiTreeNodeFlags) -> bool;
+    pub fn igTreeNodeEx_Str(label: *const cty::c_char, flags: ImGuiTreeNodeFlags) -> bool;
 }
 extern "C" {
-    pub fn igTreeNodeExStrStr(
+    pub fn igTreeNodeEx_StrStr(
         str_id: *const cty::c_char,
         flags: ImGuiTreeNodeFlags,
         fmt: *const cty::c_char,
@@ -2665,7 +2673,7 @@ extern "C" {
     ) -> bool;
 }
 extern "C" {
-    pub fn igTreeNodeExPtr(
+    pub fn igTreeNodeEx_Ptr(
         ptr_id: *const cty::c_void,
         flags: ImGuiTreeNodeFlags,
         fmt: *const cty::c_char,
@@ -2673,10 +2681,10 @@ extern "C" {
     ) -> bool;
 }
 extern "C" {
-    pub fn igTreePushStr(str_id: *const cty::c_char);
+    pub fn igTreePush_Str(str_id: *const cty::c_char);
 }
 extern "C" {
-    pub fn igTreePushPtr(ptr_id: *const cty::c_void);
+    pub fn igTreePush_Ptr(ptr_id: *const cty::c_void);
 }
 extern "C" {
     pub fn igTreePop();
@@ -2685,13 +2693,13 @@ extern "C" {
     pub fn igGetTreeNodeToLabelSpacing() -> f32;
 }
 extern "C" {
-    pub fn igCollapsingHeaderTreeNodeFlags(
+    pub fn igCollapsingHeader_TreeNodeFlags(
         label: *const cty::c_char,
         flags: ImGuiTreeNodeFlags,
     ) -> bool;
 }
 extern "C" {
-    pub fn igCollapsingHeaderBoolPtr(
+    pub fn igCollapsingHeader_BoolPtr(
         label: *const cty::c_char,
         p_visible: *mut bool,
         flags: ImGuiTreeNodeFlags,
@@ -2701,7 +2709,7 @@ extern "C" {
     pub fn igSetNextItemOpen(is_open: bool, cond: ImGuiCond);
 }
 extern "C" {
-    pub fn igSelectableBool(
+    pub fn igSelectable_Bool(
         label: *const cty::c_char,
         selected: bool,
         flags: ImGuiSelectableFlags,
@@ -2709,7 +2717,7 @@ extern "C" {
     ) -> bool;
 }
 extern "C" {
-    pub fn igSelectableBoolPtr(
+    pub fn igSelectable_BoolPtr(
         label: *const cty::c_char,
         p_selected: *mut bool,
         flags: ImGuiSelectableFlags,
@@ -2723,7 +2731,7 @@ extern "C" {
     pub fn igEndListBox();
 }
 extern "C" {
-    pub fn igListBoxStr_arr(
+    pub fn igListBox_Str_arr(
         label: *const cty::c_char,
         current_item: *mut cty::c_int,
         items: *const *const cty::c_char,
@@ -2732,7 +2740,7 @@ extern "C" {
     ) -> bool;
 }
 extern "C" {
-    pub fn igListBoxFnBoolPtr(
+    pub fn igListBox_FnBoolPtr(
         label: *const cty::c_char,
         current_item: *mut cty::c_int,
         items_getter: ::core::option::Option<
@@ -2748,7 +2756,7 @@ extern "C" {
     ) -> bool;
 }
 extern "C" {
-    pub fn igPlotLinesFloatPtr(
+    pub fn igPlotLines_FloatPtr(
         label: *const cty::c_char,
         values: *const f32,
         values_count: cty::c_int,
@@ -2761,7 +2769,7 @@ extern "C" {
     );
 }
 extern "C" {
-    pub fn igPlotLinesFnFloatPtr(
+    pub fn igPlotLines_FnFloatPtr(
         label: *const cty::c_char,
         values_getter: ::core::option::Option<
             unsafe extern "C" fn(data: *mut cty::c_void, idx: cty::c_int) -> f32,
@@ -2776,7 +2784,7 @@ extern "C" {
     );
 }
 extern "C" {
-    pub fn igPlotHistogramFloatPtr(
+    pub fn igPlotHistogram_FloatPtr(
         label: *const cty::c_char,
         values: *const f32,
         values_count: cty::c_int,
@@ -2789,7 +2797,7 @@ extern "C" {
     );
 }
 extern "C" {
-    pub fn igPlotHistogramFnFloatPtr(
+    pub fn igPlotHistogram_FnFloatPtr(
         label: *const cty::c_char,
         values_getter: ::core::option::Option<
             unsafe extern "C" fn(data: *mut cty::c_void, idx: cty::c_int) -> f32,
@@ -2804,16 +2812,16 @@ extern "C" {
     );
 }
 extern "C" {
-    pub fn igValueBool(prefix: *const cty::c_char, b: bool);
+    pub fn igValue_Bool(prefix: *const cty::c_char, b: bool);
 }
 extern "C" {
-    pub fn igValueInt(prefix: *const cty::c_char, v: cty::c_int);
+    pub fn igValue_Int(prefix: *const cty::c_char, v: cty::c_int);
 }
 extern "C" {
-    pub fn igValueUint(prefix: *const cty::c_char, v: cty::c_uint);
+    pub fn igValue_Uint(prefix: *const cty::c_char, v: cty::c_uint);
 }
 extern "C" {
-    pub fn igValueFloat(prefix: *const cty::c_char, v: f32, float_format: *const cty::c_char);
+    pub fn igValue_Float(prefix: *const cty::c_char, v: f32, float_format: *const cty::c_char);
 }
 extern "C" {
     pub fn igBeginMenuBar() -> bool;
@@ -2834,7 +2842,7 @@ extern "C" {
     pub fn igEndMenu();
 }
 extern "C" {
-    pub fn igMenuItemBool(
+    pub fn igMenuItem_Bool(
         label: *const cty::c_char,
         shortcut: *const cty::c_char,
         selected: bool,
@@ -2842,7 +2850,7 @@ extern "C" {
     ) -> bool;
 }
 extern "C" {
-    pub fn igMenuItemBoolPtr(
+    pub fn igMenuItem_BoolPtr(
         label: *const cty::c_char,
         shortcut: *const cty::c_char,
         p_selected: *mut bool,
@@ -2872,7 +2880,10 @@ extern "C" {
     pub fn igEndPopup();
 }
 extern "C" {
-    pub fn igOpenPopup(str_id: *const cty::c_char, popup_flags: ImGuiPopupFlags);
+    pub fn igOpenPopup_Str(str_id: *const cty::c_char, popup_flags: ImGuiPopupFlags);
+}
+extern "C" {
+    pub fn igOpenPopup_ID(id: ImGuiID, popup_flags: ImGuiPopupFlags);
 }
 extern "C" {
     pub fn igOpenPopupOnItemClick(str_id: *const cty::c_char, popup_flags: ImGuiPopupFlags);
@@ -2956,6 +2967,9 @@ extern "C" {
 }
 extern "C" {
     pub fn igTableGetColumnFlags(column_n: cty::c_int) -> ImGuiTableColumnFlags;
+}
+extern "C" {
+    pub fn igTableSetColumnEnabled(column_n: cty::c_int, v: bool);
 }
 extern "C" {
     pub fn igTableSetBgColor(target: ImGuiTableBgTarget, color: ImU32, column_n: cty::c_int);
@@ -3051,6 +3065,12 @@ extern "C" {
     pub fn igGetDragDropPayload() -> *const ImGuiPayload;
 }
 extern "C" {
+    pub fn igBeginDisabled(disabled: bool);
+}
+extern "C" {
+    pub fn igEndDisabled();
+}
+extern "C" {
     pub fn igPushClipRect(
         clip_rect_min: ImVec2,
         clip_rect_max: ImVec2,
@@ -3121,10 +3141,10 @@ extern "C" {
     pub fn igGetMainViewport() -> *mut ImGuiViewport;
 }
 extern "C" {
-    pub fn igIsRectVisibleNil(size: ImVec2) -> bool;
+    pub fn igIsRectVisible_Nil(size: ImVec2) -> bool;
 }
 extern "C" {
-    pub fn igIsRectVisibleVec2(rect_min: ImVec2, rect_max: ImVec2) -> bool;
+    pub fn igIsRectVisible_Vec2(rect_min: ImVec2, rect_max: ImVec2) -> bool;
 }
 extern "C" {
     pub fn igGetTime() -> f64;
@@ -3334,6 +3354,9 @@ extern "C" {
     pub fn ImGuiIO_ClearInputCharacters(self_: *mut ImGuiIO);
 }
 extern "C" {
+    pub fn ImGuiIO_AddFocusEvent(self_: *mut ImGuiIO, focused: bool);
+}
+extern "C" {
     pub fn ImGuiIO_ImGuiIO() -> *mut ImGuiIO;
 }
 extern "C" {
@@ -3437,13 +3460,13 @@ extern "C" {
     pub fn ImGuiTextFilter_IsActive(self_: *mut ImGuiTextFilter) -> bool;
 }
 extern "C" {
-    pub fn ImGuiTextRange_ImGuiTextRangeNil() -> *mut ImGuiTextRange;
+    pub fn ImGuiTextRange_ImGuiTextRange_Nil() -> *mut ImGuiTextRange;
 }
 extern "C" {
     pub fn ImGuiTextRange_destroy(self_: *mut ImGuiTextRange);
 }
 extern "C" {
-    pub fn ImGuiTextRange_ImGuiTextRangeStr(
+    pub fn ImGuiTextRange_ImGuiTextRange_Str(
         _b: *const cty::c_char,
         _e: *const cty::c_char,
     ) -> *mut ImGuiTextRange;
@@ -3493,7 +3516,7 @@ extern "C" {
     );
 }
 extern "C" {
-    pub fn ImGuiStoragePair_ImGuiStoragePairInt(
+    pub fn ImGuiStoragePair_ImGuiStoragePair_Int(
         _key: ImGuiID,
         _val_i: cty::c_int,
     ) -> *mut ImGuiStoragePair;
@@ -3502,13 +3525,13 @@ extern "C" {
     pub fn ImGuiStoragePair_destroy(self_: *mut ImGuiStoragePair);
 }
 extern "C" {
-    pub fn ImGuiStoragePair_ImGuiStoragePairFloat(
+    pub fn ImGuiStoragePair_ImGuiStoragePair_Float(
         _key: ImGuiID,
         _val_f: f32,
     ) -> *mut ImGuiStoragePair;
 }
 extern "C" {
-    pub fn ImGuiStoragePair_ImGuiStoragePairPtr(
+    pub fn ImGuiStoragePair_ImGuiStoragePair_Ptr(
         _key: ImGuiID,
         _val_p: *mut cty::c_void,
     ) -> *mut ImGuiStoragePair;
@@ -3598,13 +3621,13 @@ extern "C" {
     pub fn ImGuiListClipper_Step(self_: *mut ImGuiListClipper) -> bool;
 }
 extern "C" {
-    pub fn ImColor_ImColorNil() -> *mut ImColor;
+    pub fn ImColor_ImColor_Nil() -> *mut ImColor;
 }
 extern "C" {
     pub fn ImColor_destroy(self_: *mut ImColor);
 }
 extern "C" {
-    pub fn ImColor_ImColorInt(
+    pub fn ImColor_ImColor_Int(
         r: cty::c_int,
         g: cty::c_int,
         b: cty::c_int,
@@ -3612,13 +3635,13 @@ extern "C" {
     ) -> *mut ImColor;
 }
 extern "C" {
-    pub fn ImColor_ImColorU32(rgba: ImU32) -> *mut ImColor;
+    pub fn ImColor_ImColor_U32(rgba: ImU32) -> *mut ImColor;
 }
 extern "C" {
-    pub fn ImColor_ImColorFloat(r: f32, g: f32, b: f32, a: f32) -> *mut ImColor;
+    pub fn ImColor_ImColor_Float(r: f32, g: f32, b: f32, a: f32) -> *mut ImColor;
 }
 extern "C" {
-    pub fn ImColor_ImColorVec4(col: ImVec4) -> *mut ImColor;
+    pub fn ImColor_ImColor_Vec4(col: ImVec4) -> *mut ImColor;
 }
 extern "C" {
     pub fn ImColor_SetHSV(self_: *mut ImColor, h: f32, s: f32, v: f32, a: f32);
@@ -3631,6 +3654,9 @@ extern "C" {
 }
 extern "C" {
     pub fn ImDrawCmd_destroy(self_: *mut ImDrawCmd);
+}
+extern "C" {
+    pub fn ImDrawCmd_GetTexID(self_: *mut ImDrawCmd) -> ImTextureID;
 }
 extern "C" {
     pub fn ImDrawListSplitter_ImDrawListSplitter() -> *mut ImDrawListSplitter;
@@ -3813,7 +3839,7 @@ extern "C" {
     );
 }
 extern "C" {
-    pub fn ImDrawList_AddTextVec2(
+    pub fn ImDrawList_AddText_Vec2(
         self_: *mut ImDrawList,
         pos: ImVec2,
         col: ImU32,
@@ -3822,7 +3848,7 @@ extern "C" {
     );
 }
 extern "C" {
-    pub fn ImDrawList_AddTextFontPtr(
+    pub fn ImDrawList_AddText_FontPtr(
         self_: *mut ImDrawList,
         font: *const ImFont,
         font_size: f32,
@@ -4059,6 +4085,9 @@ extern "C" {
 }
 extern "C" {
     pub fn ImDrawList__PopUnusedDrawCmd(self_: *mut ImDrawList);
+}
+extern "C" {
+    pub fn ImDrawList__TryMergeDrawCmds(self_: *mut ImDrawList);
 }
 extern "C" {
     pub fn ImDrawList__OnChangedClipRect(self_: *mut ImDrawList);
@@ -4421,9 +4450,6 @@ extern "C" {
 }
 extern "C" {
     pub fn ImFont_SetGlyphVisible(self_: *mut ImFont, c: ImWchar, visible: bool);
-}
-extern "C" {
-    pub fn ImFont_SetFallbackChar(self_: *mut ImFont, c: ImWchar);
 }
 extern "C" {
     pub fn ImFont_IsGlyphRangeUnused(
