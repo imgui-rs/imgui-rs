@@ -224,7 +224,9 @@ pub struct Io {
     pub(crate) set_clipboard_text_fn:
         Option<unsafe extern "C" fn(user_data: *mut c_void, text: *const c_char)>,
     pub(crate) clipboard_user_data: *mut c_void,
+    #[cfg(not(feature="docking"))]
     ime_set_input_screen_pos_fn: Option<unsafe extern "C" fn(x: c_int, y: c_int)>,
+    #[cfg(not(feature="docking"))]
     ime_window_handle: *mut c_void,
     /// Mouse position, in pixels.
     ///
@@ -465,7 +467,9 @@ fn test_io_memory_layout() {
     assert_field_offset!(get_clipboard_text_fn, GetClipboardTextFn);
     assert_field_offset!(set_clipboard_text_fn, SetClipboardTextFn);
     assert_field_offset!(clipboard_user_data, ClipboardUserData);
+    #[cfg(not(feature="docking"))]
     assert_field_offset!(ime_set_input_screen_pos_fn, ImeSetInputScreenPosFn);
+    #[cfg(not(feature="docking"))]
     assert_field_offset!(ime_window_handle, ImeWindowHandle);
     assert_field_offset!(mouse_pos, MousePos);
     assert_field_offset!(mouse_down, MouseDown);
