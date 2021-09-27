@@ -215,7 +215,7 @@ where
 
         // we do this ourselves the long way...
         unsafe {
-            let buffer = &mut *ui.buffer.get();
+            let buffer = &mut *ui.scratch_buffer().get();
             buffer.refresh_buffer();
 
             label = buffer.push(self.label);
@@ -258,7 +258,7 @@ where
             let mut max_display_format = std::ptr::null();
 
             // we do this ourselves the long way...
-            let buffer = &mut *ui.buffer.get();
+            let buffer = &mut *ui.scratch_buffer().get();
             buffer.refresh_buffer();
 
             label = buffer.push(self.label);

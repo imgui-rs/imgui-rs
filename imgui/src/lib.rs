@@ -4,6 +4,7 @@
 
 pub extern crate imgui_sys as sys;
 
+use std::cell;
 use std::os::raw::{c_char, c_void};
 
 pub use self::clipboard::*;
@@ -118,17 +119,37 @@ impl Context {
 /// A temporary reference for building the user interface for one frame
 #[derive(Debug)]
 pub struct Ui<'ui> {
-    ctx: &'ui Context,
-    font_atlas: Option<std::cell::RefMut<'ui, SharedFontAtlas>>,
-    // imgui isn't mutli-threaded -- so no one will ever access twice.
-    buffer: std::cell::UnsafeCell<string::UiBuffer>,
+    phantom_data: std::marker::PhantomData<&'ui Context>,
 }
 
+/// This is our internal buffer that we use for the Ui object.
+///
+/// We edit this buffer
+static mut BUFFER: cell::UnsafeCell<string::UiBuffer> =
+    cell::UnsafeCell::new(string::UiBuffer::new(100));
+
 impl<'ui> Ui<'ui> {
+    /// This provides access to the backing scratch buffer that we use to write
+    /// strings, along with null-terminators, before we pass normal Rust strs to
+    /// Dear ImGui.
+    ///
+    /// This is given as a get-out-of-jail free card if you need to handle the buffer,
+    /// or, for example, resize it for some reason. Generally, you should never need this.
+    ///
+    /// ## Safety
+    ///
+    /// This uses a **static mut** and we assume it will *never* be passed between threads.
+    /// Do not pass the raw pointer you get between threads at all -- Dear ImGui is single-threaded.
+    /// We otherwise make no assumptions about the size or keep state in this buffer between calls,
+    /// so editing the `UiBuffer` is fine.
+    pub unsafe fn scratch_buffer(&self) -> &cell::UnsafeCell<string::UiBuffer> {
+        &BUFFER
+    }
+
     /// Internal method to push a single text to our scratch buffer.
     fn scratch_txt(&self, txt: impl AsRef<str>) -> *const sys::cty::c_char {
         unsafe {
-            let handle = &mut *self.buffer.get();
+            let handle = &mut *BUFFER.get();
             handle.scratch_txt(txt)
         }
     }
@@ -136,7 +157,7 @@ impl<'ui> Ui<'ui> {
     /// Internal method to push an option text to our scratch buffer.
     fn scratch_txt_opt(&self, txt: Option<impl AsRef<str>>) -> *const sys::cty::c_char {
         unsafe {
-            let handle = &mut *self.buffer.get();
+            let handle = &mut *BUFFER.get();
             handle.scratch_txt_opt(txt)
         }
     }
@@ -147,7 +168,7 @@ impl<'ui> Ui<'ui> {
         txt_1: impl AsRef<str>,
     ) -> (*const sys::cty::c_char, *const sys::cty::c_char) {
         unsafe {
-            let handle = &mut *self.buffer.get();
+            let handle = &mut *BUFFER.get();
             handle.scratch_txt_two(txt_0, txt_1)
         }
     }
@@ -158,7 +179,7 @@ impl<'ui> Ui<'ui> {
         txt_1: Option<impl AsRef<str>>,
     ) -> (*const sys::cty::c_char, *const sys::cty::c_char) {
         unsafe {
-            let handle = &mut *self.buffer.get();
+            let handle = &mut *BUFFER.get();
             handle.scratch_txt_with_opt(txt_0, txt_1)
         }
     }
@@ -169,19 +190,13 @@ impl<'ui> Ui<'ui> {
         unsafe { &*(sys::igGetIO() as *const Io) }
     }
 
-    /// Returns an immutable reference to the font atlas
-    pub fn fonts(&self) -> FontAtlasRef<'_> {
-        match self.font_atlas {
-            Some(ref font_atlas) => FontAtlasRef::Shared(font_atlas),
-            None => unsafe {
-                let fonts = &*(self.io().fonts as *const FontAtlas);
-                FontAtlasRef::Owned(fonts)
-            },
-        }
+    /// Returns an immutable reference to the font atlas.
+    pub fn fonts(&self) -> &FontAtlas {
+        unsafe { &*(self.io().fonts as *const FontAtlas) }
     }
     /// Returns a clone of the user interface style
     pub fn clone_style(&self) -> Style {
-        *self.ctx.style()
+        unsafe { *self.style() }
     }
     /// Renders the frame and returns a reference to the resulting draw data
     #[doc(alias = "Render", alias = "GetDrawData")]
@@ -614,7 +629,7 @@ impl<'ui> Ui<'ui> {
         height_in_items: i32,
     ) -> bool {
         let (label_ptr, items_inner) = unsafe {
-            let handle = &mut *self.buffer.get();
+            let handle = &mut *self.scratch_buffer().get();
 
             handle.refresh_buffer();
             let label_ptr = handle.push(label);

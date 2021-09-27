@@ -512,31 +512,36 @@ impl Context {
             },
         }
     }
+
+    /// Starts a new frame.
+    #[deprecated(since = "0.9.0", note = "use `new_frame` instead")]
+    pub fn frame(&mut self) -> Ui<'_> {
+        self.new_frame()
+    }
+
     /// Starts a new frame and returns an `Ui` instance for constructing a user interface.
     ///
     /// # Panics
     ///
-    /// Panics if the context uses a shared font atlas that is already borrowed
+    /// Panics if the context uses a shared font atlas that is already borrowed.
+    /// Do not attempt to borrow the context afterwards, if you are using a shared font atlas.
     #[doc(alias = "NewFame")]
-    pub fn frame(&mut self) -> Ui<'_> {
+    pub fn new_frame(&mut self) -> Ui<'_> {
         // Clear default font if it no longer exists. This could be an error in the future
         let default_font = self.io().font_default;
         if !default_font.is_null() && self.fonts().get_font(FontId(default_font)).is_none() {
             self.io_mut().font_default = ptr::null_mut();
         }
         // NewFrame/Render/EndFrame mutate the font atlas so we need exclusive access to it
-        let font_atlas = self
-            .shared_font_atlas
-            .as_ref()
-            .map(|font_atlas| font_atlas.borrow_mut());
+        if let Some(font_atlas) = self.shared_font_atlas.as_ref() {
+            assert!(font_atlas.try_borrow_mut().is_ok());
+        }
         // TODO: precondition checks
         unsafe {
             sys::igNewFrame();
         }
         Ui {
-            ctx: self,
-            font_atlas,
-            buffer: crate::UiBuffer::new(1024).into(),
+            phantom_data: std::marker::PhantomData,
         }
     }
 }

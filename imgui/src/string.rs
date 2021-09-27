@@ -7,16 +7,16 @@ use std::{fmt, ptr};
 
 /// this is the unsafe cell upon which we build our abstraction.
 #[derive(Debug)]
-pub(crate) struct UiBuffer {
-    buffer: Vec<u8>,
-    max_len: usize,
+pub struct UiBuffer {
+    pub buffer: Vec<u8>,
+    pub max_len: usize,
 }
 
 impl UiBuffer {
     /// Creates a new max buffer with the given length.
-    pub fn new(max_len: usize) -> Self {
+    pub const fn new(max_len: usize) -> Self {
         Self {
-            buffer: Vec::with_capacity(max_len),
+            buffer: Vec::new(),
             max_len,
         }
     }

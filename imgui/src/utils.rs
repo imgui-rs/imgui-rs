@@ -177,7 +177,7 @@ impl<'ui> Ui<'ui> {
     /// style object.
     #[doc(alias = "GetStyle")]
     pub fn style_color(&self, style_color: StyleColor) -> [f32; 4] {
-        self.ctx.style()[style_color]
+        unsafe { self.style() }.colors[style_color as usize]
     }
 
     /// Returns a shared reference to the current [`Style`].
@@ -193,6 +193,7 @@ impl<'ui> Ui<'ui> {
     /// pop. The [`clone_style`](Ui::clone_style) version may instead be used to avoid `unsafe`.
     #[doc(alias = "GetStyle")]
     pub unsafe fn style(&self) -> &Style {
-        self.ctx.style()
+        // safe because Style is a transparent wrapper around sys::ImGuiStyle
+        &*(sys::igGetStyle() as *const Style)
     }
 }
