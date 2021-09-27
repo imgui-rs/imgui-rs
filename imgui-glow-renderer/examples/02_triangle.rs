@@ -42,7 +42,7 @@ fn main() {
                 ui.show_demo_window(&mut true);
 
                 winit_platform.prepare_render(&ui, window.window());
-                let draw_data = ui.render();
+                let draw_data = imgui_context.render();
 
                 // Render imgui on top of it
                 ig_renderer

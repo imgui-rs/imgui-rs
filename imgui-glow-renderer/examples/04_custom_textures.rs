@@ -59,7 +59,7 @@ fn main() {
                 textures_ui.show(&ui);
 
                 winit_platform.prepare_render(&ui, window.window());
-                let draw_data = ui.render();
+                let draw_data = imgui_context.render();
                 ig_renderer
                     .render(&gl, &textures, draw_data)
                     .expect("error rendering imgui");

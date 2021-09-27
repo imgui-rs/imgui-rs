@@ -51,8 +51,8 @@ fn main() {
                 let ui = imgui_context.frame();
                 ui.show_demo_window(&mut true);
 
-                winit_platform.prepare_render(&ui, window.window());
-                let draw_data = ui.render();
+                winit_platform.prepare_render(ui, window.window());
+                let draw_data = imgui_context.render();
 
                 // This is the only extra render step to add
                 ig_renderer

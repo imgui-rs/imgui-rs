@@ -330,7 +330,7 @@ fn show_test_window(ui: &Ui, state: &mut State, opened: &mut bool) {
         window = window.opened(opened)
     }
     window.build(|| {
-        ui.push_item_width(-140.0);
+        let _w = ui.push_item_width(-140.0);
         ui.text(format!("dear imgui says hello. ({})", imgui::dear_imgui_version()));
         if let Some(menu_bar) = ui.begin_menu_bar() {
             if let Some(menu) = ui.begin_menu("Menu") {
@@ -827,7 +827,7 @@ CTRL+click on individual component to input value.\n",
     });
 }
 
-fn show_example_app_main_menu_bar<'a>(ui: &Ui<'a>, state: &mut State) {
+fn show_example_app_main_menu_bar(ui: &Ui, state: &mut State) {
     if let Some(menu_bar) = ui.begin_main_menu_bar() {
         if let Some(menu) = ui.begin_menu("File") {
             show_example_menu_file(ui, &mut state.file_menu);
@@ -849,7 +849,7 @@ fn show_example_app_main_menu_bar<'a>(ui: &Ui<'a>, state: &mut State) {
     }
 }
 
-fn show_example_menu_file<'a>(ui: &Ui<'a>, state: &mut FileMenuState) {
+fn show_example_menu_file(ui: &Ui, state: &mut FileMenuState) {
     MenuItem::new("(dummy menu)").enabled(false).build(ui);
     MenuItem::new("New").build(ui);
     MenuItem::new("Open").shortcut("Ctrl+O").build(ui);
