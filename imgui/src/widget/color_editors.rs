@@ -326,7 +326,7 @@ where
     /// Builds the color editor.
     ///
     /// Returns true if the color value was changed.
-    pub fn build(mut self, ui: &Ui<'_>) -> bool {
+    pub fn build(mut self, ui: &Ui) -> bool {
         // if let EditableColor::Float3(_) = self.value {
         self.flags.insert(ColorEditFlags::NO_ALPHA);
 
@@ -508,7 +508,7 @@ where
     /// Builds the color editor.
     ///
     /// Returns true if the color value was changed.
-    pub fn build(self, ui: &Ui<'_>) -> bool {
+    pub fn build(self, ui: &Ui) -> bool {
         let as_vec4: MintVec4 = (*self.value).into();
         let mut as_vec4: [f32; 4] = as_vec4.into();
 
@@ -694,7 +694,7 @@ where
     /// Builds the color picker.
     ///
     /// Returns true if the color value was changed.
-    pub fn build(mut self, ui: &Ui<'_>) -> bool {
+    pub fn build(mut self, ui: &Ui) -> bool {
         self.flags.insert(ColorEditFlags::NO_ALPHA);
         let mut value: [f32; 3] = (*self.value).into().into();
         let changed = unsafe {
@@ -886,7 +886,7 @@ where
     /// Builds the color picker.
     ///
     /// Returns true if the color value was changed.
-    pub fn build(mut self, ui: &Ui<'_>) -> bool {
+    pub fn build(mut self, ui: &Ui) -> bool {
         self.flags.insert(ColorEditFlags::NO_ALPHA);
         let mut value: [f32; 4] = (*self.value).into().into();
         let ref_color = self.ref_color.map(|c| c.as_ptr()).unwrap_or(ptr::null());
@@ -1009,7 +1009,7 @@ impl<T: AsRef<str>> ColorButton<T> {
     /// Builds the color button.
     ///
     /// Returns true if this color button was clicked.
-    pub fn build(self, ui: &Ui<'_>) -> bool {
+    pub fn build(self, ui: &Ui) -> bool {
         unsafe {
             sys::igColorButton(
                 ui.scratch_txt(self.desc_id),
@@ -1022,7 +1022,7 @@ impl<T: AsRef<str>> ColorButton<T> {
 }
 
 /// # Widgets: Color Editor/Picker
-impl<'ui> Ui<'ui> {
+impl Ui {
     /// Initializes current color editor/picker options (generally on application startup) if you
     /// want to select a default format, picker type, etc. Users will be able to change many
     /// settings, unless you use .options(false) in your widget builders.

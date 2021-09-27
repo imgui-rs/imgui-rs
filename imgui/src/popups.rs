@@ -118,7 +118,7 @@ impl<'p, Label: AsRef<str>> PopupModal<'p, Label> {
     /// Consume and draw the PopupModal.
     /// Returns the result of the closure, if it is called.
     #[doc(alias = "BeginPopupModal")]
-    pub fn build<T, F: FnOnce() -> T>(self, ui: &Ui<'_>, f: F) -> Option<T> {
+    pub fn build<T, F: FnOnce() -> T>(self, ui: &Ui, f: F) -> Option<T> {
         self.begin_popup(ui).map(|_popup| f())
     }
 
@@ -128,7 +128,7 @@ impl<'p, Label: AsRef<str>> PopupModal<'p, Label> {
     /// This should be called *per frame*, whereas [`Ui::open_popup`]
     /// should be called *once* when you want to actual create the popup.
     #[doc(alias = "BeginPopupModal")]
-    pub fn begin_popup<'ui>(self, ui: &Ui<'ui>) -> Option<PopupToken<'ui>> {
+    pub fn begin_popup(self, ui: &Ui) -> Option<PopupToken<'_>> {
         let render = unsafe {
             sys::igBeginPopupModal(
                 ui.scratch_txt(self.label),
@@ -148,7 +148,7 @@ impl<'p, Label: AsRef<str>> PopupModal<'p, Label> {
 }
 
 // Widgets: Popups
-impl<'ui> Ui<'ui> {
+impl Ui {
     /// Instructs ImGui to open a popup, which must be began with either [`begin_popup`](Self::begin_popup)
     /// or [`popup`](Self::popup). You also use this function to begin [PopupModal].
     ///

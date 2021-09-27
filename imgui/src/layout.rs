@@ -12,7 +12,7 @@ create_token!(
 );
 
 /// # Cursor / Layout
-impl<'ui> Ui<'ui> {
+impl Ui {
     /// Renders a separator (generally horizontal).
     ///
     /// This becomes a vertical separator inside a menu bar or in horizontal layout mode.

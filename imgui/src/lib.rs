@@ -118,9 +118,7 @@ impl Context {
 
 /// A temporary reference for building the user interface for one frame
 #[derive(Debug)]
-pub struct Ui<'ui> {
-    phantom_data: std::marker::PhantomData<&'ui Context>,
-}
+pub struct Ui(pub(crate) ());
 
 /// This is our internal buffer that we use for the Ui object.
 ///
@@ -128,7 +126,7 @@ pub struct Ui<'ui> {
 static mut BUFFER: cell::UnsafeCell<string::UiBuffer> =
     cell::UnsafeCell::new(string::UiBuffer::new(100));
 
-impl<'ui> Ui<'ui> {
+impl Ui {
     /// This provides access to the backing scratch buffer that we use to write
     /// strings, along with null-terminators, before we pass normal Rust strs to
     /// Dear ImGui.
@@ -198,29 +196,30 @@ impl<'ui> Ui<'ui> {
     pub fn clone_style(&self) -> Style {
         unsafe { *self.style() }
     }
-    /// Renders the frame and returns a reference to the resulting draw data
-    #[doc(alias = "Render", alias = "GetDrawData")]
-    pub fn render(self) -> &'ui DrawData {
-        unsafe {
-            sys::igRender();
-            &*(sys::igGetDrawData() as *mut DrawData)
-        }
-    }
+    // /// Renders the frame and returns a reference to the resulting draw data
+    // #[doc(alias = "Render", alias = "GetDrawData")]
+    // pub fn render(self) -> &DrawData {
+    //     unsafe {
+    //         sys::igRender();
+    //         &*(sys::igGetDrawData() as *mut DrawData)
+    //     }
+    // }
 }
 
-impl<'a> Drop for Ui<'a> {
-    #[doc(alias = "EndFrame")]
-    fn drop(&mut self) {
-        if !std::thread::panicking() {
-            unsafe {
-                sys::igEndFrame();
-            }
-        }
-    }
-}
+// TODO JACK YOU NEED TO MOVE THIS!
+// impl Drop for Ui {
+//     #[doc(alias = "EndFrame")]
+//     fn drop(&mut self) {
+//         if !std::thread::panicking() {
+//             unsafe {
+//                 sys::igEndFrame();
+//             }
+//         }
+//     }
+// }
 
 /// # Demo, debug, information
-impl<'ui> Ui<'ui> {
+impl Ui {
     /// Renders a demo window (previously called a test window), which demonstrates most
     /// Dear Imgui features.
     #[doc(alias = "ShowDemoWindow")]
@@ -331,7 +330,7 @@ impl<'a> Default for Id<'a> {
     }
 }
 
-impl<'ui> Ui<'ui> {
+impl Ui {
     /// # Windows
     /// Start constructing a window.
     ///
@@ -353,7 +352,7 @@ impl<'ui> Ui<'ui> {
     ///         ui.text("An example");
     ///     });
     /// ```
-    pub fn window<Label: AsRef<str>>(&'ui self, name: Label) -> Window<'ui, '_, Label> {
+    pub fn window<Label: AsRef<str>>(&self, name: Label) -> Window<'_, '_, Label> {
         Window::new(self, name)
     }
 
@@ -372,13 +371,13 @@ impl<'ui> Ui<'ui> {
     ///     wt.unwrap().end()
     /// }
     /// ```
-    pub fn child_window<Label: AsRef<str>>(&'ui self, name: Label) -> ChildWindow<'ui, Label> {
+    pub fn child_window<Label: AsRef<str>>(&self, name: Label) -> ChildWindow<'_, Label> {
         ChildWindow::new(self, name)
     }
 }
 
 // Widgets: Input
-impl<'ui> Ui<'ui> {
+impl<'ui> Ui {
     #[doc(alias = "InputText", alias = "InputTextWithHint")]
     pub fn input_text<'p, L: AsRef<str>>(
         &'ui self,
@@ -490,7 +489,7 @@ create_token!(
 );
 
 /// # Tooltips
-impl<'ui> Ui<'ui> {
+impl Ui {
     /// Construct a tooltip window that can have any kind of content.
     ///
     /// Typically used with `Ui::is_item_hovered()` or some other conditional check.
@@ -557,7 +556,7 @@ create_token!(
 /// imgui can disable widgets so they don't react to mouse/keyboard
 /// inputs, and are displayed differently (currently dimmed by an
 /// amount set in [`Style::disabled_alpha`])
-impl<'ui> Ui<'ui> {
+impl Ui {
     /// Creates a scope where interactions are disabled.
     ///
     /// Scope ends when returned token is dropped, or `.end()` is
@@ -619,7 +618,7 @@ impl<'ui> Ui<'ui> {
 }
 
 // Widgets: ListBox
-impl<'ui> Ui<'ui> {
+impl Ui {
     #[doc(alias = "ListBox")]
     pub fn list_box<'p, StringType: AsRef<str> + ?Sized>(
         &self,
@@ -686,7 +685,7 @@ impl<'ui> Ui<'ui> {
     // }
 }
 
-impl<'ui> Ui<'ui> {
+impl<'ui> Ui {
     #[doc(alias = "PlotLines")]
     pub fn plot_lines<'p, Label: AsRef<str>>(
         &'ui self,
@@ -695,9 +694,7 @@ impl<'ui> Ui<'ui> {
     ) -> PlotLines<'ui, 'p, Label> {
         PlotLines::new(self, label, values)
     }
-}
 
-impl<'ui> Ui<'ui> {
     #[doc(alias = "PlotHistogram")]
     pub fn plot_histogram<'p, Label: AsRef<str>>(
         &'ui self,
@@ -706,9 +703,7 @@ impl<'ui> Ui<'ui> {
     ) -> PlotHistogram<'ui, 'p, Label> {
         PlotHistogram::new(self, label, values)
     }
-}
 
-impl<'ui> Ui<'ui> {
     /// Calculate the size required for a given text string.
     ///
     /// This is the same as [calc_text_size_with_opts](Self::calc_text_size_with_opts)
@@ -751,7 +746,7 @@ impl<'ui> Ui<'ui> {
 }
 
 /// # Draw list for custom drawing
-impl<'ui> Ui<'ui> {
+impl Ui {
     /// Get access to drawing API
     ///
     /// # Examples
@@ -783,19 +778,19 @@ impl<'ui> Ui<'ui> {
     /// ```
     #[must_use]
     #[doc(alias = "GetWindowDrawList")]
-    pub fn get_window_draw_list(&'ui self) -> DrawListMut<'ui> {
+    pub fn get_window_draw_list(&self) -> DrawListMut<'_> {
         DrawListMut::window(self)
     }
 
     #[must_use]
     #[doc(alias = "GetBackgroundDrawList")]
-    pub fn get_background_draw_list(&'ui self) -> DrawListMut<'ui> {
+    pub fn get_background_draw_list(&self) -> DrawListMut<'_> {
         DrawListMut::background(self)
     }
 
     #[must_use]
     #[doc(alias = "GetForegroundDrawList")]
-    pub fn get_foreground_draw_list(&'ui self) -> DrawListMut<'ui> {
+    pub fn get_foreground_draw_list(&self) -> DrawListMut<'_> {
         DrawListMut::foreground(self)
     }
 }

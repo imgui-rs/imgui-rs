@@ -89,7 +89,7 @@ fn test_mouse_cursor_variants() {
 }
 
 /// # Input: Mouse
-impl<'ui> Ui<'ui> {
+impl Ui {
     /// Returns true if the given mouse button is held down.
     ///
     /// Equivalent to indexing the Io struct with the button, e.g. `ui.io()[button]`.

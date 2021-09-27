@@ -39,7 +39,7 @@ impl<T: AsRef<str>> ListBox<T> {
     ///
     /// Returns `None` if the list box is not open and no content should be rendered.
     #[must_use]
-    pub fn begin<'ui>(self, ui: &Ui<'ui>) -> Option<ListBoxToken<'ui>> {
+    pub fn begin(self, ui: &Ui) -> Option<ListBoxToken<'_>> {
         let should_render =
             unsafe { sys::igBeginListBox(ui.scratch_txt(self.label), self.size.into()) };
         if should_render {
@@ -52,7 +52,7 @@ impl<T: AsRef<str>> ListBox<T> {
     /// Returns the result of the closure, if it is called.
     ///
     /// Note: the closure is not called if the list box is not open.
-    pub fn build<R, F: FnOnce() -> R>(self, ui: &Ui<'_>, f: F) -> Option<R> {
+    pub fn build<R, F: FnOnce() -> R>(self, ui: &Ui, f: F) -> Option<R> {
         self.begin(ui).map(|_list| f())
     }
 }
@@ -71,7 +71,7 @@ impl<T: AsRef<str>> ListBox<T> {
     /// Builds a simple list box for choosing from a slice of values
     pub fn build_simple<V, L>(
         self,
-        ui: &Ui<'_>,
+        ui: &Ui,
         current_item: &mut usize,
         items: &[V],
         label_fn: &L,

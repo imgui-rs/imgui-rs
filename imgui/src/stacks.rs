@@ -8,7 +8,7 @@ use std::mem;
 use std::os::raw::{c_char, c_void};
 
 /// # Parameter stacks (shared)
-impl<'ui> Ui<'ui> {
+impl Ui {
     /// Switches to the given font by pushing it to the font stack.
     ///
     /// Returns a `FontStackToken` that must be popped by calling `.pop()`
@@ -177,7 +177,7 @@ unsafe fn push_style_var(style_var: StyleVar) {
 }
 
 /// # Parameter stacks (current window)
-impl<'ui> Ui<'ui> {
+impl Ui {
     /// Changes the item width by pushing a change to the item width stack.
     ///
     /// Returns an `ItemWidthStackToken` that may be popped by calling `.pop()`
@@ -337,13 +337,13 @@ create_token!(
 /// ImGui equivalent. We're phasing these out to make imgui-rs feel simpler to use.
 #[must_use]
 pub struct ItemFlagsStackToken<'a>(
-    std::marker::PhantomData<Ui<'a>>,
+    std::marker::PhantomData<&'a Ui>,
     mem::Discriminant<ItemFlag>,
 );
 
 impl<'a> ItemFlagsStackToken<'a> {
     /// Creates a new token type.
-    pub(crate) fn new(_: &crate::Ui<'a>, kind: ItemFlag) -> Self {
+    pub(crate) fn new(_: &'a crate::Ui, kind: ItemFlag) -> Self {
         Self(std::marker::PhantomData, mem::discriminant(&kind))
     }
 
@@ -384,7 +384,7 @@ impl IdStackToken<'_> {
 }
 
 /// # ID stack
-impl<'ui> Ui<'ui> {
+impl<'ui> Ui {
     /// Pushes an identifier to the ID stack.
     /// This can be called with an integer, a string, or a pointer.
     ///
@@ -462,7 +462,7 @@ impl<'ui> Ui<'ui> {
     /// });
     /// ```
     #[doc(alias = "PushId")]
-    pub fn push_id<'a, I: Into<Id<'a>>>(&self, id: I) -> IdStackToken<'ui> {
+    pub fn push_id<'a, I: Into<Id<'a>>>(&'ui self, id: I) -> IdStackToken<'ui> {
         let id = id.into();
 
         unsafe {

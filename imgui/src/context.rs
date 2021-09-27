@@ -60,6 +60,8 @@ pub struct Context {
     // we also put it in an unsafecell since we're going to give
     // imgui a mutable pointer to it.
     clipboard_ctx: Box<UnsafeCell<ClipboardContext>>,
+
+    ui: Ui,
 }
 
 // This mutex needs to be used to guard all public functions that can affect the underlying
@@ -241,6 +243,7 @@ impl Context {
             platform_name: None,
             renderer_name: None,
             clipboard_ctx: Box::new(ClipboardContext::dummy().into()),
+            ui: Ui(()),
         }
     }
     fn is_current_context(&self) -> bool {
@@ -322,6 +325,7 @@ impl SuspendedContext {
             platform_name: None,
             renderer_name: None,
             clipboard_ctx: Box::new(ClipboardContext::dummy().into()),
+            ui: Ui(()),
         };
         if ctx.is_current_context() {
             // Oops, the context was activated -> deactivate
@@ -515,7 +519,7 @@ impl Context {
 
     /// Starts a new frame.
     #[deprecated(since = "0.9.0", note = "use `new_frame` instead")]
-    pub fn frame(&mut self) -> Ui<'_> {
+    pub fn frame(&mut self) -> &mut Ui {
         self.new_frame()
     }
 
@@ -526,7 +530,7 @@ impl Context {
     /// Panics if the context uses a shared font atlas that is already borrowed.
     /// Do not attempt to borrow the context afterwards, if you are using a shared font atlas.
     #[doc(alias = "NewFame")]
-    pub fn new_frame(&mut self) -> Ui<'_> {
+    pub fn new_frame(&mut self) -> &mut Ui {
         // Clear default font if it no longer exists. This could be an error in the future
         let default_font = self.io().font_default;
         if !default_font.is_null() && self.fonts().get_font(FontId(default_font)).is_none() {
@@ -540,8 +544,7 @@ impl Context {
         unsafe {
             sys::igNewFrame();
         }
-        Ui {
-            phantom_data: std::marker::PhantomData,
-        }
+
+        &mut self.ui
     }
 }

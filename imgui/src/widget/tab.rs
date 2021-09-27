@@ -87,7 +87,7 @@ impl<T: AsRef<str>> TabBar<T> {
     }
 
     #[must_use]
-    pub fn begin<'ui>(self, ui: &'ui Ui<'_>) -> Option<TabBarToken<'ui>> {
+    pub fn begin(self, ui: &Ui) -> Option<TabBarToken<'_>> {
         ui.tab_bar_with_flags(self.id, self.flags)
     }
 
@@ -95,7 +95,7 @@ impl<T: AsRef<str>> TabBar<T> {
     /// Returns the result of the closure, if it is called.
     ///
     /// Note: the closure is not called if no tabbar content is visible
-    pub fn build<R, F: FnOnce() -> R>(self, ui: &Ui<'_>, f: F) -> Option<R> {
+    pub fn build<R, F: FnOnce() -> R>(self, ui: &Ui, f: F) -> Option<R> {
         self.begin(ui).map(|_tab| f())
     }
 }
@@ -144,7 +144,7 @@ impl<'a, T: AsRef<str>> TabItem<'a, T> {
     }
 
     #[must_use]
-    pub fn begin<'ui>(self, ui: &'ui Ui<'_>) -> Option<TabItemToken<'ui>> {
+    pub fn begin(self, ui: &Ui) -> Option<TabItemToken<'_>> {
         ui.tab_item_with_flags(self.label, self.opened, self.flags)
     }
 
@@ -152,7 +152,7 @@ impl<'a, T: AsRef<str>> TabItem<'a, T> {
     /// Returns the result of the closure, if it is called.
     ///
     /// Note: the closure is not called if the tab item is not selected
-    pub fn build<R, F: FnOnce() -> R>(self, ui: &Ui<'_>, f: F) -> Option<R> {
+    pub fn build<R, F: FnOnce() -> R>(self, ui: &Ui, f: F) -> Option<R> {
         self.begin(ui).map(|_tab| f())
     }
 }
@@ -166,7 +166,7 @@ create_token!(
     drop { sys::igEndTabItem() }
 );
 
-impl Ui<'_> {
+impl Ui {
     /// Creates a tab bar and returns a tab bar token, allowing you to append
     /// Tab items afterwards. This passes no flags. To pass flags explicitly,
     /// use [tab_bar_with_flags](Self::tab_bar_with_flags).

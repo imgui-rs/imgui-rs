@@ -175,7 +175,7 @@ impl<T: AsRef<str>> DragDropSource<T> {
     /// If you want to pass a simple integer or other "plain old data", take a look at
     /// [begin_payload](Self::begin_payload).
     #[inline]
-    pub fn begin<'ui>(self, ui: &Ui<'ui>) -> Option<DragDropSourceToolTip<'ui>> {
+    pub fn begin<'ui>(self, ui: &Ui) -> Option<DragDropSourceToolTip<'ui>> {
         self.begin_payload(ui, ())
     }
 
@@ -224,7 +224,7 @@ impl<T: AsRef<str>> DragDropSource<T> {
     #[inline]
     pub fn begin_payload<'ui, P: Copy + 'static>(
         self,
-        ui: &Ui<'ui>,
+        ui: &Ui,
         payload: P,
     ) -> Option<DragDropSourceToolTip<'ui>> {
         unsafe {
@@ -266,7 +266,7 @@ impl<T: AsRef<str>> DragDropSource<T> {
     #[inline]
     pub unsafe fn begin_payload_unchecked<'ui>(
         &self,
-        ui: &Ui<'ui>,
+        ui: &Ui,
         ptr: *const ffi::c_void,
         size: usize,
     ) -> Option<DragDropSourceToolTip<'ui>> {
@@ -283,7 +283,7 @@ impl<T: AsRef<str>> DragDropSource<T> {
 }
 
 /// A helper struct for RAII drap-drop support.
-pub struct DragDropSourceToolTip<'ui>(PhantomData<Ui<'ui>>);
+pub struct DragDropSourceToolTip<'ui>(PhantomData<&'ui Ui>);
 
 impl DragDropSourceToolTip<'_> {
     /// Creates a new tooltip internally.
@@ -339,14 +339,14 @@ impl Drop for DragDropSourceToolTip<'_> {
 /// on this struct. Each of these methods will spit out a _Payload struct with an increasing
 /// amount of information on the Payload. The absolute safest solution is [accept_payload_empty](Self::accept_payload_empty).
 #[derive(Debug)]
-pub struct DragDropTarget<'ui>(&'ui Ui<'ui>);
+pub struct DragDropTarget<'ui>(&'ui Ui);
 
 impl<'ui> DragDropTarget<'ui> {
     /// Creates a new DragDropTarget, holding the [Ui]'s lifetime for the duration
     /// of its existence. This is required since this struct runs some code on its Drop
     /// to end the DragDropTarget code.
     #[doc(alias = "BeginDragDropTarget")]
-    pub fn new(ui: &'ui Ui<'ui>) -> Option<Self> {
+    pub fn new(ui: &'ui Ui) -> Option<Self> {
         let should_begin = unsafe { sys::igBeginDragDropTarget() };
         if should_begin {
             Some(Self(ui))

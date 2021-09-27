@@ -19,7 +19,7 @@ bitflags!(
 );
 
 /// # Widgets: Miscellaneous
-impl<'ui> Ui<'ui> {
+impl Ui {
     /// Renders a clickable button.
     ///
     /// Returns true if this button was clicked.

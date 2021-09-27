@@ -142,7 +142,7 @@ impl<T: AsRef<str>, Preview: AsRef<str>> ComboBox<T, Preview> {
     ///
     /// Returns `None` if the combo box is not open and no content should be rendered.
     #[must_use]
-    pub fn begin<'ui>(self, ui: &Ui<'ui>) -> Option<ComboBoxToken<'ui>> {
+    pub fn begin(self, ui: &Ui) -> Option<ComboBoxToken<'_>> {
         let should_render = unsafe {
             if let Some(preview_value) = self.preview_value {
                 let (ptr_one, ptr_two) = ui.scratch_txt_two(self.label, preview_value);
@@ -162,7 +162,7 @@ impl<T: AsRef<str>, Preview: AsRef<str>> ComboBox<T, Preview> {
     /// Returns the result of the closure, if it is called.
     ///
     /// Note: the closure is not called if the combo box is not open.
-    pub fn build<R, F: FnOnce() -> R>(self, ui: &Ui<'_>, f: F) -> Option<R> {
+    pub fn build<R, F: FnOnce() -> R>(self, ui: &Ui, f: F) -> Option<R> {
         self.begin(ui).map(|_combo| f())
     }
 }
@@ -177,7 +177,7 @@ create_token!(
 );
 
 /// # Convenience functions
-impl<'ui> Ui<'ui> {
+impl Ui {
     /// Creates a combo box which can be appended to with `Selectable::new`.
     ///
     /// If you do not want to provide a preview, use [`begin_combo_no_preview`]. If you want
@@ -193,7 +193,7 @@ impl<'ui> Ui<'ui> {
         &self,
         label: impl AsRef<str>,
         preview_value: impl AsRef<str>,
-    ) -> Option<ComboBoxToken<'ui>> {
+    ) -> Option<ComboBoxToken<'_>> {
         self.begin_combo_with_flags(label, preview_value, ComboBoxFlags::empty())
     }
 
@@ -213,7 +213,7 @@ impl<'ui> Ui<'ui> {
         label: impl AsRef<str>,
         preview_value: impl AsRef<str>,
         flags: ComboBoxFlags,
-    ) -> Option<ComboBoxToken<'ui>> {
+    ) -> Option<ComboBoxToken<'_>> {
         self._begin_combo(label, Some(preview_value), flags)
     }
 
@@ -231,7 +231,7 @@ impl<'ui> Ui<'ui> {
     /// [begin_combo_no_preview_with_flags]: Ui::begin_combo_no_preview_with_flags
     #[must_use]
     #[doc(alias = "BeginCombo")]
-    pub fn begin_combo_no_preview(&self, label: impl AsRef<str>) -> Option<ComboBoxToken<'ui>> {
+    pub fn begin_combo_no_preview(&self, label: impl AsRef<str>) -> Option<ComboBoxToken<'_>> {
         self.begin_combo_no_preview_with_flags(label, ComboBoxFlags::empty())
     }
 
@@ -250,7 +250,7 @@ impl<'ui> Ui<'ui> {
         &self,
         label: impl AsRef<str>,
         flags: ComboBoxFlags,
-    ) -> Option<ComboBoxToken<'ui>> {
+    ) -> Option<ComboBoxToken<'_>> {
         self._begin_combo(label, Option::<&'static str>::None, flags)
     }
 
@@ -260,7 +260,7 @@ impl<'ui> Ui<'ui> {
         label: impl AsRef<str>,
         preview_value: Option<impl AsRef<str>>,
         flags: ComboBoxFlags,
-    ) -> Option<ComboBoxToken<'ui>> {
+    ) -> Option<ComboBoxToken<'_>> {
         let should_render = unsafe {
             let (ptr_one, ptr_two) = self.scratch_txt_with_opt(label, preview_value);
             sys::igBeginCombo(ptr_one, ptr_two, flags.bits() as i32)

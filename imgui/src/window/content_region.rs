@@ -2,7 +2,7 @@ use crate::sys;
 use crate::Ui;
 
 /// # Content region
-impl<'ui> Ui<'ui> {
+impl Ui {
     /// Returns the current content boundaries (in *window coordinates*)
     #[doc(alias = "GetContentRegionMax")]
     pub fn content_region_max(&self) -> [f32; 2] {

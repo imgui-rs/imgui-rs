@@ -75,7 +75,7 @@ enum DrawListType {
 pub struct DrawListMut<'ui> {
     draw_list_type: DrawListType,
     draw_list: *mut ImDrawList,
-    _phantom: PhantomData<&'ui Ui<'ui>>,
+    _phantom: PhantomData<&'ui Ui>,
 }
 
 // Lock for each variant of draw list. See https://github.com/imgui-rs/imgui-rs/issues/488
@@ -124,7 +124,7 @@ impl<'ui> DrawListMut<'ui> {
     }
 
     #[doc(alias = "GetWindowDrawList")]
-    pub(crate) fn window(_: &Ui<'ui>) -> Self {
+    pub(crate) fn window(_: &Ui) -> Self {
         Self::lock_draw_list(DrawListType::Window);
 
         Self {
@@ -135,7 +135,7 @@ impl<'ui> DrawListMut<'ui> {
     }
 
     #[doc(alias = "GetBackgroundDrawList")]
-    pub(crate) fn background(_: &Ui<'ui>) -> Self {
+    pub(crate) fn background(_: &Ui) -> Self {
         Self::lock_draw_list(DrawListType::Background);
         Self {
             draw_list: unsafe { sys::igGetBackgroundDrawList() },
@@ -145,7 +145,7 @@ impl<'ui> DrawListMut<'ui> {
     }
 
     #[doc(alias = "GetForegroundDrawList")]
-    pub(crate) fn foreground(_: &Ui<'ui>) -> Self {
+    pub(crate) fn foreground(_: &Ui) -> Self {
         Self::lock_draw_list(DrawListType::Foreground);
         Self {
             draw_list: unsafe { sys::igGetForegroundDrawList() },

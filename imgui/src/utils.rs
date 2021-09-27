@@ -25,7 +25,7 @@ bitflags! {
 }
 
 /// # Item/widget utilities
-impl<'ui> Ui<'ui> {
+impl Ui {
     /// Returns `true` if the last item is hovered
     #[doc(alias = "IsItemHovered")]
     pub fn is_item_hovered(&self) -> bool {
@@ -142,7 +142,7 @@ impl<'ui> Ui<'ui> {
 }
 
 /// # Miscellaneous utilities
-impl<'ui> Ui<'ui> {
+impl Ui {
     /// Returns `true` if the rectangle (of given size, starting from cursor position) is visible
     #[doc(alias = "IsRectVisibleNil")]
     pub fn is_cursor_rect_visible(&self, size: impl Into<MintVec2>) -> bool {
