@@ -56,9 +56,9 @@ fn main() {
                 unsafe { gl.clear(glow::COLOR_BUFFER_BIT) };
 
                 let ui = imgui_context.frame();
-                textures_ui.show(&ui);
+                textures_ui.show(ui);
 
-                winit_platform.prepare_render(&ui, window.window());
+                winit_platform.prepare_render(ui, window.window());
                 let draw_data = imgui_context.render();
                 ig_renderer
                     .render(&gl, &textures, draw_data)

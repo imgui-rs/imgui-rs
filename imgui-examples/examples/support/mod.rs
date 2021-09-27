@@ -120,7 +120,7 @@ impl System {
                 let gl_window = display.gl_window();
                 let mut target = display.draw();
                 target.clear_color_srgb(1.0, 1.0, 1.0, 1.0);
-                platform.prepare_render(&ui, gl_window.window());
+                platform.prepare_render(ui, gl_window.window());
                 let draw_data = imgui.render();
                 renderer
                     .render(&mut target, draw_data)
