@@ -196,27 +196,7 @@ impl Ui {
     pub fn clone_style(&self) -> Style {
         unsafe { *self.style() }
     }
-    // /// Renders the frame and returns a reference to the resulting draw data
-    // #[doc(alias = "Render", alias = "GetDrawData")]
-    // pub fn render(self) -> &DrawData {
-    //     unsafe {
-    //         sys::igRender();
-    //         &*(sys::igGetDrawData() as *mut DrawData)
-    //     }
-    // }
 }
-
-// TODO JACK YOU NEED TO MOVE THIS!
-// impl Drop for Ui {
-//     #[doc(alias = "EndFrame")]
-//     fn drop(&mut self) {
-//         if !std::thread::panicking() {
-//             unsafe {
-//                 sys::igEndFrame();
-//             }
-//         }
-//     }
-// }
 
 /// # Demo, debug, information
 impl Ui {

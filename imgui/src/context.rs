@@ -10,8 +10,8 @@ use crate::clipboard::{ClipboardBackend, ClipboardContext};
 use crate::fonts::atlas::{FontAtlas, FontAtlasRefMut, FontId, SharedFontAtlas};
 use crate::io::Io;
 use crate::style::Style;
-use crate::sys;
 use crate::Ui;
+use crate::{sys, DrawData};
 
 /// An imgui-rs context.
 ///
@@ -518,7 +518,6 @@ impl Context {
     }
 
     /// Starts a new frame.
-    #[deprecated(since = "0.9.0", note = "use `new_frame` instead")]
     pub fn frame(&mut self) -> &mut Ui {
         self.new_frame()
     }
@@ -546,5 +545,18 @@ impl Context {
         }
 
         &mut self.ui
+    }
+
+    /// Renders the frame and returns a reference to the resulting draw data.
+    ///
+    /// This should only be called after calling [`new_frame`].
+    ///
+    /// [`new_frame`]: Self::new_frame
+    #[doc(alias = "Render", alias = "GetDrawData")]
+    pub fn render(&mut self) -> &DrawData {
+        unsafe {
+            sys::igRender();
+            &*(sys::igGetDrawData() as *mut DrawData)
+        }
     }
 }
