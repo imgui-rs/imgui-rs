@@ -74,7 +74,7 @@ bitflags!(
 ///
 /// ```no_run
 /// # use imgui::*;
-/// fn show_ui(ui: &Ui<'_>) {
+/// fn show_ui(ui: &Ui) {
 ///     ui.button("Hello, I am a drag source!");
 ///     
 ///     // Creates an empty DragSource with no tooltip
@@ -141,7 +141,7 @@ impl<T: AsRef<str>> DragDropSource<T> {
     ///
     /// ```no_run
     /// # use imgui::*;
-    /// fn show_ui(ui: &Ui<'_>, drop_message: &mut Option<String>) {
+    /// fn show_ui(ui: &Ui, drop_message: &mut Option<String>) {
     ///     ui.button("Drag me!");
     ///
     ///     let drag_drop_name = "Test Drag";
@@ -194,7 +194,7 @@ impl<T: AsRef<str>> DragDropSource<T> {
     ///
     /// ```no_run
     /// # use imgui::*;
-    /// fn show_ui(ui: &Ui<'_>) {
+    /// fn show_ui(ui: &Ui) {
     ///     ui.button("Drag me!");
     ///
     ///     let drag_drop_name = "Test Drag";
@@ -310,7 +310,7 @@ impl Drop for DragDropSourceToolTip<'_> {
 ///
 /// ```no_run
 /// # use imgui::*;
-/// fn show_ui(ui: &Ui<'_>) {
+/// fn show_ui(ui: &Ui) {
 ///     // Drop something on this button please!
 ///     ui.button("Hello, I am a drag Target!");
 ///     

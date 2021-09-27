@@ -259,6 +259,10 @@ impl Drop for Context {
         // If this context is the active context, Dear ImGui automatically deactivates it during
         // destruction
         unsafe {
+            // end the frame if necessary...
+            if !sys::igGetCurrentContext().is_null() && sys::igGetFrameCount() > 0 {
+                sys::igEndFrame();
+            }
             sys::igDestroyContext(self.raw);
         }
     }

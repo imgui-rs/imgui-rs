@@ -242,6 +242,7 @@ fn test_mouse_down_clicked_released() {
             assert!(!ui.is_any_mouse_down());
             assert!(!ui.is_mouse_clicked(button));
             assert!(!ui.is_mouse_released(button));
+            let _ = ctx.render();
         }
         {
             ctx.io_mut()[button] = true;
@@ -250,6 +251,7 @@ fn test_mouse_down_clicked_released() {
             assert!(ui.is_any_mouse_down());
             assert!(ui.is_mouse_clicked(button));
             assert!(!ui.is_mouse_released(button));
+            let _ = ctx.render();
         }
         {
             let ui = ctx.new_frame();
@@ -257,6 +259,7 @@ fn test_mouse_down_clicked_released() {
             assert!(ui.is_any_mouse_down());
             assert!(!ui.is_mouse_clicked(button));
             assert!(!ui.is_mouse_released(button));
+            let _ = ctx.render();
         }
         {
             ctx.io_mut()[button] = false;
@@ -265,6 +268,7 @@ fn test_mouse_down_clicked_released() {
             assert!(!ui.is_any_mouse_down());
             assert!(!ui.is_mouse_clicked(button));
             assert!(ui.is_mouse_released(button));
+            let _ = ctx.render();
         }
         {
             let ui = ctx.new_frame();
@@ -272,6 +276,7 @@ fn test_mouse_down_clicked_released() {
             assert!(!ui.is_any_mouse_down());
             assert!(!ui.is_mouse_clicked(button));
             assert!(!ui.is_mouse_released(button));
+            let _ = ctx.render();
         }
     }
 }
@@ -279,6 +284,7 @@ fn test_mouse_down_clicked_released() {
 #[test]
 fn test_mouse_double_click() {
     let (_guard, mut ctx) = crate::test::test_ctx_initialized();
+
     // Workaround for dear imgui bug/feature:
     // If a button is clicked before io.mouse_double_click_time seconds has passed after the
     // context is initialized, the single click is interpreted as a double-click.  This happens
@@ -288,6 +294,7 @@ fn test_mouse_double_click() {
         // Pass one second of time
         ctx.io_mut().delta_time = 1.0;
         let _ = ctx.new_frame();
+        let _ = ctx.render();
     }
     // Fast clicks
     ctx.io_mut().delta_time = 1.0 / 60.0;
@@ -297,34 +304,40 @@ fn test_mouse_double_click() {
             let ui = ctx.new_frame();
             assert!(!ui.is_mouse_clicked(button));
             assert!(!ui.is_mouse_double_clicked(button));
+            let _ = ctx.render();
         }
         {
             ctx.io_mut()[button] = true;
             let ui = ctx.new_frame();
             assert!(ui.is_mouse_clicked(button));
             assert!(!ui.is_mouse_double_clicked(button));
+            let _ = ctx.render();
         }
         {
             let ui = ctx.new_frame();
             assert!(!ui.is_mouse_clicked(button));
             assert!(!ui.is_mouse_double_clicked(button));
+            let _ = ctx.render();
         }
         {
             ctx.io_mut()[button] = false;
             let ui = ctx.new_frame();
             assert!(!ui.is_mouse_clicked(button));
             assert!(!ui.is_mouse_double_clicked(button));
+            let _ = ctx.render();
         }
         {
             ctx.io_mut()[button] = true;
             let ui = ctx.new_frame();
             assert!(ui.is_mouse_clicked(button));
             assert!(ui.is_mouse_double_clicked(button));
+            let _ = ctx.render();
         }
         {
             let ui = ctx.new_frame();
             assert!(!ui.is_mouse_clicked(button));
             assert!(!ui.is_mouse_double_clicked(button));
+            let _ = ctx.render();
         }
     }
     // Slow clicks
@@ -335,34 +348,40 @@ fn test_mouse_double_click() {
             let ui = ctx.new_frame();
             assert!(!ui.is_mouse_clicked(button));
             assert!(!ui.is_mouse_double_clicked(button));
+            let _ = ctx.render();
         }
         {
             ctx.io_mut()[button] = true;
             let ui = ctx.new_frame();
             assert!(ui.is_mouse_clicked(button));
             assert!(!ui.is_mouse_double_clicked(button));
+            let _ = ctx.render();
         }
         {
             let ui = ctx.new_frame();
             assert!(!ui.is_mouse_clicked(button));
             assert!(!ui.is_mouse_double_clicked(button));
+            let _ = ctx.render();
         }
         {
             ctx.io_mut()[button] = false;
             let ui = ctx.new_frame();
             assert!(!ui.is_mouse_clicked(button));
             assert!(!ui.is_mouse_double_clicked(button));
+            let _ = ctx.render();
         }
         {
             ctx.io_mut()[button] = true;
             let ui = ctx.new_frame();
             assert!(ui.is_mouse_clicked(button));
             assert!(!ui.is_mouse_double_clicked(button));
+            let _ = ctx.render();
         }
         {
             let ui = ctx.new_frame();
             assert!(!ui.is_mouse_clicked(button));
             assert!(!ui.is_mouse_double_clicked(button));
+            let _ = ctx.render();
         }
     }
 }
@@ -392,6 +411,7 @@ fn test_mouse_drags() {
                 ui.mouse_drag_delta_with_threshold(button, 200.0),
                 [0.0, 0.0]
             );
+            let _ = ctx.render();
         }
         {
             ctx.io_mut()[button] = true;
@@ -403,6 +423,7 @@ fn test_mouse_drags() {
                 ui.mouse_drag_delta_with_threshold(button, 200.0),
                 [0.0, 0.0]
             );
+            let _ = ctx.render();
         }
         {
             ctx.io_mut().mouse_pos = [0.0, 100.0];
@@ -414,6 +435,7 @@ fn test_mouse_drags() {
                 ui.mouse_drag_delta_with_threshold(button, 200.0),
                 [0.0, 0.0]
             );
+            let _ = ctx.render();
         }
         {
             ctx.io_mut().mouse_pos = [0.0, 200.0];
@@ -425,6 +447,7 @@ fn test_mouse_drags() {
                 ui.mouse_drag_delta_with_threshold(button, 200.0),
                 [0.0, 200.0]
             );
+            let _ = ctx.render();
         }
         {
             ctx.io_mut().mouse_pos = [10.0, 10.0];
@@ -437,6 +460,7 @@ fn test_mouse_drags() {
                 ui.mouse_drag_delta_with_threshold(button, 200.0),
                 [10.0, 10.0]
             );
+            let _ = ctx.render();
         }
         {
             ctx.io_mut()[button] = true;
@@ -448,6 +472,7 @@ fn test_mouse_drags() {
                 ui.mouse_drag_delta_with_threshold(button, 200.0),
                 [0.0, 0.0]
             );
+            let _ = ctx.render();
         }
         {
             ctx.io_mut().mouse_pos = [180.0, 180.0];
@@ -467,6 +492,7 @@ fn test_mouse_drags() {
                 ui.mouse_drag_delta_with_threshold(button, 200.0),
                 [0.0, 0.0]
             );
+            let _ = ctx.render();
         }
         {
             ctx.io_mut().mouse_pos = [200.0, 200.0];
@@ -478,6 +504,7 @@ fn test_mouse_drags() {
                 ui.mouse_drag_delta_with_threshold(button, 200.0),
                 [20.0, 20.0]
             );
+            let _ = ctx.render();
         }
     }
 }
