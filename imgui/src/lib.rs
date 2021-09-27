@@ -116,15 +116,12 @@ impl Context {
     }
 }
 
-/// A temporary reference for building the user interface for one frame
+/// A reference for building the user interface for one frame
 #[derive(Debug)]
-pub struct Ui(pub(crate) cell::UnsafeCell<()>);
-
-/// This is our internal buffer that we use for the Ui object.
-///
-/// We edit this buffer
-static mut BUFFER: cell::UnsafeCell<string::UiBuffer> =
-    cell::UnsafeCell::new(string::UiBuffer::new(100));
+pub struct Ui {
+    // our scratch sheet
+    buffer: cell::UnsafeCell<string::UiBuffer>,
+}
 
 impl Ui {
     /// This provides access to the backing scratch buffer that we use to write
@@ -141,13 +138,13 @@ impl Ui {
     /// We otherwise make no assumptions about the size or keep state in this buffer between calls,
     /// so editing the `UiBuffer` is fine.
     pub unsafe fn scratch_buffer(&self) -> &cell::UnsafeCell<string::UiBuffer> {
-        &BUFFER
+        &self.buffer
     }
 
     /// Internal method to push a single text to our scratch buffer.
     fn scratch_txt(&self, txt: impl AsRef<str>) -> *const sys::cty::c_char {
         unsafe {
-            let handle = &mut *BUFFER.get();
+            let handle = &mut *self.buffer.get();
             handle.scratch_txt(txt)
         }
     }
@@ -155,7 +152,7 @@ impl Ui {
     /// Internal method to push an option text to our scratch buffer.
     fn scratch_txt_opt(&self, txt: Option<impl AsRef<str>>) -> *const sys::cty::c_char {
         unsafe {
-            let handle = &mut *BUFFER.get();
+            let handle = &mut *self.buffer.get();
             handle.scratch_txt_opt(txt)
         }
     }
@@ -166,7 +163,7 @@ impl Ui {
         txt_1: impl AsRef<str>,
     ) -> (*const sys::cty::c_char, *const sys::cty::c_char) {
         unsafe {
-            let handle = &mut *BUFFER.get();
+            let handle = &mut *self.buffer.get();
             handle.scratch_txt_two(txt_0, txt_1)
         }
     }
@@ -177,7 +174,7 @@ impl Ui {
         txt_1: Option<impl AsRef<str>>,
     ) -> (*const sys::cty::c_char, *const sys::cty::c_char) {
         unsafe {
-            let handle = &mut *BUFFER.get();
+            let handle = &mut *self.buffer.get();
             handle.scratch_txt_with_opt(txt_0, txt_1)
         }
     }
