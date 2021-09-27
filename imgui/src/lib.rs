@@ -118,7 +118,7 @@ impl Context {
 
 /// A temporary reference for building the user interface for one frame
 #[derive(Debug)]
-pub struct Ui(pub(crate) ());
+pub struct Ui(pub(crate) cell::UnsafeCell<()>);
 
 /// This is our internal buffer that we use for the Ui object.
 ///

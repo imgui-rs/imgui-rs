@@ -243,7 +243,7 @@ impl Context {
             platform_name: None,
             renderer_name: None,
             clipboard_ctx: Box::new(ClipboardContext::dummy().into()),
-            ui: Ui(()),
+            ui: Ui(().into()),
         }
     }
     fn is_current_context(&self) -> bool {
@@ -329,7 +329,7 @@ impl SuspendedContext {
             platform_name: None,
             renderer_name: None,
             clipboard_ctx: Box::new(ClipboardContext::dummy().into()),
-            ui: Ui(()),
+            ui: Ui(().into()),
         };
         if ctx.is_current_context() {
             // Oops, the context was activated -> deactivate
