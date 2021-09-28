@@ -505,17 +505,14 @@ impl Context {
         unsafe { &mut *(self.io_mut().fonts as *mut FontAtlas) }
     }
 
-    /// Starts a new frame.
+    /// Starts a new frame. Use [`new_frame`] instead.
+    ///
+    /// [`new_frame`]: Self::new_frame
     pub fn frame(&mut self) -> &mut Ui {
         self.new_frame()
     }
 
     /// Starts a new frame and returns an `Ui` instance for constructing a user interface.
-    ///
-    /// # Panics
-    ///
-    /// Panics if the context uses a shared font atlas that is already borrowed.
-    /// Do not attempt to borrow the context afterwards, if you are using a shared font atlas.
     #[doc(alias = "NewFame")]
     pub fn new_frame(&mut self) -> &mut Ui {
         // Clear default font if it no longer exists. This could be an error in the future

@@ -119,7 +119,7 @@ impl Context {
 /// A reference for building the user interface for one frame
 #[derive(Debug)]
 pub struct Ui {
-    // our scratch sheet
+    /// our scratch sheet
     buffer: cell::UnsafeCell<string::UiBuffer>,
 }
 
@@ -189,9 +189,35 @@ impl Ui {
     pub fn fonts(&self) -> &FontAtlas {
         unsafe { &*(self.io().fonts as *const FontAtlas) }
     }
+
     /// Returns a clone of the user interface style
     pub fn clone_style(&self) -> Style {
         unsafe { *self.style() }
+    }
+
+    /// This function, and the library's api, has been changed as of `0.9`!
+    /// Do not use this function! Instead, use [`Context::render`],
+    /// which does what this function in `0.8` used to do.
+    ///
+    /// This function right now simply **ends** the current frame, but does not
+    /// return draw data. If you want to end the frame without generated draw data,
+    /// and thus save some CPU time, use [`end_frame_early`].
+    #[deprecated(
+        since = "0.9.0",
+        note = "use `Context::render` to render frames, or `end_frame_early` to not render at all"
+    )]
+    pub fn render(&mut self) {
+        self.end_frame_early();
+    }
+
+    /// Use this function to end the frame early.
+    /// After this call, you should **stop using the `Ui` object till `new_frame` has been called.**
+    ///
+    /// You probably *don't want this function.* If you want to render your data, use `Context::render` now.
+    pub fn end_frame_early(&mut self) {
+        unsafe {
+            sys::igEndFrame();
+        }
     }
 }
 
