@@ -4,6 +4,7 @@ members = [
     "imgui-sys",
     "imgui-glium-renderer",
     "imgui-glow-renderer",
+    "imgui-sdl2-support",
     "imgui-winit-support",
     "imgui-examples",
     "xtask",
