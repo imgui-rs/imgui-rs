@@ -1042,7 +1042,7 @@ pub type RenderError = String;
 
 fn prepare_font_atlas<T: TextureMap>(
     gl: &Context,
-    mut fonts: imgui::FontAtlasRefMut,
+    fonts: &mut imgui::FontAtlas,
     texture_map: &mut T,
 ) -> Result<GlTexture, InitError> {
     #![allow(clippy::cast_possible_wrap)]

@@ -276,7 +276,7 @@ impl Renderer {
 }
 
 fn upload_font_texture(
-    mut fonts: imgui::FontAtlasRefMut,
+    fonts: &mut imgui::FontAtlas,
     ctx: &Rc<Context>,
 ) -> Result<Texture, RendererError> {
     let texture = fonts.build_rgba32_texture();
