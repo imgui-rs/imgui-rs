@@ -39,19 +39,19 @@ fn main() {
                         println!("Char filter fired! This means a char was inputted.");
                         Some(c)
                     }
-                    fn on_completion(&mut self, _: TextCallbackData<'_>) {
+                    fn on_completion(&mut self, _: TextCallbackData) {
                         println!("Completion request fired! This means the tab key was hit.");
                     }
 
-                    fn on_edit(&mut self, _: TextCallbackData<'_>) {
+                    fn on_edit(&mut self, _: TextCallbackData) {
                         println!("Edit was fired! Any edit will cause this to fire.")
                     }
 
-                    fn on_history(&mut self, dir: HistoryDirection, _: TextCallbackData<'_>) {
+                    fn on_history(&mut self, dir: HistoryDirection, _: TextCallbackData) {
                         println!("History was fired by pressing {:?}", dir);
                     }
 
-                    fn on_always(&mut self, _: TextCallbackData<'_>) {
+                    fn on_always(&mut self, _: TextCallbackData) {
                         // We don't actually print this out because it will flood your log a lot!
                         // println!("The always callback fired! It always fires.");
                     }
@@ -69,7 +69,7 @@ fn main() {
 
                 struct Wrapper<'a>(&'a mut String);
                 impl<'a> InputTextCallbackHandler for Wrapper<'a> {
-                    fn on_always(&mut self, data: TextCallbackData<'_>) {
+                    fn on_always(&mut self, data: TextCallbackData) {
                         *self.0 = data.str().to_owned();
                     }
                 }
@@ -99,11 +99,7 @@ fn main() {
                 struct Wrapper2<'a>(&'a str, &'a str);
 
                 impl<'a> InputTextCallbackHandler for Wrapper2<'a> {
-                    fn on_history(
-                        &mut self,
-                        dir: HistoryDirection,
-                        mut data: TextCallbackData<'_>,
-                    ) {
+                    fn on_history(&mut self, dir: HistoryDirection, mut data: TextCallbackData) {
                         match dir {
                             HistoryDirection::Up => {
                                 // remove first char...
