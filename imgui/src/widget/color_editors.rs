@@ -179,7 +179,7 @@ bitflags! {
 /// # let mut imgui = Context::create();
 /// # let ui = imgui.frame();
 /// # let mut color = [0.0, 0.0, 0.0, 1.0];
-/// let ce = ColorEdit::new(im_str!("color_edit"), &mut color);
+/// let ce = ColorEdit4::new("color_edit", &mut color);
 /// if ce.build(&ui) {
 ///   println!("The color was changed");
 /// }
@@ -361,7 +361,7 @@ where
 /// # let mut imgui = Context::create();
 /// # let ui = imgui.frame();
 /// # let mut color = [0.0, 0.0, 0.0, 1.0];
-/// let ce = ColorEdit::new(im_str!("color_edit"), &mut color);
+/// let ce = ColorEdit4::new("color_edit", &mut color);
 /// if ce.build(&ui) {
 ///   println!("The color was changed");
 /// }
@@ -540,7 +540,7 @@ where
 /// # let mut imgui = Context::create();
 /// # let ui = imgui.frame();
 /// # let mut color = [0.0, 0.0, 0.0, 1.0];
-/// let cp = ColorPicker::new(im_str!("color_picker"), &mut color);
+/// let cp = ColorPicker4::new("color_picker", &mut color);
 /// if cp.build(&ui) {
 ///   println!("A color was picked");
 /// }
@@ -724,7 +724,7 @@ where
 /// # let mut imgui = Context::create();
 /// # let ui = imgui.frame();
 /// # let mut color = [0.0, 0.0, 0.0, 1.0];
-/// let cp = ColorPicker::new(im_str!("color_picker"), &mut color);
+/// let cp = ColorPicker4::new("color_picker", &mut color);
 /// if cp.build(&ui) {
 ///   println!("A color was picked");
 /// }
