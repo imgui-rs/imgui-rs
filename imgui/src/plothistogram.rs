@@ -62,8 +62,8 @@ impl<'ui, 'p, Label: AsRef<str>, Overlay: AsRef<str>> PlotHistogram<'ui, 'p, Lab
         self
     }
 
-    pub fn graph_size(mut self, graph_size: [f32; 2]) -> Self {
-        self.graph_size = graph_size;
+    pub fn graph_size(mut self, graph_size: impl Into<crate::MintVec2>) -> Self {
+        self.graph_size = graph_size.into().into();
         self
     }
 

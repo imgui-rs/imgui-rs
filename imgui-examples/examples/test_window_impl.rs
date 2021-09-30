@@ -544,8 +544,8 @@ fn show_test_window(ui: &Ui, state: &mut State, opened: &mut bool) {
             Drag::new("drag float").range(-1.0, 1.0).speed(0.001).build(ui, &mut state.f0);
             ui.input_float3("input float3", &mut state.vec3f)
                 .build();
-            ColorEdit::new("color 1", &mut state.col1).build(ui);
-            ColorEdit::new("color 2", &mut state.col2).build(ui);
+            ColorEdit3::new("color 1", &mut state.col1).build(ui);
+            ColorEdit4::new("color 2", &mut state.col2).build(ui);
 
             TreeNode::new("Multi-component Widgets").build(ui, || {
                 ui.input_float2("input float2", &mut state.vec2f)
@@ -601,19 +601,19 @@ fn show_test_window(ui: &Ui, state: &mut State, opened: &mut bool) {
                     "Click on the colored square to open a color picker.
 CTRL+click on individual component to input value.\n",
                 );
-                ColorEdit::new("MyColor##1", &mut s.color)
+                ColorEdit4::new("MyColor##1", &mut s.color)
                     .flags(misc_flags)
                     .alpha(false)
                     .build(ui);
 
                 ui.text("Color widget HSV with Alpha:");
-                ColorEdit::new("MyColor##2", &mut s.color)
+                ColorEdit4::new("MyColor##2", &mut s.color)
                     .flags(misc_flags)
                     .input_mode(ColorEditInputMode::HSV)
                     .build(ui);
 
                 ui.text("Color widget with Float Display:");
-                ColorEdit::new("MyColor##2f", &mut s.color)
+                ColorEdit4::new("MyColor##2f", &mut s.color)
                     .flags(misc_flags)
                     .format(ColorFormat::Float)
                     .build(ui);
@@ -627,7 +627,7 @@ CTRL+click on individual component to input value.\n",
                      With the label(false) function you can pass a non-empty label which \
                      will only be used for the tooltip and picker popup.",
                 );
-                ColorEdit::new("MyColor##3", &mut s.color)
+                ColorEdit4::new("MyColor##3", &mut s.color)
                     .flags(misc_flags)
                     .inputs(false)
                     .label(false)
@@ -642,13 +642,13 @@ CTRL+click on individual component to input value.\n",
                     ui.checkbox("With Ref Color", &mut s.ref_color);
                     if s.ref_color {
                         ui.same_line();
-                        ColorEdit::new("##RefColor", &mut s.ref_color_v)
+                        ColorEdit4::new("##RefColor", &mut s.ref_color_v)
                             .flags(misc_flags)
                             .inputs(false)
                             .build(ui);
                     }
                 }
-                let mut b = ColorPicker::new
+                let mut b = ColorPicker4::new
                     ("MyColor##4", &mut s.color)
                     .flags(misc_flags)
                     .alpha(s.alpha)
@@ -657,7 +657,7 @@ CTRL+click on individual component to input value.\n",
                     .display_rgb(true);
 
                 if s.ref_color {
-                    b = b.reference_color(&s.ref_color_v)
+                    b = b.reference_color(s.ref_color_v)
                 }
                 b.build(ui);
             });
@@ -806,7 +806,7 @@ CTRL+click on individual component to input value.\n",
                     let items = &["aaaa", "bbbb", "cccc", "dddd", "eeee"];
                     ui.combo_simple_string("Combo", &mut state.stacked_modals_item, items);
 
-                    ColorEdit::new("color", &mut state.stacked_modals_color).build(ui);
+                    ColorEdit4::new("color", &mut state.stacked_modals_color).build(ui);
 
                     if ui.button("Add another modal..") {
                         ui.open_popup("Stacked 2")   ;
@@ -976,7 +976,7 @@ fn show_example_app_custom_rendering(ui: &Ui, state: &mut CustomRenderingState, 
         .build(|| {
             ui.text("Primitives");
             // TODO: Add DragFloat to change value of sz
-            ColorEdit::new("Color", &mut state.col).build(ui);
+            ColorEdit3::new("Color", &mut state.col).build(ui);
             let draw_list = ui.get_window_draw_list();
             let p = ui.cursor_screen_pos();
             let spacing = 8.0;

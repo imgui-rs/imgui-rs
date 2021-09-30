@@ -2,8 +2,10 @@
 use bitflags::bitflags;
 
 use crate::input::mouse::MouseButton;
-use crate::style::{Style, StyleColor};
+use crate::math::MintVec2;
+use crate::style::StyleColor;
 use crate::sys;
+use crate::Style;
 use crate::Ui;
 
 bitflags! {
@@ -143,13 +145,17 @@ impl<'ui> Ui<'ui> {
 impl<'ui> Ui<'ui> {
     /// Returns `true` if the rectangle (of given size, starting from cursor position) is visible
     #[doc(alias = "IsRectVisibleNil")]
-    pub fn is_cursor_rect_visible(&self, size: [f32; 2]) -> bool {
-        unsafe { sys::igIsRectVisible_Nil(size.into()) }
+    pub fn is_cursor_rect_visible(&self, size: impl Into<MintVec2>) -> bool {
+        unsafe { sys::igIsRectVisible_Nil(size.into().into()) }
     }
     /// Returns `true` if the rectangle (in screen coordinates) is visible
     #[doc(alias = "IsRectVisibleNilVec2")]
-    pub fn is_rect_visible(&self, rect_min: [f32; 2], rect_max: [f32; 2]) -> bool {
-        unsafe { sys::igIsRectVisible_Vec2(rect_min.into(), rect_max.into()) }
+    pub fn is_rect_visible(
+        &self,
+        rect_min: impl Into<MintVec2>,
+        rect_max: impl Into<MintVec2>,
+    ) -> bool {
+        unsafe { sys::igIsRectVisible_Vec2(rect_min.into().into(), rect_max.into().into()) }
     }
     /// Returns the global imgui-rs time.
     ///
@@ -173,6 +179,7 @@ impl<'ui> Ui<'ui> {
     pub fn style_color(&self, style_color: StyleColor) -> [f32; 4] {
         self.ctx.style()[style_color]
     }
+
     /// Returns a shared reference to the current [`Style`].
     ///
     /// ## Safety

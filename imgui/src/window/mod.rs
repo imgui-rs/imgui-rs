@@ -2,6 +2,7 @@ use bitflags::bitflags;
 use std::f32;
 use std::ptr;
 
+use crate::math::MintVec2;
 use crate::sys;
 use crate::{Condition, Ui};
 
@@ -165,13 +166,13 @@ pub struct Window<'ui, 'a, Label> {
     name: Label,
     opened: Option<&'a mut bool>,
     flags: WindowFlags,
-    pos: [f32; 2],
+    pos: MintVec2,
     pos_cond: Condition,
-    pos_pivot: [f32; 2],
-    size: [f32; 2],
+    pos_pivot: MintVec2,
+    size: MintVec2,
     size_cond: Condition,
-    size_constraints: Option<([f32; 2], [f32; 2])>,
-    content_size: [f32; 2],
+    size_constraints: Option<(MintVec2, MintVec2)>,
+    content_size: MintVec2,
     collapsed: bool,
     collapsed_cond: Condition,
     focused: bool,
@@ -186,13 +187,13 @@ impl<'ui, 'a, Label: AsRef<str>> Window<'ui, 'a, Label> {
             name,
             opened: None,
             flags: WindowFlags::empty(),
-            pos: [0.0, 0.0],
+            pos: [0.0, 0.0].into(),
             pos_cond: Condition::Never,
-            pos_pivot: [0.0, 0.0],
-            size: [0.0, 0.0],
+            pos_pivot: [0.0, 0.0].into(),
+            size: [0.0, 0.0].into(),
             size_cond: Condition::Never,
             size_constraints: None,
-            content_size: [0.0, 0.0],
+            content_size: [0.0, 0.0].into(),
             collapsed: false,
             collapsed_cond: Condition::Never,
             focused: false,
@@ -213,8 +214,8 @@ impl<'ui, 'a, Label: AsRef<str>> Window<'ui, 'a, Label> {
     }
     /// Sets the window position, which is applied based on the given condition value
     #[inline]
-    pub fn position(mut self, position: [f32; 2], condition: Condition) -> Self {
-        self.pos = position;
+    pub fn position(mut self, position: impl Into<MintVec2>, condition: Condition) -> Self {
+        self.pos = position.into();
         self.pos_cond = condition;
         self
     }
@@ -224,14 +225,14 @@ impl<'ui, 'a, Label: AsRef<str>> Window<'ui, 'a, Label> {
     /// For example, pass [0.5, 0.5] to center the window on the position.
     /// Does nothing if window position is not also set with `position()`.
     #[inline]
-    pub fn position_pivot(mut self, pivot: [f32; 2]) -> Self {
-        self.pos_pivot = pivot;
+    pub fn position_pivot(mut self, pivot: impl Into<MintVec2>) -> Self {
+        self.pos_pivot = pivot.into();
         self
     }
     /// Sets the window size, which is applied based on the given condition value
     #[inline]
-    pub fn size(mut self, size: [f32; 2], condition: Condition) -> Self {
-        self.size = size;
+    pub fn size(mut self, size: impl Into<MintVec2>, condition: Condition) -> Self {
+        self.size = size.into();
         self.size_cond = condition;
         self
     }
@@ -239,8 +240,12 @@ impl<'ui, 'a, Label: AsRef<str>> Window<'ui, 'a, Label> {
     ///
     /// Use -1.0, -1.0 on either X or Y axis to preserve current size.
     #[inline]
-    pub fn size_constraints(mut self, size_min: [f32; 2], size_max: [f32; 2]) -> Self {
-        self.size_constraints = Some((size_min, size_max));
+    pub fn size_constraints(
+        mut self,
+        size_min: impl Into<MintVec2>,
+        size_max: impl Into<MintVec2>,
+    ) -> Self {
+        self.size_constraints = Some((size_min.into(), size_max.into()));
         self
     }
     /// Sets the window content size, which can be used to enforce scrollbars.
@@ -248,8 +253,8 @@ impl<'ui, 'a, Label: AsRef<str>> Window<'ui, 'a, Label> {
     /// Does not include window decorations (title bar, menu bar, etc.). Set one of the values to
     /// 0.0 to leave the size automatic.
     #[inline]
-    pub fn content_size(mut self, size: [f32; 2]) -> Self {
-        self.content_size = size;
+    pub fn content_size(mut self, size: impl Into<MintVec2>) -> Self {
+        self.content_size = size.into();
         self
     }
     /// Sets the window collapse state, which is applied based on the given condition value
@@ -513,7 +518,7 @@ impl<'ui, 'a, Label: AsRef<str>> Window<'ui, 'a, Label> {
                 )
             };
         }
-        if self.content_size[0] != 0.0 || self.content_size[1] != 0.0 {
+        if self.content_size.x != 0.0 || self.content_size.y != 0.0 {
             unsafe { sys::igSetNextWindowContentSize(self.content_size.into()) };
         }
         if self.collapsed_cond != Condition::Never {

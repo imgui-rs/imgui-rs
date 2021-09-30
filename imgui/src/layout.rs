@@ -1,3 +1,4 @@
+use crate::math::MintVec2;
 use crate::sys;
 use crate::Ui;
 
@@ -64,8 +65,8 @@ impl<'ui> Ui<'ui> {
     ///
     /// Can be used to move the cursor on the window.
     #[doc(alias = "Dummy")]
-    pub fn dummy(&self, size: [f32; 2]) {
-        unsafe { sys::igDummy(size.into()) }
+    pub fn dummy(&self, size: impl Into<MintVec2>) {
+        unsafe { sys::igDummy(size.into().into()) }
     }
 
     /// Moves content position to the right by `Style::indent_spacing`
@@ -126,8 +127,8 @@ impl<'ui> Ui<'ui> {
     ///
     /// This sets the point on which the next widget will be drawn.
     #[doc(alias = "SetCursorPos")]
-    pub fn set_cursor_pos(&self, pos: [f32; 2]) {
-        unsafe { sys::igSetCursorPos(pos.into()) };
+    pub fn set_cursor_pos(&self, pos: impl Into<MintVec2>) {
+        unsafe { sys::igSetCursorPos(pos.into().into()) };
     }
     /// Returns the initial cursor position (in window coordinates)
     #[doc(alias = "GetCursorStartPos")]
@@ -147,8 +148,8 @@ impl<'ui> Ui<'ui> {
     }
     /// Sets the cursor position (in absolute screen coordinates)
     #[doc(alias = "SetCursorScreenPos")]
-    pub fn set_cursor_screen_pos(&self, pos: [f32; 2]) {
-        unsafe { sys::igSetCursorScreenPos(pos.into()) }
+    pub fn set_cursor_screen_pos(&self, pos: impl Into<MintVec2>) {
+        unsafe { sys::igSetCursorScreenPos(pos.into().into()) }
     }
     /// Vertically aligns text baseline so that it will align properly to regularly frame items.
     ///

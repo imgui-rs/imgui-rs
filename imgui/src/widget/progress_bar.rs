@@ -1,3 +1,4 @@
+use crate::math::MintVec2;
 use crate::sys;
 // use crate::ImStr;
 use crate::Ui;
@@ -55,8 +56,8 @@ impl<T: AsRef<str>> ProgressBar<T> {
     /// Negative values will automatically align to the end of the axis, zero will let the progress
     /// bar choose a size, and positive values will use the given size.
     #[inline]
-    pub fn size(mut self, size: [f32; 2]) -> Self {
-        self.size = size;
+    pub fn size(mut self, size: impl Into<MintVec2>) -> Self {
+        self.size = size.into().into();
         self
     }
 

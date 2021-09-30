@@ -1,6 +1,7 @@
 use bitflags::bitflags;
 use std::ops::{BitAnd, BitAndAssign, BitOrAssign, Not};
 
+use crate::math::MintVec2;
 use crate::sys;
 use crate::{Direction, Ui};
 
@@ -38,8 +39,8 @@ impl<'ui> Ui<'ui> {
     /// Setting `size` as `[0.0, 0.0]` will size the button to the label's width in
     /// the current style.
     #[doc(alias = "Button")]
-    pub fn button_with_size(&self, label: impl AsRef<str>, size: [f32; 2]) -> bool {
-        unsafe { sys::igButton(self.scratch_txt(label), size.into()) }
+    pub fn button_with_size(&self, label: impl AsRef<str>, size: impl Into<MintVec2>) -> bool {
+        unsafe { sys::igButton(self.scratch_txt(label), size.into().into()) }
     }
     /// Renders a small clickable button that is easy to embed in text.
     ///
@@ -52,8 +53,8 @@ impl<'ui> Ui<'ui> {
     ///
     /// Returns true if this button was clicked.
     #[doc(alias = "InvisibleButton")]
-    pub fn invisible_button(&self, id: impl AsRef<str>, size: [f32; 2]) -> bool {
-        unsafe { sys::igInvisibleButton(self.scratch_txt(id), size.into(), 0) }
+    pub fn invisible_button(&self, id: impl AsRef<str>, size: impl Into<MintVec2>) -> bool {
+        unsafe { sys::igInvisibleButton(self.scratch_txt(id), size.into().into(), 0) }
     }
     /// Renders a widget with button behaviour without the visual look.
     ///
@@ -62,10 +63,16 @@ impl<'ui> Ui<'ui> {
     pub fn invisible_button_flags(
         &self,
         id: impl AsRef<str>,
-        size: [f32; 2],
+        size: impl Into<MintVec2>,
         flags: ButtonFlags,
     ) -> bool {
-        unsafe { sys::igInvisibleButton(self.scratch_txt(id), size.into(), flags.bits() as i32) }
+        unsafe {
+            sys::igInvisibleButton(
+                self.scratch_txt(id),
+                size.into().into(),
+                flags.bits() as i32,
+            )
+        }
     }
     /// Renders a square button with an arrow shape.
     ///

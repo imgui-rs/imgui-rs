@@ -1,5 +1,7 @@
 use std::os::raw::c_void;
 
+use crate::math::MintVec2;
+use crate::math::MintVec4;
 use crate::render::renderer::TextureId;
 use crate::sys;
 use crate::Ui;
@@ -19,10 +21,10 @@ pub struct Image {
 impl Image {
     /// Creates a new image builder with the given texture and size
     #[doc(alias = "Image")]
-    pub const fn new(texture_id: TextureId, size: [f32; 2]) -> Image {
+    pub fn new(texture_id: TextureId, size: impl Into<MintVec2>) -> Image {
         Image {
             texture_id,
-            size,
+            size: size.into().into(),
             uv0: [0.0, 0.0],
             uv1: [1.0, 1.0],
             tint_col: [1.0, 1.0, 1.0, 1.0],
@@ -30,28 +32,29 @@ impl Image {
         }
     }
     /// Sets the image size
-    pub const fn size(mut self, size: [f32; 2]) -> Self {
-        self.size = size;
+    #[deprecated(note = "just set the size in the `new` constructor.")]
+    pub fn size(mut self, size: impl Into<MintVec2>) -> Self {
+        self.size = size.into().into();
         self
     }
     /// Sets uv0 (default `[0.0, 0.0]`)
-    pub const fn uv0(mut self, uv0: [f32; 2]) -> Self {
-        self.uv0 = uv0;
+    pub fn uv0(mut self, uv0: impl Into<MintVec2>) -> Self {
+        self.uv0 = uv0.into().into();
         self
     }
     /// Sets uv1 (default `[1.0, 1.0]`)
-    pub const fn uv1(mut self, uv1: [f32; 2]) -> Self {
-        self.uv1 = uv1;
+    pub fn uv1(mut self, uv1: impl Into<MintVec2>) -> Self {
+        self.uv1 = uv1.into().into();
         self
     }
     /// Sets the tint color (default: no tint color)
-    pub const fn tint_col(mut self, tint_col: [f32; 4]) -> Self {
-        self.tint_col = tint_col;
+    pub fn tint_col(mut self, tint_col: impl Into<MintVec4>) -> Self {
+        self.tint_col = tint_col.into().into();
         self
     }
     /// Sets the border color (default: no border)
-    pub const fn border_col(mut self, border_col: [f32; 4]) -> Self {
-        self.border_col = border_col;
+    pub fn border_col(mut self, border_col: impl Into<MintVec4>) -> Self {
+        self.border_col = border_col.into().into();
         self
     }
     /// Builds the image
@@ -85,10 +88,10 @@ pub struct ImageButton {
 impl ImageButton {
     /// Creates a new image button builder with the given texture and size
     #[doc(alias = "ImageButton")]
-    pub fn new(texture_id: TextureId, size: [f32; 2]) -> ImageButton {
+    pub fn new(texture_id: TextureId, size: impl Into<MintVec2>) -> ImageButton {
         ImageButton {
             texture_id,
-            size,
+            size: size.into().into(),
             uv0: [0.0, 0.0],
             uv1: [1.0, 1.0],
             frame_padding: -1,
@@ -96,19 +99,21 @@ impl ImageButton {
             tint_col: [1.0, 1.0, 1.0, 1.0],
         }
     }
+
     /// Sets the image button size
-    pub fn size(mut self, size: [f32; 2]) -> Self {
-        self.size = size;
+    #[deprecated(note = "just set the size in the `new` constructor.")]
+    pub fn size(mut self, size: impl Into<MintVec2>) -> Self {
+        self.size = size.into().into();
         self
     }
     /// Sets uv0 (default `[0.0, 0.0]`)
-    pub fn uv0(mut self, uv0: [f32; 2]) -> Self {
-        self.uv0 = uv0;
+    pub fn uv0(mut self, uv0: impl Into<MintVec2>) -> Self {
+        self.uv0 = uv0.into().into();
         self
     }
     /// Sets uv1 (default `[1.0, 1.0]`)
-    pub fn uv1(mut self, uv1: [f32; 2]) -> Self {
-        self.uv1 = uv1;
+    pub fn uv1(mut self, uv1: impl Into<MintVec2>) -> Self {
+        self.uv1 = uv1.into().into();
         self
     }
     /// Sets the frame padding (default: uses frame padding from style).
@@ -121,13 +126,13 @@ impl ImageButton {
         self
     }
     /// Sets the background color (default: no background color)
-    pub fn background_col(mut self, bg_col: [f32; 4]) -> Self {
-        self.bg_col = bg_col;
+    pub fn background_col(mut self, bg_col: impl Into<MintVec4>) -> Self {
+        self.bg_col = bg_col.into().into();
         self
     }
     /// Sets the tint color (default: no tint color)
-    pub fn tint_col(mut self, tint_col: [f32; 4]) -> Self {
-        self.tint_col = tint_col;
+    pub fn tint_col(mut self, tint_col: impl Into<MintVec4>) -> Self {
+        self.tint_col = tint_col.into().into();
         self
     }
     /// Builds the image button

@@ -2,6 +2,7 @@ use bitflags::bitflags;
 use std::ops::Range;
 use std::os::raw::{c_char, c_int, c_void};
 
+use crate::math::*;
 use crate::sys;
 use crate::Ui;
 
@@ -360,12 +361,12 @@ impl<'ui, 'p, L: AsRef<str>> InputTextMultiline<'ui, 'p, L, PassthroughCallback>
     /// your string.
     /// 3. Truncations by ImGui appear to be done primarily by insertions of `\0` to the truncation point.
     /// We will handle this for you and edit the string "properly" too, but this might show up in callbacks.
-    pub fn new(ui: &'ui Ui<'ui>, label: L, buf: &'p mut String, size: [f32; 2]) -> Self {
+    pub fn new(ui: &'ui Ui<'ui>, label: L, buf: &'p mut String, size: impl Into<MintVec2>) -> Self {
         InputTextMultiline {
             label,
             buf,
             flags: InputTextFlags::CALLBACK_RESIZE,
-            size,
+            size: size.into().into(),
             callback_handler: PassthroughCallback,
             ui,
         }
@@ -552,17 +553,22 @@ impl<'ui, 'p, L: AsRef<str>> InputFloat<'ui, 'p, L> {
 }
 
 macro_rules! impl_input_floatn {
-    ($InputFloatN:ident, $N:expr, $igInputFloatN:ident) => {
+    ($InputFloatN:ident, $MINT_TARGET:ty, $N:expr, $igInputFloatN:ident) => {
         #[must_use]
-        pub struct $InputFloatN<'ui, 'p, L> {
+        pub struct $InputFloatN<'ui, 'p, L, T> {
             label: L,
-            value: &'p mut [f32; $N],
+            value: &'p mut T,
             flags: InputTextFlags,
             ui: &'ui Ui<'ui>,
         }
 
-        impl<'ui, 'p, L: AsRef<str>> $InputFloatN<'ui, 'p, L> {
-            pub fn new(ui: &'ui Ui<'ui>, label: L, value: &'p mut [f32; $N]) -> Self {
+        impl<'ui, 'p, L, T> $InputFloatN<'ui, 'p, L, T>
+        where
+            L: AsRef<str>,
+            T: Copy + Into<$MINT_TARGET>,
+            $MINT_TARGET: Into<T> + Into<[f32; $N]>,
+        {
+            pub fn new(ui: &'ui Ui<'ui>, label: L, value: &'p mut T) -> Self {
                 $InputFloatN {
                     label,
                     value,
@@ -572,14 +578,24 @@ macro_rules! impl_input_floatn {
             }
 
             pub fn build(self) -> bool {
-                unsafe {
+                let value: $MINT_TARGET = (*self.value).into();
+                let mut value: [f32; $N] = value.into();
+
+                let changed = unsafe {
                     sys::$igInputFloatN(
                         self.ui.scratch_txt(self.label),
-                        self.value.as_mut_ptr(),
+                        value.as_mut_ptr(),
                         b"%.3f\0".as_ptr() as *const _,
                         self.flags.bits() as i32,
                     )
+                };
+
+                if changed {
+                    let value: $MINT_TARGET = value.into();
+                    *self.value = value.into();
                 }
+
+                changed
             }
 
             impl_text_flags!($InputFloatN);
@@ -587,22 +603,27 @@ macro_rules! impl_input_floatn {
     };
 }
 
-impl_input_floatn!(InputFloat2, 2, igInputFloat2);
-impl_input_floatn!(InputFloat3, 3, igInputFloat3);
-impl_input_floatn!(InputFloat4, 4, igInputFloat4);
+impl_input_floatn!(InputFloat2, MintVec2, 2, igInputFloat2);
+impl_input_floatn!(InputFloat3, MintVec3, 3, igInputFloat3);
+impl_input_floatn!(InputFloat4, MintVec4, 4, igInputFloat4);
 
 macro_rules! impl_input_intn {
-    ($InputIntN:ident, $N:expr, $igInputIntN:ident) => {
+    ($InputIntN:ident, $MINT_TARGET:ident, $N:expr, $igInputIntN:ident) => {
         #[must_use]
-        pub struct $InputIntN<'ui, 'p, L> {
+        pub struct $InputIntN<'ui, 'p, L, T> {
             label: L,
-            value: &'p mut [i32; $N],
+            value: &'p mut T,
             flags: InputTextFlags,
             ui: &'ui Ui<'ui>,
         }
 
-        impl<'ui, 'p, L: AsRef<str>> $InputIntN<'ui, 'p, L> {
-            pub fn new(ui: &'ui Ui<'ui>, label: L, value: &'p mut [i32; $N]) -> Self {
+        impl<'ui, 'p, L, T> $InputIntN<'ui, 'p, L, T>
+        where
+            L: AsRef<str>,
+            T: Copy + Into<$MINT_TARGET>,
+            $MINT_TARGET: Into<T> + Into<[i32; $N]>,
+        {
+            pub fn new(ui: &'ui Ui<'ui>, label: L, value: &'p mut T) -> Self {
                 $InputIntN {
                     label,
                     value,
@@ -612,13 +633,23 @@ macro_rules! impl_input_intn {
             }
 
             pub fn build(self) -> bool {
-                unsafe {
+                let value: $MINT_TARGET = (*self.value).into();
+                let mut value: [i32; $N] = value.into();
+
+                let changed = unsafe {
                     sys::$igInputIntN(
                         self.ui.scratch_txt(self.label),
-                        self.value.as_mut_ptr(),
+                        value.as_mut_ptr(),
                         self.flags.bits() as i32,
                     )
+                };
+
+                if changed {
+                    let value: $MINT_TARGET = value.into();
+                    *self.value = value.into();
                 }
+
+                changed
             }
 
             impl_text_flags!($InputIntN);
@@ -626,9 +657,9 @@ macro_rules! impl_input_intn {
     };
 }
 
-impl_input_intn!(InputInt2, 2, igInputInt2);
-impl_input_intn!(InputInt3, 3, igInputInt3);
-impl_input_intn!(InputInt4, 4, igInputInt4);
+impl_input_intn!(InputInt2, MintIVec2, 2, igInputInt2);
+impl_input_intn!(InputInt3, MintIVec3, 3, igInputInt3);
+impl_input_intn!(InputInt4, MintIVec4, 4, igInputInt4);
 
 bitflags!(
     /// Callback flags for an `InputText` widget. These correspond to

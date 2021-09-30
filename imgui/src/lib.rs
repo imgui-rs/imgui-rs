@@ -48,6 +48,7 @@ pub use self::widget::tree::*;
 pub use self::window::child_window::*;
 pub use self::window::*;
 use internal::RawCast;
+use math::*;
 
 #[macro_use]
 mod string;
@@ -68,6 +69,7 @@ pub mod internal;
 mod io;
 mod layout;
 mod list_clipper;
+mod math;
 mod plothistogram;
 mod plotlines;
 mod popups;
@@ -387,27 +389,43 @@ impl<'ui> Ui<'ui> {
     ) -> InputFloat<'ui, 'p, L> {
         InputFloat::new(self, label, value)
     }
-    pub fn input_float2<'p, L: AsRef<str>>(
+    #[doc(alias = "InputFloat2")]
+    pub fn input_float2<'p, L, T>(
         &'ui self,
         label: L,
-        value: &'p mut [f32; 2],
-    ) -> InputFloat2<'ui, 'p, L> {
+        value: &'p mut T,
+    ) -> InputFloat2<'ui, 'p, L, T>
+    where
+        L: AsRef<str>,
+        T: Copy + Into<MintVec2>,
+        MintVec2: Into<T> + Into<[f32; 2]>,
+    {
         InputFloat2::new(self, label, value)
     }
     #[doc(alias = "InputFloat3")]
-    pub fn input_float3<'p, L: AsRef<str>>(
+    pub fn input_float3<'p, L, T>(
         &'ui self,
         label: L,
-        value: &'p mut [f32; 3],
-    ) -> InputFloat3<'ui, 'p, L> {
+        value: &'p mut T,
+    ) -> InputFloat3<'ui, 'p, L, T>
+    where
+        L: AsRef<str>,
+        T: Copy + Into<MintVec3>,
+        MintVec3: Into<T> + Into<[f32; 3]>,
+    {
         InputFloat3::new(self, label, value)
     }
     #[doc(alias = "InputFloat4")]
-    pub fn input_float4<'p, L: AsRef<str>>(
+    pub fn input_float4<'p, L, T>(
         &'ui self,
         label: L,
-        value: &'p mut [f32; 4],
-    ) -> InputFloat4<'ui, 'p, L> {
+        value: &'p mut T,
+    ) -> InputFloat4<'ui, 'p, L, T>
+    where
+        L: AsRef<str>,
+        T: Copy + Into<MintVec4>,
+        MintVec4: Into<T> + Into<[f32; 4]>,
+    {
         InputFloat4::new(self, label, value)
     }
     #[doc(alias = "InputInt")]
@@ -419,27 +437,30 @@ impl<'ui> Ui<'ui> {
         InputInt::new(self, label, value)
     }
     #[doc(alias = "InputInt2")]
-    pub fn input_int2<'p, L: AsRef<str>>(
-        &'ui self,
-        label: L,
-        value: &'p mut [i32; 2],
-    ) -> InputInt2<'ui, 'p, L> {
+    pub fn input_int2<'p, L, T>(&'ui self, label: L, value: &'p mut T) -> InputInt2<'ui, 'p, L, T>
+    where
+        L: AsRef<str>,
+        T: Copy + Into<MintIVec2>,
+        MintIVec2: Into<T> + Into<[i32; 2]>,
+    {
         InputInt2::new(self, label, value)
     }
     #[doc(alias = "InputInt3")]
-    pub fn input_int3<'p, L: AsRef<str>>(
-        &'ui self,
-        label: L,
-        value: &'p mut [i32; 3],
-    ) -> InputInt3<'ui, 'p, L> {
+    pub fn input_int3<'p, L, T>(&'ui self, label: L, value: &'p mut T) -> InputInt3<'ui, 'p, L, T>
+    where
+        L: AsRef<str>,
+        T: Copy + Into<MintIVec3>,
+        MintIVec3: Into<T> + Into<[i32; 3]>,
+    {
         InputInt3::new(self, label, value)
     }
     #[doc(alias = "InputInt4")]
-    pub fn input_int4<'p, L: AsRef<str>>(
-        &'ui self,
-        label: L,
-        value: &'p mut [i32; 4],
-    ) -> InputInt4<'ui, 'p, L> {
+    pub fn input_int4<'p, L, T>(&'ui self, label: L, value: &'p mut T) -> InputInt4<'ui, 'p, L, T>
+    where
+        L: AsRef<str>,
+        T: Copy + Into<MintIVec4>,
+        MintIVec4: Into<T> + Into<[i32; 4]>,
+    {
         InputInt4::new(self, label, value)
     }
 }
