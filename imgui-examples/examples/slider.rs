@@ -16,12 +16,13 @@ fn main() {
 }
 
 fn example_selector(run: &mut bool, ui: &mut Ui, state: &mut State) {
-    let w = Window::new("Slider examples")
+    let w = ui
+        .window("Slider examples")
         .opened(run)
         .position([20.0, 20.0], Condition::Appearing)
         .size([700.0, 80.0], Condition::Appearing)
         .resizable(false);
-    w.build(ui, || {
+    w.build(|| {
         let mut clicked = false;
         clicked |= ui.radio_button("Example 1: Basic sliders", &mut state.example, 1);
         clicked |= ui.radio_button("Example 2: Slider arrays", &mut state.example, 2);
@@ -32,10 +33,11 @@ fn example_selector(run: &mut bool, ui: &mut Ui, state: &mut State) {
 }
 
 fn example_1(ui: &Ui, state: &mut State) {
-    let w = Window::new("Example 1: Basic sliders")
+    let w = ui
+        .window("Example 1: Basic sliders")
         .size([700.0, 340.0], Condition::Appearing)
         .position([20.0, 120.0], Condition::Appearing);
-    w.build(ui, || {
+    w.build(|| {
         ui.text("All of the following data types are supported:");
         ui.text("Signed:   i8 i16 i32 i64");
         ui.text("Unsigned: u8 u16 u32 u64");
@@ -67,10 +69,11 @@ fn example_1(ui: &Ui, state: &mut State) {
 }
 
 fn example_2(ui: &Ui, state: &mut State) {
-    let w = Window::new("Example 2: Slider arrays")
+    let w = ui
+        .window("Example 2: Slider arrays")
         .size([700.0, 260.0], Condition::Appearing)
         .position([20.0, 120.0], Condition::Appearing);
-    w.build(ui, || {
+    w.build(|| {
         ui.text("You can easily build a slider group from an array of values:");
         Slider::new("[u8; 4]", 0, u8::MAX).build_array(ui, &mut state.array);
 

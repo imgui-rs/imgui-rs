@@ -17,12 +17,13 @@ fn main() {
 }
 
 fn example_selector(run: &mut bool, ui: &mut Ui, state: &mut State) {
-    let w = Window::new("Color button examples")
+    let w = ui
+        .window("Color button examples")
         .opened(run)
         .position([20.0, 20.0], Condition::Appearing)
         .size([700.0, 100.0], Condition::Appearing)
         .resizable(false);
-    w.build(ui, || {
+    w.build(|| {
         let ex1 = ui.radio_button("Example 1: Basics", &mut state.example, 1);
         let ex2 = ui.radio_button("Example 2: Alpha component", &mut state.example, 2);
         let ex3 = ui.radio_button("Example 3: Input format", &mut state.example, 3);
@@ -33,10 +34,11 @@ fn example_selector(run: &mut bool, ui: &mut Ui, state: &mut State) {
 }
 
 fn example_1(ui: &Ui, state: &mut State) {
-    let w = Window::new("Example 1: Basics")
+    let w = ui
+        .window("Example 1: Basics")
         .size([700.0, 300.0], Condition::Appearing)
         .position([20.0, 140.0], Condition::Appearing);
-    w.build(ui, || {
+    w.build(|| {
         ui.text_wrapped(
             "Color button is a widget that displays a color value as a clickable rectangle. \
              It also supports a tooltip with detailed information about the color value. \
@@ -73,10 +75,11 @@ fn example_1(ui: &Ui, state: &mut State) {
 }
 
 fn example_2(ui: &Ui) {
-    let w = Window::new("Example 2: Alpha component")
+    let w = ui
+        .window("Example 2: Alpha component")
         .size([700.0, 320.0], Condition::Appearing)
         .position([20.0, 140.0], Condition::Appearing);
-    w.build(ui, || {
+    w.build(|| {
         ui.text_wrapped(
             "The displayed color is passed to the button as four float values between \
              0.0 - 1.0 (RGBA). If you don't care about the alpha component, it can be \
@@ -123,10 +126,11 @@ fn example_2(ui: &Ui) {
 }
 
 fn example_3(ui: &Ui) {
-    let w = Window::new("Example 3: Input format")
+    let w = ui
+        .window("Example 3: Input format")
         .size([700.0, 320.0], Condition::Appearing)
         .position([20.0, 140.0], Condition::Appearing);
-    w.build(ui, || {
+    w.build(|| {
         ui.text("This button interprets the input value [1.0, 0.0, 0.0, 1.0] as RGB(A) (default):");
         ColorButton::new("RGBA red", [1.0, 0.0, 0.0, 1.0]).build(ui);
 

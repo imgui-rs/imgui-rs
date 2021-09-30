@@ -78,9 +78,9 @@ impl CustomTexturesApp {
     }
 
     fn show_textures(&self, ui: &Ui) {
-        Window::new("Hello textures")
+        ui.window("Hello textures")
             .size([400.0, 400.0], Condition::FirstUseEver)
-            .build(ui, || {
+            .build(|| {
                 ui.text("Hello textures!");
                 if let Some(my_texture_id) = self.my_texture_id {
                     ui.text("Some generated texture");

@@ -57,10 +57,10 @@ fn main() {
             );
         }
 
-        Window::new("Draw list")
+        ui.window("Draw list")
             .size([300.0, 110.0], Condition::FirstUseEver)
             .scroll_bar(false)
-            .build(ui, || {
+            .build(|| {
                 ui.button("random button");
                 let draw_list = ui.get_window_draw_list();
                 let o = ui.cursor_screen_pos();

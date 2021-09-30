@@ -15,9 +15,9 @@ fn main() {
 
     let system = support::init(file!());
     system.main_loop(move |_, ui| {
-        Window::new("Hello long world")
+        ui.window("Hello long world")
             .size([300.0, 110.0], Condition::FirstUseEver)
-            .build(ui, || {
+            .build(|| {
                 let mut clipper = imgui::ListClipper::new(lots_of_words.len() as i32)
                     .items_height(ui.current_font_size())
                     .begin(ui);

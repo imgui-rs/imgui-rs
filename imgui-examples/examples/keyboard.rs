@@ -14,9 +14,9 @@ fn main() {
     let mut text_buffer = String::new();
 
     system.main_loop(move |_, ui| {
-        Window::new("Means of accessing key state")
+        ui.window("Means of accessing key state")
             .size([500.0, 300.0], Condition::FirstUseEver)
-            .build(ui, || {
+            .build(|| {
                 // You can check if a key is currently held down
                 if ui.is_key_down(Key::A) {
                     ui.text("The A key is down!");
