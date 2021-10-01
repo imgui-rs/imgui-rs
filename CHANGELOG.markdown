@@ -8,7 +8,7 @@
 
 - BREAKING: Ui now does not have a lifetime associated with it, but is only ever given to users in the form of `&mut Ui`. Additionally, the `render` function has been moved to the `Context` instead of `Ui`.
 
-- BREAKING: `SharedFontAtlas` now uses `UnsafeCell` rather than `Rc<RefCell>` as its wrapper -- this simplifies the codebase and more accurately reflects how we expect `SharedFontAtlas` to be used (ie, you're probably going to set it up once, and then give it around, rather than constantly edit it). `SharedFontAtlas` users, if this change is very bad for you, please let us know with issues!
+- BREAKING: `SharedFontAtlas` now hides an `Rc` within its wrapper -- this simplifies the codebase and more accurately reflects how we expect `SharedFontAtlas` to be used (ie, you're probably going to set it up once, and then give it around, rather than constantly edit it). `SharedFontAtlas` users, if this change is very bad for you, please let us know with issues!
 
 ## [0.8.0] - 2021-09-17
 
