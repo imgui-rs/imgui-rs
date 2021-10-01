@@ -340,7 +340,7 @@ impl Ui {
     /// This, like many objects in the library, uses the builder
     /// pattern to set optional arguments (like window size, flags,
     /// etc). Once all desired options are set, you must call either
-    /// [`Window::build`] or [`Window::begin`] must be called to
+    /// [`Window::build`] or [`Window::begin`] to
     /// actually create the window.
     ///
     /// # Examples
@@ -355,27 +355,43 @@ impl Ui {
     ///         ui.text("An example");
     ///     });
     /// ```
+    ///
+    /// Same as [`Ui::window`] but using the "token based" `.begin()` approach.
+    ///
+    /// ```no_run
+    /// # let mut ctx = imgui::Context::create();
+    /// # let ui = ctx.frame();
+    /// if let Some(wt) = ui
+    ///     .window("Example Window")
+    ///     .size([100.0, 50.0], imgui::Condition::FirstUseEver)
+    ///     .begin()
+    /// {
+    ///     ui.text("Window is visible");
+    ///     // Window ends where where wt is dropped,
+    ///     // or you could call
+    ///     // if you want to let it drop on its own, name it `_wt`.
+    ///     // never name it `_`, as this will drop it *immediately*.
+    ///     wt.unwrap().end();
+    /// }
+    /// ```
     pub fn window<Label: AsRef<str>>(&self, name: Label) -> Window<'_, '_, Label> {
         Window::new(self, name)
     }
 
-    /// Same as [`Ui::window`] but using the "token based" `.begin()` approach.
+    /// Begins constructing a child window with the given name.
     ///
-    /// ```
-    /// fn example(ui: &imgui::Ui) {
-    ///     let wt = ui.window("Example Window")
-    ///         .size([100.0, 50.0], imgui::Condition::FirstUseEver)
-    ///         .begin();
-    ///     if wt.is_some() {
-    ///         ui.text("Window is visible");
-    ///     }
-    ///     // Window ends where where wt is dropped,
-    ///     // or you could call
-    ///     wt.unwrap().end()
-    /// }
-    /// ```
-    pub fn child_window<Label: AsRef<str>>(&self, name: Label) -> ChildWindow<'_, Label> {
+    /// Use child windows to begin into a self-contained independent scrolling/clipping
+    /// regions within a host window. Child windows can embed their own child.
+    pub fn child_window<Label: AsRef<str>>(&self, name: Label) -> ChildWindow<'_> {
         ChildWindow::new(self, name)
+    }
+
+    /// Begins constructing a child window with the given name.
+    ///
+    /// Use child windows to begin into a self-contained independent scrolling/clipping
+    /// regions within a host window. Child windows can embed their own child.
+    pub fn child_window_id(&self, id: Id<'_>) -> ChildWindow<'_> {
+        ChildWindow::new_id(self, id)
     }
 }
 

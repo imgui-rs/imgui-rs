@@ -1,16 +1,16 @@
 use std::f32;
 
 use crate::math::MintVec2;
-use crate::sys;
 use crate::window::WindowFlags;
 use crate::Ui;
+use crate::{sys, Id};
 
 /// Builder for a child window
 #[derive(Copy, Clone, Debug)]
 #[must_use]
-pub struct ChildWindow<'ui, Label> {
+pub struct ChildWindow<'ui> {
     ui: &'ui Ui,
-    name: Label,
+    id: u32,
     flags: WindowFlags,
     size: [f32; 2],
     content_size: [f32; 2],
@@ -19,13 +19,20 @@ pub struct ChildWindow<'ui, Label> {
     border: bool,
 }
 
-impl<'ui, Label: AsRef<str>> ChildWindow<'ui, Label> {
-    /// Creates a new child window builder with the given ID
+impl<'ui> ChildWindow<'ui> {
+    /// Creates a new child window builder with the str.
     #[doc(alias = "BeginChildID")]
-    pub fn new(ui: &'ui Ui, name: Label) -> ChildWindow<'ui, Label> {
-        ChildWindow {
+    pub fn new(ui: &'ui Ui, name: impl AsRef<str>) -> Self {
+        let id = Id::Str(name.as_ref());
+        Self::new_id(ui, id)
+    }
+
+    /// Creates a new child window builder with the given imgui id.
+    #[doc(alias = "BeginChildID")]
+    pub fn new_id(ui: &'ui Ui, id: Id<'_>) -> Self {
+        Self {
             ui,
-            name,
+            id: id.as_imgui_id(),
             flags: WindowFlags::empty(),
             size: [0.0, 0.0],
             content_size: [0.0, 0.0],
@@ -34,6 +41,7 @@ impl<'ui, Label: AsRef<str>> ChildWindow<'ui, Label> {
             border: false,
         }
     }
+
     /// Replace current window flags with the given value
     #[inline]
     pub fn flags(mut self, flags: WindowFlags) -> Self {
@@ -258,8 +266,8 @@ impl<'ui, Label: AsRef<str>> ChildWindow<'ui, Label> {
             unsafe { sys::igSetNextWindowBgAlpha(self.bg_alpha) };
         }
         let should_render = unsafe {
-            sys::igBeginChild_Str(
-                self.ui.scratch_txt(self.name),
+            sys::igBeginChild_ID(
+                self.id,
                 self.size.into(),
                 self.border,
                 self.flags.bits() as i32,
