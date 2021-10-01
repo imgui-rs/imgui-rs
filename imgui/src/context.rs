@@ -49,7 +49,7 @@ use crate::{sys, DrawData};
 #[derive(Debug)]
 pub struct Context {
     raw: *mut sys::ImGuiContext,
-    shared_font_atlas: Option<UnsafeCell<SharedFontAtlas>>,
+    shared_font_atlas: Option<SharedFontAtlas>,
     ini_filename: Option<CString>,
     log_filename: Option<CString>,
     platform_name: Option<CString>,
@@ -93,7 +93,7 @@ impl Context {
     ///
     /// Panics if an active context already exists
     #[doc(alias = "CreateContext")]
-    pub fn create_with_shared_font_atlas(shared_font_atlas: UnsafeCell<SharedFontAtlas>) -> Self {
+    pub fn create_with_shared_font_atlas(shared_font_atlas: SharedFontAtlas) -> Self {
         Self::create_internal(Some(shared_font_atlas))
     }
     /// Suspends this context so another context can be the active context.
@@ -216,18 +216,15 @@ impl Context {
         io.clipboard_user_data = clipboard_ctx.get() as *mut _;
         self.clipboard_ctx = clipboard_ctx;
     }
-    fn create_internal(shared_font_atlas: Option<UnsafeCell<SharedFontAtlas>>) -> Self {
+    fn create_internal(mut shared_font_atlas: Option<SharedFontAtlas>) -> Self {
         let _guard = CTX_MUTEX.lock();
         assert!(
             no_current_context(),
             "A new active context cannot be created, because another one already exists"
         );
 
-        let shared_font_atlas_ptr = match &shared_font_atlas {
-            Some(shared_font_atlas) => {
-                let borrowed_font_atlas = shared_font_atlas.get();
-                unsafe { &*borrowed_font_atlas }.0
-            }
+        let shared_font_atlas_ptr = match &mut shared_font_atlas {
+            Some(shared_font_atlas) => shared_font_atlas.as_ptr_mut(),
             None => ptr::null_mut(),
         };
         // Dear ImGui implicitly sets the current context during igCreateContext if the current
@@ -297,8 +294,9 @@ impl SuspendedContext {
     pub fn create() -> Self {
         Self::create_internal(None)
     }
+
     /// Creates a new suspended imgui-rs context with a shared font atlas.
-    pub fn create_with_shared_font_atlas(shared_font_atlas: UnsafeCell<SharedFontAtlas>) -> Self {
+    pub fn create_with_shared_font_atlas(shared_font_atlas: SharedFontAtlas) -> Self {
         Self::create_internal(Some(shared_font_atlas))
     }
     /// Attempts to activate this suspended context.
@@ -319,7 +317,7 @@ impl SuspendedContext {
             Err(self)
         }
     }
-    fn create_internal(shared_font_atlas: Option<UnsafeCell<SharedFontAtlas>>) -> Self {
+    fn create_internal(shared_font_atlas: Option<SharedFontAtlas>) -> Self {
         let _guard = CTX_MUTEX.lock();
         let raw = unsafe { sys::igCreateContext(ptr::null_mut()) };
         let ctx = Context {
@@ -415,8 +413,8 @@ fn test_suspend_failure() {
 fn test_shared_font_atlas() {
     let _guard = crate::test::TEST_MUTEX.lock();
     let atlas = SharedFontAtlas::create();
-    let suspended1 = SuspendedContext::create_with_shared_font_atlas(atlas.clone().into());
-    let mut ctx2 = Context::create_with_shared_font_atlas(atlas.into());
+    let suspended1 = SuspendedContext::create_with_shared_font_atlas(atlas.clone());
+    let mut ctx2 = Context::create_with_shared_font_atlas(atlas);
     {
         let _borrow = ctx2.fonts();
     }
