@@ -2,7 +2,7 @@ use crate::sys;
 use crate::Ui;
 
 /// # Columns
-impl<'ui> Ui<'ui> {
+impl Ui {
     #[doc(alias = "Columns")]
     pub fn columns(&self, count: i32, id: impl AsRef<str>, border: bool) {
         unsafe { sys::igColumns(count, self.scratch_txt(id), border) }

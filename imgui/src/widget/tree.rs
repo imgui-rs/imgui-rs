@@ -241,7 +241,7 @@ impl<T: AsRef<str>, L: AsRef<str>> TreeNode<T, L> {
     /// rendered, the token can be popped by calling `.pop()`.
     ///
     /// Returns `None` if the tree node is not open and no content should be rendered.
-    pub fn push<'ui>(self, ui: &Ui<'ui>) -> Option<TreeNodeToken<'ui>> {
+    pub fn push(self, ui: &Ui) -> Option<TreeNodeToken<'_>> {
         let open = unsafe {
             if self.opened_cond != Condition::Never {
                 sys::igSetNextItemOpen(self.opened, self.opened_cond as i32);
@@ -282,7 +282,7 @@ impl<T: AsRef<str>, L: AsRef<str>> TreeNode<T, L> {
     /// Returns the result of the closure, if it is called.
     ///
     /// Note: the closure is not called if the tree node is not open.
-    pub fn build<R, F: FnOnce() -> R>(self, ui: &Ui<'_>, f: F) -> Option<R> {
+    pub fn build<R, F: FnOnce() -> R>(self, ui: &Ui, f: F) -> Option<R> {
         self.push(ui).map(|_node| f())
     }
 }
@@ -292,11 +292,11 @@ impl<T: AsRef<str>, L: AsRef<str>> TreeNode<T, L> {
 /// If `TreeNodeFlags::NO_TREE_PUSH_ON_OPEN` was used when this token was created, calling `.pop()`
 /// is not mandatory and is a no-op.
 #[must_use]
-pub struct TreeNodeToken<'a>(core::marker::PhantomData<crate::Ui<'a>>, bool);
+pub struct TreeNodeToken<'a>(core::marker::PhantomData<&'a crate::Ui>, bool);
 
 impl<'a> TreeNodeToken<'a> {
     /// Creates a new token type. This takes a bool for the no-op variant on NO_TREE_PUSH_ON_OPEN.
-    pub(crate) fn new(_: &crate::Ui<'a>, execute_drop: bool) -> Self {
+    pub(crate) fn new(_: &crate::Ui, execute_drop: bool) -> Self {
         Self(std::marker::PhantomData, execute_drop)
     }
 
@@ -408,7 +408,7 @@ impl<T: AsRef<str>> CollapsingHeader<T> {
     ///
     /// This is the same as [build](Self::build) but is provided for consistent naming.
     #[must_use]
-    pub fn begin(self, ui: &Ui<'_>) -> bool {
+    pub fn begin(self, ui: &Ui) -> bool {
         self.build(ui)
     }
 
@@ -419,7 +419,7 @@ impl<T: AsRef<str>> CollapsingHeader<T> {
     /// This is the same as [build_with_close_button](Self::build_with_close_button)
     /// but is provided for consistent naming.
     #[must_use]
-    pub fn begin_with_close_button(self, ui: &Ui<'_>, opened: &mut bool) -> bool {
+    pub fn begin_with_close_button(self, ui: &Ui, opened: &mut bool) -> bool {
         self.build_with_close_button(ui, opened)
     }
 
@@ -428,7 +428,7 @@ impl<T: AsRef<str>> CollapsingHeader<T> {
     /// Returns true if the collapsing header is open and content should be rendered.
     #[must_use]
     #[inline]
-    pub fn build(self, ui: &Ui<'_>) -> bool {
+    pub fn build(self, ui: &Ui) -> bool {
         unsafe {
             sys::igCollapsingHeader_TreeNodeFlags(
                 ui.scratch_txt(self.label),
@@ -442,7 +442,7 @@ impl<T: AsRef<str>> CollapsingHeader<T> {
     /// Returns true if the collapsing header is open and content should be rendered.
     #[must_use]
     #[inline]
-    pub fn build_with_close_button(self, ui: &Ui<'_>, opened: &mut bool) -> bool {
+    pub fn build_with_close_button(self, ui: &Ui, opened: &mut bool) -> bool {
         unsafe {
             sys::igCollapsingHeader_BoolPtr(
                 ui.scratch_txt(self.label),
@@ -453,7 +453,7 @@ impl<T: AsRef<str>> CollapsingHeader<T> {
     }
 }
 
-impl Ui<'_> {
+impl Ui {
     /// Constructs a new collapsing header
     #[doc(alias = "CollapsingHeader")]
     pub fn collapsing_header(&self, label: impl AsRef<str>, flags: TreeNodeFlags) -> bool {

@@ -13,7 +13,7 @@ fn fmt_ptr() -> *const c_char {
 }
 
 /// # Widgets: Text
-impl<'ui> Ui<'ui> {
+impl Ui {
     /// Renders simple text
     #[doc(alias = "TextUnformatted")]
     pub fn text<T: AsRef<str>>(&self, text: T) {

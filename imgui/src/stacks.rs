@@ -1,17 +1,14 @@
-use std::mem;
-use std::os::raw::{c_char, c_void};
-use std::ptr;
-
-use crate::context::Context;
 use crate::fonts::atlas::FontId;
 use crate::internal::RawCast;
 use crate::math::MintVec4;
 use crate::style::{StyleColor, StyleVar};
 use crate::sys;
 use crate::{Id, Ui};
+use std::mem;
+use std::os::raw::{c_char, c_void};
 
 /// # Parameter stacks (shared)
-impl<'ui> Ui<'ui> {
+impl Ui {
     /// Switches to the given font by pushing it to the font stack.
     ///
     /// Returns a `FontStackToken` that must be popped by calling `.pop()`
@@ -180,7 +177,7 @@ unsafe fn push_style_var(style_var: StyleVar) {
 }
 
 /// # Parameter stacks (current window)
-impl<'ui> Ui<'ui> {
+impl Ui {
     /// Changes the item width by pushing a change to the item width stack.
     ///
     /// Returns an `ItemWidthStackToken` that may be popped by calling `.pop()`
@@ -190,9 +187,9 @@ impl<'ui> Ui<'ui> {
     /// - `< 0.0`: `item_width` pixels relative to the right of window (-1.0 always aligns width to
     /// the right side)
     #[doc(alias = "PushItemWith")]
-    pub fn push_item_width(&self, item_width: f32) -> ItemWidthStackToken {
+    pub fn push_item_width(&self, item_width: f32) -> ItemWidthStackToken<'_> {
         unsafe { sys::igPushItemWidth(item_width) };
-        ItemWidthStackToken { _ctx: self.ctx }
+        ItemWidthStackToken::new(self)
     }
     /// Sets the width of the next item.
     ///
@@ -220,7 +217,7 @@ impl<'ui> Ui<'ui> {
     ///
     /// Returns a `TextWrapPosStackToken` that may be popped by calling `.pop()`
     #[doc(alias = "PushTextWrapPos")]
-    pub fn push_text_wrap_pos(&self) -> TextWrapPosStackToken {
+    pub fn push_text_wrap_pos(&self) -> TextWrapPosStackToken<'_> {
         self.push_text_wrap_pos_with_pos(0.0)
     }
 
@@ -232,25 +229,58 @@ impl<'ui> Ui<'ui> {
     /// - `= 0.0`: wrap to end of window (or column)
     /// - `< 0.0`: no wrapping
     #[doc(alias = "PushTextWrapPos")]
-    pub fn push_text_wrap_pos_with_pos(&self, wrap_pos_x: f32) -> TextWrapPosStackToken {
+    pub fn push_text_wrap_pos_with_pos(&self, wrap_pos_x: f32) -> TextWrapPosStackToken<'_> {
         unsafe { sys::igPushTextWrapPos(wrap_pos_x) };
-        TextWrapPosStackToken { _ctx: self.ctx }
+        TextWrapPosStackToken::new(self)
+    }
+
+    /// Tab stop enable.
+    /// Allow focusing using TAB/Shift-TAB, enabled by default but you can
+    /// disable it for certain widgets
+    ///
+    /// Returns a [PushAllowKeyboardFocusToken] that should be dropped.
+    #[doc(alias = "PushAllowKeyboardFocus")]
+    pub fn push_allow_keyboard_focus(&self, allow: bool) -> PushAllowKeyboardFocusToken<'_> {
+        unsafe { sys::igPushAllowKeyboardFocus(allow) };
+        PushAllowKeyboardFocusToken::new(self)
+    }
+
+    /// In 'repeat' mode, button_x functions return repeated true in a typematic
+    /// manner (using io.KeyRepeatDelay/io.KeyRepeatRate setting).
+    /// Note that you can call IsItemActive() after any Button() to tell if the
+    /// button is held in the current frame.
+    ///
+    /// Returns a [PushButtonRepeatToken] that should be dropped.
+    #[doc(alias = "PushAllowKeyboardFocus")]
+    pub fn push_button_repeat(&self, allow: bool) -> PushButtonRepeatToken<'_> {
+        unsafe { sys::igPushButtonRepeat(allow) };
+        PushButtonRepeatToken::new(self)
     }
 
     /// Changes an item flag by pushing a change to the item flag stack.
     ///
     /// Returns a `ItemFlagsStackToken` that may be popped by calling `.pop()`
-    #[doc(alias = "PushItemFlag")]
-    pub fn push_item_flag(&self, item_flag: ItemFlag) -> ItemFlagsStackToken {
+    ///
+    /// ## Deprecated
+    ///
+    /// This was deprecated in `0.9.0` because it isn't part of the dear imgui design,
+    /// and supporting it required a manual implementation of its drop token.
+    ///
+    /// Instead, just use [`push_allow_keyboard_focus`] and [`push_button_repeat`].
+    ///
+    /// [`push_allow_keyboard_focus`]: Self::push_allow_keyboard_focus
+    /// [`push_button_repeat`]: Self::push_button_repeat
+    #[deprecated(
+        since = "0.9.0",
+        note = "use `push_allow_keyboard_focus` or `push_button_repeat` instead"
+    )]
+    pub fn push_item_flag(&self, item_flag: ItemFlag) -> ItemFlagsStackToken<'_> {
         use self::ItemFlag::*;
         match item_flag {
             AllowKeyboardFocus(v) => unsafe { sys::igPushAllowKeyboardFocus(v) },
             ButtonRepeat(v) => unsafe { sys::igPushButtonRepeat(v) },
         }
-        ItemFlagsStackToken {
-            discriminant: mem::discriminant(&item_flag),
-            _ctx: self.ctx,
-        }
+        ItemFlagsStackToken::new(self, item_flag)
     }
 }
 
@@ -261,54 +291,78 @@ pub enum ItemFlag {
     ButtonRepeat(bool),
 }
 
-pub struct ItemWidthStackToken {
-    _ctx: *const Context,
-}
+create_token!(
+    /// Tracks a window that can be ended by calling `.end()`
+    /// or by dropping.
+    pub struct ItemWidthStackToken<'ui>;
 
-impl ItemWidthStackToken {
-    /// Pops a change from the item width stack
+    /// Ends a window
     #[doc(alias = "PopItemWidth")]
-    pub fn pop(mut self, _: &Ui<'_>) {
-        self._ctx = ptr::null();
-        unsafe { sys::igPopItemWidth() };
-    }
-}
+    drop { sys::igPopItemWidth() }
+);
 
-/// Tracks a change pushed to the text wrap position stack
-pub struct TextWrapPosStackToken {
-    _ctx: *const Context,
-}
+create_token!(
+    /// Tracks a window that can be ended by calling `.end()`
+    /// or by dropping.
+    pub struct TextWrapPosStackToken<'ui>;
 
-impl TextWrapPosStackToken {
-    /// Pops a change from the text wrap position stack
+    /// Ends a window
     #[doc(alias = "PopTextWrapPos")]
-    pub fn pop(mut self, _: &Ui<'_>) {
-        self._ctx = ptr::null();
-        unsafe { sys::igPopTextWrapPos() };
+    drop { sys::igPopTextWrapPos() }
+);
+
+create_token!(
+    /// Tracks a window that can be ended by calling `.end()`
+    /// or by dropping.
+    pub struct PushAllowKeyboardFocusToken<'ui>;
+
+    /// Ends a window
+    #[doc(alias = "PopAllowKeyboardFocus")]
+    drop { sys::igPopAllowKeyboardFocus() }
+);
+
+create_token!(
+    /// Tracks a window that can be ended by calling `.end()`
+    /// or by dropping.
+    pub struct PushButtonRepeatToken<'ui>;
+
+    /// Ends a window
+    #[doc(alias = "PopButtonRepeat")]
+    drop { sys::igPopButtonRepeat() }
+);
+
+/// Tracks a change pushed to the item flags stack.
+///
+/// The "item flags" stack was a concept invented in imgui-rs that doesn't have an
+/// ImGui equivalent. We're phasing these out to make imgui-rs feel simpler to use.
+#[must_use]
+pub struct ItemFlagsStackToken<'a>(
+    std::marker::PhantomData<&'a Ui>,
+    mem::Discriminant<ItemFlag>,
+);
+
+impl<'a> ItemFlagsStackToken<'a> {
+    /// Creates a new token type.
+    pub(crate) fn new(_: &'a crate::Ui, kind: ItemFlag) -> Self {
+        Self(std::marker::PhantomData, mem::discriminant(&kind))
+    }
+
+    #[inline]
+    pub fn end(self) {
+        // left empty for drop
     }
 }
 
-/// Tracks a change pushed to the item flags stack
-pub struct ItemFlagsStackToken {
-    discriminant: mem::Discriminant<ItemFlag>,
-    _ctx: *const Context,
-}
-
-impl ItemFlagsStackToken {
-    /// Pops a change from the item flags stack
-
-    #[doc(alias = "PopAllowKeyboardFocus", alias = "PopButtonRepeat")]
-    pub fn pop(mut self, _: &Ui<'_>) {
-        self._ctx = ptr::null();
-        const ALLOW_KEYBOARD_FOCUS: ItemFlag = ItemFlag::AllowKeyboardFocus(true);
-        const BUTTON_REPEAT: ItemFlag = ItemFlag::ButtonRepeat(true);
-
-        if self.discriminant == mem::discriminant(&ALLOW_KEYBOARD_FOCUS) {
-            unsafe { sys::igPopAllowKeyboardFocus() };
-        } else if self.discriminant == mem::discriminant(&BUTTON_REPEAT) {
-            unsafe { sys::igPopButtonRepeat() };
-        } else {
-            unreachable!();
+impl Drop for ItemFlagsStackToken<'_> {
+    fn drop(&mut self) {
+        unsafe {
+            if self.1 == mem::discriminant(&ItemFlag::AllowKeyboardFocus(true)) {
+                sys::igPopAllowKeyboardFocus();
+            } else if self.1 == mem::discriminant(&ItemFlag::ButtonRepeat(true)) {
+                sys::igPopButtonRepeat();
+            } else {
+                unreachable!();
+            }
         }
     }
 }
@@ -330,7 +384,7 @@ impl IdStackToken<'_> {
 }
 
 /// # ID stack
-impl<'ui> Ui<'ui> {
+impl<'ui> Ui {
     /// Pushes an identifier to the ID stack.
     /// This can be called with an integer, a string, or a pointer.
     ///
@@ -408,7 +462,7 @@ impl<'ui> Ui<'ui> {
     /// });
     /// ```
     #[doc(alias = "PushId")]
-    pub fn push_id<'a, I: Into<Id<'a>>>(&self, id: I) -> IdStackToken<'ui> {
+    pub fn push_id<'a, I: Into<Id<'a>>>(&'ui self, id: I) -> IdStackToken<'ui> {
         let id = id.into();
 
         unsafe {

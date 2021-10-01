@@ -1,9 +1,8 @@
 use bitflags::bitflags;
-use std::cell;
 use std::f32;
-use std::ops::{Deref, DerefMut};
 use std::os::raw::{c_int, c_uchar, c_void};
 use std::ptr;
+use std::rc::Rc;
 use std::slice;
 
 use crate::fonts::font::Font;
@@ -433,76 +432,95 @@ pub struct FontAtlasTexture<'a> {
 }
 
 /// A font atlas that can be shared between contexts
-#[derive(Debug)]
-pub struct SharedFontAtlas(pub(crate) *mut sys::ImFontAtlas);
+#[derive(Debug, Clone)]
+pub struct SharedFontAtlas(pub(crate) Rc<*mut sys::ImFontAtlas>);
+
+impl std::ops::Deref for SharedFontAtlas {
+    type Target = Rc<*mut sys::ImFontAtlas>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+
+impl std::ops::DerefMut for SharedFontAtlas {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.0
+    }
+}
 
 impl SharedFontAtlas {
     #[doc(alias = "ImFontAtlas", alias = "ImFontAtlas::ImFontAtlas")]
     pub fn create() -> SharedFontAtlas {
-        SharedFontAtlas(unsafe { sys::ImFontAtlas_ImFontAtlas() })
+        SharedFontAtlas(unsafe { Rc::new(sys::ImFontAtlas_ImFontAtlas()) })
+    }
+
+    /// Gets a raw pointer to the underlying `ImFontAtlas`.
+    pub fn as_ptr(&self) -> *const sys::ImFontAtlas {
+        *self.0 as *const _
+    }
+
+    /// Gets a raw pointer to the underlying `ImFontAtlas`.
+    pub fn as_ptr_mut(&mut self) -> *mut sys::ImFontAtlas {
+        *self.0
     }
 }
 
 impl Drop for SharedFontAtlas {
     #[doc(alias = "ImFontAtlas::Destory")]
     fn drop(&mut self) {
-        unsafe { sys::ImFontAtlas_destroy(self.0) };
-    }
-}
-
-impl Deref for SharedFontAtlas {
-    type Target = FontAtlas;
-    fn deref(&self) -> &FontAtlas {
-        unsafe { &*(self.0 as *const FontAtlas) }
-    }
-}
-
-impl DerefMut for SharedFontAtlas {
-    fn deref_mut(&mut self) -> &mut FontAtlas {
-        unsafe { &mut *(self.0 as *mut FontAtlas) }
-    }
-}
-
-/// An immutably borrowed reference to a (possibly shared) font atlas
-pub enum FontAtlasRef<'a> {
-    Owned(&'a FontAtlas),
-    Shared(&'a cell::RefMut<'a, SharedFontAtlas>),
-}
-
-impl<'a> Deref for FontAtlasRef<'a> {
-    type Target = FontAtlas;
-    fn deref(&self) -> &FontAtlas {
-        use self::FontAtlasRef::*;
-        match self {
-            Owned(atlas) => atlas,
-            Shared(cell) => cell,
+        // if we're about to drop the last one...
+        if Rc::strong_count(&self.0) == 1 {
+            unsafe { sys::ImFontAtlas_destroy(*self.0) };
         }
     }
 }
 
-/// A mutably borrowed reference to a (possibly shared) font atlas
-pub enum FontAtlasRefMut<'a> {
-    Owned(&'a mut FontAtlas),
-    Shared(cell::RefMut<'a, SharedFontAtlas>),
-}
+// /// An immutably borrowed reference to a (possibly shared) font atlas
+// pub enum FontAtlasRef<'a> {
+//     Owned(&'a FontAtlas),
+//     Shared(&'a cell::RefMut<'a, SharedFontAtlas>),
+// }
 
-impl<'a> Deref for FontAtlasRefMut<'a> {
-    type Target = FontAtlas;
-    fn deref(&self) -> &FontAtlas {
-        use self::FontAtlasRefMut::*;
-        match self {
-            Owned(atlas) => atlas,
-            Shared(cell) => cell,
-        }
-    }
-}
+// impl<'a> Deref for FontAtlasRef<'a> {
+//     type Target = FontAtlas;
+//     fn deref(&self) -> &FontAtlas {
+//         use self::FontAtlasRef::*;
+//         match self {
+//             Owned(atlas) => atlas,
+//             Shared(cell) => {
+//                 let font_atlas: &SharedFontAtlas = &cell;
+//                 let font_atlas: &FontAtlas = &font_atlas;
 
-impl<'a> DerefMut for FontAtlasRefMut<'a> {
-    fn deref_mut(&mut self) -> &mut FontAtlas {
-        use self::FontAtlasRefMut::*;
-        match self {
-            Owned(atlas) => atlas,
-            Shared(cell) => cell,
-        }
-    }
-}
+//                 todo!()
+//             }
+//         }
+//     }
+// }
+
+// /// A mutably borrowed reference to a (possibly shared) font atlas
+// pub enum FontAtlasRefMut<'a> {
+//     Owned(&'a mut FontAtlas),
+//     Shared(cell::RefMut<'a, SharedFontAtlas>),
+// }
+
+// impl<'a> Deref for FontAtlasRefMut<'a> {
+//     type Target = FontAtlas;
+//     fn deref(&self) -> &FontAtlas {
+//         use self::FontAtlasRefMut::*;
+//         match self {
+//             Owned(atlas) => atlas,
+//             Shared(cell) => cell,
+//         }
+//     }
+// }
+
+// impl<'a> DerefMut for FontAtlasRefMut<'a> {
+//     fn deref_mut(&mut self) -> &mut FontAtlas {
+//         use self::FontAtlasRefMut::*;
+//         match self {
+//             Owned(atlas) => atlas,
+//             Shared(cell) => cell,
+//         }
+//     }
+// }

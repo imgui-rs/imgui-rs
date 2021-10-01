@@ -25,7 +25,7 @@ bitflags! {
 }
 
 /// # Item/widget utilities
-impl<'ui> Ui<'ui> {
+impl Ui {
     /// Returns `true` if the last item is hovered
     #[doc(alias = "IsItemHovered")]
     pub fn is_item_hovered(&self) -> bool {
@@ -142,7 +142,7 @@ impl<'ui> Ui<'ui> {
 }
 
 /// # Miscellaneous utilities
-impl<'ui> Ui<'ui> {
+impl Ui {
     /// Returns `true` if the rectangle (of given size, starting from cursor position) is visible
     #[doc(alias = "IsRectVisibleNil")]
     pub fn is_cursor_rect_visible(&self, size: impl Into<MintVec2>) -> bool {
@@ -177,7 +177,7 @@ impl<'ui> Ui<'ui> {
     /// style object.
     #[doc(alias = "GetStyle")]
     pub fn style_color(&self, style_color: StyleColor) -> [f32; 4] {
-        self.ctx.style()[style_color]
+        unsafe { self.style() }.colors[style_color as usize]
     }
 
     /// Returns a shared reference to the current [`Style`].
@@ -193,6 +193,7 @@ impl<'ui> Ui<'ui> {
     /// pop. The [`clone_style`](Ui::clone_style) version may instead be used to avoid `unsafe`.
     #[doc(alias = "GetStyle")]
     pub unsafe fn style(&self) -> &Style {
-        self.ctx.style()
+        // safe because Style is a transparent wrapper around sys::ImGuiStyle
+        &*(sys::igGetStyle() as *const Style)
     }
 }

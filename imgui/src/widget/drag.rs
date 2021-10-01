@@ -66,7 +66,7 @@ impl<L: AsRef<str>, T: DataTypeKind, F: AsRef<str>> Drag<T, L, F> {
     /// Builds a drag slider that is bound to the given value.
     ///
     /// Returns true if the slider value was changed.
-    pub fn build(self, ui: &Ui<'_>, value: &mut T) -> bool {
+    pub fn build(self, ui: &Ui, value: &mut T) -> bool {
         unsafe {
             let (one, two) = ui.scratch_txt_with_opt(self.label, self.display_format);
 
@@ -91,7 +91,7 @@ impl<L: AsRef<str>, T: DataTypeKind, F: AsRef<str>> Drag<T, L, F> {
     /// Builds a horizontal array of multiple drag sliders attached to the given slice.
     ///
     /// Returns true if any slider value was changed.
-    pub fn build_array(self, ui: &Ui<'_>, values: &mut [T]) -> bool {
+    pub fn build_array(self, ui: &Ui, values: &mut [T]) -> bool {
         unsafe {
             let (one, two) = ui.scratch_txt_with_opt(self.label, self.display_format);
 
@@ -208,14 +208,14 @@ where
     ///
     /// Returns true if the slider value was changed.
     #[doc(alias = "DragFloatRange2")]
-    pub fn build(self, ui: &Ui<'_>, min: &mut f32, max: &mut f32) -> bool {
+    pub fn build(self, ui: &Ui, min: &mut f32, max: &mut f32) -> bool {
         let label;
         let mut display_format = std::ptr::null();
         let mut max_display_format = std::ptr::null();
 
         // we do this ourselves the long way...
         unsafe {
-            let buffer = &mut *ui.buffer.get();
+            let buffer = &mut *ui.scratch_buffer().get();
             buffer.refresh_buffer();
 
             label = buffer.push(self.label);
@@ -251,14 +251,14 @@ where
     ///
     /// Returns true if the slider value was changed.
     #[doc(alias = "DragIntRange2")]
-    pub fn build(self, ui: &Ui<'_>, min: &mut i32, max: &mut i32) -> bool {
+    pub fn build(self, ui: &Ui, min: &mut i32, max: &mut i32) -> bool {
         unsafe {
             let label;
             let mut display_format = std::ptr::null();
             let mut max_display_format = std::ptr::null();
 
             // we do this ourselves the long way...
-            let buffer = &mut *ui.buffer.get();
+            let buffer = &mut *ui.scratch_buffer().get();
             buffer.refresh_buffer();
 
             label = buffer.push(self.label);

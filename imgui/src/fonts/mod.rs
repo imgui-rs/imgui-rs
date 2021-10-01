@@ -8,7 +8,7 @@ pub mod glyph;
 pub mod glyph_ranges;
 
 /// # Fonts
-impl<'ui> Ui<'ui> {
+impl Ui {
     /// Returns the current font
     #[doc(alias = "GetFont")]
     pub fn current_font(&self) -> &Font {

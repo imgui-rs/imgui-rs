@@ -1,17 +1,16 @@
 use parking_lot::ReentrantMutex;
-use std::cell::{RefCell, UnsafeCell};
+use std::cell::UnsafeCell;
 use std::ffi::{CStr, CString};
 use std::ops::Drop;
 use std::path::PathBuf;
 use std::ptr;
-use std::rc::Rc;
 
 use crate::clipboard::{ClipboardBackend, ClipboardContext};
-use crate::fonts::atlas::{FontAtlas, FontAtlasRefMut, FontId, SharedFontAtlas};
+use crate::fonts::atlas::{FontAtlas, FontId, SharedFontAtlas};
 use crate::io::Io;
 use crate::style::Style;
-use crate::sys;
 use crate::Ui;
+use crate::{sys, DrawData};
 
 /// An imgui-rs context.
 ///
@@ -50,7 +49,7 @@ use crate::Ui;
 #[derive(Debug)]
 pub struct Context {
     raw: *mut sys::ImGuiContext,
-    shared_font_atlas: Option<Rc<RefCell<SharedFontAtlas>>>,
+    shared_font_atlas: Option<SharedFontAtlas>,
     ini_filename: Option<CString>,
     log_filename: Option<CString>,
     platform_name: Option<CString>,
@@ -60,6 +59,8 @@ pub struct Context {
     // we also put it in an unsafecell since we're going to give
     // imgui a mutable pointer to it.
     clipboard_ctx: Box<UnsafeCell<ClipboardContext>>,
+
+    ui: Ui,
 }
 
 // This mutex needs to be used to guard all public functions that can affect the underlying
@@ -92,7 +93,7 @@ impl Context {
     ///
     /// Panics if an active context already exists
     #[doc(alias = "CreateContext")]
-    pub fn create_with_shared_font_atlas(shared_font_atlas: Rc<RefCell<SharedFontAtlas>>) -> Self {
+    pub fn create_with_shared_font_atlas(shared_font_atlas: SharedFontAtlas) -> Self {
         Self::create_internal(Some(shared_font_atlas))
     }
     /// Suspends this context so another context can be the active context.
@@ -215,18 +216,15 @@ impl Context {
         io.clipboard_user_data = clipboard_ctx.get() as *mut _;
         self.clipboard_ctx = clipboard_ctx;
     }
-    fn create_internal(shared_font_atlas: Option<Rc<RefCell<SharedFontAtlas>>>) -> Self {
+    fn create_internal(mut shared_font_atlas: Option<SharedFontAtlas>) -> Self {
         let _guard = CTX_MUTEX.lock();
         assert!(
             no_current_context(),
             "A new active context cannot be created, because another one already exists"
         );
 
-        let shared_font_atlas_ptr = match &shared_font_atlas {
-            Some(shared_font_atlas) => {
-                let borrowed_font_atlas = shared_font_atlas.borrow();
-                borrowed_font_atlas.0
-            }
+        let shared_font_atlas_ptr = match &mut shared_font_atlas {
+            Some(shared_font_atlas) => shared_font_atlas.as_ptr_mut(),
             None => ptr::null_mut(),
         };
         // Dear ImGui implicitly sets the current context during igCreateContext if the current
@@ -241,6 +239,9 @@ impl Context {
             platform_name: None,
             renderer_name: None,
             clipboard_ctx: Box::new(ClipboardContext::dummy().into()),
+            ui: Ui {
+                buffer: UnsafeCell::new(crate::string::UiBuffer::new(1024)),
+            },
         }
     }
     fn is_current_context(&self) -> bool {
@@ -256,6 +257,10 @@ impl Drop for Context {
         // If this context is the active context, Dear ImGui automatically deactivates it during
         // destruction
         unsafe {
+            // end the frame if necessary...
+            if !sys::igGetCurrentContext().is_null() && sys::igGetFrameCount() > 0 {
+                sys::igEndFrame();
+            }
             sys::igDestroyContext(self.raw);
         }
     }
@@ -289,8 +294,9 @@ impl SuspendedContext {
     pub fn create() -> Self {
         Self::create_internal(None)
     }
+
     /// Creates a new suspended imgui-rs context with a shared font atlas.
-    pub fn create_with_shared_font_atlas(shared_font_atlas: Rc<RefCell<SharedFontAtlas>>) -> Self {
+    pub fn create_with_shared_font_atlas(shared_font_atlas: SharedFontAtlas) -> Self {
         Self::create_internal(Some(shared_font_atlas))
     }
     /// Attempts to activate this suspended context.
@@ -311,7 +317,7 @@ impl SuspendedContext {
             Err(self)
         }
     }
-    fn create_internal(shared_font_atlas: Option<Rc<RefCell<SharedFontAtlas>>>) -> Self {
+    fn create_internal(shared_font_atlas: Option<SharedFontAtlas>) -> Self {
         let _guard = CTX_MUTEX.lock();
         let raw = unsafe { sys::igCreateContext(ptr::null_mut()) };
         let ctx = Context {
@@ -322,6 +328,9 @@ impl SuspendedContext {
             platform_name: None,
             renderer_name: None,
             clipboard_ctx: Box::new(ClipboardContext::dummy().into()),
+            ui: Ui {
+                buffer: UnsafeCell::new(crate::string::UiBuffer::new(1024)),
+            },
         };
         if ctx.is_current_context() {
             // Oops, the context was activated -> deactivate
@@ -403,7 +412,7 @@ fn test_suspend_failure() {
 #[test]
 fn test_shared_font_atlas() {
     let _guard = crate::test::TEST_MUTEX.lock();
-    let atlas = Rc::new(RefCell::new(SharedFontAtlas::create()));
+    let atlas = SharedFontAtlas::create();
     let suspended1 = SuspendedContext::create_with_shared_font_atlas(atlas.clone());
     let mut ctx2 = Context::create_with_shared_font_atlas(atlas);
     {
@@ -412,17 +421,6 @@ fn test_shared_font_atlas() {
     let _suspended2 = ctx2.suspend();
     let mut ctx = suspended1.activate().unwrap();
     let _borrow = ctx.fonts();
-}
-
-#[test]
-#[should_panic]
-fn test_shared_font_atlas_borrow_panic() {
-    let _guard = crate::test::TEST_MUTEX.lock();
-    let atlas = Rc::new(RefCell::new(SharedFontAtlas::create()));
-    let _suspended = SuspendedContext::create_with_shared_font_atlas(atlas.clone());
-    let mut ctx = Context::create_with_shared_font_atlas(atlas.clone());
-    let _borrow1 = atlas.borrow();
-    let _borrow2 = ctx.fonts();
 }
 
 #[test]
@@ -498,45 +496,51 @@ impl Context {
         }
     }
     /// Returns a mutable reference to the font atlas.
-    ///
-    /// # Panics
-    ///
-    /// Panics if the context uses a shared font atlas that is already borrowed
-    pub fn fonts(&mut self) -> FontAtlasRefMut<'_> {
-        match self.shared_font_atlas {
-            Some(ref font_atlas) => FontAtlasRefMut::Shared(font_atlas.borrow_mut()),
-            None => unsafe {
-                // safe because FontAtlas is a transparent wrapper around sys::ImFontAtlas
-                let fonts = &mut *(self.io_mut().fonts as *mut FontAtlas);
-                FontAtlasRefMut::Owned(fonts)
-            },
-        }
+    pub fn fonts(&mut self) -> &mut FontAtlas {
+        // we take this with an `&mut Self` here, which means
+        // that we can't get the sharedfontatlas through safe code
+        // otherwise
+        unsafe { &mut *(self.io_mut().fonts as *mut FontAtlas) }
     }
+
+    /// Attempts to clone the interior shared font atlas **if it exists**.
+    pub fn clone_shared_font_atlas(&mut self) -> Option<SharedFontAtlas> {
+        self.shared_font_atlas.clone()
+    }
+
+    /// Starts a new frame. Use [`new_frame`] instead.
+    ///
+    /// [`new_frame`]: Self::new_frame
+    pub fn frame(&mut self) -> &mut Ui {
+        self.new_frame()
+    }
+
     /// Starts a new frame and returns an `Ui` instance for constructing a user interface.
-    ///
-    /// # Panics
-    ///
-    /// Panics if the context uses a shared font atlas that is already borrowed
     #[doc(alias = "NewFame")]
-    pub fn frame(&mut self) -> Ui<'_> {
+    pub fn new_frame(&mut self) -> &mut Ui {
         // Clear default font if it no longer exists. This could be an error in the future
         let default_font = self.io().font_default;
         if !default_font.is_null() && self.fonts().get_font(FontId(default_font)).is_none() {
             self.io_mut().font_default = ptr::null_mut();
         }
-        // NewFrame/Render/EndFrame mutate the font atlas so we need exclusive access to it
-        let font_atlas = self
-            .shared_font_atlas
-            .as_ref()
-            .map(|font_atlas| font_atlas.borrow_mut());
         // TODO: precondition checks
         unsafe {
             sys::igNewFrame();
         }
-        Ui {
-            ctx: self,
-            font_atlas,
-            buffer: crate::UiBuffer::new(1024).into(),
+
+        &mut self.ui
+    }
+
+    /// Renders the frame and returns a reference to the resulting draw data.
+    ///
+    /// This should only be called after calling [`new_frame`].
+    ///
+    /// [`new_frame`]: Self::new_frame
+    #[doc(alias = "Render", alias = "GetDrawData")]
+    pub fn render(&mut self) -> &DrawData {
+        unsafe {
+            sys::igRender();
+            &*(sys::igGetDrawData() as *mut DrawData)
         }
     }
 }

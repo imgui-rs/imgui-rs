@@ -91,7 +91,7 @@ impl FocusedWidget {
 }
 
 /// # Input: Keyboard
-impl<'ui> Ui<'ui> {
+impl Ui {
     /// Returns the key index of the given key identifier.
     ///
     /// Equivalent to indexing the Io struct `key_map` field: `ui.io().key_map[key]`

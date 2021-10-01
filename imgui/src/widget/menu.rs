@@ -3,7 +3,7 @@ use crate::sys;
 use crate::Ui;
 
 /// # Widgets: Menus
-impl<'ui> Ui<'ui> {
+impl Ui {
     /// Creates and starts appending to a full-screen menu bar.
     ///
     /// Returns `Some(MainMenuBarToken)` if the menu bar is visible. After content has been
@@ -12,7 +12,7 @@ impl<'ui> Ui<'ui> {
     /// Returns `None` if the menu bar is not visible and no content should be rendered.
     #[must_use]
     #[doc(alias = "BeginMainMenuBar")]
-    pub fn begin_main_menu_bar(&self) -> Option<MainMenuBarToken<'ui>> {
+    pub fn begin_main_menu_bar(&self) -> Option<MainMenuBarToken<'_>> {
         if unsafe { sys::igBeginMainMenuBar() } {
             Some(MainMenuBarToken::new(self))
         } else {
@@ -167,7 +167,7 @@ impl<Label: AsRef<str>, Shortcut: AsRef<str>> MenuItem<Label, Shortcut> {
     ///
     /// Returns true if the menu item is activated.
     #[doc(alias = "MenuItemBool")]
-    pub fn build(self, ui: &Ui<'_>) -> bool {
+    pub fn build(self, ui: &Ui) -> bool {
         unsafe {
             let (label, shortcut) = ui.scratch_txt_with_opt(self.label, self.shortcut);
             sys::igMenuItem_Bool(label, shortcut, self.selected, self.enabled)
@@ -176,7 +176,7 @@ impl<Label: AsRef<str>, Shortcut: AsRef<str>> MenuItem<Label, Shortcut> {
 
     #[doc(alias = "MenuItemBool")]
     /// Builds the menu item using a mutable reference to selected state.
-    pub fn build_with_ref(self, ui: &Ui<'_>, selected: &mut bool) -> bool {
+    pub fn build_with_ref(self, ui: &Ui, selected: &mut bool) -> bool {
         if self.selected(*selected).build(ui) {
             *selected = !*selected;
             true

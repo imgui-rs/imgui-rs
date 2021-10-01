@@ -4,6 +4,7 @@
 
 pub extern crate imgui_sys as sys;
 
+use std::cell;
 use std::os::raw::{c_char, c_void};
 
 pub use self::clipboard::*;
@@ -115,16 +116,31 @@ impl Context {
     }
 }
 
-/// A temporary reference for building the user interface for one frame
+/// A reference for building the user interface for one frame
 #[derive(Debug)]
-pub struct Ui<'ui> {
-    ctx: &'ui Context,
-    font_atlas: Option<std::cell::RefMut<'ui, SharedFontAtlas>>,
-    // imgui isn't mutli-threaded -- so no one will ever access twice.
-    buffer: std::cell::UnsafeCell<string::UiBuffer>,
+pub struct Ui {
+    /// our scratch sheet
+    buffer: cell::UnsafeCell<string::UiBuffer>,
 }
 
-impl<'ui> Ui<'ui> {
+impl Ui {
+    /// This provides access to the backing scratch buffer that we use to write
+    /// strings, along with null-terminators, before we pass normal Rust strs to
+    /// Dear ImGui.
+    ///
+    /// This is given as a get-out-of-jail free card if you need to handle the buffer,
+    /// or, for example, resize it for some reason. Generally, you should never need this.
+    ///
+    /// ## Safety
+    ///
+    /// This uses a **static mut** and we assume it will *never* be passed between threads.
+    /// Do not pass the raw pointer you get between threads at all -- Dear ImGui is single-threaded.
+    /// We otherwise make no assumptions about the size or keep state in this buffer between calls,
+    /// so editing the `UiBuffer` is fine.
+    pub unsafe fn scratch_buffer(&self) -> &cell::UnsafeCell<string::UiBuffer> {
+        &self.buffer
+    }
+
     /// Internal method to push a single text to our scratch buffer.
     fn scratch_txt(&self, txt: impl AsRef<str>) -> *const sys::cty::c_char {
         unsafe {
@@ -169,43 +185,44 @@ impl<'ui> Ui<'ui> {
         unsafe { &*(sys::igGetIO() as *const Io) }
     }
 
-    /// Returns an immutable reference to the font atlas
-    pub fn fonts(&self) -> FontAtlasRef<'_> {
-        match self.font_atlas {
-            Some(ref font_atlas) => FontAtlasRef::Shared(font_atlas),
-            None => unsafe {
-                let fonts = &*(self.io().fonts as *const FontAtlas);
-                FontAtlasRef::Owned(fonts)
-            },
-        }
+    /// Returns an immutable reference to the font atlas.
+    pub fn fonts(&self) -> &FontAtlas {
+        unsafe { &*(self.io().fonts as *const FontAtlas) }
     }
+
     /// Returns a clone of the user interface style
     pub fn clone_style(&self) -> Style {
-        *self.ctx.style()
+        unsafe { *self.style() }
     }
-    /// Renders the frame and returns a reference to the resulting draw data
-    #[doc(alias = "Render", alias = "GetDrawData")]
-    pub fn render(self) -> &'ui DrawData {
-        unsafe {
-            sys::igRender();
-            &*(sys::igGetDrawData() as *mut DrawData)
-        }
-    }
-}
 
-impl<'a> Drop for Ui<'a> {
-    #[doc(alias = "EndFrame")]
-    fn drop(&mut self) {
-        if !std::thread::panicking() {
-            unsafe {
-                sys::igEndFrame();
-            }
+    /// This function, and the library's api, has been changed as of `0.9`!
+    /// Do not use this function! Instead, use [`Context::render`],
+    /// which does what this function in `0.8` used to do.
+    ///
+    /// This function right now simply **ends** the current frame, but does not
+    /// return draw data. If you want to end the frame without generated draw data,
+    /// and thus save some CPU time, use [`end_frame_early`].
+    #[deprecated(
+        since = "0.9.0",
+        note = "use `Context::render` to render frames, or `end_frame_early` to not render at all"
+    )]
+    pub fn render(&mut self) {
+        self.end_frame_early();
+    }
+
+    /// Use this function to end the frame early.
+    /// After this call, you should **stop using the `Ui` object till `new_frame` has been called.**
+    ///
+    /// You probably *don't want this function.* If you want to render your data, use `Context::render` now.
+    pub fn end_frame_early(&mut self) {
+        unsafe {
+            sys::igEndFrame();
         }
     }
 }
 
 /// # Demo, debug, information
-impl<'ui> Ui<'ui> {
+impl Ui {
     /// Renders a demo window (previously called a test window), which demonstrates most
     /// Dear Imgui features.
     #[doc(alias = "ShowDemoWindow")]
@@ -316,7 +333,7 @@ impl<'a> Default for Id<'a> {
     }
 }
 
-impl<'ui> Ui<'ui> {
+impl Ui {
     /// # Windows
     /// Start constructing a window.
     ///
@@ -338,7 +355,7 @@ impl<'ui> Ui<'ui> {
     ///         ui.text("An example");
     ///     });
     /// ```
-    pub fn window<Label: AsRef<str>>(&'ui self, name: Label) -> Window<'ui, '_, Label> {
+    pub fn window<Label: AsRef<str>>(&self, name: Label) -> Window<'_, '_, Label> {
         Window::new(self, name)
     }
 
@@ -357,13 +374,13 @@ impl<'ui> Ui<'ui> {
     ///     wt.unwrap().end()
     /// }
     /// ```
-    pub fn child_window<Label: AsRef<str>>(&'ui self, name: Label) -> ChildWindow<'ui, Label> {
+    pub fn child_window<Label: AsRef<str>>(&self, name: Label) -> ChildWindow<'_, Label> {
         ChildWindow::new(self, name)
     }
 }
 
 // Widgets: Input
-impl<'ui> Ui<'ui> {
+impl<'ui> Ui {
     #[doc(alias = "InputText", alias = "InputTextWithHint")]
     pub fn input_text<'p, L: AsRef<str>>(
         &'ui self,
@@ -475,7 +492,7 @@ create_token!(
 );
 
 /// # Tooltips
-impl<'ui> Ui<'ui> {
+impl Ui {
     /// Construct a tooltip window that can have any kind of content.
     ///
     /// Typically used with `Ui::is_item_hovered()` or some other conditional check.
@@ -542,7 +559,7 @@ create_token!(
 /// imgui can disable widgets so they don't react to mouse/keyboard
 /// inputs, and are displayed differently (currently dimmed by an
 /// amount set in [`Style::disabled_alpha`])
-impl<'ui> Ui<'ui> {
+impl Ui {
     /// Creates a scope where interactions are disabled.
     ///
     /// Scope ends when returned token is dropped, or `.end()` is
@@ -604,7 +621,7 @@ impl<'ui> Ui<'ui> {
 }
 
 // Widgets: ListBox
-impl<'ui> Ui<'ui> {
+impl Ui {
     #[doc(alias = "ListBox")]
     pub fn list_box<'p, StringType: AsRef<str> + ?Sized>(
         &self,
@@ -614,7 +631,7 @@ impl<'ui> Ui<'ui> {
         height_in_items: i32,
     ) -> bool {
         let (label_ptr, items_inner) = unsafe {
-            let handle = &mut *self.buffer.get();
+            let handle = &mut *self.scratch_buffer().get();
 
             handle.refresh_buffer();
             let label_ptr = handle.push(label);
@@ -671,7 +688,7 @@ impl<'ui> Ui<'ui> {
     // }
 }
 
-impl<'ui> Ui<'ui> {
+impl<'ui> Ui {
     #[doc(alias = "PlotLines")]
     pub fn plot_lines<'p, Label: AsRef<str>>(
         &'ui self,
@@ -680,9 +697,7 @@ impl<'ui> Ui<'ui> {
     ) -> PlotLines<'ui, 'p, Label> {
         PlotLines::new(self, label, values)
     }
-}
 
-impl<'ui> Ui<'ui> {
     #[doc(alias = "PlotHistogram")]
     pub fn plot_histogram<'p, Label: AsRef<str>>(
         &'ui self,
@@ -691,9 +706,7 @@ impl<'ui> Ui<'ui> {
     ) -> PlotHistogram<'ui, 'p, Label> {
         PlotHistogram::new(self, label, values)
     }
-}
 
-impl<'ui> Ui<'ui> {
     /// Calculate the size required for a given text string.
     ///
     /// This is the same as [calc_text_size_with_opts](Self::calc_text_size_with_opts)
@@ -736,7 +749,7 @@ impl<'ui> Ui<'ui> {
 }
 
 /// # Draw list for custom drawing
-impl<'ui> Ui<'ui> {
+impl Ui {
     /// Get access to drawing API
     ///
     /// # Examples
@@ -768,19 +781,19 @@ impl<'ui> Ui<'ui> {
     /// ```
     #[must_use]
     #[doc(alias = "GetWindowDrawList")]
-    pub fn get_window_draw_list(&'ui self) -> DrawListMut<'ui> {
+    pub fn get_window_draw_list(&self) -> DrawListMut<'_> {
         DrawListMut::window(self)
     }
 
     #[must_use]
     #[doc(alias = "GetBackgroundDrawList")]
-    pub fn get_background_draw_list(&'ui self) -> DrawListMut<'ui> {
+    pub fn get_background_draw_list(&self) -> DrawListMut<'_> {
         DrawListMut::background(self)
     }
 
     #[must_use]
     #[doc(alias = "GetForegroundDrawList")]
-    pub fn get_foreground_draw_list(&'ui self) -> DrawListMut<'ui> {
+    pub fn get_foreground_draw_list(&self) -> DrawListMut<'_> {
         DrawListMut::foreground(self)
     }
 }

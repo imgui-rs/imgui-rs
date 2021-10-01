@@ -12,11 +12,11 @@ pub struct PlotHistogram<'ui, 'p, Label, Overlay = &'static str> {
     scale_min: f32,
     scale_max: f32,
     graph_size: [f32; 2],
-    ui: &'ui Ui<'ui>,
+    ui: &'ui Ui,
 }
 
 impl<'ui, 'p, Label: AsRef<str>> PlotHistogram<'ui, 'p, Label> {
-    pub fn new(ui: &'ui Ui<'ui>, label: Label, values: &'p [f32]) -> Self {
+    pub fn new(ui: &'ui Ui, label: Label, values: &'p [f32]) -> Self {
         PlotHistogram {
             label,
             values,

@@ -2,7 +2,7 @@ use crate::sys;
 use crate::Ui;
 
 /// # Window scrolling
-impl<'ui> Ui<'ui> {
+impl Ui {
     /// Returns the horizontal scrolling position.
     ///
     /// Value is between 0.0 and self.scroll_max_x().

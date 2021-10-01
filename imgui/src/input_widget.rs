@@ -166,7 +166,7 @@ pub struct InputText<'ui, 'p, L, H = &'static str, T = PassthroughCallback> {
     buf: &'p mut String,
     callback_handler: T,
     flags: InputTextFlags,
-    ui: &'ui Ui<'ui>,
+    ui: &'ui Ui,
 }
 
 impl<'ui, 'p, L: AsRef<str>> InputText<'ui, 'p, L> {
@@ -184,7 +184,7 @@ impl<'ui, 'p, L: AsRef<str>> InputText<'ui, 'p, L> {
     /// your string.
     /// 3. Truncations by ImGui appear to be done primarily by insertions of `\0` to the truncation point.
     /// We will handle this for you and edit the string "properly" too, but this might show up in callbacks.
-    pub fn new(ui: &'ui Ui<'ui>, label: L, buf: &'p mut String) -> Self {
+    pub fn new(ui: &'ui Ui, label: L, buf: &'p mut String) -> Self {
         InputText {
             label,
             hint: None,
@@ -343,7 +343,7 @@ pub struct InputTextMultiline<'ui, 'p, L, T = PassthroughCallback> {
     flags: InputTextFlags,
     size: [f32; 2],
     callback_handler: T,
-    ui: &'ui Ui<'ui>,
+    ui: &'ui Ui,
 }
 
 impl<'ui, 'p, L: AsRef<str>> InputTextMultiline<'ui, 'p, L, PassthroughCallback> {
@@ -361,7 +361,7 @@ impl<'ui, 'p, L: AsRef<str>> InputTextMultiline<'ui, 'p, L, PassthroughCallback>
     /// your string.
     /// 3. Truncations by ImGui appear to be done primarily by insertions of `\0` to the truncation point.
     /// We will handle this for you and edit the string "properly" too, but this might show up in callbacks.
-    pub fn new(ui: &'ui Ui<'ui>, label: L, buf: &'p mut String, size: impl Into<MintVec2>) -> Self {
+    pub fn new(ui: &'ui Ui, label: L, buf: &'p mut String, size: impl Into<MintVec2>) -> Self {
         InputTextMultiline {
             label,
             buf,
@@ -482,11 +482,11 @@ pub struct InputInt<'ui, 'p, L> {
     step: i32,
     step_fast: i32,
     flags: InputTextFlags,
-    ui: &'ui Ui<'ui>,
+    ui: &'ui Ui,
 }
 
 impl<'ui, 'p, L: AsRef<str>> InputInt<'ui, 'p, L> {
-    pub fn new(ui: &'ui Ui<'ui>, label: L, value: &'p mut i32) -> Self {
+    pub fn new(ui: &'ui Ui, label: L, value: &'p mut i32) -> Self {
         InputInt {
             label,
             value,
@@ -520,11 +520,11 @@ pub struct InputFloat<'ui, 'p, L> {
     step: f32,
     step_fast: f32,
     flags: InputTextFlags,
-    ui: &'ui Ui<'ui>,
+    ui: &'ui Ui,
 }
 
 impl<'ui, 'p, L: AsRef<str>> InputFloat<'ui, 'p, L> {
-    pub fn new(ui: &'ui Ui<'ui>, label: L, value: &'p mut f32) -> Self {
+    pub fn new(ui: &'ui Ui, label: L, value: &'p mut f32) -> Self {
         InputFloat {
             label,
             value,
@@ -559,7 +559,7 @@ macro_rules! impl_input_floatn {
             label: L,
             value: &'p mut T,
             flags: InputTextFlags,
-            ui: &'ui Ui<'ui>,
+            ui: &'ui Ui,
         }
 
         impl<'ui, 'p, L, T> $InputFloatN<'ui, 'p, L, T>
@@ -568,7 +568,7 @@ macro_rules! impl_input_floatn {
             T: Copy + Into<$MINT_TARGET>,
             $MINT_TARGET: Into<T> + Into<[f32; $N]>,
         {
-            pub fn new(ui: &'ui Ui<'ui>, label: L, value: &'p mut T) -> Self {
+            pub fn new(ui: &'ui Ui, label: L, value: &'p mut T) -> Self {
                 $InputFloatN {
                     label,
                     value,
@@ -614,7 +614,7 @@ macro_rules! impl_input_intn {
             label: L,
             value: &'p mut T,
             flags: InputTextFlags,
-            ui: &'ui Ui<'ui>,
+            ui: &'ui Ui,
         }
 
         impl<'ui, 'p, L, T> $InputIntN<'ui, 'p, L, T>
@@ -623,7 +623,7 @@ macro_rules! impl_input_intn {
             T: Copy + Into<$MINT_TARGET>,
             $MINT_TARGET: Into<T> + Into<[i32; $N]>,
         {
-            pub fn new(ui: &'ui Ui<'ui>, label: L, value: &'p mut T) -> Self {
+            pub fn new(ui: &'ui Ui, label: L, value: &'p mut T) -> Self {
                 $InputIntN {
                     label,
                     value,

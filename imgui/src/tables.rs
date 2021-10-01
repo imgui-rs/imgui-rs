@@ -249,7 +249,7 @@ pub enum TableSortDirection {
     Descending,
 }
 
-impl<'ui> Ui<'ui> {
+impl Ui {
     /// Begins a table with no flags and with standard sizing contraints.
     ///
     /// This does no work on styling the headers (the top row) -- see either
@@ -263,7 +263,7 @@ impl<'ui> Ui<'ui> {
         &self,
         str_id: impl AsRef<str>,
         column_count: usize,
-    ) -> Option<TableToken<'ui>> {
+    ) -> Option<TableToken<'_>> {
         self.begin_table_with_flags(str_id, column_count, TableFlags::empty())
     }
 
@@ -281,7 +281,7 @@ impl<'ui> Ui<'ui> {
         str_id: impl AsRef<str>,
         column_count: usize,
         flags: TableFlags,
-    ) -> Option<TableToken<'ui>> {
+    ) -> Option<TableToken<'_>> {
         self.begin_table_with_sizing(str_id, column_count, flags, [0.0, 0.0], 0.0)
     }
 
@@ -302,7 +302,7 @@ impl<'ui> Ui<'ui> {
         flags: TableFlags,
         outer_size: [f32; 2],
         inner_width: f32,
-    ) -> Option<TableToken<'ui>> {
+    ) -> Option<TableToken<'_>> {
         unsafe {
             sys::igBeginTable(
                 self.scratch_txt(str_id),
@@ -324,7 +324,7 @@ impl<'ui> Ui<'ui> {
         &self,
         str_id: impl AsRef<str>,
         column_data: [TableColumnSetup<'a, Name>; N],
-    ) -> Option<TableToken<'ui>> {
+    ) -> Option<TableToken<'_>> {
         self.begin_table_header_with_flags(str_id, column_data, TableFlags::empty())
     }
 
@@ -338,7 +338,7 @@ impl<'ui> Ui<'ui> {
         str_id: impl AsRef<str>,
         column_data: [TableColumnSetup<'a, Name>; N],
         flags: TableFlags,
-    ) -> Option<TableToken<'ui>> {
+    ) -> Option<TableToken<'_>> {
         self.begin_table_header_with_sizing(str_id, column_data, flags, [0.0, 0.0], 0.0)
     }
 
@@ -354,7 +354,7 @@ impl<'ui> Ui<'ui> {
         flags: TableFlags,
         outer_size: [f32; 2],
         inner_width: f32,
-    ) -> Option<TableToken<'ui>> {
+    ) -> Option<TableToken<'_>> {
         self.begin_table_with_sizing(str_id, N, flags, outer_size, inner_width)
             .map(|data| {
                 for value in column_data {
@@ -769,7 +769,7 @@ impl<'a, Name: AsRef<str>> TableColumnSetup<'a, Name> {
 /// [should_sort]: Self::should_sort
 /// [specs]: Self::specs
 /// [set_sorted]: Self::set_sorted
-pub struct TableSortSpecsMut<'ui>(*mut sys::ImGuiTableSortSpecs, PhantomData<Ui<'ui>>);
+pub struct TableSortSpecsMut<'ui>(*mut sys::ImGuiTableSortSpecs, PhantomData<&'ui Ui>);
 
 impl TableSortSpecsMut<'_> {
     /// Gets the specs for a given sort. In most scenarios, this will be a slice of 1 entry.

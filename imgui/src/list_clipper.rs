@@ -22,7 +22,7 @@ impl ListClipper {
         self
     }
 
-    pub fn begin<'ui>(self, ui: &Ui<'ui>) -> ListClipperToken<'ui> {
+    pub fn begin(self, ui: &Ui) -> ListClipperToken<'_> {
         let list_clipper = unsafe {
             let list_clipper = sys::ImGuiListClipper_ImGuiListClipper();
             sys::ImGuiListClipper_Begin(list_clipper, self.items_count, self.items_height);
@@ -34,11 +34,11 @@ impl ListClipper {
 
 pub struct ListClipperToken<'ui> {
     list_clipper: *mut sys::ImGuiListClipper,
-    _phantom: PhantomData<&'ui Ui<'ui>>,
+    _phantom: PhantomData<&'ui Ui>,
 }
 
 impl<'ui> ListClipperToken<'ui> {
-    fn new(_: &Ui<'ui>, list_clipper: *mut sys::ImGuiListClipper) -> Self {
+    fn new(_: &Ui, list_clipper: *mut sys::ImGuiListClipper) -> Self {
         Self {
             list_clipper,
             _phantom: PhantomData,

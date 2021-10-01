@@ -111,7 +111,7 @@ bitflags! {
 }
 
 /// # Window utilities
-impl<'ui> Ui<'ui> {
+impl Ui {
     /// Returns true if the current window appeared during this frame
     #[doc(alias = "IsWindowAppearing")]
     pub fn is_window_appearing(&self) -> bool {
@@ -162,7 +162,7 @@ impl<'ui> Ui<'ui> {
 #[derive(Debug)]
 #[must_use]
 pub struct Window<'ui, 'a, Label> {
-    ui: &'ui Ui<'ui>,
+    ui: &'ui Ui,
     name: Label,
     opened: Option<&'a mut bool>,
     flags: WindowFlags,
@@ -181,7 +181,7 @@ pub struct Window<'ui, 'a, Label> {
 
 impl<'ui, 'a, Label: AsRef<str>> Window<'ui, 'a, Label> {
     /// Typically created via [`Ui::window`]
-    pub fn new(ui: &'ui Ui<'ui>, name: Label) -> Self {
+    pub fn new(ui: &'ui Ui, name: Label) -> Self {
         Window {
             ui,
             name,

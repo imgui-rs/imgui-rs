@@ -9,7 +9,7 @@ use crate::Ui;
 #[derive(Copy, Clone, Debug)]
 #[must_use]
 pub struct ChildWindow<'ui, Label> {
-    ui: &'ui Ui<'ui>,
+    ui: &'ui Ui,
     name: Label,
     flags: WindowFlags,
     size: [f32; 2],
@@ -22,7 +22,7 @@ pub struct ChildWindow<'ui, Label> {
 impl<'ui, Label: AsRef<str>> ChildWindow<'ui, Label> {
     /// Creates a new child window builder with the given ID
     #[doc(alias = "BeginChildID")]
-    pub fn new(ui: &'ui Ui<'ui>, name: Label) -> ChildWindow<'ui, Label> {
+    pub fn new(ui: &'ui Ui, name: Label) -> ChildWindow<'ui, Label> {
         ChildWindow {
             ui,
             name,
