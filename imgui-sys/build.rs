@@ -52,8 +52,12 @@ fn main() -> io::Result<()> {
             build.define("IMGUI_ENABLE_FREETYPE", None);
             println!("cargo:DEFINE_IMGUI_ENABLE_FREETYPE=");
 
-            // imgui_freetype.cpp needs access to imgui.h
-            build.include(manifest_dir.join("third-party/imgui/"));
+            // imgui_freetype.cpp needs access to `#include "imgui.h"`
+            let manifest_dir = std::path::Path::new(env!("CARGO_MANIFEST_DIR"));
+            #[cfg(feature = "docking")]
+            build.include(manifest_dir.join("third-party/imgui-docking/imgui"));
+            #[cfg(not(feature = "docking"))]
+            build.include(manifest_dir.join("third-party/imgui-master/imgui"));
         }
 
         #[cfg(feature = "docking")]
