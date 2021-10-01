@@ -426,8 +426,8 @@ impl Ui {
     ///     // or you could call
     ///     // if you want to let it drop on its own, name it `_wt`.
     ///     // never name it `_`, as this will drop it *immediately*.
-    ///     wt.unwrap().end();
-    /// }
+    ///     wt.end();
+    /// };
     /// ```
     pub fn window<Label: AsRef<str>>(&self, name: Label) -> Window<'_, '_, Label> {
         Window::new(self, name)

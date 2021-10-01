@@ -418,7 +418,7 @@ impl<'ui> Ui {
     ///     for num in 0..10 {
     ///         // And now we add the loop number to the stack too,
     ///         // to make our buttons unique within this window.
-    ///         let _id = ui.push_id(num);
+    ///         let _id = ui.push_id_usize(num);
     ///         if ui.button("Click!") {
     ///             println!("Button {} clicked", num);
     ///         }
