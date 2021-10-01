@@ -503,6 +503,11 @@ impl Context {
         unsafe { &mut *(self.io_mut().fonts as *mut FontAtlas) }
     }
 
+    /// Attempts to clone the interior shared font atlas **if it exists**.
+    pub fn clone_shared_font_atlas(&mut self) -> Option<SharedFontAtlas> {
+        self.shared_font_atlas.clone()
+    }
+
     /// Starts a new frame. Use [`new_frame`] instead.
     ///
     /// [`new_frame`]: Self::new_frame
