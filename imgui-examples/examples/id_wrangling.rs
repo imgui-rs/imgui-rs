@@ -33,7 +33,7 @@ fn main() {
                     let _label_id = ui.push_id(it);
                     ui.text(it);
                     for num in 0..5 {
-                        let _num_id = ui.push_id(num);
+                        let _num_id = ui.push_id_usize(num);
                         ui.same_line();
                         if ui.button("Example") {
                             println!("{}: {}", it, num);

@@ -3,9 +3,9 @@ use crate::internal::RawCast;
 use crate::math::MintVec4;
 use crate::style::{StyleColor, StyleVar};
 use crate::sys;
-use crate::{Id, Ui};
+use crate::Ui;
 use std::mem;
-use std::os::raw::{c_char, c_void};
+use std::os::raw::c_char;
 
 /// # Parameter stacks (shared)
 impl Ui {
@@ -386,7 +386,6 @@ impl IdStackToken<'_> {
 /// # ID stack
 impl<'ui> Ui {
     /// Pushes an identifier to the ID stack.
-    /// This can be called with an integer, a string, or a pointer.
     ///
     /// Returns an `IdStackToken` that can be popped by calling `.end()`
     /// or by dropping manually.
@@ -462,20 +461,55 @@ impl<'ui> Ui {
     /// });
     /// ```
     #[doc(alias = "PushId")]
-    pub fn push_id<'a, I: Into<Id<'a>>>(&'ui self, id: I) -> IdStackToken<'ui> {
-        let id = id.into();
-
+    pub fn push_id(&self, s: impl AsRef<str>) -> IdStackToken<'_> {
         unsafe {
-            match id {
-                Id::Int(i) => sys::igPushID_Int(i),
-                Id::Str(s) => {
-                    let start = s.as_ptr() as *const c_char;
-                    let end = start.add(s.len());
-                    sys::igPushID_StrStr(start, end)
-                }
-                Id::Ptr(p) => sys::igPushID_Ptr(p as *const c_void),
-            }
+            let s = s.as_ref();
+            let start = s.as_ptr() as *const c_char;
+            let end = start.add(s.len());
+            sys::igPushID_StrStr(start, end)
         }
+        IdStackToken::new(self)
+    }
+
+    /// Pushes a `usize` to the ID stack.
+    ///
+    /// Returns an `IdStackToken` that can be popped by calling `.end()`
+    /// or by dropping manually.
+    ///
+    /// See [push_id] for more information.
+    ///
+    /// [push_id]: Self::push_id
+    #[doc(alias = "PushId")]
+    pub fn push_id_usize(&self, id: usize) -> IdStackToken<'_> {
+        unsafe { sys::igPushID_Ptr(id as *const _) }
+        IdStackToken::new(self)
+    }
+
+    /// Pushes an `i32` to the ID stack.
+    ///
+    /// Returns an `IdStackToken` that can be popped by calling `.end()`
+    /// or by dropping manually.
+    ///
+    /// See [push_id] for more information.
+    ///
+    /// [push_id]: Self::push_id
+    #[doc(alias = "PushId")]
+    pub fn push_id_int(&self, id: i32) -> IdStackToken<'_> {
+        unsafe { sys::igPushID_Int(id) }
+        IdStackToken::new(self)
+    }
+
+    /// Pushes a `ptr` to the ID stack.
+    ///
+    /// Returns an `IdStackToken` that can be popped by calling `.end()`
+    /// or by dropping manually.
+    ///
+    /// See [push_id] for more information.
+    ///
+    /// [push_id]: Self::push_id
+    #[doc(alias = "PushId")]
+    pub fn push_id_ptr<T>(&self, value: &T) -> IdStackToken<'_> {
+        unsafe { sys::igPushID_Ptr(value as *const T as *const _) }
         IdStackToken::new(self)
     }
 }

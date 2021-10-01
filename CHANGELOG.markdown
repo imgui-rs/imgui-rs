@@ -10,6 +10,8 @@
 
 - BREAKING: `SharedFontAtlas` now hides an `Rc` within its wrapper -- this simplifies the codebase and more accurately reflects how we expect `SharedFontAtlas` to be used (ie, you're probably going to set it up once, and then give it around, rather than constantly edit it). `SharedFontAtlas` users, if this change is very bad for you, please let us know with issues!
 
+- BREAKING: `Id` is now a simpler facade, but requires the `Ui` struct to generate. `push_id`, equally, has been split into multiple functions for simplicity.
+
 ## [0.8.0] - 2021-09-17
 
 Welcome to the `0.8.0` update. This is one of the largest updates imgui-rs has ever seen; it will generate errors in a `0.7` project, but hopefully it should be both quick to fix, and enjoyable to update. See our [release page](https://github.com/imgui-rs/imgui-rs/releases/tag/v0.8.0) for more information and a list of contributors to this cycle. Thank you to everyone who uses `imgui-rs`, files issues, and spend their time and effort to PR new changes into the codebase. Because of all that effort, this is by far the best `imgui-rs` has looked!

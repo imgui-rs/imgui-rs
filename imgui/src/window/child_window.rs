@@ -23,16 +23,16 @@ impl<'ui> ChildWindow<'ui> {
     /// Creates a new child window builder with the str.
     #[doc(alias = "BeginChildID")]
     pub fn new(ui: &'ui Ui, name: impl AsRef<str>) -> Self {
-        let id = Id::Str(name.as_ref());
+        let id = ui.new_id_str(name);
         Self::new_id(ui, id)
     }
 
     /// Creates a new child window builder with the given imgui id.
     #[doc(alias = "BeginChildID")]
-    pub fn new_id(ui: &'ui Ui, id: Id<'_>) -> Self {
+    pub fn new_id(ui: &'ui Ui, id: Id) -> Self {
         Self {
             ui,
-            id: id.as_imgui_id(),
+            id: id.0,
             flags: WindowFlags::empty(),
             size: [0.0, 0.0],
             content_size: [0.0, 0.0],

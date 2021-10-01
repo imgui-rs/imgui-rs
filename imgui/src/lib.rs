@@ -5,7 +5,7 @@
 pub extern crate imgui_sys as sys;
 
 use std::cell;
-use std::os::raw::{c_char, c_void};
+use std::os::raw::c_char;
 
 pub use self::clipboard::*;
 pub use self::color::ImColor32;
@@ -269,69 +269,124 @@ impl Ui {
     }
 }
 
-/// Unique ID used by widgets
-#[derive(Copy, Clone, Debug, Eq, PartialEq)]
-pub enum Id<'a> {
-    Int(i32),
-    Str(&'a str),
-    Ptr(*const c_void),
-}
+/// Unique ID used by widgets.
+///
+/// This represents a hash of the current stack of Ids used in ImGui + the
+/// input provided. It is only used in a few places directly in the
+/// codebase, but you can think of it as effectively allowing you to
+/// run your Id hashing yourself.
+///
+/// Previously, this was erroneously constructed with `From` implementations.
+/// Now, however, it is made from the `Ui` object directly, with a few
+/// deprecated helper methods here.
+#[derive(Copy, Clone, Debug, Eq, PartialEq, Default)]
+pub struct Id(pub(crate) u32);
 
-impl From<i32> for Id<'static> {
-    #[inline]
-    fn from(i: i32) -> Self {
-        Id::Int(i)
+impl Id {
+    #[allow(non_snake_case)]
+    pub fn Int(input: i32, ui: &Ui) -> Self {
+        ui.new_id_int(input)
+    }
+
+    #[allow(non_snake_case)]
+    pub fn Str(input: impl AsRef<str>, ui: &Ui) -> Self {
+        ui.new_id_str(input)
+    }
+
+    #[allow(non_snake_case)]
+    pub fn Ptr<T>(input: &T, ui: &Ui) -> Self {
+        ui.new_id_ptr(input)
     }
 }
 
-impl<'a, T: ?Sized + AsRef<str>> From<&'a T> for Id<'a> {
-    #[inline]
-    fn from(s: &'a T) -> Self {
-        Id::Str(s.as_ref())
+impl Ui {
+    pub fn new_id(&self, input: usize) -> Id {
+        let p = input as *const std::os::raw::c_void;
+        let value = unsafe { sys::igGetID_Ptr(p) };
+
+        Id(value)
+    }
+
+    pub fn new_id_int(&self, input: i32) -> Id {
+        let p = input as *const std::os::raw::c_void;
+        let value = unsafe { sys::igGetID_Ptr(p) };
+        Id(value)
+    }
+
+    pub fn new_id_ptr<T>(&self, input: &T) -> Id {
+        let p = input as *const T as *const sys::cty::c_void;
+        let value = unsafe { sys::igGetID_Ptr(p) };
+        Id(value)
+    }
+
+    pub fn new_id_str(&self, s: impl AsRef<str>) -> Id {
+        let s = s.as_ref();
+
+        let s1 = s.as_ptr() as *const std::os::raw::c_char;
+        let value = unsafe {
+            let s2 = s1.add(s.len());
+            sys::igGetID_StrStr(s1, s2)
+        };
+        Id(value)
     }
 }
 
-impl<T> From<*const T> for Id<'static> {
-    #[inline]
-    fn from(p: *const T) -> Self {
-        Id::Ptr(p as *const c_void)
-    }
-}
+// /// Unique ID used by widgets
+// pub enum Id<'a> {
+//     Int(i32),
+//     Str(&'a str),
+//     Ptr(*const c_void),
+// }
 
-impl<T> From<*mut T> for Id<'static> {
-    #[inline]
-    fn from(p: *mut T) -> Self {
-        Id::Ptr(p as *const T as *const c_void)
-    }
-}
+// impl From<i32> for Id<'static> {
+//     #[inline]
+//     fn from(i: i32) -> Self {
+//         Id::Int(i)
+//     }
+// }
 
-impl<'a> Id<'a> {
-    // this is used in the tables-api and possibly elsewhere,
-    // but not with just default features...
-    #[allow(dead_code)]
-    fn as_imgui_id(&self) -> sys::ImGuiID {
-        unsafe {
-            match self {
-                Id::Ptr(p) => sys::igGetID_Ptr(*p),
-                Id::Str(s) => {
-                    let s1 = s.as_ptr() as *const std::os::raw::c_char;
-                    let s2 = s1.add(s.len());
-                    sys::igGetID_StrStr(s1, s2)
-                }
-                Id::Int(i) => {
-                    let p = *i as *const std::os::raw::c_void;
-                    sys::igGetID_Ptr(p)
-                } // Id::ImGuiID(n) => *n,
-            }
-        }
-    }
-}
+// impl<'a, T: ?Sized + AsRef<str>> From<&'a T> for Id<'a> {
+//     #[inline]
+//     fn from(s: &'a T) -> Self {
+//         Id::Str(s.as_ref())
+//     }
+// }
 
-impl<'a> Default for Id<'a> {
-    fn default() -> Self {
-        Self::Int(0)
-    }
-}
+// impl<T> From<*const T> for Id<'static> {
+//     #[inline]
+//     fn from(p: *const T) -> Self {
+//         Id::Ptr(p as *const c_void)
+//     }
+// }
+
+// impl<T> From<*mut T> for Id<'static> {
+//     #[inline]
+//     fn from(p: *mut T) -> Self {
+//         Id::Ptr(p as *const T as *const c_void)
+//     }
+// }
+
+// impl<'a> Id<'a> {
+//     // this is used in the tables-api and possibly elsewhere,
+//     // but not with just default features...
+//     #[allow(dead_code)]
+//     fn as_imgui_id(&self) -> sys::ImGuiID {
+//         unsafe {
+//             match self {
+//                 Id::Ptr(p) => sys::igGetID_Ptr(*p),
+//                 Id::Str(s) => {
+//                     let s1 = s.as_ptr() as *const std::os::raw::c_char;
+//                     let s2 = s1.add(s.len());
+//                     sys::igGetID_StrStr(s1, s2)
+//                 }
+//                 Id::Int(i) => {
+//                     let p = *i as *const std::os::raw::c_void;
+//                     sys::igGetID_Ptr(p)
+//                 } // Id::ImGuiID(n) => *n,
+//             }
+//         }
+//     }
+// }
 
 impl Ui {
     /// # Windows
@@ -390,7 +445,7 @@ impl Ui {
     ///
     /// Use child windows to begin into a self-contained independent scrolling/clipping
     /// regions within a host window. Child windows can embed their own child.
-    pub fn child_window_id(&self, id: Id<'_>) -> ChildWindow<'_> {
+    pub fn child_window_id(&self, id: Id) -> ChildWindow<'_> {
         ChildWindow::new_id(self, id)
     }
 }

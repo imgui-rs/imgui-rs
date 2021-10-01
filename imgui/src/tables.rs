@@ -320,10 +320,10 @@ impl Ui {
     /// Takes an array of table header information, the length of which determines
     /// how many columns will be created.
     #[must_use = "if return is dropped immediately, table is ended immediately."]
-    pub fn begin_table_header<'a, Name: AsRef<str>, const N: usize>(
+    pub fn begin_table_header<Name: AsRef<str>, const N: usize>(
         &self,
         str_id: impl AsRef<str>,
-        column_data: [TableColumnSetup<'a, Name>; N],
+        column_data: [TableColumnSetup<Name>; N],
     ) -> Option<TableToken<'_>> {
         self.begin_table_header_with_flags(str_id, column_data, TableFlags::empty())
     }
@@ -333,10 +333,10 @@ impl Ui {
     /// Takes an array of table header information, the length of which determines
     /// how many columns will be created.
     #[must_use = "if return is dropped immediately, table is ended immediately."]
-    pub fn begin_table_header_with_flags<'a, Name: AsRef<str>, const N: usize>(
+    pub fn begin_table_header_with_flags<Name: AsRef<str>, const N: usize>(
         &self,
         str_id: impl AsRef<str>,
-        column_data: [TableColumnSetup<'a, Name>; N],
+        column_data: [TableColumnSetup<Name>; N],
         flags: TableFlags,
     ) -> Option<TableToken<'_>> {
         self.begin_table_header_with_sizing(str_id, column_data, flags, [0.0, 0.0], 0.0)
@@ -347,10 +347,10 @@ impl Ui {
     /// Takes an array of table header information, the length of which determines
     /// how many columns will be created.
     #[must_use = "if return is dropped immediately, table is ended immediately."]
-    pub fn begin_table_header_with_sizing<'a, Name: AsRef<str>, const N: usize>(
+    pub fn begin_table_header_with_sizing<Name: AsRef<str>, const N: usize>(
         &self,
         str_id: impl AsRef<str>,
-        column_data: [TableColumnSetup<'a, Name>; N],
+        column_data: [TableColumnSetup<Name>; N],
         flags: TableFlags,
         outer_size: [f32; 2],
         inner_width: f32,
@@ -533,13 +533,13 @@ impl Ui {
     /// row and automatically submit a table header for each column.
     /// Headers are required to perform: reordering, sorting, and opening the context menu (though,
     /// the context menu can also be made available in columns body using [TableFlags::CONTEXT_MENU_IN_BODY].
-    pub fn table_setup_column_with<N: AsRef<str>>(&self, data: TableColumnSetup<'_, N>) {
+    pub fn table_setup_column_with<N: AsRef<str>>(&self, data: TableColumnSetup<N>) {
         unsafe {
             sys::igTableSetupColumn(
                 self.scratch_txt(data.name),
                 data.flags.bits() as i32,
                 data.init_width_or_weight,
-                data.user_id.as_imgui_id(),
+                data.user_id.0,
             )
         }
     }
@@ -733,7 +733,7 @@ impl Ui {
 /// A struct containing all the data needed to setup a table column header
 /// via [begin_table_header](Ui::begin_table_header) or [table_setup_column](Ui::table_setup_column).
 #[derive(Debug, Default)]
-pub struct TableColumnSetup<'a, Name> {
+pub struct TableColumnSetup<Name> {
     /// The name of column to be displayed to users.
     pub name: Name,
     /// The flags this column will have.
@@ -741,16 +741,16 @@ pub struct TableColumnSetup<'a, Name> {
     /// The width or weight of the given column.
     pub init_width_or_weight: f32,
     /// A user_id, primarily used in sorting operations.
-    pub user_id: Id<'a>,
+    pub user_id: Id,
 }
 
-impl<'a, Name: AsRef<str>> TableColumnSetup<'a, Name> {
+impl<'a, Name: AsRef<str>> TableColumnSetup<Name> {
     pub fn new(name: Name) -> Self {
         Self {
             name,
             flags: TableColumnFlags::empty(),
             init_width_or_weight: 0.0,
-            user_id: Id::Int(0),
+            user_id: Id::default(),
         }
     }
 }
