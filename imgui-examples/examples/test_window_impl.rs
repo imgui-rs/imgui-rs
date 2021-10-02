@@ -33,6 +33,8 @@ struct State {
     text_with_hint: String,
     text_multiline: String,
     i0: i32,
+    u0: u64,
+    d0: f64,
     f0: f32,
     vec2f: [f32; 2],
     vec3f: [f32; 3],
@@ -95,7 +97,9 @@ impl Default for State {
             text_with_hint,
             text_multiline,
             i0: 123,
+            u0: 1234,
             f0: 0.001,
+            d0: 0.0001,
             vec2f: [0.10, 0.20],
             vec3f: [0.10, 0.20, 0.30],
             vec2i: [10, 20],
@@ -538,15 +542,20 @@ fn show_test_window(ui: &Ui, state: &mut State, opened: &mut bool) {
             ui.input_int("input int", &mut state.i0).build();
             // Drag::new("drag int").build(ui, &mut state.i0);
             ui.input_float("input float", &mut state.f0)
-                .step(0.01)
-                .step_fast(1.0)
-                .build();
+            .step(0.01)
+            .step_fast(1.0)
+            .build();
             Drag::new("drag float").range(-1.0, 1.0).speed(0.001).build(ui, &mut state.f0);
             ui.input_float3("input float3", &mut state.vec3f)
-                .build();
+            .build();
             ColorEdit3::new("color 1", &mut state.col1).build(ui);
             ColorEdit4::new("color 2", &mut state.col2).build(ui);
 
+            ui.input_scalar("input scalar i64", &mut state.u0).build(ui);
+            ui.input_scalar("input scalar f64", &mut state.d0).build(ui);
+            ui.input_scalar_n("input scalar int array", &mut state.vec3i).build(ui);
+            ui.input_scalar_n("input scalar float array", &mut state.vec3f).build(ui);
+            
             TreeNode::new("Multi-component Widgets").build(ui, || {
                 ui.input_float2("input float2", &mut state.vec2f)
                     .build();
