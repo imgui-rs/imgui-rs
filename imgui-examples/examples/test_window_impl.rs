@@ -542,12 +542,12 @@ fn show_test_window(ui: &Ui, state: &mut State, opened: &mut bool) {
             ui.input_int("input int", &mut state.i0).build();
             // Drag::new("drag int").build(ui, &mut state.i0);
             ui.input_float("input float", &mut state.f0)
-            .step(0.01)
-            .step_fast(1.0)
-            .build();
+                .step(0.01)
+                .step_fast(1.0)
+                .build();
             Drag::new("drag float").range(-1.0, 1.0).speed(0.001).build(ui, &mut state.f0);
             ui.input_float3("input float3", &mut state.vec3f)
-            .build();
+                .build();
             ColorEdit3::new("color 1", &mut state.col1).build(ui);
             ColorEdit4::new("color 2", &mut state.col2).build(ui);
 
