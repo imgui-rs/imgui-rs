@@ -1,7 +1,9 @@
 use bitflags::bitflags;
 use std::ops::Range;
 use std::os::raw::{c_char, c_int, c_void};
+use std::ptr;
 
+use crate::internal::DataTypeKind;
 use crate::math::*;
 use crate::sys;
 use crate::Ui;
@@ -514,11 +516,12 @@ impl<'ui, 'p, L: AsRef<str>> InputInt<'ui, 'p, L> {
 }
 
 #[must_use]
-pub struct InputFloat<'ui, 'p, L> {
+pub struct InputFloat<'ui, 'p, L, F = &'static str> {
     label: L,
     value: &'p mut f32,
     step: f32,
     step_fast: f32,
+    display_format: Option<F>,
     flags: InputTextFlags,
     ui: &'ui Ui,
 }
@@ -530,19 +533,36 @@ impl<'ui, 'p, L: AsRef<str>> InputFloat<'ui, 'p, L> {
             value,
             step: 0.0,
             step_fast: 0.0,
+            display_format: None,
             flags: InputTextFlags::empty(),
             ui,
         }
     }
 
+    pub fn display_format<F2: AsRef<str>>(self, display_format: F2) -> InputFloat<'ui, 'p, L, F2> {
+        InputFloat {
+            value: self.value,
+            label: self.label,
+            step: self.step,
+            step_fast: self.step_fast,
+            display_format: Some(display_format),
+            flags: self.flags,
+            ui: self.ui,
+        }
+    }
+
     pub fn build(self) -> bool {
+        let (one, two) = self
+            .ui
+            .scratch_txt_with_opt(self.label, self.display_format);
+
         unsafe {
             sys::igInputFloat(
-                self.ui.scratch_txt(self.label),
+                one,
                 self.value as *mut f32,
                 self.step,
                 self.step_fast,
-                b"%.3f\0".as_ptr() as *const _,
+                two,
                 self.flags.bits() as i32,
             )
         }
@@ -555,9 +575,10 @@ impl<'ui, 'p, L: AsRef<str>> InputFloat<'ui, 'p, L> {
 macro_rules! impl_input_floatn {
     ($InputFloatN:ident, $MINT_TARGET:ty, $N:expr, $igInputFloatN:ident) => {
         #[must_use]
-        pub struct $InputFloatN<'ui, 'p, L, T> {
+        pub struct $InputFloatN<'ui, 'p, L, T, F = &'static str> {
             label: L,
             value: &'p mut T,
+            display_format: Option<F>,
             flags: InputTextFlags,
             ui: &'ui Ui,
         }
@@ -572,8 +593,22 @@ macro_rules! impl_input_floatn {
                 $InputFloatN {
                     label,
                     value,
+                    display_format: None,
                     flags: InputTextFlags::empty(),
                     ui,
+                }
+            }
+
+            pub fn display_format<F2: AsRef<str>>(
+                self,
+                display_format: F2,
+            ) -> $InputFloatN<'ui, 'p, L, T, F2> {
+                $InputFloatN {
+                    label: self.label,
+                    value: self.value,
+                    display_format: Some(display_format),
+                    flags: self.flags,
+                    ui: self.ui,
                 }
             }
 
@@ -581,13 +616,12 @@ macro_rules! impl_input_floatn {
                 let value: $MINT_TARGET = (*self.value).into();
                 let mut value: [f32; $N] = value.into();
 
+                let (one, two) = self
+                    .ui
+                    .scratch_txt_with_opt(self.label, self.display_format);
+
                 let changed = unsafe {
-                    sys::$igInputFloatN(
-                        self.ui.scratch_txt(self.label),
-                        value.as_mut_ptr(),
-                        b"%.3f\0".as_ptr() as *const _,
-                        self.flags.bits() as i32,
-                    )
+                    sys::$igInputFloatN(one, value.as_mut_ptr(), two, self.flags.bits() as i32)
                 };
 
                 if changed {
@@ -660,6 +694,175 @@ macro_rules! impl_input_intn {
 impl_input_intn!(InputInt2, MintIVec2, 2, igInputInt2);
 impl_input_intn!(InputInt3, MintIVec3, 3, igInputInt3);
 impl_input_intn!(InputInt4, MintIVec4, 4, igInputInt4);
+
+/// Builder for an input scalar widget.
+#[must_use]
+pub struct InputScalar<'ui, 'p, T, L, F = &'static str> {
+    value: &'p mut T,
+    label: L,
+    step: Option<T>,
+    step_fast: Option<T>,
+    display_format: Option<F>,
+    flags: InputTextFlags,
+    ui: &'ui Ui,
+}
+
+impl<'ui, 'p, L: AsRef<str>, T: DataTypeKind> InputScalar<'ui, 'p, T, L> {
+    /// Constructs a new input scalar builder.
+    #[doc(alias = "InputScalar", alias = "InputScalarN")]
+    pub fn new(ui: &'ui Ui, label: L, value: &'p mut T) -> Self {
+        InputScalar {
+            value,
+            label,
+            step: None,
+            step_fast: None,
+            display_format: None,
+            flags: InputTextFlags::empty(),
+            ui,
+        }
+    }
+}
+
+impl<'ui, 'p, L: AsRef<str>, T: DataTypeKind, F: AsRef<str>> InputScalar<'ui, 'p, T, L, F> {
+    /// Sets the display format using *a C-style printf string*
+    pub fn display_format<F2: AsRef<str>>(
+        self,
+        display_format: F2,
+    ) -> InputScalar<'ui, 'p, T, L, F2> {
+        InputScalar {
+            value: self.value,
+            label: self.label,
+            step: self.step,
+            step_fast: self.step_fast,
+            display_format: Some(display_format),
+            flags: self.flags,
+            ui: self.ui,
+        }
+    }
+    /// Builds an input scalar that is bound to the given value.
+    ///
+    /// Returns true if the value was changed.
+    pub fn build(self, ui: &Ui) -> bool {
+        unsafe {
+            let (one, two) = ui.scratch_txt_with_opt(self.label, self.display_format);
+
+            sys::igInputScalar(
+                one,
+                T::KIND as i32,
+                self.value as *mut T as *mut c_void,
+                self.step
+                    .as_ref()
+                    .map(|step| step as *const T)
+                    .unwrap_or(ptr::null()) as *const c_void,
+                self.step_fast
+                    .as_ref()
+                    .map(|step| step as *const T)
+                    .unwrap_or(ptr::null()) as *const c_void,
+                two,
+                self.flags.bits() as i32,
+            )
+        }
+    }
+
+    #[inline]
+    pub fn step(mut self, value: T) -> Self {
+        self.step = Some(value);
+        self
+    }
+
+    #[inline]
+    pub fn step_fast(mut self, value: T) -> Self {
+        self.step_fast = Some(value);
+        self
+    }
+
+    impl_text_flags!(InputScalar);
+}
+
+/// Builder for an input scalar widget.
+#[must_use]
+pub struct InputScalarN<'ui, 'p, T, L, F = &'static str> {
+    values: &'p mut [T],
+    label: L,
+    step: Option<T>,
+    step_fast: Option<T>,
+    display_format: Option<F>,
+    flags: InputTextFlags,
+    ui: &'ui Ui,
+}
+
+impl<'ui, 'p, L: AsRef<str>, T: DataTypeKind> InputScalarN<'ui, 'p, T, L> {
+    /// Constructs a new input scalar builder.
+    #[doc(alias = "InputScalarN")]
+    pub fn new(ui: &'ui Ui, label: L, values: &'p mut [T]) -> Self {
+        InputScalarN {
+            values,
+            label,
+            step: None,
+            step_fast: None,
+            display_format: None,
+            flags: InputTextFlags::empty(),
+            ui,
+        }
+    }
+}
+
+impl<'ui, 'p, L: AsRef<str>, T: DataTypeKind, F: AsRef<str>> InputScalarN<'ui, 'p, T, L, F> {
+    /// Sets the display format using *a C-style printf string*
+    pub fn display_format<F2: AsRef<str>>(
+        self,
+        display_format: F2,
+    ) -> InputScalarN<'ui, 'p, T, L, F2> {
+        InputScalarN {
+            values: self.values,
+            label: self.label,
+            step: self.step,
+            step_fast: self.step_fast,
+            display_format: Some(display_format),
+            flags: self.flags,
+            ui: self.ui,
+        }
+    }
+    /// Builds a horizontal array of multiple input scalars attached to the given slice.
+    ///
+    /// Returns true if any value was changed.
+    pub fn build(self, ui: &Ui) -> bool {
+        unsafe {
+            let (one, two) = ui.scratch_txt_with_opt(self.label, self.display_format);
+
+            sys::igInputScalarN(
+                one,
+                T::KIND as i32,
+                self.values.as_mut_ptr() as *mut c_void,
+                self.values.len() as i32,
+                self.step
+                    .as_ref()
+                    .map(|step| step as *const T)
+                    .unwrap_or(ptr::null()) as *const c_void,
+                self.step_fast
+                    .as_ref()
+                    .map(|step| step as *const T)
+                    .unwrap_or(ptr::null()) as *const c_void,
+                two,
+                self.flags.bits() as i32,
+            )
+        }
+    }
+
+    #[inline]
+    pub fn step(mut self, value: T) -> Self {
+        self.step = Some(value);
+        self
+    }
+
+    #[inline]
+    pub fn step_fast(mut self, value: T) -> Self {
+        self.step_fast = Some(value);
+        self
+    }
+
+    impl_text_flags!(InputScalar);
+}
 
 bitflags!(
     /// Callback flags for an `InputText` widget. These correspond to

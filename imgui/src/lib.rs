@@ -551,6 +551,30 @@ impl<'ui> Ui {
     {
         InputInt4::new(self, label, value)
     }
+    #[doc(alias = "InputScalar")]
+    pub fn input_scalar<'p, L, T>(
+        &'ui self,
+        label: L,
+        value: &'p mut T,
+    ) -> InputScalar<'ui, 'p, T, L>
+    where
+        L: AsRef<str>,
+        T: internal::DataTypeKind,
+    {
+        InputScalar::new(self, label, value)
+    }
+    #[doc(alias = "InputScalarN")]
+    pub fn input_scalar_n<'p, L, T>(
+        &'ui self,
+        label: L,
+        values: &'p mut [T],
+    ) -> InputScalarN<'ui, 'p, T, L>
+    where
+        L: AsRef<str>,
+        T: internal::DataTypeKind,
+    {
+        InputScalarN::new(self, label, values)
+    }
 }
 
 create_token!(
