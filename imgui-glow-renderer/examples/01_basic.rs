@@ -29,7 +29,6 @@ fn main() {
 
     // Standard winit event loop
     event_loop.run(move |event, _, control_flow| {
-        *control_flow = glutin::event_loop::ControlFlow::Wait;
         match event {
             glutin::event::Event::NewEvents(_) => {
                 let now = Instant::now();
