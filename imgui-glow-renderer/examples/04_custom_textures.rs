@@ -36,7 +36,11 @@ fn main() {
 
     let mut last_frame = Instant::now();
     event_loop.run(move |event, _, control_flow| {
-        *control_flow = glutin::event_loop::ControlFlow::Wait;
+        // Note we can potentially make the loop more efficient by
+        // changing the `Poll` (default) value to `ControlFlow::Poll`
+        // but be careful to test on all target platforms!
+        *control_flow = glutin::event_loop::ControlFlow::Poll;
+
         match event {
             glutin::event::Event::NewEvents(_) => {
                 let now = Instant::now();
