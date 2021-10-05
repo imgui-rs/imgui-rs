@@ -17,7 +17,6 @@ fn main() {
 
     let mut last_frame = Instant::now();
     event_loop.run(move |event, _, control_flow| {
-        *control_flow = glutin::event_loop::ControlFlow::Wait;
         match event {
             glutin::event::Event::NewEvents(_) => {
                 let now = Instant::now();
