@@ -551,6 +551,8 @@ impl<'ui> Ui {
     {
         InputInt4::new(self, label, value)
     }
+    /// Shows an input field for a scalar value. This is not limited to `f32` and `i32` and can be used with
+    /// any primitive scalar type e.g. `u8` and `f64`.
     #[doc(alias = "InputScalar")]
     pub fn input_scalar<'p, L, T>(
         &'ui self,
@@ -563,6 +565,7 @@ impl<'ui> Ui {
     {
         InputScalar::new(self, label, value)
     }
+    /// Shows a horizontal array of scalar value input fields. See [`input_scalar`].
     #[doc(alias = "InputScalarN")]
     pub fn input_scalar_n<'p, L, T>(
         &'ui self,
