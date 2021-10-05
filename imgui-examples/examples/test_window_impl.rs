@@ -555,7 +555,7 @@ fn show_test_window(ui: &Ui, state: &mut State, opened: &mut bool) {
             ui.input_scalar("input scalar f64", &mut state.d0).build(ui);
             ui.input_scalar_n("input scalar int array", &mut state.vec3i).build(ui);
             ui.input_scalar_n("input scalar float array", &mut state.vec3f).build(ui);
-            
+
             TreeNode::new("Multi-component Widgets").build(ui, || {
                 ui.input_float2("input float2", &mut state.vec2f)
                     .build();
