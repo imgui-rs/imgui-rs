@@ -488,6 +488,10 @@ pub struct InputInt<'ui, 'p, L> {
 }
 
 impl<'ui, 'p, L: AsRef<str>> InputInt<'ui, 'p, L> {
+    #[deprecated(
+        since = "0.9.0",
+        note = "use `ui.input_int` or `ui.input_scalar` instead"
+    )]
     pub fn new(ui: &'ui Ui, label: L, value: &'p mut i32) -> Self {
         InputInt {
             label,
@@ -527,6 +531,10 @@ pub struct InputFloat<'ui, 'p, L, F = &'static str> {
 }
 
 impl<'ui, 'p, L: AsRef<str>> InputFloat<'ui, 'p, L> {
+    #[deprecated(
+        since = "0.9.0",
+        note = "use `ui.input_float` or `ui.input_scalar` instead"
+    )]
     pub fn new(ui: &'ui Ui, label: L, value: &'p mut f32) -> Self {
         InputFloat {
             label,
@@ -742,9 +750,11 @@ impl<'ui, 'p, L: AsRef<str>, T: DataTypeKind, F: AsRef<str>> InputScalar<'ui, 'p
     /// Builds an input scalar that is bound to the given value.
     ///
     /// Returns true if the value was changed.
-    pub fn build(self, ui: &Ui) -> bool {
+    pub fn build(self) -> bool {
         unsafe {
-            let (one, two) = ui.scratch_txt_with_opt(self.label, self.display_format);
+            let (one, two) = self
+                .ui
+                .scratch_txt_with_opt(self.label, self.display_format);
 
             sys::igInputScalar(
                 one,
@@ -826,9 +836,11 @@ impl<'ui, 'p, L: AsRef<str>, T: DataTypeKind, F: AsRef<str>> InputScalarN<'ui, '
     /// Builds a horizontal array of multiple input scalars attached to the given slice.
     ///
     /// Returns true if any value was changed.
-    pub fn build(self, ui: &Ui) -> bool {
+    pub fn build(self) -> bool {
         unsafe {
-            let (one, two) = ui.scratch_txt_with_opt(self.label, self.display_format);
+            let (one, two) = self
+                .ui
+                .scratch_txt_with_opt(self.label, self.display_format);
 
             sys::igInputScalarN(
                 one,

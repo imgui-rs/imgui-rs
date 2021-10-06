@@ -16,6 +16,12 @@
 
 - BREAKING: We now only support `glium 0.30`. We're in a difficult position supporting arbitrary `glium` versions in our renderer, since `glium` is only in a semi-maintained state. `glium` users, please get in contact in issues to let us know what will work best for your needs!
 
+- Added `InputScalar` and `InputScalarN`. These are the core Input modules that Dear ImGui uses, and ultimately what `InputFloat` and `InputInt` turn into. See deprecation of `InputFloat` and `InputInt` as a result. Thank you to @EmbersArc for [implementing this here](https://github.com/imgui-rs/imgui-rs/pull/544).
+
+- BREAKING: `ui.input_int` and `ui.input_float` now return `InputScalar<'ui, 'l, f32/i32>`, instead of `InputFloat`/`InputInt`. This struct has all of the same flags as `InputFloat` and `InputInt` did.
+
+- DEPRECATED: `InputFloat` and `InputInt` have been deprecated. `ui.input_float` and `ui.input_int` are _not_, however, and instead will just call `input_scalar` as appropriate. Therefore, please switch your code to `ui.input_float` or `ui.input_int`.
+
 ## [0.8.0] - 2021-09-17
 
 Welcome to the `0.8.0` update. This is one of the largest updates imgui-rs has ever seen; it will generate errors in a `0.7` project, but hopefully it should be both quick to fix, and enjoyable to update. See our [release page](https://github.com/imgui-rs/imgui-rs/releases/tag/v0.8.0) for more information and a list of contributors to this cycle. Thank you to everyone who uses `imgui-rs`, files issues, and spend their time and effort to PR new changes into the codebase. Because of all that effort, this is by far the best `imgui-rs` has looked!

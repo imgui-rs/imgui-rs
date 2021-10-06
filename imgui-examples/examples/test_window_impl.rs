@@ -551,10 +551,10 @@ fn show_test_window(ui: &Ui, state: &mut State, opened: &mut bool) {
             ColorEdit3::new("color 1", &mut state.col1).build(ui);
             ColorEdit4::new("color 2", &mut state.col2).build(ui);
 
-            ui.input_scalar("input scalar i64", &mut state.u0).build(ui);
-            ui.input_scalar("input scalar f64", &mut state.d0).build(ui);
-            ui.input_scalar_n("input scalar int array", &mut state.vec3i).build(ui);
-            ui.input_scalar_n("input scalar float array", &mut state.vec3f).build(ui);
+            ui.input_scalar("input scalar i64", &mut state.u0).build();
+            ui.input_scalar("input scalar f64", &mut state.d0).build();
+            ui.input_scalar_n("input scalar int array", &mut state.vec3i).build();
+            ui.input_scalar_n("input scalar float array", &mut state.vec3f).build();
 
             TreeNode::new("Multi-component Widgets").build(ui, || {
                 ui.input_float2("input float2", &mut state.vec2f)

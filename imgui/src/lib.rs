@@ -474,8 +474,8 @@ impl<'ui> Ui {
         &'ui self,
         label: L,
         value: &'p mut f32,
-    ) -> InputFloat<'ui, 'p, L> {
-        InputFloat::new(self, label, value)
+    ) -> InputScalar<'ui, 'p, f32, L> {
+        self.input_scalar(label, value)
     }
     #[doc(alias = "InputFloat2")]
     pub fn input_float2<'p, L, T>(
@@ -521,8 +521,8 @@ impl<'ui> Ui {
         &'ui self,
         label: L,
         value: &'p mut i32,
-    ) -> InputInt<'ui, 'p, L> {
-        InputInt::new(self, label, value)
+    ) -> InputScalar<'ui, 'p, i32, L> {
+        self.input_scalar(label, value).step(1)
     }
     #[doc(alias = "InputInt2")]
     pub fn input_int2<'p, L, T>(&'ui self, label: L, value: &'p mut T) -> InputInt2<'ui, 'p, L, T>
