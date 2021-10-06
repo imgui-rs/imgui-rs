@@ -81,6 +81,11 @@ fn to_sdl_cursor(cursor: MouseCursor) -> SystemCursor {
 ///
 /// # Example
 /// ```rust,no_run
+/// # let mut event_pump: sdl2::EventPump = unimplemented!();
+/// # let window: sdl2::video::Window = unimplemented!();
+/// # let mut imgui = imgui::Context::create();
+/// # let mut platform = SdlPlatform::init(&mut imgui);
+/// use imgui_sdl2_support::{SdlPlatform, filter_event};
 /// // Assuming there are multiple windows, we only want to provide the events
 /// // of the window where we are rendering to imgui-rs
 /// for event in event_pump.poll_iter().filter(|event| filter_event(&window, event)) {
