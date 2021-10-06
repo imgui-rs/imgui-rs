@@ -63,10 +63,8 @@ fn main() {
             /* pass all events to imgui platfrom */
             platform.handle_event(&mut imgui, &event);
 
-            match event {
-                Event::Quit { .. } => break 'main,
-
-                _ => {}
+            if let Event::Quit { .. } = event {
+                break 'main;
             }
         }
 

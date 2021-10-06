@@ -545,12 +545,12 @@ impl Context {
     }
 
     /// Returns the currently desired mouse cursor type.
-    /// 
+    ///
     /// This was set *last frame* by the [Ui] object, and will be reset when
     /// [new_frame] is called.
     ///
     /// Returns `None` if no cursor should be displayed
-    /// 
+    ///
     /// [new_frame]: Self::new_frame
     #[doc(alias = "GetMouseCursor")]
     pub fn mouse_cursor(&self) -> Option<MouseCursor> {
