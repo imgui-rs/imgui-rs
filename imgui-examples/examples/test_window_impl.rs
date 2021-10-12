@@ -444,7 +444,7 @@ fn show_test_window(ui: &Ui, state: &mut State, opened: &mut bool) {
                 ui.text_wrapped(
                     "This text should automatically wrap on the edge of \
                      the window.The current implementation for text \
-                     wrapping follows simple rulessuitable for English \
+                     wrapping follows simple rules suitable for English \
                      and possibly other languages."
                 );
                 ui.spacing();
