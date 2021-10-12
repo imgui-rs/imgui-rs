@@ -107,31 +107,83 @@ impl Ui {
             f();
         }
     }
+
+    /// Creates a menu item with the given label, returning `true` if it was pressed.
+    ///
+    /// Note: a `menu_item` is the actual button/selectable within a Menu.
+    pub fn menu_item(&self, label: impl AsRef<str>) -> bool {
+        self.menu_item_config(label).build()
+    }
+
+    /// Creates a menu item with the given label and enablement, returning `true` if it was pressed.
+    ///
+    /// Note: a `menu_item` is the actual button/selectable within a Menu.
+    pub fn menu_item_enabled(&self, label: impl AsRef<str>, enabled: bool) -> bool {
+        self.menu_item_config(label).enabled(enabled).build()
+    }
+
+    /// Creates a menu item with the given label and selection, returning `true` if it was pressed.
+    ///
+    /// Note: a `menu_item` is the actual button/selectable within a Menu.
+    pub fn menu_item_selected(&self, label: impl AsRef<str>, selected: bool) -> bool {
+        self.menu_item_config(label).selected(selected).build()
+    }
+
+    /// Creates a menu item with the given label and selection, returning `true` if it was pressed,
+    /// while mutating `selected` to the correct state.
+    ///
+    /// Note: a `menu_item` is the actual button/selectable within a Menu.
+    pub fn menu_item_selected_ref(&self, label: impl AsRef<str>, selected: &mut bool) -> bool {
+        self.menu_item_config(label).build_with_ref(selected)
+    }
+
+    /// Creates a menu item with the given label and shortcut, returning `true` if it was pressed.
+    ///
+    /// Note: a `menu_item` is the actual button/selectable within a Menu.
+    pub fn menu_item_shortcut(&self, label: impl AsRef<str>, shortcut: impl AsRef<str>) -> bool {
+        self.menu_item_config(label).shortcut(shortcut).build()
+    }
+
+    // Creates a menu item builder, with further methods on it as needed.
+    //
+    // Note: a `menu_item` is the actual button/selectable within a Menu.
+    pub fn menu_item_config<L: AsRef<str>>(&self, label: L) -> MenuItem<'_, L> {
+        MenuItem {
+            label,
+            shortcut: None,
+            selected: false,
+            enabled: false,
+            ui: self,
+        }
+    }
 }
 
 /// Builder for a menu item.
 #[derive(Copy, Clone, Debug)]
 #[must_use]
-pub struct MenuItem<Label, Shortcut = &'static str> {
+pub struct MenuItem<'ui, Label, Shortcut = &'static str> {
     label: Label,
     shortcut: Option<Shortcut>,
     selected: bool,
     enabled: bool,
+    ui: &'ui Ui,
 }
 
-impl<Label: AsRef<str>> MenuItem<Label> {
+impl<'ui, Label: AsRef<str>> MenuItem<'ui, Label> {
     /// Construct a new menu item builder.
-    pub fn new(label: Label) -> Self {
+    #[deprecated(since = "0.9.0", note = "Use `ui.menu_item` or `ui.menu_item_config`")]
+    pub fn new(label: Label, ui: &'ui Ui) -> Self {
         MenuItem {
             label,
             shortcut: None,
             selected: false,
             enabled: true,
+            ui,
         }
     }
 }
 
-impl<Label: AsRef<str>, Shortcut: AsRef<str>> MenuItem<Label, Shortcut> {
+impl<'ui, Label: AsRef<str>, Shortcut: AsRef<str>> MenuItem<'ui, Label, Shortcut> {
     /// Sets the menu item shortcut.
     ///
     /// Shortcuts are displayed for convenience only and are not automatically handled.
@@ -139,12 +191,13 @@ impl<Label: AsRef<str>, Shortcut: AsRef<str>> MenuItem<Label, Shortcut> {
     pub fn shortcut<Shortcut2: AsRef<str>>(
         self,
         shortcut: Shortcut2,
-    ) -> MenuItem<Label, Shortcut2> {
+    ) -> MenuItem<'ui, Label, Shortcut2> {
         MenuItem {
             label: self.label,
             shortcut: Some(shortcut),
             selected: self.selected,
             enabled: self.enabled,
+            ui: self.ui,
         }
     }
     /// Sets the selected state of the menu item.
@@ -167,17 +220,17 @@ impl<Label: AsRef<str>, Shortcut: AsRef<str>> MenuItem<Label, Shortcut> {
     ///
     /// Returns true if the menu item is activated.
     #[doc(alias = "MenuItemBool")]
-    pub fn build(self, ui: &Ui) -> bool {
+    pub fn build(self) -> bool {
         unsafe {
-            let (label, shortcut) = ui.scratch_txt_with_opt(self.label, self.shortcut);
+            let (label, shortcut) = self.ui.scratch_txt_with_opt(self.label, self.shortcut);
             sys::igMenuItem_Bool(label, shortcut, self.selected, self.enabled)
         }
     }
 
     #[doc(alias = "MenuItemBool")]
     /// Builds the menu item using a mutable reference to selected state.
-    pub fn build_with_ref(self, ui: &Ui, selected: &mut bool) -> bool {
-        if self.selected(*selected).build(ui) {
+    pub fn build_with_ref(self, selected: &mut bool) -> bool {
+        if self.selected(*selected).build() {
             *selected = !*selected;
             true
         } else {
