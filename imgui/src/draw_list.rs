@@ -230,11 +230,7 @@ impl<'ui> DrawListMut<'ui> {
     /// polygon, if not filled is drawn as a line specified by
     /// [`PolyLine::thickness`] (default 1.0)
     #[doc(alias = "AddPolyline", alias = "AddConvexPolyFilled")]
-    pub fn add_polyline<C, P>(
-        &'ui self,
-        points: Vec<P>,
-        c: C,
-    ) -> Polyline<'ui>
+    pub fn add_polyline<C, P>(&'ui self, points: Vec<P>, c: C) -> Polyline<'ui>
     where
         C: Into<ImColor32>,
         P: Into<MintVec2>,
@@ -516,11 +512,7 @@ pub struct Polyline<'ui> {
 }
 
 impl<'ui> Polyline<'ui> {
-    fn new<C, P>(
-        draw_list: &'ui DrawListMut<'_>,
-        points: Vec<P>,
-        c: C,
-    ) -> Self
+    fn new<C, P>(draw_list: &'ui DrawListMut<'_>, points: Vec<P>, c: C) -> Self
     where
         C: Into<ImColor32>,
         P: Into<MintVec2>,
@@ -572,7 +564,6 @@ impl<'ui> Polyline<'ui> {
         }
     }
 }
-
 
 /// Represents a rectangle about to be drawn
 #[must_use = "should call .build() to draw the object"]
