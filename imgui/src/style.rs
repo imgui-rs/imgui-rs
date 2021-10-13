@@ -1,3 +1,5 @@
+use std::convert::TryFrom;
+use std::fmt;
 use std::ops::{Index, IndexMut};
 
 use crate::internal::RawCast;
@@ -329,7 +331,104 @@ impl StyleColor {
     ];
     /// Total count of `StyleColor` variants
     pub const COUNT: usize = sys::ImGuiCol_COUNT as usize;
+
+    /// Returns the name of the Style Color.
+    // Note: we do this in Rust (where we have better promises of enums
+    // being of the right type) than in C++ to avoid the FFI. We confirm in
+    // Unit Tests that we are accurate.
+    pub fn name(&self) -> &'static str {
+        match self {
+            StyleColor::Text => "Text",
+            StyleColor::TextDisabled => "TextDisabled",
+            StyleColor::WindowBg => "WindowBg",
+            StyleColor::ChildBg => "ChildBg",
+            StyleColor::PopupBg => "PopupBg",
+            StyleColor::Border => "Border",
+            StyleColor::BorderShadow => "BorderShadow",
+            StyleColor::FrameBg => "FrameBg",
+            StyleColor::FrameBgHovered => "FrameBgHovered",
+            StyleColor::FrameBgActive => "FrameBgActive",
+            StyleColor::TitleBg => "TitleBg",
+            StyleColor::TitleBgActive => "TitleBgActive",
+            StyleColor::TitleBgCollapsed => "TitleBgCollapsed",
+            StyleColor::MenuBarBg => "MenuBarBg",
+            StyleColor::ScrollbarBg => "ScrollbarBg",
+            StyleColor::ScrollbarGrab => "ScrollbarGrab",
+            StyleColor::ScrollbarGrabHovered => "ScrollbarGrabHovered",
+            StyleColor::ScrollbarGrabActive => "ScrollbarGrabActive",
+            StyleColor::CheckMark => "CheckMark",
+            StyleColor::SliderGrab => "SliderGrab",
+            StyleColor::SliderGrabActive => "SliderGrabActive",
+            StyleColor::Button => "Button",
+            StyleColor::ButtonHovered => "ButtonHovered",
+            StyleColor::ButtonActive => "ButtonActive",
+            StyleColor::Header => "Header",
+            StyleColor::HeaderHovered => "HeaderHovered",
+            StyleColor::HeaderActive => "HeaderActive",
+            StyleColor::Separator => "Separator",
+            StyleColor::SeparatorHovered => "SeparatorHovered",
+            StyleColor::SeparatorActive => "SeparatorActive",
+            StyleColor::ResizeGrip => "ResizeGrip",
+            StyleColor::ResizeGripHovered => "ResizeGripHovered",
+            StyleColor::ResizeGripActive => "ResizeGripActive",
+            StyleColor::Tab => "Tab",
+            StyleColor::TabHovered => "TabHovered",
+            StyleColor::TabActive => "TabActive",
+            StyleColor::TabUnfocused => "TabUnfocused",
+            StyleColor::TabUnfocusedActive => "TabUnfocusedActive",
+            StyleColor::PlotLines => "PlotLines",
+            StyleColor::PlotLinesHovered => "PlotLinesHovered",
+            StyleColor::PlotHistogram => "PlotHistogram",
+            StyleColor::PlotHistogramHovered => "PlotHistogramHovered",
+            StyleColor::TableHeaderBg => "TableHeaderBg",
+            StyleColor::TableBorderStrong => "TableBorderStrong",
+            StyleColor::TableBorderLight => "TableBorderLight",
+            StyleColor::TableRowBg => "TableRowBg",
+            StyleColor::TableRowBgAlt => "TableRowBgAlt",
+            StyleColor::TextSelectedBg => "TextSelectedBg",
+            StyleColor::DragDropTarget => "DragDropTarget",
+            StyleColor::NavHighlight => "NavHighlight",
+            StyleColor::NavWindowingHighlight => "NavWindowingHighlight",
+            StyleColor::NavWindowingDimBg => "NavWindowingDimBg",
+            StyleColor::ModalWindowDimBg => "ModalWindowDimBg",
+        }
+    }
 }
+
+impl fmt::Display for StyleColor {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.pad(self.name())
+    }
+}
+
+impl TryFrom<usize> for StyleColor {
+    type Error = InvalidStyleColorValue;
+
+    fn try_from(value: usize) -> Result<Self, Self::Error> {
+        if value >= StyleColor::COUNT {
+            Err(InvalidStyleColorValue)
+        } else {
+            Ok(Self::VARIANTS[value])
+        }
+    }
+}
+
+impl TryFrom<u32> for StyleColor {
+    type Error = InvalidStyleColorValue;
+
+    fn try_from(value: u32) -> Result<Self, Self::Error> {
+        Self::try_from(value as usize)
+    }
+}
+
+#[derive(Debug)]
+pub struct InvalidStyleColorValue;
+impl fmt::Display for InvalidStyleColorValue {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.pad("Invalid style color value -- must be between 0..Self::COUNT")
+    }
+}
+impl std::error::Error for InvalidStyleColorValue {}
 
 /// A temporary change in user interface style
 #[derive(Copy, Clone, Debug, PartialEq)]
@@ -502,5 +601,18 @@ fn test_style_memory_layout() {
 fn test_style_color_variants() {
     for (idx, &value) in StyleColor::VARIANTS.iter().enumerate() {
         assert_eq!(idx, value as usize);
+    }
+}
+
+#[test]
+fn test_style_color_variant_names() {
+    for idx in StyleColor::VARIANTS.iter() {
+        let our_name = idx.name();
+        let their_name = unsafe {
+            let ptr = sys::igGetStyleColorName(*idx as i32);
+            std::ffi::CStr::from_ptr(ptr as *const _).to_str().unwrap()
+        };
+
+        assert_eq!(our_name, their_name);
     }
 }

@@ -180,6 +180,16 @@ impl Ui {
         unsafe { self.style() }.colors[style_color as usize]
     }
 
+    /// Gets the name of some style color.
+    ///
+    /// This is just a wrapper around calling [`name`] on [StyleColor].
+    ///
+    /// [`name`]: StyleColor::name
+    #[doc(alias = "GetStyleColorName")]
+    pub fn style_color_name(&self, style_color: StyleColor) -> &'static str {
+        style_color.name()
+    }
+
     /// Returns a shared reference to the current [`Style`].
     ///
     /// ## Safety
