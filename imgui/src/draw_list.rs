@@ -545,7 +545,7 @@ impl<'ui> Polyline<'ui> {
             unsafe {
                 sys::ImDrawList_AddConvexPolyFilled(
                     self.draw_list.draw_list,
-                    self.points.as_slice().as_ptr() as *const sys::ImVec2,
+                    self.points.as_ptr() as *const sys::ImVec2,
                     self.points.len() as i32,
                     self.color.into(),
                 )
@@ -554,7 +554,7 @@ impl<'ui> Polyline<'ui> {
             unsafe {
                 sys::ImDrawList_AddPolyline(
                     self.draw_list.draw_list,
-                    self.points.as_slice().as_ptr() as *const sys::ImVec2,
+                    self.points.as_ptr() as *const sys::ImVec2,
                     self.points.len() as i32,
                     self.color.into(),
                     sys::ImDrawFlags::default(),
