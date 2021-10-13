@@ -29,7 +29,7 @@ use sdl2::{
 /// macOS now...)
 #[derive(Debug, Clone, Copy, Default)]
 struct Button {
-    pressed_this_frame: bool,
+    pub pressed_this_frame: bool,
     state: bool,
 }
 
@@ -249,7 +249,11 @@ impl SdlPlatform {
         // Update mouse button state
         for (io_down, button) in io.mouse_down.iter_mut().zip(&mut self.mouse_buttons) {
             *io_down = button.get();
-            *button = Button::new();
+
+            // this frame is now "over" and we can set pressed_this_frame to false, but
+            // the state cannot be set to false due to actions that require multi-frame inputs
+            // ie: dragging, resizing and this is handled by the `MouseButtonDown` event.
+            button.pressed_this_frame = false;
         }
 
         // Set mouse position if requested by imgui-rs
