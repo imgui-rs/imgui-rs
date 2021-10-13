@@ -24,7 +24,7 @@
 
 - Added `add_polyline` method to `DrawListMut`, which binds to Dear ImGui's `AddPolyline` and `AddConvexPolyFilled`
 
-- BREAKING: `MenuItem::new` now takes `&ui`, but has been deprecated. Instead, use `ui.menu_item`.
+- BREAKING: `MenuItem::new` now takes `&ui`, but has been deprecated. Instead, use `ui.menu_item`. Additionally, a `ui.menu_item_config` has been created to access the builder pattern on `MenuItem`.
 
 ## [0.8.0] - 2021-09-17
 

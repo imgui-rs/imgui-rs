@@ -110,43 +110,22 @@ impl Ui {
 
     /// Creates a menu item with the given label, returning `true` if it was pressed.
     ///
+    /// If you want to configure this `menu_item` by setting `selection`, or `enablement`,
+    /// use [`menu_item_config`].
+    ///
     /// Note: a `menu_item` is the actual button/selectable within a Menu.
+    ///
+    /// [`menu_item_config`]: Self::menu_item_config
+    #[doc(alias = "MenuItem")]
     pub fn menu_item(&self, label: impl AsRef<str>) -> bool {
         self.menu_item_config(label).build()
     }
 
-    /// Creates a menu item with the given label and enablement, returning `true` if it was pressed.
+    /// Creates a menu item builder, with further methods on it as needed. Use [`menu_item`]
+    /// for simple Menu Items with no features on them.
     ///
     /// Note: a `menu_item` is the actual button/selectable within a Menu.
-    pub fn menu_item_enabled(&self, label: impl AsRef<str>, enabled: bool) -> bool {
-        self.menu_item_config(label).enabled(enabled).build()
-    }
-
-    /// Creates a menu item with the given label and selection, returning `true` if it was pressed.
-    ///
-    /// Note: a `menu_item` is the actual button/selectable within a Menu.
-    pub fn menu_item_selected(&self, label: impl AsRef<str>, selected: bool) -> bool {
-        self.menu_item_config(label).selected(selected).build()
-    }
-
-    /// Creates a menu item with the given label and selection, returning `true` if it was pressed,
-    /// while mutating `selected` to the correct state.
-    ///
-    /// Note: a `menu_item` is the actual button/selectable within a Menu.
-    pub fn menu_item_selected_ref(&self, label: impl AsRef<str>, selected: &mut bool) -> bool {
-        self.menu_item_config(label).build_with_ref(selected)
-    }
-
-    /// Creates a menu item with the given label and shortcut, returning `true` if it was pressed.
-    ///
-    /// Note: a `menu_item` is the actual button/selectable within a Menu.
-    pub fn menu_item_shortcut(&self, label: impl AsRef<str>, shortcut: impl AsRef<str>) -> bool {
-        self.menu_item_config(label).shortcut(shortcut).build()
-    }
-
-    // Creates a menu item builder, with further methods on it as needed.
-    //
-    // Note: a `menu_item` is the actual button/selectable within a Menu.
+    #[doc(alias = "MenuItem")]
     pub fn menu_item_config<L: AsRef<str>>(&self, label: L) -> MenuItem<'_, L> {
         MenuItem {
             label,
