@@ -226,6 +226,18 @@ impl<'ui> DrawListMut<'ui> {
         Line::new(self, p1, p2, c)
     }
 
+    /// Returns a polygonal line. If filled is rendered as a convex
+    /// polygon, if not filled is drawn as a line specified by
+    /// [`PolyLine::thickness`] (default 1.0)
+    #[doc(alias = "AddPolyline", alias = "AddConvexPolyFilled")]
+    pub fn add_polyline<C, P>(&'ui self, points: Vec<P>, c: C) -> Polyline<'ui>
+    where
+        C: Into<ImColor32>,
+        P: Into<MintVec2>,
+    {
+        Polyline::new(self, points, c)
+    }
+
     /// Returns a rectangle whose upper-left corner is at point `p1`
     /// and lower-right corner is at point `p2`, with color `c`.
     #[doc(alias = "AddRectFilled", alias = "AddRect")]
@@ -485,6 +497,70 @@ impl<'ui> Line<'ui> {
                 self.color.into(),
                 self.thickness,
             )
+        }
+    }
+}
+
+/// Represents a poly line about to be drawn
+#[must_use = "should call .build() to draw the object"]
+pub struct Polyline<'ui> {
+    points: Vec<[f32; 2]>,
+    thickness: f32,
+    filled: bool,
+    color: ImColor32,
+    draw_list: &'ui DrawListMut<'ui>,
+}
+
+impl<'ui> Polyline<'ui> {
+    fn new<C, P>(draw_list: &'ui DrawListMut<'_>, points: Vec<P>, c: C) -> Self
+    where
+        C: Into<ImColor32>,
+        P: Into<MintVec2>,
+    {
+        Self {
+            points: points.into_iter().map(|p| p.into().into()).collect(),
+            color: c.into(),
+            thickness: 1.0,
+            filled: false,
+            draw_list,
+        }
+    }
+
+    /// Set line's thickness (default to 1.0 pixel). Has no effect if
+    /// shape is filled
+    pub fn thickness(mut self, thickness: f32) -> Self {
+        self.thickness = thickness;
+        self
+    }
+
+    /// Draw shape as filled convex polygon
+    pub fn filled(mut self, filled: bool) -> Self {
+        self.filled = filled;
+        self
+    }
+
+    /// Draw the line on the window
+    pub fn build(self) {
+        if self.filled {
+            unsafe {
+                sys::ImDrawList_AddConvexPolyFilled(
+                    self.draw_list.draw_list,
+                    self.points.as_ptr() as *const sys::ImVec2,
+                    self.points.len() as i32,
+                    self.color.into(),
+                )
+            }
+        } else {
+            unsafe {
+                sys::ImDrawList_AddPolyline(
+                    self.draw_list.draw_list,
+                    self.points.as_ptr() as *const sys::ImVec2,
+                    self.points.len() as i32,
+                    self.color.into(),
+                    sys::ImDrawFlags::default(),
+                    self.thickness,
+                )
+            }
         }
     }
 }
