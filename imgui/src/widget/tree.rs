@@ -292,6 +292,7 @@ impl<T: AsRef<str>, L: AsRef<str>> TreeNode<T, L> {
 /// If `TreeNodeFlags::NO_TREE_PUSH_ON_OPEN` was used when this token was created, calling `.pop()`
 /// is not mandatory and is a no-op.
 #[must_use]
+#[derive(Debug)]
 pub struct TreeNodeToken<'a>(core::marker::PhantomData<&'a crate::Ui>, bool);
 
 impl<'a> TreeNodeToken<'a> {
