@@ -90,7 +90,7 @@ impl Ui {
 ///     ui.button("Hello, I am a drag source!");
 ///     
 ///     // Creates an empty DragSource with no tooltip
-///     DragDropSource::new("BUTTON_DRAG").begin(ui);
+///     ui.drag_drop_source_config("BUTTON_DRAG").begin();
 /// }
 /// ```
 ///
@@ -160,7 +160,7 @@ impl<'ui, T: AsRef<str>> DragDropSource<'ui, T> {
     ///     let drag_drop_name = "Test Drag";
     ///     
     ///     // drag drop SOURCE
-    ///     if DragDropSource::new(drag_drop_name).begin(ui).is_some() {
+    ///     if ui.drag_drop_source_config(drag_drop_name).begin().is_some() {
     ///         // warning -- this would allocate every frame if `DragDropSource` has
     ///         // condition `Always`, which it does by default. We're okay with that for
     ///         // this example, but real code probably wouldn't want to allocate so much.
@@ -170,7 +170,7 @@ impl<'ui, T: AsRef<str>> DragDropSource<'ui, T> {
     ///     ui.button("Target me!");
     ///
     ///     // drag drop TARGET
-    ///     if let Some(target) = imgui::DragDropTarget::new(ui) {
+    ///     if let Some(target) = ui.drag_drop_target() {
     ///         if target
     ///             .accept_payload_empty(drag_drop_name, DragDropFlags::empty())
     ///             .is_some()
@@ -214,7 +214,7 @@ impl<'ui, T: AsRef<str>> DragDropSource<'ui, T> {
     ///     let msg_to_send = "hello there sailor";
     ///     
     ///     // drag drop SOURCE
-    ///     if let Some(tooltip) = DragDropSource::new(drag_drop_name).begin_payload(ui, msg_to_send) {
+    ///     if let Some(tooltip) = ui.drag_drop_source_config(drag_drop_name).begin_payload(msg_to_send) {
     ///         ui.text("Sending message!");
     ///         tooltip.end();
     ///     }
@@ -222,7 +222,7 @@ impl<'ui, T: AsRef<str>> DragDropSource<'ui, T> {
     ///     ui.button("Target me!");
     ///
     ///     // drag drop TARGET
-    ///     if let Some(target) = imgui::DragDropTarget::new(ui) {
+    ///     if let Some(target) = ui.drag_drop_target() {
     ///         if let Some(Ok(payload_data)) = target
     ///             .accept_payload::<&'static str, _>(drag_drop_name, DragDropFlags::empty())
     ///         {
@@ -369,7 +369,7 @@ impl<'ui> DragDropTarget<'ui> {
     /// Creates a new DragDropTarget, which gives methods for handling
     /// accepting payloads.
     #[doc(alias = "BeginDragDropTarget")]
-    #[deprecated(since = "0.9.0", note = "Use `ui.drag_drop_taget() instead")]
+    #[deprecated(since = "0.9.0", note = "Use `ui.drag_drop_target() instead")]
     pub fn new(ui: &'ui Ui) -> Option<Self> {
         ui.drag_drop_target()
     }
