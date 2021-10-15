@@ -131,7 +131,7 @@ impl Ui {
             label,
             shortcut: None,
             selected: false,
-            enabled: false,
+            enabled: true,
             ui: self,
         }
     }
