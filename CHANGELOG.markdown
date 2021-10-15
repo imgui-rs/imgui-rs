@@ -24,7 +24,9 @@
 
 - Added `add_polyline` method to `DrawListMut`, which binds to Dear ImGui's `AddPolyline` and `AddConvexPolyFilled`
 
-- BREAKING: `MenuItem::new` now takes `&ui`, but has been deprecated. Instead, use `ui.menu_item`. Additionally, a `ui.menu_item_config` has been created to access the builder pattern on `MenuItem`.
+- BREAKING: The following structs have had their `new` method changed and deprecated; they now also take `ui` in their `new`, but you should create them on the `Ui` struct instead. These each now have a simple and a `_config` version:
+  - `MenuItem` should be made with `ui.menu_item` and `ui.menu_item_config`.
+  - `DragDropSource` and `DragDropTarget` should be made with `ui.drag_drop_source_config` and `ui.drag_drop_target`. Both of these methods, and the DragDrop API in general, are likely to change.
 
 ## [0.8.0] - 2021-09-17
 

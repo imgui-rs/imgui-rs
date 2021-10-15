@@ -70,6 +70,18 @@ bitflags!(
     }
 );
 
+impl Ui {
+    /// Creates a new [DragDropSource] with the given name.
+    pub fn drag_drop_source_config<T: AsRef<str>>(&self, name: T) -> DragDropSource<'_, T> {
+        DragDropSource {
+            name,
+            flags: DragDropFlags::empty(),
+            cond: Condition::Always,
+            ui: self,
+        }
+    }
+}
+
 /// Creates a source for drag drop data out of the last ID created.
 ///
 /// ```no_run
@@ -92,21 +104,22 @@ bitflags!(
 /// will manage, and then give to a [DragDropTarget], which will received the payload. The
 /// simplest and safest Payload is the empty payload, created with [begin](Self::begin).
 #[derive(Debug)]
-pub struct DragDropSource<T> {
+pub struct DragDropSource<'ui, T> {
     name: T,
     flags: DragDropFlags,
     cond: Condition,
+    ui: &'ui Ui,
 }
 
-impl<T: AsRef<str>> DragDropSource<T> {
-    /// Creates a new [DragDropSource] with no flags and the `Condition::Always` with the given name.
-    /// ImGui refers to this `name` field as a `type`, but really it's just an identifier to match up
-    /// Source/Target for DragDrop.
-    pub fn new(name: T) -> Self {
+impl<'ui, T: AsRef<str>> DragDropSource<'ui, T> {
+    /// Creates a new [DragDropSource] with the given name.
+    #[deprecated(since = "0.9.0", note = "use `ui.drag_drop_source_config` instead")]
+    pub fn new(name: T, ui: &'ui Ui) -> Self {
         Self {
             name,
             flags: DragDropFlags::empty(),
             cond: Condition::Always,
+            ui,
         }
     }
 
@@ -175,8 +188,8 @@ impl<T: AsRef<str>> DragDropSource<T> {
     /// If you want to pass a simple integer or other "plain old data", take a look at
     /// [begin_payload](Self::begin_payload).
     #[inline]
-    pub fn begin<'ui>(self, ui: &Ui) -> Option<DragDropSourceToolTip<'ui>> {
-        self.begin_payload(ui, ())
+    pub fn begin(self) -> Option<DragDropSourceToolTip<'ui>> {
+        self.begin_payload(())
     }
 
     /// Creates the source of a drag and returns a handle on the tooltip.
@@ -222,15 +235,13 @@ impl<T: AsRef<str>> DragDropSource<T> {
     /// }
     /// ```
     #[inline]
-    pub fn begin_payload<'ui, P: Copy + 'static>(
+    pub fn begin_payload<P: Copy + 'static>(
         self,
-        ui: &Ui,
         payload: P,
     ) -> Option<DragDropSourceToolTip<'ui>> {
         unsafe {
             let payload = TypedPayload::new(payload);
             self.begin_payload_unchecked(
-                ui,
                 &payload as *const _ as *const ffi::c_void,
                 std::mem::size_of::<TypedPayload<P>>(),
             )
@@ -264,16 +275,15 @@ impl<T: AsRef<str>> DragDropSource<T> {
     /// Overall, users should be very sure that this function is needed before they reach for it, and instead
     /// should consider either [begin](Self::begin) or [begin_payload](Self::begin_payload).
     #[inline]
-    pub unsafe fn begin_payload_unchecked<'ui>(
+    pub unsafe fn begin_payload_unchecked(
         &self,
-        ui: &Ui,
         ptr: *const ffi::c_void,
         size: usize,
     ) -> Option<DragDropSourceToolTip<'ui>> {
         let should_begin = sys::igBeginDragDropSource(self.flags.bits() as i32);
 
         if should_begin {
-            sys::igSetDragDropPayload(ui.scratch_txt(&self.name), ptr, size, self.cond as i32);
+            sys::igSetDragDropPayload(self.ui.scratch_txt(&self.name), ptr, size, self.cond as i32);
 
             Some(DragDropSourceToolTip::push())
         } else {
@@ -303,6 +313,20 @@ impl DragDropSourceToolTip<'_> {
 impl Drop for DragDropSourceToolTip<'_> {
     fn drop(&mut self) {
         unsafe { sys::igEndDragDropSource() }
+    }
+}
+
+impl Ui {
+    /// Creates a new DragDropTarget, which gives methods for handling
+    /// accepting payloads.
+    #[doc(alias = "BeginDragDropTarget")]
+    pub fn drag_drop_target(&self) -> Option<DragDropTarget<'_>> {
+        let should_begin = unsafe { sys::igBeginDragDropTarget() };
+        if should_begin {
+            Some(DragDropTarget(self))
+        } else {
+            None
+        }
     }
 }
 
@@ -342,17 +366,12 @@ impl Drop for DragDropSourceToolTip<'_> {
 pub struct DragDropTarget<'ui>(&'ui Ui);
 
 impl<'ui> DragDropTarget<'ui> {
-    /// Creates a new DragDropTarget, holding the [Ui]'s lifetime for the duration
-    /// of its existence. This is required since this struct runs some code on its Drop
-    /// to end the DragDropTarget code.
+    /// Creates a new DragDropTarget, which gives methods for handling
+    /// accepting payloads.
     #[doc(alias = "BeginDragDropTarget")]
+    #[deprecated(since = "0.9.0", note = "Use `ui.drag_drop_taget() instead")]
     pub fn new(ui: &'ui Ui) -> Option<Self> {
-        let should_begin = unsafe { sys::igBeginDragDropTarget() };
-        if should_begin {
-            Some(Self(ui))
-        } else {
-            None
-        }
+        ui.drag_drop_target()
     }
 
     /// Accepts an empty payload. This is the safest option for raising named events
