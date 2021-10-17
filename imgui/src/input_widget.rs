@@ -317,18 +317,32 @@ where
             }
         };
 
-        // first, pop our end buffer...
-        if self.buf.ends_with('\0') {
-            self.buf.pop();
-        }
+        let cap = self.buf.capacity();
 
-        if o {
-            // if a truncation occured, we'll find another one too on the end.
-            // this might end up deleting user `\0` though!
-            // this hack is working but WOW is it hacky!
-            if let Some(null_terminator_position) = self.buf.rfind('\0') {
-                self.buf.truncate(null_terminator_position);
+        // SAFETY: this slice is simply a view into the underlying buffer
+        // of a String.
+        let buf = unsafe { std::slice::from_raw_parts(self.buf.as_ptr(), cap) };
+
+        if let Some(len) = buf.iter().position(|x| *x == 0) {
+            // `len` is the position of the first `\0` byte in the String
+
+            unsafe {
+                let ptr = self.buf.as_mut_ptr();
+
+                // SAFETY: `ptr` and `cap` are from an existing String and
+                // so they are valid. `len` is an index in a buffer of
+                // length `cap` and thus it must be less than `cap`.
+                let new_buf = String::from_raw_parts(ptr, len, cap);
+
+                let old_buf = std::mem::replace(self.buf, new_buf);
+
+                // Since `new_buf` and `old_buf` share the same underlying
+                // buffer we cannot allow `old_buf` to run it's destructor.
+                std::mem::forget(old_buf);
             }
+        } else {
+            // There is no null terminator, the best we can do is to not
+            // update the string length.
         }
 
         o
@@ -457,17 +471,32 @@ impl<'ui, 'p, T: InputTextCallbackHandler, L: AsRef<str>> InputTextMultiline<'ui
             )
         };
 
-        // first, pop our end buffer...
-        if self.buf.ends_with('\0') {
-            self.buf.pop();
-        }
+        let cap = self.buf.capacity();
 
-        if o {
-            // if a truncation occured, we'll find another one too on the end.
-            // this might end up deleting user `\0` though!
-            if let Some(null_terminator_position) = self.buf.rfind('\0') {
-                self.buf.truncate(null_terminator_position);
+        // SAFETY: this slice is simply a view into the underlying buffer
+        // of a String.
+        let buf = unsafe { std::slice::from_raw_parts(self.buf.as_ptr(), cap) };
+
+        if let Some(len) = buf.iter().position(|x| *x == 0) {
+            // `len` is the position of the first `\0` byte in the String
+
+            unsafe {
+                let ptr = self.buf.as_mut_ptr();
+
+                // SAFETY: `ptr` and `cap` are from an existing String and
+                // so they are valid. `len` is an index in a buffer of
+                // length `cap` and thus it must be less than `cap`.
+                let new_buf = String::from_raw_parts(ptr, len, cap);
+
+                let old_buf = std::mem::replace(self.buf, new_buf);
+
+                // Since `new_buf` and `old_buf` share the same underlying
+                // buffer we cannot allow `old_buf` to run it's destructor.
+                std::mem::forget(old_buf);
             }
+        } else {
+            // There is no null terminator, the best we can do is to not
+            // update the string length.
         }
 
         o
