@@ -326,20 +326,16 @@ where
         if let Some(len) = buf.iter().position(|x| *x == 0) {
             // `len` is the position of the first `\0` byte in the String
 
-            unsafe {
-                let ptr = self.buf.as_mut_ptr();
+            let mut old_buf = std::mem::ManuallyDrop::new(std::mem::take(self.buf));
 
-                // SAFETY: `ptr` and `cap` are from an existing String and
-                // so they are valid. `len` is an index in a buffer of
-                // length `cap` and thus it must be less than `cap`.
-                let new_buf = String::from_raw_parts(ptr, len, cap);
+            let ptr = old_buf.as_mut_ptr();
 
-                let old_buf = std::mem::replace(self.buf, new_buf);
+            // SAFETY: `ptr` and `cap` are from an existing String and
+            // so they are valid. `len` is an index in a slice of
+            // length `cap` and thus it must be less than `cap`.
+            let new_buf = unsafe { String::from_raw_parts(ptr, len, cap) };
 
-                // Since `new_buf` and `old_buf` share the same underlying
-                // buffer we cannot allow `old_buf` to run it's destructor.
-                std::mem::forget(old_buf);
-            }
+            *self.buf = new_buf;
         } else {
             // There is no null terminator, the best we can do is to not
             // update the string length.
@@ -480,20 +476,16 @@ impl<'ui, 'p, T: InputTextCallbackHandler, L: AsRef<str>> InputTextMultiline<'ui
         if let Some(len) = buf.iter().position(|x| *x == 0) {
             // `len` is the position of the first `\0` byte in the String
 
-            unsafe {
-                let ptr = self.buf.as_mut_ptr();
+            let mut old_buf = std::mem::ManuallyDrop::new(std::mem::take(self.buf));
 
-                // SAFETY: `ptr` and `cap` are from an existing String and
-                // so they are valid. `len` is an index in a buffer of
-                // length `cap` and thus it must be less than `cap`.
-                let new_buf = String::from_raw_parts(ptr, len, cap);
+            let ptr = old_buf.as_mut_ptr();
 
-                let old_buf = std::mem::replace(self.buf, new_buf);
+            // SAFETY: `ptr` and `cap` are from an existing String and
+            // so they are valid. `len` is an index in a slice of
+            // length `cap` and thus it must be less than `cap`.
+            let new_buf = unsafe { String::from_raw_parts(ptr, len, cap) };
 
-                // Since `new_buf` and `old_buf` share the same underlying
-                // buffer we cannot allow `old_buf` to run it's destructor.
-                std::mem::forget(old_buf);
-            }
+            *self.buf = new_buf;
         } else {
             // There is no null terminator, the best we can do is to not
             // update the string length.
