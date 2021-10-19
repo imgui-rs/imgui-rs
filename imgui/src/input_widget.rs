@@ -320,26 +320,24 @@ where
             }
         };
 
-        if o {
-            let cap = self.buf.capacity();
+        let cap = self.buf.capacity();
 
-            // SAFETY: this slice is simply a view into the underlying buffer
-            // of a String. We MAY be holding onto a view of uninitialized memory,
-            // however, since we're holding this as a u8 slice, I think it should be
-            // alright...
-            // additionally, we can go over the bytes directly, rather than char indices,
-            // because NUL will never appear in any UTF8 outside the NUL character (ie, within
-            // a char).
-            let buf = unsafe { std::slice::from_raw_parts(self.buf.as_ptr(), cap) };
-            if let Some(len) = buf.iter().position(|x| *x == b'\0') {
-                // `len` is the position of the first `\0` byte in the String
-                unsafe {
-                    self.buf.as_mut_vec().set_len(len);
-                }
-            } else {
-                // There is no null terminator, the best we can do is to not
-                // update the string length.
+        // SAFETY: this slice is simply a view into the underlying buffer
+        // of a String. We MAY be holding onto a view of uninitialized memory,
+        // however, since we're holding this as a u8 slice, I think it should be
+        // alright...
+        // additionally, we can go over the bytes directly, rather than char indices,
+        // because NUL will never appear in any UTF8 outside the NUL character (ie, within
+        // a char).
+        let buf = unsafe { std::slice::from_raw_parts(self.buf.as_ptr(), cap) };
+        if let Some(len) = buf.iter().position(|x| *x == b'\0') {
+            // `len` is the position of the first `\0` byte in the String
+            unsafe {
+                self.buf.as_mut_vec().set_len(len);
             }
+        } else {
+            // There is no null terminator, the best we can do is to not
+            // update the string length.
         }
 
         o
@@ -468,26 +466,24 @@ impl<'ui, 'p, T: InputTextCallbackHandler, L: AsRef<str>> InputTextMultiline<'ui
             )
         };
 
-        if o {
-            let cap = self.buf.capacity();
+        let cap = self.buf.capacity();
 
-            // SAFETY: this slice is simply a view into the underlying buffer
-            // of a String. We MAY be holding onto a view of uninitialized memory,
-            // however, since we're holding this as a u8 slice, I think it should be
-            // alright...
-            // additionally, we can go over the bytes directly, rather than char indices,
-            // because NUL will never appear in any UTF8 outside the NUL character (ie, within
-            // a char).
-            let buf = unsafe { std::slice::from_raw_parts(self.buf.as_ptr(), cap) };
-            if let Some(len) = buf.iter().position(|x| *x == b'\0') {
-                // `len` is the position of the first `\0` byte in the String
-                unsafe {
-                    self.buf.as_mut_vec().set_len(len);
-                }
-            } else {
-                // There is no null terminator, the best we can do is to not
-                // update the string length.
+        // SAFETY: this slice is simply a view into the underlying buffer
+        // of a String. We MAY be holding onto a view of uninitialized memory,
+        // however, since we're holding this as a u8 slice, I think it should be
+        // alright...
+        // additionally, we can go over the bytes directly, rather than char indices,
+        // because NUL will never appear in any UTF8 outside the NUL character (ie, within
+        // a char).
+        let buf = unsafe { std::slice::from_raw_parts(self.buf.as_ptr(), cap) };
+        if let Some(len) = buf.iter().position(|x| *x == b'\0') {
+            // `len` is the position of the first `\0` byte in the String
+            unsafe {
+                self.buf.as_mut_vec().set_len(len);
             }
+        } else {
+            // There is no null terminator, the best we can do is to not
+            // update the string length.
         }
 
         o
