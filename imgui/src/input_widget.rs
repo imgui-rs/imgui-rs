@@ -320,17 +320,25 @@ where
             }
         };
 
-        // first, pop our end buffer...
-        if self.buf.ends_with('\0') {
-            self.buf.pop();
-        }
-
         if o {
-            // if a truncation occured, we'll find another one too on the end.
-            // this might end up deleting user `\0` though!
-            // this hack is working but WOW is it hacky!
-            if let Some(null_terminator_position) = self.buf.rfind('\0') {
-                self.buf.truncate(null_terminator_position);
+            let cap = self.buf.capacity();
+
+            // SAFETY: this slice is simply a view into the underlying buffer
+            // of a String. We MAY be holding onto a view of uninitialized memory,
+            // however, since we're holding this as a u8 slice, I think it should be
+            // alright...
+            // additionally, we can go over the bytes directly, rather than char indices,
+            // because NUL will never appear in any UTF8 outside the NUL character (ie, within
+            // a char).
+            let buf = unsafe { std::slice::from_raw_parts(self.buf.as_ptr(), cap) };
+            if let Some(len) = buf.iter().position(|x| *x == b'\0') {
+                // `len` is the position of the first `\0` byte in the String
+                unsafe {
+                    self.buf.as_mut_vec().set_len(len);
+                }
+            } else {
+                // There is no null terminator, the best we can do is to not
+                // update the string length.
             }
         }
 
@@ -460,16 +468,25 @@ impl<'ui, 'p, T: InputTextCallbackHandler, L: AsRef<str>> InputTextMultiline<'ui
             )
         };
 
-        // first, pop our end buffer...
-        if self.buf.ends_with('\0') {
-            self.buf.pop();
-        }
-
         if o {
-            // if a truncation occured, we'll find another one too on the end.
-            // this might end up deleting user `\0` though!
-            if let Some(null_terminator_position) = self.buf.rfind('\0') {
-                self.buf.truncate(null_terminator_position);
+            let cap = self.buf.capacity();
+
+            // SAFETY: this slice is simply a view into the underlying buffer
+            // of a String. We MAY be holding onto a view of uninitialized memory,
+            // however, since we're holding this as a u8 slice, I think it should be
+            // alright...
+            // additionally, we can go over the bytes directly, rather than char indices,
+            // because NUL will never appear in any UTF8 outside the NUL character (ie, within
+            // a char).
+            let buf = unsafe { std::slice::from_raw_parts(self.buf.as_ptr(), cap) };
+            if let Some(len) = buf.iter().position(|x| *x == b'\0') {
+                // `len` is the position of the first `\0` byte in the String
+                unsafe {
+                    self.buf.as_mut_vec().set_len(len);
+                }
+            } else {
+                // There is no null terminator, the best we can do is to not
+                // update the string length.
             }
         }
 
