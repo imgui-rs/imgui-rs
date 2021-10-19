@@ -283,7 +283,6 @@ impl Ui {
     where
         for<'b> L: Fn(&'b V) -> Cow<'b, str>,
     {
-        use crate::widget::selectable::Selectable;
         let label_fn = &label_fn;
         let mut result = false;
         let preview_value = items.get(*current_item).map(label_fn);
@@ -292,7 +291,7 @@ impl Ui {
             for (idx, item) in items.iter().enumerate() {
                 let text = label_fn(item);
                 let selected = idx == *current_item;
-                if Selectable::new(&text).selected(selected).build(self) {
+                if self.selectable_config(&text).selected(selected).build() {
                     *current_item = idx;
                     result = true;
                 }

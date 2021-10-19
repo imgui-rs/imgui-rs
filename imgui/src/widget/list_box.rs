@@ -79,14 +79,13 @@ impl<T: AsRef<str>> ListBox<T> {
     where
         for<'b> L: Fn(&'b V) -> Cow<'b, str>,
     {
-        use crate::widget::selectable::Selectable;
         let mut result = false;
         let lb = self;
         if let Some(_cb) = lb.begin(ui) {
             for (idx, item) in items.iter().enumerate() {
                 let text = label_fn(item);
                 let selected = idx == *current_item;
-                if Selectable::new(&text).selected(selected).build(ui) {
+                if ui.selectable_config(&text).selected(selected).build() {
                     *current_item = idx;
                     result = true;
                 }

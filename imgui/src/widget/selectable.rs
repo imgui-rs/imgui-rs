@@ -21,36 +21,60 @@ bitflags!(
     }
 );
 
-/// Builder for a selectable widget.
-#[derive(Copy, Clone, Debug)]
-#[must_use]
-pub struct Selectable<T> {
-    label: T,
-    selected: bool,
-    flags: SelectableFlags,
-    size: [f32; 2],
-}
-
-impl<T: AsRef<str>> Selectable<T> {
-    /// Constructs a new selectable builder.
-    #[inline]
+impl Ui {
+    /// Constructs a new simple selectable.
+    ///
+    /// Use [selectable_config] for a builder with additional options.
+    ///
+    /// [selectable_config]: Self::selectable_config
     #[doc(alias = "Selectable")]
-    pub fn new(label: T) -> Self {
+    pub fn selectable<T: AsRef<str>>(&self, label: T) -> bool {
+        self.selectable_config(label).build()
+    }
+
+    /// Constructs a new selectable builder.
+    #[doc(alias = "Selectable")]
+    pub fn selectable_config<T: AsRef<str>>(&self, label: T) -> Selectable<'_, T> {
         Selectable {
             label,
             selected: false,
             flags: SelectableFlags::empty(),
             size: [0.0, 0.0],
+            ui: self,
+        }
+    }
+}
+
+/// Builder for a selectable widget.
+#[derive(Copy, Clone, Debug)]
+#[must_use]
+pub struct Selectable<'ui, T> {
+    label: T,
+    selected: bool,
+    flags: SelectableFlags,
+    size: [f32; 2],
+    ui: &'ui Ui,
+}
+
+impl<'ui, T: AsRef<str>> Selectable<'ui, T> {
+    /// Constructs a new selectable builder.
+    #[doc(alias = "Selectable")]
+    #[deprecated(since = "0.9.0", note = "use `ui.selectable` or `ui.selectable_config`")]
+    pub fn new(label: T, ui: &'ui Ui) -> Self {
+        Selectable {
+            label,
+            selected: false,
+            flags: SelectableFlags::empty(),
+            size: [0.0, 0.0],
+            ui,
         }
     }
     /// Replaces all current settings with the given flags
-    #[inline]
     pub fn flags(mut self, flags: SelectableFlags) -> Self {
         self.flags = flags;
         self
     }
     /// Sets the selected state of the selectable
-    #[inline]
     pub fn selected(mut self, selected: bool) -> Self {
         self.selected = selected;
         self
@@ -58,7 +82,6 @@ impl<T: AsRef<str>> Selectable<T> {
     /// Enables/disables closing parent popup window on click.
     ///
     /// Default: enabled
-    #[inline]
     pub fn close_popups(mut self, value: bool) -> Self {
         self.flags.set(SelectableFlags::DONT_CLOSE_POPUPS, !value);
         self
@@ -66,7 +89,6 @@ impl<T: AsRef<str>> Selectable<T> {
     /// Enables/disables full column span (text will still fit in the current column).
     ///
     /// Default: disabled
-    #[inline]
     pub fn span_all_columns(mut self, value: bool) -> Self {
         self.flags.set(SelectableFlags::SPAN_ALL_COLUMNS, value);
         self
@@ -74,7 +96,6 @@ impl<T: AsRef<str>> Selectable<T> {
     /// Enables/disables click event generation on double clicks.
     ///
     /// Default: disabled
-    #[inline]
     pub fn allow_double_click(mut self, value: bool) -> Self {
         self.flags.set(SelectableFlags::ALLOW_DOUBLE_CLICK, value);
         self
@@ -84,7 +105,6 @@ impl<T: AsRef<str>> Selectable<T> {
     /// When disabled, it cannot be selected and the text uses the disabled text color.
     ///
     /// Default: disabled
-    #[inline]
     pub fn disabled(mut self, value: bool) -> Self {
         self.flags.set(SelectableFlags::DISABLED, value);
         self
@@ -100,18 +120,18 @@ impl<T: AsRef<str>> Selectable<T> {
     ///
     /// - `> 0.0`: use given height
     /// - `= 0.0`: use label height
-    #[inline]
     pub fn size(mut self, size: impl Into<MintVec2>) -> Self {
         self.size = size.into().into();
         self
     }
+
     /// Builds the selectable.
     ///
     /// Returns true if the selectable was clicked.
-    pub fn build(self, ui: &Ui) -> bool {
+    pub fn build(self) -> bool {
         unsafe {
             sys::igSelectable_Bool(
-                ui.scratch_txt(self.label),
+                self.ui.scratch_txt(self.label),
                 self.selected,
                 self.flags.bits() as i32,
                 self.size.into(),
@@ -120,8 +140,8 @@ impl<T: AsRef<str>> Selectable<T> {
     }
 
     /// Builds the selectable using a mutable reference to selected state.
-    pub fn build_with_ref(self, ui: &Ui, selected: &mut bool) -> bool {
-        if self.selected(*selected).build(ui) {
+    pub fn build_with_ref(self, selected: &mut bool) -> bool {
+        if self.selected(*selected).build() {
             *selected = !*selected;
             true
         } else {

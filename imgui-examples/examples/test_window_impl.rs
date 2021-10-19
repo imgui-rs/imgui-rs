@@ -503,7 +503,7 @@ fn show_test_window(ui: &Ui, state: &mut State, opened: &mut bool) {
             ListBox::new("selectables list").build(ui, || {
                 for (index, name) in names.iter().enumerate() {
                     let selected = matches!(state.selected_fish2, Some(i) if i == index );
-                    if Selectable::new(name).selected(selected).build(ui) {
+                    if ui.selectable_config(name).selected(selected).build() {
                         state.selected_fish2 = Some(index);
                     }
                 }
@@ -513,7 +513,7 @@ fn show_test_window(ui: &Ui, state: &mut State, opened: &mut bool) {
             ListBox::new("selectable list 2").size([0.0, last_size[1] * 0.66]).build(ui, || {
                 for (index, name) in names.iter().enumerate() {
                     let selected = matches!(state.selected_fish2, Some(i) if i == index );
-                    if Selectable::new(name).selected(selected).build(ui) {
+                    if ui.selectable_config(name).selected(selected).build() {
                         state.selected_fish2 = Some(index);
                     }
                 }
@@ -757,7 +757,7 @@ CTRL+click on individual component to input value.\n",
                     ui.text("Aquarium");
                     ui.separator();
                     for (index, name) in names.iter().enumerate() {
-                        if Selectable::new(name).build(ui) {
+                        if ui.selectable(name) {
                             state.selected_fish = Some(index);
                         }
                     }
