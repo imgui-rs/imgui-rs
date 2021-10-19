@@ -317,18 +317,24 @@ where
             }
         };
 
-        // first, pop our end buffer...
-        if self.buf.ends_with('\0') {
-            self.buf.pop();
-        }
+        let cap = self.buf.capacity();
 
-        if o {
-            // if a truncation occured, we'll find another one too on the end.
-            // this might end up deleting user `\0` though!
-            // this hack is working but WOW is it hacky!
-            if let Some(null_terminator_position) = self.buf.rfind('\0') {
-                self.buf.truncate(null_terminator_position);
+        // SAFETY: this slice is simply a view into the underlying buffer
+        // of a String. We MAY be holding onto a view of uninitialized memory,
+        // however, since we're holding this as a u8 slice, I think it should be
+        // alright...
+        // additionally, we can go over the bytes directly, rather than char indices,
+        // because NUL will never appear in any UTF8 outside the NUL character (ie, within
+        // a char).
+        let buf = unsafe { std::slice::from_raw_parts(self.buf.as_ptr(), cap) };
+        if let Some(len) = buf.iter().position(|x| *x == b'\0') {
+            // `len` is the position of the first `\0` byte in the String
+            unsafe {
+                self.buf.as_mut_vec().set_len(len);
             }
+        } else {
+            // There is no null terminator, the best we can do is to not
+            // update the string length.
         }
 
         o
@@ -457,17 +463,24 @@ impl<'ui, 'p, T: InputTextCallbackHandler, L: AsRef<str>> InputTextMultiline<'ui
             )
         };
 
-        // first, pop our end buffer...
-        if self.buf.ends_with('\0') {
-            self.buf.pop();
-        }
+        let cap = self.buf.capacity();
 
-        if o {
-            // if a truncation occured, we'll find another one too on the end.
-            // this might end up deleting user `\0` though!
-            if let Some(null_terminator_position) = self.buf.rfind('\0') {
-                self.buf.truncate(null_terminator_position);
+        // SAFETY: this slice is simply a view into the underlying buffer
+        // of a String. We MAY be holding onto a view of uninitialized memory,
+        // however, since we're holding this as a u8 slice, I think it should be
+        // alright...
+        // additionally, we can go over the bytes directly, rather than char indices,
+        // because NUL will never appear in any UTF8 outside the NUL character (ie, within
+        // a char).
+        let buf = unsafe { std::slice::from_raw_parts(self.buf.as_ptr(), cap) };
+        if let Some(len) = buf.iter().position(|x| *x == b'\0') {
+            // `len` is the position of the first `\0` byte in the String
+            unsafe {
+                self.buf.as_mut_vec().set_len(len);
             }
+        } else {
+            // There is no null terminator, the best we can do is to not
+            // update the string length.
         }
 
         o
@@ -732,8 +745,8 @@ impl<'a> TextCallbackData<'a> {
     pub fn str(&self) -> &str {
         unsafe {
             std::str::from_utf8(std::slice::from_raw_parts(
-                self.0.Buf as *const _,
-                self.0.BufTextLen as usize,
+                (*(self.0)).Buf as *const _,
+                (*(self.0)).BufTextLen as usize,
             ))
             .expect("internal imgui error -- it boofed a utf8")
         }
@@ -760,8 +773,8 @@ impl<'a> TextCallbackData<'a> {
     /// [push_str]: Self::push_str
     pub unsafe fn str_as_bytes_mut(&mut self) -> &mut [u8] {
         let str = std::str::from_utf8_mut(std::slice::from_raw_parts_mut(
-            self.0.Buf as *const _ as *mut _,
-            self.0.BufTextLen as usize,
+            (*(self.0)).Buf as *const _ as *mut _,
+            (*(self.0)).BufTextLen as usize,
         ))
         .expect("internal imgui error -- it boofed a utf8");
 
@@ -780,7 +793,7 @@ impl<'a> TextCallbackData<'a> {
     /// [remove_chars]: Self::remove_chars
     /// [insert_chars]: Self::insert_chars
     pub fn set_dirty(&mut self) {
-        self.0.BufDirty = true;
+        (*(self.0)).BufDirty = true;
     }
 
     /// Gets a range of the selected text. See [selection_start_mut](Self::selection_start_mut)
@@ -789,7 +802,7 @@ impl<'a> TextCallbackData<'a> {
     /// This Range is given in `usize` so that it might be used in indexing
     /// operations more easily. To quickly grab the selected text, use [selected](Self::selected).
     pub fn selection(&self) -> Range<usize> {
-        self.0.SelectionStart as usize..self.0.SelectionEnd as usize
+        (*(self.0)).SelectionStart as usize..(*(self.0)).SelectionEnd as usize
     }
 
     /// Returns the selected text directly. Note that if no text is selected,
@@ -823,7 +836,7 @@ impl<'a> TextCallbackData<'a> {
     pub fn push_str(&mut self, s: &str) {
         // this is safe because the ench of a self.str is a char_boundary.
         unsafe {
-            self.insert_chars_unsafe(self.0.BufTextLen as usize, s);
+            self.insert_chars_unsafe((*self.0).BufTextLen as usize, s);
         }
     }
 
@@ -863,7 +876,7 @@ impl<'a> TextCallbackData<'a> {
     /// Clears the string to an empty buffer.
     pub fn clear(&mut self) {
         unsafe {
-            self.remove_chars_unchecked(0, self.0.BufTextLen as usize);
+            self.remove_chars_unchecked(0, (*self.0).BufTextLen as usize);
         }
     }
 
@@ -899,22 +912,22 @@ impl<'a> TextCallbackData<'a> {
 
     /// Get a reference to the text callback buffer's cursor pos.
     pub fn cursor_pos(&self) -> usize {
-        self.0.CursorPos as usize
+        (*self.0).CursorPos as usize
     }
 
     /// Set the text callback buffer's cursor pos.
     pub fn set_cursor_pos(&mut self, cursor_pos: usize) {
-        self.0.CursorPos = cursor_pos as i32;
+        (*self.0).CursorPos = cursor_pos as i32;
     }
 
     /// Get a mutable reference to the text callback buffer's selection start.
     pub fn selection_start_mut(&mut self) -> &mut i32 {
-        &mut self.0.SelectionStart
+        &mut (*self.0).SelectionStart
     }
 
     /// Get a mutable reference to the text callback buffer's selection end..
     pub fn selection_end_mut(&mut self) -> &mut i32 {
-        &mut self.0.SelectionEnd
+        &mut (*self.0).SelectionEnd
     }
 }
 
@@ -960,22 +973,19 @@ extern "C" fn callback<T: InputTextCallbackHandler>(
         }
         InputTextFlags::CALLBACK_RESIZE => {
             unsafe {
-                let requested_size = (*data).BufTextLen as usize;
+                let requested_size = (*data).BufSize as usize;
+                let buffer = &mut *callback_data.user_data.container;
 
                 // just confirm that we ARE working with our string.
-                debug_assert_eq!(
-                    callback_data.user_data.container.as_ptr() as *const _,
-                    (*data).Buf
-                );
+                debug_assert_eq!(buffer.as_ptr() as *const _, (*data).Buf);
 
-                if requested_size > callback_data.user_data.container.capacity() {
+                if requested_size > buffer.capacity() {
+                    let additional_bytes = requested_size - buffer.len();
+
                     // reserve more data...
-                    callback_data
-                        .user_data
-                        .container
-                        .reserve(requested_size - callback_data.user_data.container.capacity());
+                    buffer.reserve(additional_bytes);
 
-                    (*data).Buf = callback_data.user_data.container.as_mut_ptr() as *mut _;
+                    (*data).Buf = buffer.as_mut_ptr() as *mut _;
                     (*data).BufDirty = true;
                 }
             }
