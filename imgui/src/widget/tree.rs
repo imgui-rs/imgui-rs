@@ -86,39 +86,79 @@ impl<T> From<*mut T> for TreeNodeId<T> {
     }
 }
 
-/// Builder for a tree node widget
-#[derive(Copy, Clone, Debug)]
-#[must_use]
-pub struct TreeNode<T, L = &'static str> {
-    id: TreeNodeId<T>,
-    label: Option<L>,
-    opened: bool,
-    opened_cond: Condition,
-    flags: TreeNodeFlags,
-}
+impl Ui {
+    /// Constructs a new tree node with just a name, and pushes it.
+    ///
+    /// Use [tree_node_config] to access a builder to put additional
+    /// configurations on the tree node.
+    ///
+    /// [tree_node_config]: Self::tree_node_config
+    pub fn tree_node<I, T>(&self, id: I) -> Option<TreeNodeToken<'_>>
+    where
+        I: Into<TreeNodeId<T>>,
+        T: AsRef<str>,
+    {
+        self.tree_node_config(id).push()
+    }
 
-impl<T: AsRef<str>> TreeNode<T, &'static str> {
-    /// Constructs a new tree node builder
-    pub fn new<I: Into<TreeNodeId<T>>>(id: I) -> TreeNode<T, &'static str> {
+    /// Constructs a new tree node builder.
+    ///
+    /// Use [tree_node] to build a simple node with just a name.
+    ///
+    /// [tree_node]: Self::tree_node
+    pub fn tree_node_config<I, T>(&self, id: I) -> TreeNode<'_, T>
+    where
+        I: Into<TreeNodeId<T>>,
+        T: AsRef<str>,
+    {
         TreeNode {
             id: id.into(),
             label: None,
             opened: false,
             opened_cond: Condition::Never,
             flags: TreeNodeFlags::empty(),
+            ui: self,
         }
     }
 }
 
-impl<T: AsRef<str>, L: AsRef<str>> TreeNode<T, L> {
+/// Builder for a tree node widget
+#[derive(Copy, Clone, Debug)]
+#[must_use]
+pub struct TreeNode<'a, T, L = &'static str> {
+    id: TreeNodeId<T>,
+    label: Option<L>,
+    opened: bool,
+    opened_cond: Condition,
+    flags: TreeNodeFlags,
+    ui: &'a Ui,
+}
+
+impl<'a, T: AsRef<str>> TreeNode<'a, T, &'static str> {
+    /// Constructs a new tree node builder
+    #[deprecated(since = "0.9.0", note = "use `ui.tree_node` or `ui.tree_node_config`")]
+    pub fn new<I: Into<TreeNodeId<T>>>(id: I, ui: &'a Ui) -> TreeNode<'a, T, &'static str> {
+        TreeNode {
+            id: id.into(),
+            label: None,
+            opened: false,
+            opened_cond: Condition::Never,
+            flags: TreeNodeFlags::empty(),
+            ui,
+        }
+    }
+}
+
+impl<'a, T: AsRef<str>, L: AsRef<str>> TreeNode<'a, T, L> {
     /// Sets the tree node label
-    pub fn label<I: Into<TreeNodeId<L2>>, L2: AsRef<str>>(self, label: L2) -> TreeNode<T, L2> {
+    pub fn label<I: Into<TreeNodeId<L2>>, L2: AsRef<str>>(self, label: L2) -> TreeNode<'a, T, L2> {
         TreeNode {
             label: Some(label),
             id: self.id,
             opened: self.opened,
             opened_cond: self.opened_cond,
             flags: self.flags,
+            ui: self.ui,
         }
     }
 
@@ -241,7 +281,7 @@ impl<T: AsRef<str>, L: AsRef<str>> TreeNode<T, L> {
     /// rendered, the token can be popped by calling `.pop()`.
     ///
     /// Returns `None` if the tree node is not open and no content should be rendered.
-    pub fn push(self, ui: &Ui) -> Option<TreeNodeToken<'_>> {
+    pub fn push(self) -> Option<TreeNodeToken<'a>> {
         let open = unsafe {
             if self.opened_cond != Condition::Never {
                 sys::igSetNextItemOpen(self.opened, self.opened_cond as i32);
@@ -249,9 +289,9 @@ impl<T: AsRef<str>, L: AsRef<str>> TreeNode<T, L> {
             match self.id {
                 TreeNodeId::Str(id) => {
                     let (id, label) = match self.label {
-                        Some(label) => ui.scratch_txt_two(id, label),
+                        Some(label) => self.ui.scratch_txt_two(id, label),
                         None => {
-                            let v = ui.scratch_txt(id);
+                            let v = self.ui.scratch_txt(id);
                             (v, v)
                         }
                     };
@@ -263,15 +303,15 @@ impl<T: AsRef<str>, L: AsRef<str>> TreeNode<T, L> {
                     self.flags.bits() as i32,
                     fmt_ptr(),
                     match self.label {
-                        Some(v) => ui.scratch_txt(v),
-                        None => ui.scratch_txt(""),
+                        Some(v) => self.ui.scratch_txt(v),
+                        None => self.ui.scratch_txt(""),
                     },
                 ),
             }
         };
         if open {
             Some(TreeNodeToken::new(
-                ui,
+                self.ui,
                 !self.flags.contains(TreeNodeFlags::NO_TREE_PUSH_ON_OPEN),
             ))
         } else {
@@ -282,8 +322,8 @@ impl<T: AsRef<str>, L: AsRef<str>> TreeNode<T, L> {
     /// Returns the result of the closure, if it is called.
     ///
     /// Note: the closure is not called if the tree node is not open.
-    pub fn build<R, F: FnOnce() -> R>(self, ui: &Ui, f: F) -> Option<R> {
-        self.push(ui).map(|_node| f())
+    pub fn build<R, F: FnOnce() -> R>(self, f: F) -> Option<R> {
+        self.push().map(|_node| f())
     }
 }
 

@@ -383,24 +383,24 @@ fn show_test_window(ui: &Ui, state: &mut State, opened: &mut bool) {
             ui.checkbox("No collapse", &mut state.no_collapse);
             ui.checkbox("No close", &mut state.no_close);
 
-            TreeNode::new("Style").build(ui, || {
+            if let Some(_t) = ui.tree_node("Style") {
                 ui.show_default_style_editor();
-            });
+            }
         }
         if CollapsingHeader::new("Widgets").build(ui) {
-            TreeNode::new("Tree").build(ui, || {
+            if let Some(_t) = ui.tree_node("Tree") {
                 for i in 0..5 {
-                    TreeNode::new(format!("Child {}", i)).build(ui, || {
+                    if let Some(_t) = ui.tree_node(format!("Child {}", i)) {
                         ui.text("blah blah");
                         ui.same_line();
                         if ui.small_button("print") {
                             println!("Child {} pressed", i);
                         }
-                    });
+                    }
                 }
-            });
+            }
 
-            TreeNode::new("Bullets").build(ui, || {
+            if let Some(_t) = ui.tree_node("Bullets") {
                 ui.bullet_text("Bullet point 1");
                 ui.bullet_text("Bullet point 2\nOn multiple lines");
                 ui.bullet();
@@ -408,22 +408,23 @@ fn show_test_window(ui: &Ui, state: &mut State, opened: &mut bool) {
 
                 ui.bullet();
                 ui.small_button("Button");
-            });
-            TreeNode::new("Colored text").build(ui, || {
+            }
+
+            if let Some(_t) = ui.tree_node("Colored text") {
                 ui.text_colored([1.0, 0.0, 1.0, 1.0], "Pink");
                 ui.text_colored([1.0, 1.0, 0.0, 1.0], "Yellow");
                 ui.text_disabled("Disabled");
-            });
+            }
 
-            TreeNode::new("Multi-line text").build(ui, || {
+            if let Some(_t) = ui.tree_node("Multi-line text") {
                 ui.input_text_multiline(
                     "multiline",
                     &mut state.text_multiline,
                     [300., 100.],
                 ).build();
-            });
+            }
 
-            TreeNode::new("Word wrapping").build(ui, || {
+            if let Some(_t) = ui.tree_node("Word wrapping") {
                 ui.text_wrapped(
                     "This text should automatically wrap on the edge of \
                      the window.The current implementation for text \
@@ -441,8 +442,9 @@ fn show_test_window(ui: &Ui, state: &mut State, opened: &mut bool) {
 
                 ui.text("Test paragraph 2:");
                 // TODO
-            });
-            TreeNode::new("UTF-8 Text").build(ui, || {
+            }
+
+            if let Some(_t) = ui.tree_node("UTF-8 Text") {
                 ui.text_wrapped(
                     "CJK text will only appear if the font was loaded \
                      with theappropriate CJK character ranges. Call \
@@ -454,7 +456,7 @@ fn show_test_window(ui: &Ui, state: &mut State, opened: &mut bool) {
                 ui.text("Kanjis: 日本語 (nihongo)");
                 ui.input_text("UTF-8 input", &mut state.buf)
                     .build();
-            });
+            }
 
             ui.radio_button("radio a", &mut state.radio_button, 0);
             ui.same_line();
@@ -539,7 +541,7 @@ fn show_test_window(ui: &Ui, state: &mut State, opened: &mut bool) {
             ui.input_scalar_n("input scalar int array", &mut state.vec3i).build();
             ui.input_scalar_n("input scalar float array", &mut state.vec3f).build();
 
-            TreeNode::new("Multi-component Widgets").build(ui, || {
+            if let Some(_t) = ui.tree_node("Multi-component Widgets") {
                 ui.input_float2("input float2", &mut state.vec2f)
                     .build();
                 ui.input_int2("input int2", &mut state.vec2i)
@@ -551,9 +553,9 @@ fn show_test_window(ui: &Ui, state: &mut State, opened: &mut bool) {
                 ui.input_int3("input int3", &mut state.vec3i)
                     .build();
                 ui.spacing();
-            });
+            };
 
-            TreeNode::new("Color/Picker Widgets").build(ui, || {
+            if let Some(_t) = ui.tree_node("Color/Picker Widgets") {
                 let s = &mut state.color_edit;
                 ui.checkbox("With HDR", &mut s.hdr);
                 ui.same_line();
@@ -652,12 +654,12 @@ CTRL+click on individual component to input value.\n",
                     b = b.reference_color(s.ref_color_v)
                 }
                 b.build(ui);
-            });
+            }
         }
 
         if CollapsingHeader::new("Layout").build(ui) {
-            TreeNode::new("Tabs").build(ui, || {
-                TreeNode::new("Basic").build(ui, || {
+            if let Some(_t) = ui.tree_node("Tabs") {
+                if let Some(_t) = ui.tree_node("Basic") {
                     TabBar::new("basictabbar").build(ui, || {
                         TabItem::new("Avocado").build(ui, || {
                             ui.text("This is the Avocado tab!");
@@ -672,9 +674,9 @@ CTRL+click on individual component to input value.\n",
                             ui.text("blah blah blah blah blah");
                         });
                     });
+                }
 
-                });
-                TreeNode::new("Advanced & Close button").build(ui, || {
+                if let Some(_t) = ui.tree_node("Advanced & Close button") {
 
                     ui.separator();
                     let s = &mut state.tabs;
@@ -725,11 +727,12 @@ CTRL+click on individual component to input value.\n",
                         });
                     });
 
-                });
-            });
+                }
+            }
         }
+
         if CollapsingHeader::new("Popups & Modal windows").build(ui) {
-            TreeNode::new("Popups").build(ui, || {
+            if let Some(_t) = ui.tree_node("Popups") {
                 ui.text_wrapped(
                     "When a popup is active, it inhibits interacting \
                      with windows that are behind the popup. Clicking \
@@ -759,9 +762,9 @@ CTRL+click on individual component to input value.\n",
                         }
                     }
                 });
-            });
+            }
 
-            TreeNode::new("Modals").build(ui, || {
+            if let Some(_t) = ui.tree_node("Modals") {
                 ui.text_wrapped(
                     "Modal windows are like popups but the user cannot close \
                      them by clicking outside the window."
@@ -814,7 +817,7 @@ CTRL+click on individual component to input value.\n",
                         ui.close_current_popup();
                     }
                 });
-            });
+            }
         }
     });
 }
