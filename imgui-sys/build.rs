@@ -73,10 +73,7 @@ fn main() -> io::Result<()> {
             build.flag("-fno-exceptions").flag("-fno-rtti");
         }
         // TODO: disable linking C++ stdlib? Not sure if it's allowed.
-        build
-            .warnings(false)
-            .file(imgui_cpp)
-            .compile("libcimgui.a");
+        build.warnings(false).file(imgui_cpp).compile("libcimgui.a");
     }
     Ok(())
 }

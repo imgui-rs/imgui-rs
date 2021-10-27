@@ -59,7 +59,10 @@ pub struct Selectable<'ui, T> {
 impl<'ui, T: AsRef<str>> Selectable<'ui, T> {
     /// Constructs a new selectable builder.
     #[doc(alias = "Selectable")]
-    #[deprecated(since = "0.9.0", note = "use `ui.selectable` or `ui.selectable_config`")]
+    #[deprecated(
+        since = "0.9.0",
+        note = "use `ui.selectable` or `ui.selectable_config`"
+    )]
     pub fn new(label: T, ui: &'ui Ui) -> Self {
         Selectable {
             label,
