@@ -20,17 +20,29 @@
 // `libc` has potentially undesirable linking impacts on windows.
 pub extern crate chlorine as cty;
 
-#[cfg(feature = "wasm")]
-mod wasm_bindings;
-
-#[cfg(feature = "wasm")]
-pub use crate::wasm_bindings::*;
-
-#[cfg(not(feature = "wasm"))]
-mod bindings;
-
-#[cfg(not(feature = "wasm"))]
-pub use crate::bindings::*;
+cfg_if::cfg_if! {
+    if #[cfg(feature = "wasm")] {
+        cfg_if::cfg_if! {
+            if #[cfg(feature = "docking")] {
+                mod wasm_docking_bindings;
+                pub use crate::wasm_docking_bindings::*;
+            } else {
+                mod wasm_bindings;
+                pub use crate::wasm_bindings::*;
+            }
+        }
+    } else {
+        cfg_if::cfg_if! {
+            if #[cfg(feature = "docking")] {
+                mod docking_bindings;
+                pub use crate::docking_bindings::*;
+            } else {
+                mod bindings;
+                pub use crate::bindings::*;
+            }
+        }
+    }
+}
 
 impl ImVec2 {
     #[inline]

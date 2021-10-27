@@ -1,7 +1,7 @@
 use bitflags::bitflags;
 use std::f32;
 use std::ops::{Index, IndexMut};
-use std::os::raw::{c_char, c_int, c_void};
+use std::os::raw::{c_char, c_void};
 use std::time::Duration;
 
 use crate::fonts::atlas::FontAtlas;
@@ -234,7 +234,7 @@ pub struct Io {
         Option<unsafe extern "C" fn(user_data: *mut c_void, text: *const c_char)>,
     pub(crate) clipboard_user_data: *mut c_void,
     #[cfg(not(feature="docking"))]
-    ime_set_input_screen_pos_fn: Option<unsafe extern "C" fn(x: c_int, y: c_int)>,
+    ime_set_input_screen_pos_fn: Option<unsafe extern "C" fn(x: std::os::raw::c_int, y: std::os::raw::c_int)>,
     #[cfg(not(feature="docking"))]
     ime_window_handle: *mut c_void,
     /// Mouse position, in pixels.
