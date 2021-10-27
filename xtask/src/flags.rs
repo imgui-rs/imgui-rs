@@ -23,12 +23,10 @@ xflags::args_parser! {
             /// Print help information.
             optional -h, --help
         }
-        /// Run lints the way we'd run it in CI
+        /// Run lints the way we run it in CI
         cmd lint {}
-        /// Run tests the way we'd run them in CI
+        /// Run tests the way we run them in CI
         cmd test {}
-        /// magically wrangle the submodules if needed
-        cmd modfix {}
         /// produce bindings using installed `bindgen`.
         cmd bindgen {
             /// folder containing cimgui output (default: imgui-sys/third-party)
@@ -55,7 +53,6 @@ pub enum XtaskCmd {
     Help(Help),
     Lint(Lint),
     Test(Test),
-    Modfix(Modfix),
     Bindgen(Bindgen),
 }
 
@@ -69,9 +66,6 @@ pub struct Lint {}
 
 #[derive(Debug)]
 pub struct Test {}
-
-#[derive(Debug)]
-pub struct Modfix {}
 
 #[derive(Debug)]
 pub struct Bindgen {

@@ -2,7 +2,6 @@
 
 use std::fs;
 use std::io;
-use std::path::Path;
 
 const DEFINES: &[(&str, Option<&str>)] = &[
     // Rust `char` is a unicode scalar value, e.g. 32 bits.
@@ -27,23 +26,18 @@ fn assert_file_exists(path: &str) -> io::Result<()> {
 }
 
 fn main() -> io::Result<()> {
-    let manifest_dir = Path::new(env!("CARGO_MANIFEST_DIR"));
-    println!(
-        "cargo:THIRD_PARTY={}",
-        manifest_dir.join("third-party").display()
-    );
+    // Output define args for compiler
     for (key, value) in DEFINES.iter() {
         println!("cargo:DEFINE_{}={}", key, value.unwrap_or(""));
     }
+
+    // If we aren't building WASM output, bunch of extra stuff to do
     if std::env::var_os("CARGO_FEATURE_WASM").is_none() {
-        // Check submodule status. (Anything else should be a compile error in
-        // the C code).
-        assert_file_exists("third-party/cimgui.cpp")?;
-        assert_file_exists("third-party/imgui/imgui.cpp")?;
-
+        // C++ compiler
         let mut build = cc::Build::new();
-
         build.cpp(true);
+
+        // Set defines for compiler
         for (key, value) in DEFINES.iter() {
             build.define(key, *value);
         }
@@ -58,11 +52,21 @@ fn main() -> io::Result<()> {
             build.define("IMGUI_ENABLE_FREETYPE", None);
             println!("cargo:DEFINE_IMGUI_ENABLE_FREETYPE=");
 
-            // imgui_freetype.cpp needs access to imgui.h
-            build.include(manifest_dir.join("third-party/imgui/"));
+            // imgui_freetype.cpp needs access to `#include "imgui.h"`
+            let manifest_dir = std::path::Path::new(env!("CARGO_MANIFEST_DIR"));
+            #[cfg(feature = "docking")]
+            build.include(manifest_dir.join("third-party/imgui-docking/imgui"));
+            #[cfg(not(feature = "docking"))]
+            build.include(manifest_dir.join("third-party/imgui-master/imgui"));
         }
 
+        #[cfg(feature = "docking")]
+        let imgui_cpp = "include_imgui_docking.cpp";
+        #[cfg(not(feature = "docking"))]
+        let imgui_cpp = "include_imgui_master.cpp";
+
         let compiler = build.get_compiler();
+
         // Avoid the if-supported flag functions for easy cases, as they're
         // kinda costly.
         if compiler.is_like_gnu() || compiler.is_like_clang() {
@@ -71,7 +75,7 @@ fn main() -> io::Result<()> {
         // TODO: disable linking C++ stdlib? Not sure if it's allowed.
         build
             .warnings(false)
-            .file("include_all_imgui.cpp")
+            .file(imgui_cpp)
             .compile("libcimgui.a");
     }
     Ok(())
