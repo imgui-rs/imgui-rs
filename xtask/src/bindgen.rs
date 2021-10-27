@@ -5,10 +5,6 @@ use std::path::{Path, PathBuf};
 impl Bindgen {
     pub fn run(self) -> Result<()> {
         let root = crate::project_root();
-        let bindings = self
-            .cimgui_path
-            .map(PathBuf::from)
-            .unwrap_or_else(|| root.join("imgui-sys/third-party"));
 
         let output = self
             .output_path
@@ -20,18 +16,28 @@ impl Bindgen {
             .or_else(|| std::env::var("IMGUI_RS_WASM_IMPORT_NAME").ok())
             .unwrap_or_else(|| "imgui-sys-v0".to_string());
 
-        let types = get_types(&bindings.join("structs_and_enums.json"))?;
-        let funcs = get_definitions(&bindings.join("definitions.json"))?;
-        let header = bindings.join("cimgui.h");
+        for variant in ["master", "docking"] {
+            let cimgui_output = root.join(&format!("imgui-sys/third-party/imgui-{}", variant));
 
-        generate_binding_file(&header, &output.join("bindings.rs"), &types, &funcs, None)?;
-        generate_binding_file(
-            &header,
-            &output.join("wasm_bindings.rs"),
-            &types,
-            &funcs,
-            Some(&wasm_name),
-        )?;
+            let types = get_types(&cimgui_output.join("structs_and_enums.json"))?;
+            let funcs = get_definitions(&cimgui_output.join("definitions.json"))?;
+            let header = cimgui_output.join("cimgui.h");
+
+            let output_name = if variant != "master" {
+                format!("{}_bindings.rs", variant)
+            } else {
+                "bindings.rs".into()
+            };
+
+            generate_binding_file(&header, &output.join(&output_name), &types, &funcs, None)?;
+            generate_binding_file(
+                &header,
+                &output.join(&format!("wasm_{}", &output_name)),
+                &types,
+                &funcs,
+                Some(&wasm_name),
+            )?;
+        }
 
         Ok(())
     }
@@ -104,7 +110,7 @@ fn generate_binding_file(
         "--no-prepend-enum-name",
         "--no-doc-comments",
         // Layout tests aren't portable (they hardcode type sizes), and for
-        // our case they just serve to sanity check rustc's implementation of
+        // our case they just serve to sanity check rustc's implementation of
         // `#[repr(C)]`. If we bind directly to C++ ever, we should reconsider this.
         "--no-layout-tests",
         "--with-derive-default",

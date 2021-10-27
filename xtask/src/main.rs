@@ -1,12 +1,9 @@
 mod bindgen;
 mod flags;
-mod submodules;
 
 use anyhow::Result;
 use flags::XtaskCmd;
 use std::path::{Path, PathBuf};
-
-pub use submodules::autofix_submodules;
 
 fn main() {
     if let Err(e) = try_main() {
@@ -29,7 +26,6 @@ fn try_main() -> Result<()> {
         XtaskCmd::Help(_) => eprintln!("{}", flags::Xtask::HELP),
         XtaskCmd::Lint(_) => lint_all()?,
         XtaskCmd::Test(_) => test_all()?,
-        XtaskCmd::Modfix(_) => submodules::fixup_submodules()?,
         XtaskCmd::Bindgen(cmd) => cmd.run()?,
     }
     Ok(())
