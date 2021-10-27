@@ -31,6 +31,9 @@ pub struct DrawData {
     /// Based on io.display_frame_buffer_scale. Typically [1.0, 1.0] on normal displays, and
     /// [2.0, 2.0] on Retina displays, but fractional values are also possible.
     pub framebuffer_scale: [f32; 2],
+
+    #[cfg(feature = "docking")]
+    OwnerViewport: *mut sys::ImGuiViewport,
 }
 
 unsafe impl RawCast<sys::ImDrawData> for DrawData {}
