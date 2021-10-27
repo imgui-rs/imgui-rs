@@ -2,7 +2,7 @@ use crate::sys;
 use crate::Ui;
 
 /// # Window scrolling
-impl Ui {
+impl<'ui> Ui<'ui> {
     /// Returns the horizontal scrolling position.
     ///
     /// Value is between 0.0 and self.scroll_max_x().
@@ -34,12 +34,28 @@ impl Ui {
     /// Sets the horizontal scrolling position
     #[doc(alias = "SetScrollX")]
     pub fn set_scroll_x(&self, scroll_x: f32) {
-        unsafe { sys::igSetScrollX(scroll_x) };
+        unsafe {
+            cfg_if::cfg_if! {
+                if #[cfg(feature = "docking")] {
+                    sys::igSetScrollXFloat(scroll_x);
+                } else {
+                    sys::igSetScrollX(scroll_x);
+                }
+            }
+        }
     }
     /// Sets the vertical scroll position
     #[doc(alias = "SetScrollY")]
     pub fn set_scroll_y(&self, scroll_y: f32) {
-        unsafe { sys::igSetScrollY(scroll_y) };
+        unsafe {
+            cfg_if::cfg_if! {
+                if #[cfg(feature = "docking")] {
+                    sys::igSetScrollYFloat(scroll_y);
+                } else {
+                    sys::igSetScrollY(scroll_y);
+                }
+            }
+        }
     }
     /// Adjusts the horizontal scroll position to make the current cursor position visible.
     ///
@@ -94,7 +110,15 @@ impl Ui {
     /// - `1.0`: right
     #[doc(alias = "SetScrollFromPosX")]
     pub fn set_scroll_from_pos_x_with_ratio(&self, local_x: f32, center_x_ratio: f32) {
-        unsafe { sys::igSetScrollFromPosX(local_x, center_x_ratio) };
+        unsafe {
+            cfg_if::cfg_if! {
+                if #[cfg(feature = "docking")] {
+                    sys::igSetScrollFromPosXFloat(local_x, center_x_ratio)
+                } else {
+                    sys::igSetScrollFromPosX(local_x, center_x_ratio)
+                }
+            }
+        };
     }
     /// Adjusts the vertical scroll position to make the given position visible
     ///
@@ -113,6 +137,14 @@ impl Ui {
     /// - `1.0`: bottom
     #[doc(alias = "SetScrollFromPosY")]
     pub fn set_scroll_from_pos_y_with_ratio(&self, local_y: f32, center_y_ratio: f32) {
-        unsafe { sys::igSetScrollFromPosY(local_y, center_y_ratio) };
+        unsafe {
+            cfg_if::cfg_if! {
+                if #[cfg(feature = "docking")] {
+                    sys::igSetScrollFromPosYFloat(local_y, center_y_ratio);
+                } else {
+                    sys::igSetScrollFromPosY(local_y, center_y_ratio);
+                }
+            }
+        }
     }
 }
