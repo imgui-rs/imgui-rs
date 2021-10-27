@@ -161,9 +161,7 @@ unsafe fn push_style_var(style_var: StyleVar) {
         }
         IndentSpacing(v) => igPushStyleVarFloat(sys::ImGuiStyleVar_IndentSpacing as i32, v),
         ScrollbarSize(v) => igPushStyleVarFloat(sys::ImGuiStyleVar_ScrollbarSize as i32, v),
-        ScrollbarRounding(v) => {
-            igPushStyleVarFloat(sys::ImGuiStyleVar_ScrollbarRounding as i32, v)
-        }
+        ScrollbarRounding(v) => igPushStyleVarFloat(sys::ImGuiStyleVar_ScrollbarRounding as i32, v),
         GrabMinSize(v) => igPushStyleVarFloat(sys::ImGuiStyleVar_GrabMinSize as i32, v),
         GrabRounding(v) => igPushStyleVarFloat(sys::ImGuiStyleVar_GrabRounding as i32, v),
         TabRounding(v) => igPushStyleVarFloat(sys::ImGuiStyleVar_TabRounding as i32, v),
