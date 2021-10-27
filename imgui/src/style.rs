@@ -401,6 +401,10 @@ impl StyleColor {
             StyleColor::NavWindowingHighlight => "NavWindowingHighlight",
             StyleColor::NavWindowingDimBg => "NavWindowingDimBg",
             StyleColor::ModalWindowDimBg => "ModalWindowDimBg",
+            #[cfg(feature = "docking")]
+            StyleColor::DockingPreview => "DockingPreview",
+            #[cfg(feature = "docking")]
+            StyleColor::DockingEmptyBg => "DockingEmptyBg",
         }
     }
 }

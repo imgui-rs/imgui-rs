@@ -157,7 +157,7 @@ impl Ui {
     /// able to close a popup without selected an option, use [`PopupModal`].
     #[doc(alias = "OpenPopup")]
     pub fn open_popup(&self, str_id: impl AsRef<str>) {
-        unsafe { sys::igOpenPopup_Str(self.scratch_txt(str_id), 0) };
+        unsafe { sys::igOpenPopupStr(self.scratch_txt(str_id), 0) };
     }
 
     /// Construct a popup that can have any kind of content.
