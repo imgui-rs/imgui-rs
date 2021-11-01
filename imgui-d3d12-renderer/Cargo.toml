@@ -1,0 +1,25 @@
+[package]
+name = "imgui-d3d12-renderer"
+version = "0.8.1-alpha.0"
+authors = ["Andrey Pushkar <andrey.s.pushkar@gmail.com>"]
+edition = "2021"
+description = "D3D12 renderer for the imgui crate"
+homepage = "https://github.com/curldivergence/imgui-d3d12-renderer"
+repository = "https://github.com/curldivergence/imgui-d3d12-renderer"
+license = "MIT/Apache-2.0"
+readme = "README.md"
+categories = ["gui", "rendering"]
+
+[dependencies]
+rusty-d3d12 = "0.2.4"
+imgui = "0.8"
+thiserror = "1.0"
+log = "0.4"
+memoffset = "0.5"
+
+[dev-dependencies]
+imgui = "0.8"
+imgui-winit-support = "0.8"
+winit = "0.25"
+clap = "2.33"
+simple_logger = "1.6"
