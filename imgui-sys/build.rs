@@ -27,7 +27,7 @@ fn main() -> io::Result<()> {
     let wasm_enabled = std::env::var_os("CARGO_FEATURE_WASM").is_none();
 
     let cimgui_dir = if docking_enabled {
-         manifest_dir.join("third-party/imgui-docking")
+        manifest_dir.join("third-party/imgui-docking")
     } else {
         manifest_dir.join("third-party/imgui-master")
     };
@@ -67,7 +67,7 @@ fn main() -> io::Result<()> {
 
         // Which "all imgui" file to use
         let imgui_cpp = if docking_enabled {
-             "include_imgui_docking.cpp"
+            "include_imgui_docking.cpp"
         } else {
             "include_imgui_master.cpp"
         };
