@@ -4,55 +4,59 @@ This document covers how to upgrade imgui-rs to a new version of the upstream C+
 
 The process is much the same to build imgui-rs for a tagged release (as shown) as it is for any arbitrary revision (such as one on a different branch)
 
+## Summary
+In short, there are a few steps:
+
+1. Update copy of imgui itself
+2. Run cimgui to generate C wrapper for imgui
+3. Run bindgen
+4. Fix up the imgui-rs wrapper
+
 ## Step by step
 
-1. Ensure the submodules are populated (`git submodule init` and `git submodule update --recursive`)
+1. Update the copies of `imgui` in `imgui-sys/third-party/imgui-*/imgui/` from the appropriate branches on [the upstream repo](https://github.com/ocornut/imgui)
 
-2. Check out the desired version of the `imgui-sys/third-party/imgui/` submodule
+    Each branch should generally be from roughly the same point in time. Generally just after each imgui release the `docking` branch is updated, so it's usually easy to find an equivalent commit in both.
+    
+    We trim some of the "unrequired" parts of imgui, such as it's `.github` directory, the `backends` and `docs`. We are mainly just interested in the main `.cpp` and `.h` files, as well as `misc/freetype/` support files.
+    
+    Note this step could benefit from some automation (maybe `cargo xtask update-imgui 1.99`)
 
-   ```sh
-       $ pwd
-       .../imgui-sys/third-party/imgui
-       $ git checkout v1.81
-       Previous HEAD position was 58075c44 Version 1.80
-       HEAD is now at 4df57136 Version 1.81
-   ```
-
-3. Ensure `luajit` is installed, as this is required by cimgui's generator.
+2. Ensure `luajit` is installed, as this is required by cimgui's generator.
 
    $ luajit --help
 
-4. Check out the `cimgui` project somewhere, as we use use the generator within this
+3. Check out the `cimgui` project somewhere:
 
    ```sh
        git clone --recursive https://github.com/cimgui/cimgui.git /tmp/cimgui
    ```
 
-5. Ensure the `imgui` submodule within `cimgui` is pointing to the same revision as in `imgui-rs`
+    Make sure the checkout is updated and on a reasonable a reasonably recent version. Old versions can produce differently named symbols which can make updates more tediuos than they need to be! Generally the tag corresponding to the latest imgui release is a good choice.
 
-   ```sh
-   $ cd /tmp/cimgui/imgui
-   $ git checkout v1.81
-   HEAD is now at 4df57136 Version 1.81
-   ```
-
-6. Back in `imgui-rs/imgui-sys/third-party/` - run the `update-cimgui-output.sh` helper script to execute cimgui's generator
+4. For each of the branches, run the corresponding `update-cimgui-output.sh` script.
 
    ```sh
        $ pwd
-       .../imgui-sys/third-party
+       .../imgui-sys/third-party/imgui-master
        $ ./update-cimgui-output.sh /tmp/cimgui/
        [...]
        copyfile ./output/cimgui.h ../cimgui.h
        copyfile ./output/cimgui.cpp ../cimgui.cpp
        all done!!
+       $ cd ../imgui-docking/
+       $ ./update-cimgui-output.sh /tmp/cimgui/
+       ...
+       all done!!
    ```
 
-   This updates various files in the imgui-sys folder like `cimgui.cpp`, `definitions.json` and so on
+   This updates various files like `cimgui.cpp`, `definitions.json` and so on
 
    With this step, we now have new C bindings to the desired verison of Dear ImGui.
 
-7. Back in the root of the imgui-rs repo, run `cargo xtask bindgen`
+5. Back in the root of the imgui-rs repo, run `cargo xtask bindgen`
+
+    This step generates `imgui-sys/src/bindings.rs` etc which are then used by `imgui/src/*`
 
     ```sh
         $ cargo xtask bindgen
@@ -65,14 +69,14 @@ The process is much the same to build imgui-rs for a tagged release (as shown) a
     ```
 
     This requires bindgen to be installed (`cargo install bindgen` should do it)
+    
+    Be sure to check `bindgen --version` versus the previously used version which is recoded in the first line of `imgui-sys/src/bindings.rs` - if you use a different version, you may get slightly different bindings which could also cause an update to be more work than it would otherwise be with matching bindgen versions
 
-    This step generates `imgui-sys/src/bindings.rs` which is used by `imgui/src/*`
+6. Run `cargo build` and fix any errors caused by changes upstream (see next section)
 
-8. Run `cargo build` and fix any errors caused by changes upstream (see next section)
+7. Run the tests with `cargo test`.
 
-9. Run the tests with `cargo test`.
-
-10. Try running one of the examples
+8. Try running one of the examples
 
     ```sh
         cargo run --example test_window_impl
