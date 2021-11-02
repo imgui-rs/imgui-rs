@@ -13,6 +13,9 @@ const DEFINES: &[(&str, Option<&str>)] = &[
 ];
 
 fn main() -> io::Result<()> {
+    // Root of imgui-sys
+    let manifest_dir = std::path::Path::new(env!("CARGO_MANIFEST_DIR"));
+
     // Output define args for compiler
     for (key, value) in DEFINES.iter() {
         println!("cargo:DEFINE_{}={}", key, value.unwrap_or(""));
@@ -22,6 +25,17 @@ fn main() -> io::Result<()> {
     // env-vars to avoid recompilation of build.rs
     let docking_enabled = std::env::var_os("CARGO_FEATURE_DOCKING").is_some();
     let wasm_enabled = std::env::var_os("CARGO_FEATURE_WASM").is_none();
+
+    let cimgui_dir = if docking_enabled {
+         manifest_dir.join("third-party/imgui-docking")
+    } else {
+        manifest_dir.join("third-party/imgui-master")
+    };
+
+    // For projects like implot-rs we expose the path to our cimgui
+    // files, via `DEP_IMGUI_THIRD_PARTY` env-var, so they can build
+    // against the same thing
+    println!("cargo:THIRD_PARTY={}", cimgui_dir.display());
 
     // If we aren't building WASM output, bunch of extra stuff to do
     if !wasm_enabled {
@@ -46,13 +60,9 @@ fn main() -> io::Result<()> {
             build.define("IMGUI_ENABLE_FREETYPE", None);
             println!("cargo:DEFINE_IMGUI_ENABLE_FREETYPE=");
 
-            // imgui_freetype.cpp needs access to `#include "imgui.h"`
-            let manifest_dir = std::path::Path::new(env!("CARGO_MANIFEST_DIR"));
-            if docking_enabled {
-                build.include(manifest_dir.join("third-party/imgui-docking/imgui"));
-            } else {
-                build.include(manifest_dir.join("third-party/imgui-master/imgui"));
-            }
+            // imgui_freetype.cpp needs access to `#include "imgui.h"`.
+            // So we include something like '[...]/third-party/imgui-master/imgui/'
+            build.include(cimgui_dir.join("imgui"));
         }
 
         // Which "all imgui" file to use
