@@ -1,8 +1,5 @@
 #![allow(dead_code)]
 
-use std::fs;
-use std::io;
-
 const DEFINES: &[(&str, Option<&str>)] = &[
     // Rust `char` is a unicode scalar value, e.g. 32 bits.
     ("IMGUI_USE_WCHAR32", None),
@@ -12,7 +9,7 @@ const DEFINES: &[(&str, Option<&str>)] = &[
     ("IMGUI_DISABLE_OSX_FUNCTIONS", None),
 ];
 
-fn main() -> io::Result<()> {
+fn main() -> std::io::Result<()> {
     // Root of imgui-sys
     let manifest_dir = std::path::Path::new(env!("CARGO_MANIFEST_DIR"));
 
