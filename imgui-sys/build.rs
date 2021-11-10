@@ -21,7 +21,7 @@ fn main() -> std::io::Result<()> {
     // Feature flags - no extra dependencies, so these are queried as
     // env-vars to avoid recompilation of build.rs
     let docking_enabled = std::env::var_os("CARGO_FEATURE_DOCKING").is_some();
-    let wasm_enabled = std::env::var_os("CARGO_FEATURE_WASM").is_none();
+    let wasm_enabled = std::env::var_os("CARGO_FEATURE_WASM").is_some();
 
     let cimgui_dir = if docking_enabled {
         manifest_dir.join("third-party/imgui-docking")
