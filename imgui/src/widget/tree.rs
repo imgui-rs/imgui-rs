@@ -296,9 +296,9 @@ impl<'a, T: AsRef<str>, L: AsRef<str>> TreeNode<'a, T, L> {
                         }
                     };
 
-                    sys::igTreeNodeEx_StrStr(id, self.flags.bits() as i32, fmt_ptr(), label)
+                    sys::igTreeNodeExStrStr(id, self.flags.bits() as i32, fmt_ptr(), label)
                 }
-                TreeNodeId::Ptr(id) => sys::igTreeNodeEx_Ptr(
+                TreeNodeId::Ptr(id) => sys::igTreeNodeExPtr(
                     id,
                     self.flags.bits() as i32,
                     fmt_ptr(),
@@ -471,7 +471,7 @@ impl<T: AsRef<str>> CollapsingHeader<T> {
     #[inline]
     pub fn build(self, ui: &Ui) -> bool {
         unsafe {
-            sys::igCollapsingHeader_TreeNodeFlags(
+            sys::igCollapsingHeaderTreeNodeFlags(
                 ui.scratch_txt(self.label),
                 self.flags.bits() as i32,
             )
@@ -485,7 +485,7 @@ impl<T: AsRef<str>> CollapsingHeader<T> {
     #[inline]
     pub fn build_with_close_button(self, ui: &Ui, opened: &mut bool) -> bool {
         unsafe {
-            sys::igCollapsingHeader_BoolPtr(
+            sys::igCollapsingHeaderBoolPtr(
                 ui.scratch_txt(self.label),
                 opened as *mut bool,
                 self.flags.bits() as i32,

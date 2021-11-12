@@ -138,7 +138,16 @@ impl<'ui> DrawListMut<'ui> {
     pub(crate) fn background(_: &Ui) -> Self {
         Self::lock_draw_list(DrawListType::Background);
         Self {
-            draw_list: unsafe { sys::igGetBackgroundDrawList() },
+            draw_list: unsafe {
+                cfg_if::cfg_if! {
+                    if #[cfg(feature = "docking")] {
+                        // Has extra overload in docking branch
+                        sys::igGetBackgroundDrawListNil()
+                    } else {
+                        sys::igGetBackgroundDrawList()
+                    }
+                }
+            },
             draw_list_type: DrawListType::Background,
             _phantom: PhantomData,
         }
@@ -148,7 +157,16 @@ impl<'ui> DrawListMut<'ui> {
     pub(crate) fn foreground(_: &Ui) -> Self {
         Self::lock_draw_list(DrawListType::Foreground);
         Self {
-            draw_list: unsafe { sys::igGetForegroundDrawList() },
+            draw_list: unsafe {
+                cfg_if::cfg_if! {
+                    if #[cfg(feature = "docking")] {
+                        // Has extra overload in docking branch
+                        sys::igGetForegroundDrawListNil()
+                    } else {
+                        sys::igGetForegroundDrawList()
+                    }
+                }
+            },
             draw_list_type: DrawListType::Foreground,
             _phantom: PhantomData,
         }
@@ -330,7 +348,7 @@ impl<'ui> DrawListMut<'ui> {
         unsafe {
             let start = text.as_ptr() as *const c_char;
             let end = (start as usize + text.len()) as *const c_char;
-            sys::ImDrawList_AddText_Vec2(
+            sys::ImDrawList_AddTextVec2(
                 self.draw_list,
                 pos.into().into(),
                 col.into().into(),

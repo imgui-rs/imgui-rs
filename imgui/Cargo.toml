@@ -17,10 +17,12 @@ bitflags = "1"
 imgui-sys = { version = "0.8.1-alpha.0", path = "../imgui-sys" }
 mint = "0.5.6"
 parking_lot = "0.11"
+cfg-if = "1"
 
 [features]
 wasm = ["imgui-sys/wasm"]
 freetype = ["imgui-sys/freetype"]
+docking = ["imgui-sys/docking"]
 # this api is in beta in the upstream imgui crate. See issue #524 for more info.
 # it should be stable and fine to use though.
 tables-api = []
