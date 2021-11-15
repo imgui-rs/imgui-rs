@@ -45,8 +45,12 @@ jobs:
             ${{ runner.os }}-target-lint-stable-${{ hashFiles('**/Cargo.toml') }}
             ${{ runner.os }}-target-lint-stable-
             ${{ runner.os }}-target-lint-
+
+      # default
       - run: cargo clippy --workspace --all-targets
-      # supported winit versions
+      # with only docking
+      - run: cargo clippy --workspace --all-targets --features docking
+      # supported winit versions (with otherwise default features)
       - run: cargo clippy --manifest-path imgui-winit-support/Cargo.toml --all-features --all-targets
       - run: cargo clippy --manifest-path imgui-winit-support/Cargo.toml --no-default-features --features winit-19 --all-targets
       - run: cargo clippy --manifest-path imgui-winit-support/Cargo.toml --no-default-features --features winit-20 --all-targets
@@ -54,6 +58,7 @@ jobs:
       - run: cargo clippy --manifest-path imgui-winit-support/Cargo.toml --no-default-features --features winit-23/default --all-targets
       - run: cargo clippy --manifest-path imgui-winit-support/Cargo.toml --no-default-features --features winit-24/default --all-targets
       - run: cargo clippy --manifest-path imgui-winit-support/Cargo.toml --no-default-features --features winit-25/default --all-targets
+
   rustfmt:
     name: Check rustfmt
     runs-on: ubuntu-latest
@@ -132,12 +137,12 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-target-test-${{ matrix.rust }}-${{ hashFiles('**/Cargo.toml') }}
             ${{ runner.os }}-target-test-${{ matrix.rust }}-
+
       - run: cargo test --workspace --all-targets
+      - run: cargo test --workspace --all-targets --features docking
       - run: cargo test --workspace --doc
       # run to check for lint problems
       - run: cargo doc
-      # - run: cargo test --manifest-path imgui-gfx-examples/Cargo.toml --no-default-features --features directx
-      #   if: runner.os == 'Windows'
       - run: cargo test --manifest-path imgui-winit-support/Cargo.toml --no-default-features --features winit-19
       - run: cargo test --manifest-path imgui-winit-support/Cargo.toml --no-default-features --features winit-20
       - run: cargo test --manifest-path imgui-winit-support/Cargo.toml --no-default-features --features winit-22
