@@ -105,6 +105,7 @@ Main examples are located in the `imgui-examples` directory. These can be run li
 
 ```bash
 # At the reposity root
+cargo test
 cargo run --example hello_world
 cargo run --example test_window
 cargo run --example test_window_impl
@@ -114,6 +115,7 @@ Examples for the Glow renderer are under the `imgui-glow-renderer/examples/` dir
 These can be run the same way as any other examples,
 
 ```bash
+cargo test
 cargo run --example glow_01_basic
 ```
 
