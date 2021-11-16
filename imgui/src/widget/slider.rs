@@ -67,6 +67,11 @@ where
     ///
     /// It is safe, though up to C++ Dear ImGui, on how to handle when
     /// `min > max`.
+    ///
+    /// Note for f32 and f64 sliders, Dear ImGui limits the available
+    /// range to half their full range (e.g `-f32::MIN/2.0 .. f32::MAX/2.0`)
+    /// Specifying a value above this will cause an abort.
+    /// For large ranged values, consider using [`Ui::input_scalar`] instead
     #[inline]
     pub fn range(mut self, min: Data, max: Data) -> Self {
         self.min = min;
