@@ -21,6 +21,10 @@ pub struct ChildWindow<'ui> {
 
 impl<'ui> ChildWindow<'ui> {
     /// Creates a new child window builder with the str.
+    #[deprecated(
+        since = "0.9.0",
+        note = "use ui.child_window(...) instead"
+    )]
     #[doc(alias = "BeginChildID")]
     pub fn new(ui: &'ui Ui, name: impl AsRef<str>) -> Self {
         let id = ui.new_id_str(name);

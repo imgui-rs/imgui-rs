@@ -184,6 +184,10 @@ pub struct Window<'ui, 'a, Label> {
 
 impl<'ui, 'a, Label: AsRef<str>> Window<'ui, 'a, Label> {
     /// Typically created via [`Ui::window`]
+    #[deprecated(
+        since = "0.9.0",
+        note = "use ui.window(...) instead"
+    )]
     pub fn new(ui: &'ui Ui, name: Label) -> Self {
         Window {
             ui,
