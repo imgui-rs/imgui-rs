@@ -37,7 +37,7 @@ ui.window("Hello world")
 Additionally, the following are no longer maintained, but might work still:
 
 - imgui-gfx-renderer: Renderer implementation that uses the `gfx` crate (_not
-  the new gfx-hal crate_)
+  the new gfx-hal crate_). This can be found at [imgui-rs/imgui-gfx-renderer](https://github.com/imgui-rs/imgui-gfx-renderer)
 
 ## Features
 
@@ -99,29 +99,22 @@ support code if you have a more advanced use case, because **imgui-rs is not tie
 ```bash
 git clone https://github.com/imgui-rs/imgui-rs
 cd imgui-rs
-git submodule update --init --recursive
 ```
 
-Main examples are located in the `imgui-examples` directory.
+Main examples are located in the `imgui-examples` directory. These can be run like so:
 
 ```bash
 # At the reposity root
-cd imgui-examples
-cargo test
-
 cargo run --example hello_world
 cargo run --example test_window
 cargo run --example test_window_impl
 ```
 
-Examples for the gfx backend are under the imgui-gfx-examples directory.
+Examples for the Glow renderer are under the `imgui-glow-renderer/examples/` directory.
+These can be run the same way as any other examples,
 
 ```bash
-cd imgui-gfx-examples
-cargo test
-
-cargo run --example gfx_hello_world
-cargo run --example gfx_test_window
+cargo run --example glow_01_basic
 ```
 
 Note to Windows users: You will need to use the _MSVC ABI_ version of the Rust
