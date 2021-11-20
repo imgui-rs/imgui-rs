@@ -49,7 +49,7 @@ fn example_1(ui: &Ui, state: &mut State) {
 
         // However for larger data-types, it's usually best to specify
         // a much smaller range. The following slider is hard to use.
-        Slider::new("Full range f32 value", -f32::MIN/2.0, f32::MAX/2.0)
+        Slider::new("Full range f32 value", f32::MIN/2.0, f32::MAX/2.0)
             .build(ui, &mut state.f32_value);
         // Note the `... / 2.0` - anything larger is not supported by
         // the upstream C++ library
