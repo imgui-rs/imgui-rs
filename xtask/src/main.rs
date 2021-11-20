@@ -32,11 +32,18 @@ fn try_main() -> Result<()> {
 }
 
 fn lint_all() -> Result<()> {
+    // Lint with only default, only docking, and only freetype
     xshell::cmd!("cargo clippy --workspace --all-targets").run()?;
+    xshell::cmd!("cargo clippy --workspace --all-targets --features docking").run()?;
+    xshell::cmd!("cargo clippy --workspace --all-targets --features freetype").run()?;
+
+    // Lint winit with all features
     xshell::cmd!(
         "cargo clippy --manifest-path imgui-winit-support/Cargo.toml --all-features --all-targets"
     )
     .run()?;
+
+    // Lint with various winit versions
     let winits = &[
         "winit-19",
         "winit-20",
@@ -48,13 +55,22 @@ fn lint_all() -> Result<()> {
     for &winit in winits {
         xshell::cmd!("cargo clippy --manifest-path imgui-winit-support/Cargo.toml --no-default-features --features {winit} --all-targets").run()?;
     }
+
+    // Check formatting
     xshell::cmd!("cargo fmt --all -- --check").run()?;
     Ok(())
 }
 
 fn test_all() -> Result<()> {
+    // Test with default/docking/freetype features
     xshell::cmd!("cargo test --workspace --all-targets").run()?;
+    xshell::cmd!("cargo test --workspace --all-targets --features docking").run()?;
+    xshell::cmd!("cargo test --workspace --all-targets --features freetype").run()?;
+
+    // Test doc examples
     xshell::cmd!("cargo test --workspace --doc").run()?;
+
+    // Test with various winit versions
     let winits = &[
         "winit-19",
         "winit-20",
@@ -66,6 +82,7 @@ fn test_all() -> Result<()> {
     for &winit in winits {
         xshell::cmd!("cargo test --manifest-path imgui-winit-support/Cargo.toml --no-default-features --features {winit} --all-targets").run()?;
     }
+    // Run heavy tests in release mode
     xshell::cmd!("cargo test -p imgui --release -- --ignored").run()?;
     Ok(())
 }

@@ -33,7 +33,7 @@ pub struct DrawData {
     pub framebuffer_scale: [f32; 2],
 
     #[cfg(feature = "docking")]
-    OwnerViewport: *mut sys::ImGuiViewport,
+    owner_viewport: *mut sys::ImGuiViewport,
 }
 
 unsafe impl RawCast<sys::ImDrawData> for DrawData {}
