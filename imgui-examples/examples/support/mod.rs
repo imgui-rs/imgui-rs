@@ -46,15 +46,41 @@ pub fn init(title: &str) -> System {
     {
         let gl_window = display.gl_window();
         let window = gl_window.window();
-        platform.attach_window(imgui.io_mut(), window, HiDpiMode::Rounded);
+
+        let dpi_mode = if let Ok(factor) = std::env::var("IMGUI_EXAMPLE_FORCE_DPI_FACTOR") {
+            // Allow forcing of HiDPI factor for debugging purposes
+            match factor.parse::<f64>() {
+                Ok(f) => HiDpiMode::Locked(f),
+                Err(e) => panic!("Invalid scaling factor: {}", e),
+            }
+        } else {
+            HiDpiMode::Default
+        };
+
+        platform.attach_window(imgui.io_mut(), window, dpi_mode);
     }
 
-    let hidpi_factor = platform.hidpi_factor();
-    let font_size = (13.0 * hidpi_factor) as f32;
+    // Fixed font size. Note imgui_winit_support uses "logical
+    // pixels", which are physical pixels scaled by the devices
+    // scaling factor. Meaning, 13.0 pixels should look the same size
+    // on two different screens, and thus we do not need to scale this
+    // value (as the scaling is handled by winit)
+    let font_size = 13.0;
+
     imgui.fonts().add_font(&[
-        FontSource::DefaultFontData {
+        FontSource::TtfData {
+            data: include_bytes!("../../../resources/Roboto-Regular.ttf"),
+            size_pixels: font_size,
             config: Some(FontConfig {
-                size_pixels: font_size,
+                // As imgui-glium-renderer isn't gamma-correct with
+                // it's font rendering, we apply an arbitrary
+                // multiplier to make the font a bit "heavier". With
+                // default imgui-glow-renderer this is unnecessary.
+                rasterizer_multiply: 1.5,
+                // Oversampling font helps improve text rendering at
+                // expense of larger font atlas texture.
+                oversample_h: 4,
+                oversample_v: 4,
                 ..FontConfig::default()
             }),
         },
@@ -62,14 +88,16 @@ pub fn init(title: &str) -> System {
             data: include_bytes!("../../../resources/mplus-1p-regular.ttf"),
             size_pixels: font_size,
             config: Some(FontConfig {
-                rasterizer_multiply: 1.75,
+                // Oversampling font helps improve text rendering at
+                // expense of larger font atlas texture.
+                oversample_h: 4,
+                oversample_v: 4,
+                // Range of glyphs to rasterize
                 glyph_ranges: FontGlyphRanges::japanese(),
                 ..FontConfig::default()
             }),
         },
     ]);
-
-    imgui.io_mut().font_global_scale = (1.0 / hidpi_factor) as f32;
 
     let renderer = Renderer::init(&mut imgui, &display).expect("Failed to initialize renderer");
 
