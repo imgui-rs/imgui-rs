@@ -69,7 +69,7 @@ fn example_1(ui: &Ui, state: &mut State) {
             .display_format("%09.0f")
             .build(ui, &mut state.f64_formatted);
 
-        // This formatting impacts the increments the slider operates in:
+        // The display format changes the increments the slider operates in:
         Slider::new("f32 with %.01f", 0.0, 1.0)
             .display_format("%.01f")
             .build(ui, &mut state.f32_value);
