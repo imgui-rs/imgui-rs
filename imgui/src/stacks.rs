@@ -171,6 +171,7 @@ unsafe fn push_style_var(style_var: StyleVar) {
         SelectableTextAlign(v) => {
             igPushStyleVarVec2(sys::ImGuiStyleVar_SelectableTextAlign as i32, v.into())
         }
+        CellPadding(v) => igPushStyleVarVec2(sys::ImGuiStyleVar_CellPadding as i32, v.into()),
     }
 }
 
