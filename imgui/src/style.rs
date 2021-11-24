@@ -494,6 +494,8 @@ pub enum StyleVar {
     ButtonTextAlign([f32; 2]),
     /// Alignment of selectable text when selectable is larger than text
     SelectableTextAlign([f32; 2]),
+    /// Padding within a table cell
+    CellPadding([f32; 2]),
 }
 
 #[test]
@@ -521,6 +523,7 @@ fn test_style_scaling() {
     style.display_window_padding = [24.0, 25.0];
     style.display_safe_area_padding = [26.0, 27.0];
     style.mouse_cursor_scale = 28.0;
+    style.cell_padding = [29.0, 30.0];
     style.scale_all_sizes(2.0);
     assert_eq!(style.window_padding, [2.0, 4.0]);
     assert_eq!(style.window_rounding, 6.0);
@@ -543,6 +546,7 @@ fn test_style_scaling() {
     assert_eq!(style.display_window_padding, [48.0, 50.0]);
     assert_eq!(style.display_safe_area_padding, [52.0, 54.0]);
     assert_eq!(style.mouse_cursor_scale, 56.0);
+    assert_eq!(style.cell_padding, [58.0, 60.0]);
 }
 
 #[test]
@@ -586,6 +590,7 @@ fn test_style_memory_layout() {
     assert_field_offset!(frame_border_size, FrameBorderSize);
     assert_field_offset!(item_spacing, ItemSpacing);
     assert_field_offset!(item_inner_spacing, ItemInnerSpacing);
+    assert_field_offset!(cell_padding, CellPadding);
     assert_field_offset!(touch_extra_padding, TouchExtraPadding);
     assert_field_offset!(indent_spacing, IndentSpacing);
     assert_field_offset!(columns_min_spacing, ColumnsMinSpacing);
