@@ -28,7 +28,8 @@ bitflags!(
         const CALLBACK_COMPLETION = sys::ImGuiInputTextFlags_CallbackCompletion;
         /// Call user function on pressing Up/Down arrows (for history handling)
         const CALLBACK_HISTORY = sys::ImGuiInputTextFlags_CallbackHistory;
-        /// Call user function on pressing Up/Down arrows (for history handling)
+        /// Callback on any edit (note that InputText() already returns true on edit, the callback
+        /// is useful mainly to manipulate the underlying buffer while focus is active)
         const CALLBACK_EDIT = sys::ImGuiInputTextFlags_CallbackEdit;
         /// Call user function every time. User code may query cursor position, modify text buffer.
         const CALLBACK_ALWAYS = sys::ImGuiInputTextFlags_CallbackAlways;
