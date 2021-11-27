@@ -12,6 +12,9 @@ readme = "../README.markdown"
 
 exclude = ["/resources"]
 
+[package.metadata.docs.rs]
+features = ["freetype", "docking", "tables-api"]
+
 [dependencies]
 bitflags = "1"
 imgui-sys = { version = "0.8.1-alpha.0", path = "../imgui-sys" }
