@@ -510,6 +510,7 @@ fn test_io_memory_layout() {
     assert_field_offset!(metrics_active_allocations, MetricsActiveAllocations);
     assert_field_offset!(mouse_delta, MouseDelta);
     assert_field_offset!(key_mods, KeyMods);
+    assert_field_offset!(key_mods_prev, KeyModsPrev);
     assert_field_offset!(mouse_pos_prev, MousePosPrev);
     assert_field_offset!(mouse_clicked_pos, MouseClickedPos);
     assert_field_offset!(mouse_clicked_time, MouseClickedTime);

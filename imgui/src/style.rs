@@ -575,6 +575,7 @@ fn test_style_memory_layout() {
         };
     }
     assert_field_offset!(alpha, Alpha);
+    assert_field_offset!(disabled_alpha, DisabledAlpha);
     assert_field_offset!(window_padding, WindowPadding);
     assert_field_offset!(window_rounding, WindowRounding);
     assert_field_offset!(window_border_size, WindowBorderSize);

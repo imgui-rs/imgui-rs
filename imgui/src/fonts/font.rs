@@ -62,6 +62,7 @@ fn test_font_memory_layout() {
     assert_field_offset!(config_data_count, ConfigDataCount);
     assert_field_offset!(fallback_char, FallbackChar);
     assert_field_offset!(ellipsis_char, EllipsisChar);
+    assert_field_offset!(dot_char, DotChar);
     assert_field_offset!(dirty_lookup_tables, DirtyLookupTables);
     assert_field_offset!(scale, Scale);
     assert_field_offset!(ascent, Ascent);
