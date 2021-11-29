@@ -10,4 +10,4 @@ publish = false
 anyhow = "1"
 smoljson = "0.1"
 xshell = "0.1"
-xflags = "0.1"
+xflags = "0.2"
