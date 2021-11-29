@@ -2,7 +2,7 @@ mod bindgen;
 mod flags;
 
 use anyhow::Result;
-use flags::XtaskCmd;
+use flags::*;
 use std::path::{Path, PathBuf};
 
 fn main() {
