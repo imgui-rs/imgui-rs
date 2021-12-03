@@ -909,6 +909,15 @@ impl WinitPlatform {
                     _ => (),
                 }
             }
+            WindowEvent::Touch(touch) => {
+                let position = self.scale_pos_from_winit(window, touch.location);
+                io.mouse_pos = [position.x as f32, position.y as f32];
+                match touch.phase {
+                    TouchPhase::Started => self.mouse_buttons[0].set(true),
+                    TouchPhase::Ended => self.mouse_buttons[1].set(false),
+                    TouchPhase::Cancelled | TouchPhase::Moved => {}
+                }
+            }
             _ => (),
         }
     }
@@ -1014,6 +1023,16 @@ impl WinitPlatform {
                     _ => (),
                 }
             }
+            WindowEvent::Touch(touch) => {
+                let position = touch.location.to_logical(window.scale_factor());
+                let position = self.scale_pos_from_winit(window, position);
+                io.mouse_pos = [position.x as f32, position.y as f32];
+                match touch.phase {
+                    TouchPhase::Started => self.mouse_buttons[0].set(true),
+                    TouchPhase::Ended => self.mouse_buttons[1].set(false),
+                    TouchPhase::Cancelled | TouchPhase::Moved => {}
+                }
+            }
             _ => (),
         }
     }
@@ -1116,6 +1135,16 @@ impl WinitPlatform {
                         self.mouse_buttons[idx as usize].set(pressed)
                     }
                     _ => (),
+                }
+            }
+            WindowEvent::Touch(touch) => {
+                let position = touch.location.to_logical(window.scale_factor());
+                let position = self.scale_pos_from_winit(window, position);
+                io.mouse_pos = [position.x as f32, position.y as f32];
+                match touch.phase {
+                    TouchPhase::Started => self.mouse_buttons[0].set(true),
+                    TouchPhase::Ended => self.mouse_buttons[1].set(false),
+                    TouchPhase::Cancelled | TouchPhase::Moved => {}
                 }
             }
             _ => (),
