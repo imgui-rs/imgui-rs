@@ -886,8 +886,7 @@ where
     /// Builds the color picker.
     ///
     /// Returns true if the color value was changed.
-    pub fn build(mut self, ui: &Ui) -> bool {
-        self.flags.insert(ColorEditFlags::NO_ALPHA);
+    pub fn build(self, ui: &Ui) -> bool {
         let mut value: [f32; 4] = (*self.value).into().into();
         let ref_color = self.ref_color.map(|c| c.as_ptr()).unwrap_or(ptr::null());
 
