@@ -9,11 +9,34 @@ const DEFINES: &[(&str, Option<&str>)] = &[
     ("IMGUI_DISABLE_OSX_FUNCTIONS", None),
 ];
 
+// Output define args for compiler
 fn main() -> std::io::Result<()> {
     // Root of imgui-sys
     let manifest_dir = std::path::Path::new(env!("CARGO_MANIFEST_DIR"));
 
-    // Output define args for compiler
+    #[cfg(feature = "freetype")]
+    fn find_freetype() -> Vec<impl AsRef<std::path::Path>> {
+        let err_pkg_config;
+        let err_vcpkg;
+        match pkg_config::Config::new().find("freetype2") {
+            Ok(freetype) => return freetype.include_paths,
+            Err(err) => err_pkg_config = err,
+        }
+        match vcpkg::find_package("freetype") {
+            Ok(freetype) => return freetype.include_paths,
+            Err(err) => err_vcpkg = err,
+        }
+        panic!(
+            "cannot find freetype:\n\
+        - pkg-config failed with: {}\n\
+        - vcpkg failed with: {}",
+            err_pkg_config, err_vcpkg
+        );
+    }
+    println!(
+        "cargo:THIRD_PARTY={}",
+        manifest_dir.join("third-party").display()
+    );
     for (key, value) in DEFINES.iter() {
         println!("cargo:DEFINE_{}={}", key, value.unwrap_or(""));
     }
@@ -48,9 +71,7 @@ fn main() -> std::io::Result<()> {
         // Freetype font rasterizer feature
         #[cfg(feature = "freetype")]
         {
-            // Find library
-            let freetype = pkg_config::Config::new().find("freetype2").unwrap();
-            for include in freetype.include_paths.iter() {
+            for include in find_freetype() {
                 build.include(include);
             }
             // Set flag for dear imgui
