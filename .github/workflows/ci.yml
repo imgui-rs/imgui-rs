@@ -58,6 +58,7 @@ jobs:
       - run: cargo clippy --manifest-path imgui-winit-support/Cargo.toml --no-default-features --features winit-23/default --all-targets
       - run: cargo clippy --manifest-path imgui-winit-support/Cargo.toml --no-default-features --features winit-24/default --all-targets
       - run: cargo clippy --manifest-path imgui-winit-support/Cargo.toml --no-default-features --features winit-25/default --all-targets
+      - run: cargo clippy --manifest-path imgui-winit-support/Cargo.toml --no-default-features --features winit-26/default --all-targets
 
   rustfmt:
     name: Check rustfmt

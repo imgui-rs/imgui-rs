@@ -133,26 +133,38 @@
 //! - Changing the default feature to the new latest `winit` version is *not* a
 //!   breaking change.
 
-#[cfg(feature = "winit-25")]
+#[cfg(feature = "winit-26")]
+use winit_26 as winit;
+
+#[cfg(all(not(any(feature = "winit-26")), feature = "winit-25"))]
 use winit_25 as winit;
 
-#[cfg(all(not(feature = "winit-25"), feature = "winit-24"))]
+#[cfg(all(
+    not(any(feature = "winit-26", feature = "winit-25")),
+    feature = "winit-24"
+))]
 use winit_24 as winit;
 
 #[cfg(all(
-    not(any(feature = "winit-25", feature = "winit-24")),
+    not(any(feature = "winit-26", feature = "winit-25", feature = "winit-24")),
     feature = "winit-23"
 ))]
 use winit_23 as winit;
 
 #[cfg(all(
-    not(any(feature = "winit-25", feature = "winit-24", feature = "winit-23")),
+    not(any(
+        feature = "winit-26",
+        feature = "winit-25",
+        feature = "winit-24",
+        feature = "winit-23"
+    )),
     feature = "winit-22",
 ))]
 use winit_22 as winit;
 
 #[cfg(all(
     not(any(
+        feature = "winit-26",
         feature = "winit-25",
         feature = "winit-24",
         feature = "winit-23",
@@ -164,6 +176,7 @@ use winit_20 as winit;
 
 #[cfg(all(
     not(any(
+        feature = "winit-26",
         feature = "winit-25",
         feature = "winit-24",
         feature = "winit-23",
@@ -181,6 +194,7 @@ use winit::dpi::{LogicalPosition, LogicalSize};
 
 #[cfg(all(
     not(any(
+        feature = "winit-26",
         feature = "winit-25",
         feature = "winit-24",
         feature = "winit-23",
@@ -195,6 +209,7 @@ use winit::{
 };
 
 #[cfg(any(
+    feature = "winit-26",
     feature = "winit-25",
     feature = "winit-24",
     feature = "winit-23",
@@ -218,6 +233,7 @@ use winit::{
     feature = "winit-23",
     feature = "winit-24",
     feature = "winit-25",
+    feature = "winit-26",
 )))]
 compile_error!("Please enable at least one version of `winit` (see documentation for details).");
 
@@ -258,6 +274,7 @@ fn check_multiple_winits() {
         (this likely indicates misconfiguration, see documentation for details)."
     );
     let feats = [
+        ("winit-26", cfg!(feature = "winit-26"), ""),
         ("winit-25", cfg!(feature = "winit-25"), " (default)"),
         ("winit-24", cfg!(feature = "winit-24"), ""),
         ("winit-23", cfg!(feature = "winit-23"), ""),
@@ -348,6 +365,7 @@ fn to_winit_cursor(cursor: imgui::MouseCursor) -> MouseCursor {
 impl CursorSettings {
     #[cfg(all(
         not(any(
+            feature = "winit-26",
             feature = "winit-25",
             feature = "winit-24",
             feature = "winit-23",
@@ -370,7 +388,8 @@ impl CursorSettings {
         feature = "winit-22",
         feature = "winit-23",
         feature = "winit-24",
-        feature = "winit-25"
+        feature = "winit-25",
+        feature = "winit-26"
     ))]
     fn apply(&self, window: &Window) {
         match self.cursor {
@@ -478,6 +497,7 @@ impl WinitPlatform {
     /// * display size is set
     #[cfg(all(
         not(any(
+            feature = "winit-26",
             feature = "winit-25",
             feature = "winit-24",
             feature = "winit-23",
@@ -508,6 +528,7 @@ impl WinitPlatform {
         feature = "winit-23",
         feature = "winit-24",
         feature = "winit-25",
+        feature = "winit-26",
     ))]
     pub fn attach_window(&mut self, io: &mut Io, window: &Window, hidpi_mode: HiDpiMode) {
         let (hidpi_mode, hidpi_factor) = hidpi_mode.apply(window.scale_factor());
@@ -530,6 +551,7 @@ impl WinitPlatform {
     /// your application to use the same logical coordinates as imgui-rs.
     #[cfg(all(
         not(any(
+            feature = "winit-26",
             feature = "winit-25",
             feature = "winit-24",
             feature = "winit-23",
@@ -555,7 +577,8 @@ impl WinitPlatform {
         feature = "winit-22",
         feature = "winit-23",
         feature = "winit-24",
-        feature = "winit-25"
+        feature = "winit-25",
+        feature = "winit-26"
     ))]
     pub fn scale_size_from_winit(
         &self,
@@ -575,6 +598,7 @@ impl WinitPlatform {
     /// your application to use the same logical coordinates as imgui-rs.
     #[cfg(all(
         not(any(
+            feature = "winit-26",
             feature = "winit-25",
             feature = "winit-24",
             feature = "winit-23",
@@ -604,7 +628,8 @@ impl WinitPlatform {
         feature = "winit-22",
         feature = "winit-23",
         feature = "winit-24",
-        feature = "winit-25"
+        feature = "winit-25",
+        feature = "winit-26"
     ))]
     pub fn scale_pos_from_winit(
         &self,
@@ -624,6 +649,7 @@ impl WinitPlatform {
     /// your application to use the same logical coordinates as imgui-rs.
     #[cfg(all(
         not(any(
+            feature = "winit-26",
             feature = "winit-25",
             feature = "winit-24",
             feature = "winit-23",
@@ -653,7 +679,8 @@ impl WinitPlatform {
         feature = "winit-22",
         feature = "winit-23",
         feature = "winit-24",
-        feature = "winit-25"
+        feature = "winit-25",
+        feature = "winit-26"
     ))]
     pub fn scale_pos_for_winit(
         &self,
@@ -676,6 +703,7 @@ impl WinitPlatform {
     /// * mouse state is updated
     #[cfg(all(
         not(any(
+            feature = "winit-26",
             feature = "winit-25",
             feature = "winit-24",
             feature = "winit-23",
@@ -724,6 +752,7 @@ impl WinitPlatform {
     /// * mouse state is updated
     #[cfg(all(
         not(any(
+            feature = "winit-26",
             feature = "winit-25",
             feature = "winit-24",
             feature = "winit-23",
@@ -779,7 +808,8 @@ impl WinitPlatform {
         feature = "winit-22",
         feature = "winit-23",
         feature = "winit-24",
-        feature = "winit-25"
+        feature = "winit-25",
+        feature = "winit-26",
     ))]
     pub fn handle_event<T>(&mut self, io: &mut Io, window: &Window, event: &Event<T>) {
         match *event {
@@ -817,6 +847,7 @@ impl WinitPlatform {
     }
     #[cfg(all(
         not(any(
+            feature = "winit-26",
             feature = "winit-25",
             feature = "winit-24",
             feature = "winit-23",
@@ -913,7 +944,12 @@ impl WinitPlatform {
         }
     }
     #[cfg(all(
-        not(any(feature = "winit-23", feature = "winit-24", feature = "winit-25")),
+        not(any(
+            feature = "winit-23",
+            feature = "winit-24",
+            feature = "winit-25",
+            feature = "winit-26"
+        )),
         any(feature = "winit-20", feature = "winit-22")
     ))]
     fn handle_window_event(&mut self, io: &mut Io, window: &Window, event: &WindowEvent) {
@@ -1018,7 +1054,12 @@ impl WinitPlatform {
         }
     }
 
-    #[cfg(any(feature = "winit-23", feature = "winit-24", feature = "winit-25"))]
+    #[cfg(any(
+        feature = "winit-23",
+        feature = "winit-24",
+        feature = "winit-25",
+        feature = "winit-26"
+    ))]
     fn handle_window_event(&mut self, io: &mut Io, window: &Window, event: &WindowEvent) {
         match *event {
             WindowEvent::Resized(physical_size) => {
@@ -1129,6 +1170,7 @@ impl WinitPlatform {
     /// * mouse cursor is repositioned (if requested by imgui-rs)
     #[cfg(all(
         not(any(
+            feature = "winit-26",
             feature = "winit-25",
             feature = "winit-24",
             feature = "winit-23",
@@ -1160,7 +1202,8 @@ impl WinitPlatform {
         feature = "winit-22",
         feature = "winit-23",
         feature = "winit-24",
-        feature = "winit-25"
+        feature = "winit-25",
+        feature = "winit-26",
     ))]
     pub fn prepare_frame(&self, io: &mut Io, window: &Window) -> Result<(), ExternalError> {
         self.copy_mouse_to_io(&mut io.mouse_down);
