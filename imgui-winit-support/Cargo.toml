@@ -17,6 +17,7 @@ winit-22 = { version = "0.22", package = "winit", optional = true }
 winit-23 = { version = "0.23", package = "winit", default-features = false, optional = true }
 winit-24 = { version = "0.24", package = "winit", default-features = false, optional = true }
 winit-25 = { version = "0.25", package = "winit", default-features = false, optional = true }
+winit-26 = { version = "0.26", package = "winit", default-features = false, optional = true }
 
 [features]
 default = ["winit-25/default"]
