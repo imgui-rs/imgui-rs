@@ -430,6 +430,7 @@ impl Ui {
     /// };
     /// ```
     pub fn window<Label: AsRef<str>>(&self, name: Label) -> Window<'_, '_, Label> {
+        #[allow(deprecated)]
         Window::new(self, name)
     }
 
@@ -438,6 +439,7 @@ impl Ui {
     /// Use child windows to begin into a self-contained independent scrolling/clipping
     /// regions within a host window. Child windows can embed their own child.
     pub fn child_window<Label: AsRef<str>>(&self, name: Label) -> ChildWindow<'_> {
+        #[allow(deprecated)]
         ChildWindow::new(self, name)
     }
 

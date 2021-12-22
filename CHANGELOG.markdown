@@ -24,9 +24,11 @@
 
 - Added `add_polyline` method to `DrawListMut`, which binds to Dear ImGui's `AddPolyline` and `AddConvexPolyFilled`
 
-- BREAKING: The following structs have had their `new` method changed and deprecated; they now also take `ui` in their `new`, but you should create them on the `Ui` struct instead. These each now have a simple and a `_config` version:
-  - `MenuItem` should be made with `ui.menu_item` and `ui.menu_item_config`.
-  - `DragDropSource` and `DragDropTarget` should be made with `ui.drag_drop_source_config` and `ui.drag_drop_target`. Both of these methods, and the DragDrop API in general, are likely to change.
+- BREAKING: The following structs have had their `new` method changed and deprecated; they now also take `ui` in their `new`, but you should create them on the `Ui` struct instead.
+  - `Window` should be made with `ui.window` - e.g `ui.window("My Window").build(|| { ui.text("Contents") });`
+  - `ChildWindow` should be made with `ui.child_window`
+  - `MenuItem` should be made with `ui.menu_item` or `ui.menu_item_config`.
+  - `DragDropSource` and `DragDropTarget` should be made with `ui.drag_drop_source_config` or `ui.drag_drop_target`. Both of these methods, and the DragDrop API in general, are likely to change.
 
 - Added `docking` feature which builds against the upstream docking branch. Only basic API is exposed currently, just enough to enable the docking `imgui_context.io_mut().config_flags |= imgui::ConfigFlags::DOCKING_ENABLE;` - API for programtically docking windows and so on will be added later.
 

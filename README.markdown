@@ -37,7 +37,7 @@ ui.window("Hello world")
 Additionally, the following are no longer maintained, but might work still:
 
 - imgui-gfx-renderer: Renderer implementation that uses the `gfx` crate (_not
-  the new gfx-hal crate_)
+   the new gfx-hal crate_). This can be found at [imgui-rs/imgui-gfx-renderer](https://github.com/imgui-rs/imgui-gfx-renderer)
 
 ## Features
 
@@ -58,6 +58,8 @@ The MSRV for `imgui-rs` and all of the backend crates is **1.54**. We update our
 Almost every application that uses imgui-rs needs two additional components in
 addition to the main `imgui` crate: a backend platform, and a renderer.
 
+**imgui-rs is not tied to any particular renderer or platform.**
+
 The backend platform is responsible for integrating imgui-rs with the operating
 system and its window management. Its responsibilities include the following:
 
@@ -74,26 +76,34 @@ responsibilities include the following:
 - Handling of DPI factors and scissor rects
 - Texture management
 
+We provide the following renderers as an official source (ie, they will always be up to date and working): `imgui-glow-renderer` and `imgui-glium-renderer`.
+
+Additionally, we provide the following backends as an official source (ie, they will always be up to date and working): `imgui-winit-support` and `imgui-sdl2-support`.
+
 The most tested platform/renderer combination is `imgui-glium-renderer` +
-`glium` + `imgui-winit-support` + `winit`, but this is not the only possible
-combination. There's also `imgui-glow-renderer`, which will increasingly replace
-`glium`, and you can find additional 3rd party crates that provide a wider
-support for more libraries (e.g. raw OpenGL, SDL2). You can also write your own
-support code if you have a more advanced use case, because **imgui-rs is not tied to any specific graphics / OS API**.
+ `glium` + `imgui-winit-support` + `winit`, but this is not the only possible
+ combination. There's also `imgui-glow-renderer`, which will increasingly replace
+`glium`.
+
+Additionally, there are other libraries which provide other kind sof renderers, which may be out of date with `imgui-rs` releases, but might work well for your use case:
+
+ 1. [`imgui-wgpu`](https://github.com/Yatekii/imgui-wgpu-rs)
+ 2. [`imgui-d3d12-renderer`](https://github.com/curldivergence/imgui-d3d12-renderer)
+ 3. [`imgui-dx11-renderer`](https://github.com/veykril/imgui-dx11-renderer)
+
+You can also write your own support code if you have a more advanced use case, because **imgui-rs is not tied to any specific graphics / OS API**.
 
 ## Compiling and running the demos
 
 ```bash
 git clone https://github.com/imgui-rs/imgui-rs
 cd imgui-rs
-git submodule update --init --recursive
 ```
 
-Main examples are located in the `imgui-examples` directory.
+Main examples are located in the `imgui-examples` directory. These can be run like so:
 
 ```bash
 # At the reposity root
-cd imgui-examples
 cargo test
 
 cargo run --example hello_world
@@ -101,14 +111,13 @@ cargo run --example test_window
 cargo run --example test_window_impl
 ```
 
-Examples for the gfx backend are under the imgui-gfx-examples directory.
+Examples for the Glow renderer are under the `imgui-glow-renderer/examples/` directory.
+These can be run the same way as any other examples:
 
 ```bash
-cd imgui-gfx-examples
 cargo test
 
-cargo run --example gfx_hello_world
-cargo run --example gfx_test_window
+cargo run --example glow_01_basic
 ```
 
 Note to Windows users: You will need to use the _MSVC ABI_ version of the Rust

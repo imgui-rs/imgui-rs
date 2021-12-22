@@ -5,6 +5,7 @@ This document covers how to upgrade imgui-rs to a new version of the upstream C+
 The process is much the same to build imgui-rs for a tagged release (as shown) as it is for any arbitrary revision (such as one on a different branch)
 
 ## Summary
+
 In short, there are a few steps:
 
 1. Update copy of imgui itself
@@ -17,9 +18,9 @@ In short, there are a few steps:
 1. Update the copies of `imgui` in `imgui-sys/third-party/imgui-*/imgui/` from the appropriate branches on [the upstream repo](https://github.com/ocornut/imgui)
 
     Each branch should generally be from roughly the same point in time. Generally just after each imgui release the `docking` branch is updated, so it's usually easy to find an equivalent commit in both.
-    
+
     We trim some of the "unrequired" parts of imgui, such as it's `.github` directory, the `backends` and `docs`. We are mainly just interested in the main `.cpp` and `.h` files, as well as `misc/freetype/` support files.
-    
+
     Note this step could benefit from some automation (maybe `cargo xtask update-imgui 1.99`)
 
 2. Ensure `luajit` is installed, as this is required by cimgui's generator.
@@ -69,7 +70,7 @@ In short, there are a few steps:
     ```
 
     This requires bindgen to be installed (`cargo install bindgen` should do it)
-    
+
     Be sure to check `bindgen --version` versus the previously used version which is recoded in the first line of `imgui-sys/src/bindings.rs` - if you use a different version, you may get slightly different bindings which could also cause an update to be more work than it would otherwise be with matching bindgen versions
 
 6. Run `cargo build` and fix any errors caused by changes upstream (see next section)
