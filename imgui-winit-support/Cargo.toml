@@ -21,7 +21,7 @@ winit-26 = { version = "0.26", package = "winit", default-features = false, opti
 
 [features]
 default = ["winit-25/default"]
-test = ["winit-23/default", "winit-24/default", "winit-25/default"]
+test = ["winit-23/default", "winit-24/default", "winit-25/default", "winit-26/default"]
 
 # This is phrased as a negative (unlike most features) so that it needs to be
 # explicitly disabled (and `default-features = false` won't do it). To avoid
