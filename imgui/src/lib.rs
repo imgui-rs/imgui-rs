@@ -202,7 +202,7 @@ impl Ui {
     /// This function right now simply **ends** the current frame, but does not
     /// return draw data. If you want to end the frame without generated draw data,
     /// and thus save some CPU time, use [`end_frame_early`].
-    /// 
+    ///
     /// [`end_frame_early`]: Self::end_frame_early
     #[deprecated(
         since = "0.9.0",
@@ -570,7 +570,7 @@ impl<'ui> Ui {
         InputScalar::new(self, label, value)
     }
     /// Shows a horizontal array of scalar value input fields. See [`input_scalar`].
-    /// 
+    ///
     /// [`input_scalar`]: Self::input_scalar
     #[doc(alias = "InputScalarN")]
     pub fn input_scalar_n<'p, L, T>(
