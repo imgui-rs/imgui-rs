@@ -125,6 +125,8 @@ impl Ui {
     /// for simple Menu Items with no features on them.
     ///
     /// Note: a `menu_item` is the actual button/selectable within a Menu.
+    /// 
+    /// [`menu_item`]: Self::menu_item
     #[doc(alias = "MenuItem")]
     pub fn menu_item_config<L: AsRef<str>>(&self, label: L) -> MenuItem<'_, L> {
         MenuItem {

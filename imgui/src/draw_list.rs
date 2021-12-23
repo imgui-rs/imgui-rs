@@ -246,7 +246,7 @@ impl<'ui> DrawListMut<'ui> {
 
     /// Returns a polygonal line. If filled is rendered as a convex
     /// polygon, if not filled is drawn as a line specified by
-    /// [`PolyLine::thickness`] (default 1.0)
+    /// [`Polyline::thickness`] (default 1.0)
     #[doc(alias = "AddPolyline", alias = "AddConvexPolyFilled")]
     pub fn add_polyline<C, P>(&'ui self, points: Vec<P>, c: C) -> Polyline<'ui>
     where
