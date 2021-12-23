@@ -8,6 +8,14 @@ on:
     - cron: "0 0 * * 1"
 
 jobs:
+  rustfmt:
+    name: Check rustfmt
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - run: cargo fmt --all -- --check
+
   clippy:
     name: Run linter
     runs-on: ubuntu-latest
@@ -18,10 +26,10 @@ jobs:
 
     env:
       RUSTFLAGS: -D warnings
+      RUSTDOCFLAGS: -D warnings
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-        with: { submodules: true }
       - uses: hecrj/setup-rust-action@v1
         with:
           components: clippy
@@ -46,12 +54,21 @@ jobs:
             ${{ runner.os }}-target-lint-stable-
             ${{ runner.os }}-target-lint-
 
-      # default
-      - run: cargo clippy --workspace --all-targets
-      # with only docking
-      - run: cargo clippy --workspace --all-targets --features docking
+      # feature testing
+      - name: no features
+        run: cargo clippy --workspace --all-targets
+
+      - name: docking feature
+        run: cargo clippy --workspace --all-targets --features docking
+
+      - name: freetype feature
+        run: cargo clippy --workspace --all-targets --features freetype
+
+      - name: freetype and docking
+        run: cargo clippy --workspace --all-targets --features freetype,docking
+
       # supported winit versions (with otherwise default features)
-      - run: cargo clippy --manifest-path imgui-winit-support/Cargo.toml --all-features --all-targets
+      - run: cargo doc
       - run: cargo clippy --manifest-path imgui-winit-support/Cargo.toml --no-default-features --features winit-19 --all-targets
       - run: cargo clippy --manifest-path imgui-winit-support/Cargo.toml --no-default-features --features winit-20 --all-targets
       - run: cargo clippy --manifest-path imgui-winit-support/Cargo.toml --no-default-features --features winit-22 --all-targets
@@ -59,24 +76,6 @@ jobs:
       - run: cargo clippy --manifest-path imgui-winit-support/Cargo.toml --no-default-features --features winit-24/default --all-targets
       - run: cargo clippy --manifest-path imgui-winit-support/Cargo.toml --no-default-features --features winit-25/default --all-targets
       - run: cargo clippy --manifest-path imgui-winit-support/Cargo.toml --no-default-features --features winit-26/default --all-targets
-
-  rustfmt:
-    name: Check rustfmt
-    runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        rust: ["1.54"]
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-        with: { submodules: true }
-      - uses: hecrj/setup-rust-action@v1
-        with:
-          components: rustfmt
-          rust-version: ${{ matrix.rust }}
-      - run: cargo fmt --all -- --check
 
   test:
     name: Run tests
@@ -98,12 +97,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-      - name: Checkout submodules
-        shell: bash
-        run: |
-          auth_header="$(git config --local --get http.https://github.com/.extraheader)"
-          git submodule sync --recursive
-          git -c "http.extraheader=$auth_header" -c protocol.version=2 submodule update --init --force --recursive --depth=1
       - name: Install toolchain
         uses: actions-rs/toolchain@v1
         with:
@@ -139,8 +132,25 @@ jobs:
             ${{ runner.os }}-target-test-${{ matrix.rust }}-${{ hashFiles('**/Cargo.toml') }}
             ${{ runner.os }}-target-test-${{ matrix.rust }}-
 
-      - run: cargo test --workspace --all-targets
-      - run: cargo test --workspace --all-targets --features docking
+      # - name: Setup vcpkg
+      #   if: matrix.os == 'windows-latest'
+      #   run: vcpkg integrate install; vcpkg install freetype;
+
+      # feature testing
+      - name: no features
+        run: cargo test --workspace --all-targets
+
+      - name: docking feature
+        run: cargo test --workspace --all-targets --features docking
+
+      - name: freetype feature
+        if: matrix.os != 'windows-latest'
+        run: cargo test --workspace --all-targets --features freetype
+
+      - name: freetype and docking
+        if: matrix.os != 'windows-latest'
+        run: cargo test --workspace --all-targets --features freetype,docking
+
       - run: cargo test --workspace --doc
       # run to check for lint problems
       - run: cargo doc
@@ -150,6 +160,7 @@ jobs:
       - run: cargo test --manifest-path imgui-winit-support/Cargo.toml --no-default-features --features winit-23/default
       - run: cargo test --manifest-path imgui-winit-support/Cargo.toml --no-default-features --features winit-24/default
       - run: cargo test --manifest-path imgui-winit-support/Cargo.toml --no-default-features --features winit-25/default
+      - run: cargo test --manifest-path imgui-winit-support/Cargo.toml --no-default-features --features winit-26/default
       # Run unreasonably slow tests under release, but only the crates that have
       # them, and don't bother doing this on most platforms.
       - run: cargo test -p imgui --release -- --ignored
