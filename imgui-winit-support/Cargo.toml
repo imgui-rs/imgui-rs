@@ -1,6 +1,6 @@
 [package]
 name = "imgui-winit-support"
-version = "0.8.0"
+version = "0.8.1"
 edition = "2018"
 authors = ["The imgui-rs Developers"]
 description = "winit support code for the imgui crate"
