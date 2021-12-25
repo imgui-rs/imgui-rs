@@ -11,22 +11,16 @@ const DEFINES: &[(&str, Option<&str>)] = &[
 
 #[cfg(feature = "freetype")]
 fn find_freetype() -> Vec<impl AsRef<std::path::Path>> {
-    let err_pkg_config;
-    let err_vcpkg;
+    #[cfg(not(feature = "use-vcpkg"))]
     match pkg_config::Config::new().find("freetype2") {
         Ok(freetype) => return freetype.include_paths,
-        Err(err) => err_pkg_config = err,
+        Err(err) => panic!("cannot find freetype: {}", err),
     }
+    #[cfg(feature = "use-vcpkg")]
     match vcpkg::find_package("freetype") {
         Ok(freetype) => return freetype.include_paths,
-        Err(err) => err_vcpkg = err,
+        Err(err) => panic!("cannot find freetype: {}", err),
     }
-    panic!(
-        "cannot find freetype:\n\
-    - pkg-config failed with: {}\n\
-    - vcpkg failed with: {}",
-        err_pkg_config, err_vcpkg
-    );
 }
 
 // Output define args for compiler

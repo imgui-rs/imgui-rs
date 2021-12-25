@@ -39,4 +39,5 @@ vcpkg = { version="0.2.15", optional=true }
 default = []
 wasm = []
 docking = []
-freetype = ["pkg-config", "vcpkg"]
+freetype = ["pkg-config"]
+use-vcpkg = ["vcpkg"]
