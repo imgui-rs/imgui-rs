@@ -1,5 +1,11 @@
 # Change Log
 
+## [0.8.2] - 2021-12-26
+
+Merry uh Boxing Day, here's another `imgui-rs` patch.
+
+- FIXES: We incorrectly listed `docking` as a feature in `imgui-rs`'s features list to `doc.rs`. This prevented our docs from building.
+
 ## [0.8.1] - 2021-12-24
 
 Merry Christmas Eve, here's an `imgui-rs` patch.
