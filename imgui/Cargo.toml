@@ -13,7 +13,7 @@ readme = "../README.markdown"
 exclude = ["/resources"]
 
 [package.metadata.docs.rs]
-features = ["freetype", "docking", "tables-api"]
+features = ["freetype", "tables-api"]
 
 [dependencies]
 bitflags = "1"
