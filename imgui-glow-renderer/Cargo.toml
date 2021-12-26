@@ -10,7 +10,7 @@ license = "MIT/Apache-2.0"
 categories = ["gui", "rendering"]
 
 [dependencies]
-imgui = { version = "0.8.0", path = "../imgui" }
+imgui = { version = "0.8.2", path = "../imgui" }
 glow = "0.10.0"
 memoffset = "0.6.4"
 
