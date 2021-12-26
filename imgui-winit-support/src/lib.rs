@@ -79,9 +79,10 @@
 //!
 //! The following versions are supported, controlled by the listed feature.
 //!
-//! - The `winit-25` feature uses winit versions compatible with `0.25`. This is
+//! - The `winit-26` feature uses winit versions compatible with `0.26`. This is
 //!   on by default, so to use any other version you need to disable this crates
 //!   default features.
+//! - The `winit-25` feature supports winit versions `0.25`.
 //! - The `winit-24` feature supports winit versions `0.24`.
 //! - The `winit-23` feature uses winit versions compatible with `0.23`.
 //! - The `winit-22` feature uses winit versions compatible with `0.22`.
@@ -95,7 +96,7 @@
 //! feature, fixing the configuration, or disabling `debug_assertions`.
 //!
 //! Conversely, if no `winit-*` features are enabled, we will fail to compile.
-//! This is not an issue generally, as by default we turn on `winit-25`.
+//! This is not an issue generally, as by default we turn on `winit-26`.
 //!
 //! All of this is in attempt to preserve the additive nature of features (while
 //! still helping users notice project configuration issues), however it's done
@@ -245,7 +246,8 @@ fn check_multiple_winits() {
     if cfg!(any(not(debug_assertions), feature = "no-warn-on-multiple")) {
         return;
     }
-    let winits_enabled = cfg!(feature = "winit-25") as usize
+    let winits_enabled = cfg(feature = "winit-26") as usize
+        + cfg!(feature = "winit-25") as usize
         + cfg!(feature = "winit-24") as usize
         + cfg!(feature = "winit-23") as usize
         + cfg!(feature = "winit-22") as usize
@@ -274,8 +276,8 @@ fn check_multiple_winits() {
         (this likely indicates misconfiguration, see documentation for details)."
     );
     let feats = [
-        ("winit-26", cfg!(feature = "winit-26"), ""),
-        ("winit-25", cfg!(feature = "winit-25"), " (default)"),
+        ("winit-26", cfg!(feature = "winit-26"), " (default)"),
+        ("winit-25", cfg!(feature = "winit-25"), ""),
         ("winit-24", cfg!(feature = "winit-24"), ""),
         ("winit-23", cfg!(feature = "winit-23"), ""),
         ("winit-22", cfg!(feature = "winit-22"), ""),
