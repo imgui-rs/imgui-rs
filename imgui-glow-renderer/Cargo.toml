@@ -1,6 +1,6 @@
 [package]
 name = "imgui-glow-renderer"
-version = "0.8.2"
+version = "0.8.3"
 edition = "2018"
 authors = ["jmaargh and the imgui-rs Developers"]
 description = "glow renderer for the imgui crate"
