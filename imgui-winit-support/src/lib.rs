@@ -246,7 +246,7 @@ fn check_multiple_winits() {
     if cfg!(any(not(debug_assertions), feature = "no-warn-on-multiple")) {
         return;
     }
-    let winits_enabled = cfg(feature = "winit-26") as usize
+    let winits_enabled = cfg!(feature = "winit-26") as usize
         + cfg!(feature = "winit-25") as usize
         + cfg!(feature = "winit-24") as usize
         + cfg!(feature = "winit-23") as usize
