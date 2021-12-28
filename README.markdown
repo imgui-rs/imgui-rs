@@ -30,7 +30,7 @@ ui.window("Hello world")
 - imgui: High-level safe API
 - imgui-winit-support: Backend platform implementation that uses the `winit`
   crate (latest by default, but earlier versions are supported via feature flags)
-- imgui-glow-renderer: Renderer implementation that uses the `imgui` crate
+- imgui-glow-renderer: Renderer implementation that uses the `glow` crate
 - imgui-glium-renderer: Renderer implementation that uses the `glium` crate
 - imgui-sys: Low-level unsafe API (automatically generated)
 
@@ -85,7 +85,7 @@ The most tested platform/renderer combination is `imgui-glium-renderer` +
  combination. There's also `imgui-glow-renderer`, which will increasingly replace
 `glium`.
 
-Additionally, there are other libraries which provide other kind sof renderers, which may be out of date with `imgui-rs` releases, but might work well for your use case:
+Additionally, there are other libraries which provide other kinds of renderers, which may be out of date with `imgui-rs` releases, but might work well for your use case:
 
  1. [`imgui-wgpu`](https://github.com/Yatekii/imgui-wgpu-rs)
  2. [`imgui-d3d12-renderer`](https://github.com/curldivergence/imgui-d3d12-renderer)
