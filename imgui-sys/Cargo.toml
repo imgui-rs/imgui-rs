@@ -11,7 +11,18 @@ categories = ["gui", "external-ffi-bindings"]
 build = "build.rs"
 links = "imgui"
 # exclude json, lua, and the imgui subdirs (imgui/examples, imgui/docs, etc)
-exclude = ["third-party/*.json", "third-party/*.lua", "third-party/imgui/*/"]
+# ..but we need imgui/misc/freetype/ for the freetype feature
+exclude = [
+    "third-party/*.json",
+    "third-party/*.lua",
+    "third-party/imgui/backends/",
+    "third-party/imgui/docs/",
+    "third-party/imgui/examples/",
+    "third-party/imgui/misc/cpp/",
+    "third-party/imgui/misc/debuggers/",
+    "third-party/imgui/misc/fonts/",
+    "third-party/imgui/misc/single_file/",
+]
 
 [dependencies]
 chlorine = "1.0.7"
