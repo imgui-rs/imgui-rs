@@ -932,9 +932,8 @@ void main() {
         }
 
         let vertex_source = format!(
-            "#version {major}{minor}{es_extras}\n{body}",
-            major = major,
-            minor = minor * 10,
+            "#version {version}{es_extras}\n{body}",
+            version = major * 100 + minor * 10,
             es_extras = if is_gles {
                 " es\nprecision mediump float;"
             } else {
@@ -943,9 +942,8 @@ void main() {
             body = VERTEX_BODY,
         );
         let fragment_source = format!(
-            "#version {major}{minor}{es_extras}{defines}\n{body}",
-            major = major,
-            minor = minor * 10,
+            "#version {version}{es_extras}{defines}\n{body}",
+            version = major * 100 + minor * 10,
             es_extras = if is_gles {
                 " es\nprecision mediump float;"
             } else {
