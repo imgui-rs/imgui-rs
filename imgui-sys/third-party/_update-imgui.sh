@@ -32,5 +32,4 @@ cp "${CHECKOUT}"/*.{h,cpp} "${OUT_DIR}"/
 cp -r "${CHECKOUT}"/misc/freetype/ "${OUT_DIR}"/misc/
 
 # Clean up
-
 rm -r "${CHECKOUT}"
