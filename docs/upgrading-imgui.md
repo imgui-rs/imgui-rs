@@ -21,7 +21,7 @@ In short, there are a few steps:
 
     We trim some of the "unrequired" parts of imgui, such as it's `.github` directory, the `backends` and `docs`. We are mainly just interested in the main `.cpp` and `.h` files, as well as `misc/freetype/` support files.
 
-    Note this step could benefit from some automation (maybe `cargo xtask update-imgui 1.99`)
+    There's a simple shell script to perform the updates at `imgui-sys/third-party/update-imgui.sh` - this also serves as documentation of what revision was used.
 
 2. Ensure `luajit` is installed, as this is required by cimgui's generator.
 
