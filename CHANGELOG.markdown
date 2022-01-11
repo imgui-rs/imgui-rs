@@ -4,6 +4,8 @@
 
 - MSRV is now **1.54**. We soft-updated to this in 0.8.0 with a feature `min-const-generics`, which has now been removed (and as such, we resume having no default features).
 
+- Upgraded from Dear ImGui 1.84.2 to 1.86. See [the 1.85](https://github.com/ocornut/imgui/releases/tag/v1.85) and [the 1.86](https://github.com/ocornut/imgui/releases/tag/v1.86) release notes
+
 - BREAKING: Removed `push_style_colors` and `push_style_vars`. Instead, use `push_style_color` in a loop. This was deprecated in `0.7.0` and should have been removed in `0.8.0`. This also removes their associated tokens.
 
 - BREAKING: Ui now does not have a lifetime associated with it, but is only ever given to users in the form of `&mut Ui`. Additionally, the `render` function has been moved to the `Context` instead of `Ui`.
