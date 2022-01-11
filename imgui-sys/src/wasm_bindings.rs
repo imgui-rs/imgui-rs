@@ -136,6 +136,7 @@ pub type ImDrawIdx = cty::c_ushort;
 pub type ImGuiID = cty::c_uint;
 pub type ImU8 = cty::c_uchar;
 pub type ImS16 = cty::c_short;
+pub type ImU16 = cty::c_ushort;
 pub type ImU32 = cty::c_uint;
 pub type ImWchar16 = cty::c_ushort;
 pub type ImWchar32 = cty::c_uint;
@@ -638,17 +639,19 @@ pub const ImGuiFocusedFlags_None: ImGuiFocusedFlags_ = 0;
 pub const ImGuiFocusedFlags_ChildWindows: ImGuiFocusedFlags_ = 1;
 pub const ImGuiFocusedFlags_RootWindow: ImGuiFocusedFlags_ = 2;
 pub const ImGuiFocusedFlags_AnyWindow: ImGuiFocusedFlags_ = 4;
+pub const ImGuiFocusedFlags_NoPopupHierarchy: ImGuiFocusedFlags_ = 8;
 pub const ImGuiFocusedFlags_RootAndChildWindows: ImGuiFocusedFlags_ = 3;
 pub type ImGuiFocusedFlags_ = cty::c_uint;
 pub const ImGuiHoveredFlags_None: ImGuiHoveredFlags_ = 0;
 pub const ImGuiHoveredFlags_ChildWindows: ImGuiHoveredFlags_ = 1;
 pub const ImGuiHoveredFlags_RootWindow: ImGuiHoveredFlags_ = 2;
 pub const ImGuiHoveredFlags_AnyWindow: ImGuiHoveredFlags_ = 4;
-pub const ImGuiHoveredFlags_AllowWhenBlockedByPopup: ImGuiHoveredFlags_ = 8;
-pub const ImGuiHoveredFlags_AllowWhenBlockedByActiveItem: ImGuiHoveredFlags_ = 32;
-pub const ImGuiHoveredFlags_AllowWhenOverlapped: ImGuiHoveredFlags_ = 64;
-pub const ImGuiHoveredFlags_AllowWhenDisabled: ImGuiHoveredFlags_ = 128;
-pub const ImGuiHoveredFlags_RectOnly: ImGuiHoveredFlags_ = 104;
+pub const ImGuiHoveredFlags_NoPopupHierarchy: ImGuiHoveredFlags_ = 8;
+pub const ImGuiHoveredFlags_AllowWhenBlockedByPopup: ImGuiHoveredFlags_ = 32;
+pub const ImGuiHoveredFlags_AllowWhenBlockedByActiveItem: ImGuiHoveredFlags_ = 128;
+pub const ImGuiHoveredFlags_AllowWhenOverlapped: ImGuiHoveredFlags_ = 256;
+pub const ImGuiHoveredFlags_AllowWhenDisabled: ImGuiHoveredFlags_ = 512;
+pub const ImGuiHoveredFlags_RectOnly: ImGuiHoveredFlags_ = 416;
 pub const ImGuiHoveredFlags_RootAndChildWindows: ImGuiHoveredFlags_ = 3;
 pub type ImGuiHoveredFlags_ = cty::c_uint;
 pub const ImGuiDragDropFlags_None: ImGuiDragDropFlags_ = 0;
@@ -1026,6 +1029,7 @@ pub struct ImGuiIO {
     pub MetricsActiveWindows: cty::c_int,
     pub MetricsActiveAllocations: cty::c_int,
     pub MouseDelta: ImVec2,
+    pub WantCaptureMouseUnlessPopupClose: bool,
     pub KeyMods: ImGuiKeyModFlags,
     pub KeyModsPrev: ImGuiKeyModFlags,
     pub MousePosPrev: ImVec2,
@@ -1033,9 +1037,11 @@ pub struct ImGuiIO {
     pub MouseClickedTime: [f64; 5usize],
     pub MouseClicked: [bool; 5usize],
     pub MouseDoubleClicked: [bool; 5usize],
+    pub MouseClickedCount: [ImU16; 5usize],
+    pub MouseClickedLastCount: [ImU16; 5usize],
     pub MouseReleased: [bool; 5usize],
     pub MouseDownOwned: [bool; 5usize],
-    pub MouseDownWasDoubleClick: [bool; 5usize],
+    pub MouseDownOwnedUnlessPopupClose: [bool; 5usize],
     pub MouseDownDuration: [f32; 5usize],
     pub MouseDownDurationPrev: [f32; 5usize],
     pub MouseDragMaxDistanceAbs: [ImVec2; 5usize],
@@ -1045,6 +1051,7 @@ pub struct ImGuiIO {
     pub NavInputsDownDuration: [f32; 20usize],
     pub NavInputsDownDurationPrev: [f32; 20usize],
     pub PenPressure: f32,
+    pub AppFocusLost: bool,
     pub InputQueueSurrogate: ImWchar16,
     pub InputQueueCharacters: ImVector_ImWchar,
 }
@@ -1280,15 +1287,23 @@ impl Default for ImGuiStorage {
     }
 }
 #[repr(C)]
-#[derive(Debug, Default, Copy, Clone, PartialEq)]
+#[derive(Debug, Copy, Clone, PartialEq)]
 pub struct ImGuiListClipper {
     pub DisplayStart: cty::c_int,
     pub DisplayEnd: cty::c_int,
     pub ItemsCount: cty::c_int,
-    pub StepNo: cty::c_int,
-    pub ItemsFrozen: cty::c_int,
     pub ItemsHeight: f32,
     pub StartPosY: f32,
+    pub TempData: *mut cty::c_void,
+}
+impl Default for ImGuiListClipper {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
 }
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone, PartialEq)]
@@ -1735,6 +1750,10 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
+    pub fn igShowStackToolWindow(p_open: *mut bool);
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
     pub fn igShowAboutWindow(p_open: *mut bool);
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
@@ -1915,10 +1934,6 @@ extern "C" {
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igGetWindowContentRegionMax(pOut: *mut ImVec2);
-}
-#[link(wasm_import_module = "imgui-sys-v0")]
-extern "C" {
-    pub fn igGetWindowContentRegionWidth() -> f32;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
@@ -3493,15 +3508,6 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igCalcListClipping(
-        items_count: cty::c_int,
-        items_height: f32,
-        out_items_display_start: *mut cty::c_int,
-        out_items_display_end: *mut cty::c_int,
-    );
-}
-#[link(wasm_import_module = "imgui-sys-v0")]
-extern "C" {
     pub fn igBeginChildFrame(id: ImGuiID, size: ImVec2, flags: ImGuiWindowFlags) -> bool;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
@@ -3588,6 +3594,10 @@ extern "C" {
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igIsMouseDoubleClicked(button: ImGuiMouseButton) -> bool;
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
+    pub fn igGetMouseClickedCount(button: ImGuiMouseButton) -> cty::c_int;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
@@ -3719,11 +3729,15 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
+    pub fn ImGuiIO_AddFocusEvent(self_: *mut ImGuiIO, focused: bool);
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
     pub fn ImGuiIO_ClearInputCharacters(self_: *mut ImGuiIO);
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn ImGuiIO_AddFocusEvent(self_: *mut ImGuiIO, focused: bool);
+    pub fn ImGuiIO_ClearInputKeys(self_: *mut ImGuiIO);
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
@@ -4055,6 +4069,14 @@ extern "C" {
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImGuiListClipper_Step(self_: *mut ImGuiListClipper) -> bool;
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
+    pub fn ImGuiListClipper_ForceDisplayRangeByIndices(
+        self_: *mut ImGuiListClipper,
+        item_min: cty::c_int,
+        item_max: cty::c_int,
+    );
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
