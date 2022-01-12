@@ -180,6 +180,8 @@ pub struct Io {
     #[cfg(feature = "docking")]
     pub config_docking_no_split: bool,
     #[cfg(feature = "docking")]
+    pub config_docking_with_shift: bool,
+    #[cfg(feature = "docking")]
     pub config_docking_always_tab_bar: bool,
     #[cfg(feature = "docking")]
     pub config_docking_transparent_payload: bool,
