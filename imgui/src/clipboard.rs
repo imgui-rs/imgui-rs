@@ -40,7 +40,7 @@ impl ClipboardContext {
         }
     }
 }
-
+/// Non-functioning placeholder
 pub struct DummyClipboardContext;
 impl ClipboardBackend for DummyClipboardContext {
     fn get(&mut self) -> Option<String> {

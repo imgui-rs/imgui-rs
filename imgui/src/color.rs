@@ -164,6 +164,7 @@ impl std::fmt::Debug for ImColor32 {
 #[repr(C, align(4))]
 // Should this be #[non_exhaustive] to discourage direct use?
 #[rustfmt::skip]
+#[allow(missing_docs)]
 pub struct ImColor32Fields {
     #[cfg(target_endian = "little")] pub r: u8,
     #[cfg(target_endian = "little")] pub g: u8,

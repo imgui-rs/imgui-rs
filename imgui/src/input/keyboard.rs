@@ -4,6 +4,7 @@ use crate::Ui;
 /// A key identifier
 #[repr(u32)]
 #[derive(Copy, Clone, Debug, Hash, Eq, PartialEq)]
+#[allow(missing_docs)] // Self-describing
 pub enum Key {
     Tab = sys::ImGuiKey_Tab,
     LeftArrow = sys::ImGuiKey_LeftArrow,
@@ -188,6 +189,7 @@ impl Ui {
         self.key_index_pressed_amount(key_index, repeat_delay, rate)
     }
 
+    /// Same as [`key_pressed_amount`] but takes a key index.
     #[inline]
     #[doc(alias = "GetKeyPressedAmount")]
     pub fn key_index_pressed_amount(&self, key_index: i32, repeat_delay: f32, rate: f32) -> u32 {

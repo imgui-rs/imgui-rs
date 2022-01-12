@@ -205,11 +205,17 @@ impl IndexMut<StyleColor> for Style {
     }
 }
 
-/// A color identifier for styling
+/// A color identifier for styling.
+///
+/// The use of some colours can sometimes be be unobvious. A good way to find a particular color is to use
+/// the [`Ui::show_default_style_editor`] window, set a color to a very bright color, and explore the
+/// [`Ui::show_demo_window`] until you spot it
 #[repr(u32)]
 #[derive(Copy, Clone, Debug, Hash, Eq, PartialEq)]
 pub enum StyleColor {
+    /// Default color of text througout application
     Text = sys::ImGuiCol_Text,
+    /// Text in areas disabled e.g via [`Ui::begin_disable`]
     TextDisabled = sys::ImGuiCol_TextDisabled,
     /// Background of normal windows
     WindowBg = sys::ImGuiCol_WindowBg,
@@ -217,56 +223,104 @@ pub enum StyleColor {
     ChildBg = sys::ImGuiCol_ChildBg,
     /// Background of popups, menus, tooltips windows
     PopupBg = sys::ImGuiCol_PopupBg,
+    /// Border around windows, frames, etc
     Border = sys::ImGuiCol_Border,
+    /// Used for a drop-shadow/emboss style effect wherever `Border` is used
     BorderShadow = sys::ImGuiCol_BorderShadow,
     /// Background of checkbox, radio button, plot, slider, text input
     FrameBg = sys::ImGuiCol_FrameBg,
+    /// Same as `FrameBg` but when mouse is hovering over the widget
     FrameBgHovered = sys::ImGuiCol_FrameBgHovered,
+    /// Same as `FrameBg` but when the mouse is active (e.g mouse is down)
     FrameBgActive = sys::ImGuiCol_FrameBgActive,
+    /// Window title for inactive windows. Also used as the "docked window tab area" when docking is enabled.
     TitleBg = sys::ImGuiCol_TitleBg,
+    /// Window title for active windows.
     TitleBgActive = sys::ImGuiCol_TitleBgActive,
+    /// Color of a floating window when it is "rolled up"
     TitleBgCollapsed = sys::ImGuiCol_TitleBgCollapsed,
+    /// Main menu bar background, see [`Ui::main_menu_bar`]
     MenuBarBg = sys::ImGuiCol_MenuBarBg,
+    /// Background area of scrollbar
     ScrollbarBg = sys::ImGuiCol_ScrollbarBg,
+    /// Movable area of scollbar when "idle"
     ScrollbarGrab = sys::ImGuiCol_ScrollbarGrab,
+    /// Moveable area of scrollbar when mouse is over it
     ScrollbarGrabHovered = sys::ImGuiCol_ScrollbarGrabHovered,
+    /// Moveable area of scollbar when it is being clicked on
     ScrollbarGrabActive = sys::ImGuiCol_ScrollbarGrabActive,
+    /// The color of the tick character inside the checkbox
     CheckMark = sys::ImGuiCol_CheckMark,
+    /// Color of interactive handle inside various slider widgets
     SliderGrab = sys::ImGuiCol_SliderGrab,
+    /// Interactive handle when being clicked on
     SliderGrabActive = sys::ImGuiCol_SliderGrabActive,
+    /// Main frame color of default button
     Button = sys::ImGuiCol_Button,
+    /// Button when mouse hovers over it
     ButtonHovered = sys::ImGuiCol_ButtonHovered,
+    /// Button when mouse is down
     ButtonActive = sys::ImGuiCol_ButtonActive,
+    /// Inactive color for header sections, such as [`Ui::collapsing_header`]
     Header = sys::ImGuiCol_Header,
+    /// As with `Header` but when hovered
     HeaderHovered = sys::ImGuiCol_HeaderHovered,
+    /// As with `Header` but when mouse is down
     HeaderActive = sys::ImGuiCol_HeaderActive,
+    /// Dividing line, e.g [`Ui::separator`]
     Separator = sys::ImGuiCol_Separator,
+    /// Dividing line when mouse hovered
     SeparatorHovered = sys::ImGuiCol_SeparatorHovered,
+    /// Dividing line when mouse button down
     SeparatorActive = sys::ImGuiCol_SeparatorActive,
+    /// Resize handle on windows
     ResizeGrip = sys::ImGuiCol_ResizeGrip,
+    /// Resize handle when mouse hovered over handle
     ResizeGripHovered = sys::ImGuiCol_ResizeGripHovered,
+    /// Resize handle when mouse button down
     ResizeGripActive = sys::ImGuiCol_ResizeGripActive,
+    /// Inactive tab color. Applies to both tab widgets and docked windows
     Tab = sys::ImGuiCol_Tab,
+    /// Hovered tab (applies regardless if tab is active, or is in the active window)
     TabHovered = sys::ImGuiCol_TabHovered,
+    /// Color of currently selected tab
     TabActive = sys::ImGuiCol_TabActive,
+    /// Non-selected, when in an unfocused window
     TabUnfocused = sys::ImGuiCol_TabUnfocused,
+    /// Selected tab, in an unfocused window
     TabUnfocusedActive = sys::ImGuiCol_TabUnfocusedActive,
 
+    /// Color of widget which appears when moving windows around, allowing splitting/etc of dock areas
     #[cfg(feature = "docking")]
     DockingPreview = sys::ImGuiCol_DockingPreview,
+    /// Colour when black area is present in docking setup (e.g while dragging a window away from a split area, leaving it temporarily empty)
     #[cfg(feature = "docking")]
     DockingEmptyBg = sys::ImGuiCol_DockingEmptyBg,
 
+    /// Lines in [`Ui::plot_lines`]
     PlotLines = sys::ImGuiCol_PlotLines,
+    /// `PlotLines` when hovered
     PlotLinesHovered = sys::ImGuiCol_PlotLinesHovered,
+    /// Used for [`Ui::plot_histogram`]
     PlotHistogram = sys::ImGuiCol_PlotHistogram,
+    /// `PlotHistogram` when hovered
     PlotHistogramHovered = sys::ImGuiCol_PlotHistogramHovered,
+
+    /// Background color of header rows in table widget
     TableHeaderBg = sys::ImGuiCol_TableHeaderBg,
+    /// Main border color for table, used around whole table and around header cells
     TableBorderStrong = sys::ImGuiCol_TableBorderStrong,
+    /// Used within border to separate cells
     TableBorderLight = sys::ImGuiCol_TableBorderLight,
+    /// Background of cells in table
     TableRowBg = sys::ImGuiCol_TableRowBg,
+    /// Used for alternating row colors, if enabled by `TableFlags::ROW_BG`
     TableRowBgAlt = sys::ImGuiCol_TableRowBgAlt,
+
+    /// The highlight color used for selection in text inputs
     TextSelectedBg = sys::ImGuiCol_TextSelectedBg,
+
+    /// Used for drag-and-drop system
     DragDropTarget = sys::ImGuiCol_DragDropTarget,
     /// Gamepad/keyboard: current highlighted item
     NavHighlight = sys::ImGuiCol_NavHighlight,

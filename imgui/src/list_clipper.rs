@@ -4,6 +4,18 @@ use std::thread;
 use crate::sys;
 use crate::Ui;
 
+/// Used to render only the visible items when displaying a
+/// long list of items in a scrollable area.
+///
+/// For example, you can have a huge list of checkboxes.
+/// Without the clipper you have to call `ui.checkbox(...)`
+/// for every one, even if 99% of of them are not visible in
+/// the current frame. Using the `ListClipper`, you can only
+/// call `ui.checkbox(...)` for the currently visible items.
+///
+/// Note the efficiency of list clipper relies on the height
+/// of each item being cheaply calculated. The current rust
+/// bindings only works with a fixed height for all items.
 pub struct ListClipper {
     items_count: i32,
     items_height: f32,
@@ -17,6 +29,7 @@ impl ListClipper {
         }
     }
 
+    /// Manually set item height. If not set, the height of the first item is used for all subsequent rows.
     pub const fn items_height(mut self, items_height: f32) -> Self {
         self.items_height = items_height;
         self
