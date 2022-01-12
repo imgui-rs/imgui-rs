@@ -291,41 +291,29 @@ pub enum ItemFlag {
 }
 
 create_token!(
-    /// Tracks a window that can be ended by calling `.end()`
-    /// or by dropping.
     pub struct ItemWidthStackToken<'ui>;
 
-    /// Ends a window
     #[doc(alias = "PopItemWidth")]
     drop { sys::igPopItemWidth() }
 );
 
 create_token!(
-    /// Tracks a window that can be ended by calling `.end()`
-    /// or by dropping.
     pub struct TextWrapPosStackToken<'ui>;
 
-    /// Ends a window
     #[doc(alias = "PopTextWrapPos")]
     drop { sys::igPopTextWrapPos() }
 );
 
 create_token!(
-    /// Tracks a window that can be ended by calling `.end()`
-    /// or by dropping.
     pub struct PushAllowKeyboardFocusToken<'ui>;
 
-    /// Ends a window
     #[doc(alias = "PopAllowKeyboardFocus")]
     drop { sys::igPopAllowKeyboardFocus() }
 );
 
 create_token!(
-    /// Tracks a window that can be ended by calling `.end()`
-    /// or by dropping.
     pub struct PushButtonRepeatToken<'ui>;
 
-    /// Ends a window
     #[doc(alias = "PopButtonRepeat")]
     drop { sys::igPopButtonRepeat() }
 );
