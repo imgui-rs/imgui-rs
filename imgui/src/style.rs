@@ -207,15 +207,15 @@ impl IndexMut<StyleColor> for Style {
 
 /// A color identifier for styling.
 ///
-/// The use of some colours can sometimes be be unobvious. A good way to find a particular color is to use
-/// the [`Ui::show_default_style_editor`] window, set a color to a very bright color, and explore the
-/// [`Ui::show_demo_window`] until you spot it
+/// Which color does what can sometimes be be unobvious. A good way to find a particular color is to use
+/// the [`crate::Ui::show_default_style_editor`] window, set a color to a very bright color, and explore the
+/// [`crate::Ui::show_demo_window`] until you spot it
 #[repr(u32)]
 #[derive(Copy, Clone, Debug, Hash, Eq, PartialEq)]
 pub enum StyleColor {
     /// Default color of text througout application
     Text = sys::ImGuiCol_Text,
-    /// Text in areas disabled e.g via [`Ui::begin_disable`]
+    /// Text in areas disabled e.g via [`crate::Ui::begin_disabled`]
     TextDisabled = sys::ImGuiCol_TextDisabled,
     /// Background of normal windows
     WindowBg = sys::ImGuiCol_WindowBg,
@@ -239,7 +239,7 @@ pub enum StyleColor {
     TitleBgActive = sys::ImGuiCol_TitleBgActive,
     /// Color of a floating window when it is "rolled up"
     TitleBgCollapsed = sys::ImGuiCol_TitleBgCollapsed,
-    /// Main menu bar background, see [`Ui::main_menu_bar`]
+    /// Main menu bar background, see [`crate::Ui::main_menu_bar`]
     MenuBarBg = sys::ImGuiCol_MenuBarBg,
     /// Background area of scrollbar
     ScrollbarBg = sys::ImGuiCol_ScrollbarBg,
@@ -261,13 +261,13 @@ pub enum StyleColor {
     ButtonHovered = sys::ImGuiCol_ButtonHovered,
     /// Button when mouse is down
     ButtonActive = sys::ImGuiCol_ButtonActive,
-    /// Inactive color for header sections, such as [`Ui::collapsing_header`]
+    /// Inactive color for header sections, such as [`crate::Ui::collapsing_header`]
     Header = sys::ImGuiCol_Header,
     /// As with `Header` but when hovered
     HeaderHovered = sys::ImGuiCol_HeaderHovered,
     /// As with `Header` but when mouse is down
     HeaderActive = sys::ImGuiCol_HeaderActive,
-    /// Dividing line, e.g [`Ui::separator`]
+    /// Dividing line, e.g [`crate::Ui::separator`]
     Separator = sys::ImGuiCol_Separator,
     /// Dividing line when mouse hovered
     SeparatorHovered = sys::ImGuiCol_SeparatorHovered,
@@ -297,11 +297,11 @@ pub enum StyleColor {
     #[cfg(feature = "docking")]
     DockingEmptyBg = sys::ImGuiCol_DockingEmptyBg,
 
-    /// Lines in [`Ui::plot_lines`]
+    /// Lines in [`crate::Ui::plot_lines`]
     PlotLines = sys::ImGuiCol_PlotLines,
     /// `PlotLines` when hovered
     PlotLinesHovered = sys::ImGuiCol_PlotLinesHovered,
-    /// Used for [`Ui::plot_histogram`]
+    /// Used for [`crate::Ui::plot_histogram`]
     PlotHistogram = sys::ImGuiCol_PlotHistogram,
     /// `PlotHistogram` when hovered
     PlotHistogramHovered = sys::ImGuiCol_PlotHistogramHovered,

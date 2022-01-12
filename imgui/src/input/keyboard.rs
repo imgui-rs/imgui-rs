@@ -189,7 +189,7 @@ impl Ui {
         self.key_index_pressed_amount(key_index, repeat_delay, rate)
     }
 
-    /// Same as [`key_pressed_amount`] but takes a key index.
+    /// Same as [`crate::Ui::key_pressed_amount`] but takes a key index.
     #[inline]
     #[doc(alias = "GetKeyPressedAmount")]
     pub fn key_index_pressed_amount(&self, key_index: i32, repeat_delay: f32, rate: f32) -> u32 {
