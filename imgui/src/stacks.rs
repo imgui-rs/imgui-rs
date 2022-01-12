@@ -356,7 +356,7 @@ impl Drop for ItemFlagsStackToken<'_> {
 
 create_token!(
     /// Tracks an ID pushed to the ID stack that can be popped by calling `.pop()`
-    /// or by dropping.
+    /// or by dropping. See [`crate::Ui::push_id`] for more details.
     pub struct IdStackToken<'ui>;
 
     /// Pops a change from the ID stack
@@ -442,8 +442,12 @@ impl<'ui> Ui {
     ///     {
     ///         // Same for second callback. If we didn't do this, clicking the "Click" button
     ///         // would trigger both println statements!
-    ///         let _id2 = ui.push_id("second");
+    ///         let id2 = ui.push_id("second");
     ///         callback2(&ui);
+    ///         // Here we manually end the scope. Typically letting it drop is neater
+    ///         // but sometimes it's useful to end the scope earlier
+    ///         id2.end();
+    ///         ui.text("We can do other things, outside of the id2 scope");
     ///     }
     /// });
     /// ```
