@@ -195,7 +195,10 @@ impl Ui {
     }
 
     /// Creates a PopupModal directly.
-    pub fn popup_modal<'ui, 'p, Label: AsRef<str>>(&self, str_id: Label) -> PopupModal<'_, '_, Label> {
+    pub fn popup_modal<'ui, 'p, Label: AsRef<str>>(
+        &self,
+        str_id: Label,
+    ) -> PopupModal<'_, '_, Label> {
         #[allow(deprecated)]
         PopupModal::new(self, str_id)
     }
