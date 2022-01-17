@@ -14,7 +14,7 @@ use crate::Ui;
 /// if ui.button(im_str!("Show modal")) {
 ///     ui.open_popup(im_str!("modal"));
 /// }
-/// if let Some(_token) = PopupModal::new(im_str!("modal")).begin_popup(&ui) {
+/// if let Some(_token) = ui.popup_modal("modal").begin_popup() {
 ///     ui.text("Content of my modal");
 ///     if ui.button(im_str!("OK")) {
 ///         ui.close_current_popup();
@@ -22,15 +22,18 @@ use crate::Ui;
 /// };
 /// ```
 #[must_use]
-pub struct PopupModal<'p, Label> {
+pub struct PopupModal<'ui, 'p, Label> {
+    ui: &'ui Ui,
     label: Label,
     opened: Option<&'p mut bool>,
     flags: WindowFlags,
 }
 
-impl<'p, Label: AsRef<str>> PopupModal<'p, Label> {
-    pub fn new(label: Label) -> Self {
+impl<'ui, 'p, Label: AsRef<str>> PopupModal<'ui, 'p, Label> {
+    #[deprecated(since = "0.9.0", note = "Use `ui.popup_modal(...)` instead")]
+    pub fn new(ui: &'ui Ui, label: Label) -> Self {
         PopupModal {
+            ui,
             label,
             opened: None,
             flags: WindowFlags::empty(),
@@ -118,8 +121,8 @@ impl<'p, Label: AsRef<str>> PopupModal<'p, Label> {
     /// Consume and draw the PopupModal.
     /// Returns the result of the closure, if it is called.
     #[doc(alias = "BeginPopupModal")]
-    pub fn build<T, F: FnOnce() -> T>(self, ui: &Ui, f: F) -> Option<T> {
-        self.begin_popup(ui).map(|_popup| f())
+    pub fn build<T, F: FnOnce() -> T>(self, f: F) -> Option<T> {
+        self.begin_popup().map(|_popup| f())
     }
 
     /// Consume and draw the PopupModal.
@@ -128,10 +131,10 @@ impl<'p, Label: AsRef<str>> PopupModal<'p, Label> {
     /// This should be called *per frame*, whereas [`Ui::open_popup`]
     /// should be called *once* when you want to actual create the popup.
     #[doc(alias = "BeginPopupModal")]
-    pub fn begin_popup(self, ui: &Ui) -> Option<PopupToken<'_>> {
+    pub fn begin_popup(self) -> Option<PopupToken<'ui>> {
         let render = unsafe {
             sys::igBeginPopupModal(
-                ui.scratch_txt(self.label),
+                self.ui.scratch_txt(self.label),
                 self.opened
                     .map(|x| x as *mut bool)
                     .unwrap_or(ptr::null_mut()),
@@ -140,7 +143,7 @@ impl<'p, Label: AsRef<str>> PopupModal<'p, Label> {
         };
 
         if render {
-            Some(PopupToken::new(ui))
+            Some(PopupToken::new(self.ui))
         } else {
             None
         }
@@ -192,8 +195,9 @@ impl Ui {
     }
 
     /// Creates a PopupModal directly.
-    pub fn popup_modal<'p, Label: AsRef<str>>(&self, str_id: Label) -> PopupModal<'p, Label> {
-        PopupModal::new(str_id)
+    pub fn popup_modal<'ui, 'p, Label: AsRef<str>>(&self, str_id: Label) -> PopupModal<'_, '_, Label> {
+        #[allow(deprecated)]
+        PopupModal::new(self, str_id)
     }
 
     /// Close a popup. Should be called within the closure given as argument to
