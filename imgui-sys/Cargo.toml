@@ -10,8 +10,8 @@ license = "MIT/Apache-2.0"
 categories = ["gui", "external-ffi-bindings"]
 build = "build.rs"
 links = "imgui"
-# exclude json, lua, and the imgui subdirs (imgui/examples, imgui/docs, etc)
-exclude = ["third-party/*.json", "third-party/*.lua", "third-party/imgui/*/"]
+# exclude .json, .lua from imgui dirs - they are intermediate artifacts from cimgui generator
+exclude = ["third-party/imgui-*/*.json", "third-party/imgui-*/*.lua"]
 
 [dependencies]
 chlorine = "1.0.7"
