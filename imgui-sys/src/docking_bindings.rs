@@ -221,8 +221,8 @@ pub type ImDrawCallback = ::core::option::Option<
 >;
 pub type ImGuiDataAuthority = cty::c_int;
 pub type ImGuiLayoutType = cty::c_int;
+pub type ImGuiActivateFlags = cty::c_int;
 pub type ImGuiItemFlags = cty::c_int;
-pub type ImGuiItemAddFlags = cty::c_int;
 pub type ImGuiItemStatusFlags = cty::c_int;
 pub type ImGuiOldColumnFlags = cty::c_int;
 pub type ImGuiNavHighlightFlags = cty::c_int;
@@ -230,6 +230,7 @@ pub type ImGuiNavDirSourceFlags = cty::c_int;
 pub type ImGuiNavMoveFlags = cty::c_int;
 pub type ImGuiNextItemDataFlags = cty::c_int;
 pub type ImGuiNextWindowDataFlags = cty::c_int;
+pub type ImGuiScrollFlags = cty::c_int;
 pub type ImGuiSeparatorFlags = cty::c_int;
 pub type ImGuiTextFlags = cty::c_int;
 pub type ImGuiTooltipFlags = cty::c_int;
@@ -606,6 +607,38 @@ impl Default for ImVector_ImGuiItemFlags {
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub struct ImVector_ImGuiListClipperData {
+    pub Size: cty::c_int,
+    pub Capacity: cty::c_int,
+    pub Data: *mut ImGuiListClipperData,
+}
+impl Default for ImVector_ImGuiListClipperData {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub struct ImVector_ImGuiListClipperRange {
+    pub Size: cty::c_int,
+    pub Capacity: cty::c_int,
+    pub Data: *mut ImGuiListClipperRange,
+}
+impl Default for ImVector_ImGuiListClipperRange {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
 pub struct ImVector_ImGuiOldColumnData {
     pub Size: cty::c_int,
     pub Capacity: cty::c_int,
@@ -708,6 +741,22 @@ pub struct ImVector_ImGuiShrinkWidthItem {
     pub Data: *mut ImGuiShrinkWidthItem,
 }
 impl Default for ImVector_ImGuiShrinkWidthItem {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub struct ImVector_ImGuiStackLevelInfo {
+    pub Size: cty::c_int,
+    pub Capacity: cty::c_int,
+    pub Data: *mut ImGuiStackLevelInfo,
+}
+impl Default for ImVector_ImGuiStackLevelInfo {
     fn default() -> Self {
         let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
         unsafe {
@@ -1234,17 +1283,21 @@ pub const ImGuiFocusedFlags_None: ImGuiFocusedFlags_ = 0;
 pub const ImGuiFocusedFlags_ChildWindows: ImGuiFocusedFlags_ = 1;
 pub const ImGuiFocusedFlags_RootWindow: ImGuiFocusedFlags_ = 2;
 pub const ImGuiFocusedFlags_AnyWindow: ImGuiFocusedFlags_ = 4;
+pub const ImGuiFocusedFlags_NoPopupHierarchy: ImGuiFocusedFlags_ = 8;
+pub const ImGuiFocusedFlags_DockHierarchy: ImGuiFocusedFlags_ = 16;
 pub const ImGuiFocusedFlags_RootAndChildWindows: ImGuiFocusedFlags_ = 3;
 pub type ImGuiFocusedFlags_ = cty::c_uint;
 pub const ImGuiHoveredFlags_None: ImGuiHoveredFlags_ = 0;
 pub const ImGuiHoveredFlags_ChildWindows: ImGuiHoveredFlags_ = 1;
 pub const ImGuiHoveredFlags_RootWindow: ImGuiHoveredFlags_ = 2;
 pub const ImGuiHoveredFlags_AnyWindow: ImGuiHoveredFlags_ = 4;
-pub const ImGuiHoveredFlags_AllowWhenBlockedByPopup: ImGuiHoveredFlags_ = 8;
-pub const ImGuiHoveredFlags_AllowWhenBlockedByActiveItem: ImGuiHoveredFlags_ = 32;
-pub const ImGuiHoveredFlags_AllowWhenOverlapped: ImGuiHoveredFlags_ = 64;
-pub const ImGuiHoveredFlags_AllowWhenDisabled: ImGuiHoveredFlags_ = 128;
-pub const ImGuiHoveredFlags_RectOnly: ImGuiHoveredFlags_ = 104;
+pub const ImGuiHoveredFlags_NoPopupHierarchy: ImGuiHoveredFlags_ = 8;
+pub const ImGuiHoveredFlags_DockHierarchy: ImGuiHoveredFlags_ = 16;
+pub const ImGuiHoveredFlags_AllowWhenBlockedByPopup: ImGuiHoveredFlags_ = 32;
+pub const ImGuiHoveredFlags_AllowWhenBlockedByActiveItem: ImGuiHoveredFlags_ = 128;
+pub const ImGuiHoveredFlags_AllowWhenOverlapped: ImGuiHoveredFlags_ = 256;
+pub const ImGuiHoveredFlags_AllowWhenDisabled: ImGuiHoveredFlags_ = 512;
+pub const ImGuiHoveredFlags_RectOnly: ImGuiHoveredFlags_ = 416;
 pub const ImGuiHoveredFlags_RootAndChildWindows: ImGuiHoveredFlags_ = 3;
 pub type ImGuiHoveredFlags_ = cty::c_uint;
 pub const ImGuiDockNodeFlags_None: ImGuiDockNodeFlags_ = 0;
@@ -1594,6 +1647,7 @@ pub struct ImGuiIO {
     pub FontDefault: *mut ImFont,
     pub DisplayFramebufferScale: ImVec2,
     pub ConfigDockingNoSplit: bool,
+    pub ConfigDockingWithShift: bool,
     pub ConfigDockingAlwaysTabBar: bool,
     pub ConfigDockingTransparentPayload: bool,
     pub ConfigViewportsNoAutoMerge: bool,
@@ -1652,10 +1706,11 @@ pub struct ImGuiIO {
     pub MouseClickedTime: [f64; 5usize],
     pub MouseClicked: [bool; 5usize],
     pub MouseDoubleClicked: [bool; 5usize],
+    pub MouseClickedCount: [ImU16; 5usize],
+    pub MouseClickedLastCount: [ImU16; 5usize],
     pub MouseReleased: [bool; 5usize],
     pub MouseDownOwned: [bool; 5usize],
     pub MouseDownOwnedUnlessPopupClose: [bool; 5usize],
-    pub MouseDownWasDoubleClick: [bool; 5usize],
     pub MouseDownDuration: [f32; 5usize],
     pub MouseDownDurationPrev: [f32; 5usize],
     pub MouseDragMaxDistanceAbs: [ImVec2; 5usize],
@@ -1977,15 +2032,23 @@ impl Default for ImPool_ImGuiTable {
     }
 }
 #[repr(C)]
-#[derive(Debug, Default, Copy, Clone, PartialEq)]
+#[derive(Debug, Copy, Clone, PartialEq)]
 pub struct ImGuiListClipper {
     pub DisplayStart: cty::c_int,
     pub DisplayEnd: cty::c_int,
     pub ItemsCount: cty::c_int,
-    pub StepNo: cty::c_int,
-    pub ItemsFrozen: cty::c_int,
     pub ItemsHeight: f32,
     pub StartPosY: f32,
+    pub TempData: *mut cty::c_void,
+}
+impl Default for ImGuiListClipper {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
 }
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone, PartialEq)]
@@ -2610,10 +2673,8 @@ pub const ImGuiItemFlags_NoNavDefaultFocus: ImGuiItemFlags_ = 16;
 pub const ImGuiItemFlags_SelectableDontClosePopup: ImGuiItemFlags_ = 32;
 pub const ImGuiItemFlags_MixedValue: ImGuiItemFlags_ = 64;
 pub const ImGuiItemFlags_ReadOnly: ImGuiItemFlags_ = 128;
+pub const ImGuiItemFlags_Inputable: ImGuiItemFlags_ = 256;
 pub type ImGuiItemFlags_ = cty::c_uint;
-pub const ImGuiItemAddFlags_None: ImGuiItemAddFlags_ = 0;
-pub const ImGuiItemAddFlags_Focusable: ImGuiItemAddFlags_ = 1;
-pub type ImGuiItemAddFlags_ = cty::c_uint;
 pub const ImGuiItemStatusFlags_None: ImGuiItemStatusFlags_ = 0;
 pub const ImGuiItemStatusFlags_HoveredRect: ImGuiItemStatusFlags_ = 1;
 pub const ImGuiItemStatusFlags_HasDisplayRect: ImGuiItemStatusFlags_ = 2;
@@ -2623,9 +2684,7 @@ pub const ImGuiItemStatusFlags_ToggledOpen: ImGuiItemStatusFlags_ = 16;
 pub const ImGuiItemStatusFlags_HasDeactivated: ImGuiItemStatusFlags_ = 32;
 pub const ImGuiItemStatusFlags_Deactivated: ImGuiItemStatusFlags_ = 64;
 pub const ImGuiItemStatusFlags_HoveredWindow: ImGuiItemStatusFlags_ = 128;
-pub const ImGuiItemStatusFlags_FocusedByCode: ImGuiItemStatusFlags_ = 256;
-pub const ImGuiItemStatusFlags_FocusedByTabbing: ImGuiItemStatusFlags_ = 512;
-pub const ImGuiItemStatusFlags_Focused: ImGuiItemStatusFlags_ = 768;
+pub const ImGuiItemStatusFlags_FocusedByTabbing: ImGuiItemStatusFlags_ = 256;
 pub type ImGuiItemStatusFlags_ = cty::c_uint;
 pub const ImGuiInputTextFlags_Multiline: ImGuiInputTextFlagsPrivate_ = 67108864;
 pub const ImGuiInputTextFlags_NoMarkEdited: ImGuiInputTextFlagsPrivate_ = 134217728;
@@ -2842,8 +2901,6 @@ pub struct ImGuiInputTextState {
     pub SelectedAllMouseLock: bool,
     pub Edited: bool,
     pub Flags: ImGuiInputTextFlags,
-    pub UserCallback: ImGuiInputTextCallback,
-    pub UserCallbackData: *mut cty::c_void,
 }
 impl Default for ImGuiInputTextState {
     fn default() -> Self {
@@ -2940,13 +2997,28 @@ pub struct ImGuiLastItemData {
     pub InFlags: ImGuiItemFlags,
     pub StatusFlags: ImGuiItemStatusFlags,
     pub Rect: ImRect,
+    pub NavRect: ImRect,
     pub DisplayRect: ImRect,
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone, Hash, PartialEq, Eq)]
+pub struct ImGuiStackSizes {
+    pub SizeOfIDStack: cty::c_short,
+    pub SizeOfColorStack: cty::c_short,
+    pub SizeOfStyleVarStack: cty::c_short,
+    pub SizeOfFontStack: cty::c_short,
+    pub SizeOfFocusScopeStack: cty::c_short,
+    pub SizeOfGroupStack: cty::c_short,
+    pub SizeOfItemFlagsStack: cty::c_short,
+    pub SizeOfBeginPopupStack: cty::c_short,
+    pub SizeOfDisabledStack: cty::c_short,
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub struct ImGuiWindowStackData {
     pub Window: *mut ImGuiWindow,
     pub ParentLastItemDataBackup: ImGuiLastItemData,
+    pub StackSizesOnBegin: ImGuiStackSizes,
 }
 impl Default for ImGuiWindowStackData {
     fn default() -> Self {
@@ -2978,6 +3050,49 @@ impl Default for ImGuiPtrOrIndex {
         }
     }
 }
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone, Hash, PartialEq, Eq)]
+pub struct ImGuiListClipperRange {
+    pub Min: cty::c_int,
+    pub Max: cty::c_int,
+    pub PosToIndexConvert: bool,
+    pub PosToIndexOffsetMin: ImS8,
+    pub PosToIndexOffsetMax: ImS8,
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone, PartialEq)]
+pub struct ImGuiListClipperData {
+    pub ListClipper: *mut ImGuiListClipper,
+    pub LossynessOffset: f32,
+    pub StepNo: cty::c_int,
+    pub ItemsFrozen: cty::c_int,
+    pub Ranges: ImVector_ImGuiListClipperRange,
+}
+impl Default for ImGuiListClipperData {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub const ImGuiActivateFlags_None: ImGuiActivateFlags_ = 0;
+pub const ImGuiActivateFlags_PreferInput: ImGuiActivateFlags_ = 1;
+pub const ImGuiActivateFlags_PreferTweak: ImGuiActivateFlags_ = 2;
+pub const ImGuiActivateFlags_TryToPreserveState: ImGuiActivateFlags_ = 4;
+pub type ImGuiActivateFlags_ = cty::c_uint;
+pub const ImGuiScrollFlags_None: ImGuiScrollFlags_ = 0;
+pub const ImGuiScrollFlags_KeepVisibleEdgeX: ImGuiScrollFlags_ = 1;
+pub const ImGuiScrollFlags_KeepVisibleEdgeY: ImGuiScrollFlags_ = 2;
+pub const ImGuiScrollFlags_KeepVisibleCenterX: ImGuiScrollFlags_ = 4;
+pub const ImGuiScrollFlags_KeepVisibleCenterY: ImGuiScrollFlags_ = 8;
+pub const ImGuiScrollFlags_AlwaysCenterX: ImGuiScrollFlags_ = 16;
+pub const ImGuiScrollFlags_AlwaysCenterY: ImGuiScrollFlags_ = 32;
+pub const ImGuiScrollFlags_NoScrollParent: ImGuiScrollFlags_ = 64;
+pub const ImGuiScrollFlags_MaskX_: ImGuiScrollFlags_ = 21;
+pub const ImGuiScrollFlags_MaskY_: ImGuiScrollFlags_ = 42;
+pub type ImGuiScrollFlags_ = cty::c_uint;
 pub const ImGuiNavHighlightFlags_None: ImGuiNavHighlightFlags_ = 0;
 pub const ImGuiNavHighlightFlags_TypeDefault: ImGuiNavHighlightFlags_ = 1;
 pub const ImGuiNavHighlightFlags_TypeThin: ImGuiNavHighlightFlags_ = 2;
@@ -2985,9 +3100,10 @@ pub const ImGuiNavHighlightFlags_AlwaysDraw: ImGuiNavHighlightFlags_ = 4;
 pub const ImGuiNavHighlightFlags_NoRounding: ImGuiNavHighlightFlags_ = 8;
 pub type ImGuiNavHighlightFlags_ = cty::c_uint;
 pub const ImGuiNavDirSourceFlags_None: ImGuiNavDirSourceFlags_ = 0;
-pub const ImGuiNavDirSourceFlags_Keyboard: ImGuiNavDirSourceFlags_ = 1;
-pub const ImGuiNavDirSourceFlags_PadDPad: ImGuiNavDirSourceFlags_ = 2;
-pub const ImGuiNavDirSourceFlags_PadLStick: ImGuiNavDirSourceFlags_ = 4;
+pub const ImGuiNavDirSourceFlags_RawKeyboard: ImGuiNavDirSourceFlags_ = 1;
+pub const ImGuiNavDirSourceFlags_Keyboard: ImGuiNavDirSourceFlags_ = 2;
+pub const ImGuiNavDirSourceFlags_PadDPad: ImGuiNavDirSourceFlags_ = 4;
+pub const ImGuiNavDirSourceFlags_PadLStick: ImGuiNavDirSourceFlags_ = 8;
 pub type ImGuiNavDirSourceFlags_ = cty::c_uint;
 pub const ImGuiNavMoveFlags_None: ImGuiNavMoveFlags_ = 0;
 pub const ImGuiNavMoveFlags_LoopX: ImGuiNavMoveFlags_ = 1;
@@ -2996,8 +3112,13 @@ pub const ImGuiNavMoveFlags_WrapX: ImGuiNavMoveFlags_ = 4;
 pub const ImGuiNavMoveFlags_WrapY: ImGuiNavMoveFlags_ = 8;
 pub const ImGuiNavMoveFlags_AllowCurrentNavId: ImGuiNavMoveFlags_ = 16;
 pub const ImGuiNavMoveFlags_AlsoScoreVisibleSet: ImGuiNavMoveFlags_ = 32;
-pub const ImGuiNavMoveFlags_ScrollToEdge: ImGuiNavMoveFlags_ = 64;
+pub const ImGuiNavMoveFlags_ScrollToEdgeY: ImGuiNavMoveFlags_ = 64;
 pub const ImGuiNavMoveFlags_Forwarded: ImGuiNavMoveFlags_ = 128;
+pub const ImGuiNavMoveFlags_DebugNoResult: ImGuiNavMoveFlags_ = 256;
+pub const ImGuiNavMoveFlags_FocusApi: ImGuiNavMoveFlags_ = 512;
+pub const ImGuiNavMoveFlags_Tabbing: ImGuiNavMoveFlags_ = 1024;
+pub const ImGuiNavMoveFlags_Activate: ImGuiNavMoveFlags_ = 2048;
+pub const ImGuiNavMoveFlags_DontSetNavHighlight: ImGuiNavMoveFlags_ = 4096;
 pub type ImGuiNavMoveFlags_ = cty::c_uint;
 pub const ImGuiNavLayer_Main: ImGuiNavLayer = 0;
 pub const ImGuiNavLayer_Menu: ImGuiNavLayer = 1;
@@ -3010,6 +3131,7 @@ pub struct ImGuiNavItemData {
     pub ID: ImGuiID,
     pub FocusScopeId: ImGuiID,
     pub RectRel: ImRect,
+    pub InFlags: ImGuiItemFlags,
     pub DistBox: f32,
     pub DistCenter: f32,
     pub DistAxial: f32,
@@ -3115,10 +3237,12 @@ pub struct ImGuiDockNode {
     pub SizeRef: ImVec2,
     pub SplitAxis: ImGuiAxis,
     pub WindowClass: ImGuiWindowClass,
+    pub LastBgColor: ImU32,
     pub HostWindow: *mut ImGuiWindow,
     pub VisibleWindow: *mut ImGuiWindow,
     pub CentralNode: *mut ImGuiDockNode,
     pub OnlyNodeWithWindows: *mut ImGuiDockNode,
+    pub CountNodeWithWindows: cty::c_int,
     pub LastFrameAlive: cty::c_int,
     pub LastFrameActive: cty::c_int,
     pub LastFrameFocused: cty::c_int,
@@ -3127,7 +3251,7 @@ pub struct ImGuiDockNode {
     pub WantCloseTabId: ImGuiID,
     pub _bitfield_align_1: [u8; 0],
     pub _bitfield_1: __BindgenBitfieldUnit<[u8; 3usize]>,
-    pub __bindgen_padding_0: [u8; 5usize],
+    pub __bindgen_padding_0: u8,
 }
 impl Default for ImGuiDockNode {
     fn default() -> Self {
@@ -3195,91 +3319,102 @@ impl ImGuiDockNode {
         }
     }
     #[inline]
-    pub fn HasCloseButton(&self) -> bool {
+    pub fn IsBgDrawnThisFrame(&self) -> bool {
         unsafe { ::core::mem::transmute(self._bitfield_1.get(11usize, 1u8) as u8) }
     }
     #[inline]
-    pub fn set_HasCloseButton(&mut self, val: bool) {
+    pub fn set_IsBgDrawnThisFrame(&mut self, val: bool) {
         unsafe {
             let val: u8 = ::core::mem::transmute(val);
             self._bitfield_1.set(11usize, 1u8, val as u64)
         }
     }
     #[inline]
-    pub fn HasWindowMenuButton(&self) -> bool {
+    pub fn HasCloseButton(&self) -> bool {
         unsafe { ::core::mem::transmute(self._bitfield_1.get(12usize, 1u8) as u8) }
     }
     #[inline]
-    pub fn set_HasWindowMenuButton(&mut self, val: bool) {
+    pub fn set_HasCloseButton(&mut self, val: bool) {
         unsafe {
             let val: u8 = ::core::mem::transmute(val);
             self._bitfield_1.set(12usize, 1u8, val as u64)
         }
     }
     #[inline]
-    pub fn WantCloseAll(&self) -> bool {
+    pub fn HasWindowMenuButton(&self) -> bool {
         unsafe { ::core::mem::transmute(self._bitfield_1.get(13usize, 1u8) as u8) }
     }
     #[inline]
-    pub fn set_WantCloseAll(&mut self, val: bool) {
+    pub fn set_HasWindowMenuButton(&mut self, val: bool) {
         unsafe {
             let val: u8 = ::core::mem::transmute(val);
             self._bitfield_1.set(13usize, 1u8, val as u64)
         }
     }
     #[inline]
-    pub fn WantLockSizeOnce(&self) -> bool {
+    pub fn HasCentralNodeChild(&self) -> bool {
         unsafe { ::core::mem::transmute(self._bitfield_1.get(14usize, 1u8) as u8) }
     }
     #[inline]
-    pub fn set_WantLockSizeOnce(&mut self, val: bool) {
+    pub fn set_HasCentralNodeChild(&mut self, val: bool) {
         unsafe {
             let val: u8 = ::core::mem::transmute(val);
             self._bitfield_1.set(14usize, 1u8, val as u64)
         }
     }
     #[inline]
-    pub fn WantMouseMove(&self) -> bool {
+    pub fn WantCloseAll(&self) -> bool {
         unsafe { ::core::mem::transmute(self._bitfield_1.get(15usize, 1u8) as u8) }
     }
     #[inline]
-    pub fn set_WantMouseMove(&mut self, val: bool) {
+    pub fn set_WantCloseAll(&mut self, val: bool) {
         unsafe {
             let val: u8 = ::core::mem::transmute(val);
             self._bitfield_1.set(15usize, 1u8, val as u64)
         }
     }
     #[inline]
-    pub fn WantHiddenTabBarUpdate(&self) -> bool {
+    pub fn WantLockSizeOnce(&self) -> bool {
         unsafe { ::core::mem::transmute(self._bitfield_1.get(16usize, 1u8) as u8) }
     }
     #[inline]
-    pub fn set_WantHiddenTabBarUpdate(&mut self, val: bool) {
+    pub fn set_WantLockSizeOnce(&mut self, val: bool) {
         unsafe {
             let val: u8 = ::core::mem::transmute(val);
             self._bitfield_1.set(16usize, 1u8, val as u64)
         }
     }
     #[inline]
-    pub fn WantHiddenTabBarToggle(&self) -> bool {
+    pub fn WantMouseMove(&self) -> bool {
         unsafe { ::core::mem::transmute(self._bitfield_1.get(17usize, 1u8) as u8) }
     }
     #[inline]
-    pub fn set_WantHiddenTabBarToggle(&mut self, val: bool) {
+    pub fn set_WantMouseMove(&mut self, val: bool) {
         unsafe {
             let val: u8 = ::core::mem::transmute(val);
             self._bitfield_1.set(17usize, 1u8, val as u64)
         }
     }
     #[inline]
-    pub fn MarkedForPosSizeWrite(&self) -> bool {
+    pub fn WantHiddenTabBarUpdate(&self) -> bool {
         unsafe { ::core::mem::transmute(self._bitfield_1.get(18usize, 1u8) as u8) }
     }
     #[inline]
-    pub fn set_MarkedForPosSizeWrite(&mut self, val: bool) {
+    pub fn set_WantHiddenTabBarUpdate(&mut self, val: bool) {
         unsafe {
             let val: u8 = ::core::mem::transmute(val);
             self._bitfield_1.set(18usize, 1u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn WantHiddenTabBarToggle(&self) -> bool {
+        unsafe { ::core::mem::transmute(self._bitfield_1.get(19usize, 1u8) as u8) }
+    }
+    #[inline]
+    pub fn set_WantHiddenTabBarToggle(&mut self, val: bool) {
+        unsafe {
+            let val: u8 = ::core::mem::transmute(val);
+            self._bitfield_1.set(19usize, 1u8, val as u64)
         }
     }
     #[inline]
@@ -3289,14 +3424,15 @@ impl ImGuiDockNode {
         AuthorityForViewport: ImGuiDataAuthority,
         IsVisible: bool,
         IsFocused: bool,
+        IsBgDrawnThisFrame: bool,
         HasCloseButton: bool,
         HasWindowMenuButton: bool,
+        HasCentralNodeChild: bool,
         WantCloseAll: bool,
         WantLockSizeOnce: bool,
         WantMouseMove: bool,
         WantHiddenTabBarUpdate: bool,
         WantHiddenTabBarToggle: bool,
-        MarkedForPosSizeWrite: bool,
     ) -> __BindgenBitfieldUnit<[u8; 3usize]> {
         let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 3usize]> = Default::default();
         __bindgen_bitfield_unit.set(0usize, 3u8, {
@@ -3320,39 +3456,42 @@ impl ImGuiDockNode {
             IsFocused as u64
         });
         __bindgen_bitfield_unit.set(11usize, 1u8, {
+            let IsBgDrawnThisFrame: u8 = unsafe { ::core::mem::transmute(IsBgDrawnThisFrame) };
+            IsBgDrawnThisFrame as u64
+        });
+        __bindgen_bitfield_unit.set(12usize, 1u8, {
             let HasCloseButton: u8 = unsafe { ::core::mem::transmute(HasCloseButton) };
             HasCloseButton as u64
         });
-        __bindgen_bitfield_unit.set(12usize, 1u8, {
+        __bindgen_bitfield_unit.set(13usize, 1u8, {
             let HasWindowMenuButton: u8 = unsafe { ::core::mem::transmute(HasWindowMenuButton) };
             HasWindowMenuButton as u64
         });
-        __bindgen_bitfield_unit.set(13usize, 1u8, {
+        __bindgen_bitfield_unit.set(14usize, 1u8, {
+            let HasCentralNodeChild: u8 = unsafe { ::core::mem::transmute(HasCentralNodeChild) };
+            HasCentralNodeChild as u64
+        });
+        __bindgen_bitfield_unit.set(15usize, 1u8, {
             let WantCloseAll: u8 = unsafe { ::core::mem::transmute(WantCloseAll) };
             WantCloseAll as u64
         });
-        __bindgen_bitfield_unit.set(14usize, 1u8, {
+        __bindgen_bitfield_unit.set(16usize, 1u8, {
             let WantLockSizeOnce: u8 = unsafe { ::core::mem::transmute(WantLockSizeOnce) };
             WantLockSizeOnce as u64
         });
-        __bindgen_bitfield_unit.set(15usize, 1u8, {
+        __bindgen_bitfield_unit.set(17usize, 1u8, {
             let WantMouseMove: u8 = unsafe { ::core::mem::transmute(WantMouseMove) };
             WantMouseMove as u64
         });
-        __bindgen_bitfield_unit.set(16usize, 1u8, {
+        __bindgen_bitfield_unit.set(18usize, 1u8, {
             let WantHiddenTabBarUpdate: u8 =
                 unsafe { ::core::mem::transmute(WantHiddenTabBarUpdate) };
             WantHiddenTabBarUpdate as u64
         });
-        __bindgen_bitfield_unit.set(17usize, 1u8, {
+        __bindgen_bitfield_unit.set(19usize, 1u8, {
             let WantHiddenTabBarToggle: u8 =
                 unsafe { ::core::mem::transmute(WantHiddenTabBarToggle) };
             WantHiddenTabBarToggle as u64
-        });
-        __bindgen_bitfield_unit.set(18usize, 1u8, {
-            let MarkedForPosSizeWrite: u8 =
-                unsafe { ::core::mem::transmute(MarkedForPosSizeWrite) };
-            MarkedForPosSizeWrite as u64
         });
         __bindgen_bitfield_unit
     }
@@ -3486,6 +3625,7 @@ impl Default for ImGuiSettingsHandler {
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone, Hash, PartialEq, Eq)]
 pub struct ImGuiMetricsConfig {
+    pub ShowStackTool: bool,
     pub ShowWindowsRects: bool,
     pub ShowWindowsBeginOrder: bool,
     pub ShowTablesRects: bool,
@@ -3496,15 +3636,38 @@ pub struct ImGuiMetricsConfig {
     pub ShowTablesRectsType: cty::c_int,
 }
 #[repr(C)]
-#[derive(Debug, Default, Copy, Clone, Hash, PartialEq, Eq)]
-pub struct ImGuiStackSizes {
-    pub SizeOfIDStack: cty::c_short,
-    pub SizeOfColorStack: cty::c_short,
-    pub SizeOfStyleVarStack: cty::c_short,
-    pub SizeOfFontStack: cty::c_short,
-    pub SizeOfFocusScopeStack: cty::c_short,
-    pub SizeOfGroupStack: cty::c_short,
-    pub SizeOfBeginPopupStack: cty::c_short,
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub struct ImGuiStackLevelInfo {
+    pub ID: ImGuiID,
+    pub QueryFrameCount: ImS8,
+    pub QuerySuccess: bool,
+    pub Desc: [cty::c_char; 58usize],
+}
+impl Default for ImGuiStackLevelInfo {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub struct ImGuiStackTool {
+    pub LastActiveFrame: cty::c_int,
+    pub StackLevel: cty::c_int,
+    pub QueryId: ImGuiID,
+    pub Results: ImVector_ImGuiStackLevelInfo,
+}
+impl Default for ImGuiStackTool {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
 }
 pub const ImGuiContextHookType_NewFramePre: ImGuiContextHookType = 0;
 pub const ImGuiContextHookType_NewFramePost: ImGuiContextHookType = 1;
@@ -3557,7 +3720,6 @@ pub struct ImGuiContext {
     pub WithinEndChild: bool,
     pub GcCompactAll: bool,
     pub TestEngineHookItems: bool,
-    pub TestEngineHookIdInfo: ImGuiID,
     pub TestEngine: *mut cty::c_void,
     pub Windows: ImVector_ImGuiWindowPtr,
     pub WindowsFocusOrder: ImVector_ImGuiWindowPtr,
@@ -3574,6 +3736,7 @@ pub struct ImGuiContext {
     pub WheelingWindow: *mut ImGuiWindow,
     pub WheelingWindowRefMousePos: ImVec2,
     pub WheelingWindowTimer: f32,
+    pub DebugHookIdInfo: ImGuiID,
     pub HoveredId: ImGuiID,
     pub HoveredIdPreviousFrame: ImGuiID,
     pub HoveredIdAllowOverlap: bool,
@@ -3617,6 +3780,7 @@ pub struct ImGuiContext {
     pub GroupStack: ImVector_ImGuiGroupData,
     pub OpenPopupStack: ImVector_ImGuiPopupData,
     pub BeginPopupStack: ImVector_ImGuiPopupData,
+    pub BeginMenuCount: cty::c_int,
     pub Viewports: ImVector_ImGuiViewportPPtr,
     pub CurrentDpiScale: f32,
     pub CurrentViewport: *mut ImGuiViewportP,
@@ -3631,17 +3795,15 @@ pub struct ImGuiContext {
     pub NavActivateId: ImGuiID,
     pub NavActivateDownId: ImGuiID,
     pub NavActivatePressedId: ImGuiID,
-    pub NavInputId: ImGuiID,
-    pub NavJustTabbedId: ImGuiID,
+    pub NavActivateInputId: ImGuiID,
+    pub NavActivateFlags: ImGuiActivateFlags,
     pub NavJustMovedToId: ImGuiID,
     pub NavJustMovedToFocusScopeId: ImGuiID,
     pub NavJustMovedToKeyMods: ImGuiKeyModFlags,
     pub NavNextActivateId: ImGuiID,
+    pub NavNextActivateFlags: ImGuiActivateFlags,
     pub NavInputSource: ImGuiInputSource,
-    pub NavScoringRect: ImRect,
-    pub NavScoringCount: cty::c_int,
     pub NavLayer: ImGuiNavLayer,
-    pub NavIdTabCounter: cty::c_int,
     pub NavIdIsAlive: bool,
     pub NavMousePosDirty: bool,
     pub NavDisableHighlight: bool,
@@ -3651,29 +3813,30 @@ pub struct ImGuiContext {
     pub NavInitRequestFromMove: bool,
     pub NavInitResultId: ImGuiID,
     pub NavInitResultRectRel: ImRect,
-    pub NavMoveRequest: bool,
-    pub NavMoveRequestForwardToNextFrame: bool,
-    pub NavMoveRequestFlags: ImGuiNavMoveFlags,
-    pub NavMoveRequestKeyMods: ImGuiKeyModFlags,
+    pub NavMoveSubmitted: bool,
+    pub NavMoveScoringItems: bool,
+    pub NavMoveForwardToNextFrame: bool,
+    pub NavMoveFlags: ImGuiNavMoveFlags,
+    pub NavMoveScrollFlags: ImGuiScrollFlags,
+    pub NavMoveKeyMods: ImGuiKeyModFlags,
     pub NavMoveDir: ImGuiDir,
-    pub NavMoveDirLast: ImGuiDir,
+    pub NavMoveDirForDebug: ImGuiDir,
     pub NavMoveClipDir: ImGuiDir,
+    pub NavScoringRect: ImRect,
+    pub NavScoringNoClipRect: ImRect,
+    pub NavScoringDebugCount: cty::c_int,
+    pub NavTabbingDir: cty::c_int,
+    pub NavTabbingCounter: cty::c_int,
     pub NavMoveResultLocal: ImGuiNavItemData,
-    pub NavMoveResultLocalVisibleSet: ImGuiNavItemData,
+    pub NavMoveResultLocalVisible: ImGuiNavItemData,
     pub NavMoveResultOther: ImGuiNavItemData,
+    pub NavTabbingResultFirst: ImGuiNavItemData,
     pub NavWindowingTarget: *mut ImGuiWindow,
     pub NavWindowingTargetAnim: *mut ImGuiWindow,
     pub NavWindowingListWindow: *mut ImGuiWindow,
     pub NavWindowingTimer: f32,
     pub NavWindowingHighlightAlpha: f32,
     pub NavWindowingToggleLayer: bool,
-    pub TabFocusRequestCurrWindow: *mut ImGuiWindow,
-    pub TabFocusRequestNextWindow: *mut ImGuiWindow,
-    pub TabFocusRequestCurrCounterRegular: cty::c_int,
-    pub TabFocusRequestCurrCounterTabStop: cty::c_int,
-    pub TabFocusRequestNextCounterRegular: cty::c_int,
-    pub TabFocusRequestNextCounterTabStop: cty::c_int,
-    pub TabFocusPressed: bool,
     pub DimBgRatio: f32,
     pub MouseCursor: ImGuiMouseCursor,
     pub DragDropActive: bool,
@@ -3693,24 +3856,26 @@ pub struct ImGuiContext {
     pub DragDropHoldJustPressedId: ImGuiID,
     pub DragDropPayloadBufHeap: ImVector_unsigned_char,
     pub DragDropPayloadBufLocal: [cty::c_uchar; 16usize],
+    pub ClipperTempDataStacked: cty::c_int,
+    pub ClipperTempData: ImVector_ImGuiListClipperData,
     pub CurrentTable: *mut ImGuiTable,
-    pub CurrentTableStackIdx: cty::c_int,
+    pub TablesTempDataStacked: cty::c_int,
+    pub TablesTempData: ImVector_ImGuiTableTempData,
     pub Tables: ImPool_ImGuiTable,
-    pub TablesTempDataStack: ImVector_ImGuiTableTempData,
     pub TablesLastTimeActive: ImVector_float,
     pub DrawChannelsTempMergeBuffer: ImVector_ImDrawChannel,
     pub CurrentTabBar: *mut ImGuiTabBar,
     pub TabBars: ImPool_ImGuiTabBar,
     pub CurrentTabBarStack: ImVector_ImGuiPtrOrIndex,
     pub ShrinkWidthBuffer: ImVector_ImGuiShrinkWidthItem,
-    pub LastValidMousePos: ImVec2,
+    pub MouseLastValidPos: ImVec2,
     pub InputTextState: ImGuiInputTextState,
     pub InputTextPasswordFont: ImFont,
     pub TempInputId: ImGuiID,
     pub ColorEditOptions: ImGuiColorEditFlags,
     pub ColorEditLastHue: f32,
     pub ColorEditLastSat: f32,
-    pub ColorEditLastColor: [f32; 3usize],
+    pub ColorEditLastColor: ImU32,
     pub ColorPickerRef: ImVec4,
     pub ComboPreviewData: ImGuiComboPreviewData,
     pub SliderCurrentAccum: f32,
@@ -3718,9 +3883,10 @@ pub struct ImGuiContext {
     pub DragCurrentAccumDirty: bool,
     pub DragCurrentAccum: f32,
     pub DragSpeedDefaultRatio: f32,
-    pub DisabledAlphaBackup: f32,
     pub ScrollbarClickDeltaToGrabCenter: f32,
-    pub TooltipOverrideCount: cty::c_int,
+    pub DisabledAlphaBackup: f32,
+    pub DisabledStackSize: cty::c_short,
+    pub TooltipOverrideCount: cty::c_short,
     pub TooltipSlowDelay: f32,
     pub ClipboardHandlerData: ImVector_char,
     pub MenusIdSubmittedThisFrame: ImVector_ImGuiID,
@@ -3751,6 +3917,7 @@ pub struct ImGuiContext {
     pub DebugItemPickerActive: bool,
     pub DebugItemPickerBreakId: ImGuiID,
     pub DebugMetricsConfig: ImGuiMetricsConfig,
+    pub DebugStackTool: ImGuiStackTool,
     pub FramerateSecPerFrame: [f32; 120usize],
     pub FramerateSecPerFrameIdx: cty::c_int,
     pub FramerateSecPerFrameCount: cty::c_int,
@@ -3784,6 +3951,7 @@ pub struct ImGuiWindowTempData {
     pub Indent: ImVec1,
     pub ColumnsOffset: ImVec1,
     pub GroupOffset: ImVec1,
+    pub CursorStartPosLossyness: ImVec2,
     pub NavLayerCurrent: ImGuiNavLayer,
     pub NavLayersActiveMask: cty::c_short,
     pub NavLayersActiveMaskNext: cty::c_short,
@@ -3801,13 +3969,10 @@ pub struct ImGuiWindowTempData {
     pub CurrentTableIdx: cty::c_int,
     pub LayoutType: ImGuiLayoutType,
     pub ParentLayoutType: ImGuiLayoutType,
-    pub FocusCounterRegular: cty::c_int,
-    pub FocusCounterTabStop: cty::c_int,
     pub ItemWidth: f32,
     pub TextWrapPos: f32,
     pub ItemWidthStack: ImVector_float,
     pub TextWrapPosStack: ImVector_float,
-    pub StackSizesOnBegin: ImGuiStackSizes,
 }
 impl Default for ImGuiWindowTempData {
     fn default() -> Self {
@@ -3860,6 +4025,7 @@ pub struct ImGuiWindow {
     pub Appearing: bool,
     pub Hidden: bool,
     pub IsFallbackWindow: bool,
+    pub IsExplicitChild: bool,
     pub HasCloseButton: bool,
     pub ResizeBorderHeld: cty::c_schar,
     pub BeginCount: cty::c_short,
@@ -3903,7 +4069,9 @@ pub struct ImGuiWindow {
     pub DrawList: *mut ImDrawList,
     pub DrawListInst: ImDrawList,
     pub ParentWindow: *mut ImGuiWindow,
+    pub ParentWindowInBeginStack: *mut ImGuiWindow,
     pub RootWindow: *mut ImGuiWindow,
+    pub RootWindowPopupTree: *mut ImGuiWindow,
     pub RootWindowDockTree: *mut ImGuiWindow,
     pub RootWindowForTitleBarHighlight: *mut ImGuiWindow,
     pub RootWindowForNav: *mut ImGuiWindow,
@@ -4582,6 +4750,9 @@ extern "C" {
 }
 extern "C" {
     pub fn igShowMetricsWindow(p_open: *mut bool);
+}
+extern "C" {
+    pub fn igShowStackToolWindow(p_open: *mut bool);
 }
 extern "C" {
     pub fn igShowAboutWindow(p_open: *mut bool);
@@ -6074,14 +6245,6 @@ extern "C" {
     pub fn igGetStateStorage() -> *mut ImGuiStorage;
 }
 extern "C" {
-    pub fn igCalcListClipping(
-        items_count: cty::c_int,
-        items_height: f32,
-        out_items_display_start: *mut cty::c_int,
-        out_items_display_end: *mut cty::c_int,
-    );
-}
-extern "C" {
     pub fn igBeginChildFrame(id: ImGuiID, size: ImVec2, flags: ImGuiWindowFlags) -> bool;
 }
 extern "C" {
@@ -6152,6 +6315,9 @@ extern "C" {
 }
 extern "C" {
     pub fn igIsMouseDoubleClicked(button: ImGuiMouseButton) -> bool;
+}
+extern "C" {
+    pub fn igGetMouseClickedCount(button: ImGuiMouseButton) -> cty::c_int;
 }
 extern "C" {
     pub fn igIsMouseHoveringRect(r_min: ImVec2, r_max: ImVec2, clip: bool) -> bool;
@@ -6552,6 +6718,13 @@ extern "C" {
 }
 extern "C" {
     pub fn ImGuiListClipper_Step(self_: *mut ImGuiListClipper) -> bool;
+}
+extern "C" {
+    pub fn ImGuiListClipper_ForceDisplayRangeByIndices(
+        self_: *mut ImGuiListClipper,
+        item_min: cty::c_int,
+        item_max: cty::c_int,
+    );
 }
 extern "C" {
     pub fn ImColor_ImColorNil() -> *mut ImColor;
@@ -7422,6 +7595,16 @@ extern "C" {
     pub fn igImHashStr(data: *const cty::c_char, data_size: usize, seed: ImU32) -> ImGuiID;
 }
 extern "C" {
+    pub fn igImQsort(
+        base: *mut cty::c_void,
+        count: usize,
+        size_of_element: usize,
+        compare_func: ::core::option::Option<
+            unsafe extern "C" fn(arg1: *const cty::c_void, arg2: *const cty::c_void) -> cty::c_int,
+        >,
+    );
+}
+extern "C" {
     pub fn igImAlphaBlendColors(col_a: ImU32, col_b: ImU32) -> ImU32;
 }
 extern "C" {
@@ -7686,6 +7869,9 @@ extern "C" {
 }
 extern "C" {
     pub fn igImMul(pOut: *mut ImVec2, lhs: ImVec2, rhs: ImVec2);
+}
+extern "C" {
+    pub fn igImIsFloatAboveGuaranteedIntegerPrecision(f: f32) -> bool;
 }
 extern "C" {
     pub fn igImBezierCubicCalc(
@@ -8026,6 +8212,18 @@ extern "C" {
     pub fn ImGuiLastItemData_destroy(self_: *mut ImGuiLastItemData);
 }
 extern "C" {
+    pub fn ImGuiStackSizes_ImGuiStackSizes() -> *mut ImGuiStackSizes;
+}
+extern "C" {
+    pub fn ImGuiStackSizes_destroy(self_: *mut ImGuiStackSizes);
+}
+extern "C" {
+    pub fn ImGuiStackSizes_SetToCurrentState(self_: *mut ImGuiStackSizes);
+}
+extern "C" {
+    pub fn ImGuiStackSizes_CompareWithCurrentState(self_: *mut ImGuiStackSizes);
+}
+extern "C" {
     pub fn ImGuiPtrOrIndex_ImGuiPtrOrIndexPtr(ptr: *mut cty::c_void) -> *mut ImGuiPtrOrIndex;
 }
 extern "C" {
@@ -8033,6 +8231,32 @@ extern "C" {
 }
 extern "C" {
     pub fn ImGuiPtrOrIndex_ImGuiPtrOrIndexInt(index: cty::c_int) -> *mut ImGuiPtrOrIndex;
+}
+extern "C" {
+    pub fn ImGuiListClipperRange_FromIndices(
+        min: cty::c_int,
+        max: cty::c_int,
+    ) -> ImGuiListClipperRange;
+}
+extern "C" {
+    pub fn ImGuiListClipperRange_FromPositions(
+        y1: f32,
+        y2: f32,
+        off_min: cty::c_int,
+        off_max: cty::c_int,
+    ) -> ImGuiListClipperRange;
+}
+extern "C" {
+    pub fn ImGuiListClipperData_ImGuiListClipperData() -> *mut ImGuiListClipperData;
+}
+extern "C" {
+    pub fn ImGuiListClipperData_destroy(self_: *mut ImGuiListClipperData);
+}
+extern "C" {
+    pub fn ImGuiListClipperData_Reset(
+        self_: *mut ImGuiListClipperData,
+        clipper: *mut ImGuiListClipper,
+    );
 }
 extern "C" {
     pub fn ImGuiNavItemData_ImGuiNavItemData() -> *mut ImGuiNavItemData;
@@ -8161,16 +8385,16 @@ extern "C" {
     pub fn ImGuiMetricsConfig_destroy(self_: *mut ImGuiMetricsConfig);
 }
 extern "C" {
-    pub fn ImGuiStackSizes_ImGuiStackSizes() -> *mut ImGuiStackSizes;
+    pub fn ImGuiStackLevelInfo_ImGuiStackLevelInfo() -> *mut ImGuiStackLevelInfo;
 }
 extern "C" {
-    pub fn ImGuiStackSizes_destroy(self_: *mut ImGuiStackSizes);
+    pub fn ImGuiStackLevelInfo_destroy(self_: *mut ImGuiStackLevelInfo);
 }
 extern "C" {
-    pub fn ImGuiStackSizes_SetToCurrentState(self_: *mut ImGuiStackSizes);
+    pub fn ImGuiStackTool_ImGuiStackTool() -> *mut ImGuiStackTool;
 }
 extern "C" {
-    pub fn ImGuiStackSizes_CompareWithCurrentState(self_: *mut ImGuiStackSizes);
+    pub fn ImGuiStackTool_destroy(self_: *mut ImGuiStackTool);
 }
 extern "C" {
     pub fn ImGuiContextHook_ImGuiContextHook() -> *mut ImGuiContextHook;
@@ -8323,7 +8547,18 @@ extern "C" {
     pub fn igCalcWindowNextAutoFitSize(pOut: *mut ImVec2, window: *mut ImGuiWindow);
 }
 extern "C" {
-    pub fn igIsWindowChildOf(window: *mut ImGuiWindow, potential_parent: *mut ImGuiWindow) -> bool;
+    pub fn igIsWindowChildOf(
+        window: *mut ImGuiWindow,
+        potential_parent: *mut ImGuiWindow,
+        popup_hierarchy: bool,
+        dock_hierarchy: bool,
+    ) -> bool;
+}
+extern "C" {
+    pub fn igIsWindowWithinBeginStackOf(
+        window: *mut ImGuiWindow,
+        potential_parent: *mut ImGuiWindow,
+    ) -> bool;
 }
 extern "C" {
     pub fn igIsWindowAbove(
@@ -8351,6 +8586,12 @@ extern "C" {
     pub fn igSetWindowHitTestHole(window: *mut ImGuiWindow, pos: ImVec2, size: ImVec2);
 }
 extern "C" {
+    pub fn igWindowRectAbsToRel(pOut: *mut ImRect, window: *mut ImGuiWindow, r: ImRect);
+}
+extern "C" {
+    pub fn igWindowRectRelToAbs(pOut: *mut ImRect, window: *mut ImGuiWindow, r: ImRect);
+}
+extern "C" {
     pub fn igFocusWindow(window: *mut ImGuiWindow);
 }
 extern "C" {
@@ -8367,6 +8608,17 @@ extern "C" {
 }
 extern "C" {
     pub fn igBringWindowToDisplayBack(window: *mut ImGuiWindow);
+}
+extern "C" {
+    pub fn igBringWindowToDisplayBehind(window: *mut ImGuiWindow, above_window: *mut ImGuiWindow);
+}
+extern "C" {
+    pub fn igFindWindowDisplayIndex(window: *mut ImGuiWindow) -> cty::c_int;
+}
+extern "C" {
+    pub fn igFindBottomMostVisibleWindowWithinBeginStack(
+        window: *mut ImGuiWindow,
+    ) -> *mut ImGuiWindow;
 }
 extern "C" {
     pub fn igSetCurrentFont(font: *mut ImFont);
@@ -8477,11 +8729,21 @@ extern "C" {
     );
 }
 extern "C" {
-    pub fn igScrollToBringRectIntoView(
+    pub fn igScrollToItem(flags: ImGuiScrollFlags);
+}
+extern "C" {
+    pub fn igScrollToRect(window: *mut ImGuiWindow, rect: ImRect, flags: ImGuiScrollFlags);
+}
+extern "C" {
+    pub fn igScrollToRectEx(
         pOut: *mut ImVec2,
         window: *mut ImGuiWindow,
-        item_rect: ImRect,
+        rect: ImRect,
+        flags: ImGuiScrollFlags,
     );
+}
+extern "C" {
+    pub fn igScrollToBringRectIntoView(window: *mut ImGuiWindow, rect: ImRect);
 }
 extern "C" {
     pub fn igGetItemID() -> ImGuiID;
@@ -8540,17 +8802,14 @@ extern "C" {
         bb: ImRect,
         id: ImGuiID,
         nav_bb: *const ImRect,
-        flags: ImGuiItemAddFlags,
+        extra_flags: ImGuiItemFlags,
     ) -> bool;
 }
 extern "C" {
     pub fn igItemHoverable(bb: ImRect, id: ImGuiID) -> bool;
 }
 extern "C" {
-    pub fn igItemFocusable(window: *mut ImGuiWindow, id: ImGuiID);
-}
-extern "C" {
-    pub fn igIsClippedEx(bb: ImRect, id: ImGuiID, clip_even_when_logged: bool) -> bool;
+    pub fn igIsClippedEx(bb: ImRect, id: ImGuiID) -> bool;
 }
 extern "C" {
     pub fn igSetLastItemData(
@@ -8622,19 +8881,25 @@ extern "C" {
     );
 }
 extern "C" {
+    pub fn igClosePopupsExceptModals();
+}
+extern "C" {
     pub fn igIsPopupOpenID(id: ImGuiID, popup_flags: ImGuiPopupFlags) -> bool;
 }
 extern "C" {
     pub fn igBeginPopupEx(id: ImGuiID, extra_flags: ImGuiWindowFlags) -> bool;
 }
 extern "C" {
-    pub fn igBeginTooltipEx(extra_flags: ImGuiWindowFlags, tooltip_flags: ImGuiTooltipFlags);
+    pub fn igBeginTooltipEx(tooltip_flags: ImGuiTooltipFlags, extra_window_flags: ImGuiWindowFlags);
 }
 extern "C" {
     pub fn igGetPopupAllowedExtentRect(pOut: *mut ImRect, window: *mut ImGuiWindow);
 }
 extern "C" {
     pub fn igGetTopMostPopupModal() -> *mut ImGuiWindow;
+}
+extern "C" {
+    pub fn igGetTopMostAndVisiblePopupModal() -> *mut ImGuiWindow;
 }
 extern "C" {
     pub fn igFindBestWindowPosForPopup(pOut: *mut ImVec2, window: *mut ImGuiWindow);
@@ -8688,14 +8953,29 @@ extern "C" {
     pub fn igNavInitWindow(window: *mut ImGuiWindow, force_reinit: bool);
 }
 extern "C" {
+    pub fn igNavInitRequestApplyResult();
+}
+extern "C" {
     pub fn igNavMoveRequestButNoResultYet() -> bool;
+}
+extern "C" {
+    pub fn igNavMoveRequestSubmit(
+        move_dir: ImGuiDir,
+        clip_dir: ImGuiDir,
+        move_flags: ImGuiNavMoveFlags,
+        scroll_flags: ImGuiScrollFlags,
+    );
 }
 extern "C" {
     pub fn igNavMoveRequestForward(
         move_dir: ImGuiDir,
         clip_dir: ImGuiDir,
         move_flags: ImGuiNavMoveFlags,
+        scroll_flags: ImGuiScrollFlags,
     );
+}
+extern "C" {
+    pub fn igNavMoveRequestResolveWithLastItem(result: *mut ImGuiNavItemData);
 }
 extern "C" {
     pub fn igNavMoveRequestCancel();
@@ -8802,6 +9082,9 @@ extern "C" {
     pub fn igDockContextNewFrameUpdateDocking(ctx: *mut ImGuiContext);
 }
 extern "C" {
+    pub fn igDockContextEndFrame(ctx: *mut ImGuiContext);
+}
+extern "C" {
     pub fn igDockContextGenNodeID(ctx: *mut ImGuiContext) -> ImGuiID;
 }
 extern "C" {
@@ -8839,6 +9122,9 @@ extern "C" {
 }
 extern "C" {
     pub fn igDockNodeGetRootNode(node: *mut ImGuiDockNode) -> *mut ImGuiDockNode;
+}
+extern "C" {
+    pub fn igDockNodeIsInHierarchyOf(node: *mut ImGuiDockNode, parent: *mut ImGuiDockNode) -> bool;
 }
 extern "C" {
     pub fn igDockNodeGetDepth(node: *const ImGuiDockNode) -> cty::c_int;
@@ -9342,6 +9628,13 @@ extern "C" {
     );
 }
 extern "C" {
+    pub fn igCalcRoundingFlagsForRectInRect(
+        r_in: ImRect,
+        r_outer: ImRect,
+        threshold: f32,
+    ) -> ImDrawFlags;
+}
+extern "C" {
     pub fn igTextEx(text: *const cty::c_char, text_end: *const cty::c_char, flags: ImGuiTextFlags);
 }
 extern "C" {
@@ -9370,9 +9663,9 @@ extern "C" {
         bb: ImRect,
         id: ImGuiID,
         axis: ImGuiAxis,
-        p_scroll_v: *mut f32,
-        avail_v: f32,
-        contents_v: f32,
+        p_scroll_v: *mut ImS64,
+        avail_v: ImS64,
+        contents_v: ImS64,
         flags: ImDrawFlags,
     ) -> bool;
 }
@@ -9462,6 +9755,7 @@ extern "C" {
         min_size2: f32,
         hover_extend: f32,
         hover_visibility_delay: f32,
+        bg_col: ImU32,
     ) -> bool;
 }
 extern "C" {
@@ -9627,6 +9921,12 @@ extern "C" {
     );
 }
 extern "C" {
+    pub fn igErrorCheckEndWindowRecover(
+        log_callback: ImGuiErrorLogCallback,
+        user_data: *mut cty::c_void,
+    );
+}
+extern "C" {
     pub fn igDebugDrawItemRect(col: ImU32);
 }
 extern "C" {
@@ -9634,6 +9934,14 @@ extern "C" {
 }
 extern "C" {
     pub fn igShowFontAtlas(atlas: *mut ImFontAtlas);
+}
+extern "C" {
+    pub fn igDebugHookIdInfo(
+        id: ImGuiID,
+        data_type: ImGuiDataType,
+        data_id: *const cty::c_void,
+        data_id_end: *const cty::c_void,
+    );
 }
 extern "C" {
     pub fn igDebugNodeColumns(columns: *mut ImGuiOldColumns);
@@ -9681,6 +9989,13 @@ extern "C" {
 }
 extern "C" {
     pub fn igDebugNodeWindowsList(windows: *mut ImVector_ImGuiWindowPtr, label: *const cty::c_char);
+}
+extern "C" {
+    pub fn igDebugNodeWindowsListByBeginStackParent(
+        windows: *mut *mut ImGuiWindow,
+        windows_size: cty::c_int,
+        parent_in_begin_stack: *mut ImGuiWindow,
+    );
 }
 extern "C" {
     pub fn igDebugNodeViewport(viewport: *mut ImGuiViewportP);

@@ -180,6 +180,8 @@ pub struct Io {
     #[cfg(feature = "docking")]
     pub config_docking_no_split: bool,
     #[cfg(feature = "docking")]
+    pub config_docking_with_shift: bool,
+    #[cfg(feature = "docking")]
     pub config_docking_always_tab_bar: bool,
     #[cfg(feature = "docking")]
     pub config_docking_transparent_payload: bool,
@@ -314,7 +316,6 @@ pub struct Io {
     /// f32::MAX]), so a disappearing/reappearing mouse won't have a huge delta.
     pub mouse_delta: [f32; 2],
 
-    #[cfg(feature = "docking")]
     pub want_capture_mouse_unless_popup_close: bool,
 
     key_mods: sys::ImGuiKeyModFlags,
@@ -324,11 +325,11 @@ pub struct Io {
     mouse_clicked_time: [f64; 5],
     mouse_clicked: [bool; 5],
     mouse_double_clicked: [bool; 5],
+    mouse_clicked_count: [u16; 5],
+    mouse_clicked_last_count: [u16; 5],
     mouse_released: [bool; 5],
     mouse_down_owned: [bool; 5],
-    #[cfg(feature = "docking")]
     mouse_down_owned_unless_popup_close: [bool; 5],
-    mouse_down_was_double_click: [bool; 5],
     mouse_down_duration: [f32; 5],
     mouse_down_duration_prev: [f32; 5],
     mouse_drag_max_distance_abs: [[f32; 2]; 5],
@@ -338,7 +339,6 @@ pub struct Io {
     nav_inputs_down_duration: [f32; NavInput::COUNT + NavInput::INTERNAL_COUNT],
     nav_inputs_down_duration_prev: [f32; NavInput::COUNT + NavInput::INTERNAL_COUNT],
     pen_pressure: f32,
-    #[cfg(feature = "docking")]
     app_focus_lost: bool,
     input_queue_surrogate: sys::ImWchar16,
     input_queue_characters: ImVector<sys::ImWchar>,
@@ -516,9 +516,10 @@ fn test_io_memory_layout() {
     assert_field_offset!(mouse_clicked_time, MouseClickedTime);
     assert_field_offset!(mouse_clicked, MouseClicked);
     assert_field_offset!(mouse_double_clicked, MouseDoubleClicked);
+    assert_field_offset!(mouse_clicked_count, MouseClickedCount);
+    assert_field_offset!(mouse_clicked_last_count, MouseClickedLastCount);
     assert_field_offset!(mouse_released, MouseReleased);
     assert_field_offset!(mouse_down_owned, MouseDownOwned);
-    assert_field_offset!(mouse_down_was_double_click, MouseDownWasDoubleClick);
     assert_field_offset!(mouse_down_duration, MouseDownDuration);
     assert_field_offset!(mouse_down_duration_prev, MouseDownDurationPrev);
     assert_field_offset!(mouse_drag_max_distance_abs, MouseDragMaxDistanceAbs);

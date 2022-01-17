@@ -4,13 +4,15 @@
 
 - MSRV is now **1.54**. We soft-updated to this in 0.8.0 with a feature `min-const-generics`, which has now been removed (and as such, we resume having no default features).
 
+- Upgraded from Dear ImGui 1.84.2 to 1.86. See [the 1.85](https://github.com/ocornut/imgui/releases/tag/v1.85) and [the 1.86](https://github.com/ocornut/imgui/releases/tag/v1.86) release notes
+
 - BREAKING: Removed `push_style_colors` and `push_style_vars`. Instead, use `push_style_color` in a loop. This was deprecated in `0.7.0` and should have been removed in `0.8.0`. This also removes their associated tokens.
 
 - BREAKING: Ui now does not have a lifetime associated with it, but is only ever given to users in the form of `&mut Ui`. Additionally, the `render` function has been moved to the `Context` instead of `Ui`.
 
 - BREAKING: `SharedFontAtlas` now hides an `Rc` within its wrapper -- this simplifies the codebase and more accurately reflects how we expect `SharedFontAtlas` to be used (ie, you're probably going to set it up once, and then give it around, rather than constantly edit it). `SharedFontAtlas` users, if this change is very bad for you, please let us know with issues!
 
-- BREAKING: `Id` is now a simpler facade, but requires the `Ui` struct to generate. `push_id`, equally, has been split into multiple functions for simplicity.
+- BREAKING: `Id` is now a simpler facade, but requires the `Ui` struct to generate. `push_id`, equally, has been split into multiple functions for simplicity. New example `imgui-examples/examples/id_wrangling.rs` shows some of the `push_id` usage
 
 - Added `imgui-sdl2-support` to provide a simple ImGui platform wrapper. Please give it a try! Thank you to @NightShade256 for [implementing this here](https://github.com/imgui-rs/imgui-rs/pull/541)
 
@@ -30,7 +32,7 @@
   - `MenuItem` should be made with `ui.menu_item` or `ui.menu_item_config`.
   - `DragDropSource` and `DragDropTarget` should be made with `ui.drag_drop_source_config` or `ui.drag_drop_target`. Both of these methods, and the DragDrop API in general, are likely to change.
 
-- Added `docking` feature which builds against the upstream docking branch. Only basic API is exposed currently, just enough to enable the docking `imgui_context.io_mut().config_flags |= imgui::ConfigFlags::DOCKING_ENABLE;` - API for programtically docking windows and so on will be added later.
+- Added `docking` feature which builds against the upstream docking branch. Only basic API is exposed currently, just enough to enable the docking `imgui_context.io_mut().config_flags |= imgui::ConfigFlags::DOCKING_ENABLE;` - a safe API for programtically docking windows and so on will be added later (until then the internal docking API can be accessed, `imgui::sys::igDockBuilderDockWindow` and so on)
 
 ## [0.8.0] - 2021-09-17
 
