@@ -178,7 +178,21 @@ create_token!(
 
 /// # Convenience functions
 impl Ui {
-    /// Creates a combo box which can be appended to with `Selectable::new`.
+    /// Begins flexibly creating a combo box.
+    ///
+    /// You provide a preview string, which is displayed on the widget
+    /// before it is opened. If the function returns `Some(_token)` you
+    /// can then begin creating the widgets inside the combo popup area.
+    ///
+    /// A standard looking combo is made by using [selectable
+    /// items](`Ui::selectable`), however you can create almost
+    /// anything inside if desired (for example using
+    /// [`Ui::separator`] and [`Ui::text`] to create sections with
+    /// headings).
+    ///
+    /// See the simpler [`Ui::combo_simple_string`] if you have a list
+    /// of strings plus a "currently selected item index", or
+    /// [`Ui::combo`]
     ///
     /// If you do not want to provide a preview, use [`begin_combo_no_preview`]. If you want
     /// to pass flags, use [`begin_combo_with_flags`].
@@ -187,6 +201,29 @@ impl Ui {
     ///
     /// [`begin_combo_no_preview`]: Ui::begin_combo_no_preview
     /// [`begin_combo_with_flags`]: Ui::begin_combo_with_flags
+    ///
+    /// # Example
+    ///
+    /// ```rust,no_run
+    /// let items = vec!["Example 1", "Example 2"];
+    /// let mut selected = &items[0];
+    /// if let Some(cb) = ui.begin_combo("example_combo") {
+    ///     for cur in &items {
+    ///         if selected == cur {
+    ///             // Auto-scroll to selected item
+    ///             ui.set_item_default_focus();
+    ///         }
+    ///         // Create a "selectable"
+    ///         let clicked = ui.selectable_config(cur)
+    ///             .selected(selected == cur)
+    ///             .build();
+    ///         // When item is clicked, store it
+    ///         if clicked {
+    ///             selected = cur;
+    ///         }
+    ///     }
+    /// }
+    /// ```
     #[must_use]
     #[doc(alias = "BeginCombo")]
     pub fn begin_combo(
@@ -271,7 +308,10 @@ impl Ui {
             None
         }
     }
-    /// Builds a simple combo box for choosing from a slice of values
+    /// Builds a simple combo box for choosing from a slice of values.
+    ///
+    /// See [`Ui::begin_combo`] for a more "immediate mode" style API
+    /// for creating dynamic combo boxes
     #[doc(alias = "Combo")]
     pub fn combo<V, L>(
         &self,
@@ -303,7 +343,13 @@ impl Ui {
         result
     }
 
-    /// Builds a simple combo box for choosing from a slice of values
+    /// Builds a simple combo box for choosing from a slice of strings
+    ///
+    /// This is useful if you already have a list of strings to choose
+    /// from, along with a currently selected idnex value. In cases
+    /// where you have a list of non-string objects, instead of
+    /// allocating a `Vec<String>` to use this method try using
+    /// [`Ui::begin_combo`] instead
     #[doc(alias = "Combo")]
     pub fn combo_simple_string(
         &self,
