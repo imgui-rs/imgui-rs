@@ -44,13 +44,11 @@ fn example_1(ui: &Ui, state: &mut State) {
         ui.text("Floats:   f32 f64");
 
         // Full ranges can be specified with Rust's `::MIN/MAX` constants
-        Slider::new("u8 value", u8::MIN, u8::MAX)
-            .build(ui, &mut state.u8_value);
+        ui.slider("u8 value", u8::MIN, u8::MAX,  &mut state.u8_value);
 
         // However for larger data-types, it's usually best to specify
         // a much smaller range. The following slider is hard to use.
-        Slider::new("Full range f32 value", f32::MIN/2.0, f32::MAX/2.0)
-            .build(ui, &mut state.f32_value);
+        ui.slider("Full range f32 value", f32::MIN/2.0, f32::MAX/2.0, &mut state.f32_value);
         // Note the `... / 2.0` - anything larger is not supported by
         // the upstream C++ library
         ui.text("Note that for 32-bit/64-bit types, sliders are always limited to half of the natural type range!");
@@ -58,24 +56,16 @@ fn example_1(ui: &Ui, state: &mut State) {
         // Most of the time, it's best to specify the range
         ui.separator();
         ui.text("Slider range can be limited:");
-        Slider::new("i32 value with range", -999, 999)
-            .build(ui, &mut state.i32_value);
-        Slider::new("f32 value", -10.0, 10.0)
-            .build(ui, &mut state.f32_value);
+        ui.slider("i32 value with range", -999, 999, &mut state.i32_value);
+        ui.slider("f32 value", -10.0, 10.0, &mut state.f32_value);
 
         ui.separator();
         ui.text("Value formatting can be customized with a C-style printf string:");
-        Slider::new("f64 value with custom formatting", -999_999_999.0, 999_999_999.0)
-            .display_format("%09.0f")
-            .build(ui, &mut state.f64_formatted);
+        ui.slider_config("f64 value with custom formatting", -999_999_999.0, 999_999_999.0).display_format("%09.0f").build(&mut state.f64_formatted);
 
         // The display format changes the increments the slider operates in:
-        Slider::new("f32 with %.01f", 0.0, 1.0)
-            .display_format("%.01f")
-            .build(ui, &mut state.f32_value);
-        Slider::new("Same f32 with %.05f", 0.0, 1.0)
-            .display_format("%.05f")
-            .build(ui, &mut state.f32_value);
+        ui.slider_config("f32 with %.01f", 0.0, 1.0).display_format("%.01f").build(&mut state.f32_value);
+        ui.slider_config("Same f32 with %.05f", 0.0, 1.0).display_format("%.05f").build(&mut state.f32_value);
 
         ui.separator();
         ui.text("Vertical sliders require a size parameter but otherwise work in a similar way:");
@@ -91,11 +81,12 @@ fn example_2(ui: &Ui, state: &mut State) {
         .position([20.0, 120.0], Condition::Appearing);
     w.build(|| {
         ui.text("You can easily build a slider group from an array of values:");
-        Slider::new("[u8; 4]", 0, u8::MAX).build_array(ui, &mut state.array);
+        ui.slider_config("[u8; 4]", 0, u8::MAX)
+            .build_array(&mut state.array);
 
         ui.text("You don't need to use arrays with known length; arbitrary slices can be used:");
         let slice: &mut [u8] = &mut state.array[1..=2];
-        Slider::new("subslice", 0, u8::MAX).build_array(ui, slice);
+        ui.slider_config("subslice", 0, u8::MAX).build_array(slice);
     });
 }
 
