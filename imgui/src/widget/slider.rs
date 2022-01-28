@@ -23,32 +23,65 @@ bitflags!(
     }
 );
 
+impl Ui {
+    /// Creates a new slider widget. Returns true if the value has been edited.
+    pub fn slider<T: AsRef<str>, K: DataTypeKind>(
+        &self,
+        label: T,
+        min: K,
+        max: K,
+        value: &mut K,
+    ) -> bool {
+        self.slider_config(label, min, max).build(value)
+    }
+
+    /// Creates an new ubuilt Slider.
+    pub fn slider_config<T: AsRef<str>, K: DataTypeKind>(
+        &self,
+        label: T,
+        min: K,
+        max: K,
+    ) -> Slider<'_, T, K> {
+        Slider {
+            label,
+            min,
+            max,
+            display_format: Option::<&'static str>::None,
+            flags: SliderFlags::empty(),
+            ui: self,
+        }
+    }
+}
+
 /// Builder for a slider widget.
 #[derive(Copy, Clone, Debug)]
 #[must_use]
-pub struct Slider<Label, Data, Format = &'static str> {
+pub struct Slider<'ui, Label, Data, Format = &'static str> {
     label: Label,
     min: Data,
     max: Data,
     display_format: Option<Format>,
     flags: SliderFlags,
+    ui: &'ui Ui,
 }
 
-impl<T: AsRef<str>, K: DataTypeKind> Slider<T, K> {
+impl<'ui, T: AsRef<str>, K: DataTypeKind> Slider<'ui, T, K> {
     /// Constructs a new slider builder with the given range.
     #[doc(alias = "SliderScalar", alias = "SliderScalarN")]
-    pub fn new(label: T, min: K, max: K) -> Self {
+    #[deprecated(note = "Use `Ui::slider` or `Ui::slider_config`.", since = "0.9.0")]
+    pub fn new(ui: &'ui Ui, label: T, min: K, max: K) -> Self {
         Slider {
             label,
             min,
             max,
             display_format: None,
             flags: SliderFlags::empty(),
+            ui,
         }
     }
 }
 
-impl<Label, Data, Format> Slider<Label, Data, Format>
+impl<'ui, Label, Data, Format> Slider<'ui, Label, Data, Format>
 where
     Label: AsRef<str>,
     Data: DataTypeKind,
@@ -57,11 +90,12 @@ where
     /// Sets the range inclusively, such that both values given
     /// are valid values which the slider can be dragged to.
     ///
-    /// ```rust
-    /// # use imgui::im_str;
-    /// imgui::Slider::new(im_str!("Example"), i8::MIN, i8::MAX)
+    /// ```no_run
+    /// # let mut ctx = imgui::Context::create();
+    /// # let ui = ctx.frame();
+    /// ui.slider_config("Example", i8::MIN, i8::MAX)
     ///     .range(4, 8)
-    ///     // Remember to call .build(&ui)
+    ///     // Remember to call .build()
     ///     ;
     /// ```
     ///
@@ -83,13 +117,14 @@ where
     pub fn display_format<Format2: AsRef<str>>(
         self,
         display_format: Format2,
-    ) -> Slider<Label, Data, Format2> {
+    ) -> Slider<'ui, Label, Data, Format2> {
         Slider {
             label: self.label,
             min: self.min,
             max: self.max,
             display_format: Some(display_format),
             flags: self.flags,
+            ui: self.ui,
         }
     }
     /// Replaces all current settings with the given flags
@@ -101,9 +136,11 @@ where
     /// Builds a slider that is bound to the given value.
     ///
     /// Returns true if the slider value was changed.
-    pub fn build(self, ui: &Ui, value: &mut Data) -> bool {
+    pub fn build(self, value: &mut Data) -> bool {
         unsafe {
-            let (label, display_format) = ui.scratch_txt_with_opt(self.label, self.display_format);
+            let (label, display_format) = self
+                .ui
+                .scratch_txt_with_opt(self.label, self.display_format);
 
             sys::igSliderScalar(
                 label,
@@ -119,9 +156,11 @@ where
     /// Builds a horizontal array of multiple sliders attached to the given slice.
     ///
     /// Returns true if any slider value was changed.
-    pub fn build_array(self, ui: &Ui, values: &mut [Data]) -> bool {
+    pub fn build_array(self, values: &mut [Data]) -> bool {
         unsafe {
-            let (label, display_format) = ui.scratch_txt_with_opt(self.label, self.display_format);
+            let (label, display_format) = self
+                .ui
+                .scratch_txt_with_opt(self.label, self.display_format);
 
             sys::igSliderScalarN(
                 label,

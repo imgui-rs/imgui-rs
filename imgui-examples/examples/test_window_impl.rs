@@ -433,9 +433,9 @@ fn show_test_window(ui: &Ui, state: &mut State, opened: &mut bool) {
                 );
                 ui.spacing();
 
-                Slider::new("Wrap width", -20.0, 600.0)
+                ui.slider_config("Wrap width", -20.0, 600.0)
                     .display_format("%.0f")
-                    .build(ui, &mut state.wrap_width);
+                    .build(&mut state.wrap_width);
 
                 ui.text("Test paragraph 1:");
                 // TODO
@@ -877,7 +877,7 @@ fn show_example_menu_file(ui: &Ui, state: &mut FileMenuState) {
                     ui.text(format!("Scrolling Text {}", i));
                 }
             });
-        Slider::new("Value", 0.0, 1.0).build(ui, &mut state.f);
+        ui.slider("Value", 0.0, 1.0, &mut state.f);
 
         ui.input_float("Input", &mut state.f).step(0.1).build();
         let items = ["Yes", "No", "Maybe"];
@@ -904,7 +904,7 @@ fn show_example_app_auto_resize(ui: &Ui, state: &mut AutoResizeState, opened: &m
 Note that you probably don't want to query the window size to
 output your content because that would create a feedback loop.",
             );
-            Slider::new("Number of lines", 1, 20).build(ui, &mut state.lines);
+            ui.slider("Number of lines", 1, 20, &mut state.lines);
             for i in 0..state.lines {
                 ui.text(format!("{:2$}This is line {}", "", i, i as usize * 4));
             }
