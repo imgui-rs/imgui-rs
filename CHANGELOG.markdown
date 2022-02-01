@@ -34,6 +34,8 @@
 
 - Added `docking` feature which builds against the upstream docking branch. Only basic API is exposed currently, just enough to enable the docking `imgui_context.io_mut().config_flags |= imgui::ConfigFlags::DOCKING_ENABLE;` - a safe API for programtically docking windows and so on will be added later (until then the internal docking API can be accessed, `imgui::sys::igDockBuilderDockWindow` and so on)
 
+- Fixed dpi related issues when not in `HiDpiMode::Default` mode. The wrong scale factor was used when converting winit physical size to logical size, causing the imgui display size to be incorrect.
+
 ## [0.8.0] - 2021-09-17
 
 Welcome to the `0.8.0` update. This is one of the largest updates imgui-rs has ever seen; it will generate errors in a `0.7` project, but hopefully it should be both quick to fix, and enjoyable to update. See our [release page](https://github.com/imgui-rs/imgui-rs/releases/tag/v0.8.0) for more information and a list of contributors to this cycle. Thank you to everyone who uses `imgui-rs`, files issues, and spend their time and effort to PR new changes into the codebase. Because of all that effort, this is by far the best `imgui-rs` has looked!

@@ -535,7 +535,7 @@ impl WinitPlatform {
         self.hidpi_mode = hidpi_mode;
         self.hidpi_factor = hidpi_factor;
         io.display_framebuffer_scale = [hidpi_factor as f32, hidpi_factor as f32];
-        let logical_size = window.inner_size().to_logical(hidpi_factor);
+        let logical_size = window.inner_size().to_logical(window.scale_factor());
         let logical_size = self.scale_size_from_winit(window, logical_size);
         io.display_size = [logical_size.width as f32, logical_size.height as f32];
     }
@@ -976,7 +976,7 @@ impl WinitPlatform {
                 self.hidpi_factor = hidpi_factor;
                 io.display_framebuffer_scale = [hidpi_factor as f32, hidpi_factor as f32];
                 // Window size might change too if we are using DPI rounding
-                let logical_size = window.inner_size().to_logical(scale_factor);
+                let logical_size = window.inner_size().to_logical(window.scale_factor());
                 let logical_size = self.scale_size_from_winit(window, logical_size);
                 io.display_size = [logical_size.width as f32, logical_size.height as f32];
             }
@@ -1084,7 +1084,7 @@ impl WinitPlatform {
                 self.hidpi_factor = hidpi_factor;
                 io.display_framebuffer_scale = [hidpi_factor as f32, hidpi_factor as f32];
                 // Window size might change too if we are using DPI rounding
-                let logical_size = window.inner_size().to_logical(scale_factor);
+                let logical_size = window.inner_size().to_logical(window.scale_factor());
                 let logical_size = self.scale_size_from_winit(window, logical_size);
                 io.display_size = [logical_size.width as f32, logical_size.height as f32];
             }
