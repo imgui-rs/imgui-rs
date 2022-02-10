@@ -205,9 +205,12 @@ impl Ui {
     /// # Example
     ///
     /// ```rust,no_run
+    /// # let mut ctx = imgui::Context::create();
+    /// # {let ui = ctx.frame();
+    ///
     /// let items = vec!["Example 1", "Example 2"];
     /// let mut selected = &items[0];
-    /// if let Some(cb) = ui.begin_combo("example_combo") {
+    /// if let Some(cb) = ui.begin_combo("example_combo", format!("Selected item: {}", selected)) {
     ///     for cur in &items {
     ///         if selected == cur {
     ///             // Auto-scroll to selected item
@@ -223,6 +226,7 @@ impl Ui {
     ///         }
     ///     }
     /// }
+    /// # };
     /// ```
     #[must_use]
     #[doc(alias = "BeginCombo")]
