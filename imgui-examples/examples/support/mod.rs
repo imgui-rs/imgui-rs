@@ -137,10 +137,10 @@ impl System {
                 gl_window.window().request_redraw();
             }
             Event::RedrawRequested(_) => {
-                let mut ui = imgui.frame();
+                let ui = imgui.frame();
 
                 let mut run = true;
-                run_ui(&mut run, &mut ui);
+                run_ui(&mut run, ui);
                 if !run {
                     *control_flow = ControlFlow::Exit;
                 }

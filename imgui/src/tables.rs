@@ -840,7 +840,7 @@ pub struct Specs<'a>(&'a [sys::ImGuiTableColumnSortSpecs]);
 
 impl<'a> Specs<'a> {
     pub fn iter(self) -> impl Iterator<Item = TableColumnSortSpecs<'a>> {
-        self.0.iter().map(|v| TableColumnSortSpecs(v))
+        self.0.iter().map(TableColumnSortSpecs)
     }
 }
 

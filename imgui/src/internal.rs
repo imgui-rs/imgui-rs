@@ -65,6 +65,11 @@ pub trait RawWrapper {
 }
 
 /// Casting from/to a raw type that has the same layout and alignment as the target type
+///
+/// # Safety
+///
+/// Each function outlines its own safety contract, which generally is
+/// that the cast from `T` to `Self` is valid.
 pub unsafe trait RawCast<T>: Sized {
     /// Casts an immutable reference from the raw type
     ///
@@ -124,6 +129,9 @@ pub enum DataType {
 ///
 /// If this trait is implemented for a type, it is assumed to have *exactly* the same
 /// representation in memory as the primitive value described by the associated `KIND` constant.
+///
+/// # Safety
+/// The `DataType` *must* have the same representation as the primitive value of `KIND`.
 pub unsafe trait DataTypeKind: Copy {
     const KIND: DataType;
 }
