@@ -186,25 +186,27 @@ bitflags! {
 /// ```
 #[derive(Debug)]
 #[must_use]
-pub struct ColorEdit3<'a, T, C> {
-    label: T,
+pub struct ColorEdit3<'ui, 'a, Label, C> {
+    label: Label,
     value: &'a mut C,
     flags: ColorEditFlags,
+    ui: &'ui Ui,
 }
 
-impl<'a, T, C> ColorEdit3<'a, T, C>
+impl<'ui, 'a, Label, C> ColorEdit3<'ui, 'a, Label, C>
 where
-    T: AsRef<str>,
+    Label: AsRef<str>,
     C: Copy + Into<MintVec3>,
     MintVec3: Into<C> + Into<[f32; 3]>,
 {
     /// Constructs a new color editor builder.
-    #[doc(alias = "ColorEdit3")]
-    pub fn new(label: T, value: &'a mut C) -> Self {
+    #[deprecated(since = "0.9.0", note = "Use `ui.color_edit3(...)` instead")]
+    pub fn new(ui: &'ui Ui, label: Label, value: &'a mut C) -> Self {
         ColorEdit3 {
             label,
             value,
             flags: ColorEditFlags::empty(),
+            ui,
         }
     }
     /// Replaces all current settings with the given flags.
@@ -326,8 +328,7 @@ where
     /// Builds the color editor.
     ///
     /// Returns true if the color value was changed.
-    pub fn build(mut self, ui: &Ui) -> bool {
-        // if let EditableColor::Float3(_) = self.value {
+    pub fn build(mut self) -> bool {
         self.flags.insert(ColorEditFlags::NO_ALPHA);
 
         let as_vec3: MintVec3 = (*self.value).into();
@@ -335,7 +336,7 @@ where
 
         let changed = unsafe {
             sys::igColorEdit3(
-                ui.scratch_txt(self.label),
+                self.ui.scratch_txt(self.label),
                 as_vec3.as_mut_ptr(),
                 self.flags.bits() as _,
             )
@@ -349,6 +350,44 @@ where
         }
 
         changed
+    }
+}
+
+impl Ui {
+    /// Edits a color of 3 channels. Use [color_edit3_config](Self::color_edit3_config)
+    /// for a builder to customize this widget.
+    pub fn color_edit3<Label, C>(&self, label: Label, value: &mut C) -> bool
+    where
+        Label: AsRef<str>,
+        C: Copy + Into<MintVec3>,
+        MintVec3: Into<C> + Into<[f32; 3]>,
+    {
+        ColorEdit3 {
+            label,
+            value,
+            flags: ColorEditFlags::empty(),
+            ui: self,
+        }
+        .build()
+    }
+
+    /// Constructs a new color editor builder.
+    pub fn color_edit3_config<'a, Label, C>(
+        &self,
+        label: Label,
+        value: &'a mut C,
+    ) -> ColorEdit3<'_, 'a, Label, C>
+    where
+        Label: AsRef<str>,
+        C: Copy + Into<MintVec3>,
+        MintVec3: Into<C> + Into<[f32; 3]>,
+    {
+        ColorEdit3 {
+            label,
+            value,
+            flags: ColorEditFlags::empty(),
+            ui: self,
+        }
     }
 }
 
@@ -368,25 +407,27 @@ where
 /// ```
 #[derive(Debug)]
 #[must_use]
-pub struct ColorEdit4<'a, T, C> {
+pub struct ColorEdit4<'ui, 'a, T, C> {
     label: T,
     value: &'a mut C,
     flags: ColorEditFlags,
+    ui: &'ui Ui,
 }
 
-impl<'a, T, C> ColorEdit4<'a, T, C>
+impl<'ui, 'a, T, C> ColorEdit4<'ui, 'a, T, C>
 where
     T: AsRef<str>,
     C: Copy + Into<MintVec4>,
     MintVec4: Into<C> + Into<[f32; 4]>,
 {
     /// Constructs a new color editor builder.
-    #[doc(alias = "ColorEdit4")]
-    pub fn new(label: T, value: &'a mut C) -> Self {
+    #[deprecated(since = "0.9.0", note = "Use `ui.color_edit4(...)` instead")]
+    pub fn new(ui: &'ui Ui, label: T, value: &'a mut C) -> Self {
         Self {
             label,
             value,
             flags: ColorEditFlags::empty(),
+            ui,
         }
     }
     /// Replaces all current settings with the given flags.
@@ -508,13 +549,13 @@ where
     /// Builds the color editor.
     ///
     /// Returns true if the color value was changed.
-    pub fn build(self, ui: &Ui) -> bool {
+    pub fn build(self) -> bool {
         let as_vec4: MintVec4 = (*self.value).into();
         let mut as_vec4: [f32; 4] = as_vec4.into();
 
         let changed = unsafe {
             sys::igColorEdit4(
-                ui.scratch_txt(self.label),
+                self.ui.scratch_txt(self.label),
                 as_vec4.as_mut_ptr(),
                 self.flags.bits() as _,
             )
@@ -528,6 +569,44 @@ where
         }
 
         changed
+    }
+}
+
+impl Ui {
+    /// Edits a color of 4 channels. Use [color_edit4_config](Self::color_edit4_config)
+    /// for a builder to customize this widget.
+    pub fn color_edit4<Label, C>(&self, label: Label, value: &mut C) -> bool
+    where
+        Label: AsRef<str>,
+        C: Copy + Into<MintVec4>,
+        MintVec4: Into<C> + Into<[f32; 4]>,
+    {
+        ColorEdit4 {
+            label,
+            value,
+            flags: ColorEditFlags::empty(),
+            ui: self,
+        }
+        .build()
+    }
+
+    /// Constructs a new color editor builder.
+    pub fn color_edit4_config<'a, Label, C>(
+        &self,
+        label: Label,
+        value: &'a mut C,
+    ) -> ColorEdit4<'_, 'a, Label, C>
+    where
+        Label: AsRef<str>,
+        C: Copy + Into<MintVec4>,
+        MintVec4: Into<C> + Into<[f32; 4]>,
+    {
+        ColorEdit4 {
+            label,
+            value,
+            flags: ColorEditFlags::empty(),
+            ui: self,
+        }
     }
 }
 
@@ -547,25 +626,27 @@ where
 /// ```
 #[derive(Debug)]
 #[must_use]
-pub struct ColorPicker3<'a, Label, Color> {
+pub struct ColorPicker3<'ui, 'a, Label, Color> {
     label: Label,
     value: &'a mut Color,
     flags: ColorEditFlags,
+    ui: &'ui Ui,
 }
 
-impl<'a, Label, Color> ColorPicker3<'a, Label, Color>
+impl<'ui, 'a, Label, Color> ColorPicker3<'ui, 'a, Label, Color>
 where
     Label: AsRef<str>,
     Color: Copy + Into<MintVec3>,
     MintVec3: Into<Color> + Into<[f32; 3]>,
 {
     /// Constructs a new color picker builder.
-    #[doc(alias = "ColorPicker3")]
-    pub fn new(label: Label, value: &'a mut Color) -> Self {
+    #[deprecated(since = "0.9.0", note = "Use `ui.color_picker3(...)` instead")]
+    pub fn new(ui: &'ui Ui, label: Label, value: &'a mut Color) -> Self {
         ColorPicker3 {
             label,
             value,
             flags: ColorEditFlags::empty(),
+            ui,
         }
     }
     /// Replaces all current settings with the given flags.
@@ -694,12 +775,12 @@ where
     /// Builds the color picker.
     ///
     /// Returns true if the color value was changed.
-    pub fn build(mut self, ui: &Ui) -> bool {
+    pub fn build(mut self) -> bool {
         self.flags.insert(ColorEditFlags::NO_ALPHA);
         let mut value: [f32; 3] = (*self.value).into().into();
         let changed = unsafe {
             sys::igColorPicker3(
-                ui.scratch_txt(self.label),
+                self.ui.scratch_txt(self.label),
                 value.as_mut_ptr(),
                 self.flags.bits() as _,
             )
@@ -712,6 +793,44 @@ where
         }
 
         changed
+    }
+}
+
+impl Ui {
+    /// Edits a color of 3 channels. Use [color_picker3](Self::color_picker3)
+    /// for a builder to customize this widget.
+    pub fn color_picker3<Label, C>(&self, label: Label, value: &mut C) -> bool
+    where
+        Label: AsRef<str>,
+        C: Copy + Into<MintVec3>,
+        MintVec3: Into<C> + Into<[f32; 3]>,
+    {
+        ColorPicker3 {
+            label,
+            value,
+            flags: ColorEditFlags::empty(),
+            ui: self,
+        }
+        .build()
+    }
+
+    /// Constructs a new color picker editor builder.
+    pub fn color_picker3_config<'a, Label, C>(
+        &self,
+        label: Label,
+        value: &'a mut C,
+    ) -> ColorPicker3<'_, 'a, Label, C>
+    where
+        Label: AsRef<str>,
+        C: Copy + Into<MintVec3>,
+        MintVec3: Into<C> + Into<[f32; 3]>,
+    {
+        ColorPicker3 {
+            label,
+            value,
+            flags: ColorEditFlags::empty(),
+            ui: self,
+        }
     }
 }
 
@@ -731,27 +850,29 @@ where
 /// ```
 #[derive(Debug)]
 #[must_use]
-pub struct ColorPicker4<'a, Label, Color> {
+pub struct ColorPicker4<'ui, 'a, Label, Color> {
     label: Label,
     value: &'a mut Color,
     flags: ColorEditFlags,
     ref_color: Option<[f32; 4]>,
+    ui: &'ui Ui,
 }
 
-impl<'a, Label, Color> ColorPicker4<'a, Label, Color>
+impl<'ui, 'a, Label, Color> ColorPicker4<'ui, 'a, Label, Color>
 where
     Label: AsRef<str>,
     Color: Copy + Into<MintVec4>,
     MintVec4: Into<Color> + Into<[f32; 4]>,
 {
     /// Constructs a new color picker builder.
-    #[doc(alias = "ColorPicker4")]
-    pub fn new(label: Label, value: &'a mut Color) -> Self {
+    #[deprecated(since = "0.9.0", note = "Use `ui.color_picker4(...)` instead")]
+    pub fn new(ui: &'ui Ui, label: Label, value: &'a mut Color) -> Self {
         Self {
             label,
             value,
             flags: ColorEditFlags::empty(),
             ref_color: None,
+            ui,
         }
     }
     /// Replaces all current settings with the given flags.
@@ -886,13 +1007,13 @@ where
     /// Builds the color picker.
     ///
     /// Returns true if the color value was changed.
-    pub fn build(self, ui: &Ui) -> bool {
+    pub fn build(self) -> bool {
         let mut value: [f32; 4] = (*self.value).into().into();
         let ref_color = self.ref_color.map(|c| c.as_ptr()).unwrap_or(ptr::null());
 
         let changed = unsafe {
             sys::igColorPicker4(
-                ui.scratch_txt(self.label),
+                self.ui.scratch_txt(self.label),
                 value.as_mut_ptr(),
                 self.flags.bits() as _,
                 ref_color,
@@ -909,6 +1030,46 @@ where
     }
 }
 
+impl Ui {
+    /// Edits a color of 4 channels. Use [color_picker4_config](Self::color_picker4_config)
+    /// for a builder to customize this widget.
+    pub fn color_picker4<Label, C>(&self, label: Label, value: &mut C) -> bool
+    where
+        Label: AsRef<str>,
+        C: Copy + Into<MintVec4>,
+        MintVec4: Into<C> + Into<[f32; 4]>,
+    {
+        ColorPicker4 {
+            label,
+            value,
+            flags: ColorEditFlags::empty(),
+            ref_color: None,
+            ui: self,
+        }
+        .build()
+    }
+
+    /// Constructs a new color picker editor builder.
+    pub fn color_picker4_config<'a, Label, C>(
+        &self,
+        label: Label,
+        value: &'a mut C,
+    ) -> ColorPicker4<'_, 'a, Label, C>
+    where
+        Label: AsRef<str>,
+        C: Copy + Into<MintVec4>,
+        MintVec4: Into<C> + Into<[f32; 4]>,
+    {
+        ColorPicker4 {
+            label,
+            value,
+            flags: ColorEditFlags::empty(),
+            ref_color: None,
+            ui: self,
+        }
+    }
+}
+
 /// Builder for a color button widget.
 ///
 /// # Examples
@@ -922,21 +1083,24 @@ where
 /// ```
 #[derive(Copy, Clone, Debug)]
 #[must_use]
-pub struct ColorButton<T> {
+pub struct ColorButton<'ui, T> {
     desc_id: T,
     color: [f32; 4],
     flags: ColorEditFlags,
     size: [f32; 2],
+    ui: &'ui Ui,
 }
 
-impl<T: AsRef<str>> ColorButton<T> {
+impl<'ui, T: AsRef<str>> ColorButton<'ui, T> {
     /// Constructs a new color button builder.
-    pub fn new(desc_id: T, color: impl Into<MintVec4>) -> Self {
+    #[deprecated(since = "0.9.0", note = "Use `ui.color_button_config(...)` instead")]
+    pub fn new(ui: &'ui Ui, desc_id: T, color: impl Into<MintVec4>) -> Self {
         ColorButton {
             desc_id,
             color: color.into().into(),
             flags: ColorEditFlags::empty(),
             size: [0.0, 0.0],
+            ui,
         }
     }
     /// Replaces all current settings with the given flags.
@@ -1008,14 +1172,49 @@ impl<T: AsRef<str>> ColorButton<T> {
     /// Builds the color button.
     ///
     /// Returns true if this color button was clicked.
-    pub fn build(self, ui: &Ui) -> bool {
+    pub fn build(self) -> bool {
         unsafe {
             sys::igColorButton(
-                ui.scratch_txt(self.desc_id),
+                self.ui.scratch_txt(self.desc_id),
                 self.color.into(),
                 self.flags.bits() as _,
                 self.size.into(),
             )
+        }
+    }
+}
+
+impl Ui {
+    /// Builds a [ColorButton].
+    ///
+    /// Returns true if this color button was clicked.
+    pub fn color_button<Label: AsRef<str>>(
+        &self,
+        desc_id: Label,
+        color: impl Into<MintVec4>,
+    ) -> bool {
+        ColorButton {
+            desc_id,
+            color: color.into().into(),
+            flags: ColorEditFlags::empty(),
+            size: [0.0, 0.0],
+            ui: self,
+        }
+        .build()
+    }
+
+    /// Returns a [ColorButton] builder.
+    pub fn color_button_config<Label: AsRef<str>>(
+        &self,
+        desc_id: Label,
+        color: impl Into<MintVec4>,
+    ) -> ColorButton<'_, Label> {
+        ColorButton {
+            desc_id,
+            color: color.into().into(),
+            flags: ColorEditFlags::empty(),
+            size: [0.0, 0.0],
+            ui: self,
         }
     }
 }
