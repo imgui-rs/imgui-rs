@@ -773,7 +773,7 @@ CTRL+click on individual component to input value.\n",
                 if ui.button("Delete..") {
                     ui.open_popup("Delete?");
                 }
-                ui.popup_modal("Delete?").always_auto_resize(true).build(|| {
+                ui.modal_popup_config("Delete?").always_auto_resize(true).build(|| {
                     ui.text("All those beautiful files will be deleted.\nThis operation cannot be undone!\n\n");
                     ui.separator();
                     let style = ui.push_style_var(StyleVar::FramePadding([0.0, 0.0]));
@@ -792,7 +792,7 @@ CTRL+click on individual component to input value.\n",
                 if ui.button("Stacked modals..") {
                     ui.open_popup("Stacked 1");
                 }
-                ui.popup_modal("Stacked 1").build(|| {
+                ui.modal_popup_config("Stacked 1").build(|| {
                     ui.text(
                        "Hello from Stacked The First\n\
                         Using style[StyleColor::ModalWindowDarkening] for darkening."
@@ -806,7 +806,7 @@ CTRL+click on individual component to input value.\n",
                     if ui.button("Add another modal..") {
                         ui.open_popup("Stacked 2")   ;
                     }
-                    ui.popup_modal("Stacked 2").build(|| {
+                    ui.modal_popup_config("Stacked 2").build(|| {
                         ui.text("Hello from Stacked The Second");
                         if ui.button("Close") {
                             ui.close_current_popup();
