@@ -30,7 +30,7 @@ pub struct PopupModal<'ui, 'p, Label> {
 }
 
 impl<'ui, 'p, Label: AsRef<str>> PopupModal<'ui, 'p, Label> {
-    #[deprecated(since = "0.9.0", note = "Use `ui.popup_modal(...)` instead")]
+    #[deprecated(since = "0.9.0", note = "Use `ui.modal_popup_config(...)` instead")]
     pub fn new(ui: &'ui Ui, label: Label) -> Self {
         PopupModal {
             ui,
@@ -152,12 +152,16 @@ impl<'ui, 'p, Label: AsRef<str>> PopupModal<'ui, 'p, Label> {
 
 // Widgets: Popups
 impl Ui {
-    /// Instructs ImGui to open a popup, which must be began with either [`begin_popup`](Self::begin_popup)
-    /// or [`popup`](Self::popup). You also use this function to begin [PopupModal].
+    /// Instructs ImGui that a popup is open.
     ///
-    /// The confusing aspect to popups is that ImGui holds "control" over the popup fundamentally, so that ImGui
-    /// can also force close a popup when a user clicks outside a popup. If you do not want users to be
-    /// able to close a popup without selected an option, use [`PopupModal`].
+    /// You should **call this function once** while calling any of the following per-frame:
+    ///
+    /// - [`begin_popup`](Self::begin_popup)
+    /// - [`popup`](Self::popup)
+    /// - [`modal_popup`](Self::modal_popup)
+    /// - [`modal_popup_config`](Self::modal_popup_config)
+    ///
+    /// The confusing aspect to popups is that ImGui holds control over the popup itself.
     #[doc(alias = "OpenPopup")]
     pub fn open_popup(&self, str_id: impl AsRef<str>) {
         unsafe { sys::igOpenPopupStr(self.scratch_txt(str_id), 0) };
@@ -166,7 +170,7 @@ impl Ui {
     /// Construct a popup that can have any kind of content.
     ///
     /// This should be called *per frame*, whereas [`open_popup`](Self::open_popup) should be called *once*
-    /// when you want to actual create the popup.
+    /// to signal that this popup is active.
     #[doc(alias = "BeginPopup")]
     pub fn begin_popup(&self, str_id: impl AsRef<str>) -> Option<PopupToken<'_>> {
         let render = unsafe {
@@ -183,7 +187,7 @@ impl Ui {
     /// Construct a popup that can have any kind of content.
     ///
     /// This should be called *per frame*, whereas [`open_popup`](Self::open_popup) should be called *once*
-    /// when you want to actual create the popup.
+    /// to signal that this popup is active.
     #[doc(alias = "BeginPopup")]
     pub fn popup<F>(&self, str_id: impl AsRef<str>, f: F)
     where
@@ -194,10 +198,47 @@ impl Ui {
         }
     }
 
-    /// Creates a PopupModal directly.
-    pub fn popup_modal<Label: AsRef<str>>(&self, str_id: Label) -> PopupModal<'_, '_, Label> {
-        #[allow(deprecated)]
-        PopupModal::new(self, str_id)
+    /// Creates a [PopupModal], and runs a closure on it.
+    ///
+    /// To customize the behavior of this [PopupModal], use [`modal_popup_config`](Self::modal_popup_config).
+    pub fn modal_popup<Label, Func, R>(&self, str_id: Label, f: Func) -> Option<R>
+    where
+        Label: AsRef<str>,
+        Func: FnOnce() -> R,
+    {
+        PopupModal {
+            ui: self,
+            label: str_id,
+            opened: None,
+            flags: WindowFlags::empty(),
+        }
+        .build(f)
+    }
+
+    /// Creates a [PopupModal], returning a drop token.
+    ///
+    /// To customize the behavior of this [PopupModal], use [`modal_popup_config`](Self::modal_popup_config).
+    pub fn begin_modal_popup<Label: AsRef<str>>(&self, str_id: Label) -> Option<PopupToken<'_>> {
+        PopupModal {
+            ui: self,
+            label: str_id,
+            opened: None,
+            flags: WindowFlags::empty(),
+        }
+        .begin_popup()
+    }
+
+    /// Creates a [PopupModal] builder.
+    pub fn modal_popup_config<Label: AsRef<str>>(
+        &self,
+        str_id: Label,
+    ) -> PopupModal<'_, '_, Label> {
+        PopupModal {
+            ui: self,
+            label: str_id,
+            opened: None,
+            flags: WindowFlags::empty(),
+        }
     }
 
     /// Close a popup. Should be called within the closure given as argument to
