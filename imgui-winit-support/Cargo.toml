@@ -20,7 +20,7 @@ winit-25 = { version = "0.25", package = "winit", default-features = false, opti
 winit-26 = { version = "0.26", package = "winit", default-features = false, optional = true }
 
 [features]
-default = ["winit-25/default"]
+default = ["winit-26/default"]
 test = ["winit-23/default", "winit-24/default", "winit-25/default", "winit-26/default"]
 
 # This is phrased as a negative (unlike most features) so that it needs to be
