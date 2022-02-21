@@ -242,7 +242,7 @@ impl Ui {
     }
 
     /// Close a popup. Should be called within the closure given as argument to
-    /// [`Ui::popup`] or [`Ui::popup_modal`].
+    /// [`Ui::popup`] or [`Ui::modal_popup`].
     #[doc(alias = "CloseCurrentPopup")]
     pub fn close_current_popup(&self) {
         unsafe { sys::igCloseCurrentPopup() };
