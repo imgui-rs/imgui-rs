@@ -179,8 +179,7 @@ bitflags! {
 /// # let mut imgui = Context::create();
 /// # let ui = imgui.frame();
 /// # let mut color = [0.0, 0.0, 0.0, 1.0];
-/// let ce = ColorEdit4::new("color_edit", &mut color);
-/// if ce.build(&ui) {
+/// if ui.color_edit4("color_edit", &mut color) {
 ///   println!("The color was changed");
 /// }
 /// ```
@@ -400,8 +399,7 @@ impl Ui {
 /// # let mut imgui = Context::create();
 /// # let ui = imgui.frame();
 /// # let mut color = [0.0, 0.0, 0.0, 1.0];
-/// let ce = ColorEdit4::new("color_edit", &mut color);
-/// if ce.build(&ui) {
+/// if ui.color_edit4("color_edit", &mut color) {
 ///   println!("The color was changed");
 /// }
 /// ```
@@ -619,8 +617,7 @@ impl Ui {
 /// # let mut imgui = Context::create();
 /// # let ui = imgui.frame();
 /// # let mut color = [0.0, 0.0, 0.0, 1.0];
-/// let cp = ColorPicker4::new("color_picker", &mut color);
-/// if cp.build(&ui) {
+/// if ui.color_picker4("color_picker", &mut color) {
 ///   println!("A color was picked");
 /// }
 /// ```
@@ -843,8 +840,7 @@ impl Ui {
 /// # let mut imgui = Context::create();
 /// # let ui = imgui.frame();
 /// # let mut color = [0.0, 0.0, 0.0, 1.0];
-/// let cp = ColorPicker4::new("color_picker", &mut color);
-/// if cp.build(&ui) {
+/// if ui.color_picker4("color_picker", &mut color) {
 ///   println!("A color was picked");
 /// }
 /// ```
@@ -1078,8 +1074,9 @@ impl Ui {
 /// # use imgui::*;
 /// # let mut imgui = Context::create();
 /// # let ui = imgui.frame();
-/// ColorButton::new(im_str!("color_button"), [1.0, 0.0, 0.0, 1.0])
-///     .build(&ui);
+/// if ui.color_button("color_button", [1.0, 0.0, 0.0, 1.0]) {
+///     println!("pressed!");
+/// }
 /// ```
 #[derive(Copy, Clone, Debug)]
 #[must_use]
