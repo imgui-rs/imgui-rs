@@ -11,12 +11,12 @@ use crate::Ui;
 /// # use imgui::*;
 /// # let mut imgui = Context::create();
 /// # let ui = imgui.frame();
-/// if ui.button(im_str!("Show modal")) {
-///     ui.open_popup(im_str!("modal"));
+/// if ui.button("Show modal") {
+///     ui.open_popup("modal");
 /// }
-/// if let Some(_token) = ui.popup_modal("modal").begin_popup() {
+/// if let Some(_token) = ui.begin_modal_popup("modal") {
 ///     ui.text("Content of my modal");
-///     if ui.button(im_str!("OK")) {
+///     if ui.button("OK") {
 ///         ui.close_current_popup();
 ///     }
 /// };
