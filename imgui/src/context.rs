@@ -9,7 +9,7 @@ use crate::clipboard::{ClipboardBackend, ClipboardContext};
 use crate::fonts::atlas::{FontAtlas, FontId, SharedFontAtlas};
 use crate::io::Io;
 use crate::style::Style;
-use crate::{sys, DrawData};
+use crate::{sys, DrawData, PlatformIo};
 use crate::{MouseCursor, Ui};
 
 /// An imgui-rs context.
@@ -477,6 +477,18 @@ impl Context {
         unsafe {
             // safe because Io is a transparent wrapper around sys::ImGuiIO
             &mut *(sys::igGetIO() as *mut Io)
+        }
+    }
+    pub fn platform_io(&self) -> &PlatformIo {
+        unsafe {
+            // safe because PlatformIo is a transparent wrapper around sys::ImGuiPlatformIO
+            &*(sys::igGetPlatformIO() as *const PlatformIo)
+        }
+    }
+    pub fn platform_io_mut(&mut self) -> &PlatformIo {
+        unsafe {
+            // safe because PlatformIo is a transparent wrapper around sys::ImGuiPlatformIO
+            &mut *(sys::igGetPlatformIO() as *mut PlatformIo)
         }
     }
     /// Returns an immutable reference to the user interface style
