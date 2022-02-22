@@ -212,7 +212,7 @@ impl SdlPlatform {
                 true
             }
 
-            _ => false
+            _ => false,
         }
     }
 
