@@ -54,33 +54,37 @@ pub struct ComboBoxFlags: u32 {
 /// Builder for a combo box widget
 #[derive(Copy, Clone, Debug)]
 #[must_use]
-pub struct ComboBox<Label, Preview = &'static str> {
-    label: Label,
-    preview_value: Option<Preview>,
-    flags: ComboBoxFlags,
+pub struct ComboBox<'ui, Label, Preview = &'static str> {
+    pub label: Label,
+    pub preview_value: Option<Preview>,
+    pub flags: ComboBoxFlags,
+    pub ui: &'ui Ui,
 }
 
-impl<Label: AsRef<str>> ComboBox<Label> {
+impl<'ui, Label: AsRef<str>> ComboBox<'ui, Label> {
     /// Constructs a new combo box builder.
-    #[doc(alias = "BeginCombo")]
-    pub fn new(label: Label) -> Self {
+    // #[doc(alias = "BeginCombo")]
+    #[deprecated(since = "0.9.0", note = "Use `ui.combo_box_config(...)` instead")]
+    pub fn new(ui: &'ui Ui, label: Label) -> Self {
         ComboBox {
             label,
             preview_value: None,
             flags: ComboBoxFlags::empty(),
+            ui,
         }
     }
 }
 
-impl<T: AsRef<str>, Preview: AsRef<str>> ComboBox<T, Preview> {
+impl<'ui, T: AsRef<str>, Preview: AsRef<str>> ComboBox<'ui, T, Preview> {
     pub fn preview_value<Preview2: AsRef<str>>(
         self,
         preview_value: Preview2,
-    ) -> ComboBox<T, Preview2> {
+    ) -> ComboBox<'ui, T, Preview2> {
         ComboBox {
             label: self.label,
             preview_value: Some(preview_value),
             flags: self.flags,
+            ui: self.ui,
         }
     }
 
@@ -142,18 +146,13 @@ impl<T: AsRef<str>, Preview: AsRef<str>> ComboBox<T, Preview> {
     ///
     /// Returns `None` if the combo box is not open and no content should be rendered.
     #[must_use]
-    pub fn begin(self, ui: &Ui) -> Option<ComboBoxToken<'_>> {
+    pub fn begin(self) -> Option<ComboBoxToken<'ui>> {
         let should_render = unsafe {
-            if let Some(preview_value) = self.preview_value {
-                let (ptr_one, ptr_two) = ui.scratch_txt_two(self.label, preview_value);
-                sys::igBeginCombo(ptr_one, ptr_two, self.flags.bits() as i32)
-            } else {
-                let ptr_one = ui.scratch_txt(self.label);
-                sys::igBeginCombo(ptr_one, std::ptr::null(), self.flags.bits() as i32)
-            }
+            let (ptr_one, ptr_two) = self.ui.scratch_txt_with_opt(self.label, self.preview_value);
+            sys::igBeginCombo(ptr_one, ptr_two, self.flags.bits() as i32)
         };
         if should_render {
-            Some(ComboBoxToken::new(ui))
+            Some(ComboBoxToken::new(self.ui))
         } else {
             None
         }
@@ -162,8 +161,8 @@ impl<T: AsRef<str>, Preview: AsRef<str>> ComboBox<T, Preview> {
     /// Returns the result of the closure, if it is called.
     ///
     /// Note: the closure is not called if the combo box is not open.
-    pub fn build<R, F: FnOnce() -> R>(self, ui: &Ui, f: F) -> Option<R> {
-        self.begin(ui).map(|_combo| f())
+    pub fn build<R, F: FnOnce() -> R>(self, f: F) -> Option<R> {
+        self.begin().map(|_combo| f())
     }
 }
 
@@ -255,7 +254,13 @@ impl Ui {
         preview_value: impl AsRef<str>,
         flags: ComboBoxFlags,
     ) -> Option<ComboBoxToken<'_>> {
-        self._begin_combo(label, Some(preview_value), flags)
+        ComboBox {
+            label,
+            preview_value: Some(preview_value),
+            flags,
+            ui: self,
+        }
+        .begin()
     }
 
     /// Creates a combo box which can be appended to with `Selectable::new`.
@@ -292,26 +297,15 @@ impl Ui {
         label: impl AsRef<str>,
         flags: ComboBoxFlags,
     ) -> Option<ComboBoxToken<'_>> {
-        self._begin_combo(label, Option::<&'static str>::None, flags)
+        ComboBox {
+            label,
+            preview_value: None::<&'static str>,
+            flags,
+            ui: self,
+        }
+        .begin()
     }
 
-    /// This is the internal begin combo method that they all...eventually call.
-    fn _begin_combo(
-        &self,
-        label: impl AsRef<str>,
-        preview_value: Option<impl AsRef<str>>,
-        flags: ComboBoxFlags,
-    ) -> Option<ComboBoxToken<'_>> {
-        let should_render = unsafe {
-            let (ptr_one, ptr_two) = self.scratch_txt_with_opt(label, preview_value);
-            sys::igBeginCombo(ptr_one, ptr_two, flags.bits() as i32)
-        };
-        if should_render {
-            Some(ComboBoxToken::new(self))
-        } else {
-            None
-        }
-    }
     /// Builds a simple combo box for choosing from a slice of values.
     ///
     /// See [`Ui::begin_combo`] for a more "immediate mode" style API
@@ -331,7 +325,15 @@ impl Ui {
         let mut result = false;
         let preview_value = items.get(*current_item).map(label_fn);
 
-        if let Some(_cb) = self._begin_combo(label, preview_value, ComboBoxFlags::empty()) {
+        let cmbx = ComboBox {
+            label,
+            preview_value,
+            flags: ComboBoxFlags::empty(),
+            ui: self,
+        }
+        .begin();
+
+        if let Some(_cb) = cmbx {
             for (idx, item) in items.iter().enumerate() {
                 let text = label_fn(item);
                 let selected = idx == *current_item;
