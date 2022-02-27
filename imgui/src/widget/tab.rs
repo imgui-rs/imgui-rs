@@ -6,12 +6,12 @@
 //! # let ui = ctx.frame();
 //!
 //! // During UI construction
-//! TabBar::new(im_str!("tabbar")).build(&ui, || {
-//!                   TabItem::new(im_str!("a tab")).build(&ui, || {
-//!                       ui.text(im_str!("tab content 1"));
+//! TabBar::new("tabbar").build(&ui, || {
+//!                   TabItem::new("a tab").build(&ui, || {
+//!                       ui.text("tab content 1");
 //!                   });
-//!                   TabItem::new(im_str!("2tab")).build(&ui, || {
-//!                       ui.text(im_str!("tab content 2"));
+//!                   TabItem::new("2tab").build(&ui, || {
+//!                       ui.text("tab content 2");
 //!                   });
 //!               });
 //! ```

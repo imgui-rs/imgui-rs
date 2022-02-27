@@ -609,7 +609,7 @@ impl Ui {
     ///     ui.text("Hover over me");
     ///     if ui.is_item_hovered() {
     ///         ui.tooltip(|| {
-    ///             ui.text_colored([1.0, 0.0, 0.0, 1.0], im_str!("I'm red!"));
+    ///             ui.text_colored([1.0, 0.0, 0.0, 1.0], "I'm red!");
     ///         });
     ///     }
     /// }
@@ -676,7 +676,7 @@ impl Ui {
     /// fn user_interface(ui: &Ui) {
     ///     let disable_buttons = true;
     ///     let _d = ui.begin_disabled(disable_buttons);
-    ///     ui.button(im_str!("Dangerous button"));
+    ///     ui.button("Dangerous button");
     /// }
     /// ```
 
@@ -703,7 +703,7 @@ impl Ui {
     /// fn user_interface(ui: &Ui) {
     ///     let safe_mode = true;
     ///     ui.disabled(safe_mode, || {
-    ///         ui.button(im_str!("Dangerous button"));
+    ///         ui.button("Dangerous button");
     ///     });
     /// }
     /// ```
