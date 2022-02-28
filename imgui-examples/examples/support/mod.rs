@@ -7,7 +7,6 @@ use imgui::{Context, FontConfig, FontGlyphRanges, FontSource, Ui, ConfigFlags};
 use imgui_glium_renderer::Renderer;
 use imgui_winit_support::{HiDpiMode, WinitPlatform};
 use std::path::Path;
-use std::rc::Rc;
 use std::time::Instant;
 
 mod clipboard;

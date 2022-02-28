@@ -186,67 +186,67 @@ pub(crate) extern "C" fn platform_create_vk_surface(viewport: *mut Viewport, ins
 
 pub(crate) struct DummyPlatformViewportBackend {}
 impl PlatformViewportBackend for DummyPlatformViewportBackend {
-    fn create_window(&mut self, viewport: &mut Viewport) {
+    fn create_window(&mut self, _viewport: &mut Viewport) {
         unimplemented!()
     }
 
-    fn destroy_window(&mut self, viewport: &mut Viewport) {
+    fn destroy_window(&mut self, _viewport: &mut Viewport) {
         unimplemented!()
     }
 
-    fn show_window(&mut self, viewport: &mut Viewport) {
+    fn show_window(&mut self, _viewport: &mut Viewport) {
         unimplemented!()
     }
 
-    fn set_window_pos(&mut self, viewport: &mut Viewport, pos: [f32; 2]) {
+    fn set_window_pos(&mut self, _viewport: &mut Viewport, _pos: [f32; 2]) {
         unimplemented!()
     }
 
-    fn get_window_pos(&mut self, viewport: &mut Viewport) -> [f32; 2] {
+    fn get_window_pos(&mut self, _viewport: &mut Viewport) -> [f32; 2] {
         unimplemented!()
     }
 
-    fn set_window_size(&mut self, viewport: &mut Viewport, size: [f32; 2]) {
+    fn set_window_size(&mut self, _viewport: &mut Viewport, _size: [f32; 2]) {
         unimplemented!()
     }
 
-    fn get_window_size(&mut self, viewport: &mut Viewport) -> [f32; 2] {
+    fn get_window_size(&mut self, _viewport: &mut Viewport) -> [f32; 2] {
         unimplemented!()
     }
 
-    fn set_window_focus(&mut self, viewport: &mut Viewport) {
+    fn set_window_focus(&mut self, _viewport: &mut Viewport) {
         unimplemented!()
     }
 
-    fn get_window_focus(&mut self, viewport: &mut Viewport) -> bool {
+    fn get_window_focus(&mut self, _viewport: &mut Viewport) -> bool {
         unimplemented!()
     }
 
-    fn get_window_minimized(&mut self, viewport: &mut Viewport) -> bool {
+    fn get_window_minimized(&mut self, _viewport: &mut Viewport) -> bool {
         unimplemented!()
     }
 
-    fn set_window_title(&mut self, viewport: &mut Viewport, title: &str) {
+    fn set_window_title(&mut self, _viewport: &mut Viewport, _title: &str) {
         unimplemented!()
     }
 
-    fn set_window_alpha(&mut self, viewport: &mut Viewport, alpha: f32) {
+    fn set_window_alpha(&mut self, _viewport: &mut Viewport, _alpha: f32) {
         unimplemented!()
     }
 
-    fn update_window(&mut self, viewport: &mut Viewport) {
+    fn update_window(&mut self, _viewport: &mut Viewport) {
         unimplemented!()
     }
 
-    fn render_window(&mut self, viewport: &mut Viewport) {
+    fn render_window(&mut self, _viewport: &mut Viewport) {
         unimplemented!()
     }
 
-    fn swap_buffers(&mut self, viewport: &mut Viewport) {
+    fn swap_buffers(&mut self, _viewport: &mut Viewport) {
         unimplemented!()
     }
 
-    fn create_vk_surface(&mut self, viewport: &mut Viewport, instance: u64, out_surface: &mut u64) -> i32 {
+    fn create_vk_surface(&mut self, _viewport: &mut Viewport, _instance: u64, _out_surface: &mut u64) -> i32 {
         unimplemented!()
     }
 }
@@ -294,23 +294,23 @@ pub(crate) extern "C" fn renderer_swap_buffers(viewport: *mut Viewport, _arg: *m
 
 pub(crate) struct DummyRendererViewportBackend {}
 impl RendererViewportBackend for DummyRendererViewportBackend {
-    fn create_window(&mut self, viewport: &mut Viewport) {
+    fn create_window(&mut self, _viewport: &mut Viewport) {
         unimplemented!()
     }
 
-    fn destroy_window(&mut self, viewport: &mut Viewport) {
+    fn destroy_window(&mut self, _viewport: &mut Viewport) {
         unimplemented!()
     }
 
-    fn set_window_size(&mut self, viewport: &mut Viewport, size: [f32; 2]) {
+    fn set_window_size(&mut self, _viewport: &mut Viewport, _size: [f32; 2]) {
         unimplemented!()
     }
 
-    fn render_window(&mut self, viewport: &mut Viewport) {
+    fn render_window(&mut self, _viewport: &mut Viewport) {
         unimplemented!()
     }
 
-    fn swap_buffers(&mut self, viewport: &mut Viewport) {
+    fn swap_buffers(&mut self, _viewport: &mut Viewport) {
         unimplemented!()
     }
 }

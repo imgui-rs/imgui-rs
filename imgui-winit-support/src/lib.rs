@@ -188,8 +188,8 @@ use winit_20 as winit;
 ))]
 use winit_19 as winit;
 
-use imgui::{self, BackendFlags, ConfigFlags, Context, Io, Key, Ui, PlatformViewportBackend, ViewportFlags, PlatformMonitor, Viewport};
-use std::{cell::Cell, rc::Rc};
+use imgui::{self, BackendFlags, ConfigFlags, Context, Io, Key, Ui, PlatformViewportBackend, ViewportFlags, PlatformMonitor};
+use std::cell::Cell; 
 use std::cmp::Ordering;
 use winit::dpi::{LogicalPosition, LogicalSize};
 
@@ -514,11 +514,11 @@ impl PlatformViewportBackend for ViewportBackend {
         window.focus_window();
     }
 
-    fn get_window_focus(&mut self, viewport: &mut imgui::Viewport) -> bool {
+    fn get_window_focus(&mut self, _viewport: &mut imgui::Viewport) -> bool {
         true
     }
 
-    fn get_window_minimized(&mut self, viewport: &mut imgui::Viewport) -> bool {
+    fn get_window_minimized(&mut self, _viewport: &mut imgui::Viewport) -> bool {
         false
     }
 
@@ -527,23 +527,23 @@ impl PlatformViewportBackend for ViewportBackend {
         window.set_title(title);
     }
 
-    fn set_window_alpha(&mut self, viewport: &mut imgui::Viewport, alpha: f32) {
+    fn set_window_alpha(&mut self, _viewport: &mut imgui::Viewport, _alpha: f32) {
 
     }
 
-    fn update_window(&mut self, viewport: &mut imgui::Viewport) {
+    fn update_window(&mut self, _viewport: &mut imgui::Viewport) {
         
     }
 
-    fn render_window(&mut self, viewport: &mut imgui::Viewport) {
+    fn render_window(&mut self, _viewport: &mut imgui::Viewport) {
         
     }
 
-    fn swap_buffers(&mut self, viewport: &mut imgui::Viewport) {
+    fn swap_buffers(&mut self, _viewport: &mut imgui::Viewport) {
         
     }
 
-    fn create_vk_surface(&mut self, viewport: &mut imgui::Viewport, instance: u64, out_surface: &mut u64) -> i32 {
+    fn create_vk_surface(&mut self, _viewport: &mut imgui::Viewport, _instance: u64, _out_surface: &mut u64) -> i32 {
         0
     }
 }
