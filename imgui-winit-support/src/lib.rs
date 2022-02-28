@@ -188,8 +188,8 @@ use winit_20 as winit;
 ))]
 use winit_19 as winit;
 
-use imgui::{self, BackendFlags, ConfigFlags, Context, Io, Key, Ui};
-use std::cell::Cell;
+use imgui::{self, BackendFlags, ConfigFlags, Context, Io, Key, Ui, PlatformViewportBackend, ViewportFlags, PlatformMonitor, Viewport};
+use std::{cell::Cell, rc::Rc};
 use std::cmp::Ordering;
 use winit::dpi::{LogicalPosition, LogicalSize};
 
@@ -444,6 +444,110 @@ impl HiDpiMode {
     }
 }
 
+struct ViewportBackend {
+    event_loop: *const winit::event_loop::EventLoopWindowTarget<()>,
+}
+
+enum PlatformHandle {
+    MainWindow(*const winit::window::Window),
+    SecondaryWindow(winit::window::Window),
+}
+
+impl PlatformHandle {
+    fn get(&self) -> &winit::window::Window {
+        match self {
+            PlatformHandle::MainWindow(ptr) => unsafe { &**ptr },
+            PlatformHandle::SecondaryWindow(wnd) => wnd,
+        }
+    }
+}
+
+impl PlatformViewportBackend for ViewportBackend {
+    fn create_window(&mut self, viewport: &mut imgui::Viewport) {
+        let window = winit::window::WindowBuilder::new()
+            .with_always_on_top(viewport.flags.contains(ViewportFlags::TOP_MOST))
+            .with_decorations(!viewport.flags.contains(ViewportFlags::NO_DECORATION))
+            .with_resizable(true)
+            .with_visible(false)
+            .build(unsafe{&*self.event_loop})
+            .unwrap();
+
+        viewport.platform_handle = Box::into_raw(Box::new(PlatformHandle::SecondaryWindow(window))) as *mut _;
+    }
+
+    fn destroy_window(&mut self, viewport: &mut imgui::Viewport) {
+        unsafe {
+            // drop window
+            Box::from_raw(viewport.platform_handle as *mut PlatformHandle);
+        }
+    }
+
+    fn show_window(&mut self, viewport: &mut imgui::Viewport) {
+        let window = unsafe { (*(viewport.platform_handle as *const PlatformHandle)).get() };
+        window.set_visible(true);
+    }
+
+    fn set_window_pos(&mut self, viewport: &mut imgui::Viewport, pos: [f32; 2]) {
+        let window = unsafe { (*(viewport.platform_handle as *const PlatformHandle)).get() };
+        window.set_outer_position(winit::dpi::LogicalPosition::new(pos[0], pos[1]));
+    }
+
+    fn get_window_pos(&mut self, viewport: &mut imgui::Viewport) -> [f32; 2] {
+        let window = unsafe { (*(viewport.platform_handle as *const PlatformHandle)).get() };
+        let pos = window.outer_position().unwrap();
+        [pos.x as f32, pos.y as f32]
+    }
+
+    fn set_window_size(&mut self, viewport: &mut imgui::Viewport, size: [f32; 2]) {
+        let window = unsafe { (*(viewport.platform_handle as *const PlatformHandle)).get() };
+        window.set_inner_size(winit::dpi::LogicalSize::new(size[0], size[1]));
+    }
+
+    fn get_window_size(&mut self, viewport: &mut imgui::Viewport) -> [f32; 2] {
+        let window = unsafe { (*(viewport.platform_handle as *const PlatformHandle)).get() };
+        let size = window.inner_size();
+        [size.width as f32, size.width as f32]
+    }
+
+    fn set_window_focus(&mut self, viewport: &mut imgui::Viewport) {
+        let window = unsafe { (*(viewport.platform_handle as *const PlatformHandle)).get() };
+        window.focus_window();
+    }
+
+    fn get_window_focus(&mut self, viewport: &mut imgui::Viewport) -> bool {
+        true
+    }
+
+    fn get_window_minimized(&mut self, viewport: &mut imgui::Viewport) -> bool {
+        false
+    }
+
+    fn set_window_title(&mut self, viewport: &mut imgui::Viewport, title: &str) {
+        let window = unsafe { (*(viewport.platform_handle as *const PlatformHandle)).get() };
+        window.set_title(title);
+    }
+
+    fn set_window_alpha(&mut self, viewport: &mut imgui::Viewport, alpha: f32) {
+
+    }
+
+    fn update_window(&mut self, viewport: &mut imgui::Viewport) {
+        
+    }
+
+    fn render_window(&mut self, viewport: &mut imgui::Viewport) {
+        
+    }
+
+    fn swap_buffers(&mut self, viewport: &mut imgui::Viewport) {
+        
+    }
+
+    fn create_vk_surface(&mut self, viewport: &mut imgui::Viewport, instance: u64, out_surface: &mut u64) -> i32 {
+        0
+    }
+}
+
 impl WinitPlatform {
     /// Initializes a winit platform instance and configures imgui.
     ///
@@ -491,6 +595,32 @@ impl WinitPlatform {
             mouse_buttons: [Button::INIT; 5],
         }
     }
+
+    pub fn init_viewports(imgui: &mut Context, event_loop: &winit::event_loop::EventLoopWindowTarget<()>, main_window: &winit::window::Window) {
+        let io = imgui.io_mut();
+        io.backend_flags.insert(BackendFlags::PLATFORM_HAS_VIEWPORTS);
+
+        imgui.set_platform_backend(ViewportBackend{
+            event_loop: event_loop as *const _,
+        });
+
+        let pio = imgui.platform_io_mut();
+        let mut monitors = Vec::new();
+        for monitor in main_window.available_monitors() {
+            monitors.push(PlatformMonitor {
+                main_pos: [monitor.position().x as f32, monitor.position().y as f32],
+                main_size: [monitor.size().width as f32, monitor.size().height as f32],
+                work_pos: [monitor.position().x as f32, monitor.position().y as f32],
+                work_size: [monitor.size().width as f32, monitor.size().height as f32],
+                dpi_scale: 1.0,
+            });
+        }
+        pio.monitors.replace_from_slice(&monitors);
+
+        let main_viewport = imgui.main_viewport_mut();
+        main_viewport.platform_handle = Box::into_raw(Box::new(PlatformHandle::MainWindow(main_window as *const _))) as *mut _;
+    }
+
     /// Attaches the platform instance to a winit window.
     ///
     /// This function configures imgui-rs in the following ways:

@@ -1,7 +1,7 @@
 use bitflags::bitflags;
 use std::f32;
 use std::ops::{Index, IndexMut};
-use std::os::raw::{c_char, c_void, c_int};
+use std::os::raw::{c_char, c_void};
 use std::time::Duration;
 
 use crate::fonts::atlas::FontAtlas;
@@ -158,73 +158,6 @@ fn test_nav_input_variants() {
     }
 }
 
-#[cfg(feature = "docking")]
-#[repr(C)]
-pub struct PlatformIo {
-    pub(crate) platform_create_window: Option<unsafe extern "C" fn(*mut Viewport)>,
-    pub(crate) platform_destroy_window: Option<unsafe extern "C" fn(*mut Viewport)>,
-    pub(crate) platform_show_window: Option<unsafe extern "C" fn(*mut Viewport)>,
-    pub(crate) platform_set_window_pos: Option<unsafe extern "C" fn(*mut Viewport, sys::ImVec2)>,
-    pub(crate) platform_get_window_pos: Option<unsafe extern "C" fn(*mut Viewport) -> sys::ImVec2>,
-    pub(crate) platform_set_window_size: Option<unsafe extern "C" fn(*mut Viewport, sys::ImVec2)>,
-    pub(crate) platform_get_window_size: Option<unsafe extern "C" fn(*mut Viewport) -> sys::ImVec2>,
-    pub(crate) platform_set_window_focus: Option<unsafe extern "C" fn(*mut Viewport)>,
-    pub(crate) platform_get_window_focus: Option<unsafe extern "C" fn(*mut Viewport) -> bool>,
-    pub(crate) platform_get_window_minimized: Option<unsafe extern "C" fn(*mut Viewport) -> bool>,
-    pub(crate) platform_set_window_title: Option<unsafe extern "C" fn(*mut Viewport, *const c_char)>,
-    pub(crate) platform_set_window_alpha: Option<unsafe extern "C" fn(*mut Viewport, f32)>,
-    pub(crate) platform_update_window: Option<unsafe extern "C" fn(*mut Viewport)>,
-    pub(crate) platform_render_window: Option<unsafe extern "C" fn(*mut Viewport, *mut c_void)>,
-    pub(crate) platform_swap_buffers: Option<unsafe extern "C" fn(*mut Viewport, *mut c_void)>,
-    pub(crate) platform_get_window_dpi_scale: Option<unsafe extern "C" fn(*mut Viewport) -> f32>,
-    pub(crate) platform_on_changed_viewport: Option<unsafe extern "C" fn(*mut Viewport)>,
-    pub(crate) platform_create_vk_surface: Option<unsafe extern "C" fn(*mut Viewport, u64, *const c_void, *mut u64) -> c_int>,
-
-    pub(crate) renderer_create_window: Option<unsafe extern "C" fn(*mut Viewport)>,
-    pub(crate) renderer_destroy_window: Option<unsafe extern "C" fn(*mut Viewport)>,
-    pub(crate) renderer_set_window_size: Option<unsafe extern "C" fn(*mut Viewport, sys::ImVec2)>,
-    pub(crate) renderer_render_window: Option<unsafe extern "C" fn(*mut Viewport, *mut c_void)>,
-    pub(crate) renderer_swap_buffers: Option<unsafe extern "C" fn(*mut Viewport, *mut c_void)>,
-
-    pub(crate) monitors: ImVector<PlatformMonitor>,
-
-    pub(crate) viewports: ImVector<*mut Viewport>,
-}
-
-unsafe impl RawCast<sys::ImGuiPlatformIO> for PlatformIo {}
-
-#[cfg(feature = "docking")]
-#[repr(C)]
-pub struct Viewport {
-    pub(crate) id: crate::Id,
-    pub(crate) flags: ViewportFlags,
-    pub(crate) pos: [f32; 2],
-    pub(crate) size: [f32; 2],
-    pub(crate) work_pos: [f32; 2],
-    pub(crate) work_size: [f32; 2],
-    pub(crate) dpi_scale: f32,
-    pub(crate) parent_viewport_id: crate::Id,
-    pub(crate) draw_data: *mut crate::DrawData,
-    
-    pub(crate) renderer_user_data: *mut c_void,
-    pub(crate) platform_user_data: *mut c_void,
-    pub(crate) platform_handle: *mut c_void,
-    pub(crate) platform_handle_raw: *mut c_void,
-    pub(crate) platform_request_move: bool,
-    pub(crate) platform_request_resize: bool,
-    pub(crate) platform_request_close: bool,
-}
-
-#[cfg(feature = "docking")]
-#[repr(C)]
-pub struct PlatformMonitor {
-    main_pos: [f32; 2],
-    main_size: [f32; 2],
-    work_pos: [f32; 2],
-    work_size: [f32; 2],
-    dpi_scale: f32,
-}
-
 /// Settings and inputs/outputs for imgui-rs
 #[repr(C)]
 pub struct Io {
@@ -320,8 +253,8 @@ pub struct Io {
 
     pub(crate) backend_platform_name: *const c_char,
     pub(crate) backend_renderer_name: *const c_char,
-    backend_platform_user_data: *mut c_void,
-    backend_renderer_user_data: *mut c_void,
+    pub(crate) backend_platform_user_data: *mut c_void,
+    pub(crate) backend_renderer_user_data: *mut c_void,
     backend_language_user_data: *mut c_void,
     pub(crate) get_clipboard_text_fn:
         Option<unsafe extern "C" fn(user_data: *mut c_void) -> *const c_char>,

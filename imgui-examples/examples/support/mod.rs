@@ -3,10 +3,11 @@ use glium::glutin::event::{Event, WindowEvent};
 use glium::glutin::event_loop::{ControlFlow, EventLoop};
 use glium::glutin::window::WindowBuilder;
 use glium::{Display, Surface};
-use imgui::{Context, FontConfig, FontGlyphRanges, FontSource, Ui};
+use imgui::{Context, FontConfig, FontGlyphRanges, FontSource, Ui, ConfigFlags};
 use imgui_glium_renderer::Renderer;
 use imgui_winit_support::{HiDpiMode, WinitPlatform};
 use std::path::Path;
+use std::rc::Rc;
 use std::time::Instant;
 
 mod clipboard;
@@ -112,6 +113,11 @@ pub fn init(title: &str) -> System {
 }
 
 impl System {
+    pub fn enable_viewports(&mut self) {
+        WinitPlatform::init_viewports(&mut self.imgui, &self.event_loop, self.display.gl_window().window());
+        self.imgui.io_mut().config_flags.insert(ConfigFlags::VIEWPORTS_ENABLE);
+    }
+
     pub fn main_loop<F: FnMut(&mut bool, &mut Ui) + 'static>(self, mut run_ui: F) {
         let System {
             event_loop,
