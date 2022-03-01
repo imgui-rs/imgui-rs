@@ -188,7 +188,7 @@ use winit_20 as winit;
 ))]
 use winit_19 as winit;
 
-use imgui::{self, BackendFlags, ConfigFlags, Context, Io, Key, Ui, PlatformViewportBackend, ViewportFlags, PlatformMonitor};
+use imgui::{self, BackendFlags, ConfigFlags, Context, Io, Key, Ui, PlatformViewportBackend, ViewportFlags, PlatformMonitor, Viewport};
 use std::cell::Cell; 
 use std::cmp::Ordering;
 use winit::dpi::{LogicalPosition, LogicalSize};
@@ -619,6 +619,8 @@ impl WinitPlatform {
 
         let main_viewport = imgui.main_viewport_mut();
         main_viewport.platform_handle = Box::into_raw(Box::new(PlatformHandle::MainWindow(main_window as *const _))) as *mut _;
+        println!("MAIN VIEWPORT: {:016X}", main_viewport as *mut Viewport as u64);
+        println!("PLATFORM HANDLE: {:016X}", main_viewport.platform_handle as u64);
     }
 
     /// Attaches the platform instance to a winit window.

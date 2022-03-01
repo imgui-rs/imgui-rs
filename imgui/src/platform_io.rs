@@ -1,6 +1,6 @@
 use std::{os::raw::{c_char, c_int}, ffi::{c_void, CStr}};
 
-use crate::{internal::{ImVector, RawCast}, ViewportFlags};
+use crate::{internal::{ImVector, RawCast}, ViewportFlags, Io};
 
 #[cfg(feature = "docking")]
 #[repr(C)]
@@ -106,13 +106,13 @@ pub trait PlatformViewportBackend: 'static {
 
 fn get_platform_ctx() -> &'static mut PlatformViewportContext {
     unsafe {
-        &mut *((*sys::igGetIO()).BackendPlatformUserData as *mut PlatformViewportContext)
+        &mut *((*(sys::igGetIO() as *const Io)).backend_platform_user_data as *mut PlatformViewportContext)
     }
 }
 
 fn get_renderer_ctx() -> &'static mut RendererViewportContext {
     unsafe {
-        &mut *((*sys::igGetIO()).BackendRendererUserData as *mut RendererViewportContext)
+        &mut *((*(sys::igGetIO() as *const Io)).backend_platform_user_data as *mut RendererViewportContext)
     }
 }
 
@@ -132,19 +132,23 @@ pub(crate) extern "C" fn platform_set_window_pos(viewport: *mut Viewport, pos: s
     let ctx = get_platform_ctx();
     ctx.backend.set_window_pos(unsafe{&mut *viewport}, [pos.x, pos.y]);
 }
-pub(crate) extern "C" fn platform_get_window_pos(viewport: *mut Viewport) -> sys::ImVec2 {
+pub(crate) extern "C" fn platform_get_window_pos(viewport: *mut Viewport, out_pos: *mut sys::ImVec2) {
     let ctx = get_platform_ctx();
     let pos = ctx.backend.get_window_pos(unsafe{&mut *viewport});
-    sys::ImVec2::new(pos[0], pos[1])
+    unsafe {
+        *out_pos = sys::ImVec2::new(pos[0], pos[1]);
+    }
 }
 pub(crate) extern "C" fn platform_set_window_size(viewport: *mut Viewport, size: sys::ImVec2) {
     let ctx = get_platform_ctx();
     ctx.backend.set_window_size(unsafe{&mut *viewport}, [size.x, size.y]);
 }
-pub(crate) extern "C" fn platform_get_window_size(viewport: *mut Viewport) -> sys::ImVec2 {
+pub(crate) extern "C" fn platform_get_window_size(viewport: *mut Viewport, out_size: *mut sys::ImVec2) {
     let ctx = get_platform_ctx();
     let size = ctx.backend.get_window_size(unsafe{&mut *viewport});
-    sys::ImVec2::new(size[0], size[1])
+    unsafe {
+        *out_size = sys::ImVec2::new(size[0], size[1]);
+    }
 }
 pub(crate) extern "C" fn platform_set_window_focus(viewport: *mut Viewport) {
     let ctx = get_platform_ctx();
@@ -415,4 +419,9 @@ fn test_platform_monitor_memory_layout() {
     assert_field_offset!(work_pos, WorkPos);
     assert_field_offset!(work_size, WorkSize);
     assert_field_offset!(dpi_scale, DpiScale);
+}
+
+extern "C" {
+    pub(crate) fn ImGuiPlatformIO_Set_Platform_GetWindowPos(pio: *mut PlatformIo, func: extern "C" fn(*mut Viewport, *mut sys::ImVec2));
+    pub(crate) fn ImGuiPlatformIO_Set_Platform_GetWindowSize(pio: *mut PlatformIo, func: extern "C" fn(*mut Viewport, *mut sys::ImVec2));
 }

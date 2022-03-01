@@ -16,6 +16,11 @@ impl<T> ImVector<T> {
         unsafe { slice::from_raw_parts(self.data, self.size as usize) }
     }
 
+    #[inline]
+    pub fn as_slice_mut(&mut self) -> &mut [T] {
+        unsafe { slice::from_raw_parts_mut(self.data, self.size as usize) }
+    }
+
     pub fn replace_from_slice(&mut self, data: &[T]) {
         unsafe {
             sys::igMemFree(self.data as *mut _);

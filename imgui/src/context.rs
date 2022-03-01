@@ -232,9 +232,15 @@ impl Context {
         pio.platform_destroy_window = Some(crate::platform_io::platform_destroy_window);
         pio.platform_show_window = Some(crate::platform_io::platform_show_window);
         pio.platform_set_window_pos = Some(crate::platform_io::platform_set_window_pos);
-        pio.platform_get_window_pos = Some(crate::platform_io::platform_get_window_pos);
+        // pio.platform_get_window_pos = Some(crate::platform_io::platform_get_window_pos);
+        unsafe {
+            crate::platform_io::ImGuiPlatformIO_Set_Platform_GetWindowPos(pio, crate::platform_io::platform_get_window_pos);
+        }
         pio.platform_set_window_size = Some(crate::platform_io::platform_set_window_size);
-        pio.platform_get_window_size = Some(crate::platform_io::platform_get_window_size);
+        // pio.platform_get_window_size = Some(crate::platform_io::platform_get_window_size);
+        unsafe {
+            crate::platform_io::ImGuiPlatformIO_Set_Platform_GetWindowSize(pio, crate::platform_io::platform_get_window_size);
+        }
         pio.platform_set_window_focus = Some(crate::platform_io::platform_set_window_focus);
         pio.platform_get_window_focus = Some(crate::platform_io::platform_get_window_focus);
         pio.platform_get_window_minimized = Some(crate::platform_io::platform_get_window_minimized);
@@ -263,6 +269,11 @@ impl Context {
         pio.renderer_swap_buffers = Some(crate::platform_io::renderer_swap_buffers);
 
         self.renderer_viewport_ctx = ctx;
+    }
+    pub fn update_platform_windows(&mut self) {
+        unsafe {
+            sys::igUpdatePlatformWindows();
+        }
     }
     fn create_internal(mut shared_font_atlas: Option<SharedFontAtlas>) -> Self {
         let _guard = CTX_MUTEX.lock();

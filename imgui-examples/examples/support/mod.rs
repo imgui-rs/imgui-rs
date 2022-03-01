@@ -158,6 +158,7 @@ impl System {
                 renderer
                     .render(&mut target, draw_data)
                     .expect("Rendering failed");
+                imgui.update_platform_windows();
                 target.finish().expect("Failed to swap buffers");
             }
             Event::WindowEvent {
