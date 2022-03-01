@@ -8,8 +8,11 @@ fn main() {
 
     let mut value = 0;
     let choices = ["test test this is 1", "test test this is 2"];
+    let mut open = true;
+
     system.main_loop(move |_, ui| {
         ui.window("Hello world")
+            .opened(&mut open)
             .size([300.0, 110.0], Condition::FirstUseEver)
             .build(|| {
                 ui.text_wrapped("Hello world!");

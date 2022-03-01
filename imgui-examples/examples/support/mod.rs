@@ -136,6 +136,8 @@ impl System {
                     .prepare_frame(imgui.io_mut(), gl_window.window())
                     .expect("Failed to prepare frame");
                 gl_window.window().request_redraw();
+
+                platform.update_viewports(&mut imgui, window_target);
             }
             Event::RedrawRequested(_) => {
                 let ui = imgui.frame();
@@ -157,12 +159,12 @@ impl System {
                 target.finish().expect("Failed to swap buffers");
 
                 imgui.update_platform_windows();
-                platform.update_viewports(&mut imgui, window_target);
             }
             Event::WindowEvent {
                 event: WindowEvent::CloseRequested,
+                window_id,
                 ..
-            } => *control_flow = ControlFlow::Exit,
+            } if window_id == display.gl_window().window().id() => *control_flow = ControlFlow::Exit,
             event => {
                 let gl_window = display.gl_window();
                 platform.handle_event(imgui.io_mut(), gl_window.window(), &event);

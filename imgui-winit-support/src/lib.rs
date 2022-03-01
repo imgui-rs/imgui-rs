@@ -1053,7 +1053,7 @@ impl WinitPlatform {
                     if window_id == main_window.id() {
                         imgui.main_viewport_mut()
                     } else {
-                        let imgui_id = self.windows.iter().find(|(id, wnd)| wnd.id() == window_id).map(|(id, wnd)| *id).unwrap();
+                        let imgui_id = self.windows.iter().find(|(_, wnd)| wnd.id() == window_id).map(|(id, _)| *id).unwrap();
                         imgui.viewport_by_id_mut(imgui_id).unwrap()
                     }
                 };
@@ -1078,12 +1078,86 @@ impl WinitPlatform {
                         pos[1] += position.y as f32;
                         imgui.io_mut().mouse_pos = pos;
                     },
+                    WindowEvent::KeyboardInput {
+                        input:
+                            KeyboardInput {
+                                virtual_keycode: Some(key),
+                                state,
+                                ..
+                            },
+                        ..
+                    } if window_id != main_window.id() => {
+                        let io = imgui.io_mut();
+
+                        let pressed = state == ElementState::Pressed;
+                        io.keys_down[key as usize] = pressed;
+        
+                        // This is a bit redundant here, but we'll leave it in. The OS occasionally
+                        // fails to send modifiers keys, but it doesn't seem to send false-positives,
+                        // so double checking isn't terrible in case some system *doesn't* send
+                        // device events sometimes.
+                        match key {
+                            VirtualKeyCode::LShift | VirtualKeyCode::RShift => io.key_shift = pressed,
+                            VirtualKeyCode::LControl | VirtualKeyCode::RControl => io.key_ctrl = pressed,
+                            VirtualKeyCode::LAlt | VirtualKeyCode::RAlt => io.key_alt = pressed,
+                            VirtualKeyCode::LWin | VirtualKeyCode::RWin => io.key_super = pressed,
+                            _ => (),
+                        }
+                    },
+                    WindowEvent::ReceivedCharacter(ch) if window_id != main_window.id() => {
+                        let io = imgui.io_mut();
+
+                        // Exclude the backspace key ('\u{7f}'). Otherwise we will insert this char and then
+                        // delete it.
+                        if ch != '\u{7f}' {
+                            io.add_input_character(ch)
+                        }
+                    },
+                    WindowEvent::MouseWheel {
+                        delta,
+                        phase: TouchPhase::Moved,
+                        ..
+                    } if window_id != main_window.id() => match delta {
+                        MouseScrollDelta::LineDelta(h, v) => {
+                            let io = imgui.io_mut();
+                            io.mouse_wheel_h = h;
+                            io.mouse_wheel = v;
+                        }
+                        MouseScrollDelta::PixelDelta(pos) => {
+                            let io = imgui.io_mut();
+                            let pos = pos.to_logical::<f64>(self.hidpi_factor);
+                            match pos.x.partial_cmp(&0.0) {
+                                Some(Ordering::Greater) => io.mouse_wheel_h += 1.0,
+                                Some(Ordering::Less) => io.mouse_wheel_h -= 1.0,
+                                _ => (),
+                            }
+                            match pos.y.partial_cmp(&0.0) {
+                                Some(Ordering::Greater) => io.mouse_wheel += 1.0,
+                                Some(Ordering::Less) => io.mouse_wheel -= 1.0,
+                                _ => (),
+                            }
+                        }
+                    },
+                    WindowEvent::MouseInput { state, button, .. } if window_id != main_window.id() => {
+                        let pressed = state == ElementState::Pressed;
+                        match button {
+                            MouseButton::Left => self.mouse_buttons[0].set(pressed),
+                            MouseButton::Right => self.mouse_buttons[1].set(pressed),
+                            MouseButton::Middle => self.mouse_buttons[2].set(pressed),
+                            MouseButton::Other(idx @ 0..=4) => {
+                                self.mouse_buttons[idx as usize].set(pressed)
+                            }
+                            _ => (),
+                        }
+                    },
                     _ => {},
                 }
             },
             _ => {},
         }
     }
+
+
     #[cfg(all(
         not(any(
             feature = "winit-26",
