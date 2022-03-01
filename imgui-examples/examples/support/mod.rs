@@ -3,7 +3,7 @@ use glium::glutin::event::{Event, WindowEvent};
 use glium::glutin::event_loop::{ControlFlow, EventLoop};
 use glium::glutin::window::WindowBuilder;
 use glium::{Display, Surface};
-use imgui::{Context, FontConfig, FontGlyphRanges, FontSource, Ui, ConfigFlags};
+use imgui::{Context, FontConfig, FontGlyphRanges, FontSource, Ui};
 use imgui_glium_renderer::Renderer;
 use imgui_winit_support::{HiDpiMode, WinitPlatform};
 use std::path::Path;
@@ -112,11 +112,6 @@ pub fn init(title: &str) -> System {
 }
 
 impl System {
-    pub fn enable_viewports(&mut self) {
-        WinitPlatform::init_viewports(&mut self.imgui, &self.event_loop, self.display.gl_window().window());
-        self.imgui.io_mut().config_flags.insert(ConfigFlags::VIEWPORTS_ENABLE);
-    }
-
     pub fn main_loop<F: FnMut(&mut bool, &mut Ui) + 'static>(self, mut run_ui: F) {
         let System {
             event_loop,
@@ -159,18 +154,11 @@ impl System {
                     .render(&mut target, draw_data)
                     .expect("Rendering failed");
                 target.finish().expect("Failed to swap buffers");
-
-                imgui.update_platform_windows();
-                imgui.render_platform_windows_default();
             }
             Event::WindowEvent {
                 event: WindowEvent::CloseRequested,
-                window_id,
                 ..
-            } if window_id == display.gl_window().window().id() => *control_flow = ControlFlow::Exit,
-            Event::WindowEvent { event, window_id, .. } if window_id != display.gl_window().window().id() => {
-                platform.handle_viewport_event(&mut imgui, window_id, &event);
-            },
+            } => *control_flow = ControlFlow::Exit,
             event => {
                 let gl_window = display.gl_window();
                 platform.handle_event(imgui.io_mut(), gl_window.window(), &event);
