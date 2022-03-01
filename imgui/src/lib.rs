@@ -284,7 +284,7 @@ impl Ui {
 /// Now, however, it is made from the `Ui` object directly, with a few
 /// deprecated helper methods here.
 #[repr(transparent)]
-#[derive(Copy, Clone, Debug, Eq, PartialEq, Default)]
+#[derive(Copy, Clone, Debug, Eq, PartialEq, Default, Hash)]
 pub struct Id(pub(crate) u32);
 
 impl Id {

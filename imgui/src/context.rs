@@ -9,7 +9,7 @@ use crate::clipboard::{ClipboardBackend, ClipboardContext};
 use crate::fonts::atlas::{FontAtlas, FontId, SharedFontAtlas};
 use crate::io::Io;
 use crate::style::Style;
-use crate::{sys, DrawData, PlatformIo, PlatformViewportContext, RendererViewportContext, PlatformViewportBackend, RendererViewportBackend, Viewport};
+use crate::{sys, DrawData, PlatformIo, PlatformViewportContext, RendererViewportContext, PlatformViewportBackend, RendererViewportBackend, Viewport, Id};
 use crate::{MouseCursor, Ui};
 
 /// An imgui-rs context.
@@ -569,16 +569,26 @@ impl Context {
             &mut *(sys::igGetMainViewport() as *mut Viewport)
         }
     }
-    pub fn viewport_by_id(&self, id: *mut c_void) -> Option<&Viewport> {
+    pub fn viewport_by_id(&self, id: Id) -> Option<&Viewport> {
         unsafe {
-            let ptr = sys::igFindViewportByPlatformHandle(id) as *const Viewport;
-            ptr.as_ref()
+            (sys::igFindViewportByID(id.0) as *const Viewport).as_ref()
         }
     }
-    pub fn viewport_by_id_mut(&mut self, id: *mut c_void) -> Option<&mut Viewport> {
+    pub fn viewport_by_id_mut(&mut self, id: Id) -> Option<&mut Viewport> {
         unsafe {
-            let ptr = sys::igFindViewportByPlatformHandle(id) as *mut Viewport;
-            ptr.as_mut()
+            (sys::igFindViewportByID(id.0) as *mut Viewport).as_mut()
+        }
+    }
+    pub fn viewports(&self) -> impl Iterator<Item = &Viewport> {
+        let slice = self.platform_io().viewports.as_slice();
+        unsafe {
+            slice.iter().map(|ptr| &**ptr)
+        }
+    }
+    pub fn viewports_mut(&mut self) -> impl Iterator<Item = &mut Viewport> {
+        let slice = self.platform_io_mut().viewports.as_slice();
+        unsafe {
+            slice.iter().map(|ptr| &mut **ptr)
         }
     }
     /// Returns an immutable reference to the user interface style

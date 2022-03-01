@@ -189,7 +189,7 @@ use winit_20 as winit;
 use winit_19 as winit;
 
 use imgui::{self, BackendFlags, ConfigFlags, Context, Io, Key, Ui};
-use std::cell::Cell;
+use std::{cell::Cell, collections::HashMap};
 use std::cmp::Ordering;
 use winit::dpi::{LogicalPosition, LogicalSize};
 
@@ -342,6 +342,9 @@ pub struct WinitPlatform {
     hidpi_factor: f64,
     cursor_cache: Option<CursorSettings>,
     mouse_buttons: [Button; 5],
+
+    #[cfg(feature = "viewports")]
+    windows: HashMap<imgui::Id, winit::window::Window>,
 }
 
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
@@ -444,6 +447,107 @@ impl HiDpiMode {
     }
 }
 
+#[cfg(feature = "viewports")]
+struct ViewportBackend {}
+
+#[cfg(feature = "viewports")]
+impl imgui::PlatformViewportBackend for ViewportBackend {
+    fn create_window(&mut self, viewport: &mut imgui::Viewport) {
+        viewport.platform_user_data = Box::into_raw(Box::new(ViewportState {
+            create: true,
+            create_flags: viewport.flags,
+            set_show: false,
+            set_pos: None,
+            set_size: None,
+            set_focus: false,
+            set_title: None,
+            pos: [0.0, 0.0],
+            size: [0.0, 0.0],
+            focus: false,
+            minimized: false,
+        })) as *mut _;
+    }
+
+    fn destroy_window(&mut self, viewport: &mut imgui::Viewport) {
+        unsafe {
+            Box::from_raw(viewport.platform_user_data as *mut ViewportState);
+        }
+        viewport.platform_user_data = std::ptr::null_mut();
+    }
+
+    fn show_window(&mut self, viewport: &mut imgui::Viewport) {
+        let state = unsafe{&mut *(viewport.platform_user_data as *mut ViewportState)};
+        state.set_show = true;
+    }
+
+    fn set_window_pos(&mut self, viewport: &mut imgui::Viewport, pos: [f32; 2]) {
+        let state = unsafe{&mut *(viewport.platform_user_data as *mut ViewportState)};
+        state.set_pos = Some(pos);
+    }
+
+    fn get_window_pos(&mut self, viewport: &mut imgui::Viewport) -> [f32; 2] {
+        let state = unsafe{&mut *(viewport.platform_user_data as *mut ViewportState)};
+        state.pos
+    }
+
+    fn set_window_size(&mut self, viewport: &mut imgui::Viewport, size: [f32; 2]) {
+        let state = unsafe{&mut *(viewport.platform_user_data as *mut ViewportState)};
+        state.set_size = Some(size);
+    }
+
+    fn get_window_size(&mut self, viewport: &mut imgui::Viewport) -> [f32; 2] {
+        let state = unsafe{&mut *(viewport.platform_user_data as *mut ViewportState)};
+        state.size
+    }
+
+    fn set_window_focus(&mut self, viewport: &mut imgui::Viewport) {
+        let state = unsafe{&mut *(viewport.platform_user_data as *mut ViewportState)};
+        state.set_focus = true;
+    }
+
+    fn get_window_focus(&mut self, viewport: &mut imgui::Viewport) -> bool {
+        let state = unsafe{&mut *(viewport.platform_user_data as *mut ViewportState)};
+        state.focus
+    }
+
+    fn get_window_minimized(&mut self, viewport: &mut imgui::Viewport) -> bool {
+        let state = unsafe{&mut *(viewport.platform_user_data as *mut ViewportState)};
+        state.focus
+    }
+
+    fn set_window_title(&mut self, viewport: &mut imgui::Viewport, title: &str) {
+        let state = unsafe{&mut *(viewport.platform_user_data as *mut ViewportState)};
+        state.set_title = Some(title.to_string());
+    }
+
+    fn set_window_alpha(&mut self, _viewport: &mut imgui::Viewport, _alpha: f32) {}
+
+    fn update_window(&mut self, _viewport: &mut imgui::Viewport) {}
+
+    fn render_window(&mut self, _viewport: &mut imgui::Viewport) {}
+
+    fn swap_buffers(&mut self, _viewport: &mut imgui::Viewport) {}
+
+    fn create_vk_surface(&mut self, _viewport: &mut imgui::Viewport, _instance: u64, _out_surface: &mut u64) -> i32 { 0 }
+}
+
+#[cfg(feature = "viewports")]
+struct ViewportState {
+    create: bool,
+    create_flags: imgui::ViewportFlags,
+
+    set_show: bool,
+    set_pos: Option<[f32; 2]>,
+    set_size: Option<[f32; 2]>,
+    set_focus: bool,
+    set_title: Option<String>,
+
+    pos: [f32; 2],
+    size: [f32; 2],
+    focus: bool,
+    minimized: bool,
+}
+
 impl WinitPlatform {
     /// Initializes a winit platform instance and configures imgui.
     ///
@@ -489,8 +593,102 @@ impl WinitPlatform {
             hidpi_factor: 1.0,
             cursor_cache: None,
             mouse_buttons: [Button::INIT; 5],
+
+            #[cfg(feature = "viewports")]
+            windows: HashMap::new(),
         }
     }
+
+    #[cfg(feature = "viewports")]
+    pub fn init_viewports<T>(imgui: &mut Context, event_loop: &winit::event_loop::EventLoop<T>) {
+        let io = imgui.io_mut();
+
+        io.backend_flags.insert(BackendFlags::PLATFORM_HAS_VIEWPORTS);
+
+        imgui.set_platform_backend(ViewportBackend {});
+
+        let mut monitors = Vec::new();
+        for monitor in event_loop.available_monitors() {
+            monitors.push(imgui::PlatformMonitor {
+                main_pos: [monitor.position().x as f32, monitor.position().y as f32],
+                main_size: [monitor.size().width as f32, monitor.size().height as f32],
+                work_pos: [monitor.position().x as f32, monitor.position().y as f32],
+                work_size: [monitor.size().width as f32, monitor.size().height as f32],
+                dpi_scale: 1.0,
+            });
+        }
+        imgui.platform_io_mut().monitors.replace_from_slice(&monitors);
+
+        let main_viewport = imgui.main_viewport_mut();
+        main_viewport.platform_user_data = Box::into_raw(Box::new(ViewportState {
+            create: false,
+            create_flags: imgui::ViewportFlags::empty(),
+            set_show: false,
+            set_pos: None,
+            set_size: None,
+            set_focus: false,
+            set_title: None,
+            pos: [0.0, 0.0],
+            size: [0.0, 0.0],
+            focus: true,
+            minimized: false,
+        })) as *mut _;
+    }
+
+    #[cfg(feature = "viewports")]
+    pub fn update_viewports<T>(&mut self, imgui: &mut Context, window_target: &winit::event_loop::EventLoopWindowTarget<T>) {
+        // remove destroyed windows
+        self.windows.retain(|id, _| {
+            imgui.viewport_by_id(*id).is_some()
+        });
+
+        // handle new viewports
+        for viewport in imgui.viewports_mut() {
+            let state = unsafe{&mut *(viewport.platform_user_data as *mut ViewportState)};
+
+            if state.create {
+                let window = winit::window::WindowBuilder::new()
+                    .with_always_on_top(state.create_flags.contains(imgui::ViewportFlags::TOP_MOST))
+                    // .with_decorations(!state.create_flags.contains(imgui::ViewportFlags::NO_DECORATION))
+                    .with_resizable(true)
+                    .with_visible(false)
+                    .build(window_target)
+                    .unwrap();
+                
+                self.windows.insert(viewport.id, window);
+
+                state.create = false;
+            }
+        }
+
+        // handle other viewport events
+        for (id, wnd) in &self.windows {
+            let viewport = imgui.viewport_by_id_mut(*id).unwrap();
+            let state = unsafe{&mut *(viewport.platform_user_data as *mut ViewportState)};
+
+            if state.set_show {
+                wnd.set_visible(true);
+                state.set_show = false;
+            }
+            if let Some(pos) = &state.set_pos {
+                wnd.set_outer_position(winit::dpi::LogicalPosition::new(pos[0], pos[1]));
+                state.set_pos = None;
+            }
+            if let Some(size) = &state.set_size {
+                wnd.set_inner_size(winit::dpi::LogicalSize::new(size[0], size[1]));
+                state.set_size = None;
+            }
+            if state.set_focus {
+                wnd.focus_window();
+                state.set_focus = false;
+            }
+            if let Some(title) = &state.set_title {
+                wnd.set_title(title);
+                state.set_title = None;
+            }
+        }
+    }
+
     /// Attaches the platform instance to a winit window.
     ///
     /// This function configures imgui-rs in the following ways:
@@ -845,6 +1043,45 @@ impl WinitPlatform {
                 io.keys_down[key as usize] = false;
             }
             _ => (),
+        }
+    }
+    #[cfg(feature = "viewports")]
+    pub fn handle_viewport_event<T>(&mut self, imgui: &mut imgui::Context, main_window: &Window, event: &Event<T>) {
+        match *event {
+            Event::WindowEvent { window_id, ref event } => {
+                let viewport = {
+                    if window_id == main_window.id() {
+                        imgui.main_viewport_mut()
+                    } else {
+                        let imgui_id = self.windows.iter().find(|(id, wnd)| wnd.id() == window_id).map(|(id, wnd)| *id).unwrap();
+                        imgui.viewport_by_id_mut(imgui_id).unwrap()
+                    }
+                };
+                let state = unsafe{&mut *(viewport.platform_user_data as *mut ViewportState)};
+
+                match *event {
+                    WindowEvent::Resized(new_size) => {
+                        state.size = [new_size.width as f32, new_size.height as f32];
+                    },
+                    WindowEvent::Moved(new_pos) => {
+                        state.pos = [new_pos.x as f32, new_pos.y as f32];
+                    },
+                    WindowEvent::CloseRequested => {
+                        viewport.platform_request_close = true;
+                    },
+                    WindowEvent::Focused(focus) => {
+                        state.focus = focus;
+                    },
+                    WindowEvent::CursorMoved { position, .. } => {
+                        let mut pos = state.pos;
+                        pos[0] += position.x as f32;
+                        pos[1] += position.y as f32;
+                        imgui.io_mut().mouse_pos = pos;
+                    },
+                    _ => {},
+                }
+            },
+            _ => {},
         }
     }
     #[cfg(all(

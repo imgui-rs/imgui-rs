@@ -3,7 +3,8 @@ use imgui::*;
 mod support;
 
 fn main() {
-    let system = support::init(file!());
+    let mut system = support::init(file!());
+    system.imgui.io_mut().config_flags.insert(ConfigFlags::VIEWPORTS_ENABLE);
 
     let mut value = 0;
     let choices = ["test test this is 1", "test test this is 2"];

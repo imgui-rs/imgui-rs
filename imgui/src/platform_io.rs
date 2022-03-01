@@ -334,7 +334,7 @@ impl RendererViewportContext {
 #[cfg(feature = "docking")]
 #[repr(C)]
 pub struct Viewport {
-    pub(crate) id: crate::Id,
+    pub id: crate::Id,
     pub flags: ViewportFlags,
     pub(crate) pos: [f32; 2],
     pub(crate) size: [f32; 2],

@@ -43,6 +43,7 @@ pub fn init(title: &str) -> System {
     }
 
     let mut platform = WinitPlatform::init(&mut imgui);
+    WinitPlatform::init_viewports(&mut imgui, &event_loop);
     {
         let gl_window = display.gl_window();
         let window = gl_window.window();
@@ -123,7 +124,7 @@ impl System {
         } = self;
         let mut last_frame = Instant::now();
 
-        event_loop.run(move |event, _, control_flow| match event {
+        event_loop.run(move |event, window_target, control_flow| match event {
             Event::NewEvents(_) => {
                 let now = Instant::now();
                 imgui.io_mut().update_delta_time(now - last_frame);
@@ -154,6 +155,9 @@ impl System {
                     .render(&mut target, draw_data)
                     .expect("Rendering failed");
                 target.finish().expect("Failed to swap buffers");
+
+                imgui.update_platform_windows();
+                platform.update_viewports(&mut imgui, window_target);
             }
             Event::WindowEvent {
                 event: WindowEvent::CloseRequested,
@@ -162,6 +166,7 @@ impl System {
             event => {
                 let gl_window = display.gl_window();
                 platform.handle_event(imgui.io_mut(), gl_window.window(), &event);
+                platform.handle_viewport_event(&mut imgui, gl_window.window(), &event);
             }
         })
     }
