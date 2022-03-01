@@ -639,7 +639,7 @@ impl WinitPlatform {
     pub fn update_viewports<T>(&mut self, imgui: &mut Context, window_target: &winit::event_loop::EventLoopWindowTarget<T>) {
         // remove destroyed windows
         self.windows.retain(|id, _| {
-            imgui.viewport_by_id(*id).is_some()
+            imgui.viewports().any(|vp| vp.id == *id)
         });
 
         // handle new viewports
@@ -1051,12 +1051,17 @@ impl WinitPlatform {
             Event::WindowEvent { window_id, ref event } => {
                 let viewport = {
                     if window_id == main_window.id() {
-                        imgui.main_viewport_mut()
+                        Some(imgui.main_viewport_mut())
                     } else {
-                        let imgui_id = self.windows.iter().find(|(_, wnd)| wnd.id() == window_id).map(|(id, _)| *id).unwrap();
-                        imgui.viewport_by_id_mut(imgui_id).unwrap()
+                        self.windows.iter().find(|(_, wnd)| wnd.id() == window_id).map(|(id, _)| *id).and_then(|id| imgui.viewport_by_id_mut(id))
                     }
                 };
+                let viewport = if let Some(viewport) = viewport {
+                    viewport
+                } else {
+                    return;
+                };
+
                 let state = unsafe{&mut *(viewport.platform_user_data as *mut ViewportState)};
 
                 match *event {
