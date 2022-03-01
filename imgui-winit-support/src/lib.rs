@@ -188,8 +188,10 @@ use winit_20 as winit;
 ))]
 use winit_19 as winit;
 
-use imgui::{self, BackendFlags, ConfigFlags, Context, Io, Key, Ui, PlatformViewportBackend, ViewportFlags, PlatformMonitor, Viewport};
-use std::cell::Cell; 
+use imgui::{self, BackendFlags, ConfigFlags, Context, Io, Key, Ui, PlatformViewportBackend, ViewportFlags, PlatformMonitor};
+use std::collections::hash_map::DefaultHasher;
+use std::hash::{Hash, Hasher};
+use std::{cell::Cell, ptr::null_mut}; 
 use std::cmp::Ordering;
 use winit::dpi::{LogicalPosition, LogicalSize};
 
@@ -466,51 +468,56 @@ impl PlatformViewportBackend for ViewportBackend {
     fn create_window(&mut self, viewport: &mut imgui::Viewport) {
         let window = winit::window::WindowBuilder::new()
             .with_always_on_top(viewport.flags.contains(ViewportFlags::TOP_MOST))
-            .with_decorations(!viewport.flags.contains(ViewportFlags::NO_DECORATION))
+            // .with_decorations(!viewport.flags.contains(ViewportFlags::NO_DECORATION))
             .with_resizable(true)
             .with_visible(false)
             .build(unsafe{&*self.event_loop})
             .unwrap();
 
-        viewport.platform_handle = Box::into_raw(Box::new(PlatformHandle::SecondaryWindow(window))) as *mut _;
+        let mut hasher = DefaultHasher::new();
+        viewport.platform_handle = window.id().hash(&hasher);
+        viewport.platform_handle = hasher.finish() as *mut c_void;
+
+        viewport.platform_user_data = Box::into_raw(Box::new(PlatformHandle::SecondaryWindow(window))) as *mut _;
     }
 
     fn destroy_window(&mut self, viewport: &mut imgui::Viewport) {
         unsafe {
             // drop window
-            Box::from_raw(viewport.platform_handle as *mut PlatformHandle);
+            Box::from_raw(viewport.platform_user_data as *mut PlatformHandle);
+            viewport.platform_user_data = null_mut(); // satisfy ImGui check
         }
     }
 
     fn show_window(&mut self, viewport: &mut imgui::Viewport) {
-        let window = unsafe { (*(viewport.platform_handle as *const PlatformHandle)).get() };
+        let window = unsafe { (*(viewport.platform_user_data as *const PlatformHandle)).get() };
         window.set_visible(true);
     }
 
     fn set_window_pos(&mut self, viewport: &mut imgui::Viewport, pos: [f32; 2]) {
-        let window = unsafe { (*(viewport.platform_handle as *const PlatformHandle)).get() };
+        let window = unsafe { (*(viewport.platform_user_data as *const PlatformHandle)).get() };
         window.set_outer_position(winit::dpi::LogicalPosition::new(pos[0], pos[1]));
     }
 
     fn get_window_pos(&mut self, viewport: &mut imgui::Viewport) -> [f32; 2] {
-        let window = unsafe { (*(viewport.platform_handle as *const PlatformHandle)).get() };
+        let window = unsafe { (*(viewport.platform_user_data as *const PlatformHandle)).get() };
         let pos = window.outer_position().unwrap();
         [pos.x as f32, pos.y as f32]
     }
 
     fn set_window_size(&mut self, viewport: &mut imgui::Viewport, size: [f32; 2]) {
-        let window = unsafe { (*(viewport.platform_handle as *const PlatformHandle)).get() };
+        let window = unsafe { (*(viewport.platform_user_data as *const PlatformHandle)).get() };
         window.set_inner_size(winit::dpi::LogicalSize::new(size[0], size[1]));
     }
 
     fn get_window_size(&mut self, viewport: &mut imgui::Viewport) -> [f32; 2] {
-        let window = unsafe { (*(viewport.platform_handle as *const PlatformHandle)).get() };
+        let window = unsafe { (*(viewport.platform_user_data as *const PlatformHandle)).get() };
         let size = window.inner_size();
         [size.width as f32, size.width as f32]
     }
 
     fn set_window_focus(&mut self, viewport: &mut imgui::Viewport) {
-        let window = unsafe { (*(viewport.platform_handle as *const PlatformHandle)).get() };
+        let window = unsafe { (*(viewport.platform_user_data as *const PlatformHandle)).get() };
         window.focus_window();
     }
 
@@ -523,7 +530,7 @@ impl PlatformViewportBackend for ViewportBackend {
     }
 
     fn set_window_title(&mut self, viewport: &mut imgui::Viewport, title: &str) {
-        let window = unsafe { (*(viewport.platform_handle as *const PlatformHandle)).get() };
+        let window = unsafe { (*(viewport.platform_user_data as *const PlatformHandle)).get() };
         window.set_title(title);
     }
 
@@ -618,9 +625,10 @@ impl WinitPlatform {
         pio.monitors.replace_from_slice(&monitors);
 
         let main_viewport = imgui.main_viewport_mut();
-        main_viewport.platform_handle = Box::into_raw(Box::new(PlatformHandle::MainWindow(main_window as *const _))) as *mut _;
-        println!("MAIN VIEWPORT: {:016X}", main_viewport as *mut Viewport as u64);
-        println!("PLATFORM HANDLE: {:016X}", main_viewport.platform_handle as u64);
+        let mut hasher = DefaultHasher::new();
+        main_window.id().hash(&mut hasher);
+        main_viewport.platform_handle = hasher.finish() as *mut c_void;
+        main_viewport.platform_user_data = Box::into_raw(Box::new(PlatformHandle::MainWindow(main_window as *const _))) as *mut _;
     }
 
     /// Attaches the platform instance to a winit window.
@@ -977,6 +985,37 @@ impl WinitPlatform {
                 io.keys_down[key as usize] = false;
             }
             _ => (),
+        }
+    }
+    pub fn handle_viewport_event(&mut self, imgui: &mut imgui::Context, window_id: winit::window::WindowId, window_event: &winit::event::WindowEvent) {
+        let hasher = DefaultHasher::new();
+        window_id.hash(&mut hasher);
+        let viewport_id = hasher.finish();
+
+        match *window_event {
+            WindowEvent::Resized(new_size) => {
+
+            },
+            WindowEvent::Moved(_) => todo!(),
+            WindowEvent::CloseRequested => todo!(),
+            WindowEvent::Destroyed => todo!(),
+            WindowEvent::DroppedFile(_) => todo!(),
+            WindowEvent::HoveredFile(_) => todo!(),
+            WindowEvent::HoveredFileCancelled => todo!(),
+            WindowEvent::ReceivedCharacter(_) => todo!(),
+            WindowEvent::Focused(_) => todo!(),
+            WindowEvent::KeyboardInput { device_id, input, is_synthetic } => todo!(),
+            WindowEvent::ModifiersChanged(_) => todo!(),
+            WindowEvent::CursorMoved { device_id, position, modifiers } => todo!(),
+            WindowEvent::CursorEntered { device_id } => todo!(),
+            WindowEvent::CursorLeft { device_id } => todo!(),
+            WindowEvent::MouseWheel { device_id, delta, phase, modifiers } => todo!(),
+            WindowEvent::MouseInput { device_id, state, button, modifiers } => todo!(),
+            WindowEvent::TouchpadPressure { device_id, pressure, stage } => todo!(),
+            WindowEvent::AxisMotion { device_id, axis, value } => todo!(),
+            WindowEvent::Touch(_) => todo!(),
+            WindowEvent::ScaleFactorChanged { scale_factor, new_inner_size } => todo!(),
+            WindowEvent::ThemeChanged(_) => todo!(),
         }
     }
     #[cfg(all(

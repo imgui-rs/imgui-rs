@@ -283,6 +283,7 @@ impl Ui {
 /// Previously, this was erroneously constructed with `From` implementations.
 /// Now, however, it is made from the `Ui` object directly, with a few
 /// deprecated helper methods here.
+#[repr(transparent)]
 #[derive(Copy, Clone, Debug, Eq, PartialEq, Default)]
 pub struct Id(pub(crate) u32);
 

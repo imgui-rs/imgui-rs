@@ -1,9 +1,9 @@
 use parking_lot::ReentrantMutex;
 use std::cell::UnsafeCell;
-use std::ffi::{CStr, CString};
+use std::ffi::{CStr, CString, c_void};
 use std::ops::Drop;
 use std::path::PathBuf;
-use std::ptr;
+use std::ptr::{self, null_mut};
 
 use crate::clipboard::{ClipboardBackend, ClipboardContext};
 use crate::fonts::atlas::{FontAtlas, FontId, SharedFontAtlas};
@@ -273,6 +273,11 @@ impl Context {
     pub fn update_platform_windows(&mut self) {
         unsafe {
             sys::igUpdatePlatformWindows();
+        }
+    }
+    pub fn render_platform_windows_default(&mut self) {
+        unsafe {
+            sys::igRenderPlatformWindowsDefault(null_mut(), null_mut());
         }
     }
     fn create_internal(mut shared_font_atlas: Option<SharedFontAtlas>) -> Self {
@@ -562,6 +567,18 @@ impl Context {
     pub fn main_viewport_mut(&mut self) -> &mut Viewport {
         unsafe {
             &mut *(sys::igGetMainViewport() as *mut Viewport)
+        }
+    }
+    pub fn viewport_by_id(&self, id: *mut c_void) -> Option<&Viewport> {
+        unsafe {
+            let ptr = sys::igFindViewportByPlatformHandle(id) as *const Viewport;
+            ptr.as_ref()
+        }
+    }
+    pub fn viewport_by_id_mut(&mut self, id: *mut c_void) -> Option<&mut Viewport> {
+        unsafe {
+            let ptr = sys::igFindViewportByPlatformHandle(id) as *mut Viewport;
+            ptr.as_mut()
         }
     }
     /// Returns an immutable reference to the user interface style

@@ -158,13 +158,19 @@ impl System {
                 renderer
                     .render(&mut target, draw_data)
                     .expect("Rendering failed");
-                imgui.update_platform_windows();
                 target.finish().expect("Failed to swap buffers");
+
+                imgui.update_platform_windows();
+                imgui.render_platform_windows_default();
             }
             Event::WindowEvent {
                 event: WindowEvent::CloseRequested,
+                window_id,
                 ..
-            } => *control_flow = ControlFlow::Exit,
+            } if window_id == display.gl_window().window().id() => *control_flow = ControlFlow::Exit,
+            Event::WindowEvent { event, window_id, .. } if window_id != display.gl_window().window().id() => {
+                platform.handle_viewport_event(&mut imgui, window_id, &event);
+            },
             event => {
                 let gl_window = display.gl_window();
                 platform.handle_event(imgui.io_mut(), gl_window.window(), &event);
