@@ -512,7 +512,7 @@ impl imgui::PlatformViewportBackend for ViewportBackend {
 
     fn get_window_minimized(&mut self, viewport: &mut imgui::Viewport) -> bool {
         let state = unsafe{&mut *(viewport.platform_user_data as *mut ViewportState)};
-        state.focus
+        state.minimized
     }
 
     fn set_window_title(&mut self, viewport: &mut imgui::Viewport, title: &str) {
@@ -666,17 +666,21 @@ impl WinitPlatform {
             let viewport = imgui.viewport_by_id_mut(*id).unwrap();
             let state = unsafe{&mut *(viewport.platform_user_data as *mut ViewportState)};
 
-            if state.set_show {
-                wnd.set_visible(true);
-                state.set_show = false;
-            }
             if let Some(pos) = &state.set_pos {
-                wnd.set_outer_position(winit::dpi::LogicalPosition::new(pos[0], pos[1]));
+                let wnd_pos = wnd.outer_position().unwrap();
+                let inner_pos = wnd.inner_position().unwrap();
+                let decoration_size = [inner_pos.x - wnd_pos.x, inner_pos.y - wnd_pos.y];
+
+                wnd.set_outer_position(winit::dpi::LogicalPosition::new(pos[0] - decoration_size[0] as f32, pos[1] - decoration_size[1] as f32));
                 state.set_pos = None;
             }
             if let Some(size) = &state.set_size {
                 wnd.set_inner_size(winit::dpi::LogicalSize::new(size[0], size[1]));
                 state.set_size = None;
+            }
+            if state.set_show {
+                wnd.set_visible(true);
+                state.set_show = false;
             }
             if state.set_focus {
                 wnd.focus_window();
@@ -1049,6 +1053,17 @@ impl WinitPlatform {
     pub fn handle_viewport_event<T>(&mut self, imgui: &mut imgui::Context, main_window: &Window, event: &Event<T>) {
         match *event {
             Event::WindowEvent { window_id, ref event } => {
+                let window = if window_id == main_window.id() {
+                    Some(main_window)
+                } else {
+                    self.windows.iter().find_map(|(_, wnd)| (wnd.id() == window_id).then(|| wnd))
+                };
+                let window = if let Some(window) = window {
+                    window
+                } else {
+                    return;
+                };
+                
                 let viewport = {
                     if window_id == main_window.id() {
                         Some(imgui.main_viewport_mut())
@@ -1068,8 +1083,9 @@ impl WinitPlatform {
                     WindowEvent::Resized(new_size) => {
                         state.size = [new_size.width as f32, new_size.height as f32];
                     },
-                    WindowEvent::Moved(new_pos) => {
-                        state.pos = [new_pos.x as f32, new_pos.y as f32];
+                    WindowEvent::Moved(_new_pos) => {
+                        let pos = window.inner_position().unwrap();
+                        state.pos = [pos.x as f32, pos.y as f32];
                     },
                     WindowEvent::CloseRequested => {
                         viewport.platform_request_close = true;
@@ -1078,9 +1094,8 @@ impl WinitPlatform {
                         state.focus = focus;
                     },
                     WindowEvent::CursorMoved { position, .. } => {
-                        let mut pos = state.pos;
-                        pos[0] += position.x as f32;
-                        pos[1] += position.y as f32;
+                        let wnd_pos = window.inner_position().unwrap();
+                        let pos = [wnd_pos.x as f32 + position.x as f32, wnd_pos.y as f32 + position.y as f32];
                         imgui.io_mut().mouse_pos = pos;
                     },
                     WindowEvent::KeyboardInput {
