@@ -1056,134 +1056,131 @@ impl WinitPlatform {
     }
     #[cfg(feature = "viewports")]
     pub fn handle_viewport_event<T>(&mut self, imgui: &mut imgui::Context, main_window: &Window, event: &Event<T>) {
-        match *event {
-            Event::WindowEvent { window_id, ref event } => {
-                let window = if window_id == main_window.id() {
-                    Some(main_window)
+        if let Event::WindowEvent { window_id, ref event } = *event {
+            let window = if window_id == main_window.id() {
+                Some(main_window)
+            } else {
+                self.windows.iter().find_map(|(_, wnd)| (wnd.id() == window_id).then(|| wnd))
+            };
+            let window = if let Some(window) = window {
+                window
+            } else {
+                return;
+            };
+            
+            let viewport = {
+                if window_id == main_window.id() {
+                    Some(imgui.main_viewport_mut())
                 } else {
-                    self.windows.iter().find_map(|(_, wnd)| (wnd.id() == window_id).then(|| wnd))
-                };
-                let window = if let Some(window) = window {
-                    window
-                } else {
-                    return;
-                };
-                
-                let viewport = {
-                    if window_id == main_window.id() {
-                        Some(imgui.main_viewport_mut())
-                    } else {
-                        self.windows.iter().find(|(_, wnd)| wnd.id() == window_id).map(|(id, _)| *id).and_then(|id| imgui.viewport_by_id_mut(id))
-                    }
-                };
-                let viewport = if let Some(viewport) = viewport {
-                    viewport
-                } else {
-                    return;
-                };
-
-                let state = unsafe{&mut *(viewport.platform_user_data as *mut ViewportState)};
-
-                match *event {
-                    WindowEvent::Resized(new_size) => {
-                        state.size = [new_size.width as f32, new_size.height as f32];
-                        if new_size.width == 0 || new_size.height == 0 {
-                            state.minimized = true;
-                        } else {
-                            state.minimized = false;
-                        }
-                    },
-                    WindowEvent::Moved(_new_pos) => {
-                        let pos = window.inner_position().unwrap();
-                        state.pos = [pos.x as f32, pos.y as f32];
-                    },
-                    WindowEvent::CloseRequested => {
-                        viewport.platform_request_close = true;
-                    },
-                    WindowEvent::Focused(focus) => {
-                        state.focus = focus;
-                    },
-                    WindowEvent::CursorMoved { position, .. } => {
-                        let wnd_pos = window.inner_position().unwrap();
-                        let pos = [wnd_pos.x as f32 + position.x as f32, wnd_pos.y as f32 + position.y as f32];
-                        imgui.io_mut().mouse_pos = pos;
-                    },
-                    WindowEvent::KeyboardInput {
-                        input:
-                            KeyboardInput {
-                                virtual_keycode: Some(key),
-                                state,
-                                ..
-                            },
-                        ..
-                    } if window_id != main_window.id() => {
-                        let io = imgui.io_mut();
-
-                        let pressed = state == ElementState::Pressed;
-                        io.keys_down[key as usize] = pressed;
-        
-                        // This is a bit redundant here, but we'll leave it in. The OS occasionally
-                        // fails to send modifiers keys, but it doesn't seem to send false-positives,
-                        // so double checking isn't terrible in case some system *doesn't* send
-                        // device events sometimes.
-                        match key {
-                            VirtualKeyCode::LShift | VirtualKeyCode::RShift => io.key_shift = pressed,
-                            VirtualKeyCode::LControl | VirtualKeyCode::RControl => io.key_ctrl = pressed,
-                            VirtualKeyCode::LAlt | VirtualKeyCode::RAlt => io.key_alt = pressed,
-                            VirtualKeyCode::LWin | VirtualKeyCode::RWin => io.key_super = pressed,
-                            _ => (),
-                        }
-                    },
-                    WindowEvent::ReceivedCharacter(ch) if window_id != main_window.id() => {
-                        let io = imgui.io_mut();
-
-                        // Exclude the backspace key ('\u{7f}'). Otherwise we will insert this char and then
-                        // delete it.
-                        if ch != '\u{7f}' {
-                            io.add_input_character(ch)
-                        }
-                    },
-                    WindowEvent::MouseWheel {
-                        delta,
-                        phase: TouchPhase::Moved,
-                        ..
-                    } if window_id != main_window.id() => match delta {
-                        MouseScrollDelta::LineDelta(h, v) => {
-                            let io = imgui.io_mut();
-                            io.mouse_wheel_h = h;
-                            io.mouse_wheel = v;
-                        }
-                        MouseScrollDelta::PixelDelta(pos) => {
-                            let io = imgui.io_mut();
-                            let pos = pos.to_logical::<f64>(self.hidpi_factor);
-                            match pos.x.partial_cmp(&0.0) {
-                                Some(Ordering::Greater) => io.mouse_wheel_h += 1.0,
-                                Some(Ordering::Less) => io.mouse_wheel_h -= 1.0,
-                                _ => (),
-                            }
-                            match pos.y.partial_cmp(&0.0) {
-                                Some(Ordering::Greater) => io.mouse_wheel += 1.0,
-                                Some(Ordering::Less) => io.mouse_wheel -= 1.0,
-                                _ => (),
-                            }
-                        }
-                    },
-                    WindowEvent::MouseInput { state, button, .. } if window_id != main_window.id() => {
-                        let pressed = state == ElementState::Pressed;
-                        match button {
-                            MouseButton::Left => self.mouse_buttons[0].set(pressed),
-                            MouseButton::Right => self.mouse_buttons[1].set(pressed),
-                            MouseButton::Middle => self.mouse_buttons[2].set(pressed),
-                            MouseButton::Other(idx @ 0..=4) => {
-                                self.mouse_buttons[idx as usize].set(pressed)
-                            }
-                            _ => (),
-                        }
-                    },
-                    _ => {},
+                    self.windows.iter().find(|(_, wnd)| wnd.id() == window_id).map(|(id, _)| *id).and_then(|id| imgui.viewport_by_id_mut(id))
                 }
-            },
-            _ => {},
+            };
+            let viewport = if let Some(viewport) = viewport {
+                viewport
+            } else {
+                return;
+            };
+
+            let state = unsafe{&mut *(viewport.platform_user_data as *mut ViewportState)};
+
+            match *event {
+                WindowEvent::Resized(new_size) => {
+                    state.size = [new_size.width as f32, new_size.height as f32];
+                    if new_size.width == 0 || new_size.height == 0 {
+                        state.minimized = true;
+                    } else {
+                        state.minimized = false;
+                    }
+                },
+                WindowEvent::Moved(_new_pos) => {
+                    let pos = window.inner_position().unwrap();
+                    state.pos = [pos.x as f32, pos.y as f32];
+                },
+                WindowEvent::CloseRequested => {
+                    viewport.platform_request_close = true;
+                },
+                WindowEvent::Focused(focus) => {
+                    state.focus = focus;
+                },
+                WindowEvent::CursorMoved { position, .. } => {
+                    let wnd_pos = window.inner_position().unwrap();
+                    let pos = [wnd_pos.x as f32 + position.x as f32, wnd_pos.y as f32 + position.y as f32];
+                    imgui.io_mut().mouse_pos = pos;
+                },
+                WindowEvent::KeyboardInput {
+                    input:
+                        KeyboardInput {
+                            virtual_keycode: Some(key),
+                            state,
+                            ..
+                        },
+                    ..
+                } if window_id != main_window.id() => {
+                    let io = imgui.io_mut();
+
+                    let pressed = state == ElementState::Pressed;
+                    io.keys_down[key as usize] = pressed;
+    
+                    // This is a bit redundant here, but we'll leave it in. The OS occasionally
+                    // fails to send modifiers keys, but it doesn't seem to send false-positives,
+                    // so double checking isn't terrible in case some system *doesn't* send
+                    // device events sometimes.
+                    match key {
+                        VirtualKeyCode::LShift | VirtualKeyCode::RShift => io.key_shift = pressed,
+                        VirtualKeyCode::LControl | VirtualKeyCode::RControl => io.key_ctrl = pressed,
+                        VirtualKeyCode::LAlt | VirtualKeyCode::RAlt => io.key_alt = pressed,
+                        VirtualKeyCode::LWin | VirtualKeyCode::RWin => io.key_super = pressed,
+                        _ => (),
+                    }
+                },
+                WindowEvent::ReceivedCharacter(ch) if window_id != main_window.id() => {
+                    let io = imgui.io_mut();
+
+                    // Exclude the backspace key ('\u{7f}'). Otherwise we will insert this char and then
+                    // delete it.
+                    if ch != '\u{7f}' {
+                        io.add_input_character(ch)
+                    }
+                },
+                WindowEvent::MouseWheel {
+                    delta,
+                    phase: TouchPhase::Moved,
+                    ..
+                } if window_id != main_window.id() => match delta {
+                    MouseScrollDelta::LineDelta(h, v) => {
+                        let io = imgui.io_mut();
+                        io.mouse_wheel_h = h;
+                        io.mouse_wheel = v;
+                    }
+                    MouseScrollDelta::PixelDelta(pos) => {
+                        let io = imgui.io_mut();
+                        let pos = pos.to_logical::<f64>(self.hidpi_factor);
+                        match pos.x.partial_cmp(&0.0) {
+                            Some(Ordering::Greater) => io.mouse_wheel_h += 1.0,
+                            Some(Ordering::Less) => io.mouse_wheel_h -= 1.0,
+                            _ => (),
+                        }
+                        match pos.y.partial_cmp(&0.0) {
+                            Some(Ordering::Greater) => io.mouse_wheel += 1.0,
+                            Some(Ordering::Less) => io.mouse_wheel -= 1.0,
+                            _ => (),
+                        }
+                    }
+                },
+                WindowEvent::MouseInput { state, button, .. } if window_id != main_window.id() => {
+                    let pressed = state == ElementState::Pressed;
+                    match button {
+                        MouseButton::Left => self.mouse_buttons[0].set(pressed),
+                        MouseButton::Right => self.mouse_buttons[1].set(pressed),
+                        MouseButton::Middle => self.mouse_buttons[2].set(pressed),
+                        MouseButton::Other(idx @ 0..=4) => {
+                            self.mouse_buttons[idx as usize].set(pressed)
+                        }
+                        _ => (),
+                    }
+                },
+                _ => {},
+            }
         }
     }
 
