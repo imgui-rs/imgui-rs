@@ -600,7 +600,7 @@ impl WinitPlatform {
     }
 
     #[cfg(feature = "viewports")]
-    pub fn init_viewports<T>(imgui: &mut Context, event_loop: &winit::event_loop::EventLoop<T>) {
+    pub fn init_viewports<T>(imgui: &mut Context, main_window: &winit::window::Window, event_loop: &winit::event_loop::EventLoop<T>) {
         let io = imgui.io_mut();
 
         io.backend_flags.insert(BackendFlags::PLATFORM_HAS_VIEWPORTS);
@@ -619,6 +619,11 @@ impl WinitPlatform {
         }
         imgui.platform_io_mut().monitors.replace_from_slice(&monitors);
 
+        let pos = main_window.inner_position().unwrap();
+        let pos = [pos.x as f32, pos.y as f32];
+        let size = main_window.inner_size();
+        let size = [size.width as f32, size.height as f32];
+
         let main_viewport = imgui.main_viewport_mut();
         main_viewport.platform_user_data = Box::into_raw(Box::new(ViewportState {
             create: false,
@@ -628,8 +633,8 @@ impl WinitPlatform {
             set_size: None,
             set_focus: false,
             set_title: None,
-            pos: [0.0, 0.0],
-            size: [0.0, 0.0],
+            pos,
+            size,
             focus: true,
             minimized: false,
         })) as *mut _;
@@ -1082,6 +1087,11 @@ impl WinitPlatform {
                 match *event {
                     WindowEvent::Resized(new_size) => {
                         state.size = [new_size.width as f32, new_size.height as f32];
+                        if new_size.width == 0 || new_size.height == 0 {
+                            state.minimized = true;
+                        } else {
+                            state.minimized = false;
+                        }
                     },
                     WindowEvent::Moved(_new_pos) => {
                         let pos = window.inner_position().unwrap();

@@ -43,7 +43,7 @@ pub fn init(title: &str) -> System {
     }
 
     let mut platform = WinitPlatform::init(&mut imgui);
-    WinitPlatform::init_viewports(&mut imgui, &event_loop);
+    WinitPlatform::init_viewports(&mut imgui, display.gl_window().window(), &event_loop);
     {
         let gl_window = display.gl_window();
         let window = gl_window.window();

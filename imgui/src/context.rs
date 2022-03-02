@@ -1,6 +1,6 @@
 use parking_lot::ReentrantMutex;
 use std::cell::UnsafeCell;
-use std::ffi::{CStr, CString, c_void};
+use std::ffi::{CStr, CString};
 use std::ops::Drop;
 use std::path::PathBuf;
 use std::ptr::{self, null_mut};
