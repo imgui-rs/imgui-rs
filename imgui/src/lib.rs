@@ -20,9 +20,10 @@ pub use self::input::keyboard::*;
 pub use self::input::mouse::*;
 pub use self::input_widget::*;
 pub use self::io::*;
-pub use self::platform_io::*;
 pub use self::layout::*;
 pub use self::list_clipper::ListClipper;
+#[cfg(feature = "docking")]
+pub use self::platform_io::*;
 pub use self::plothistogram::PlotHistogram;
 pub use self::plotlines::PlotLines;
 pub use self::popups::*;
@@ -69,10 +70,11 @@ mod input;
 mod input_widget;
 pub mod internal;
 mod io;
-mod platform_io;
 mod layout;
 mod list_clipper;
 mod math;
+#[cfg(feature = "docking")]
+mod platform_io;
 mod plothistogram;
 mod plotlines;
 mod popups;

@@ -1,6 +1,6 @@
 //! Internal raw utilities (don't use unless you know what you're doing!)
 
-use std::{slice, mem::size_of};
+use std::{mem::size_of, slice};
 
 /// A generic version of the raw imgui-sys ImVector struct types
 #[repr(C)]

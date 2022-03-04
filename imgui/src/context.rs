@@ -3,13 +3,13 @@ use std::cell::UnsafeCell;
 use std::ffi::{CStr, CString};
 use std::ops::Drop;
 use std::path::PathBuf;
-use std::ptr::{self, null_mut};
+use std::ptr;
 
 use crate::clipboard::{ClipboardBackend, ClipboardContext};
 use crate::fonts::atlas::{FontAtlas, FontId, SharedFontAtlas};
 use crate::io::Io;
 use crate::style::Style;
-use crate::{sys, DrawData, PlatformIo, PlatformViewportContext, RendererViewportContext, PlatformViewportBackend, RendererViewportBackend, Viewport, Id};
+use crate::{sys, DrawData};
 use crate::{MouseCursor, Ui};
 
 /// An imgui-rs context.
@@ -60,8 +60,10 @@ pub struct Context {
     // imgui a mutable pointer to it.
     clipboard_ctx: Box<UnsafeCell<ClipboardContext>>,
 
-    platform_viewport_ctx: Box<UnsafeCell<PlatformViewportContext>>,
-    renderer_viewport_ctx: Box<UnsafeCell<RendererViewportContext>>,
+    #[cfg(feature = "docking")]
+    platform_viewport_ctx: Box<UnsafeCell<crate::PlatformViewportContext>>,
+    #[cfg(feature = "docking")]
+    renderer_viewport_ctx: Box<UnsafeCell<crate::RendererViewportContext>>,
 
     ui: Ui,
 }
@@ -219,67 +221,6 @@ impl Context {
         io.clipboard_user_data = clipboard_ctx.get() as *mut _;
         self.clipboard_ctx = clipboard_ctx;
     }
-    pub fn set_platform_backend<T: PlatformViewportBackend>(&mut self, backend: T) {
-        let ctx = Box::new(UnsafeCell::new(PlatformViewportContext {
-            backend: Box::new(backend),
-        }));
-
-        let io = self.io_mut();
-        io.backend_platform_user_data = ctx.get() as *mut _;
-
-        let pio = self.platform_io_mut();
-        pio.platform_create_window = Some(crate::platform_io::platform_create_window);
-        pio.platform_destroy_window = Some(crate::platform_io::platform_destroy_window);
-        pio.platform_show_window = Some(crate::platform_io::platform_show_window);
-        pio.platform_set_window_pos = Some(crate::platform_io::platform_set_window_pos);
-        // pio.platform_get_window_pos = Some(crate::platform_io::platform_get_window_pos);
-        unsafe {
-            crate::platform_io::ImGuiPlatformIO_Set_Platform_GetWindowPos(pio, crate::platform_io::platform_get_window_pos);
-        }
-        pio.platform_set_window_size = Some(crate::platform_io::platform_set_window_size);
-        // pio.platform_get_window_size = Some(crate::platform_io::platform_get_window_size);
-        unsafe {
-            crate::platform_io::ImGuiPlatformIO_Set_Platform_GetWindowSize(pio, crate::platform_io::platform_get_window_size);
-        }
-        pio.platform_set_window_focus = Some(crate::platform_io::platform_set_window_focus);
-        pio.platform_get_window_focus = Some(crate::platform_io::platform_get_window_focus);
-        pio.platform_get_window_minimized = Some(crate::platform_io::platform_get_window_minimized);
-        pio.platform_set_window_title = Some(crate::platform_io::platform_set_window_title);
-        pio.platform_set_window_alpha = Some(crate::platform_io::platform_set_window_alpha);
-        pio.platform_update_window = Some(crate::platform_io::platform_update_window);
-        pio.platform_render_window = Some(crate::platform_io::platform_render_window);
-        pio.platform_swap_buffers = Some(crate::platform_io::platform_swap_buffers);
-        pio.platform_create_vk_surface = Some(crate::platform_io::platform_create_vk_surface);
-
-        self.platform_viewport_ctx = ctx;
-    }
-    pub fn set_renderer_backend<T: RendererViewportBackend>(&mut self, backend: T) {
-        let ctx = Box::new(UnsafeCell::new(RendererViewportContext {
-            backend: Box::new(backend),
-        }));
-
-        let io = self.io_mut();
-        io.backend_renderer_user_data = ctx.get() as *mut _;
-
-        let pio = self.platform_io_mut();
-        pio.renderer_create_window = Some(crate::platform_io::renderer_create_window);
-        pio.renderer_destroy_window = Some(crate::platform_io::renderer_destroy_window);
-        pio.renderer_set_window_size = Some(crate::platform_io::renderer_set_window_size);
-        pio.renderer_render_window = Some(crate::platform_io::renderer_render_window);
-        pio.renderer_swap_buffers = Some(crate::platform_io::renderer_swap_buffers);
-
-        self.renderer_viewport_ctx = ctx;
-    }
-    pub fn update_platform_windows(&mut self) {
-        unsafe {
-            sys::igUpdatePlatformWindows();
-        }
-    }
-    pub fn render_platform_windows_default(&mut self) {
-        unsafe {
-            sys::igRenderPlatformWindowsDefault(null_mut(), null_mut());
-        }
-    }
     fn create_internal(mut shared_font_atlas: Option<SharedFontAtlas>) -> Self {
         let _guard = CTX_MUTEX.lock();
         assert!(
@@ -303,8 +244,14 @@ impl Context {
             platform_name: None,
             renderer_name: None,
             clipboard_ctx: Box::new(ClipboardContext::dummy().into()),
-            platform_viewport_ctx: Box::new(UnsafeCell::new(PlatformViewportContext::dummy())),
-            renderer_viewport_ctx: Box::new(UnsafeCell::new(RendererViewportContext::dummy())),
+            #[cfg(feature = "docking")]
+            platform_viewport_ctx: Box::new(UnsafeCell::new(
+                crate::PlatformViewportContext::dummy(),
+            )),
+            #[cfg(feature = "docking")]
+            renderer_viewport_ctx: Box::new(UnsafeCell::new(
+                crate::RendererViewportContext::dummy(),
+            )),
             ui: Ui {
                 buffer: UnsafeCell::new(crate::string::UiBuffer::new(1024)),
             },
@@ -394,8 +341,14 @@ impl SuspendedContext {
             platform_name: None,
             renderer_name: None,
             clipboard_ctx: Box::new(ClipboardContext::dummy().into()),
-            platform_viewport_ctx: Box::new(UnsafeCell::new(PlatformViewportContext::dummy())),
-            renderer_viewport_ctx: Box::new(UnsafeCell::new(RendererViewportContext::dummy())),
+            #[cfg(feature = "docking")]
+            platform_viewport_ctx: Box::new(UnsafeCell::new(
+                crate::PlatformViewportContext::dummy(),
+            )),
+            #[cfg(feature = "docking")]
+            renderer_viewport_ctx: Box::new(UnsafeCell::new(
+                crate::RendererViewportContext::dummy(),
+            )),
             ui: Ui {
                 buffer: UnsafeCell::new(crate::string::UiBuffer::new(1024)),
             },
@@ -547,50 +500,6 @@ impl Context {
             &mut *(sys::igGetIO() as *mut Io)
         }
     }
-    pub fn platform_io(&self) -> &PlatformIo {
-        unsafe {
-            // safe because PlatformIo is a transparent wrapper around sys::ImGuiPlatformIO
-            &*(sys::igGetPlatformIO() as *const PlatformIo)
-        }
-    }
-    pub fn platform_io_mut(&mut self) -> &mut PlatformIo {
-        unsafe {
-            // safe because PlatformIo is a transparent wrapper around sys::ImGuiPlatformIO
-            &mut *(sys::igGetPlatformIO() as *mut PlatformIo)
-        }
-    }
-    pub fn main_viewport(&self) -> &Viewport {
-        unsafe {
-            &*(sys::igGetMainViewport() as *mut Viewport)
-        }
-    }
-    pub fn main_viewport_mut(&mut self) -> &mut Viewport {
-        unsafe {
-            &mut *(sys::igGetMainViewport() as *mut Viewport)
-        }
-    }
-    pub fn viewport_by_id(&self, id: Id) -> Option<&Viewport> {
-        unsafe {
-            (sys::igFindViewportByID(id.0) as *const Viewport).as_ref()
-        }
-    }
-    pub fn viewport_by_id_mut(&mut self, id: Id) -> Option<&mut Viewport> {
-        unsafe {
-            (sys::igFindViewportByID(id.0) as *mut Viewport).as_mut()
-        }
-    }
-    pub fn viewports(&self) -> impl Iterator<Item = &Viewport> {
-        let slice = self.platform_io().viewports.as_slice();
-        unsafe {
-            slice.iter().map(|ptr| &**ptr)
-        }
-    }
-    pub fn viewports_mut(&mut self) -> impl Iterator<Item = &mut Viewport> {
-        let slice = self.platform_io_mut().viewports.as_slice();
-        unsafe {
-            slice.iter().map(|ptr| &mut **ptr)
-        }
-    }
     /// Returns an immutable reference to the user interface style
     #[doc(alias = "GetStyle")]
     pub fn style(&self) -> &Style {
@@ -677,6 +586,110 @@ impl Context {
             sys::ImGuiMouseCursor_Hand => Some(MouseCursor::Hand),
             sys::ImGuiMouseCursor_NotAllowed => Some(MouseCursor::NotAllowed),
             _ => None,
+        }
+    }
+}
+
+#[cfg(feature = "docking")]
+impl Context {
+    pub fn platform_io(&self) -> &crate::PlatformIo {
+        unsafe {
+            // safe because PlatformIo is a transparent wrapper around sys::ImGuiPlatformIO
+            &*(sys::igGetPlatformIO() as *const crate::PlatformIo)
+        }
+    }
+    pub fn platform_io_mut(&mut self) -> &mut crate::PlatformIo {
+        unsafe {
+            // safe because PlatformIo is a transparent wrapper around sys::ImGuiPlatformIO
+            &mut *(sys::igGetPlatformIO() as *mut crate::PlatformIo)
+        }
+    }
+    pub fn main_viewport(&self) -> &crate::Viewport {
+        unsafe { &*(sys::igGetMainViewport() as *mut crate::Viewport) }
+    }
+    pub fn main_viewport_mut(&mut self) -> &mut crate::Viewport {
+        unsafe { &mut *(sys::igGetMainViewport() as *mut crate::Viewport) }
+    }
+    pub fn viewport_by_id(&self, id: crate::Id) -> Option<&crate::Viewport> {
+        unsafe { (sys::igFindViewportByID(id.0) as *const crate::Viewport).as_ref() }
+    }
+    pub fn viewport_by_id_mut(&mut self, id: crate::Id) -> Option<&mut crate::Viewport> {
+        unsafe { (sys::igFindViewportByID(id.0) as *mut crate::Viewport).as_mut() }
+    }
+    pub fn viewports(&self) -> impl Iterator<Item = &crate::Viewport> {
+        let slice = self.platform_io().viewports.as_slice();
+        unsafe { slice.iter().map(|ptr| &**ptr) }
+    }
+    pub fn viewports_mut(&mut self) -> impl Iterator<Item = &mut crate::Viewport> {
+        let slice = self.platform_io_mut().viewports.as_slice();
+        unsafe { slice.iter().map(|ptr| &mut **ptr) }
+    }
+
+    pub fn set_platform_backend<T: crate::PlatformViewportBackend>(&mut self, backend: T) {
+        let ctx = Box::new(UnsafeCell::new(crate::PlatformViewportContext {
+            backend: Box::new(backend),
+        }));
+
+        let io = self.io_mut();
+        io.backend_platform_user_data = ctx.get() as *mut _;
+
+        let pio = self.platform_io_mut();
+        pio.platform_create_window = Some(crate::platform_io::platform_create_window);
+        pio.platform_destroy_window = Some(crate::platform_io::platform_destroy_window);
+        pio.platform_show_window = Some(crate::platform_io::platform_show_window);
+        pio.platform_set_window_pos = Some(crate::platform_io::platform_set_window_pos);
+        // pio.platform_get_window_pos = Some(crate::platform_io::platform_get_window_pos);
+        unsafe {
+            crate::platform_io::ImGuiPlatformIO_Set_Platform_GetWindowPos(
+                pio,
+                crate::platform_io::platform_get_window_pos,
+            );
+        }
+        pio.platform_set_window_size = Some(crate::platform_io::platform_set_window_size);
+        // pio.platform_get_window_size = Some(crate::platform_io::platform_get_window_size);
+        unsafe {
+            crate::platform_io::ImGuiPlatformIO_Set_Platform_GetWindowSize(
+                pio,
+                crate::platform_io::platform_get_window_size,
+            );
+        }
+        pio.platform_set_window_focus = Some(crate::platform_io::platform_set_window_focus);
+        pio.platform_get_window_focus = Some(crate::platform_io::platform_get_window_focus);
+        pio.platform_get_window_minimized = Some(crate::platform_io::platform_get_window_minimized);
+        pio.platform_set_window_title = Some(crate::platform_io::platform_set_window_title);
+        pio.platform_set_window_alpha = Some(crate::platform_io::platform_set_window_alpha);
+        pio.platform_update_window = Some(crate::platform_io::platform_update_window);
+        pio.platform_render_window = Some(crate::platform_io::platform_render_window);
+        pio.platform_swap_buffers = Some(crate::platform_io::platform_swap_buffers);
+        pio.platform_create_vk_surface = Some(crate::platform_io::platform_create_vk_surface);
+
+        self.platform_viewport_ctx = ctx;
+    }
+    pub fn set_renderer_backend<T: crate::RendererViewportBackend>(&mut self, backend: T) {
+        let ctx = Box::new(UnsafeCell::new(crate::RendererViewportContext {
+            backend: Box::new(backend),
+        }));
+
+        let io = self.io_mut();
+        io.backend_renderer_user_data = ctx.get() as *mut _;
+
+        let pio = self.platform_io_mut();
+        pio.renderer_create_window = Some(crate::platform_io::renderer_create_window);
+        pio.renderer_destroy_window = Some(crate::platform_io::renderer_destroy_window);
+        pio.renderer_set_window_size = Some(crate::platform_io::renderer_set_window_size);
+        pio.renderer_render_window = Some(crate::platform_io::renderer_render_window);
+        pio.renderer_swap_buffers = Some(crate::platform_io::renderer_swap_buffers);
+
+        self.renderer_viewport_ctx = ctx;
+    }
+    pub fn update_platform_windows(&mut self) {
+        unsafe {
+            sys::igUpdatePlatformWindows();
+        }
+    }
+    pub fn render_platform_windows_default(&mut self) {
+        unsafe {
+            sys::igRenderPlatformWindowsDefault(std::ptr::null_mut(), std::ptr::null_mut());
         }
     }
 }

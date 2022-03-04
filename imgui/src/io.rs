@@ -59,8 +59,10 @@ bitflags! {
         #[cfg(feature = "docking")]
         const VIEWPORTS_ENABLE = sys::ImGuiConfigFlags_ViewportsEnable;
     }
+}
 
-    #[cfg(feature = "docking")]
+#[cfg(feature = "docking")]
+bitflags! {
     #[repr(transparent)]
     pub struct ViewportFlags: u32 {
         const IS_PLATFORM_WINDOW = sys::ImGuiViewportFlags_IsPlatformWindow;
