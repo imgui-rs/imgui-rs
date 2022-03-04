@@ -99,8 +99,10 @@ bitflags! {
         const RENDERER_HAS_VTX_OFFSET = sys::ImGuiBackendFlags_RendererHasVtxOffset;
 
         #[cfg(feature = "docking")]
+        /// Set if the platform backend supports viewports.
         const PLATFORM_HAS_VIEWPORTS = sys::ImGuiBackendFlags_PlatformHasViewports;
         #[cfg(feature = "docking")]
+        /// Set if the renderer backend supports viewports.
         const RENDERER_HAS_VIEWPORTS = sys::ImGuiBackendFlags_RendererHasViewports;
     }
 }
