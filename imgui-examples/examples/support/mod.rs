@@ -3,9 +3,10 @@ use glium::glutin::event::{Event, WindowEvent};
 use glium::glutin::event_loop::{ControlFlow, EventLoop};
 use glium::glutin::window::WindowBuilder;
 use glium::{Display, Surface};
-use imgui::{Context, FontConfig, FontGlyphRanges, FontSource, Ui};
+use imgui::{Context, FontConfig, FontGlyphRanges, FontSource, Ui, ViewportFlags};
 use imgui_glium_renderer::Renderer;
 use imgui_winit_support::{HiDpiMode, WinitPlatform};
+use std::collections::HashMap;
 use std::path::Path;
 use std::time::Instant;
 
@@ -112,6 +113,46 @@ pub fn init(title: &str) -> System {
     }
 }
 
+struct ViewportStorage<'a, T: 'static> {
+    event_loop: &'a glium::glutin::event_loop::EventLoopWindowTarget<T>,
+    viewports: &'a mut HashMap<imgui::Id, glium::glutin::window::Window>,
+}
+
+impl<'a, T> imgui_winit_support::WinitPlatformViewportStorage for ViewportStorage<'a, T> {
+    fn create_window(&mut self, id: imgui::Id, flags: imgui::ViewportFlags) {
+        let builder = WindowBuilder::new()
+            .with_always_on_top(flags.contains(ViewportFlags::TOP_MOST))
+            // .with_decorations(!flags.contains(ViewportFlags::NO_DECORATION))
+            .with_resizable(true)
+            .with_visible(false);
+
+        let window = builder.build(self.event_loop).unwrap();
+        self.viewports.insert(id, window);
+    }
+
+    fn remove_windows(&mut self, filter: impl Fn(imgui::Id) -> bool) {
+        self.viewports.retain(|id, _| !filter(*id));
+    }
+
+    fn get_window(
+        &mut self,
+        id: glium::glutin::window::WindowId,
+    ) -> Option<(imgui::Id, &glium::glutin::window::Window)> {
+        let res = self
+            .viewports
+            .iter()
+            .find(|(_, wnd)| wnd.id() == id)
+            .map(|(id, wnd)| (*id, wnd));
+        res
+    }
+
+    fn for_each(&mut self, mut func: impl FnMut(imgui::Id, &glium::glutin::window::Window)) {
+        for (id, wnd) in self.viewports.iter() {
+            func(*id, wnd);
+        }
+    }
+}
+
 impl System {
     pub fn main_loop<F: FnMut(&mut bool, &mut Ui) + 'static>(self, mut run_ui: F) {
         let System {
@@ -123,6 +164,8 @@ impl System {
             ..
         } = self;
         let mut last_frame = Instant::now();
+
+        let mut viewports = HashMap::new();
 
         event_loop.run(move |event, window_target, control_flow| match event {
             Event::NewEvents(_) => {
@@ -137,7 +180,11 @@ impl System {
                     .expect("Failed to prepare frame");
                 gl_window.window().request_redraw();
 
-                platform.update_viewports(&mut imgui, window_target);
+                let mut storage = ViewportStorage {
+                    event_loop: window_target,
+                    viewports: &mut viewports,
+                };
+                platform.update_viewports(&mut imgui, &mut storage);
             }
             Event::RedrawRequested(_) => {
                 let ui = imgui.frame();
@@ -164,11 +211,23 @@ impl System {
                 event: WindowEvent::CloseRequested,
                 window_id,
                 ..
-            } if window_id == display.gl_window().window().id() => *control_flow = ControlFlow::Exit,
+            } if window_id == display.gl_window().window().id() => {
+                *control_flow = ControlFlow::Exit
+            }
             event => {
                 let gl_window = display.gl_window();
                 platform.handle_event(imgui.io_mut(), gl_window.window(), &event);
-                platform.handle_viewport_event(&mut imgui, gl_window.window(), &event);
+
+                let mut storage = ViewportStorage {
+                    event_loop: window_target,
+                    viewports: &mut viewports,
+                };
+                platform.handle_viewport_event(
+                    &mut imgui,
+                    gl_window.window(),
+                    &mut storage,
+                    &event,
+                );
             }
         })
     }

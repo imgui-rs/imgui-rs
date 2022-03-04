@@ -150,9 +150,6 @@ impl Renderer {
         ctx.io_mut()
             .backend_flags
             .insert(BackendFlags::RENDERER_HAS_VTX_OFFSET);
-        ctx.io_mut()
-            .backend_flags
-            .insert(BackendFlags::RENDERER_HAS_VIEWPORTS);
         Ok(Renderer {
             ctx: Rc::clone(facade.get_context()),
             program,

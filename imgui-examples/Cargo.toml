@@ -13,6 +13,6 @@ publish = false
 clipboard = "0.5"
 glium = { version = "0.31", default-features = true }
 image = "0.23"
-imgui = { path = "../imgui", features = ["tables-api", "docking"] }
+imgui = { path = "../imgui", features = ["tables-api"] }
 imgui-glium-renderer = { path = "../imgui-glium-renderer" }
 imgui-winit-support = { path = "../imgui-winit-support", features=["viewports"] }

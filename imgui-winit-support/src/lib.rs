@@ -189,8 +189,8 @@ use winit_20 as winit;
 use winit_19 as winit;
 
 use imgui::{self, BackendFlags, ConfigFlags, Context, Io, Key, Ui};
+use std::cell::Cell;
 use std::cmp::Ordering;
-use std::{cell::Cell, collections::HashMap};
 use winit::dpi::{LogicalPosition, LogicalSize};
 
 #[cfg(all(
@@ -452,7 +452,6 @@ impl imgui::PlatformViewportBackend for ViewportBackend {
     fn create_window(&mut self, viewport: &mut imgui::Viewport) {
         viewport.platform_user_data = Box::into_raw(Box::new(ViewportState {
             create: true,
-            create_flags: viewport.flags,
             set_show: false,
             set_pos: None,
             set_size: None,
@@ -538,7 +537,6 @@ impl imgui::PlatformViewportBackend for ViewportBackend {
 #[cfg(feature = "viewports")]
 struct ViewportState {
     create: bool,
-    create_flags: imgui::ViewportFlags,
 
     set_show: bool,
     set_pos: Option<[f32; 2]>,
@@ -648,7 +646,6 @@ impl WinitPlatform {
         let main_viewport = imgui.main_viewport_mut();
         main_viewport.platform_user_data = Box::into_raw(Box::new(ViewportState {
             create: false,
-            create_flags: imgui::ViewportFlags::empty(),
             set_show: false,
             set_pos: None,
             set_size: None,
@@ -1079,6 +1076,18 @@ impl WinitPlatform {
         storage: &mut impl WinitPlatformViewportStorage,
         event: &Event<T>,
     ) {
+        if !imgui
+            .io()
+            .backend_flags
+            .contains(BackendFlags::PLATFORM_HAS_VIEWPORTS | BackendFlags::RENDERER_HAS_VIEWPORTS)
+            || !imgui
+                .io()
+                .config_flags
+                .contains(ConfigFlags::VIEWPORTS_ENABLE)
+        {
+            return;
+        }
+
         if let Event::WindowEvent {
             window_id,
             ref event,
@@ -1086,16 +1095,14 @@ impl WinitPlatform {
         {
             let (viewport, window) = if window_id == main_window.id() {
                 (imgui.main_viewport_mut(), main_window)
-            } else {
-                if let Some((viewport_id, window)) = storage.get_window(window_id) {
-                    if let Some(viewport) = imgui.viewport_by_id_mut(viewport_id) {
-                        (viewport, window)
-                    } else {
-                        return;
-                    }
+            } else if let Some((viewport_id, window)) = storage.get_window(window_id) {
+                if let Some(viewport) = imgui.viewport_by_id_mut(viewport_id) {
+                    (viewport, window)
                 } else {
                     return;
                 }
+            } else {
+                return;
             };
 
             let state = unsafe { &mut *(viewport.platform_user_data as *mut ViewportState) };
