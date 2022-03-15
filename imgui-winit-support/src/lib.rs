@@ -79,7 +79,7 @@
 //!
 //!             platform.prepare_render(&ui, &window); // step 5
 //!             // render the UI with a renderer
-//!             let draw_data = ui.render();
+//!             let draw_data = imgui.render();
 //!             // renderer.render(..., draw_data).expect("UI rendering failed");
 //!
 //!             // application-specific rendering *over the UI*
