@@ -1,22 +1,37 @@
-use std::{mem::size_of, collections::HashMap};
+use std::{collections::HashMap, mem::size_of};
 
 use glow::HasContext;
-use glutin::{PossiblyCurrent, event_loop::ControlFlow, event::WindowEvent};
-use imgui::{DrawVert, BackendFlags, ConfigFlags, ViewportFlags, DrawData};
+use glutin::{event::WindowEvent, event_loop::ControlFlow, PossiblyCurrent};
+use imgui::{BackendFlags, ConfigFlags, DrawData, DrawVert, ViewportFlags};
 
 fn main() {
     let event_loop = glutin::event_loop::EventLoop::new();
 
     let mut imgui = imgui::Context::create();
-    imgui.io_mut().backend_flags.insert(BackendFlags::RENDERER_HAS_VIEWPORTS);
-    imgui.io_mut().config_flags.insert(ConfigFlags::DOCKING_ENABLE);
-    imgui.io_mut().config_flags.insert(ConfigFlags::VIEWPORTS_ENABLE);
+    imgui
+        .io_mut()
+        .backend_flags
+        .insert(BackendFlags::RENDERER_HAS_VIEWPORTS);
+    imgui
+        .io_mut()
+        .config_flags
+        .insert(ConfigFlags::DOCKING_ENABLE);
+    imgui
+        .io_mut()
+        .config_flags
+        .insert(ConfigFlags::VIEWPORTS_ENABLE);
+
+    imgui.set_ini_filename(None);
 
     let mut main_viewport = Viewport::new(&event_loop, true, true);
     main_viewport.init_font_texture(&mut imgui);
 
     let mut winit_platform = imgui_winit_support::WinitPlatform::init(&mut imgui);
-    imgui_winit_support::WinitPlatform::init_viewports(&mut imgui, main_viewport.window(), &event_loop);
+    imgui_winit_support::WinitPlatform::init_viewports(
+        &mut imgui,
+        main_viewport.window(),
+        &event_loop,
+    );
 
     let mut viewports = HashMap::new();
 
@@ -27,21 +42,31 @@ fn main() {
             window_target,
             viewports: &mut viewports,
         };
-        winit_platform.handle_viewport_event(&mut imgui, main_viewport.window(), &mut storage, &event);
+        winit_platform.handle_viewport_event(
+            &mut imgui,
+            main_viewport.window(),
+            &mut storage,
+            &event,
+        );
 
         match event {
-            glutin::event::Event::WindowEvent { window_id, event: WindowEvent::CloseRequested } => {
+            glutin::event::Event::WindowEvent {
+                window_id,
+                event: WindowEvent::CloseRequested,
+            } => {
                 if window_id == main_viewport.window().id() {
                     *control_flow = ControlFlow::Exit;
                 }
-            },
+            }
             glutin::event::Event::MainEventsCleared => {
                 main_viewport.window().request_redraw();
-            },
+            }
             glutin::event::Event::RedrawRequested(window_id) => {
                 if window_id == main_viewport.window().id() {
-                    winit_platform.prepare_frame(imgui.io_mut(), main_viewport.window()).unwrap();
-        
+                    winit_platform
+                        .prepare_frame(imgui.io_mut(), main_viewport.window())
+                        .unwrap();
+
                     render(&mut imgui);
 
                     imgui.update_platform_windows();
@@ -62,7 +87,7 @@ fn main() {
                         render_viewport(viewport, draw_data);
                     }
                 }
-            },
+            }
             _ => {}
         }
     });
@@ -70,6 +95,8 @@ fn main() {
 
 fn render(imgui: &mut imgui::Context) {
     let ui = imgui.new_frame();
+
+    ui.dockspace_over_main_viewport();
 
     let mut open = true;
     ui.show_demo_window(&mut open);
@@ -95,59 +122,107 @@ fn render_viewport(viewport: &mut Viewport, draw_data: &DrawData) {
         let top = draw_data.display_pos[1];
         let bottom = draw_data.display_pos[1] + draw_data.display_size[1];
         let matrix = [
-            (2.0 / (right - left)), 0.0, 0.0, 0.0,
-            0.0, (2.0 / (top - bottom)), 0.0, 0.0,
-            0.0, 0.0, -1.0, 0.0,
-            
+            (2.0 / (right - left)),
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            (2.0 / (top - bottom)),
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            -1.0,
+            0.0,
             (right + left) / (left - right),
             (top + bottom) / (bottom - top),
             0.0,
             1.0,
         ];
 
-        let loc = viewport.context.get_uniform_location(viewport.shader, "u_Matrix").unwrap();
-        viewport.context.uniform_matrix_4_f32_slice(Some(&loc), false, &matrix);
+        let loc = viewport
+            .context
+            .get_uniform_location(viewport.shader, "u_Matrix")
+            .unwrap();
+        viewport
+            .context
+            .uniform_matrix_4_f32_slice(Some(&loc), false, &matrix);
 
-        viewport.context.blend_func_separate(glow::SRC_ALPHA, glow::ONE_MINUS_SRC_ALPHA, glow::ONE, glow::ZERO);
+        viewport.context.blend_func_separate(
+            glow::SRC_ALPHA,
+            glow::ONE_MINUS_SRC_ALPHA,
+            glow::ONE,
+            glow::ZERO,
+        );
         viewport.context.enable(glow::BLEND);
 
-        viewport.context.bind_buffer(glow::ARRAY_BUFFER, Some(viewport.vbo));
-        viewport.context.bind_buffer(glow::ELEMENT_ARRAY_BUFFER, Some(viewport.ibo));
+        viewport
+            .context
+            .bind_buffer(glow::ARRAY_BUFFER, Some(viewport.vbo));
+        viewport
+            .context
+            .bind_buffer(glow::ELEMENT_ARRAY_BUFFER, Some(viewport.ibo));
 
-        viewport.context.bind_texture(glow::TEXTURE_2D, viewport.font_tex);
+        viewport
+            .context
+            .bind_texture(glow::TEXTURE_2D, viewport.font_tex);
 
-        viewport.context.viewport(0, 0, viewport.window().inner_size().width as i32, viewport.window().inner_size().height as i32);
+        viewport.context.viewport(
+            0,
+            0,
+            viewport.window().inner_size().width as i32,
+            viewport.window().inner_size().height as i32,
+        );
     }
 
     for draw_list in draw_data.draw_lists() {
         unsafe {
-            viewport.context.buffer_data_u8_slice(glow::ARRAY_BUFFER, std::slice::from_raw_parts(draw_list.vtx_buffer().as_ptr() as *const u8, draw_list.vtx_buffer().len() * size_of::<DrawVert>()), glow::STREAM_DRAW);
-            viewport.context.buffer_data_u8_slice(glow::ELEMENT_ARRAY_BUFFER, std::slice::from_raw_parts(draw_list.idx_buffer().as_ptr() as *const u8, draw_list.idx_buffer().len() * size_of::<u16>()), glow::STREAM_DRAW);
-            viewport.context.bind_vertex_buffer(0, Some(viewport.vbo), 0, size_of::<DrawVert>() as i32);
+            viewport.context.buffer_data_u8_slice(
+                glow::ARRAY_BUFFER,
+                std::slice::from_raw_parts(
+                    draw_list.vtx_buffer().as_ptr() as *const u8,
+                    draw_list.vtx_buffer().len() * size_of::<DrawVert>(),
+                ),
+                glow::STREAM_DRAW,
+            );
+            viewport.context.buffer_data_u8_slice(
+                glow::ELEMENT_ARRAY_BUFFER,
+                std::slice::from_raw_parts(
+                    draw_list.idx_buffer().as_ptr() as *const u8,
+                    draw_list.idx_buffer().len() * size_of::<u16>(),
+                ),
+                glow::STREAM_DRAW,
+            );
+            viewport.context.bind_vertex_buffer(
+                0,
+                Some(viewport.vbo),
+                0,
+                size_of::<DrawVert>() as i32,
+            );
         }
 
         for cmd in draw_list.commands() {
-            match cmd {
-                imgui::DrawCmd::Elements { count, cmd_params } => {
-                    unsafe {
-                        let window_height = viewport.window().inner_size().height as i32;
+            if let imgui::DrawCmd::Elements { count, cmd_params } = cmd {
+                unsafe {
+                    let window_height = viewport.window().inner_size().height as i32;
 
-                        let x = cmd_params.clip_rect[0] as i32 - pos.x;
-                        let y = cmd_params.clip_rect[1] as i32 - pos.y;
-                        let width = (cmd_params.clip_rect[2] - cmd_params.clip_rect[0]) as i32;
-                        let height = (cmd_params.clip_rect[3] - cmd_params.clip_rect[1]) as i32;
+                    let x = cmd_params.clip_rect[0] as i32 - pos.x;
+                    let y = cmd_params.clip_rect[1] as i32 - pos.y;
+                    let width = (cmd_params.clip_rect[2] - cmd_params.clip_rect[0]) as i32;
+                    let height = (cmd_params.clip_rect[3] - cmd_params.clip_rect[1]) as i32;
 
-                        viewport.context.scissor(
-                            x,
-                            window_height - (y + height),
-                            width,
-                            height
-                        );
-                        viewport.context.enable(glow::SCISSOR_TEST);
-                        viewport.context.draw_elements_base_vertex(glow::TRIANGLES, count as i32, glow::UNSIGNED_SHORT, (cmd_params.idx_offset * size_of::<u16>()) as i32, cmd_params.vtx_offset as i32);
-                    }
-                },
-                _ => {},
+                    viewport
+                        .context
+                        .scissor(x, window_height - (y + height), width, height);
+                    viewport.context.enable(glow::SCISSOR_TEST);
+                    viewport.context.draw_elements_base_vertex(
+                        glow::TRIANGLES,
+                        count as i32,
+                        glow::UNSIGNED_SHORT,
+                        (cmd_params.idx_offset * size_of::<u16>()) as i32,
+                        cmd_params.vtx_offset as i32,
+                    );
+                }
             }
         }
     }
@@ -162,7 +237,11 @@ struct ViewportStorage<'a, T: 'static> {
 
 impl<'a, T: 'static> imgui_winit_support::WinitPlatformViewportStorage for ViewportStorage<'a, T> {
     fn create_window(&mut self, id: imgui::Id, flags: imgui::ViewportFlags) {
-        let viewport = Viewport::new(self.window_target, false, !flags.contains(ViewportFlags::NO_DECORATION));
+        let viewport = Viewport::new(
+            self.window_target,
+            false,
+            !flags.contains(ViewportFlags::NO_DECORATION),
+        );
         self.viewports.insert(id, viewport);
     }
 
@@ -174,7 +253,9 @@ impl<'a, T: 'static> imgui_winit_support::WinitPlatformViewportStorage for Viewp
         &mut self,
         id: glutin::window::WindowId,
     ) -> Option<(imgui::Id, &glutin::window::Window)> {
-        self.viewports.iter().find(|(viewport_id, viewport)| viewport.window().id() == id)
+        self.viewports
+            .iter()
+            .find(|(_, viewport)| viewport.window().id() == id)
             .map(|(viewport_id, viewport)| (*viewport_id, viewport.window()))
     }
 
@@ -196,22 +277,30 @@ struct Viewport {
 }
 
 impl Viewport {
-    fn new<T>(event_loop: &glutin::event_loop::EventLoopWindowTarget<T>, visible: bool, decorated: bool) -> Self {
+    fn new<T>(
+        event_loop: &glutin::event_loop::EventLoopWindowTarget<T>,
+        visible: bool,
+        decorated: bool,
+    ) -> Self {
         let wb = glutin::window::WindowBuilder::new()
             .with_inner_size(glutin::dpi::LogicalSize::new(800.0, 600.0))
             .with_resizable(true)
             .with_title("Viewports")
             .with_visible(visible)
             .with_decorations(decorated);
-        let window = unsafe{glutin::ContextBuilder::new()
-            .with_double_buffer(Some(true))
-            .with_vsync(true)
-            .build_windowed(wb, &event_loop)
-            .unwrap()
-            .make_current()
-            .unwrap()};
+        let window = unsafe {
+            glutin::ContextBuilder::new()
+                .with_double_buffer(Some(true))
+                .with_vsync(true)
+                .build_windowed(wb, event_loop)
+                .unwrap()
+                .make_current()
+                .unwrap()
+        };
 
-        let context = unsafe{glow::Context::from_loader_function(|s| window.get_proc_address(s) as *const _)};
+        let context = unsafe {
+            glow::Context::from_loader_function(|s| window.get_proc_address(s) as *const _)
+        };
 
         let (vao, vbo, ibo, shader) = unsafe {
             let vao = context.create_vertex_array().unwrap();
@@ -230,7 +319,7 @@ impl Viewport {
             context.enable_vertex_attrib_array(2);
             context.bind_buffer(glow::ELEMENT_ARRAY_BUFFER, Some(ibo));
             context.bind_vertex_array(None);
-            
+
             let vertex_shader = context.create_shader(glow::VERTEX_SHADER).unwrap();
             context.shader_source(vertex_shader, VERTEX_SHADER);
             context.compile_shader(vertex_shader);
@@ -243,7 +332,7 @@ impl Viewport {
             context.attach_shader(program, vertex_shader);
             context.attach_shader(program, fragment_shader);
             context.link_program(program);
-            
+
             context.delete_shader(vertex_shader);
             context.delete_shader(fragment_shader);
 
@@ -273,11 +362,37 @@ impl Viewport {
 
             let data = imgui.fonts().build_rgba32_texture();
             self.context.bind_texture(glow::TEXTURE_2D, Some(font_tex));
-            self.context.tex_image_2d(glow::TEXTURE_2D, 0, glow::RGBA as i32, data.width as i32, data.height as i32, 0, glow::RGBA, glow::UNSIGNED_BYTE, Some(data.data));
-            self.context.tex_parameter_i32(glow::TEXTURE_2D, glow::TEXTURE_MAG_FILTER, glow::LINEAR as i32);
-            self.context.tex_parameter_i32(glow::TEXTURE_2D, glow::TEXTURE_MIN_FILTER, glow::LINEAR as i32);
-            self.context.tex_parameter_i32(glow::TEXTURE_2D, glow::TEXTURE_WRAP_S, glow::CLAMP_TO_EDGE as i32);
-            self.context.tex_parameter_i32(glow::TEXTURE_2D, glow::TEXTURE_WRAP_T, glow::CLAMP_TO_EDGE as i32);
+            self.context.tex_image_2d(
+                glow::TEXTURE_2D,
+                0,
+                glow::RGBA as i32,
+                data.width as i32,
+                data.height as i32,
+                0,
+                glow::RGBA,
+                glow::UNSIGNED_BYTE,
+                Some(data.data),
+            );
+            self.context.tex_parameter_i32(
+                glow::TEXTURE_2D,
+                glow::TEXTURE_MAG_FILTER,
+                glow::LINEAR as i32,
+            );
+            self.context.tex_parameter_i32(
+                glow::TEXTURE_2D,
+                glow::TEXTURE_MIN_FILTER,
+                glow::LINEAR as i32,
+            );
+            self.context.tex_parameter_i32(
+                glow::TEXTURE_2D,
+                glow::TEXTURE_WRAP_S,
+                glow::CLAMP_TO_EDGE as i32,
+            );
+            self.context.tex_parameter_i32(
+                glow::TEXTURE_2D,
+                glow::TEXTURE_WRAP_T,
+                glow::CLAMP_TO_EDGE as i32,
+            );
 
             self.font_tex = Some(font_tex);
         }
@@ -289,7 +404,7 @@ impl Viewport {
 
     fn make_current(&mut self) {
         let window = self.window.take().unwrap();
-        self.window = unsafe{Some(window.make_current().unwrap())};
+        self.window = unsafe { Some(window.make_current().unwrap()) };
     }
 
     fn swap_buffers(&self) {
@@ -297,7 +412,7 @@ impl Viewport {
     }
 }
 
-const VERTEX_SHADER: &'static str = "#version 450 core
+const VERTEX_SHADER: &str = "#version 450 core
 
 layout(location = 0) in vec2 in_Position;
 layout(location = 1) in vec2 in_UV;
@@ -316,7 +431,7 @@ void main() {
 
 ";
 
-const FRAGMENT_SHADER: &'static str = "#version 450 core
+const FRAGMENT_SHADER: &str = "#version 450 core
 
 in vec2 v2f_UV;
 in vec4 v2f_Color;
