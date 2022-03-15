@@ -1,36 +1,66 @@
-use std::mem::size_of;
+use std::{mem::size_of, collections::HashMap};
 
 use glow::HasContext;
 use glutin::{PossiblyCurrent, event_loop::ControlFlow, event::WindowEvent};
-use imgui::DrawVert;
-
+use imgui::{DrawVert, BackendFlags, ConfigFlags, ViewportFlags, DrawData};
 
 fn main() {
     let event_loop = glutin::event_loop::EventLoop::new();
 
     let mut imgui = imgui::Context::create();
+    imgui.io_mut().backend_flags.insert(BackendFlags::RENDERER_HAS_VIEWPORTS);
+    imgui.io_mut().config_flags.insert(ConfigFlags::DOCKING_ENABLE);
+    imgui.io_mut().config_flags.insert(ConfigFlags::VIEWPORTS_ENABLE);
 
-    let mut main_viewport = Viewport::new(&event_loop, &mut imgui);
+    let mut main_viewport = Viewport::new(&event_loop, true, true);
+    main_viewport.init_font_texture(&mut imgui);
 
     let mut winit_platform = imgui_winit_support::WinitPlatform::init(&mut imgui);
-    // imgui_winit_support::WinitPlatform::init_viewports(&mut imgui, main_viewport.window.window(), &event_loop);
+    imgui_winit_support::WinitPlatform::init_viewports(&mut imgui, main_viewport.window(), &event_loop);
+
+    let mut viewports = HashMap::new();
 
     event_loop.run(move |event, window_target, control_flow| {
-        winit_platform.handle_event(imgui.io_mut(), main_viewport.window.window(), &event);
+        winit_platform.handle_event(imgui.io_mut(), main_viewport.window(), &event);
+
+        let mut storage = ViewportStorage {
+            window_target,
+            viewports: &mut viewports,
+        };
+        winit_platform.handle_viewport_event(&mut imgui, main_viewport.window(), &mut storage, &event);
 
         match event {
             glutin::event::Event::WindowEvent { window_id, event: WindowEvent::CloseRequested } => {
-                if window_id == main_viewport.window.window().id() {
+                if window_id == main_viewport.window().id() {
                     *control_flow = ControlFlow::Exit;
                 }
             },
             glutin::event::Event::MainEventsCleared => {
-                main_viewport.window.window().request_redraw();
+                main_viewport.window().request_redraw();
             },
             glutin::event::Event::RedrawRequested(window_id) => {
-                if window_id == main_viewport.window.window().id() {
-                    winit_platform.prepare_frame(imgui.io_mut(), main_viewport.window.window()).unwrap();
-                    render(&mut imgui, &mut main_viewport);
+                if window_id == main_viewport.window().id() {
+                    winit_platform.prepare_frame(imgui.io_mut(), main_viewport.window()).unwrap();
+        
+                    render(&mut imgui);
+
+                    imgui.update_platform_windows();
+
+                    let mut storage = ViewportStorage {
+                        window_target,
+                        viewports: &mut viewports,
+                    };
+                    winit_platform.update_viewports(&mut imgui, &mut storage);
+
+                    let main_draw_data = imgui.render();
+                    render_viewport(&mut main_viewport, main_draw_data);
+
+                    for (id, viewport) in &mut viewports {
+                        viewport.init_font_texture(&mut imgui);
+
+                        let draw_data = imgui.viewport_by_id(*id).unwrap().draw_data();
+                        render_viewport(viewport, draw_data);
+                    }
                 }
             },
             _ => {}
@@ -38,16 +68,21 @@ fn main() {
     });
 }
 
-fn render(imgui: &mut imgui::Context, viewport: &mut Viewport) {
+fn render(imgui: &mut imgui::Context) {
     let ui = imgui.new_frame();
 
     let mut open = true;
     ui.show_demo_window(&mut open);
 
-    let draw_data = imgui.render();
+    ui.end_frame_early();
+}
+
+fn render_viewport(viewport: &mut Viewport, draw_data: &DrawData) {
+    let pos = viewport.window().inner_position().unwrap();
 
     unsafe {
-        //viewport.window = viewport.window.make_current().unwrap();
+        viewport.make_current();
+
         viewport.context.disable(glow::SCISSOR_TEST);
         viewport.context.clear(glow::COLOR_BUFFER_BIT);
         viewport.context.enable(glow::SCISSOR_TEST);
@@ -79,9 +114,9 @@ fn render(imgui: &mut imgui::Context, viewport: &mut Viewport) {
         viewport.context.bind_buffer(glow::ARRAY_BUFFER, Some(viewport.vbo));
         viewport.context.bind_buffer(glow::ELEMENT_ARRAY_BUFFER, Some(viewport.ibo));
 
-        viewport.context.bind_texture(glow::TEXTURE_2D, Some(viewport.font_tex));
+        viewport.context.bind_texture(glow::TEXTURE_2D, viewport.font_tex);
 
-        viewport.context.viewport(0, 0, viewport.window.window().inner_size().width as i32, viewport.window.window().inner_size().height as i32);
+        viewport.context.viewport(0, 0, viewport.window().inner_size().width as i32, viewport.window().inner_size().height as i32);
     }
 
     for draw_list in draw_data.draw_lists() {
@@ -95,10 +130,10 @@ fn render(imgui: &mut imgui::Context, viewport: &mut Viewport) {
             match cmd {
                 imgui::DrawCmd::Elements { count, cmd_params } => {
                     unsafe {
-                        let window_height = viewport.window.window().inner_size().height as i32;
+                        let window_height = viewport.window().inner_size().height as i32;
 
-                        let x = cmd_params.clip_rect[0] as i32;
-                        let y = cmd_params.clip_rect[1] as i32;
+                        let x = cmd_params.clip_rect[0] as i32 - pos.x;
+                        let y = cmd_params.clip_rect[1] as i32 - pos.y;
                         let width = (cmd_params.clip_rect[2] - cmd_params.clip_rect[0]) as i32;
                         let height = (cmd_params.clip_rect[3] - cmd_params.clip_rect[1]) as i32;
 
@@ -117,26 +152,57 @@ fn render(imgui: &mut imgui::Context, viewport: &mut Viewport) {
         }
     }
 
-    viewport.window.swap_buffers().unwrap();
+    viewport.swap_buffers();
+}
+
+struct ViewportStorage<'a, T: 'static> {
+    window_target: &'a glutin::event_loop::EventLoopWindowTarget<T>,
+    viewports: &'a mut HashMap<imgui::Id, Viewport>,
+}
+
+impl<'a, T: 'static> imgui_winit_support::WinitPlatformViewportStorage for ViewportStorage<'a, T> {
+    fn create_window(&mut self, id: imgui::Id, flags: imgui::ViewportFlags) {
+        let viewport = Viewport::new(self.window_target, false, !flags.contains(ViewportFlags::NO_DECORATION));
+        self.viewports.insert(id, viewport);
+    }
+
+    fn remove_windows(&mut self, filter: impl Fn(imgui::Id) -> bool) {
+        self.viewports.retain(|id, _| !filter(*id));
+    }
+
+    fn get_window(
+        &mut self,
+        id: glutin::window::WindowId,
+    ) -> Option<(imgui::Id, &glutin::window::Window)> {
+        self.viewports.iter().find(|(viewport_id, viewport)| viewport.window().id() == id)
+            .map(|(viewport_id, viewport)| (*viewport_id, viewport.window()))
+    }
+
+    fn for_each(&mut self, mut func: impl FnMut(imgui::Id, &glutin::window::Window)) {
+        self.viewports.iter().for_each(|(id, vp)| {
+            func(*id, vp.window());
+        });
+    }
 }
 
 struct Viewport {
-    window: glutin::ContextWrapper<PossiblyCurrent, glutin::window::Window>,
+    window: Option<glutin::ContextWrapper<PossiblyCurrent, glutin::window::Window>>,
     context: glow::Context,
     vao: glow::VertexArray,
     vbo: glow::Buffer,
     ibo: glow::Buffer,
     shader: glow::Program,
-    font_tex: glow::Texture,
+    font_tex: Option<glow::Texture>,
 }
 
 impl Viewport {
-    fn new<T>(event_loop: &glutin::event_loop::EventLoopWindowTarget<T>, imgui: &mut imgui::Context) -> Self {
+    fn new<T>(event_loop: &glutin::event_loop::EventLoopWindowTarget<T>, visible: bool, decorated: bool) -> Self {
         let wb = glutin::window::WindowBuilder::new()
             .with_inner_size(glutin::dpi::LogicalSize::new(800.0, 600.0))
             .with_resizable(true)
             .with_title("Viewports")
-            .with_visible(true);
+            .with_visible(visible)
+            .with_decorations(decorated);
         let window = unsafe{glutin::ContextBuilder::new()
             .with_double_buffer(Some(true))
             .with_vsync(true)
@@ -147,7 +213,7 @@ impl Viewport {
 
         let context = unsafe{glow::Context::from_loader_function(|s| window.get_proc_address(s) as *const _)};
 
-        let (vao, vbo, ibo, shader, font_tex) = unsafe {
+        let (vao, vbo, ibo, shader) = unsafe {
             let vao = context.create_vertex_array().unwrap();
             let vbo = context.create_buffer().unwrap();
             let ibo = context.create_buffer().unwrap();
@@ -181,27 +247,53 @@ impl Viewport {
             context.delete_shader(vertex_shader);
             context.delete_shader(fragment_shader);
 
-            let font_tex = context.create_texture().unwrap();
-            let data = imgui.fonts().build_rgba32_texture();
-            context.bind_texture(glow::TEXTURE_2D, Some(font_tex));
-            context.tex_image_2d(glow::TEXTURE_2D, 0, glow::RGBA as i32, data.width as i32, data.height as i32, 0, glow::RGBA, glow::UNSIGNED_BYTE, Some(data.data));
-            context.tex_parameter_i32(glow::TEXTURE_2D, glow::TEXTURE_MAG_FILTER, glow::LINEAR as i32);
-            context.tex_parameter_i32(glow::TEXTURE_2D, glow::TEXTURE_MIN_FILTER, glow::LINEAR as i32);
-            context.tex_parameter_i32(glow::TEXTURE_2D, glow::TEXTURE_WRAP_S, glow::CLAMP_TO_EDGE as i32);
-            context.tex_parameter_i32(glow::TEXTURE_2D, glow::TEXTURE_WRAP_T, glow::CLAMP_TO_EDGE as i32);
-
-            (vao, vbo, ibo, program, font_tex)
+            (vao, vbo, ibo, program)
         };
 
         Self {
-            window,
+            window: Some(window),
             context,
             vao,
             vbo,
             ibo,
             shader,
-            font_tex,
+            font_tex: None,
         }
+    }
+
+    fn init_font_texture(&mut self, imgui: &mut imgui::Context) {
+        if self.font_tex.is_some() {
+            return;
+        }
+
+        unsafe {
+            self.make_current();
+
+            let font_tex = self.context.create_texture().unwrap();
+
+            let data = imgui.fonts().build_rgba32_texture();
+            self.context.bind_texture(glow::TEXTURE_2D, Some(font_tex));
+            self.context.tex_image_2d(glow::TEXTURE_2D, 0, glow::RGBA as i32, data.width as i32, data.height as i32, 0, glow::RGBA, glow::UNSIGNED_BYTE, Some(data.data));
+            self.context.tex_parameter_i32(glow::TEXTURE_2D, glow::TEXTURE_MAG_FILTER, glow::LINEAR as i32);
+            self.context.tex_parameter_i32(glow::TEXTURE_2D, glow::TEXTURE_MIN_FILTER, glow::LINEAR as i32);
+            self.context.tex_parameter_i32(glow::TEXTURE_2D, glow::TEXTURE_WRAP_S, glow::CLAMP_TO_EDGE as i32);
+            self.context.tex_parameter_i32(glow::TEXTURE_2D, glow::TEXTURE_WRAP_T, glow::CLAMP_TO_EDGE as i32);
+
+            self.font_tex = Some(font_tex);
+        }
+    }
+
+    fn window(&self) -> &glutin::window::Window {
+        self.window.as_ref().unwrap().window()
+    }
+
+    fn make_current(&mut self) {
+        let window = self.window.take().unwrap();
+        self.window = unsafe{Some(window.make_current().unwrap())};
+    }
+
+    fn swap_buffers(&self) {
+        self.window.as_ref().unwrap().swap_buffers().unwrap();
     }
 }
 
