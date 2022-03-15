@@ -1,5 +1,5 @@
 use crate::flags::Bindgen;
-use anyhow::{anyhow, Context, Result, bail};
+use anyhow::{anyhow, bail, Context, Result};
 use std::path::{Path, PathBuf};
 
 impl Bindgen {
