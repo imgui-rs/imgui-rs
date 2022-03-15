@@ -253,7 +253,6 @@ where
     #[doc(alias = "DragIntRange2")]
     pub fn build(self, ui: &Ui, min: &mut i32, max: &mut i32) -> bool {
         unsafe {
-            let label;
             let mut display_format = std::ptr::null();
             let mut max_display_format = std::ptr::null();
 
@@ -261,7 +260,7 @@ where
             let buffer = &mut *ui.scratch_buffer().get();
             buffer.refresh_buffer();
 
-            label = buffer.push(self.label);
+            let label = buffer.push(self.label);
             if let Some(v) = self.display_format {
                 display_format = buffer.push(v);
             }
