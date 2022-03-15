@@ -1,5 +1,5 @@
 use crate::flags::Bindgen;
-use anyhow::{anyhow, Context, Result};
+use anyhow::{anyhow, Context, Result, bail};
 use std::path::{Path, PathBuf};
 
 impl Bindgen {
@@ -140,7 +140,7 @@ fn generate_binding_file(
     eprintln!("Executing bindgen [output = {}]", output.display());
     let status = cmd.status().context("Failed to execute bindgen")?;
     if !status.success() {
-        anyhow!(
+        bail!(
             "Failed to execute bindgen: {}, see output for details",
             status
         );
