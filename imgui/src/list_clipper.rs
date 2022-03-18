@@ -1,5 +1,4 @@
 use std::marker::PhantomData;
-use std::thread;
 
 use crate::sys;
 use crate::Ui;
@@ -22,6 +21,7 @@ pub struct ListClipper {
 }
 
 impl ListClipper {
+    /// Begins configuring a list clipper.
     pub const fn new(items_count: i32) -> Self {
         ListClipper {
             items_count,
@@ -45,6 +45,11 @@ impl ListClipper {
     }
 }
 
+/// List clipper is a mechanism to efficiently implement scrolling of
+/// large lists with random access.
+///
+/// For example you have a list of 1 million buttons, and the list
+/// clipper will help you only draw the ones which are visible.
 pub struct ListClipperToken<'ui> {
     list_clipper: *mut sys::ImGuiListClipper,
     _phantom: PhantomData<&'ui Ui>,
@@ -58,37 +63,186 @@ impl<'ui> ListClipperToken<'ui> {
         }
     }
 
+    /// Progress the list clipper.
+    ///
+    /// If this returns returns `true` then the you can loop between
+    /// between `clipper.display_start() .. clipper.display_end()`.
+    /// If this returns false, you must stop calling this method.
+    ///
+    /// Calling step again after it returns `false` will cause imgui
+    /// to abort. This mirrors the C++ interface.
+    ///
+    /// It is recommended to use the iterator interface!
     pub fn step(&mut self) -> bool {
         unsafe { sys::ImGuiListClipper_Step(self.list_clipper) }
     }
 
+    /// This is automatically called back the final call to
+    /// `step`. You can call it sooner but typically not needed.
     pub fn end(&mut self) {
         unsafe {
             sys::ImGuiListClipper_End(self.list_clipper);
         }
     }
 
+    /// First item to call, updated each call to `step`
     pub fn display_start(&self) -> i32 {
         unsafe { (*self.list_clipper).DisplayStart }
     }
 
+    /// End of items to call (exclusive), updated each call to `step`
     pub fn display_end(&self) -> i32 {
         unsafe { (*self.list_clipper).DisplayEnd }
+    }
+
+    /// Get an iterator which outputs all visible indexes. This is the
+    /// recommended way of using the clipper.
+    pub fn iter(self) -> ListClipperIterator<'ui> {
+        ListClipperIterator::new(self)
     }
 }
 
 impl<'ui> Drop for ListClipperToken<'ui> {
     fn drop(&mut self) {
-        if !self.step() {
-            unsafe {
-                sys::ImGuiListClipper_destroy(self.list_clipper);
-            };
-        } else if !thread::panicking() {
-            panic!(
-                "Forgot to call End(), or to Step() until false? \
-            This is the only token in the repository which users must call `.end()` or `.step()` \
-            with. See https://github.com/imgui-rs/imgui-rs/issues/438"
-            );
+        unsafe {
+            sys::ImGuiListClipper_destroy(self.list_clipper);
+        };
+    }
+}
+
+pub struct ListClipperIterator<'ui> {
+    list_clipper: ListClipperToken<'ui>,
+    exhausted: bool,
+    last_value: Option<i32>,
+}
+
+impl<'ui> ListClipperIterator<'ui> {
+    fn new(list_clipper: ListClipperToken<'ui>) -> Self {
+        Self {
+            list_clipper,
+            exhausted: false,
+            last_value: None,
         }
     }
+}
+
+impl Iterator for ListClipperIterator<'_> {
+    type Item = i32;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if let Some(lv) = self.last_value {
+            // Currently iterating a chunk (returning all values
+            // between display_start and display_end)
+            let next_value = lv + 1;
+
+            if lv >= self.list_clipper.display_end() - 1 {
+                // If we reach the end of the current chunk, clear
+                // last_value so we call step below
+                self.last_value = None;
+            } else {
+                // Otherwise just increment it
+                self.last_value = Some(next_value);
+            }
+        }
+
+        if let Some(lv) = self.last_value {
+            // Next item within current step's chunk
+            Some(lv)
+        } else {
+            // Start iterating a new chunk
+
+            if self.exhausted {
+                // If the clipper is exhausted, don't call step again!
+                None
+            } else {
+                // Advance the clipper
+                let ret = self.list_clipper.step();
+                if !ret {
+                    self.exhausted = true;
+                    None
+                } else {
+                    // Setup iteration for this step's chunk
+                    let start = self.list_clipper.display_start();
+                    let end = self.list_clipper.display_end();
+
+                    if start == end {
+                        // Somewhat special case: if a single item, we
+                        // don't store the last_value so we call
+                        // step() again next iteration
+                        self.last_value = None;
+                    } else {
+                        self.last_value = Some(start);
+                    }
+                    Some(start)
+                }
+            }
+        }
+    }
+}
+
+#[test]
+fn cpp_style_usage() {
+    // Setup
+    let (_guard, mut ctx) = crate::test::test_ctx_initialized();
+    let ui = ctx.frame();
+
+    let _window = ui
+        .window("Example")
+        .position([0.0, 0.0], crate::Condition::Always)
+        .size([100.0, 800.0], crate::Condition::Always)
+        .begin();
+
+    // Create clipper
+    let clip = ListClipper::new(1000);
+    let mut tok = clip.begin(&ui);
+
+    let mut ticks = 0;
+
+    while dbg!(tok.step()) {
+        for row_num in dbg!(tok.display_start())..dbg!(tok.display_end()) {
+            dbg!(row_num);
+            ui.text("...");
+            ticks += 1;
+        }
+    }
+
+    // Check it's called an expected amount of time (only the ones
+    // visible in given sized window)
+    assert_eq!(ticks, 44);
+
+    // Calling end multiple times is fine albeit redundant
+    tok.end();
+    tok.end();
+    tok.end();
+    tok.end();
+    tok.end();
+    tok.end();
+}
+
+#[test]
+fn iterator_usage() {
+    // Setup
+    let (_guard, mut ctx) = crate::test::test_ctx_initialized();
+    let ui = ctx.frame();
+
+    let _window = ui
+        .window("Example")
+        .position([0.0, 0.0], crate::Condition::Always)
+        .size([100.0, 800.0], crate::Condition::Always)
+        .begin();
+
+    // Create clipper
+    let clip = ListClipper::new(1000);
+
+    let mut ticks = 0;
+
+    let tok = clip.begin(&ui);
+    for row_num in tok.iter() {
+        dbg!(row_num);
+        ui.text("...");
+        ticks += 1;
+    }
+
+    // Should be consistent with size in `cpp_style_usage`
+    assert_eq!(ticks, 44);
 }
