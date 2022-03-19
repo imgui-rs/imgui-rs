@@ -40,11 +40,11 @@ fn main() {
                     // Create clipper with st
                     let clip = imgui::ListClipper::new(num_rows).begin(ui);
                     for row_num in clip.iter() {
-                            ui.table_next_row();
-                            for col_num in 0..num_cols {
-                                ui.table_set_column_index(col_num);
-                                ui.text(format!("Hello {},{}", col_num, row_num));
-                            }
+                        ui.table_next_row();
+                        for col_num in 0..num_cols {
+                            ui.table_set_column_index(col_num);
+                            ui.text(format!("Hello {},{}", col_num, row_num));
+                        }
                     }
                 }
             });
