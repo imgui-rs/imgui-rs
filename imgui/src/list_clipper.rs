@@ -53,6 +53,15 @@ impl ListClipper {
 pub struct ListClipperToken<'ui> {
     list_clipper: *mut sys::ImGuiListClipper,
     _phantom: PhantomData<&'ui Ui>,
+
+    /// In upstream imgui < 1.87, calling step too many times will
+    /// cause a segfault due to null pointer. So we keep track of this
+    /// and panic instead.
+    ///
+    /// Fixed in https://github.com/ocornut/imgui/commit/dca527b which
+    /// will likely be part of imgui 1.88 - at which point this can be
+    /// removed.
+    consumed_workaround: bool,
 }
 
 impl<'ui> ListClipperToken<'ui> {
@@ -60,6 +69,7 @@ impl<'ui> ListClipperToken<'ui> {
         Self {
             list_clipper,
             _phantom: PhantomData,
+            consumed_workaround: false,
         }
     }
 
@@ -74,7 +84,19 @@ impl<'ui> ListClipperToken<'ui> {
     ///
     /// It is recommended to use the iterator interface!
     pub fn step(&mut self) -> bool {
-        unsafe { sys::ImGuiListClipper_Step(self.list_clipper) }
+        let is_imgui_1_88_or_higher = false;
+        if is_imgui_1_88_or_higher {
+            unsafe { sys::ImGuiListClipper_Step(self.list_clipper) }
+        } else {
+            if self.consumed_workaround {
+                panic!("ListClipperToken::step called after it has previously returned false");
+            }
+            let ret = unsafe { sys::ImGuiListClipper_Step(self.list_clipper) };
+            if ret {
+                self.consumed_workaround = true;
+            }
+            ret
+        }
     }
 
     /// This is automatically called back the final call to
