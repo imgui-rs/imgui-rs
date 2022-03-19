@@ -339,7 +339,7 @@ pub struct Io {
     nav_inputs_down_duration: [f32; NavInput::COUNT + NavInput::INTERNAL_COUNT],
     nav_inputs_down_duration_prev: [f32; NavInput::COUNT + NavInput::INTERNAL_COUNT],
     pen_pressure: f32,
-    app_focus_lost: bool,
+    pub app_focus_lost: bool,
     input_queue_surrogate: sys::ImWchar16,
     input_queue_characters: ImVector<sys::ImWchar>,
 }
