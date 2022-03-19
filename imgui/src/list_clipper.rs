@@ -92,7 +92,7 @@ impl<'ui> ListClipperToken<'ui> {
                 panic!("ListClipperToken::step called after it has previously returned false");
             }
             let ret = unsafe { sys::ImGuiListClipper_Step(self.list_clipper) };
-            if ret {
+            if !ret {
                 self.consumed_workaround = true;
             }
             ret
