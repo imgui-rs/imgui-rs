@@ -194,7 +194,7 @@ fn cpp_style_usage() {
 
     // Create clipper
     let clip = ListClipper::new(1000);
-    let mut tok = clip.begin(&ui);
+    let mut tok = clip.begin(ui);
 
     let mut ticks = 0;
 
@@ -236,7 +236,7 @@ fn iterator_usage() {
 
     let mut ticks = 0;
 
-    let tok = clip.begin(&ui);
+    let tok = clip.begin(ui);
     for row_num in tok.iter() {
         dbg!(row_num);
         ui.text("...");
