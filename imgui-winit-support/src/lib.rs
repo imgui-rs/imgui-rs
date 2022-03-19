@@ -941,14 +941,14 @@ impl WinitPlatform {
                     }
                     _ => (),
                 }
-            },
+            }
             WindowEvent::Focused(newly_focused) => {
                 if !newly_focused {
                     // Set focus-lost to avoid stuck keys (like 'alt'
                     // when alt-tabbing)
                     io.app_focus_lost = true;
                 }
-            },
+            }
             _ => (),
         }
     }
