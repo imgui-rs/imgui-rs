@@ -15,8 +15,30 @@
 //!
 //! ## Complete example for winit 0.20+ (without a renderer)
 //!
-//! ```rust,no_run,ignore
-//! # // TODO: Remove ignore when only one winit version is used
+//! ```no_run
+//! # #[cfg(feature = "winit-19")]
+//! # fn main() {}
+//! #
+//! # #[cfg(not(feature = "winit-19"))]
+//! # fn main() {
+//! # #[cfg(feature = "winit-20")]
+//! # use winit_20 as winit;
+//! #
+//! # #[cfg(feature = "winit-22")]
+//! # use winit_22 as winit;
+//! #
+//! # #[cfg(feature = "winit-23")]
+//! # use winit_23 as winit;
+//! #
+//! # #[cfg(feature = "winit-24")]
+//! # use winit_24 as winit;
+//! #
+//! # #[cfg(feature = "winit-25")]
+//! # use winit_25 as winit;
+//! #
+//! # #[cfg(feature = "winit-26")]
+//! # use winit_26 as winit;
+//! #
 //! use imgui::Context;
 //! use imgui_winit_support::{HiDpiMode, WinitPlatform};
 //! use std::time::Instant;
@@ -39,7 +61,9 @@
 //!     match event {
 //!         Event::NewEvents(_) => {
 //!             // other application-specific logic
-//!             last_frame = imgui.io_mut().update_delta_time(last_frame);
+//!             let now = Instant::now();
+//!             imgui.io_mut().update_delta_time(now - last_frame);
+//!             last_frame = now;
 //!         },
 //!         Event::MainEventsCleared => {
 //!             // other application-specific logic
@@ -55,7 +79,7 @@
 //!
 //!             platform.prepare_render(&ui, &window); // step 5
 //!             // render the UI with a renderer
-//!             let draw_data = ui.render();
+//!             let draw_data = imgui.render();
 //!             // renderer.render(..., draw_data).expect("UI rendering failed");
 //!
 //!             // application-specific rendering *over the UI*
@@ -70,6 +94,7 @@
 //!         }
 //!     }
 //! })
+//! # }
 //! ```
 //!
 //! ## `winit` versions and features.
