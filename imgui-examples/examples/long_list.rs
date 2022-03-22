@@ -15,8 +15,10 @@ fn main() {
 
     let system = support::init(file!());
     system.main_loop(move |_, ui| {
+        // Show the C++ style API
         ui.window("Hello long world")
-            .size([300.0, 110.0], Condition::FirstUseEver)
+            .size([100.0, 500.0], Condition::FirstUseEver)
+            .position([10.0, 10.0], crate::Condition::Always)
             .build(|| {
                 let mut clipper = imgui::ListClipper::new(lots_of_words.len() as i32)
                     .items_height(ui.current_font_size())
@@ -25,6 +27,19 @@ fn main() {
                     for row_num in clipper.display_start()..clipper.display_end() {
                         ui.text(&lots_of_words[row_num as usize]);
                     }
+                }
+            });
+
+        // Show the more Rust'y iterator
+        ui.window("Hello long world (iterator API)")
+            .size([100.0, 500.0], Condition::FirstUseEver)
+            .position([150.0, 10.0], crate::Condition::Always)
+            .build(|| {
+                let clipper = imgui::ListClipper::new(lots_of_words.len() as i32)
+                    .items_height(ui.current_font_size())
+                    .begin(ui);
+                for row_num in clipper.iter() {
+                    ui.text(&lots_of_words[row_num as usize]);
                 }
             });
     });
