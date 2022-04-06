@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use nohash_hasher::IntMap;
 
 /// An opaque texture identifier
 #[derive(Copy, Clone, Debug, Eq, PartialEq, Hash)]
@@ -56,16 +56,16 @@ fn test_texture_id_memory_layout() {
 /// Generic texture mapping for use by renderers.
 #[derive(Debug, Default)]
 pub struct Textures<T> {
-    textures: HashMap<usize, T>,
+    textures: IntMap<usize, T>,
     next: usize,
 }
 
 impl<T> Textures<T> {
-    // TODO: hasher like rustc_hash::FxHashMap or something would let this be
+    // TODO: once std exposes a `const fn` constructor for HashMap this can be
     // `const fn`
     pub fn new() -> Self {
         Textures {
-            textures: HashMap::new(),
+            textures: IntMap::default(),
             next: 0,
         }
     }
