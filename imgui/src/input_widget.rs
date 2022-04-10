@@ -1051,7 +1051,20 @@ impl TextCallbackData {
     /// This Range is given in `usize` so that it might be used in indexing
     /// operations more easily. To quickly grab the selected text, use [selected](Self::selected).
     pub fn selection(&self) -> Range<usize> {
-        unsafe { (*(self.0)).SelectionStart as usize..(*(self.0)).SelectionEnd as usize }
+        let (start, end) = unsafe {
+            (
+                (*(self.0)).SelectionStart as usize,
+                (*(self.0)).SelectionEnd as usize,
+            )
+        };
+        // Avoid returning a range with start > end, which would be problematic. For example, it
+        // would cause panics when used to index the string buffer and would also cause Self::has_selection
+        // to return a false negative.
+        if start < end {
+            start..end
+        } else {
+            end..start
+        }
     }
 
     /// Returns the selected text directly. Note that if no text is selected,
