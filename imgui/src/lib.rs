@@ -723,9 +723,7 @@ impl Ui {
     /// [`Ui::begin_enabled`].
     #[doc(alias = "BeginDisabled", alias = "EndDisabled")]
     pub fn enabled<F: FnOnce()>(&self, enabled: bool, f: F) {
-        unsafe { sys::igBeginDisabled(!enabled) };
-        f();
-        unsafe { sys::igEndDisabled() };
+        self.disabled(!enabled, f)
     }
 }
 
