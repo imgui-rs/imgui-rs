@@ -3,6 +3,11 @@
 //! This is heavily influenced by the
 //! [example from upstream](https://github.com/ocornut/imgui/blob/fe245914114588f272b0924538fdd43f6c127a26/backends/imgui_impl_opengl3.cpp).
 //!
+//! It is important to note this renderer's API is not foolproof. It was designed
+//! more for simplicity and control (allowing the user to manually have some control
+//! over the GL state) than as a production-ready fully-general API. This control is
+//! why so many things are `pub`.
+//!
 //! # Basic usage
 //!
 //! A few code [examples] are provided in the source.
@@ -276,6 +281,16 @@ impl Renderer {
         gl_debug_message(gl, "imgui-rs-glow: start render");
         self.state_backup.pre_render(gl, self.gl_version);
 
+        #[cfg(feature = "bind_vertex_array_support")]
+        if self.gl_version.bind_vertex_array_support() {
+            unsafe {
+                self.vertex_array_object = gl
+                    .create_vertex_array()
+                    .map_err(|err| format!("Error creating vertex array object: {}", err))?;
+                gl.bind_vertex_array(Some(self.vertex_array_object));
+            }
+        }
+
         self.set_up_render_state(gl, draw_data, fb_width, fb_height)?;
 
         gl_debug_message(gl, "start loop over draw lists");
@@ -394,16 +409,6 @@ impl Renderer {
         #[cfg(feature = "bind_sampler_support")]
         if self.gl_version.bind_sampler_support() {
             unsafe { gl.bind_sampler(0, None) };
-        }
-
-        #[cfg(feature = "bind_vertex_array_support")]
-        if self.gl_version.bind_vertex_array_support() {
-            unsafe {
-                self.vertex_array_object = gl
-                    .create_vertex_array()
-                    .map_err(|err| format!("Error creating vertex array object: {}", err))?;
-                gl.bind_vertex_array(Some(self.vertex_array_object));
-            }
         }
 
         // TODO: soon it should be possible for these to be `const` functions
