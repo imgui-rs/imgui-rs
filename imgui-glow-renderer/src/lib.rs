@@ -3,11 +3,6 @@
 //! This is heavily influenced by the
 //! [example from upstream](https://github.com/ocornut/imgui/blob/fe245914114588f272b0924538fdd43f6c127a26/backends/imgui_impl_opengl3.cpp).
 //!
-//! It is important to note this renderer's API is not foolproof. It was designed
-//! more for simplicity and control (allowing the user to manually have some control
-//! over the GL state) than as a production-ready fully-general API. This control is
-//! why so many things are `pub`.
-//!
 //! # Basic usage
 //!
 //! A few code [examples] are provided in the source.
@@ -31,7 +26,10 @@
 //! Consider this an example renderer. It is intended to be sufficent for simple
 //! applications running imgui-rs as the final rendering step. If your application
 //! has more specific needs, it's probably best to write your own renderer, in
-//! which case this can be a useful starting point.
+//! which case this can be a useful starting point. This renderer is also not
+//! foolproof (largely due to the global nature of the OpenGL state). For example,
+//! a few "internal" functions are marked `pub` to allow the user more
+//! fine-grained control at the cost of allowing potential rendering errors.
 //!
 //! # sRGB
 //!
