@@ -1,6 +1,6 @@
 [package]
 name = "imgui-glow-renderer"
-version = "0.8.1-alpha.0"
+version = "0.8.3"
 edition = "2018"
 authors = ["jmaargh and the imgui-rs Developers"]
 description = "glow renderer for the imgui crate"
@@ -10,13 +10,13 @@ license = "MIT/Apache-2.0"
 categories = ["gui", "rendering"]
 
 [dependencies]
-imgui = { version = "0.8.1-alpha.0", path = "../imgui" }
+imgui = { version = "0.8.3", path = "../imgui" }
 glow = "0.10.0"
 memoffset = "0.6.4"
 
 [dev-dependencies]
 glutin = "0.28.0"
-imgui-winit-support = { version = "0.8.1-alpha.0", path = "../imgui-winit-support" }
+imgui-winit-support = { version = "0.8.3", path = "../imgui-winit-support" }
 image = "0.23"
 
 [features]
