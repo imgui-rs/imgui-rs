@@ -3,7 +3,7 @@
 [![Build Status](https://github.com/imgui-rs/imgui-rs/workflows/ci/badge.svg)](https://github.com/imgui-rs/imgui-rs/actions)
 [![Latest release on crates.io](https://img.shields.io/crates/v/imgui.svg)](https://crates.io/crates/imgui)
 [![Documentation on docs.rs](https://docs.rs/imgui/badge.svg)](https://docs.rs/imgui)
-[![Wrapped Dear ImGui Version](https://img.shields.io/badge/Dear%20ImGui%20Version-1.84.2-blue.svg)](https://github.com/ocornut/imgui)
+[![Wrapped Dear ImGui Version](https://img.shields.io/badge/Dear%20ImGui%20Version-1.86-blue.svg)](https://github.com/ocornut/imgui)
 
 (Recently under new maintenance, things subject to change)
 
@@ -123,7 +123,7 @@ cargo run --example glow_01_basic
 Note to Windows users: You will need to use the _MSVC ABI_ version of the Rust
 compiler along with its associated
 [dependencies](https://www.rust-lang.org/en-US/downloads.html#win-foot) to
-build this libary and run the examples.
+build this library and run the examples.
 
 ## How to contribute
 
