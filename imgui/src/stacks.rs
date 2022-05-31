@@ -284,7 +284,7 @@ impl Ui {
 }
 
 /// A temporary change in item flags
-#[derive(Copy, Clone, Debug, PartialEq)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq)]
 pub enum ItemFlag {
     AllowKeyboardFocus(bool),
     ButtonRepeat(bool),
@@ -371,7 +371,7 @@ impl IdStackToken<'_> {
 }
 
 /// # ID stack
-impl<'ui> Ui {
+impl Ui {
     /// Pushes an identifier to the ID stack.
     ///
     /// Returns an `IdStackToken` that can be popped by calling `.end()`

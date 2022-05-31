@@ -760,7 +760,7 @@ pub struct TableColumnSetup<Name> {
     pub user_id: Id,
 }
 
-impl<'a, Name: AsRef<str>> TableColumnSetup<Name> {
+impl<Name: AsRef<str>> TableColumnSetup<Name> {
     pub fn new(name: Name) -> Self {
         Self {
             name,

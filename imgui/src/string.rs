@@ -232,7 +232,7 @@ impl ImString {
     }
 }
 
-impl<'a> Default for ImString {
+impl Default for ImString {
     #[inline]
     fn default() -> ImString {
         ImString(vec![b'\0'])

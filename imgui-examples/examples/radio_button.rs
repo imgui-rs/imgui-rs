@@ -107,7 +107,7 @@ struct State {
     choice: Option<Choice>,
 }
 
-#[derive(Copy, Clone, PartialEq)]
+#[derive(Copy, Clone, PartialEq, Eq)]
 enum Choice {
     A,
     B,

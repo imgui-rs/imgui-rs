@@ -160,7 +160,7 @@ impl CursorSettings {
     }
 }
 
-#[derive(Copy, Clone, Debug, PartialEq)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq)]
 enum ActiveHiDpiMode {
     Default,
     Rounded,
