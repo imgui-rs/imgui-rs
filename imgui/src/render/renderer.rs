@@ -1,4 +1,4 @@
-use nohash_hasher::IntMap;
+use std::collections::HashMap;
 
 /// An opaque texture identifier
 #[derive(Copy, Clone, Debug, Eq, PartialEq, Hash)]
@@ -56,7 +56,7 @@ fn test_texture_id_memory_layout() {
 /// Generic texture mapping for use by renderers.
 #[derive(Debug, Default)]
 pub struct Textures<T> {
-    textures: IntMap<usize, T>,
+    textures: HashMap<usize, T, NoHashHasherBuilder>,
     next: usize,
 }
 
@@ -65,7 +65,7 @@ impl<T> Textures<T> {
     // `const fn`
     pub fn new() -> Self {
         Textures {
-            textures: IntMap::default(),
+            textures: Default::default(),
             next: 0,
         }
     }
@@ -91,5 +91,32 @@ impl<T> Textures<T> {
 
     pub fn get_mut(&mut self, id: TextureId) -> Option<&mut T> {
         self.textures.get_mut(&id.0)
+    }
+}
+
+#[derive(Default)]
+struct NoHashHasherBuilder;
+impl std::hash::BuildHasher for NoHashHasherBuilder {
+    type Hasher = NoHashHasher;
+    #[inline(always)]
+    fn build_hasher(&self) -> Self::Hasher {
+        NoHashHasher(0)
+    }
+}
+
+struct NoHashHasher(u64);
+impl std::hash::Hasher for NoHashHasher {
+    #[inline(always)]
+    fn finish(&self) -> u64 {
+        self.0
+    }
+
+    fn write(&mut self, _: &[u8]) {
+        panic!("This hasher only supports usize.");
+    }
+
+    #[inline(always)]
+    fn write_usize(&mut self, i: usize) {
+        self.0 = i as u64;
     }
 }
