@@ -151,6 +151,16 @@ jobs:
       - name: build documentation
         run: cargo doc
 
+      # Test the .crate sent to crates.io can be built
+      - name: build .crate package (default)
+        run: cargo package
+      - name: build .crate package (docking)
+        run: cargo package --features docking
+      - name: build .crate package (freetype)
+        run: cargo package --features freetype
+      - name: build .crate package (all)
+        run: cargo package --features freetype,docking
+
       # Run unreasonably slow tests under release, but only the crates that have
       # them, and don't bother doing this on most platforms.
       - run: cargo test -p imgui --release -- --ignored
