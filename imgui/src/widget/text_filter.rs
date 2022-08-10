@@ -58,8 +58,18 @@ impl TextFilter {
         }
     }
 
-    pub fn pass_filter_end(_buf: String, _end: String) -> bool {
-        true
+    pub fn pass_filter_end(&self, mut start: String, mut end: String) -> bool {
+        start.push('\0');
+        end.push('\0');
+        let b_ptr = start.as_mut_ptr();
+        let e_ptr = end.as_mut_ptr();
+        unsafe {
+            sys::ImGuiTextFilter_PassFilter(
+                self.raw,
+                b_ptr as *mut sys::cty::c_char,
+                e_ptr as *mut sys::cty::c_char,
+            )
+        }
     }
 
     pub fn clear(&mut self) {
