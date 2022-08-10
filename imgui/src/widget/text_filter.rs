@@ -1,3 +1,4 @@
+//! Helper to parse and apply text filters
 use crate::sys;
 use crate::Ui;
 use std::ptr;
@@ -9,15 +10,19 @@ pub struct TextFilter {
 }
 
 impl TextFilter {
-    pub fn new(id: String) -> Self {
-        Self::new_with_filter(id, String::new())
+    /// Creates a new TextFilter with a empty filter.
+    ///
+    /// This is equivalent of [new_with_filter](Self::new_with_filter) with `filter` set to `""`.
+    pub fn new(label: String) -> Self {
+        Self::new_with_filter(label, String::new())
     }
 
-    pub fn new_with_filter(id: String, mut filter: String) -> Self {
+    /// Creates a new TextFilter with a custom filter.
+    pub fn new_with_filter(label: String, mut filter: String) -> Self {
         filter.push('\0');
         let ptr = filter.as_mut_ptr();
         Self {
-            id,
+            id: label,
             size: 0.0,
             raw: unsafe { sys::ImGuiTextFilter_ImGuiTextFilter(ptr as *mut sys::cty::c_char) },
         }
@@ -27,12 +32,13 @@ impl TextFilter {
         self.size = size;
     }
 
-    pub fn build(&mut self) {
+    pub fn build(&self) {
         unsafe {
             sys::ImGuiTextFilter_Build(self.raw);
         }
     }
 
+    /// Draws the TextFilter.
     pub fn draw(&self) {
         self.draw_size(0.0);
     }
@@ -50,6 +56,7 @@ impl TextFilter {
         unsafe { sys::ImGuiTextFilter_IsActive(self.raw) }
     }
 
+    /// Returns true if the text matches the filter.
     pub fn pass_filter(&self, mut buf: String) -> bool {
         buf.push('\0');
         let ptr = buf.as_mut_ptr();
@@ -72,7 +79,7 @@ impl TextFilter {
         }
     }
 
-    pub fn clear(&mut self) {
+    pub fn clear(&self) {
         unsafe {
             sys::ImGuiTextFilter_Clear(self.raw);
         }
