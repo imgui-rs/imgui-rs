@@ -53,6 +53,7 @@ struct State {
     stacked_modals_item: usize,
     stacked_modals_color: [f32; 4],
     app_log: Vec<String>,
+    filter: imgui::TextFilter,
 
     tabs: TabState,
 }
@@ -117,6 +118,7 @@ impl Default for State {
             stacked_modals_item: 0,
             stacked_modals_color: [0.4, 0.7, 0.0, 0.5],
             app_log: Vec::new(),
+            filter: TextFilter::new(String::from("Test")),
             tabs: TabState::default(),
         }
     }
@@ -728,6 +730,24 @@ CTRL+click on individual component to input value.\n",
                         });
                     });
 
+                }
+            }
+        }
+
+        if CollapsingHeader::new("Filtering").build(ui) {
+            ui.text_wrapped(
+                "Filter usage:\n\
+                 \"\"         display all lines\n\
+                 \"xxx\"      display lines containing \"xxx\"\n\
+                 \"xxx,yyy\"  display lines containing \"xxx\" or \"yyy\"\n\
+                 \"-xxx\"     hide lines containing \"xxx\""
+            );
+
+            state.filter.draw();
+            let lines = vec!["aaa1.c", "bbb1.c", "ccc1.c", "aaa2.cpp", "bbb2.cpp", "ccc2.cpp", "abc.h", "hello, world!"];
+            for i in lines.iter() {
+                if state.filter.pass_filter(String::from(*i)) {
+                    ui.bullet_text(i);
                 }
             }
         }

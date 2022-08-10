@@ -10,4 +10,5 @@ pub mod selectable;
 pub mod slider;
 pub mod tab;
 pub mod text;
+pub mod text_filter;
 pub mod tree;

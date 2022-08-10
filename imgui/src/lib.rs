@@ -45,6 +45,7 @@ pub use self::widget::progress_bar::*;
 pub use self::widget::selectable::*;
 pub use self::widget::slider::*;
 pub use self::widget::tab::*;
+pub use self::widget::text_filter::*;
 pub use self::widget::tree::*;
 pub use self::window::child_window::*;
 pub use self::window::*;
