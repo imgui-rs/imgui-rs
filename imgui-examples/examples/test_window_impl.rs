@@ -745,6 +745,12 @@ CTRL+click on individual component to input value.\n",
 
             state.filter.draw();
             let lines = vec!["aaa1.c", "bbb1.c", "ccc1.c", "aaa2.cpp", "bbb2.cpp", "ccc2.cpp", "abc.h", "hello, world!"];
+
+            ui.same_line();
+            if ui.button("Clear##clear_filter") {
+                state.filter.clear();
+            }
+
             for i in lines.iter() {
                 if state.filter.pass_filter(String::from(*i)) {
                     ui.bullet_text(i);

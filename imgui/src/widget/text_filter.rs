@@ -5,12 +5,11 @@ use std::ptr;
 
 pub struct TextFilter {
     id: String,
-    size: f32,
     raw: *mut sys::ImGuiTextFilter,
 }
 
 impl TextFilter {
-    /// Creates a new TextFilter with a empty filter.
+    /// Creates a new TextFilter with an empty filter.
     ///
     /// This is equivalent of [new_with_filter](Self::new_with_filter) with `filter` set to `""`.
     pub fn new(label: String) -> Self {
@@ -23,27 +22,31 @@ impl TextFilter {
         let ptr = filter.as_mut_ptr();
         Self {
             id: label,
-            size: 0.0,
             raw: unsafe { sys::ImGuiTextFilter_ImGuiTextFilter(ptr as *mut sys::cty::c_char) },
         }
     }
 
-    pub fn set_size(&mut self, size: f32) {
-        self.size = size;
-    }
-
+    /// Builds the TextFilter with its filter attribute. You can use
+    /// `[pass_filter()](Self::pass_filter)` after it.
+    ///
+    /// If you want control the filter with an InputText, check `[draw()](Self::draw)`.
     pub fn build(&self) {
         unsafe {
             sys::ImGuiTextFilter_Build(self.raw);
         }
     }
 
-    /// Draws the TextFilter.
+    /// Draws an [InputText](crate::input_widget::InputText) to control the filter of the TextFilter.
+    ///
+    /// This is equivalent of [draw_with_size](Self::draw_with_size) with `size` set to `0.0`.
     pub fn draw(&self) {
-        self.draw_size(0.0);
+        self.draw_with_size(0.0);
     }
 
-    pub fn draw_size(&self, size: f32) {
+    /// Draws an [InputText](crate::input_widget::InputText) to control the filter of the TextFilter.
+    ///
+    /// The InputText has the size passed in parameters.
+    pub fn draw_with_size(&self, size: f32) {
         unsafe {
             let mut id = self.id.clone();
             id.push('\0');
@@ -52,11 +55,12 @@ impl TextFilter {
         }
     }
 
+    /// Returns true if the filter is not empty (`""`).
     pub fn is_active(&self) -> bool {
         unsafe { sys::ImGuiTextFilter_IsActive(self.raw) }
     }
 
-    /// Returns true if the text matches the filter.
+    /// Returns true if the buffer matches the filter.
     pub fn pass_filter(&self, mut buf: String) -> bool {
         buf.push('\0');
         let ptr = buf.as_mut_ptr();
@@ -65,7 +69,7 @@ impl TextFilter {
         }
     }
 
-    pub fn pass_filter_end(&self, mut start: String, mut end: String) -> bool {
+    pub fn pass_filter_with_end(&self, mut start: String, mut end: String) -> bool {
         start.push('\0');
         end.push('\0');
         let b_ptr = start.as_mut_ptr();
@@ -79,6 +83,7 @@ impl TextFilter {
         }
     }
 
+    /// Clears the filter.
     pub fn clear(&self) {
         unsafe {
             sys::ImGuiTextFilter_Clear(self.raw);
