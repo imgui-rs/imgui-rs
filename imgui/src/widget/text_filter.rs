@@ -1,8 +1,8 @@
-//! Helper to parse and apply text filters
 use crate::sys;
 use crate::Ui;
 use std::ptr;
 
+/// Helper to parse and apply text filters
 pub struct TextFilter {
     id: String,
     raw: *mut sys::ImGuiTextFilter,
@@ -27,9 +27,9 @@ impl TextFilter {
     }
 
     /// Builds the TextFilter with its filter attribute. You can use
-    /// `[pass_filter()](Self::pass_filter)` after it.
+    /// [`pass_filter()`](Self::pass_filter) after it.
     ///
-    /// If you want control the filter with an InputText, check `[draw()](Self::draw)`.
+    /// If you want control the filter with an InputText, check [`draw()`](Self::draw).
     pub fn build(&self) {
         unsafe {
             sys::ImGuiTextFilter_Build(self.raw);
@@ -61,6 +61,8 @@ impl TextFilter {
     }
 
     /// Returns true if the buffer matches the filter.
+    ///
+    /// [`draw()`](Self::draw) or [`build()`](Self::build) mut be called **before** this function.
     pub fn pass_filter(&self, mut buf: String) -> bool {
         buf.push('\0');
         let ptr = buf.as_mut_ptr();
@@ -94,5 +96,9 @@ impl TextFilter {
 impl Ui {
     pub fn text_filter(label: String) -> TextFilter {
         TextFilter::new(label)
+    }
+
+    pub fn text_filter_with_filter(label: String, filter: String) -> TextFilter {
+        TextFilter::new_with_filter(label, filter)
     }
 }
