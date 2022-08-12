@@ -63,7 +63,8 @@ impl TextFilter {
     /// Returns true if the buffer matches the filter.
     ///
     /// [`draw()`](Self::draw) or [`build()`](Self::build) mut be called **before** this function.
-    pub fn pass_filter(&self, mut buf: String) -> bool {
+    pub fn pass_filter(&self, buf: &str) -> bool {
+        let mut buf = String::from(buf);
         buf.push('\0');
         let ptr = buf.as_mut_ptr();
         unsafe {
@@ -71,7 +72,8 @@ impl TextFilter {
         }
     }
 
-    pub fn pass_filter_with_end(&self, mut start: String, mut end: String) -> bool {
+    pub fn pass_filter_with_end(&self, start: &str, end: &str) -> bool {
+        let (mut start, mut end) = (String::from(start), String::from(end));
         start.push('\0');
         end.push('\0');
         let b_ptr = start.as_mut_ptr();

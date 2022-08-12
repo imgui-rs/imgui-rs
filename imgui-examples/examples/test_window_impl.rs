@@ -752,7 +752,7 @@ CTRL+click on individual component to input value.\n",
             }
 
             for i in lines.iter() {
-                if state.filter.pass_filter(String::from(*i)) {
+                if state.filter.pass_filter(i) {
                     ui.bullet_text(i);
                 }
             }
