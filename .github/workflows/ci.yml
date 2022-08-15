@@ -153,13 +153,13 @@ jobs:
 
       # Test the .crate sent to crates.io can be built
       - name: build .crate package (default)
-        run: cargo package -p imgui-sys && cargo package -p imgui
+        run: cargo package --no-verify -p imgui-sys && cargo package --no-verify -p imgui
       - name: build .crate package (docking)
-        run: cargo package -p imgui-sys --features docking && cargo package -p imgui --features docking
+        run: cargo package --no-verify -p imgui-sys --features docking && cargo package --no-verify -p imgui --features docking
       - name: build .crate package (freetype)
-        run: cargo package -p imgui-sys --features freetype && cargo package -p imgui --features freetype
+        run: cargo package --no-verify -p imgui-sys --features freetype && cargo package --no-verify -p imgui --features freetype
       - name: build .crate package (all)
-        run: cargo package -p imgui-sys --features docking,freetype && cargo package -p imgui --features docking,freetype
+        run: cargo package --no-verify -p imgui-sys --features docking,freetype && cargo package --no-verify -p imgui --features docking,freetype
 
       # Run unreasonably slow tests under release, but only the crates that have
       # them, and don't bother doing this on most platforms.
