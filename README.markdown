@@ -5,8 +5,6 @@
 [![Documentation on docs.rs](https://docs.rs/imgui/badge.svg)](https://docs.rs/imgui)
 [![Wrapped Dear ImGui Version](https://img.shields.io/badge/Dear%20ImGui%20Version-1.84.2-blue.svg)](https://github.com/ocornut/imgui)
 
-(Recently under new maintenance, things subject to change)
-
 ![Hello world](hello_world.png)
 
 ```rust
