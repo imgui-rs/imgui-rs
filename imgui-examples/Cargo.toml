@@ -11,7 +11,7 @@ publish = false
 
 [dev-dependencies]
 clipboard = "0.5"
-glium = { version = "0.31", default-features = true }
+glium = { version = "0.32.1", default-features = true }
 image = "0.23"
 imgui = { path = "../imgui", features = ["tables-api"] }
 imgui-glium-renderer = { path = "../imgui-glium-renderer" }
