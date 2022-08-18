@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-- MSRV is now **1.54**. We soft-updated to this in 0.8.0 with a feature `min-const-generics`, which has now been removed (and as such, we resume having no default features).
+- MSRV is now **1.56**. We soft-updated to this to Rust 1.54 in the v0.8.0 release (with a feature `min-const-generics`), which has now been removed (and as such, we resume having no default features). Rust 1.56 is required for some indirect dependencies which now use the Rust 2021 edition
 
 - Upgraded from Dear ImGui 1.84.2 to 1.86. See [the 1.85](https://github.com/ocornut/imgui/releases/tag/v1.85) and [the 1.86](https://github.com/ocornut/imgui/releases/tag/v1.86) release notes
 

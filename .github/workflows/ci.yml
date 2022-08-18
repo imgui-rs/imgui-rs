@@ -22,7 +22,7 @@ jobs:
 
     strategy:
       matrix:
-        rust: ["1.54"]
+        rust: ["1.56"]
 
     env:
       RUSTFLAGS: -D warnings
@@ -82,7 +82,7 @@ jobs:
         rust:
           - stable
           - beta
-          - "1.54"
+          - "1.56"
         os:
           - ubuntu-latest
           - macos-latest
