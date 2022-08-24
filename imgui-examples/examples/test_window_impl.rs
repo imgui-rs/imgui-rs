@@ -389,13 +389,28 @@ fn show_test_window(ui: &Ui, state: &mut State, opened: &mut bool) {
         }
         if CollapsingHeader::new("Widgets").build(ui) {
             if let Some(_t) = ui.tree_node("Tree") {
-                for i in 0..5 {
+                let num_child = 4;
+                for i in 0..num_child {
                     if let Some(_t) = ui.tree_node(format!("Child {}", i)) {
                         ui.text("blah blah");
                         ui.same_line();
                         if ui.small_button("print") {
                             println!("Child {} pressed", i);
                         }
+                    }
+                }
+
+                {
+                    let tree_node_stack = ui.tree_node_config("##HideTreeNodeLabel")
+                        .allow_item_overlap(true)
+                        .push();
+                    ui.same_line();
+                    if ui.small_button(format!("Child {} is a button", num_child)) {
+                        println!("TreeNode Button pressed.");
+                    }
+
+                    if tree_node_stack.is_some() {
+                        ui.text("blah blah")
                     }
                 }
             }
