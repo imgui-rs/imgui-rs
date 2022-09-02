@@ -179,7 +179,8 @@ unsafe fn push_style_var(style_var: StyleVar) {
 impl Ui {
     /// Changes the item width by pushing a change to the item width stack.
     ///
-    /// Returns an `ItemWidthStackToken` that may be popped by calling `.pop()`
+    /// Returns an `ItemWidthStackToken`. The pushed width item is popped when either
+    /// `ItemWidthStackToken` goes out of scope, or `.end()` is called.
     ///
     /// - `> 0.0`: width is `item_width` pixels
     /// - `= 0.0`: default to ~2/3 of window width
@@ -208,13 +209,14 @@ impl Ui {
         unsafe { sys::igCalcItemWidth() }
     }
 
-    /// Changes the text wrapping position to the end of window (or column), which
-    /// is generally the default.
+    /// Makes the text wrap at the end of window/column (which is generally the default), by
+    /// pushing a change to the text wrapping position stack.
     ///
     /// This is the same as calling [push_text_wrap_pos_with_pos](Self::push_text_wrap_pos_with_pos)
     /// with `wrap_pos_x` set to 0.0.
     ///
-    /// Returns a `TextWrapPosStackToken` that may be popped by calling `.pop()`
+    /// Returns a `TextWrapPosStackToken`. The pushed position item is popped when either
+    /// `TextWrapPosStackToken` goes out of scope, or `.end()` is called.
     #[doc(alias = "PushTextWrapPos")]
     pub fn push_text_wrap_pos(&self) -> TextWrapPosStackToken<'_> {
         self.push_text_wrap_pos_with_pos(0.0)
@@ -222,7 +224,8 @@ impl Ui {
 
     /// Changes the text wrapping position by pushing a change to the text wrapping position stack.
     ///
-    /// Returns a `TextWrapPosStackToken` that may be popped by calling `.pop()`
+    /// Returns a `TextWrapPosStackToken`. The pushed position item is popped when either
+    /// `TextWrapPosStackToken` goes out of scope, or `.end()` is called.
     ///
     /// - `> 0.0`: wrap at `wrap_pos_x` position in window local space
     /// - `= 0.0`: wrap to end of window (or column)
