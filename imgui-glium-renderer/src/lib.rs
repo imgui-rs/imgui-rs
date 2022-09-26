@@ -117,18 +117,21 @@ impl glium::vertex::Vertex for GliumDrawVert {
             (
                 Borrowed("pos"),
                 0,
+                -1,
                 glium::vertex::AttributeType::F32F32,
                 false,
             ),
             (
                 Borrowed("uv"),
                 8,
+                -1,
                 glium::vertex::AttributeType::F32F32,
                 false,
             ),
             (
                 Borrowed("col"),
                 16,
+                -1,
                 glium::vertex::AttributeType::U8U8U8U8,
                 false,
             ),
