@@ -22,7 +22,7 @@ jobs:
 
     strategy:
       matrix:
-        rust: ["1.56"]
+        rust: ["1.57"]
 
     env:
       RUSTFLAGS: -D warnings

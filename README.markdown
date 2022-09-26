@@ -49,7 +49,7 @@ Additionally, the following are no longer maintained, but might work still:
 
 ## Minimum Support Rust Version (MSRV)
 
-The MSRV for `imgui-rs` and all of the backend crates is **1.56**. We update our MSRV periodically, and issue a minor bump for it.
+The MSRV for `imgui-rs` and all of the backend crates is **1.57**. We update our MSRV periodically, and issue a minor bump for it.
 
 ## Choosing a backend platform and a renderer
 
