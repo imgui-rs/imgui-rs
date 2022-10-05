@@ -33,6 +33,7 @@ pub use self::style::*;
 
 #[cfg(feature = "tables-api")]
 pub use self::tables::*;
+pub use self::text_filter::*;
 pub use self::utils::*;
 pub use self::widget::color_editors::*;
 pub use self::widget::combo_box::*;
@@ -81,6 +82,7 @@ mod style;
 mod tables;
 #[cfg(test)]
 mod test;
+pub mod text_filter;
 mod utils;
 mod widget;
 mod window;
