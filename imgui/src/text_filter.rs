@@ -17,8 +17,7 @@ impl TextFilter {
     }
 
     /// Creates a new TextFilter with a custom filter.
-    pub fn new_with_filter(label: String, filter: String) -> Self {
-        let mut filter = filter.clone();
+    pub fn new_with_filter(label: String, mut filter: String) -> Self {
         filter.push('\0');
         let ptr = filter.as_mut_ptr();
         Self {
