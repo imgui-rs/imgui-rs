@@ -29,4 +29,4 @@ All further PR's are still done to `main`
 
 Only before publishing to crates.io.
 
-This makes users able use [patch.crates-io] without hand-editing versions throughout their dependency tree (typically impossible without forking/editing transitive dependencies, even if there are no breaking code changes otherwise).
+This makes users able use `[patch.crates-io]` without hand-editing versions throughout their dependency tree (typically impossible without forking/editing transitive dependencies, even if there are no breaking code changes otherwise).
