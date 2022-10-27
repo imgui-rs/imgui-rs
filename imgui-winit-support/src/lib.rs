@@ -76,6 +76,9 @@
 use imgui::{self, BackendFlags, ConfigFlags, Context, Io, Key, Ui};
 use std::cell::Cell;
 use std::cmp::Ordering;
+
+// Re-export winit to make it easier for users to use the correct version.
+pub use winit;
 use winit::dpi::{LogicalPosition, LogicalSize};
 
 use winit::{

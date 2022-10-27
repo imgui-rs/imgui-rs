@@ -50,6 +50,9 @@ use std::{borrow::Cow, error::Error, fmt::Display, mem::size_of};
 use imgui::{internal::RawWrapper, DrawCmd, DrawData, DrawVert};
 
 use crate::versions::{GlVersion, GlslVersion};
+
+// Re-export glow to make it easier for users to use the correct version.
+pub use glow;
 use glow::{Context, HasContext};
 
 pub mod versions;
