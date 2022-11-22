@@ -6,6 +6,10 @@
 
 - Upgraded from Dear ImGui 1.84.2 to 1.86. See [the 1.85](https://github.com/ocornut/imgui/releases/tag/v1.85) and [the 1.86](https://github.com/ocornut/imgui/releases/tag/v1.86) release notes
 
+- Upgraded winit version to `v0.27` for `imgu-winit-support`
+
+- The `imgui-winit-support` and `imgui-glow-renderer` re-export `winit` and `glow` respectively to make setup easier for simple projects. [PR #676](https://github.com/imgui-rs/imgui-rs/pull/676)
+
 - BREAKING: Removed `push_style_colors` and `push_style_vars`. Instead, use `push_style_color` in a loop. This was deprecated in `0.7.0` and should have been removed in `0.8.0`. This also removes their associated tokens.
 
 - BREAKING: Ui now does not have a lifetime associated with it, but is only ever given to users in the form of `&mut Ui`. Additionally, the `render` function has been moved to the `Context` instead of `Ui`.
@@ -35,6 +39,10 @@
 - Added `docking` feature which builds against the upstream docking branch. Only basic API is exposed currently, just enough to enable the docking `imgui_context.io_mut().config_flags |= imgui::ConfigFlags::DOCKING_ENABLE;` - a safe API for programtically docking windows and so on will be added later (until then the internal docking API can be accessed, `imgui::sys::igDockBuilderDockWindow` and so on)
 
 - Fixed dpi related issues when not in `HiDpiMode::Default` mode. The wrong scale factor was used when converting winit physical size to logical size, causing the imgui display size to be incorrect.
+
+- Fixed creation of `.crate` (published to crates.io) so required files for freetype feature are included
+
+- Added binding to TextFilter API. [PR #658](https://github.com/imgui-rs/imgui-rs/pull/658)
 
 ## [0.8.0] - 2021-09-17
 
