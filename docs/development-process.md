@@ -18,8 +18,11 @@ Day to day development
 When it is time to make a new release, we create a `x.y-stable` branch (e.g `0.9-stable`) from `main`
 
 1. Ensure `CHANGELOG` is up to date
-1. Bump `version` in the various `Cargo.toml`
-2. A stable branch is created, e.g `git switch -c 0.9-stable` and pushed to Github
+2. Bump `version` in the various `Cargo.toml`
+3. A stable branch is created, e.g `git switch -c 0.9-stable` and pushed to Github
+4. Create annotated tag `v0.9.0` and push to github
+5. Create Release for this version on Github
+6. Update and close any relevant tickets
 
 All further PR's are still done to `main`
 
