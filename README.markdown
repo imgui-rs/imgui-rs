@@ -32,11 +32,6 @@ ui.window("Hello world")
 - imgui-glium-renderer: Renderer implementation that uses the `glium` crate
 - imgui-sys: Low-level unsafe API (automatically generated)
 
-Additionally, the following are no longer maintained, but might work still:
-
-- imgui-gfx-renderer: Renderer implementation that uses the `gfx` crate (_not
-   the new gfx-hal crate_). This can be found at [imgui-rs/imgui-gfx-renderer](https://github.com/imgui-rs/imgui-gfx-renderer)
-
 ## Features
 
 - Bindings for Dear ImGui that can be used with safe Rust. Note: API coverage
@@ -88,6 +83,8 @@ Additionally, there are other libraries which provide other kinds of renderers, 
  1. [`imgui-wgpu`](https://github.com/Yatekii/imgui-wgpu-rs)
  2. [`imgui-d3d12-renderer`](https://github.com/curldivergence/imgui-d3d12-renderer)
  3. [`imgui-dx11-renderer`](https://github.com/veykril/imgui-dx11-renderer)
+ 4. [`imgui-gfx-renderer`](https://github.com/imgui-rs/imgui-gfx-renderer): Deprecated (no longer maintained beyond imgui-rs v0.8). Renderer implementation that uses the `gfx` crate (_not the new gfx-hal crate_)
+
 
 You can also write your own support code if you have a more advanced use case, because **imgui-rs is not tied to any specific graphics / OS API**.
 
