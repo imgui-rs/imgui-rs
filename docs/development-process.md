@@ -21,9 +21,10 @@ When it is time to make a new release, we create a `x.y-stable` branch (e.g `0.9
 2. Ensure README is up-to-date (including the Dear ImGui Version in badge URL, MSRV)
 3. Bump `version` in the various `Cargo.toml`
 4. A stable branch is created, e.g `git switch -c 0.9-stable` and pushed to Github
-5. Create annotated tag `v0.9.0` and push to github
-6. Create Release for this version on Github
-7. Update and close any relevant tickets
+5. Publish various crates (noting it has to be done starting with `imgui-sys`, then `imgui`, then the others)
+6. Create annotated tag `v0.9.0` and push to github
+7. Create Release for this version on Github
+8. Update and close any relevant tickets
 
 All further PR's are still done to `main`
 
