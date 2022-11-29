@@ -1,6 +1,8 @@
 # Change Log
 
-## Unreleased
+## [unreleased]
+
+## [0.9.0] - 2022-11-30
 
 - MSRV is now **1.57**. We soft-updated to this to Rust 1.54 in the v0.8.0 release (with a feature `min-const-generics`), which has now been removed (and as such, we resume having no default features). Rust 1.56 is required for the Rust 2021 edition, and 1.57 is required by some dependencies
 
@@ -779,7 +781,8 @@ As mentioned, the 0.6.1 release of `imgui-winit-support` has been yanked.
 
 - Initial release with cimgui/imgui 1.44, glium 0.9
 
-[unreleased]: https://github.com/Gekkio/imgui-rs/compare/v0.8.0...HEAD
+[unreleased]: https://github.com/Gekkio/imgui-rs/compare/v0.9.0...HEAD
+[0.9.0]: https://github.com/Gekkio/imgui-rs/compare/v0.8.0...v0.9.0
 [0.8.0]: https://github.com/Gekkio/imgui-rs/compare/v0.7.0...v0.8.0
 [0.7.0]: https://github.com/Gekkio/imgui-rs/compare/v0.6.1...v0.7.0
 [0.6.1]: https://github.com/Gekkio/imgui-rs/compare/v0.6.0...v0.6.1
