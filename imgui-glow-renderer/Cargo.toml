@@ -2,7 +2,6 @@
 name = "imgui-glow-renderer"
 version = "0.9.0"
 edition = "2018"
-authors = ["jmaargh and the imgui-rs Developers"]
 description = "glow renderer for the imgui crate"
 homepage = "https://github.com/imgui-rs/imgui-rs"
 repository = "https://github.com/imgui-rs/imgui-rs"

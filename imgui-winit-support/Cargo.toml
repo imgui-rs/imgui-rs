@@ -2,7 +2,6 @@
 name = "imgui-winit-support"
 version = "0.9.0"
 edition = "2018"
-authors = ["The imgui-rs Developers"]
 description = "winit support code for the imgui crate"
 homepage = "https://github.com/imgui-rs/imgui-rs"
 repository = "https://github.com/imgui-rs/imgui-rs"
