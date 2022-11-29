@@ -18,11 +18,12 @@ Day to day development
 When it is time to make a new release, we create a `x.y-stable` branch (e.g `0.9-stable`) from `main`
 
 1. Ensure `CHANGELOG` is up to date
-2. Bump `version` in the various `Cargo.toml`
-3. A stable branch is created, e.g `git switch -c 0.9-stable` and pushed to Github
-4. Create annotated tag `v0.9.0` and push to github
-5. Create Release for this version on Github
-6. Update and close any relevant tickets
+2. Ensure README is up-to-date (including the Dear ImGui Version in badge URL, MSRV)
+3. Bump `version` in the various `Cargo.toml`
+4. A stable branch is created, e.g `git switch -c 0.9-stable` and pushed to Github
+5. Create annotated tag `v0.9.0` and push to github
+6. Create Release for this version on Github
+7. Update and close any relevant tickets
 
 All further PR's are still done to `main`
 
