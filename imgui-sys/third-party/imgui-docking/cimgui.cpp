@@ -4927,7 +4927,11 @@ CIMGUI_API void igDebugRenderViewportThumbnail(ImDrawList* draw_list,ImGuiViewpo
 }
 CIMGUI_API const ImFontBuilderIO* igImFontAtlasGetBuilderForStbTruetype()
 {
+#ifdef IMGUI_ENABLE_FREETYPE
+    return static_cast<const ImFontBuilderIO*>(0);
+#else
     return ImFontAtlasGetBuilderForStbTruetype();
+#endif
 }
 CIMGUI_API void igImFontAtlasBuildInit(ImFontAtlas* atlas)
 {
