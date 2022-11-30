@@ -5,6 +5,7 @@ edition = "2018"
 description = "winit support code for the imgui crate"
 homepage = "https://github.com/imgui-rs/imgui-rs"
 repository = "https://github.com/imgui-rs/imgui-rs"
+documentation = "https://docs.rs/imgui-winit-support"
 license = "MIT/Apache-2.0"
 categories = ["gui"]
 
