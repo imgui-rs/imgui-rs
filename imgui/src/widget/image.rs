@@ -75,26 +75,26 @@ impl Image {
 /// Builder for an image button widget
 #[derive(Copy, Clone, Debug)]
 #[must_use]
-pub struct ImageButton {
+pub struct ImageButton<L> {
+    label: L,
     texture_id: TextureId,
     size: [f32; 2],
     uv0: [f32; 2],
     uv1: [f32; 2],
-    frame_padding: i32,
     bg_col: [f32; 4],
     tint_col: [f32; 4],
 }
 
-impl ImageButton {
+impl <L: AsRef<str>>ImageButton<L> {
     /// Creates a new image button builder with the given texture and size
     #[doc(alias = "ImageButton")]
-    pub fn new(texture_id: TextureId, size: impl Into<MintVec2>) -> ImageButton {
+    pub fn new(label: L, texture_id: TextureId, size: impl Into<MintVec2>) -> ImageButton<L> {
         ImageButton {
             texture_id,
+            label,
             size: size.into().into(),
             uv0: [0.0, 0.0],
             uv1: [1.0, 1.0],
-            frame_padding: -1,
             bg_col: [0.0, 0.0, 0.0, 0.0],
             tint_col: [1.0, 1.0, 1.0, 1.0],
         }
@@ -116,15 +116,6 @@ impl ImageButton {
         self.uv1 = uv1.into().into();
         self
     }
-    /// Sets the frame padding (default: uses frame padding from style).
-    ///
-    /// - `< 0`: uses frame padding from style (default)
-    /// - `= 0`: no framing
-    /// - `> 0`: set framing size
-    pub fn frame_padding(mut self, frame_padding: i32) -> Self {
-        self.frame_padding = frame_padding;
-        self
-    }
     /// Sets the background color (default: no background color)
     pub fn background_col(mut self, bg_col: impl Into<MintVec4>) -> Self {
         self.bg_col = bg_col.into().into();
@@ -136,14 +127,14 @@ impl ImageButton {
         self
     }
     /// Builds the image button
-    pub fn build(self, _: &Ui) -> bool {
+    pub fn build(self, ui: &Ui) -> bool {
         unsafe {
             sys::igImageButton(
+                ui.scratch_txt(self.label),
                 self.texture_id.id() as *mut c_void,
                 self.size.into(),
                 self.uv0.into(),
                 self.uv1.into(),
-                self.frame_padding,
                 self.bg_col.into(),
                 self.tint_col.into(),
             )
