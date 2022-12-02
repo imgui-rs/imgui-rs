@@ -1,6 +1,9 @@
 # Change Log
 
 ## [unreleased]
+- Removed `im_str!` macro - deprecated since v0.8.
+
+  `ui.button(im_str!("Example"))` just becomes `ui.button("Example")` and `ui.button(&im_str!("My age is {}", 100))` becomes `ui.button!(format!("My age is {}", 100))`
 
 ## [0.9.0] - 2022-11-30
 
