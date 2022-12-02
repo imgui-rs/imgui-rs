@@ -267,7 +267,7 @@ impl<'ui> ChildWindow<'ui> {
             unsafe { sys::igSetNextWindowBgAlpha(self.bg_alpha) };
         }
         let should_render = unsafe {
-            sys::igBeginChildID(
+            sys::igBeginChild_ID(
                 self.id,
                 self.size.into(),
                 self.border,

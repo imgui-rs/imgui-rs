@@ -164,7 +164,7 @@ impl Ui {
     /// The confusing aspect to popups is that ImGui holds control over the popup itself.
     #[doc(alias = "OpenPopup")]
     pub fn open_popup(&self, str_id: impl AsRef<str>) {
-        unsafe { sys::igOpenPopupStr(self.scratch_txt(str_id), 0) };
+        unsafe { sys::igOpenPopup_Str(self.scratch_txt(str_id), 0) };
     }
 
     /// Construct a popup that can have any kind of content.

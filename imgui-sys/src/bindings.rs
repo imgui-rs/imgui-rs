@@ -84,7 +84,7 @@ where
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
-pub struct ImGuiContext {
+pub struct ImDrawListSharedData {
     _unused: [u8; 0],
 }
 #[repr(C)]
@@ -94,14 +94,13 @@ pub struct ImFontBuilderIO {
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
-pub struct ImDrawListSharedData {
+pub struct ImGuiContext {
     _unused: [u8; 0],
 }
 pub type ImGuiCol = cty::c_int;
 pub type ImGuiCond = cty::c_int;
 pub type ImGuiDataType = cty::c_int;
 pub type ImGuiDir = cty::c_int;
-pub type ImGuiKey = cty::c_int;
 pub type ImGuiMouseButton = cty::c_int;
 pub type ImGuiMouseCursor = cty::c_int;
 pub type ImGuiSortDirection = cty::c_int;
@@ -119,7 +118,7 @@ pub type ImGuiDragDropFlags = cty::c_int;
 pub type ImGuiFocusedFlags = cty::c_int;
 pub type ImGuiHoveredFlags = cty::c_int;
 pub type ImGuiInputTextFlags = cty::c_int;
-pub type ImGuiKeyModFlags = cty::c_int;
+pub type ImGuiKeyChord = cty::c_int;
 pub type ImGuiPopupFlags = cty::c_int;
 pub type ImGuiSelectableFlags = cty::c_int;
 pub type ImGuiSliderFlags = cty::c_int;
@@ -134,6 +133,7 @@ pub type ImGuiWindowFlags = cty::c_int;
 pub type ImTextureID = *mut cty::c_void;
 pub type ImDrawIdx = cty::c_ushort;
 pub type ImGuiID = cty::c_uint;
+pub type ImS8 = cty::c_schar;
 pub type ImU8 = cty::c_uchar;
 pub type ImS16 = cty::c_short;
 pub type ImU16 = cty::c_ushort;
@@ -152,281 +152,6 @@ pub type ImGuiMemAllocFunc = ::core::option::Option<
 pub type ImGuiMemFreeFunc = ::core::option::Option<
     unsafe extern "C" fn(ptr: *mut cty::c_void, user_data: *mut cty::c_void),
 >;
-pub type ImDrawCallback = ::core::option::Option<
-    unsafe extern "C" fn(parent_list: *const ImDrawList, cmd: *const ImDrawCmd),
->;
-#[repr(C)]
-#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-pub struct ImVector_ImDrawChannel {
-    pub Size: cty::c_int,
-    pub Capacity: cty::c_int,
-    pub Data: *mut ImDrawChannel,
-}
-impl Default for ImVector_ImDrawChannel {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-pub struct ImVector_ImDrawCmd {
-    pub Size: cty::c_int,
-    pub Capacity: cty::c_int,
-    pub Data: *mut ImDrawCmd,
-}
-impl Default for ImVector_ImDrawCmd {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-pub struct ImVector_ImDrawIdx {
-    pub Size: cty::c_int,
-    pub Capacity: cty::c_int,
-    pub Data: *mut ImDrawIdx,
-}
-impl Default for ImVector_ImDrawIdx {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-pub struct ImVector_ImDrawVert {
-    pub Size: cty::c_int,
-    pub Capacity: cty::c_int,
-    pub Data: *mut ImDrawVert,
-}
-impl Default for ImVector_ImDrawVert {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-pub struct ImVector_ImFontPtr {
-    pub Size: cty::c_int,
-    pub Capacity: cty::c_int,
-    pub Data: *mut *mut ImFont,
-}
-impl Default for ImVector_ImFontPtr {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-pub struct ImVector_ImFontAtlasCustomRect {
-    pub Size: cty::c_int,
-    pub Capacity: cty::c_int,
-    pub Data: *mut ImFontAtlasCustomRect,
-}
-impl Default for ImVector_ImFontAtlasCustomRect {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-pub struct ImVector_ImFontConfig {
-    pub Size: cty::c_int,
-    pub Capacity: cty::c_int,
-    pub Data: *mut ImFontConfig,
-}
-impl Default for ImVector_ImFontConfig {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-pub struct ImVector_ImFontGlyph {
-    pub Size: cty::c_int,
-    pub Capacity: cty::c_int,
-    pub Data: *mut ImFontGlyph,
-}
-impl Default for ImVector_ImFontGlyph {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-pub struct ImVector_ImGuiStoragePair {
-    pub Size: cty::c_int,
-    pub Capacity: cty::c_int,
-    pub Data: *mut ImGuiStoragePair,
-}
-impl Default for ImVector_ImGuiStoragePair {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-pub struct ImVector_ImGuiTextRange {
-    pub Size: cty::c_int,
-    pub Capacity: cty::c_int,
-    pub Data: *mut ImGuiTextRange,
-}
-impl Default for ImVector_ImGuiTextRange {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-pub struct ImVector_ImTextureID {
-    pub Size: cty::c_int,
-    pub Capacity: cty::c_int,
-    pub Data: *mut ImTextureID,
-}
-impl Default for ImVector_ImTextureID {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-pub struct ImVector_ImU32 {
-    pub Size: cty::c_int,
-    pub Capacity: cty::c_int,
-    pub Data: *mut ImU32,
-}
-impl Default for ImVector_ImU32 {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-pub struct ImVector_ImVec2 {
-    pub Size: cty::c_int,
-    pub Capacity: cty::c_int,
-    pub Data: *mut ImVec2,
-}
-impl Default for ImVector_ImVec2 {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-pub struct ImVector_ImVec4 {
-    pub Size: cty::c_int,
-    pub Capacity: cty::c_int,
-    pub Data: *mut ImVec4,
-}
-impl Default for ImVector_ImVec4 {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-pub struct ImVector_ImWchar {
-    pub Size: cty::c_int,
-    pub Capacity: cty::c_int,
-    pub Data: *mut ImWchar,
-}
-impl Default for ImVector_ImWchar {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-pub struct ImVector_char {
-    pub Size: cty::c_int,
-    pub Capacity: cty::c_int,
-    pub Data: *mut cty::c_char,
-}
-impl Default for ImVector_char {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-pub struct ImVector_float {
-    pub Size: cty::c_int,
-    pub Capacity: cty::c_int,
-    pub Data: *mut f32,
-}
-impl Default for ImVector_float {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone, PartialEq)]
 pub struct ImVec2 {
@@ -493,6 +218,7 @@ pub const ImGuiInputTextFlags_NoUndoRedo: ImGuiInputTextFlags_ = 65536;
 pub const ImGuiInputTextFlags_CharsScientific: ImGuiInputTextFlags_ = 131072;
 pub const ImGuiInputTextFlags_CallbackResize: ImGuiInputTextFlags_ = 262144;
 pub const ImGuiInputTextFlags_CallbackEdit: ImGuiInputTextFlags_ = 524288;
+pub const ImGuiInputTextFlags_EscapeClearsAll: ImGuiInputTextFlags_ = 1048576;
 pub type ImGuiInputTextFlags_ = cty::c_uint;
 pub const ImGuiTreeNodeFlags_None: ImGuiTreeNodeFlags_ = 0;
 pub const ImGuiTreeNodeFlags_Selected: ImGuiTreeNodeFlags_ = 1;
@@ -651,8 +377,12 @@ pub const ImGuiHoveredFlags_AllowWhenBlockedByPopup: ImGuiHoveredFlags_ = 32;
 pub const ImGuiHoveredFlags_AllowWhenBlockedByActiveItem: ImGuiHoveredFlags_ = 128;
 pub const ImGuiHoveredFlags_AllowWhenOverlapped: ImGuiHoveredFlags_ = 256;
 pub const ImGuiHoveredFlags_AllowWhenDisabled: ImGuiHoveredFlags_ = 512;
+pub const ImGuiHoveredFlags_NoNavOverride: ImGuiHoveredFlags_ = 1024;
 pub const ImGuiHoveredFlags_RectOnly: ImGuiHoveredFlags_ = 416;
 pub const ImGuiHoveredFlags_RootAndChildWindows: ImGuiHoveredFlags_ = 3;
+pub const ImGuiHoveredFlags_DelayNormal: ImGuiHoveredFlags_ = 2048;
+pub const ImGuiHoveredFlags_DelayShort: ImGuiHoveredFlags_ = 4096;
+pub const ImGuiHoveredFlags_NoSharedDelay: ImGuiHoveredFlags_ = 8192;
 pub type ImGuiHoveredFlags_ = cty::c_uint;
 pub const ImGuiDragDropFlags_None: ImGuiDragDropFlags_ = 0;
 pub const ImGuiDragDropFlags_SourceNoPreviewTooltip: ImGuiDragDropFlags_ = 1;
@@ -689,59 +419,179 @@ pub const ImGuiSortDirection_None: ImGuiSortDirection_ = 0;
 pub const ImGuiSortDirection_Ascending: ImGuiSortDirection_ = 1;
 pub const ImGuiSortDirection_Descending: ImGuiSortDirection_ = 2;
 pub type ImGuiSortDirection_ = cty::c_uint;
-pub const ImGuiKey_Tab: ImGuiKey_ = 0;
-pub const ImGuiKey_LeftArrow: ImGuiKey_ = 1;
-pub const ImGuiKey_RightArrow: ImGuiKey_ = 2;
-pub const ImGuiKey_UpArrow: ImGuiKey_ = 3;
-pub const ImGuiKey_DownArrow: ImGuiKey_ = 4;
-pub const ImGuiKey_PageUp: ImGuiKey_ = 5;
-pub const ImGuiKey_PageDown: ImGuiKey_ = 6;
-pub const ImGuiKey_Home: ImGuiKey_ = 7;
-pub const ImGuiKey_End: ImGuiKey_ = 8;
-pub const ImGuiKey_Insert: ImGuiKey_ = 9;
-pub const ImGuiKey_Delete: ImGuiKey_ = 10;
-pub const ImGuiKey_Backspace: ImGuiKey_ = 11;
-pub const ImGuiKey_Space: ImGuiKey_ = 12;
-pub const ImGuiKey_Enter: ImGuiKey_ = 13;
-pub const ImGuiKey_Escape: ImGuiKey_ = 14;
-pub const ImGuiKey_KeyPadEnter: ImGuiKey_ = 15;
-pub const ImGuiKey_A: ImGuiKey_ = 16;
-pub const ImGuiKey_C: ImGuiKey_ = 17;
-pub const ImGuiKey_V: ImGuiKey_ = 18;
-pub const ImGuiKey_X: ImGuiKey_ = 19;
-pub const ImGuiKey_Y: ImGuiKey_ = 20;
-pub const ImGuiKey_Z: ImGuiKey_ = 21;
-pub const ImGuiKey_COUNT: ImGuiKey_ = 22;
-pub type ImGuiKey_ = cty::c_uint;
-pub const ImGuiKeyModFlags_None: ImGuiKeyModFlags_ = 0;
-pub const ImGuiKeyModFlags_Ctrl: ImGuiKeyModFlags_ = 1;
-pub const ImGuiKeyModFlags_Shift: ImGuiKeyModFlags_ = 2;
-pub const ImGuiKeyModFlags_Alt: ImGuiKeyModFlags_ = 4;
-pub const ImGuiKeyModFlags_Super: ImGuiKeyModFlags_ = 8;
-pub type ImGuiKeyModFlags_ = cty::c_uint;
-pub const ImGuiNavInput_Activate: ImGuiNavInput_ = 0;
-pub const ImGuiNavInput_Cancel: ImGuiNavInput_ = 1;
-pub const ImGuiNavInput_Input: ImGuiNavInput_ = 2;
-pub const ImGuiNavInput_Menu: ImGuiNavInput_ = 3;
-pub const ImGuiNavInput_DpadLeft: ImGuiNavInput_ = 4;
-pub const ImGuiNavInput_DpadRight: ImGuiNavInput_ = 5;
-pub const ImGuiNavInput_DpadUp: ImGuiNavInput_ = 6;
-pub const ImGuiNavInput_DpadDown: ImGuiNavInput_ = 7;
-pub const ImGuiNavInput_LStickLeft: ImGuiNavInput_ = 8;
-pub const ImGuiNavInput_LStickRight: ImGuiNavInput_ = 9;
-pub const ImGuiNavInput_LStickUp: ImGuiNavInput_ = 10;
-pub const ImGuiNavInput_LStickDown: ImGuiNavInput_ = 11;
-pub const ImGuiNavInput_FocusPrev: ImGuiNavInput_ = 12;
-pub const ImGuiNavInput_FocusNext: ImGuiNavInput_ = 13;
-pub const ImGuiNavInput_TweakSlow: ImGuiNavInput_ = 14;
-pub const ImGuiNavInput_TweakFast: ImGuiNavInput_ = 15;
-pub const ImGuiNavInput_KeyLeft_: ImGuiNavInput_ = 16;
-pub const ImGuiNavInput_KeyRight_: ImGuiNavInput_ = 17;
-pub const ImGuiNavInput_KeyUp_: ImGuiNavInput_ = 18;
-pub const ImGuiNavInput_KeyDown_: ImGuiNavInput_ = 19;
-pub const ImGuiNavInput_COUNT: ImGuiNavInput_ = 20;
-pub const ImGuiNavInput_InternalStart_: ImGuiNavInput_ = 16;
-pub type ImGuiNavInput_ = cty::c_uint;
+pub const ImGuiKey_None: ImGuiKey = 0;
+pub const ImGuiKey_Tab: ImGuiKey = 512;
+pub const ImGuiKey_LeftArrow: ImGuiKey = 513;
+pub const ImGuiKey_RightArrow: ImGuiKey = 514;
+pub const ImGuiKey_UpArrow: ImGuiKey = 515;
+pub const ImGuiKey_DownArrow: ImGuiKey = 516;
+pub const ImGuiKey_PageUp: ImGuiKey = 517;
+pub const ImGuiKey_PageDown: ImGuiKey = 518;
+pub const ImGuiKey_Home: ImGuiKey = 519;
+pub const ImGuiKey_End: ImGuiKey = 520;
+pub const ImGuiKey_Insert: ImGuiKey = 521;
+pub const ImGuiKey_Delete: ImGuiKey = 522;
+pub const ImGuiKey_Backspace: ImGuiKey = 523;
+pub const ImGuiKey_Space: ImGuiKey = 524;
+pub const ImGuiKey_Enter: ImGuiKey = 525;
+pub const ImGuiKey_Escape: ImGuiKey = 526;
+pub const ImGuiKey_LeftCtrl: ImGuiKey = 527;
+pub const ImGuiKey_LeftShift: ImGuiKey = 528;
+pub const ImGuiKey_LeftAlt: ImGuiKey = 529;
+pub const ImGuiKey_LeftSuper: ImGuiKey = 530;
+pub const ImGuiKey_RightCtrl: ImGuiKey = 531;
+pub const ImGuiKey_RightShift: ImGuiKey = 532;
+pub const ImGuiKey_RightAlt: ImGuiKey = 533;
+pub const ImGuiKey_RightSuper: ImGuiKey = 534;
+pub const ImGuiKey_Menu: ImGuiKey = 535;
+pub const ImGuiKey_0: ImGuiKey = 536;
+pub const ImGuiKey_1: ImGuiKey = 537;
+pub const ImGuiKey_2: ImGuiKey = 538;
+pub const ImGuiKey_3: ImGuiKey = 539;
+pub const ImGuiKey_4: ImGuiKey = 540;
+pub const ImGuiKey_5: ImGuiKey = 541;
+pub const ImGuiKey_6: ImGuiKey = 542;
+pub const ImGuiKey_7: ImGuiKey = 543;
+pub const ImGuiKey_8: ImGuiKey = 544;
+pub const ImGuiKey_9: ImGuiKey = 545;
+pub const ImGuiKey_A: ImGuiKey = 546;
+pub const ImGuiKey_B: ImGuiKey = 547;
+pub const ImGuiKey_C: ImGuiKey = 548;
+pub const ImGuiKey_D: ImGuiKey = 549;
+pub const ImGuiKey_E: ImGuiKey = 550;
+pub const ImGuiKey_F: ImGuiKey = 551;
+pub const ImGuiKey_G: ImGuiKey = 552;
+pub const ImGuiKey_H: ImGuiKey = 553;
+pub const ImGuiKey_I: ImGuiKey = 554;
+pub const ImGuiKey_J: ImGuiKey = 555;
+pub const ImGuiKey_K: ImGuiKey = 556;
+pub const ImGuiKey_L: ImGuiKey = 557;
+pub const ImGuiKey_M: ImGuiKey = 558;
+pub const ImGuiKey_N: ImGuiKey = 559;
+pub const ImGuiKey_O: ImGuiKey = 560;
+pub const ImGuiKey_P: ImGuiKey = 561;
+pub const ImGuiKey_Q: ImGuiKey = 562;
+pub const ImGuiKey_R: ImGuiKey = 563;
+pub const ImGuiKey_S: ImGuiKey = 564;
+pub const ImGuiKey_T: ImGuiKey = 565;
+pub const ImGuiKey_U: ImGuiKey = 566;
+pub const ImGuiKey_V: ImGuiKey = 567;
+pub const ImGuiKey_W: ImGuiKey = 568;
+pub const ImGuiKey_X: ImGuiKey = 569;
+pub const ImGuiKey_Y: ImGuiKey = 570;
+pub const ImGuiKey_Z: ImGuiKey = 571;
+pub const ImGuiKey_F1: ImGuiKey = 572;
+pub const ImGuiKey_F2: ImGuiKey = 573;
+pub const ImGuiKey_F3: ImGuiKey = 574;
+pub const ImGuiKey_F4: ImGuiKey = 575;
+pub const ImGuiKey_F5: ImGuiKey = 576;
+pub const ImGuiKey_F6: ImGuiKey = 577;
+pub const ImGuiKey_F7: ImGuiKey = 578;
+pub const ImGuiKey_F8: ImGuiKey = 579;
+pub const ImGuiKey_F9: ImGuiKey = 580;
+pub const ImGuiKey_F10: ImGuiKey = 581;
+pub const ImGuiKey_F11: ImGuiKey = 582;
+pub const ImGuiKey_F12: ImGuiKey = 583;
+pub const ImGuiKey_Apostrophe: ImGuiKey = 584;
+pub const ImGuiKey_Comma: ImGuiKey = 585;
+pub const ImGuiKey_Minus: ImGuiKey = 586;
+pub const ImGuiKey_Period: ImGuiKey = 587;
+pub const ImGuiKey_Slash: ImGuiKey = 588;
+pub const ImGuiKey_Semicolon: ImGuiKey = 589;
+pub const ImGuiKey_Equal: ImGuiKey = 590;
+pub const ImGuiKey_LeftBracket: ImGuiKey = 591;
+pub const ImGuiKey_Backslash: ImGuiKey = 592;
+pub const ImGuiKey_RightBracket: ImGuiKey = 593;
+pub const ImGuiKey_GraveAccent: ImGuiKey = 594;
+pub const ImGuiKey_CapsLock: ImGuiKey = 595;
+pub const ImGuiKey_ScrollLock: ImGuiKey = 596;
+pub const ImGuiKey_NumLock: ImGuiKey = 597;
+pub const ImGuiKey_PrintScreen: ImGuiKey = 598;
+pub const ImGuiKey_Pause: ImGuiKey = 599;
+pub const ImGuiKey_Keypad0: ImGuiKey = 600;
+pub const ImGuiKey_Keypad1: ImGuiKey = 601;
+pub const ImGuiKey_Keypad2: ImGuiKey = 602;
+pub const ImGuiKey_Keypad3: ImGuiKey = 603;
+pub const ImGuiKey_Keypad4: ImGuiKey = 604;
+pub const ImGuiKey_Keypad5: ImGuiKey = 605;
+pub const ImGuiKey_Keypad6: ImGuiKey = 606;
+pub const ImGuiKey_Keypad7: ImGuiKey = 607;
+pub const ImGuiKey_Keypad8: ImGuiKey = 608;
+pub const ImGuiKey_Keypad9: ImGuiKey = 609;
+pub const ImGuiKey_KeypadDecimal: ImGuiKey = 610;
+pub const ImGuiKey_KeypadDivide: ImGuiKey = 611;
+pub const ImGuiKey_KeypadMultiply: ImGuiKey = 612;
+pub const ImGuiKey_KeypadSubtract: ImGuiKey = 613;
+pub const ImGuiKey_KeypadAdd: ImGuiKey = 614;
+pub const ImGuiKey_KeypadEnter: ImGuiKey = 615;
+pub const ImGuiKey_KeypadEqual: ImGuiKey = 616;
+pub const ImGuiKey_GamepadStart: ImGuiKey = 617;
+pub const ImGuiKey_GamepadBack: ImGuiKey = 618;
+pub const ImGuiKey_GamepadFaceLeft: ImGuiKey = 619;
+pub const ImGuiKey_GamepadFaceRight: ImGuiKey = 620;
+pub const ImGuiKey_GamepadFaceUp: ImGuiKey = 621;
+pub const ImGuiKey_GamepadFaceDown: ImGuiKey = 622;
+pub const ImGuiKey_GamepadDpadLeft: ImGuiKey = 623;
+pub const ImGuiKey_GamepadDpadRight: ImGuiKey = 624;
+pub const ImGuiKey_GamepadDpadUp: ImGuiKey = 625;
+pub const ImGuiKey_GamepadDpadDown: ImGuiKey = 626;
+pub const ImGuiKey_GamepadL1: ImGuiKey = 627;
+pub const ImGuiKey_GamepadR1: ImGuiKey = 628;
+pub const ImGuiKey_GamepadL2: ImGuiKey = 629;
+pub const ImGuiKey_GamepadR2: ImGuiKey = 630;
+pub const ImGuiKey_GamepadL3: ImGuiKey = 631;
+pub const ImGuiKey_GamepadR3: ImGuiKey = 632;
+pub const ImGuiKey_GamepadLStickLeft: ImGuiKey = 633;
+pub const ImGuiKey_GamepadLStickRight: ImGuiKey = 634;
+pub const ImGuiKey_GamepadLStickUp: ImGuiKey = 635;
+pub const ImGuiKey_GamepadLStickDown: ImGuiKey = 636;
+pub const ImGuiKey_GamepadRStickLeft: ImGuiKey = 637;
+pub const ImGuiKey_GamepadRStickRight: ImGuiKey = 638;
+pub const ImGuiKey_GamepadRStickUp: ImGuiKey = 639;
+pub const ImGuiKey_GamepadRStickDown: ImGuiKey = 640;
+pub const ImGuiKey_MouseLeft: ImGuiKey = 641;
+pub const ImGuiKey_MouseRight: ImGuiKey = 642;
+pub const ImGuiKey_MouseMiddle: ImGuiKey = 643;
+pub const ImGuiKey_MouseX1: ImGuiKey = 644;
+pub const ImGuiKey_MouseX2: ImGuiKey = 645;
+pub const ImGuiKey_MouseWheelX: ImGuiKey = 646;
+pub const ImGuiKey_MouseWheelY: ImGuiKey = 647;
+pub const ImGuiKey_ReservedForModCtrl: ImGuiKey = 648;
+pub const ImGuiKey_ReservedForModShift: ImGuiKey = 649;
+pub const ImGuiKey_ReservedForModAlt: ImGuiKey = 650;
+pub const ImGuiKey_ReservedForModSuper: ImGuiKey = 651;
+pub const ImGuiKey_COUNT: ImGuiKey = 652;
+pub const ImGuiMod_None: ImGuiKey = 0;
+pub const ImGuiMod_Ctrl: ImGuiKey = 4096;
+pub const ImGuiMod_Shift: ImGuiKey = 8192;
+pub const ImGuiMod_Alt: ImGuiKey = 16384;
+pub const ImGuiMod_Super: ImGuiKey = 32768;
+pub const ImGuiMod_Mask_: ImGuiKey = 61440;
+pub const ImGuiMod_Shortcut: ImGuiKey = 4096;
+pub const ImGuiKey_NamedKey_BEGIN: ImGuiKey = 512;
+pub const ImGuiKey_NamedKey_END: ImGuiKey = 652;
+pub const ImGuiKey_NamedKey_COUNT: ImGuiKey = 140;
+pub const ImGuiKey_KeysData_SIZE: ImGuiKey = 652;
+pub const ImGuiKey_KeysData_OFFSET: ImGuiKey = 0;
+pub type ImGuiKey = cty::c_uint;
+pub const ImGuiNavInput_Activate: ImGuiNavInput = 0;
+pub const ImGuiNavInput_Cancel: ImGuiNavInput = 1;
+pub const ImGuiNavInput_Input: ImGuiNavInput = 2;
+pub const ImGuiNavInput_Menu: ImGuiNavInput = 3;
+pub const ImGuiNavInput_DpadLeft: ImGuiNavInput = 4;
+pub const ImGuiNavInput_DpadRight: ImGuiNavInput = 5;
+pub const ImGuiNavInput_DpadUp: ImGuiNavInput = 6;
+pub const ImGuiNavInput_DpadDown: ImGuiNavInput = 7;
+pub const ImGuiNavInput_LStickLeft: ImGuiNavInput = 8;
+pub const ImGuiNavInput_LStickRight: ImGuiNavInput = 9;
+pub const ImGuiNavInput_LStickUp: ImGuiNavInput = 10;
+pub const ImGuiNavInput_LStickDown: ImGuiNavInput = 11;
+pub const ImGuiNavInput_FocusPrev: ImGuiNavInput = 12;
+pub const ImGuiNavInput_FocusNext: ImGuiNavInput = 13;
+pub const ImGuiNavInput_TweakSlow: ImGuiNavInput = 14;
+pub const ImGuiNavInput_TweakFast: ImGuiNavInput = 15;
+pub const ImGuiNavInput_COUNT: ImGuiNavInput = 16;
+pub type ImGuiNavInput = cty::c_uint;
 pub const ImGuiConfigFlags_None: ImGuiConfigFlags_ = 0;
 pub const ImGuiConfigFlags_NavEnableKeyboard: ImGuiConfigFlags_ = 1;
 pub const ImGuiConfigFlags_NavEnableGamepad: ImGuiConfigFlags_ = 2;
@@ -962,6 +812,30 @@ impl Default for ImGuiStyle {
     }
 }
 #[repr(C)]
+#[derive(Debug, Default, Copy, Clone, PartialEq)]
+pub struct ImGuiKeyData {
+    pub Down: bool,
+    pub DownDuration: f32,
+    pub DownDurationPrev: f32,
+    pub AnalogValue: f32,
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub struct ImVector_ImWchar {
+    pub Size: cty::c_int,
+    pub Capacity: cty::c_int,
+    pub Data: *mut ImWchar,
+}
+impl Default for ImVector_ImWchar {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub struct ImGuiIO {
     pub ConfigFlags: ImGuiConfigFlags,
@@ -974,9 +848,10 @@ pub struct ImGuiIO {
     pub MouseDoubleClickTime: f32,
     pub MouseDoubleClickMaxDist: f32,
     pub MouseDragThreshold: f32,
-    pub KeyMap: [cty::c_int; 22usize],
     pub KeyRepeatDelay: f32,
     pub KeyRepeatRate: f32,
+    pub HoverDelayNormal: f32,
+    pub HoverDelayShort: f32,
     pub UserData: *mut cty::c_void,
     pub Fonts: *mut ImFontAtlas,
     pub FontGlobalScale: f32,
@@ -985,7 +860,9 @@ pub struct ImGuiIO {
     pub DisplayFramebufferScale: ImVec2,
     pub MouseDrawCursor: bool,
     pub ConfigMacOSXBehaviors: bool,
+    pub ConfigInputTrickleEventQueue: bool,
     pub ConfigInputTextCursorBlink: bool,
+    pub ConfigInputTextEnterKeepActive: bool,
     pub ConfigDragClickToInputText: bool,
     pub ConfigWindowsResizeFromEdges: bool,
     pub ConfigWindowsMoveFromTitleBarOnly: bool,
@@ -1002,19 +879,10 @@ pub struct ImGuiIO {
         unsafe extern "C" fn(user_data: *mut cty::c_void, text: *const cty::c_char),
     >,
     pub ClipboardUserData: *mut cty::c_void,
-    pub ImeSetInputScreenPosFn:
-        ::core::option::Option<unsafe extern "C" fn(x: cty::c_int, y: cty::c_int)>,
-    pub ImeWindowHandle: *mut cty::c_void,
-    pub MousePos: ImVec2,
-    pub MouseDown: [bool; 5usize],
-    pub MouseWheel: f32,
-    pub MouseWheelH: f32,
-    pub KeyCtrl: bool,
-    pub KeyShift: bool,
-    pub KeyAlt: bool,
-    pub KeySuper: bool,
-    pub KeysDown: [bool; 512usize],
-    pub NavInputs: [f32; 20usize],
+    pub SetPlatformImeDataFn: ::core::option::Option<
+        unsafe extern "C" fn(viewport: *mut ImGuiViewport, data: *mut ImGuiPlatformImeData),
+    >,
+    pub _UnusedPadding: *mut cty::c_void,
     pub WantCaptureMouse: bool,
     pub WantCaptureKeyboard: bool,
     pub WantTextInput: bool,
@@ -1029,9 +897,20 @@ pub struct ImGuiIO {
     pub MetricsActiveWindows: cty::c_int,
     pub MetricsActiveAllocations: cty::c_int,
     pub MouseDelta: ImVec2,
+    pub KeyMap: [cty::c_int; 652usize],
+    pub KeysDown: [bool; 652usize],
+    pub NavInputs: [f32; 16usize],
+    pub MousePos: ImVec2,
+    pub MouseDown: [bool; 5usize],
+    pub MouseWheel: f32,
+    pub MouseWheelH: f32,
+    pub KeyCtrl: bool,
+    pub KeyShift: bool,
+    pub KeyAlt: bool,
+    pub KeySuper: bool,
+    pub KeyMods: ImGuiKeyChord,
+    pub KeysData: [ImGuiKeyData; 652usize],
     pub WantCaptureMouseUnlessPopupClose: bool,
-    pub KeyMods: ImGuiKeyModFlags,
-    pub KeyModsPrev: ImGuiKeyModFlags,
     pub MousePosPrev: ImVec2,
     pub MouseClickedPos: [ImVec2; 5usize],
     pub MouseClickedTime: [f64; 5usize],
@@ -1044,14 +923,12 @@ pub struct ImGuiIO {
     pub MouseDownOwnedUnlessPopupClose: [bool; 5usize],
     pub MouseDownDuration: [f32; 5usize],
     pub MouseDownDurationPrev: [f32; 5usize],
-    pub MouseDragMaxDistanceAbs: [ImVec2; 5usize],
     pub MouseDragMaxDistanceSqr: [f32; 5usize],
-    pub KeysDownDuration: [f32; 512usize],
-    pub KeysDownDurationPrev: [f32; 512usize],
-    pub NavInputsDownDuration: [f32; 20usize],
-    pub NavInputsDownDurationPrev: [f32; 20usize],
     pub PenPressure: f32,
     pub AppFocusLost: bool,
+    pub AppAcceptingEvents: bool,
+    pub BackendUsingLegacyKeyArrays: ImS8,
+    pub BackendUsingLegacyNavInputArray: bool,
     pub InputQueueSurrogate: ImWchar16,
     pub InputQueueCharacters: ImVector_ImWchar,
 }
@@ -1199,12 +1076,44 @@ impl Default for ImGuiTextRange {
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub struct ImVector_ImGuiTextRange {
+    pub Size: cty::c_int,
+    pub Capacity: cty::c_int,
+    pub Data: *mut ImGuiTextRange,
+}
+impl Default for ImVector_ImGuiTextRange {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
 pub struct ImGuiTextFilter {
     pub InputBuf: [cty::c_char; 256usize],
     pub Filters: ImVector_ImGuiTextRange,
     pub CountGrep: cty::c_int,
 }
 impl Default for ImGuiTextFilter {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub struct ImVector_char {
+    pub Size: cty::c_int,
+    pub Capacity: cty::c_int,
+    pub Data: *mut cty::c_char,
+}
+impl Default for ImVector_char {
     fn default() -> Self {
         let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
         unsafe {
@@ -1274,6 +1183,22 @@ impl ::core::fmt::Debug for ImGuiStoragePair {
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub struct ImVector_ImGuiStoragePair {
+    pub Size: cty::c_int,
+    pub Capacity: cty::c_int,
+    pub Data: *mut ImGuiStoragePair,
+}
+impl Default for ImVector_ImGuiStoragePair {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
 pub struct ImGuiStorage {
     pub Data: ImVector_ImGuiStoragePair,
 }
@@ -1310,6 +1235,9 @@ impl Default for ImGuiListClipper {
 pub struct ImColor {
     pub Value: ImVec4,
 }
+pub type ImDrawCallback = ::core::option::Option<
+    unsafe extern "C" fn(parent_list: *const ImDrawList, cmd: *const ImDrawCmd),
+>;
 #[repr(C)]
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub struct ImDrawCmd {
@@ -1355,11 +1283,59 @@ impl Default for ImDrawCmdHeader {
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub struct ImVector_ImDrawCmd {
+    pub Size: cty::c_int,
+    pub Capacity: cty::c_int,
+    pub Data: *mut ImDrawCmd,
+}
+impl Default for ImVector_ImDrawCmd {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub struct ImVector_ImDrawIdx {
+    pub Size: cty::c_int,
+    pub Capacity: cty::c_int,
+    pub Data: *mut ImDrawIdx,
+}
+impl Default for ImVector_ImDrawIdx {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
 pub struct ImDrawChannel {
     pub _CmdBuffer: ImVector_ImDrawCmd,
     pub _IdxBuffer: ImVector_ImDrawIdx,
 }
 impl Default for ImDrawChannel {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub struct ImVector_ImDrawChannel {
+    pub Size: cty::c_int,
+    pub Capacity: cty::c_int,
+    pub Data: *mut ImDrawChannel,
+}
+impl Default for ImVector_ImDrawChannel {
     fn default() -> Self {
         let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
         unsafe {
@@ -1406,6 +1382,70 @@ pub const ImDrawListFlags_AntiAliasedFill: ImDrawListFlags_ = 4;
 pub const ImDrawListFlags_AllowVtxOffset: ImDrawListFlags_ = 8;
 pub type ImDrawListFlags_ = cty::c_uint;
 #[repr(C)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub struct ImVector_ImDrawVert {
+    pub Size: cty::c_int,
+    pub Capacity: cty::c_int,
+    pub Data: *mut ImDrawVert,
+}
+impl Default for ImVector_ImDrawVert {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub struct ImVector_ImVec4 {
+    pub Size: cty::c_int,
+    pub Capacity: cty::c_int,
+    pub Data: *mut ImVec4,
+}
+impl Default for ImVector_ImVec4 {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub struct ImVector_ImTextureID {
+    pub Size: cty::c_int,
+    pub Capacity: cty::c_int,
+    pub Data: *mut ImTextureID,
+}
+impl Default for ImVector_ImTextureID {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub struct ImVector_ImVec2 {
+    pub Size: cty::c_int,
+    pub Capacity: cty::c_int,
+    pub Data: *mut ImVec2,
+}
+impl Default for ImVector_ImVec2 {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub struct ImDrawList {
     pub CmdBuffer: ImVector_ImDrawCmd,
@@ -1413,7 +1453,7 @@ pub struct ImDrawList {
     pub VtxBuffer: ImVector_ImDrawVert,
     pub Flags: ImDrawListFlags,
     pub _VtxCurrentIdx: cty::c_uint,
-    pub _Data: *const ImDrawListSharedData,
+    pub _Data: *mut ImDrawListSharedData,
     pub _OwnerName: *const cty::c_char,
     pub _VtxWritePtr: *mut ImDrawVert,
     pub _IdxWritePtr: *mut ImDrawIdx,
@@ -1559,6 +1599,22 @@ impl ImFontGlyph {
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub struct ImVector_ImU32 {
+    pub Size: cty::c_int,
+    pub Capacity: cty::c_int,
+    pub Data: *mut ImU32,
+}
+impl Default for ImVector_ImU32 {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
 pub struct ImFontGlyphRangesBuilder {
     pub UsedChars: ImVector_ImU32,
 }
@@ -1598,6 +1654,54 @@ pub const ImFontAtlasFlags_NoMouseCursors: ImFontAtlasFlags_ = 2;
 pub const ImFontAtlasFlags_NoBakedLines: ImFontAtlasFlags_ = 4;
 pub type ImFontAtlasFlags_ = cty::c_uint;
 #[repr(C)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub struct ImVector_ImFontPtr {
+    pub Size: cty::c_int,
+    pub Capacity: cty::c_int,
+    pub Data: *mut *mut ImFont,
+}
+impl Default for ImVector_ImFontPtr {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub struct ImVector_ImFontAtlasCustomRect {
+    pub Size: cty::c_int,
+    pub Capacity: cty::c_int,
+    pub Data: *mut ImFontAtlasCustomRect,
+}
+impl Default for ImVector_ImFontAtlasCustomRect {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub struct ImVector_ImFontConfig {
+    pub Size: cty::c_int,
+    pub Capacity: cty::c_int,
+    pub Data: *mut ImFontConfig,
+}
+impl Default for ImVector_ImFontConfig {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub struct ImFontAtlas {
     pub Flags: ImFontAtlasFlags,
@@ -1623,6 +1727,38 @@ pub struct ImFontAtlas {
     pub PackIdLines: cty::c_int,
 }
 impl Default for ImFontAtlas {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub struct ImVector_float {
+    pub Size: cty::c_int,
+    pub Capacity: cty::c_int,
+    pub Data: *mut f32,
+}
+impl Default for ImVector_float {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub struct ImVector_ImFontGlyph {
+    pub Size: cty::c_int,
+    pub Capacity: cty::c_int,
+    pub Data: *mut ImFontGlyph,
+}
+impl Default for ImVector_ImFontGlyph {
     fn default() -> Self {
         let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
         unsafe {
@@ -1668,31 +1804,48 @@ pub const ImGuiViewportFlags_IsPlatformMonitor: ImGuiViewportFlags_ = 2;
 pub const ImGuiViewportFlags_OwnedByApp: ImGuiViewportFlags_ = 4;
 pub type ImGuiViewportFlags_ = cty::c_uint;
 #[repr(C)]
-#[derive(Debug, Default, Copy, Clone, PartialEq)]
+#[derive(Debug, Copy, Clone, PartialEq)]
 pub struct ImGuiViewport {
     pub Flags: ImGuiViewportFlags,
     pub Pos: ImVec2,
     pub Size: ImVec2,
     pub WorkPos: ImVec2,
     pub WorkSize: ImVec2,
+    pub PlatformHandleRaw: *mut cty::c_void,
+}
+impl Default for ImGuiViewport {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone, PartialEq)]
+pub struct ImGuiPlatformImeData {
+    pub WantVisible: bool,
+    pub InputPos: ImVec2,
+    pub InputLineHeight: f32,
 }
 extern "C" {
-    pub fn ImVec2_ImVec2Nil() -> *mut ImVec2;
+    pub fn ImVec2_ImVec2_Nil() -> *mut ImVec2;
 }
 extern "C" {
     pub fn ImVec2_destroy(self_: *mut ImVec2);
 }
 extern "C" {
-    pub fn ImVec2_ImVec2Float(_x: f32, _y: f32) -> *mut ImVec2;
+    pub fn ImVec2_ImVec2_Float(_x: f32, _y: f32) -> *mut ImVec2;
 }
 extern "C" {
-    pub fn ImVec4_ImVec4Nil() -> *mut ImVec4;
+    pub fn ImVec4_ImVec4_Nil() -> *mut ImVec4;
 }
 extern "C" {
     pub fn ImVec4_destroy(self_: *mut ImVec4);
 }
 extern "C" {
-    pub fn ImVec4_ImVec4Float(_x: f32, _y: f32, _z: f32, _w: f32) -> *mut ImVec4;
+    pub fn ImVec4_ImVec4_Float(_x: f32, _y: f32, _z: f32, _w: f32) -> *mut ImVec4;
 }
 extern "C" {
     pub fn igCreateContext(shared_font_atlas: *mut ImFontAtlas) -> *mut ImGuiContext;
@@ -1731,6 +1884,9 @@ extern "C" {
     pub fn igShowMetricsWindow(p_open: *mut bool);
 }
 extern "C" {
+    pub fn igShowDebugLogWindow(p_open: *mut bool);
+}
+extern "C" {
     pub fn igShowStackToolWindow(p_open: *mut bool);
 }
 extern "C" {
@@ -1767,7 +1923,7 @@ extern "C" {
     pub fn igEnd();
 }
 extern "C" {
-    pub fn igBeginChildStr(
+    pub fn igBeginChild_Str(
         str_id: *const cty::c_char,
         size: ImVec2,
         border: bool,
@@ -1775,8 +1931,12 @@ extern "C" {
     ) -> bool;
 }
 extern "C" {
-    pub fn igBeginChildID(id: ImGuiID, size: ImVec2, border: bool, flags: ImGuiWindowFlags)
-        -> bool;
+    pub fn igBeginChild_ID(
+        id: ImGuiID,
+        size: ImVec2,
+        border: bool,
+        flags: ImGuiWindowFlags,
+    ) -> bool;
 }
 extern "C" {
     pub fn igEndChild();
@@ -1832,34 +1992,37 @@ extern "C" {
     pub fn igSetNextWindowFocus();
 }
 extern "C" {
+    pub fn igSetNextWindowScroll(scroll: ImVec2);
+}
+extern "C" {
     pub fn igSetNextWindowBgAlpha(alpha: f32);
 }
 extern "C" {
-    pub fn igSetWindowPosVec2(pos: ImVec2, cond: ImGuiCond);
+    pub fn igSetWindowPos_Vec2(pos: ImVec2, cond: ImGuiCond);
 }
 extern "C" {
-    pub fn igSetWindowSizeVec2(size: ImVec2, cond: ImGuiCond);
+    pub fn igSetWindowSize_Vec2(size: ImVec2, cond: ImGuiCond);
 }
 extern "C" {
-    pub fn igSetWindowCollapsedBool(collapsed: bool, cond: ImGuiCond);
+    pub fn igSetWindowCollapsed_Bool(collapsed: bool, cond: ImGuiCond);
 }
 extern "C" {
-    pub fn igSetWindowFocusNil();
+    pub fn igSetWindowFocus_Nil();
 }
 extern "C" {
     pub fn igSetWindowFontScale(scale: f32);
 }
 extern "C" {
-    pub fn igSetWindowPosStr(name: *const cty::c_char, pos: ImVec2, cond: ImGuiCond);
+    pub fn igSetWindowPos_Str(name: *const cty::c_char, pos: ImVec2, cond: ImGuiCond);
 }
 extern "C" {
-    pub fn igSetWindowSizeStr(name: *const cty::c_char, size: ImVec2, cond: ImGuiCond);
+    pub fn igSetWindowSize_Str(name: *const cty::c_char, size: ImVec2, cond: ImGuiCond);
 }
 extern "C" {
-    pub fn igSetWindowCollapsedStr(name: *const cty::c_char, collapsed: bool, cond: ImGuiCond);
+    pub fn igSetWindowCollapsed_Str(name: *const cty::c_char, collapsed: bool, cond: ImGuiCond);
 }
 extern "C" {
-    pub fn igSetWindowFocusStr(name: *const cty::c_char);
+    pub fn igSetWindowFocus_Str(name: *const cty::c_char);
 }
 extern "C" {
     pub fn igGetContentRegionAvail(pOut: *mut ImVec2);
@@ -1910,19 +2073,19 @@ extern "C" {
     pub fn igPopFont();
 }
 extern "C" {
-    pub fn igPushStyleColorU32(idx: ImGuiCol, col: ImU32);
+    pub fn igPushStyleColor_U32(idx: ImGuiCol, col: ImU32);
 }
 extern "C" {
-    pub fn igPushStyleColorVec4(idx: ImGuiCol, col: ImVec4);
+    pub fn igPushStyleColor_Vec4(idx: ImGuiCol, col: ImVec4);
 }
 extern "C" {
     pub fn igPopStyleColor(count: cty::c_int);
 }
 extern "C" {
-    pub fn igPushStyleVarFloat(idx: ImGuiStyleVar, val: f32);
+    pub fn igPushStyleVar_Float(idx: ImGuiStyleVar, val: f32);
 }
 extern "C" {
-    pub fn igPushStyleVarVec2(idx: ImGuiStyleVar, val: ImVec2);
+    pub fn igPushStyleVar_Vec2(idx: ImGuiStyleVar, val: ImVec2);
 }
 extern "C" {
     pub fn igPopStyleVar(count: cty::c_int);
@@ -1967,13 +2130,13 @@ extern "C" {
     pub fn igGetFontTexUvWhitePixel(pOut: *mut ImVec2);
 }
 extern "C" {
-    pub fn igGetColorU32Col(idx: ImGuiCol, alpha_mul: f32) -> ImU32;
+    pub fn igGetColorU32_Col(idx: ImGuiCol, alpha_mul: f32) -> ImU32;
 }
 extern "C" {
-    pub fn igGetColorU32Vec4(col: ImVec4) -> ImU32;
+    pub fn igGetColorU32_Vec4(col: ImVec4) -> ImU32;
 }
 extern "C" {
-    pub fn igGetColorU32U32(col: ImU32) -> ImU32;
+    pub fn igGetColorU32_U32(col: ImU32) -> ImU32;
 }
 extern "C" {
     pub fn igGetStyleColorVec4(idx: ImGuiCol) -> *const ImVec4;
@@ -2048,31 +2211,31 @@ extern "C" {
     pub fn igGetFrameHeightWithSpacing() -> f32;
 }
 extern "C" {
-    pub fn igPushIDStr(str_id: *const cty::c_char);
+    pub fn igPushID_Str(str_id: *const cty::c_char);
 }
 extern "C" {
-    pub fn igPushIDStrStr(str_id_begin: *const cty::c_char, str_id_end: *const cty::c_char);
+    pub fn igPushID_StrStr(str_id_begin: *const cty::c_char, str_id_end: *const cty::c_char);
 }
 extern "C" {
-    pub fn igPushIDPtr(ptr_id: *const cty::c_void);
+    pub fn igPushID_Ptr(ptr_id: *const cty::c_void);
 }
 extern "C" {
-    pub fn igPushIDInt(int_id: cty::c_int);
+    pub fn igPushID_Int(int_id: cty::c_int);
 }
 extern "C" {
     pub fn igPopID();
 }
 extern "C" {
-    pub fn igGetIDStr(str_id: *const cty::c_char) -> ImGuiID;
+    pub fn igGetID_Str(str_id: *const cty::c_char) -> ImGuiID;
 }
 extern "C" {
-    pub fn igGetIDStrStr(
+    pub fn igGetID_StrStr(
         str_id_begin: *const cty::c_char,
         str_id_end: *const cty::c_char,
     ) -> ImGuiID;
 }
 extern "C" {
-    pub fn igGetIDPtr(ptr_id: *const cty::c_void) -> ImGuiID;
+    pub fn igGetID_Ptr(ptr_id: *const cty::c_void) -> ImGuiID;
 }
 extern "C" {
     pub fn igTextUnformatted(text: *const cty::c_char, text_end: *const cty::c_char);
@@ -2112,48 +2275,27 @@ extern "C" {
     pub fn igArrowButton(str_id: *const cty::c_char, dir: ImGuiDir) -> bool;
 }
 extern "C" {
-    pub fn igImage(
-        user_texture_id: ImTextureID,
-        size: ImVec2,
-        uv0: ImVec2,
-        uv1: ImVec2,
-        tint_col: ImVec4,
-        border_col: ImVec4,
-    );
-}
-extern "C" {
-    pub fn igImageButton(
-        user_texture_id: ImTextureID,
-        size: ImVec2,
-        uv0: ImVec2,
-        uv1: ImVec2,
-        frame_padding: cty::c_int,
-        bg_col: ImVec4,
-        tint_col: ImVec4,
-    ) -> bool;
-}
-extern "C" {
     pub fn igCheckbox(label: *const cty::c_char, v: *mut bool) -> bool;
 }
 extern "C" {
-    pub fn igCheckboxFlagsIntPtr(
+    pub fn igCheckboxFlags_IntPtr(
         label: *const cty::c_char,
         flags: *mut cty::c_int,
         flags_value: cty::c_int,
     ) -> bool;
 }
 extern "C" {
-    pub fn igCheckboxFlagsUintPtr(
+    pub fn igCheckboxFlags_UintPtr(
         label: *const cty::c_char,
         flags: *mut cty::c_uint,
         flags_value: cty::c_uint,
     ) -> bool;
 }
 extern "C" {
-    pub fn igRadioButtonBool(label: *const cty::c_char, active: bool) -> bool;
+    pub fn igRadioButton_Bool(label: *const cty::c_char, active: bool) -> bool;
 }
 extern "C" {
-    pub fn igRadioButtonIntPtr(
+    pub fn igRadioButton_IntPtr(
         label: *const cty::c_char,
         v: *mut cty::c_int,
         v_button: cty::c_int,
@@ -2166,6 +2308,27 @@ extern "C" {
     pub fn igBullet();
 }
 extern "C" {
+    pub fn igImage(
+        user_texture_id: ImTextureID,
+        size: ImVec2,
+        uv0: ImVec2,
+        uv1: ImVec2,
+        tint_col: ImVec4,
+        border_col: ImVec4,
+    );
+}
+extern "C" {
+    pub fn igImageButton(
+        str_id: *const cty::c_char,
+        user_texture_id: ImTextureID,
+        size: ImVec2,
+        uv0: ImVec2,
+        uv1: ImVec2,
+        bg_col: ImVec4,
+        tint_col: ImVec4,
+    ) -> bool;
+}
+extern "C" {
     pub fn igBeginCombo(
         label: *const cty::c_char,
         preview_value: *const cty::c_char,
@@ -2176,7 +2339,7 @@ extern "C" {
     pub fn igEndCombo();
 }
 extern "C" {
-    pub fn igComboStr_arr(
+    pub fn igCombo_Str_arr(
         label: *const cty::c_char,
         current_item: *mut cty::c_int,
         items: *const *const cty::c_char,
@@ -2185,7 +2348,7 @@ extern "C" {
     ) -> bool;
 }
 extern "C" {
-    pub fn igComboStr(
+    pub fn igCombo_Str(
         label: *const cty::c_char,
         current_item: *mut cty::c_int,
         items_separated_by_zeros: *const cty::c_char,
@@ -2193,7 +2356,7 @@ extern "C" {
     ) -> bool;
 }
 extern "C" {
-    pub fn igComboFnBoolPtr(
+    pub fn igCombo_FnBoolPtr(
         label: *const cty::c_char,
         current_item: *mut cty::c_int,
         items_getter: ::core::option::Option<
@@ -2664,19 +2827,19 @@ extern "C" {
     pub fn igSetColorEditOptions(flags: ImGuiColorEditFlags);
 }
 extern "C" {
-    pub fn igTreeNodeStr(label: *const cty::c_char) -> bool;
+    pub fn igTreeNode_Str(label: *const cty::c_char) -> bool;
 }
 extern "C" {
-    pub fn igTreeNodeStrStr(str_id: *const cty::c_char, fmt: *const cty::c_char, ...) -> bool;
+    pub fn igTreeNode_StrStr(str_id: *const cty::c_char, fmt: *const cty::c_char, ...) -> bool;
 }
 extern "C" {
-    pub fn igTreeNodePtr(ptr_id: *const cty::c_void, fmt: *const cty::c_char, ...) -> bool;
+    pub fn igTreeNode_Ptr(ptr_id: *const cty::c_void, fmt: *const cty::c_char, ...) -> bool;
 }
 extern "C" {
-    pub fn igTreeNodeExStr(label: *const cty::c_char, flags: ImGuiTreeNodeFlags) -> bool;
+    pub fn igTreeNodeEx_Str(label: *const cty::c_char, flags: ImGuiTreeNodeFlags) -> bool;
 }
 extern "C" {
-    pub fn igTreeNodeExStrStr(
+    pub fn igTreeNodeEx_StrStr(
         str_id: *const cty::c_char,
         flags: ImGuiTreeNodeFlags,
         fmt: *const cty::c_char,
@@ -2684,7 +2847,7 @@ extern "C" {
     ) -> bool;
 }
 extern "C" {
-    pub fn igTreeNodeExPtr(
+    pub fn igTreeNodeEx_Ptr(
         ptr_id: *const cty::c_void,
         flags: ImGuiTreeNodeFlags,
         fmt: *const cty::c_char,
@@ -2692,10 +2855,10 @@ extern "C" {
     ) -> bool;
 }
 extern "C" {
-    pub fn igTreePushStr(str_id: *const cty::c_char);
+    pub fn igTreePush_Str(str_id: *const cty::c_char);
 }
 extern "C" {
-    pub fn igTreePushPtr(ptr_id: *const cty::c_void);
+    pub fn igTreePush_Ptr(ptr_id: *const cty::c_void);
 }
 extern "C" {
     pub fn igTreePop();
@@ -2704,13 +2867,13 @@ extern "C" {
     pub fn igGetTreeNodeToLabelSpacing() -> f32;
 }
 extern "C" {
-    pub fn igCollapsingHeaderTreeNodeFlags(
+    pub fn igCollapsingHeader_TreeNodeFlags(
         label: *const cty::c_char,
         flags: ImGuiTreeNodeFlags,
     ) -> bool;
 }
 extern "C" {
-    pub fn igCollapsingHeaderBoolPtr(
+    pub fn igCollapsingHeader_BoolPtr(
         label: *const cty::c_char,
         p_visible: *mut bool,
         flags: ImGuiTreeNodeFlags,
@@ -2720,7 +2883,7 @@ extern "C" {
     pub fn igSetNextItemOpen(is_open: bool, cond: ImGuiCond);
 }
 extern "C" {
-    pub fn igSelectableBool(
+    pub fn igSelectable_Bool(
         label: *const cty::c_char,
         selected: bool,
         flags: ImGuiSelectableFlags,
@@ -2728,7 +2891,7 @@ extern "C" {
     ) -> bool;
 }
 extern "C" {
-    pub fn igSelectableBoolPtr(
+    pub fn igSelectable_BoolPtr(
         label: *const cty::c_char,
         p_selected: *mut bool,
         flags: ImGuiSelectableFlags,
@@ -2742,7 +2905,7 @@ extern "C" {
     pub fn igEndListBox();
 }
 extern "C" {
-    pub fn igListBoxStr_arr(
+    pub fn igListBox_Str_arr(
         label: *const cty::c_char,
         current_item: *mut cty::c_int,
         items: *const *const cty::c_char,
@@ -2751,7 +2914,7 @@ extern "C" {
     ) -> bool;
 }
 extern "C" {
-    pub fn igListBoxFnBoolPtr(
+    pub fn igListBox_FnBoolPtr(
         label: *const cty::c_char,
         current_item: *mut cty::c_int,
         items_getter: ::core::option::Option<
@@ -2767,7 +2930,7 @@ extern "C" {
     ) -> bool;
 }
 extern "C" {
-    pub fn igPlotLinesFloatPtr(
+    pub fn igPlotLines_FloatPtr(
         label: *const cty::c_char,
         values: *const f32,
         values_count: cty::c_int,
@@ -2780,7 +2943,7 @@ extern "C" {
     );
 }
 extern "C" {
-    pub fn igPlotLinesFnFloatPtr(
+    pub fn igPlotLines_FnFloatPtr(
         label: *const cty::c_char,
         values_getter: ::core::option::Option<
             unsafe extern "C" fn(data: *mut cty::c_void, idx: cty::c_int) -> f32,
@@ -2795,7 +2958,7 @@ extern "C" {
     );
 }
 extern "C" {
-    pub fn igPlotHistogramFloatPtr(
+    pub fn igPlotHistogram_FloatPtr(
         label: *const cty::c_char,
         values: *const f32,
         values_count: cty::c_int,
@@ -2808,7 +2971,7 @@ extern "C" {
     );
 }
 extern "C" {
-    pub fn igPlotHistogramFnFloatPtr(
+    pub fn igPlotHistogram_FnFloatPtr(
         label: *const cty::c_char,
         values_getter: ::core::option::Option<
             unsafe extern "C" fn(data: *mut cty::c_void, idx: cty::c_int) -> f32,
@@ -2823,16 +2986,16 @@ extern "C" {
     );
 }
 extern "C" {
-    pub fn igValueBool(prefix: *const cty::c_char, b: bool);
+    pub fn igValue_Bool(prefix: *const cty::c_char, b: bool);
 }
 extern "C" {
-    pub fn igValueInt(prefix: *const cty::c_char, v: cty::c_int);
+    pub fn igValue_Int(prefix: *const cty::c_char, v: cty::c_int);
 }
 extern "C" {
-    pub fn igValueUint(prefix: *const cty::c_char, v: cty::c_uint);
+    pub fn igValue_Uint(prefix: *const cty::c_char, v: cty::c_uint);
 }
 extern "C" {
-    pub fn igValueFloat(prefix: *const cty::c_char, v: f32, float_format: *const cty::c_char);
+    pub fn igValue_Float(prefix: *const cty::c_char, v: f32, float_format: *const cty::c_char);
 }
 extern "C" {
     pub fn igBeginMenuBar() -> bool;
@@ -2853,7 +3016,7 @@ extern "C" {
     pub fn igEndMenu();
 }
 extern "C" {
-    pub fn igMenuItemBool(
+    pub fn igMenuItem_Bool(
         label: *const cty::c_char,
         shortcut: *const cty::c_char,
         selected: bool,
@@ -2861,7 +3024,7 @@ extern "C" {
     ) -> bool;
 }
 extern "C" {
-    pub fn igMenuItemBoolPtr(
+    pub fn igMenuItem_BoolPtr(
         label: *const cty::c_char,
         shortcut: *const cty::c_char,
         p_selected: *mut bool,
@@ -2891,10 +3054,10 @@ extern "C" {
     pub fn igEndPopup();
 }
 extern "C" {
-    pub fn igOpenPopupStr(str_id: *const cty::c_char, popup_flags: ImGuiPopupFlags);
+    pub fn igOpenPopup_Str(str_id: *const cty::c_char, popup_flags: ImGuiPopupFlags);
 }
 extern "C" {
-    pub fn igOpenPopupID(id: ImGuiID, popup_flags: ImGuiPopupFlags);
+    pub fn igOpenPopup_ID(id: ImGuiID, popup_flags: ImGuiPopupFlags);
 }
 extern "C" {
     pub fn igOpenPopupOnItemClick(str_id: *const cty::c_char, popup_flags: ImGuiPopupFlags);
@@ -3152,22 +3315,22 @@ extern "C" {
     pub fn igGetMainViewport() -> *mut ImGuiViewport;
 }
 extern "C" {
-    pub fn igIsRectVisibleNil(size: ImVec2) -> bool;
+    pub fn igGetBackgroundDrawList() -> *mut ImDrawList;
 }
 extern "C" {
-    pub fn igIsRectVisibleVec2(rect_min: ImVec2, rect_max: ImVec2) -> bool;
+    pub fn igGetForegroundDrawList() -> *mut ImDrawList;
+}
+extern "C" {
+    pub fn igIsRectVisible_Nil(size: ImVec2) -> bool;
+}
+extern "C" {
+    pub fn igIsRectVisible_Vec2(rect_min: ImVec2, rect_max: ImVec2) -> bool;
 }
 extern "C" {
     pub fn igGetTime() -> f64;
 }
 extern "C" {
     pub fn igGetFrameCount() -> cty::c_int;
-}
-extern "C" {
-    pub fn igGetBackgroundDrawList() -> *mut ImDrawList;
-}
-extern "C" {
-    pub fn igGetForegroundDrawList() -> *mut ImDrawList;
 }
 extern "C" {
     pub fn igGetDrawListSharedData() -> *mut ImDrawListSharedData;
@@ -3223,23 +3386,22 @@ extern "C" {
     );
 }
 extern "C" {
-    pub fn igGetKeyIndex(imgui_key: ImGuiKey) -> cty::c_int;
+    pub fn igIsKeyDown(key: ImGuiKey) -> bool;
 }
 extern "C" {
-    pub fn igIsKeyDown(user_key_index: cty::c_int) -> bool;
+    pub fn igIsKeyPressed(key: ImGuiKey, repeat: bool) -> bool;
 }
 extern "C" {
-    pub fn igIsKeyPressed(user_key_index: cty::c_int, repeat: bool) -> bool;
+    pub fn igIsKeyReleased(key: ImGuiKey) -> bool;
 }
 extern "C" {
-    pub fn igIsKeyReleased(user_key_index: cty::c_int) -> bool;
+    pub fn igGetKeyPressedAmount(key: ImGuiKey, repeat_delay: f32, rate: f32) -> cty::c_int;
 }
 extern "C" {
-    pub fn igGetKeyPressedAmount(key_index: cty::c_int, repeat_delay: f32, rate: f32)
-        -> cty::c_int;
+    pub fn igGetKeyName(key: ImGuiKey) -> *const cty::c_char;
 }
 extern "C" {
-    pub fn igCaptureKeyboardFromApp(want_capture_keyboard_value: bool);
+    pub fn igSetNextFrameWantCaptureKeyboard(want_capture_keyboard: bool);
 }
 extern "C" {
     pub fn igIsMouseDown(button: ImGuiMouseButton) -> bool;
@@ -3287,7 +3449,7 @@ extern "C" {
     pub fn igSetMouseCursor(cursor_type: ImGuiMouseCursor);
 }
 extern "C" {
-    pub fn igCaptureMouseFromApp(want_capture_mouse_value: bool);
+    pub fn igSetNextFrameWantCaptureMouse(want_capture_mouse: bool);
 }
 extern "C" {
     pub fn igGetClipboardText() -> *const cty::c_char;
@@ -3306,6 +3468,9 @@ extern "C" {
 }
 extern "C" {
     pub fn igSaveIniSettingsToMemory(out_ini_size: *mut usize) -> *const cty::c_char;
+}
+extern "C" {
+    pub fn igDebugTextEncoding(text: *const cty::c_char);
 }
 extern "C" {
     pub fn igDebugCheckVersionAndDataLayout(
@@ -3348,6 +3513,24 @@ extern "C" {
     pub fn ImGuiStyle_ScaleAllSizes(self_: *mut ImGuiStyle, scale_factor: f32);
 }
 extern "C" {
+    pub fn ImGuiIO_AddKeyEvent(self_: *mut ImGuiIO, key: ImGuiKey, down: bool);
+}
+extern "C" {
+    pub fn ImGuiIO_AddKeyAnalogEvent(self_: *mut ImGuiIO, key: ImGuiKey, down: bool, v: f32);
+}
+extern "C" {
+    pub fn ImGuiIO_AddMousePosEvent(self_: *mut ImGuiIO, x: f32, y: f32);
+}
+extern "C" {
+    pub fn ImGuiIO_AddMouseButtonEvent(self_: *mut ImGuiIO, button: cty::c_int, down: bool);
+}
+extern "C" {
+    pub fn ImGuiIO_AddMouseWheelEvent(self_: *mut ImGuiIO, wh_x: f32, wh_y: f32);
+}
+extern "C" {
+    pub fn ImGuiIO_AddFocusEvent(self_: *mut ImGuiIO, focused: bool);
+}
+extern "C" {
     pub fn ImGuiIO_AddInputCharacter(self_: *mut ImGuiIO, c: cty::c_uint);
 }
 extern "C" {
@@ -3357,7 +3540,16 @@ extern "C" {
     pub fn ImGuiIO_AddInputCharactersUTF8(self_: *mut ImGuiIO, str_: *const cty::c_char);
 }
 extern "C" {
-    pub fn ImGuiIO_AddFocusEvent(self_: *mut ImGuiIO, focused: bool);
+    pub fn ImGuiIO_SetKeyEventNativeData(
+        self_: *mut ImGuiIO,
+        key: ImGuiKey,
+        native_keycode: cty::c_int,
+        native_scancode: cty::c_int,
+        native_legacy_index: cty::c_int,
+    );
+}
+extern "C" {
+    pub fn ImGuiIO_SetAppAcceptingEvents(self_: *mut ImGuiIO, accepting_events: bool);
 }
 extern "C" {
     pub fn ImGuiIO_ClearInputCharacters(self_: *mut ImGuiIO);
@@ -3469,13 +3661,13 @@ extern "C" {
     pub fn ImGuiTextFilter_IsActive(self_: *mut ImGuiTextFilter) -> bool;
 }
 extern "C" {
-    pub fn ImGuiTextRange_ImGuiTextRangeNil() -> *mut ImGuiTextRange;
+    pub fn ImGuiTextRange_ImGuiTextRange_Nil() -> *mut ImGuiTextRange;
 }
 extern "C" {
     pub fn ImGuiTextRange_destroy(self_: *mut ImGuiTextRange);
 }
 extern "C" {
-    pub fn ImGuiTextRange_ImGuiTextRangeStr(
+    pub fn ImGuiTextRange_ImGuiTextRange_Str(
         _b: *const cty::c_char,
         _e: *const cty::c_char,
     ) -> *mut ImGuiTextRange;
@@ -3525,7 +3717,7 @@ extern "C" {
     );
 }
 extern "C" {
-    pub fn ImGuiStoragePair_ImGuiStoragePairInt(
+    pub fn ImGuiStoragePair_ImGuiStoragePair_Int(
         _key: ImGuiID,
         _val_i: cty::c_int,
     ) -> *mut ImGuiStoragePair;
@@ -3534,13 +3726,13 @@ extern "C" {
     pub fn ImGuiStoragePair_destroy(self_: *mut ImGuiStoragePair);
 }
 extern "C" {
-    pub fn ImGuiStoragePair_ImGuiStoragePairFloat(
+    pub fn ImGuiStoragePair_ImGuiStoragePair_Float(
         _key: ImGuiID,
         _val_f: f32,
     ) -> *mut ImGuiStoragePair;
 }
 extern "C" {
-    pub fn ImGuiStoragePair_ImGuiStoragePairPtr(
+    pub fn ImGuiStoragePair_ImGuiStoragePair_Ptr(
         _key: ImGuiID,
         _val_p: *mut cty::c_void,
     ) -> *mut ImGuiStoragePair;
@@ -3637,13 +3829,19 @@ extern "C" {
     );
 }
 extern "C" {
-    pub fn ImColor_ImColorNil() -> *mut ImColor;
+    pub fn ImColor_ImColor_Nil() -> *mut ImColor;
 }
 extern "C" {
     pub fn ImColor_destroy(self_: *mut ImColor);
 }
 extern "C" {
-    pub fn ImColor_ImColorInt(
+    pub fn ImColor_ImColor_Float(r: f32, g: f32, b: f32, a: f32) -> *mut ImColor;
+}
+extern "C" {
+    pub fn ImColor_ImColor_Vec4(col: ImVec4) -> *mut ImColor;
+}
+extern "C" {
+    pub fn ImColor_ImColor_Int(
         r: cty::c_int,
         g: cty::c_int,
         b: cty::c_int,
@@ -3651,13 +3849,7 @@ extern "C" {
     ) -> *mut ImColor;
 }
 extern "C" {
-    pub fn ImColor_ImColorU32(rgba: ImU32) -> *mut ImColor;
-}
-extern "C" {
-    pub fn ImColor_ImColorFloat(r: f32, g: f32, b: f32, a: f32) -> *mut ImColor;
-}
-extern "C" {
-    pub fn ImColor_ImColorVec4(col: ImVec4) -> *mut ImColor;
+    pub fn ImColor_ImColor_U32(rgba: ImU32) -> *mut ImColor;
 }
 extern "C" {
     pub fn ImColor_SetHSV(self_: *mut ImColor, h: f32, s: f32, v: f32, a: f32);
@@ -3704,7 +3896,7 @@ extern "C" {
     );
 }
 extern "C" {
-    pub fn ImDrawList_ImDrawList(shared_data: *const ImDrawListSharedData) -> *mut ImDrawList;
+    pub fn ImDrawList_ImDrawList(shared_data: *mut ImDrawListSharedData) -> *mut ImDrawList;
 }
 extern "C" {
     pub fn ImDrawList_destroy(self_: *mut ImDrawList);
@@ -3855,7 +4047,7 @@ extern "C" {
     );
 }
 extern "C" {
-    pub fn ImDrawList_AddTextVec2(
+    pub fn ImDrawList_AddText_Vec2(
         self_: *mut ImDrawList,
         pos: ImVec2,
         col: ImU32,
@@ -3864,7 +4056,7 @@ extern "C" {
     );
 }
 extern "C" {
-    pub fn ImDrawList_AddTextFontPtr(
+    pub fn ImDrawList_AddText_FontPtr(
         self_: *mut ImDrawList,
         font: *const ImFont,
         font_size: f32,
@@ -4306,6 +4498,9 @@ extern "C" {
     pub fn ImFontAtlas_GetGlyphRangesDefault(self_: *mut ImFontAtlas) -> *const ImWchar;
 }
 extern "C" {
+    pub fn ImFontAtlas_GetGlyphRangesGreek(self_: *mut ImFontAtlas) -> *const ImWchar;
+}
+extern "C" {
     pub fn ImFontAtlas_GetGlyphRangesKorean(self_: *mut ImFontAtlas) -> *const ImWchar;
 }
 extern "C" {
@@ -4485,6 +4680,15 @@ extern "C" {
 }
 extern "C" {
     pub fn ImGuiViewport_GetWorkCenter(pOut: *mut ImVec2, self_: *mut ImGuiViewport);
+}
+extern "C" {
+    pub fn ImGuiPlatformImeData_ImGuiPlatformImeData() -> *mut ImGuiPlatformImeData;
+}
+extern "C" {
+    pub fn ImGuiPlatformImeData_destroy(self_: *mut ImGuiPlatformImeData);
+}
+extern "C" {
+    pub fn igGetKeyIndex(key: ImGuiKey) -> ImGuiKey;
 }
 extern "C" {
     pub fn igLogText(fmt: *const cty::c_char, ...);

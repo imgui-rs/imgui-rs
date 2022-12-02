@@ -82,8 +82,6 @@ where
         }
     }
 }
-pub type __int64_t = cty::c_long;
-pub type __uint64_t = cty::c_ulong;
 pub type __off_t = cty::c_long;
 pub type __off64_t = cty::c_long;
 pub type FILE = _IO_FILE;
@@ -147,20 +145,34 @@ impl Default for _IO_FILE {
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
-pub struct ImGuiDockNodeSettings {
+pub struct ImGuiDockRequest {
     _unused: [u8; 0],
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
-pub struct ImGuiDockRequest {
+pub struct ImGuiDockNodeSettings {
     _unused: [u8; 0],
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub struct ImVector_const_charPtr {
+    pub Size: cty::c_int,
+    pub Capacity: cty::c_int,
+    pub Data: *mut *const cty::c_char,
+}
+impl Default for ImVector_const_charPtr {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
 }
 pub type ImGuiCol = cty::c_int;
 pub type ImGuiCond = cty::c_int;
 pub type ImGuiDataType = cty::c_int;
 pub type ImGuiDir = cty::c_int;
-pub type ImGuiKey = cty::c_int;
-pub type ImGuiNavInput = cty::c_int;
 pub type ImGuiMouseButton = cty::c_int;
 pub type ImGuiMouseCursor = cty::c_int;
 pub type ImGuiSortDirection = cty::c_int;
@@ -179,7 +191,7 @@ pub type ImGuiDragDropFlags = cty::c_int;
 pub type ImGuiFocusedFlags = cty::c_int;
 pub type ImGuiHoveredFlags = cty::c_int;
 pub type ImGuiInputTextFlags = cty::c_int;
-pub type ImGuiKeyModFlags = cty::c_int;
+pub type ImGuiKeyChord = cty::c_int;
 pub type ImGuiPopupFlags = cty::c_int;
 pub type ImGuiSelectableFlags = cty::c_int;
 pub type ImGuiSliderFlags = cty::c_int;
@@ -200,8 +212,8 @@ pub type ImS16 = cty::c_short;
 pub type ImU16 = cty::c_ushort;
 pub type ImS32 = cty::c_int;
 pub type ImU32 = cty::c_uint;
-pub type ImS64 = i64;
-pub type ImU64 = u64;
+pub type ImS64 = cty::c_longlong;
+pub type ImU64 = cty::c_ulonglong;
 pub type ImWchar16 = cty::c_ushort;
 pub type ImWchar32 = cty::c_uint;
 pub type ImWchar = ImWchar32;
@@ -216,859 +228,6 @@ pub type ImGuiMemAllocFunc = ::core::option::Option<
 pub type ImGuiMemFreeFunc = ::core::option::Option<
     unsafe extern "C" fn(ptr: *mut cty::c_void, user_data: *mut cty::c_void),
 >;
-pub type ImDrawCallback = ::core::option::Option<
-    unsafe extern "C" fn(parent_list: *const ImDrawList, cmd: *const ImDrawCmd),
->;
-pub type ImGuiDataAuthority = cty::c_int;
-pub type ImGuiLayoutType = cty::c_int;
-pub type ImGuiActivateFlags = cty::c_int;
-pub type ImGuiItemFlags = cty::c_int;
-pub type ImGuiItemStatusFlags = cty::c_int;
-pub type ImGuiOldColumnFlags = cty::c_int;
-pub type ImGuiNavHighlightFlags = cty::c_int;
-pub type ImGuiNavDirSourceFlags = cty::c_int;
-pub type ImGuiNavMoveFlags = cty::c_int;
-pub type ImGuiNextItemDataFlags = cty::c_int;
-pub type ImGuiNextWindowDataFlags = cty::c_int;
-pub type ImGuiScrollFlags = cty::c_int;
-pub type ImGuiSeparatorFlags = cty::c_int;
-pub type ImGuiTextFlags = cty::c_int;
-pub type ImGuiTooltipFlags = cty::c_int;
-pub type ImGuiErrorLogCallback = ::core::option::Option<
-    unsafe extern "C" fn(user_data: *mut cty::c_void, fmt: *const cty::c_char, ...),
->;
-pub type ImFileHandle = *mut FILE;
-pub type ImPoolIdx = cty::c_int;
-pub type ImGuiContextHookCallback = ::core::option::Option<
-    unsafe extern "C" fn(ctx: *mut ImGuiContext, hook: *mut ImGuiContextHook),
->;
-pub type ImGuiTableColumnIdx = ImS8;
-pub type ImGuiTableDrawChannelIdx = ImU8;
-#[repr(C)]
-#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-pub struct ImVector_ImGuiTableSettings {
-    pub Size: cty::c_int,
-    pub Capacity: cty::c_int,
-    pub Data: *mut ImGuiTableSettings,
-}
-impl Default for ImVector_ImGuiTableSettings {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-pub struct ImChunkStream_ImGuiTableSettings {
-    pub Buf: ImVector_ImGuiTableSettings,
-}
-impl Default for ImChunkStream_ImGuiTableSettings {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-pub struct ImVector_ImGuiWindowSettings {
-    pub Size: cty::c_int,
-    pub Capacity: cty::c_int,
-    pub Data: *mut ImGuiWindowSettings,
-}
-impl Default for ImVector_ImGuiWindowSettings {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-pub struct ImChunkStream_ImGuiWindowSettings {
-    pub Buf: ImVector_ImGuiWindowSettings,
-}
-impl Default for ImChunkStream_ImGuiWindowSettings {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-pub struct ImSpan_ImGuiTableCellData {
-    pub Data: *mut ImGuiTableCellData,
-    pub DataEnd: *mut ImGuiTableCellData,
-}
-impl Default for ImSpan_ImGuiTableCellData {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-pub struct ImSpan_ImGuiTableColumn {
-    pub Data: *mut ImGuiTableColumn,
-    pub DataEnd: *mut ImGuiTableColumn,
-}
-impl Default for ImSpan_ImGuiTableColumn {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-pub struct ImSpan_ImGuiTableColumnIdx {
-    pub Data: *mut ImGuiTableColumnIdx,
-    pub DataEnd: *mut ImGuiTableColumnIdx,
-}
-impl Default for ImSpan_ImGuiTableColumnIdx {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-pub struct ImVector_ImDrawChannel {
-    pub Size: cty::c_int,
-    pub Capacity: cty::c_int,
-    pub Data: *mut ImDrawChannel,
-}
-impl Default for ImVector_ImDrawChannel {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-pub struct ImVector_ImDrawCmd {
-    pub Size: cty::c_int,
-    pub Capacity: cty::c_int,
-    pub Data: *mut ImDrawCmd,
-}
-impl Default for ImVector_ImDrawCmd {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-pub struct ImVector_ImDrawIdx {
-    pub Size: cty::c_int,
-    pub Capacity: cty::c_int,
-    pub Data: *mut ImDrawIdx,
-}
-impl Default for ImVector_ImDrawIdx {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-pub struct ImVector_ImDrawListPtr {
-    pub Size: cty::c_int,
-    pub Capacity: cty::c_int,
-    pub Data: *mut *mut ImDrawList,
-}
-impl Default for ImVector_ImDrawListPtr {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-pub struct ImVector_ImDrawVert {
-    pub Size: cty::c_int,
-    pub Capacity: cty::c_int,
-    pub Data: *mut ImDrawVert,
-}
-impl Default for ImVector_ImDrawVert {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-pub struct ImVector_ImFontPtr {
-    pub Size: cty::c_int,
-    pub Capacity: cty::c_int,
-    pub Data: *mut *mut ImFont,
-}
-impl Default for ImVector_ImFontPtr {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-pub struct ImVector_ImFontAtlasCustomRect {
-    pub Size: cty::c_int,
-    pub Capacity: cty::c_int,
-    pub Data: *mut ImFontAtlasCustomRect,
-}
-impl Default for ImVector_ImFontAtlasCustomRect {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-pub struct ImVector_ImFontConfig {
-    pub Size: cty::c_int,
-    pub Capacity: cty::c_int,
-    pub Data: *mut ImFontConfig,
-}
-impl Default for ImVector_ImFontConfig {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-pub struct ImVector_ImFontGlyph {
-    pub Size: cty::c_int,
-    pub Capacity: cty::c_int,
-    pub Data: *mut ImFontGlyph,
-}
-impl Default for ImVector_ImFontGlyph {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-pub struct ImVector_ImGuiColorMod {
-    pub Size: cty::c_int,
-    pub Capacity: cty::c_int,
-    pub Data: *mut ImGuiColorMod,
-}
-impl Default for ImVector_ImGuiColorMod {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-pub struct ImVector_ImGuiContextHook {
-    pub Size: cty::c_int,
-    pub Capacity: cty::c_int,
-    pub Data: *mut ImGuiContextHook,
-}
-impl Default for ImVector_ImGuiContextHook {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-pub struct ImVector_ImGuiDockNodeSettings {
-    pub Size: cty::c_int,
-    pub Capacity: cty::c_int,
-    pub Data: *mut ImGuiDockNodeSettings,
-}
-impl Default for ImVector_ImGuiDockNodeSettings {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-pub struct ImVector_ImGuiDockRequest {
-    pub Size: cty::c_int,
-    pub Capacity: cty::c_int,
-    pub Data: *mut ImGuiDockRequest,
-}
-impl Default for ImVector_ImGuiDockRequest {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-pub struct ImVector_ImGuiGroupData {
-    pub Size: cty::c_int,
-    pub Capacity: cty::c_int,
-    pub Data: *mut ImGuiGroupData,
-}
-impl Default for ImVector_ImGuiGroupData {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-pub struct ImVector_ImGuiID {
-    pub Size: cty::c_int,
-    pub Capacity: cty::c_int,
-    pub Data: *mut ImGuiID,
-}
-impl Default for ImVector_ImGuiID {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-pub struct ImVector_ImGuiItemFlags {
-    pub Size: cty::c_int,
-    pub Capacity: cty::c_int,
-    pub Data: *mut ImGuiItemFlags,
-}
-impl Default for ImVector_ImGuiItemFlags {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-pub struct ImVector_ImGuiListClipperData {
-    pub Size: cty::c_int,
-    pub Capacity: cty::c_int,
-    pub Data: *mut ImGuiListClipperData,
-}
-impl Default for ImVector_ImGuiListClipperData {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-pub struct ImVector_ImGuiListClipperRange {
-    pub Size: cty::c_int,
-    pub Capacity: cty::c_int,
-    pub Data: *mut ImGuiListClipperRange,
-}
-impl Default for ImVector_ImGuiListClipperRange {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-pub struct ImVector_ImGuiOldColumnData {
-    pub Size: cty::c_int,
-    pub Capacity: cty::c_int,
-    pub Data: *mut ImGuiOldColumnData,
-}
-impl Default for ImVector_ImGuiOldColumnData {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-pub struct ImVector_ImGuiOldColumns {
-    pub Size: cty::c_int,
-    pub Capacity: cty::c_int,
-    pub Data: *mut ImGuiOldColumns,
-}
-impl Default for ImVector_ImGuiOldColumns {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-pub struct ImVector_ImGuiPlatformMonitor {
-    pub Size: cty::c_int,
-    pub Capacity: cty::c_int,
-    pub Data: *mut ImGuiPlatformMonitor,
-}
-impl Default for ImVector_ImGuiPlatformMonitor {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-pub struct ImVector_ImGuiPopupData {
-    pub Size: cty::c_int,
-    pub Capacity: cty::c_int,
-    pub Data: *mut ImGuiPopupData,
-}
-impl Default for ImVector_ImGuiPopupData {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-pub struct ImVector_ImGuiPtrOrIndex {
-    pub Size: cty::c_int,
-    pub Capacity: cty::c_int,
-    pub Data: *mut ImGuiPtrOrIndex,
-}
-impl Default for ImVector_ImGuiPtrOrIndex {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-pub struct ImVector_ImGuiSettingsHandler {
-    pub Size: cty::c_int,
-    pub Capacity: cty::c_int,
-    pub Data: *mut ImGuiSettingsHandler,
-}
-impl Default for ImVector_ImGuiSettingsHandler {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-pub struct ImVector_ImGuiShrinkWidthItem {
-    pub Size: cty::c_int,
-    pub Capacity: cty::c_int,
-    pub Data: *mut ImGuiShrinkWidthItem,
-}
-impl Default for ImVector_ImGuiShrinkWidthItem {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-pub struct ImVector_ImGuiStackLevelInfo {
-    pub Size: cty::c_int,
-    pub Capacity: cty::c_int,
-    pub Data: *mut ImGuiStackLevelInfo,
-}
-impl Default for ImVector_ImGuiStackLevelInfo {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-pub struct ImVector_ImGuiStoragePair {
-    pub Size: cty::c_int,
-    pub Capacity: cty::c_int,
-    pub Data: *mut ImGuiStoragePair,
-}
-impl Default for ImVector_ImGuiStoragePair {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-pub struct ImVector_ImGuiStyleMod {
-    pub Size: cty::c_int,
-    pub Capacity: cty::c_int,
-    pub Data: *mut ImGuiStyleMod,
-}
-impl Default for ImVector_ImGuiStyleMod {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-pub struct ImVector_ImGuiTabItem {
-    pub Size: cty::c_int,
-    pub Capacity: cty::c_int,
-    pub Data: *mut ImGuiTabItem,
-}
-impl Default for ImVector_ImGuiTabItem {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-pub struct ImVector_ImGuiTableColumnSortSpecs {
-    pub Size: cty::c_int,
-    pub Capacity: cty::c_int,
-    pub Data: *mut ImGuiTableColumnSortSpecs,
-}
-impl Default for ImVector_ImGuiTableColumnSortSpecs {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-pub struct ImVector_ImGuiTableTempData {
-    pub Size: cty::c_int,
-    pub Capacity: cty::c_int,
-    pub Data: *mut ImGuiTableTempData,
-}
-impl Default for ImVector_ImGuiTableTempData {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-pub struct ImVector_ImGuiTextRange {
-    pub Size: cty::c_int,
-    pub Capacity: cty::c_int,
-    pub Data: *mut ImGuiTextRange,
-}
-impl Default for ImVector_ImGuiTextRange {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-pub struct ImVector_ImGuiViewportPtr {
-    pub Size: cty::c_int,
-    pub Capacity: cty::c_int,
-    pub Data: *mut *mut ImGuiViewport,
-}
-impl Default for ImVector_ImGuiViewportPtr {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-pub struct ImVector_ImGuiViewportPPtr {
-    pub Size: cty::c_int,
-    pub Capacity: cty::c_int,
-    pub Data: *mut *mut ImGuiViewportP,
-}
-impl Default for ImVector_ImGuiViewportPPtr {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-pub struct ImVector_ImGuiWindowPtr {
-    pub Size: cty::c_int,
-    pub Capacity: cty::c_int,
-    pub Data: *mut *mut ImGuiWindow,
-}
-impl Default for ImVector_ImGuiWindowPtr {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-pub struct ImVector_ImGuiWindowStackData {
-    pub Size: cty::c_int,
-    pub Capacity: cty::c_int,
-    pub Data: *mut ImGuiWindowStackData,
-}
-impl Default for ImVector_ImGuiWindowStackData {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-pub struct ImVector_ImTextureID {
-    pub Size: cty::c_int,
-    pub Capacity: cty::c_int,
-    pub Data: *mut ImTextureID,
-}
-impl Default for ImVector_ImTextureID {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-pub struct ImVector_ImU32 {
-    pub Size: cty::c_int,
-    pub Capacity: cty::c_int,
-    pub Data: *mut ImU32,
-}
-impl Default for ImVector_ImU32 {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-pub struct ImVector_ImVec2 {
-    pub Size: cty::c_int,
-    pub Capacity: cty::c_int,
-    pub Data: *mut ImVec2,
-}
-impl Default for ImVector_ImVec2 {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-pub struct ImVector_ImVec4 {
-    pub Size: cty::c_int,
-    pub Capacity: cty::c_int,
-    pub Data: *mut ImVec4,
-}
-impl Default for ImVector_ImVec4 {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-pub struct ImVector_ImWchar {
-    pub Size: cty::c_int,
-    pub Capacity: cty::c_int,
-    pub Data: *mut ImWchar,
-}
-impl Default for ImVector_ImWchar {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-pub struct ImVector_char {
-    pub Size: cty::c_int,
-    pub Capacity: cty::c_int,
-    pub Data: *mut cty::c_char,
-}
-impl Default for ImVector_char {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-pub struct ImVector_const_charPtr {
-    pub Size: cty::c_int,
-    pub Capacity: cty::c_int,
-    pub Data: *mut *const cty::c_char,
-}
-impl Default for ImVector_const_charPtr {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-pub struct ImVector_float {
-    pub Size: cty::c_int,
-    pub Capacity: cty::c_int,
-    pub Data: *mut f32,
-}
-impl Default for ImVector_float {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-pub struct ImVector_unsigned_char {
-    pub Size: cty::c_int,
-    pub Capacity: cty::c_int,
-    pub Data: *mut cty::c_uchar,
-}
-impl Default for ImVector_unsigned_char {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone, PartialEq)]
 pub struct ImVec2 {
@@ -1137,6 +296,7 @@ pub const ImGuiInputTextFlags_NoUndoRedo: ImGuiInputTextFlags_ = 65536;
 pub const ImGuiInputTextFlags_CharsScientific: ImGuiInputTextFlags_ = 131072;
 pub const ImGuiInputTextFlags_CallbackResize: ImGuiInputTextFlags_ = 262144;
 pub const ImGuiInputTextFlags_CallbackEdit: ImGuiInputTextFlags_ = 524288;
+pub const ImGuiInputTextFlags_EscapeClearsAll: ImGuiInputTextFlags_ = 1048576;
 pub type ImGuiInputTextFlags_ = cty::c_uint;
 pub const ImGuiTreeNodeFlags_None: ImGuiTreeNodeFlags_ = 0;
 pub const ImGuiTreeNodeFlags_Selected: ImGuiTreeNodeFlags_ = 1;
@@ -1297,8 +457,12 @@ pub const ImGuiHoveredFlags_AllowWhenBlockedByPopup: ImGuiHoveredFlags_ = 32;
 pub const ImGuiHoveredFlags_AllowWhenBlockedByActiveItem: ImGuiHoveredFlags_ = 128;
 pub const ImGuiHoveredFlags_AllowWhenOverlapped: ImGuiHoveredFlags_ = 256;
 pub const ImGuiHoveredFlags_AllowWhenDisabled: ImGuiHoveredFlags_ = 512;
+pub const ImGuiHoveredFlags_NoNavOverride: ImGuiHoveredFlags_ = 1024;
 pub const ImGuiHoveredFlags_RectOnly: ImGuiHoveredFlags_ = 416;
 pub const ImGuiHoveredFlags_RootAndChildWindows: ImGuiHoveredFlags_ = 3;
+pub const ImGuiHoveredFlags_DelayNormal: ImGuiHoveredFlags_ = 2048;
+pub const ImGuiHoveredFlags_DelayShort: ImGuiHoveredFlags_ = 4096;
+pub const ImGuiHoveredFlags_NoSharedDelay: ImGuiHoveredFlags_ = 8192;
 pub type ImGuiHoveredFlags_ = cty::c_uint;
 pub const ImGuiDockNodeFlags_None: ImGuiDockNodeFlags_ = 0;
 pub const ImGuiDockNodeFlags_KeepAliveOnly: ImGuiDockNodeFlags_ = 1;
@@ -1343,59 +507,179 @@ pub const ImGuiSortDirection_None: ImGuiSortDirection_ = 0;
 pub const ImGuiSortDirection_Ascending: ImGuiSortDirection_ = 1;
 pub const ImGuiSortDirection_Descending: ImGuiSortDirection_ = 2;
 pub type ImGuiSortDirection_ = cty::c_uint;
-pub const ImGuiKey_Tab: ImGuiKey_ = 0;
-pub const ImGuiKey_LeftArrow: ImGuiKey_ = 1;
-pub const ImGuiKey_RightArrow: ImGuiKey_ = 2;
-pub const ImGuiKey_UpArrow: ImGuiKey_ = 3;
-pub const ImGuiKey_DownArrow: ImGuiKey_ = 4;
-pub const ImGuiKey_PageUp: ImGuiKey_ = 5;
-pub const ImGuiKey_PageDown: ImGuiKey_ = 6;
-pub const ImGuiKey_Home: ImGuiKey_ = 7;
-pub const ImGuiKey_End: ImGuiKey_ = 8;
-pub const ImGuiKey_Insert: ImGuiKey_ = 9;
-pub const ImGuiKey_Delete: ImGuiKey_ = 10;
-pub const ImGuiKey_Backspace: ImGuiKey_ = 11;
-pub const ImGuiKey_Space: ImGuiKey_ = 12;
-pub const ImGuiKey_Enter: ImGuiKey_ = 13;
-pub const ImGuiKey_Escape: ImGuiKey_ = 14;
-pub const ImGuiKey_KeyPadEnter: ImGuiKey_ = 15;
-pub const ImGuiKey_A: ImGuiKey_ = 16;
-pub const ImGuiKey_C: ImGuiKey_ = 17;
-pub const ImGuiKey_V: ImGuiKey_ = 18;
-pub const ImGuiKey_X: ImGuiKey_ = 19;
-pub const ImGuiKey_Y: ImGuiKey_ = 20;
-pub const ImGuiKey_Z: ImGuiKey_ = 21;
-pub const ImGuiKey_COUNT: ImGuiKey_ = 22;
-pub type ImGuiKey_ = cty::c_uint;
-pub const ImGuiKeyModFlags_None: ImGuiKeyModFlags_ = 0;
-pub const ImGuiKeyModFlags_Ctrl: ImGuiKeyModFlags_ = 1;
-pub const ImGuiKeyModFlags_Shift: ImGuiKeyModFlags_ = 2;
-pub const ImGuiKeyModFlags_Alt: ImGuiKeyModFlags_ = 4;
-pub const ImGuiKeyModFlags_Super: ImGuiKeyModFlags_ = 8;
-pub type ImGuiKeyModFlags_ = cty::c_uint;
-pub const ImGuiNavInput_Activate: ImGuiNavInput_ = 0;
-pub const ImGuiNavInput_Cancel: ImGuiNavInput_ = 1;
-pub const ImGuiNavInput_Input: ImGuiNavInput_ = 2;
-pub const ImGuiNavInput_Menu: ImGuiNavInput_ = 3;
-pub const ImGuiNavInput_DpadLeft: ImGuiNavInput_ = 4;
-pub const ImGuiNavInput_DpadRight: ImGuiNavInput_ = 5;
-pub const ImGuiNavInput_DpadUp: ImGuiNavInput_ = 6;
-pub const ImGuiNavInput_DpadDown: ImGuiNavInput_ = 7;
-pub const ImGuiNavInput_LStickLeft: ImGuiNavInput_ = 8;
-pub const ImGuiNavInput_LStickRight: ImGuiNavInput_ = 9;
-pub const ImGuiNavInput_LStickUp: ImGuiNavInput_ = 10;
-pub const ImGuiNavInput_LStickDown: ImGuiNavInput_ = 11;
-pub const ImGuiNavInput_FocusPrev: ImGuiNavInput_ = 12;
-pub const ImGuiNavInput_FocusNext: ImGuiNavInput_ = 13;
-pub const ImGuiNavInput_TweakSlow: ImGuiNavInput_ = 14;
-pub const ImGuiNavInput_TweakFast: ImGuiNavInput_ = 15;
-pub const ImGuiNavInput_KeyLeft_: ImGuiNavInput_ = 16;
-pub const ImGuiNavInput_KeyRight_: ImGuiNavInput_ = 17;
-pub const ImGuiNavInput_KeyUp_: ImGuiNavInput_ = 18;
-pub const ImGuiNavInput_KeyDown_: ImGuiNavInput_ = 19;
-pub const ImGuiNavInput_COUNT: ImGuiNavInput_ = 20;
-pub const ImGuiNavInput_InternalStart_: ImGuiNavInput_ = 16;
-pub type ImGuiNavInput_ = cty::c_uint;
+pub const ImGuiKey_None: ImGuiKey = 0;
+pub const ImGuiKey_Tab: ImGuiKey = 512;
+pub const ImGuiKey_LeftArrow: ImGuiKey = 513;
+pub const ImGuiKey_RightArrow: ImGuiKey = 514;
+pub const ImGuiKey_UpArrow: ImGuiKey = 515;
+pub const ImGuiKey_DownArrow: ImGuiKey = 516;
+pub const ImGuiKey_PageUp: ImGuiKey = 517;
+pub const ImGuiKey_PageDown: ImGuiKey = 518;
+pub const ImGuiKey_Home: ImGuiKey = 519;
+pub const ImGuiKey_End: ImGuiKey = 520;
+pub const ImGuiKey_Insert: ImGuiKey = 521;
+pub const ImGuiKey_Delete: ImGuiKey = 522;
+pub const ImGuiKey_Backspace: ImGuiKey = 523;
+pub const ImGuiKey_Space: ImGuiKey = 524;
+pub const ImGuiKey_Enter: ImGuiKey = 525;
+pub const ImGuiKey_Escape: ImGuiKey = 526;
+pub const ImGuiKey_LeftCtrl: ImGuiKey = 527;
+pub const ImGuiKey_LeftShift: ImGuiKey = 528;
+pub const ImGuiKey_LeftAlt: ImGuiKey = 529;
+pub const ImGuiKey_LeftSuper: ImGuiKey = 530;
+pub const ImGuiKey_RightCtrl: ImGuiKey = 531;
+pub const ImGuiKey_RightShift: ImGuiKey = 532;
+pub const ImGuiKey_RightAlt: ImGuiKey = 533;
+pub const ImGuiKey_RightSuper: ImGuiKey = 534;
+pub const ImGuiKey_Menu: ImGuiKey = 535;
+pub const ImGuiKey_0: ImGuiKey = 536;
+pub const ImGuiKey_1: ImGuiKey = 537;
+pub const ImGuiKey_2: ImGuiKey = 538;
+pub const ImGuiKey_3: ImGuiKey = 539;
+pub const ImGuiKey_4: ImGuiKey = 540;
+pub const ImGuiKey_5: ImGuiKey = 541;
+pub const ImGuiKey_6: ImGuiKey = 542;
+pub const ImGuiKey_7: ImGuiKey = 543;
+pub const ImGuiKey_8: ImGuiKey = 544;
+pub const ImGuiKey_9: ImGuiKey = 545;
+pub const ImGuiKey_A: ImGuiKey = 546;
+pub const ImGuiKey_B: ImGuiKey = 547;
+pub const ImGuiKey_C: ImGuiKey = 548;
+pub const ImGuiKey_D: ImGuiKey = 549;
+pub const ImGuiKey_E: ImGuiKey = 550;
+pub const ImGuiKey_F: ImGuiKey = 551;
+pub const ImGuiKey_G: ImGuiKey = 552;
+pub const ImGuiKey_H: ImGuiKey = 553;
+pub const ImGuiKey_I: ImGuiKey = 554;
+pub const ImGuiKey_J: ImGuiKey = 555;
+pub const ImGuiKey_K: ImGuiKey = 556;
+pub const ImGuiKey_L: ImGuiKey = 557;
+pub const ImGuiKey_M: ImGuiKey = 558;
+pub const ImGuiKey_N: ImGuiKey = 559;
+pub const ImGuiKey_O: ImGuiKey = 560;
+pub const ImGuiKey_P: ImGuiKey = 561;
+pub const ImGuiKey_Q: ImGuiKey = 562;
+pub const ImGuiKey_R: ImGuiKey = 563;
+pub const ImGuiKey_S: ImGuiKey = 564;
+pub const ImGuiKey_T: ImGuiKey = 565;
+pub const ImGuiKey_U: ImGuiKey = 566;
+pub const ImGuiKey_V: ImGuiKey = 567;
+pub const ImGuiKey_W: ImGuiKey = 568;
+pub const ImGuiKey_X: ImGuiKey = 569;
+pub const ImGuiKey_Y: ImGuiKey = 570;
+pub const ImGuiKey_Z: ImGuiKey = 571;
+pub const ImGuiKey_F1: ImGuiKey = 572;
+pub const ImGuiKey_F2: ImGuiKey = 573;
+pub const ImGuiKey_F3: ImGuiKey = 574;
+pub const ImGuiKey_F4: ImGuiKey = 575;
+pub const ImGuiKey_F5: ImGuiKey = 576;
+pub const ImGuiKey_F6: ImGuiKey = 577;
+pub const ImGuiKey_F7: ImGuiKey = 578;
+pub const ImGuiKey_F8: ImGuiKey = 579;
+pub const ImGuiKey_F9: ImGuiKey = 580;
+pub const ImGuiKey_F10: ImGuiKey = 581;
+pub const ImGuiKey_F11: ImGuiKey = 582;
+pub const ImGuiKey_F12: ImGuiKey = 583;
+pub const ImGuiKey_Apostrophe: ImGuiKey = 584;
+pub const ImGuiKey_Comma: ImGuiKey = 585;
+pub const ImGuiKey_Minus: ImGuiKey = 586;
+pub const ImGuiKey_Period: ImGuiKey = 587;
+pub const ImGuiKey_Slash: ImGuiKey = 588;
+pub const ImGuiKey_Semicolon: ImGuiKey = 589;
+pub const ImGuiKey_Equal: ImGuiKey = 590;
+pub const ImGuiKey_LeftBracket: ImGuiKey = 591;
+pub const ImGuiKey_Backslash: ImGuiKey = 592;
+pub const ImGuiKey_RightBracket: ImGuiKey = 593;
+pub const ImGuiKey_GraveAccent: ImGuiKey = 594;
+pub const ImGuiKey_CapsLock: ImGuiKey = 595;
+pub const ImGuiKey_ScrollLock: ImGuiKey = 596;
+pub const ImGuiKey_NumLock: ImGuiKey = 597;
+pub const ImGuiKey_PrintScreen: ImGuiKey = 598;
+pub const ImGuiKey_Pause: ImGuiKey = 599;
+pub const ImGuiKey_Keypad0: ImGuiKey = 600;
+pub const ImGuiKey_Keypad1: ImGuiKey = 601;
+pub const ImGuiKey_Keypad2: ImGuiKey = 602;
+pub const ImGuiKey_Keypad3: ImGuiKey = 603;
+pub const ImGuiKey_Keypad4: ImGuiKey = 604;
+pub const ImGuiKey_Keypad5: ImGuiKey = 605;
+pub const ImGuiKey_Keypad6: ImGuiKey = 606;
+pub const ImGuiKey_Keypad7: ImGuiKey = 607;
+pub const ImGuiKey_Keypad8: ImGuiKey = 608;
+pub const ImGuiKey_Keypad9: ImGuiKey = 609;
+pub const ImGuiKey_KeypadDecimal: ImGuiKey = 610;
+pub const ImGuiKey_KeypadDivide: ImGuiKey = 611;
+pub const ImGuiKey_KeypadMultiply: ImGuiKey = 612;
+pub const ImGuiKey_KeypadSubtract: ImGuiKey = 613;
+pub const ImGuiKey_KeypadAdd: ImGuiKey = 614;
+pub const ImGuiKey_KeypadEnter: ImGuiKey = 615;
+pub const ImGuiKey_KeypadEqual: ImGuiKey = 616;
+pub const ImGuiKey_GamepadStart: ImGuiKey = 617;
+pub const ImGuiKey_GamepadBack: ImGuiKey = 618;
+pub const ImGuiKey_GamepadFaceLeft: ImGuiKey = 619;
+pub const ImGuiKey_GamepadFaceRight: ImGuiKey = 620;
+pub const ImGuiKey_GamepadFaceUp: ImGuiKey = 621;
+pub const ImGuiKey_GamepadFaceDown: ImGuiKey = 622;
+pub const ImGuiKey_GamepadDpadLeft: ImGuiKey = 623;
+pub const ImGuiKey_GamepadDpadRight: ImGuiKey = 624;
+pub const ImGuiKey_GamepadDpadUp: ImGuiKey = 625;
+pub const ImGuiKey_GamepadDpadDown: ImGuiKey = 626;
+pub const ImGuiKey_GamepadL1: ImGuiKey = 627;
+pub const ImGuiKey_GamepadR1: ImGuiKey = 628;
+pub const ImGuiKey_GamepadL2: ImGuiKey = 629;
+pub const ImGuiKey_GamepadR2: ImGuiKey = 630;
+pub const ImGuiKey_GamepadL3: ImGuiKey = 631;
+pub const ImGuiKey_GamepadR3: ImGuiKey = 632;
+pub const ImGuiKey_GamepadLStickLeft: ImGuiKey = 633;
+pub const ImGuiKey_GamepadLStickRight: ImGuiKey = 634;
+pub const ImGuiKey_GamepadLStickUp: ImGuiKey = 635;
+pub const ImGuiKey_GamepadLStickDown: ImGuiKey = 636;
+pub const ImGuiKey_GamepadRStickLeft: ImGuiKey = 637;
+pub const ImGuiKey_GamepadRStickRight: ImGuiKey = 638;
+pub const ImGuiKey_GamepadRStickUp: ImGuiKey = 639;
+pub const ImGuiKey_GamepadRStickDown: ImGuiKey = 640;
+pub const ImGuiKey_MouseLeft: ImGuiKey = 641;
+pub const ImGuiKey_MouseRight: ImGuiKey = 642;
+pub const ImGuiKey_MouseMiddle: ImGuiKey = 643;
+pub const ImGuiKey_MouseX1: ImGuiKey = 644;
+pub const ImGuiKey_MouseX2: ImGuiKey = 645;
+pub const ImGuiKey_MouseWheelX: ImGuiKey = 646;
+pub const ImGuiKey_MouseWheelY: ImGuiKey = 647;
+pub const ImGuiKey_ReservedForModCtrl: ImGuiKey = 648;
+pub const ImGuiKey_ReservedForModShift: ImGuiKey = 649;
+pub const ImGuiKey_ReservedForModAlt: ImGuiKey = 650;
+pub const ImGuiKey_ReservedForModSuper: ImGuiKey = 651;
+pub const ImGuiKey_COUNT: ImGuiKey = 652;
+pub const ImGuiMod_None: ImGuiKey = 0;
+pub const ImGuiMod_Ctrl: ImGuiKey = 4096;
+pub const ImGuiMod_Shift: ImGuiKey = 8192;
+pub const ImGuiMod_Alt: ImGuiKey = 16384;
+pub const ImGuiMod_Super: ImGuiKey = 32768;
+pub const ImGuiMod_Mask_: ImGuiKey = 61440;
+pub const ImGuiMod_Shortcut: ImGuiKey = 4096;
+pub const ImGuiKey_NamedKey_BEGIN: ImGuiKey = 512;
+pub const ImGuiKey_NamedKey_END: ImGuiKey = 652;
+pub const ImGuiKey_NamedKey_COUNT: ImGuiKey = 140;
+pub const ImGuiKey_KeysData_SIZE: ImGuiKey = 652;
+pub const ImGuiKey_KeysData_OFFSET: ImGuiKey = 0;
+pub type ImGuiKey = cty::c_uint;
+pub const ImGuiNavInput_Activate: ImGuiNavInput = 0;
+pub const ImGuiNavInput_Cancel: ImGuiNavInput = 1;
+pub const ImGuiNavInput_Input: ImGuiNavInput = 2;
+pub const ImGuiNavInput_Menu: ImGuiNavInput = 3;
+pub const ImGuiNavInput_DpadLeft: ImGuiNavInput = 4;
+pub const ImGuiNavInput_DpadRight: ImGuiNavInput = 5;
+pub const ImGuiNavInput_DpadUp: ImGuiNavInput = 6;
+pub const ImGuiNavInput_DpadDown: ImGuiNavInput = 7;
+pub const ImGuiNavInput_LStickLeft: ImGuiNavInput = 8;
+pub const ImGuiNavInput_LStickRight: ImGuiNavInput = 9;
+pub const ImGuiNavInput_LStickUp: ImGuiNavInput = 10;
+pub const ImGuiNavInput_LStickDown: ImGuiNavInput = 11;
+pub const ImGuiNavInput_FocusPrev: ImGuiNavInput = 12;
+pub const ImGuiNavInput_FocusNext: ImGuiNavInput = 13;
+pub const ImGuiNavInput_TweakSlow: ImGuiNavInput = 14;
+pub const ImGuiNavInput_TweakFast: ImGuiNavInput = 15;
+pub const ImGuiNavInput_COUNT: ImGuiNavInput = 16;
+pub type ImGuiNavInput = cty::c_uint;
 pub const ImGuiConfigFlags_None: ImGuiConfigFlags_ = 0;
 pub const ImGuiConfigFlags_NavEnableKeyboard: ImGuiConfigFlags_ = 1;
 pub const ImGuiConfigFlags_NavEnableGamepad: ImGuiConfigFlags_ = 2;
@@ -1625,6 +909,30 @@ impl Default for ImGuiStyle {
     }
 }
 #[repr(C)]
+#[derive(Debug, Default, Copy, Clone, PartialEq)]
+pub struct ImGuiKeyData {
+    pub Down: bool,
+    pub DownDuration: f32,
+    pub DownDurationPrev: f32,
+    pub AnalogValue: f32,
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub struct ImVector_ImWchar {
+    pub Size: cty::c_int,
+    pub Capacity: cty::c_int,
+    pub Data: *mut ImWchar,
+}
+impl Default for ImVector_ImWchar {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub struct ImGuiIO {
     pub ConfigFlags: ImGuiConfigFlags,
@@ -1637,9 +945,10 @@ pub struct ImGuiIO {
     pub MouseDoubleClickTime: f32,
     pub MouseDoubleClickMaxDist: f32,
     pub MouseDragThreshold: f32,
-    pub KeyMap: [cty::c_int; 22usize],
     pub KeyRepeatDelay: f32,
     pub KeyRepeatRate: f32,
+    pub HoverDelayNormal: f32,
+    pub HoverDelayShort: f32,
     pub UserData: *mut cty::c_void,
     pub Fonts: *mut ImFontAtlas,
     pub FontGlobalScale: f32,
@@ -1656,7 +965,9 @@ pub struct ImGuiIO {
     pub ConfigViewportsNoDefaultParent: bool,
     pub MouseDrawCursor: bool,
     pub ConfigMacOSXBehaviors: bool,
+    pub ConfigInputTrickleEventQueue: bool,
     pub ConfigInputTextCursorBlink: bool,
+    pub ConfigInputTextEnterKeepActive: bool,
     pub ConfigDragClickToInputText: bool,
     pub ConfigWindowsResizeFromEdges: bool,
     pub ConfigWindowsMoveFromTitleBarOnly: bool,
@@ -1673,17 +984,10 @@ pub struct ImGuiIO {
         unsafe extern "C" fn(user_data: *mut cty::c_void, text: *const cty::c_char),
     >,
     pub ClipboardUserData: *mut cty::c_void,
-    pub MousePos: ImVec2,
-    pub MouseDown: [bool; 5usize],
-    pub MouseWheel: f32,
-    pub MouseWheelH: f32,
-    pub MouseHoveredViewport: ImGuiID,
-    pub KeyCtrl: bool,
-    pub KeyShift: bool,
-    pub KeyAlt: bool,
-    pub KeySuper: bool,
-    pub KeysDown: [bool; 512usize],
-    pub NavInputs: [f32; 20usize],
+    pub SetPlatformImeDataFn: ::core::option::Option<
+        unsafe extern "C" fn(viewport: *mut ImGuiViewport, data: *mut ImGuiPlatformImeData),
+    >,
+    pub _UnusedPadding: *mut cty::c_void,
     pub WantCaptureMouse: bool,
     pub WantCaptureKeyboard: bool,
     pub WantTextInput: bool,
@@ -1698,9 +1002,21 @@ pub struct ImGuiIO {
     pub MetricsActiveWindows: cty::c_int,
     pub MetricsActiveAllocations: cty::c_int,
     pub MouseDelta: ImVec2,
+    pub KeyMap: [cty::c_int; 652usize],
+    pub KeysDown: [bool; 652usize],
+    pub NavInputs: [f32; 16usize],
+    pub MousePos: ImVec2,
+    pub MouseDown: [bool; 5usize],
+    pub MouseWheel: f32,
+    pub MouseWheelH: f32,
+    pub MouseHoveredViewport: ImGuiID,
+    pub KeyCtrl: bool,
+    pub KeyShift: bool,
+    pub KeyAlt: bool,
+    pub KeySuper: bool,
+    pub KeyMods: ImGuiKeyChord,
+    pub KeysData: [ImGuiKeyData; 652usize],
     pub WantCaptureMouseUnlessPopupClose: bool,
-    pub KeyMods: ImGuiKeyModFlags,
-    pub KeyModsPrev: ImGuiKeyModFlags,
     pub MousePosPrev: ImVec2,
     pub MouseClickedPos: [ImVec2; 5usize],
     pub MouseClickedTime: [f64; 5usize],
@@ -1715,12 +1031,11 @@ pub struct ImGuiIO {
     pub MouseDownDurationPrev: [f32; 5usize],
     pub MouseDragMaxDistanceAbs: [ImVec2; 5usize],
     pub MouseDragMaxDistanceSqr: [f32; 5usize],
-    pub KeysDownDuration: [f32; 512usize],
-    pub KeysDownDurationPrev: [f32; 512usize],
-    pub NavInputsDownDuration: [f32; 20usize],
-    pub NavInputsDownDurationPrev: [f32; 20usize],
     pub PenPressure: f32,
     pub AppFocusLost: bool,
+    pub AppAcceptingEvents: bool,
+    pub BackendUsingLegacyKeyArrays: ImS8,
+    pub BackendUsingLegacyNavInputArray: bool,
     pub InputQueueSurrogate: ImWchar16,
     pub InputQueueCharacters: ImVector_ImWchar,
 }
@@ -1880,12 +1195,44 @@ impl Default for ImGuiTextRange {
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub struct ImVector_ImGuiTextRange {
+    pub Size: cty::c_int,
+    pub Capacity: cty::c_int,
+    pub Data: *mut ImGuiTextRange,
+}
+impl Default for ImVector_ImGuiTextRange {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
 pub struct ImGuiTextFilter {
     pub InputBuf: [cty::c_char; 256usize],
     pub Filters: ImVector_ImGuiTextRange,
     pub CountGrep: cty::c_int,
 }
 impl Default for ImGuiTextFilter {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub struct ImVector_char {
+    pub Size: cty::c_int,
+    pub Capacity: cty::c_int,
+    pub Data: *mut cty::c_char,
+}
+impl Default for ImVector_char {
     fn default() -> Self {
         let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
         unsafe {
@@ -1955,74 +1302,26 @@ impl ::core::fmt::Debug for ImGuiStoragePair {
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub struct ImVector_ImGuiStoragePair {
+    pub Size: cty::c_int,
+    pub Capacity: cty::c_int,
+    pub Data: *mut ImGuiStoragePair,
+}
+impl Default for ImVector_ImGuiStoragePair {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
 pub struct ImGuiStorage {
     pub Data: ImVector_ImGuiStoragePair,
 }
 impl Default for ImGuiStorage {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-pub struct ImVector_ImGuiTabBar {
-    pub Size: cty::c_int,
-    pub Capacity: cty::c_int,
-    pub Data: *mut ImGuiTabBar,
-}
-impl Default for ImVector_ImGuiTabBar {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-pub struct ImPool_ImGuiTabBar {
-    pub Buf: ImVector_ImGuiTabBar,
-    pub Map: ImGuiStorage,
-    pub FreeIdx: ImPoolIdx,
-}
-impl Default for ImPool_ImGuiTabBar {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-pub struct ImVector_ImGuiTable {
-    pub Size: cty::c_int,
-    pub Capacity: cty::c_int,
-    pub Data: *mut ImGuiTable,
-}
-impl Default for ImVector_ImGuiTable {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-pub struct ImPool_ImGuiTable {
-    pub Buf: ImVector_ImGuiTable,
-    pub Map: ImGuiStorage,
-    pub FreeIdx: ImPoolIdx,
-}
-impl Default for ImPool_ImGuiTable {
     fn default() -> Self {
         let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
         unsafe {
@@ -2055,6 +1354,9 @@ impl Default for ImGuiListClipper {
 pub struct ImColor {
     pub Value: ImVec4,
 }
+pub type ImDrawCallback = ::core::option::Option<
+    unsafe extern "C" fn(parent_list: *const ImDrawList, cmd: *const ImDrawCmd),
+>;
 #[repr(C)]
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub struct ImDrawCmd {
@@ -2100,11 +1402,59 @@ impl Default for ImDrawCmdHeader {
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub struct ImVector_ImDrawCmd {
+    pub Size: cty::c_int,
+    pub Capacity: cty::c_int,
+    pub Data: *mut ImDrawCmd,
+}
+impl Default for ImVector_ImDrawCmd {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub struct ImVector_ImDrawIdx {
+    pub Size: cty::c_int,
+    pub Capacity: cty::c_int,
+    pub Data: *mut ImDrawIdx,
+}
+impl Default for ImVector_ImDrawIdx {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
 pub struct ImDrawChannel {
     pub _CmdBuffer: ImVector_ImDrawCmd,
     pub _IdxBuffer: ImVector_ImDrawIdx,
 }
 impl Default for ImDrawChannel {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub struct ImVector_ImDrawChannel {
+    pub Size: cty::c_int,
+    pub Capacity: cty::c_int,
+    pub Data: *mut ImDrawChannel,
+}
+impl Default for ImVector_ImDrawChannel {
     fn default() -> Self {
         let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
         unsafe {
@@ -2151,6 +1501,70 @@ pub const ImDrawListFlags_AntiAliasedFill: ImDrawListFlags_ = 4;
 pub const ImDrawListFlags_AllowVtxOffset: ImDrawListFlags_ = 8;
 pub type ImDrawListFlags_ = cty::c_uint;
 #[repr(C)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub struct ImVector_ImDrawVert {
+    pub Size: cty::c_int,
+    pub Capacity: cty::c_int,
+    pub Data: *mut ImDrawVert,
+}
+impl Default for ImVector_ImDrawVert {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub struct ImVector_ImVec4 {
+    pub Size: cty::c_int,
+    pub Capacity: cty::c_int,
+    pub Data: *mut ImVec4,
+}
+impl Default for ImVector_ImVec4 {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub struct ImVector_ImTextureID {
+    pub Size: cty::c_int,
+    pub Capacity: cty::c_int,
+    pub Data: *mut ImTextureID,
+}
+impl Default for ImVector_ImTextureID {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub struct ImVector_ImVec2 {
+    pub Size: cty::c_int,
+    pub Capacity: cty::c_int,
+    pub Data: *mut ImVec2,
+}
+impl Default for ImVector_ImVec2 {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub struct ImDrawList {
     pub CmdBuffer: ImVector_ImDrawCmd,
@@ -2158,7 +1572,7 @@ pub struct ImDrawList {
     pub VtxBuffer: ImVector_ImDrawVert,
     pub Flags: ImDrawListFlags,
     pub _VtxCurrentIdx: cty::c_uint,
-    pub _Data: *const ImDrawListSharedData,
+    pub _Data: *mut ImDrawListSharedData,
     pub _OwnerName: *const cty::c_char,
     pub _VtxWritePtr: *mut ImDrawVert,
     pub _IdxWritePtr: *mut ImDrawIdx,
@@ -2305,6 +1719,22 @@ impl ImFontGlyph {
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub struct ImVector_ImU32 {
+    pub Size: cty::c_int,
+    pub Capacity: cty::c_int,
+    pub Data: *mut ImU32,
+}
+impl Default for ImVector_ImU32 {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
 pub struct ImFontGlyphRangesBuilder {
     pub UsedChars: ImVector_ImU32,
 }
@@ -2344,6 +1774,54 @@ pub const ImFontAtlasFlags_NoMouseCursors: ImFontAtlasFlags_ = 2;
 pub const ImFontAtlasFlags_NoBakedLines: ImFontAtlasFlags_ = 4;
 pub type ImFontAtlasFlags_ = cty::c_uint;
 #[repr(C)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub struct ImVector_ImFontPtr {
+    pub Size: cty::c_int,
+    pub Capacity: cty::c_int,
+    pub Data: *mut *mut ImFont,
+}
+impl Default for ImVector_ImFontPtr {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub struct ImVector_ImFontAtlasCustomRect {
+    pub Size: cty::c_int,
+    pub Capacity: cty::c_int,
+    pub Data: *mut ImFontAtlasCustomRect,
+}
+impl Default for ImVector_ImFontAtlasCustomRect {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub struct ImVector_ImFontConfig {
+    pub Size: cty::c_int,
+    pub Capacity: cty::c_int,
+    pub Data: *mut ImFontConfig,
+}
+impl Default for ImVector_ImFontConfig {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub struct ImFontAtlas {
     pub Flags: ImFontAtlasFlags,
@@ -2369,6 +1847,38 @@ pub struct ImFontAtlas {
     pub PackIdLines: cty::c_int,
 }
 impl Default for ImFontAtlas {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub struct ImVector_float {
+    pub Size: cty::c_int,
+    pub Capacity: cty::c_int,
+    pub Data: *mut f32,
+}
+impl Default for ImVector_float {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub struct ImVector_ImFontGlyph {
+    pub Size: cty::c_int,
+    pub Capacity: cty::c_int,
+    pub Data: *mut ImFontGlyph,
+}
+impl Default for ImVector_ImFontGlyph {
     fn default() -> Self {
         let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
         unsafe {
@@ -2439,11 +1949,44 @@ pub struct ImGuiViewport {
     pub PlatformUserData: *mut cty::c_void,
     pub PlatformHandle: *mut cty::c_void,
     pub PlatformHandleRaw: *mut cty::c_void,
+    pub PlatformWindowCreated: bool,
     pub PlatformRequestMove: bool,
     pub PlatformRequestResize: bool,
     pub PlatformRequestClose: bool,
 }
 impl Default for ImGuiViewport {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub struct ImVector_ImGuiPlatformMonitor {
+    pub Size: cty::c_int,
+    pub Capacity: cty::c_int,
+    pub Data: *mut ImGuiPlatformMonitor,
+}
+impl Default for ImVector_ImGuiPlatformMonitor {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub struct ImVector_ImGuiViewportPtr {
+    pub Size: cty::c_int,
+    pub Capacity: cty::c_int,
+    pub Data: *mut *mut ImGuiViewport,
+}
+impl Default for ImVector_ImGuiViewportPtr {
     fn default() -> Self {
         let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
         unsafe {
@@ -2489,8 +2032,6 @@ pub struct ImGuiPlatformIO {
         ::core::option::Option<unsafe extern "C" fn(vp: *mut ImGuiViewport) -> f32>,
     pub Platform_OnChangedViewport:
         ::core::option::Option<unsafe extern "C" fn(vp: *mut ImGuiViewport)>,
-    pub Platform_SetImeInputPos:
-        ::core::option::Option<unsafe extern "C" fn(vp: *mut ImGuiViewport, pos: ImVec2)>,
     pub Platform_CreateVkSurface: ::core::option::Option<
         unsafe extern "C" fn(
             vp: *mut ImGuiViewport,
@@ -2531,6 +2072,32 @@ pub struct ImGuiPlatformMonitor {
     pub WorkSize: ImVec2,
     pub DpiScale: f32,
 }
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone, PartialEq)]
+pub struct ImGuiPlatformImeData {
+    pub WantVisible: bool,
+    pub InputPos: ImVec2,
+    pub InputLineHeight: f32,
+}
+pub type ImGuiDataAuthority = cty::c_int;
+pub type ImGuiLayoutType = cty::c_int;
+pub type ImGuiActivateFlags = cty::c_int;
+pub type ImGuiDebugLogFlags = cty::c_int;
+pub type ImGuiInputFlags = cty::c_int;
+pub type ImGuiItemFlags = cty::c_int;
+pub type ImGuiItemStatusFlags = cty::c_int;
+pub type ImGuiOldColumnFlags = cty::c_int;
+pub type ImGuiNavHighlightFlags = cty::c_int;
+pub type ImGuiNavMoveFlags = cty::c_int;
+pub type ImGuiNextItemDataFlags = cty::c_int;
+pub type ImGuiNextWindowDataFlags = cty::c_int;
+pub type ImGuiScrollFlags = cty::c_int;
+pub type ImGuiSeparatorFlags = cty::c_int;
+pub type ImGuiTextFlags = cty::c_int;
+pub type ImGuiTooltipFlags = cty::c_int;
+pub type ImGuiErrorLogCallback = ::core::option::Option<
+    unsafe extern "C" fn(user_data: *mut cty::c_void, fmt: *const cty::c_char, ...),
+>;
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone, Hash, PartialEq, Eq)]
 pub struct StbUndoRecord {
@@ -2595,6 +2162,7 @@ pub struct StbTexteditRow {
     pub ymax: f32,
     pub num_chars: cty::c_int,
 }
+pub type ImFileHandle = *mut FILE;
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone, PartialEq)]
 pub struct ImVec1 {
@@ -2626,6 +2194,38 @@ impl Default for ImBitVector {
         }
     }
 }
+pub type ImPoolIdx = cty::c_int;
+#[repr(C)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub struct ImVector_int {
+    pub Size: cty::c_int,
+    pub Capacity: cty::c_int,
+    pub Data: *mut cty::c_int,
+}
+impl Default for ImVector_int {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub struct ImGuiTextIndex {
+    pub LineOffsets: ImVector_int,
+    pub EndOffset: cty::c_int,
+}
+impl Default for ImGuiTextIndex {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub struct ImDrawListSharedData {
@@ -2636,12 +2236,29 @@ pub struct ImDrawListSharedData {
     pub CircleSegmentMaxError: f32,
     pub ClipRectFullscreen: ImVec4,
     pub InitialFlags: ImDrawListFlags,
+    pub TempBuffer: ImVector_ImVec2,
     pub ArcFastVtx: [ImVec2; 48usize],
     pub ArcFastRadiusCutoff: f32,
     pub CircleSegmentCounts: [ImU8; 64usize],
     pub TexUvLines: *const ImVec4,
 }
 impl Default for ImDrawListSharedData {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub struct ImVector_ImDrawListPtr {
+    pub Size: cty::c_int,
+    pub Capacity: cty::c_int,
+    pub Data: *mut *mut ImDrawList,
+}
+impl Default for ImVector_ImDrawListPtr {
     fn default() -> Self {
         let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
         unsafe {
@@ -2673,7 +2290,8 @@ pub const ImGuiItemFlags_NoNavDefaultFocus: ImGuiItemFlags_ = 16;
 pub const ImGuiItemFlags_SelectableDontClosePopup: ImGuiItemFlags_ = 32;
 pub const ImGuiItemFlags_MixedValue: ImGuiItemFlags_ = 64;
 pub const ImGuiItemFlags_ReadOnly: ImGuiItemFlags_ = 128;
-pub const ImGuiItemFlags_Inputable: ImGuiItemFlags_ = 256;
+pub const ImGuiItemFlags_NoWindowHoverableCheck: ImGuiItemFlags_ = 256;
+pub const ImGuiItemFlags_Inputable: ImGuiItemFlags_ = 1024;
 pub type ImGuiItemFlags_ = cty::c_uint;
 pub const ImGuiItemStatusFlags_None: ImGuiItemStatusFlags_ = 0;
 pub const ImGuiItemStatusFlags_HoveredRect: ImGuiItemStatusFlags_ = 1;
@@ -2685,6 +2303,7 @@ pub const ImGuiItemStatusFlags_HasDeactivated: ImGuiItemStatusFlags_ = 32;
 pub const ImGuiItemStatusFlags_Deactivated: ImGuiItemStatusFlags_ = 64;
 pub const ImGuiItemStatusFlags_HoveredWindow: ImGuiItemStatusFlags_ = 128;
 pub const ImGuiItemStatusFlags_FocusedByTabbing: ImGuiItemStatusFlags_ = 256;
+pub const ImGuiItemStatusFlags_Visible: ImGuiItemStatusFlags_ = 512;
 pub type ImGuiItemStatusFlags_ = cty::c_uint;
 pub const ImGuiInputTextFlags_Multiline: ImGuiInputTextFlagsPrivate_ = 67108864;
 pub const ImGuiInputTextFlags_NoMarkEdited: ImGuiInputTextFlagsPrivate_ = 134217728;
@@ -2705,6 +2324,8 @@ pub const ImGuiButtonFlags_NoKeyModifiers: ImGuiButtonFlagsPrivate_ = 65536;
 pub const ImGuiButtonFlags_NoHoldingActiveId: ImGuiButtonFlagsPrivate_ = 131072;
 pub const ImGuiButtonFlags_NoNavFocus: ImGuiButtonFlagsPrivate_ = 262144;
 pub const ImGuiButtonFlags_NoHoveredOnFocus: ImGuiButtonFlagsPrivate_ = 524288;
+pub const ImGuiButtonFlags_NoSetKeyOwner: ImGuiButtonFlagsPrivate_ = 1048576;
+pub const ImGuiButtonFlags_NoTestKeyOwner: ImGuiButtonFlagsPrivate_ = 2097152;
 pub const ImGuiButtonFlags_PressedOnMask_: ImGuiButtonFlagsPrivate_ = 1008;
 pub const ImGuiButtonFlags_PressedOnDefault_: ImGuiButtonFlagsPrivate_ = 32;
 pub type ImGuiButtonFlagsPrivate_ = cty::c_uint;
@@ -2721,6 +2342,7 @@ pub const ImGuiSelectableFlags_SpanAvailWidth: ImGuiSelectableFlagsPrivate_ = 16
 pub const ImGuiSelectableFlags_DrawHoveredWhenHeld: ImGuiSelectableFlagsPrivate_ = 33554432;
 pub const ImGuiSelectableFlags_SetNavIdOnHover: ImGuiSelectableFlagsPrivate_ = 67108864;
 pub const ImGuiSelectableFlags_NoPadWithHalfSpacing: ImGuiSelectableFlagsPrivate_ = 134217728;
+pub const ImGuiSelectableFlags_NoSetKeyOwner: ImGuiSelectableFlagsPrivate_ = 268435456;
 pub type ImGuiSelectableFlagsPrivate_ = cty::c_uint;
 pub const ImGuiTreeNodeFlags_ClipLabelForTrailingButton: ImGuiTreeNodeFlagsPrivate_ = 1048576;
 pub type ImGuiTreeNodeFlagsPrivate_ = cty::c_uint;
@@ -2751,21 +2373,6 @@ pub type ImGuiAxis = cty::c_int;
 pub const ImGuiPlotType_Lines: ImGuiPlotType = 0;
 pub const ImGuiPlotType_Histogram: ImGuiPlotType = 1;
 pub type ImGuiPlotType = cty::c_uint;
-pub const ImGuiInputSource_None: ImGuiInputSource = 0;
-pub const ImGuiInputSource_Mouse: ImGuiInputSource = 1;
-pub const ImGuiInputSource_Keyboard: ImGuiInputSource = 2;
-pub const ImGuiInputSource_Gamepad: ImGuiInputSource = 3;
-pub const ImGuiInputSource_Nav: ImGuiInputSource = 4;
-pub const ImGuiInputSource_Clipboard: ImGuiInputSource = 5;
-pub const ImGuiInputSource_COUNT: ImGuiInputSource = 6;
-pub type ImGuiInputSource = cty::c_uint;
-pub const ImGuiInputReadMode_Down: ImGuiInputReadMode = 0;
-pub const ImGuiInputReadMode_Pressed: ImGuiInputReadMode = 1;
-pub const ImGuiInputReadMode_Released: ImGuiInputReadMode = 2;
-pub const ImGuiInputReadMode_Repeat: ImGuiInputReadMode = 3;
-pub const ImGuiInputReadMode_RepeatSlow: ImGuiInputReadMode = 4;
-pub const ImGuiInputReadMode_RepeatFast: ImGuiInputReadMode = 5;
-pub type ImGuiInputReadMode = cty::c_uint;
 pub const ImGuiPopupPositionPolicy_Default: ImGuiPopupPositionPolicy = 0;
 pub const ImGuiPopupPositionPolicy_ComboBox: ImGuiPopupPositionPolicy = 1;
 pub const ImGuiPopupPositionPolicy_Tooltip: ImGuiPopupPositionPolicy = 2;
@@ -2916,7 +2523,8 @@ impl Default for ImGuiInputTextState {
 pub struct ImGuiPopupData {
     pub PopupId: ImGuiID,
     pub Window: *mut ImGuiWindow,
-    pub SourceWindow: *mut ImGuiWindow,
+    pub BackupNavWindow: *mut ImGuiWindow,
+    pub ParentNavLayer: cty::c_int,
     pub OpenFrameCount: cty::c_int,
     pub OpenParentId: ImGuiID,
     pub OpenPopupPos: ImVec2,
@@ -3034,6 +2642,7 @@ impl Default for ImGuiWindowStackData {
 pub struct ImGuiShrinkWidthItem {
     pub Index: cty::c_int,
     pub Width: f32,
+    pub InitialWidth: f32,
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
@@ -3050,6 +2659,195 @@ impl Default for ImGuiPtrOrIndex {
         }
     }
 }
+pub const ImGuiInputEventType_None: ImGuiInputEventType = 0;
+pub const ImGuiInputEventType_MousePos: ImGuiInputEventType = 1;
+pub const ImGuiInputEventType_MouseWheel: ImGuiInputEventType = 2;
+pub const ImGuiInputEventType_MouseButton: ImGuiInputEventType = 3;
+pub const ImGuiInputEventType_MouseViewport: ImGuiInputEventType = 4;
+pub const ImGuiInputEventType_Key: ImGuiInputEventType = 5;
+pub const ImGuiInputEventType_Text: ImGuiInputEventType = 6;
+pub const ImGuiInputEventType_Focus: ImGuiInputEventType = 7;
+pub const ImGuiInputEventType_COUNT: ImGuiInputEventType = 8;
+pub type ImGuiInputEventType = cty::c_uint;
+pub const ImGuiInputSource_None: ImGuiInputSource = 0;
+pub const ImGuiInputSource_Mouse: ImGuiInputSource = 1;
+pub const ImGuiInputSource_Keyboard: ImGuiInputSource = 2;
+pub const ImGuiInputSource_Gamepad: ImGuiInputSource = 3;
+pub const ImGuiInputSource_Clipboard: ImGuiInputSource = 4;
+pub const ImGuiInputSource_Nav: ImGuiInputSource = 5;
+pub const ImGuiInputSource_COUNT: ImGuiInputSource = 6;
+pub type ImGuiInputSource = cty::c_uint;
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone, PartialEq)]
+pub struct ImGuiInputEventMousePos {
+    pub PosX: f32,
+    pub PosY: f32,
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone, PartialEq)]
+pub struct ImGuiInputEventMouseWheel {
+    pub WheelX: f32,
+    pub WheelY: f32,
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone, Hash, PartialEq, Eq)]
+pub struct ImGuiInputEventMouseButton {
+    pub Button: cty::c_int,
+    pub Down: bool,
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone, Hash, PartialEq, Eq)]
+pub struct ImGuiInputEventMouseViewport {
+    pub HoveredViewportID: ImGuiID,
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone, PartialEq)]
+pub struct ImGuiInputEventKey {
+    pub Key: ImGuiKey,
+    pub Down: bool,
+    pub AnalogValue: f32,
+}
+impl Default for ImGuiInputEventKey {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone, Hash, PartialEq, Eq)]
+pub struct ImGuiInputEventText {
+    pub Char: cty::c_uint,
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone, Hash, PartialEq, Eq)]
+pub struct ImGuiInputEventAppFocused {
+    pub Focused: bool,
+}
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct ImGuiInputEvent {
+    pub Type: ImGuiInputEventType,
+    pub Source: ImGuiInputSource,
+    pub __bindgen_anon_1: ImGuiInputEvent__bindgen_ty_1,
+    pub AddedByTestEngine: bool,
+}
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub union ImGuiInputEvent__bindgen_ty_1 {
+    pub MousePos: ImGuiInputEventMousePos,
+    pub MouseWheel: ImGuiInputEventMouseWheel,
+    pub MouseButton: ImGuiInputEventMouseButton,
+    pub MouseViewport: ImGuiInputEventMouseViewport,
+    pub Key: ImGuiInputEventKey,
+    pub Text: ImGuiInputEventText,
+    pub AppFocused: ImGuiInputEventAppFocused,
+}
+impl Default for ImGuiInputEvent__bindgen_ty_1 {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+impl ::core::fmt::Debug for ImGuiInputEvent__bindgen_ty_1 {
+    fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
+        write!(f, "ImGuiInputEvent__bindgen_ty_1 {{ union }}")
+    }
+}
+impl Default for ImGuiInputEvent {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+impl ::core::fmt::Debug for ImGuiInputEvent {
+    fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
+        write ! (f , "ImGuiInputEvent {{ Type: {:?}, Source: {:?}, __bindgen_anon_1: {:?}, AddedByTestEngine: {:?} }}" , self . Type , self . Source , self . __bindgen_anon_1 , self . AddedByTestEngine)
+    }
+}
+pub type ImGuiKeyRoutingIndex = ImS16;
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone, Hash, PartialEq, Eq)]
+pub struct ImGuiKeyRoutingData {
+    pub NextEntryIndex: ImGuiKeyRoutingIndex,
+    pub Mods: ImU16,
+    pub RoutingNextScore: ImU8,
+    pub RoutingCurr: ImGuiID,
+    pub RoutingNext: ImGuiID,
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub struct ImVector_ImGuiKeyRoutingData {
+    pub Size: cty::c_int,
+    pub Capacity: cty::c_int,
+    pub Data: *mut ImGuiKeyRoutingData,
+}
+impl Default for ImVector_ImGuiKeyRoutingData {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub struct ImGuiKeyRoutingTable {
+    pub Index: [ImGuiKeyRoutingIndex; 140usize],
+    pub Entries: ImVector_ImGuiKeyRoutingData,
+    pub EntriesNext: ImVector_ImGuiKeyRoutingData,
+}
+impl Default for ImGuiKeyRoutingTable {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone, Hash, PartialEq, Eq)]
+pub struct ImGuiKeyOwnerData {
+    pub OwnerCurr: ImGuiID,
+    pub OwnerNext: ImGuiID,
+    pub LockThisFrame: bool,
+    pub LockUntilRelease: bool,
+}
+pub const ImGuiInputFlags_None: ImGuiInputFlags_ = 0;
+pub const ImGuiInputFlags_Repeat: ImGuiInputFlags_ = 1;
+pub const ImGuiInputFlags_RepeatRateDefault: ImGuiInputFlags_ = 2;
+pub const ImGuiInputFlags_RepeatRateNavMove: ImGuiInputFlags_ = 4;
+pub const ImGuiInputFlags_RepeatRateNavTweak: ImGuiInputFlags_ = 8;
+pub const ImGuiInputFlags_RepeatRateMask_: ImGuiInputFlags_ = 14;
+pub const ImGuiInputFlags_CondHovered: ImGuiInputFlags_ = 16;
+pub const ImGuiInputFlags_CondActive: ImGuiInputFlags_ = 32;
+pub const ImGuiInputFlags_CondDefault_: ImGuiInputFlags_ = 48;
+pub const ImGuiInputFlags_CondMask_: ImGuiInputFlags_ = 48;
+pub const ImGuiInputFlags_LockThisFrame: ImGuiInputFlags_ = 64;
+pub const ImGuiInputFlags_LockUntilRelease: ImGuiInputFlags_ = 128;
+pub const ImGuiInputFlags_RouteFocused: ImGuiInputFlags_ = 256;
+pub const ImGuiInputFlags_RouteGlobalLow: ImGuiInputFlags_ = 512;
+pub const ImGuiInputFlags_RouteGlobal: ImGuiInputFlags_ = 1024;
+pub const ImGuiInputFlags_RouteGlobalHigh: ImGuiInputFlags_ = 2048;
+pub const ImGuiInputFlags_RouteMask_: ImGuiInputFlags_ = 3840;
+pub const ImGuiInputFlags_RouteAlways: ImGuiInputFlags_ = 4096;
+pub const ImGuiInputFlags_RouteUnlessBgFocused: ImGuiInputFlags_ = 8192;
+pub const ImGuiInputFlags_RouteExtraMask_: ImGuiInputFlags_ = 12288;
+pub const ImGuiInputFlags_SupportedByIsKeyPressed: ImGuiInputFlags_ = 15;
+pub const ImGuiInputFlags_SupportedByShortcut: ImGuiInputFlags_ = 16143;
+pub const ImGuiInputFlags_SupportedBySetKeyOwner: ImGuiInputFlags_ = 192;
+pub const ImGuiInputFlags_SupportedBySetItemKeyOwner: ImGuiInputFlags_ = 240;
+pub type ImGuiInputFlags_ = cty::c_uint;
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone, Hash, PartialEq, Eq)]
 pub struct ImGuiListClipperRange {
@@ -3058,6 +2856,22 @@ pub struct ImGuiListClipperRange {
     pub PosToIndexConvert: bool,
     pub PosToIndexOffsetMin: ImS8,
     pub PosToIndexOffsetMax: ImS8,
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub struct ImVector_ImGuiListClipperRange {
+    pub Size: cty::c_int,
+    pub Capacity: cty::c_int,
+    pub Data: *mut ImGuiListClipperRange,
+}
+impl Default for ImVector_ImGuiListClipperRange {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone, PartialEq)]
@@ -3099,12 +2913,6 @@ pub const ImGuiNavHighlightFlags_TypeThin: ImGuiNavHighlightFlags_ = 2;
 pub const ImGuiNavHighlightFlags_AlwaysDraw: ImGuiNavHighlightFlags_ = 4;
 pub const ImGuiNavHighlightFlags_NoRounding: ImGuiNavHighlightFlags_ = 8;
 pub type ImGuiNavHighlightFlags_ = cty::c_uint;
-pub const ImGuiNavDirSourceFlags_None: ImGuiNavDirSourceFlags_ = 0;
-pub const ImGuiNavDirSourceFlags_RawKeyboard: ImGuiNavDirSourceFlags_ = 1;
-pub const ImGuiNavDirSourceFlags_Keyboard: ImGuiNavDirSourceFlags_ = 2;
-pub const ImGuiNavDirSourceFlags_PadDPad: ImGuiNavDirSourceFlags_ = 4;
-pub const ImGuiNavDirSourceFlags_PadLStick: ImGuiNavDirSourceFlags_ = 8;
-pub type ImGuiNavDirSourceFlags_ = cty::c_uint;
 pub const ImGuiNavMoveFlags_None: ImGuiNavMoveFlags_ = 0;
 pub const ImGuiNavMoveFlags_LoopX: ImGuiNavMoveFlags_ = 1;
 pub const ImGuiNavMoveFlags_LoopY: ImGuiNavMoveFlags_ = 2;
@@ -3159,6 +2967,22 @@ pub struct ImGuiOldColumnData {
     pub OffsetNormBeforeResize: f32,
     pub Flags: ImGuiOldColumnFlags,
     pub ClipRect: ImRect,
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub struct ImVector_ImGuiOldColumnData {
+    pub Size: cty::c_int,
+    pub Capacity: cty::c_int,
+    pub Data: *mut ImGuiOldColumnData,
+}
+impl Default for ImVector_ImGuiOldColumnData {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone, PartialEq)]
@@ -3219,6 +3043,22 @@ pub const ImGuiDockNodeState_HostWindowHiddenBecauseSingleWindow: ImGuiDockNodeS
 pub const ImGuiDockNodeState_HostWindowHiddenBecauseWindowsAreResizing: ImGuiDockNodeState = 2;
 pub const ImGuiDockNodeState_HostWindowVisible: ImGuiDockNodeState = 3;
 pub type ImGuiDockNodeState = cty::c_uint;
+#[repr(C)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub struct ImVector_ImGuiWindowPtr {
+    pub Size: cty::c_int,
+    pub Capacity: cty::c_int,
+    pub Data: *mut *mut ImGuiWindow,
+}
+impl Default for ImVector_ImGuiWindowPtr {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub struct ImGuiDockNode {
@@ -3511,6 +3351,38 @@ pub struct ImGuiWindowDockStyle {
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub struct ImVector_ImGuiDockRequest {
+    pub Size: cty::c_int,
+    pub Capacity: cty::c_int,
+    pub Data: *mut ImGuiDockRequest,
+}
+impl Default for ImVector_ImGuiDockRequest {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub struct ImVector_ImGuiDockNodeSettings {
+    pub Size: cty::c_int,
+    pub Capacity: cty::c_int,
+    pub Data: *mut ImGuiDockNodeSettings,
+}
+impl Default for ImVector_ImGuiDockNodeSettings {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
 pub struct ImGuiDockContext {
     pub Nodes: ImGuiStorage,
     pub Requests: ImVector_ImGuiDockRequest,
@@ -3538,7 +3410,6 @@ pub struct ImGuiViewportP {
     pub Alpha: f32,
     pub LastAlpha: f32,
     pub PlatformMonitor: cty::c_short,
-    pub PlatformWindowCreated: bool,
     pub Window: *mut ImGuiWindow,
     pub DrawListsLastFrame: [cty::c_int; 2usize],
     pub DrawLists: [*mut ImDrawList; 2usize],
@@ -3622,9 +3493,47 @@ impl Default for ImGuiSettingsHandler {
         }
     }
 }
+pub const ImGuiLocKey_TableSizeOne: ImGuiLocKey = 0;
+pub const ImGuiLocKey_TableSizeAllFit: ImGuiLocKey = 1;
+pub const ImGuiLocKey_TableSizeAllDefault: ImGuiLocKey = 2;
+pub const ImGuiLocKey_TableResetOrder: ImGuiLocKey = 3;
+pub const ImGuiLocKey_WindowingMainMenuBar: ImGuiLocKey = 4;
+pub const ImGuiLocKey_WindowingPopup: ImGuiLocKey = 5;
+pub const ImGuiLocKey_WindowingUntitled: ImGuiLocKey = 6;
+pub const ImGuiLocKey_DockingHideTabBar: ImGuiLocKey = 7;
+pub const ImGuiLocKey_COUNT: ImGuiLocKey = 8;
+pub type ImGuiLocKey = cty::c_uint;
+#[repr(C)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub struct ImGuiLocEntry {
+    pub Key: ImGuiLocKey,
+    pub Text: *const cty::c_char,
+}
+impl Default for ImGuiLocEntry {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub const ImGuiDebugLogFlags_None: ImGuiDebugLogFlags_ = 0;
+pub const ImGuiDebugLogFlags_EventActiveId: ImGuiDebugLogFlags_ = 1;
+pub const ImGuiDebugLogFlags_EventFocus: ImGuiDebugLogFlags_ = 2;
+pub const ImGuiDebugLogFlags_EventPopup: ImGuiDebugLogFlags_ = 4;
+pub const ImGuiDebugLogFlags_EventNav: ImGuiDebugLogFlags_ = 8;
+pub const ImGuiDebugLogFlags_EventClipper: ImGuiDebugLogFlags_ = 16;
+pub const ImGuiDebugLogFlags_EventIO: ImGuiDebugLogFlags_ = 32;
+pub const ImGuiDebugLogFlags_EventDocking: ImGuiDebugLogFlags_ = 64;
+pub const ImGuiDebugLogFlags_EventViewport: ImGuiDebugLogFlags_ = 128;
+pub const ImGuiDebugLogFlags_EventMask_: ImGuiDebugLogFlags_ = 255;
+pub const ImGuiDebugLogFlags_OutputToTTY: ImGuiDebugLogFlags_ = 1024;
+pub type ImGuiDebugLogFlags_ = cty::c_uint;
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone, Hash, PartialEq, Eq)]
 pub struct ImGuiMetricsConfig {
+    pub ShowDebugLog: bool,
     pub ShowStackTool: bool,
     pub ShowWindowsRects: bool,
     pub ShowWindowsBeginOrder: bool,
@@ -3641,7 +3550,9 @@ pub struct ImGuiStackLevelInfo {
     pub ID: ImGuiID,
     pub QueryFrameCount: ImS8,
     pub QuerySuccess: bool,
-    pub Desc: [cty::c_char; 58usize],
+    pub _bitfield_align_1: [u8; 0],
+    pub _bitfield_1: __BindgenBitfieldUnit<[u8; 1usize]>,
+    pub Desc: [cty::c_char; 57usize],
 }
 impl Default for ImGuiStackLevelInfo {
     fn default() -> Self {
@@ -3652,13 +3563,53 @@ impl Default for ImGuiStackLevelInfo {
         }
     }
 }
+impl ImGuiStackLevelInfo {
+    #[inline]
+    pub fn DataType(&self) -> ImGuiDataType {
+        unsafe { ::core::mem::transmute(self._bitfield_1.get(0usize, 8u8) as u32) }
+    }
+    #[inline]
+    pub fn set_DataType(&mut self, val: ImGuiDataType) {
+        unsafe {
+            let val: u32 = ::core::mem::transmute(val);
+            self._bitfield_1.set(0usize, 8u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn new_bitfield_1(DataType: ImGuiDataType) -> __BindgenBitfieldUnit<[u8; 1usize]> {
+        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 1usize]> = Default::default();
+        __bindgen_bitfield_unit.set(0usize, 8u8, {
+            let DataType: u32 = unsafe { ::core::mem::transmute(DataType) };
+            DataType as u64
+        });
+        __bindgen_bitfield_unit
+    }
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub struct ImVector_ImGuiStackLevelInfo {
+    pub Size: cty::c_int,
+    pub Capacity: cty::c_int,
+    pub Data: *mut ImGuiStackLevelInfo,
+}
+impl Default for ImVector_ImGuiStackLevelInfo {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone, PartialEq)]
 pub struct ImGuiStackTool {
     pub LastActiveFrame: cty::c_int,
     pub StackLevel: cty::c_int,
     pub QueryId: ImGuiID,
     pub Results: ImVector_ImGuiStackLevelInfo,
+    pub CopyToClipboardOnCtrlC: bool,
+    pub CopyToClipboardLastTime: f32,
 }
 impl Default for ImGuiStackTool {
     fn default() -> Self {
@@ -3669,6 +3620,9 @@ impl Default for ImGuiStackTool {
         }
     }
 }
+pub type ImGuiContextHookCallback = ::core::option::Option<
+    unsafe extern "C" fn(ctx: *mut ImGuiContext, hook: *mut ImGuiContextHook),
+>;
 pub const ImGuiContextHookType_NewFramePre: ImGuiContextHookType = 0;
 pub const ImGuiContextHookType_NewFramePost: ImGuiContextHookType = 1;
 pub const ImGuiContextHookType_EndFramePre: ImGuiContextHookType = 2;
@@ -3697,12 +3651,364 @@ impl Default for ImGuiContextHook {
     }
 }
 #[repr(C)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub struct ImVector_ImGuiInputEvent {
+    pub Size: cty::c_int,
+    pub Capacity: cty::c_int,
+    pub Data: *mut ImGuiInputEvent,
+}
+impl Default for ImVector_ImGuiInputEvent {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub struct ImVector_ImGuiWindowStackData {
+    pub Size: cty::c_int,
+    pub Capacity: cty::c_int,
+    pub Data: *mut ImGuiWindowStackData,
+}
+impl Default for ImVector_ImGuiWindowStackData {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub struct ImVector_ImGuiColorMod {
+    pub Size: cty::c_int,
+    pub Capacity: cty::c_int,
+    pub Data: *mut ImGuiColorMod,
+}
+impl Default for ImVector_ImGuiColorMod {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub struct ImVector_ImGuiStyleMod {
+    pub Size: cty::c_int,
+    pub Capacity: cty::c_int,
+    pub Data: *mut ImGuiStyleMod,
+}
+impl Default for ImVector_ImGuiStyleMod {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub struct ImVector_ImGuiID {
+    pub Size: cty::c_int,
+    pub Capacity: cty::c_int,
+    pub Data: *mut ImGuiID,
+}
+impl Default for ImVector_ImGuiID {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub struct ImVector_ImGuiItemFlags {
+    pub Size: cty::c_int,
+    pub Capacity: cty::c_int,
+    pub Data: *mut ImGuiItemFlags,
+}
+impl Default for ImVector_ImGuiItemFlags {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub struct ImVector_ImGuiGroupData {
+    pub Size: cty::c_int,
+    pub Capacity: cty::c_int,
+    pub Data: *mut ImGuiGroupData,
+}
+impl Default for ImVector_ImGuiGroupData {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub struct ImVector_ImGuiPopupData {
+    pub Size: cty::c_int,
+    pub Capacity: cty::c_int,
+    pub Data: *mut ImGuiPopupData,
+}
+impl Default for ImVector_ImGuiPopupData {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub struct ImVector_ImGuiViewportPPtr {
+    pub Size: cty::c_int,
+    pub Capacity: cty::c_int,
+    pub Data: *mut *mut ImGuiViewportP,
+}
+impl Default for ImVector_ImGuiViewportPPtr {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub struct ImVector_unsigned_char {
+    pub Size: cty::c_int,
+    pub Capacity: cty::c_int,
+    pub Data: *mut cty::c_uchar,
+}
+impl Default for ImVector_unsigned_char {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub struct ImVector_ImGuiListClipperData {
+    pub Size: cty::c_int,
+    pub Capacity: cty::c_int,
+    pub Data: *mut ImGuiListClipperData,
+}
+impl Default for ImVector_ImGuiListClipperData {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub struct ImVector_ImGuiTableTempData {
+    pub Size: cty::c_int,
+    pub Capacity: cty::c_int,
+    pub Data: *mut ImGuiTableTempData,
+}
+impl Default for ImVector_ImGuiTableTempData {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub struct ImVector_ImGuiTable {
+    pub Size: cty::c_int,
+    pub Capacity: cty::c_int,
+    pub Data: *mut ImGuiTable,
+}
+impl Default for ImVector_ImGuiTable {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub struct ImPool_ImGuiTable {
+    pub Buf: ImVector_ImGuiTable,
+    pub Map: ImGuiStorage,
+    pub FreeIdx: ImPoolIdx,
+    pub AliveCount: ImPoolIdx,
+}
+impl Default for ImPool_ImGuiTable {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub struct ImVector_ImGuiTabBar {
+    pub Size: cty::c_int,
+    pub Capacity: cty::c_int,
+    pub Data: *mut ImGuiTabBar,
+}
+impl Default for ImVector_ImGuiTabBar {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub struct ImPool_ImGuiTabBar {
+    pub Buf: ImVector_ImGuiTabBar,
+    pub Map: ImGuiStorage,
+    pub FreeIdx: ImPoolIdx,
+    pub AliveCount: ImPoolIdx,
+}
+impl Default for ImPool_ImGuiTabBar {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub struct ImVector_ImGuiPtrOrIndex {
+    pub Size: cty::c_int,
+    pub Capacity: cty::c_int,
+    pub Data: *mut ImGuiPtrOrIndex,
+}
+impl Default for ImVector_ImGuiPtrOrIndex {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub struct ImVector_ImGuiShrinkWidthItem {
+    pub Size: cty::c_int,
+    pub Capacity: cty::c_int,
+    pub Data: *mut ImGuiShrinkWidthItem,
+}
+impl Default for ImVector_ImGuiShrinkWidthItem {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub struct ImVector_ImGuiSettingsHandler {
+    pub Size: cty::c_int,
+    pub Capacity: cty::c_int,
+    pub Data: *mut ImGuiSettingsHandler,
+}
+impl Default for ImVector_ImGuiSettingsHandler {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub struct ImChunkStream_ImGuiWindowSettings {
+    pub Buf: ImVector_char,
+}
+impl Default for ImChunkStream_ImGuiWindowSettings {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub struct ImChunkStream_ImGuiTableSettings {
+    pub Buf: ImVector_char,
+}
+impl Default for ImChunkStream_ImGuiTableSettings {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub struct ImVector_ImGuiContextHook {
+    pub Size: cty::c_int,
+    pub Capacity: cty::c_int,
+    pub Data: *mut ImGuiContextHook,
+}
+impl Default for ImVector_ImGuiContextHook {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub struct ImGuiContext {
     pub Initialized: bool,
     pub FontAtlasOwnedByContext: bool,
     pub IO: ImGuiIO,
     pub PlatformIO: ImGuiPlatformIO,
+    pub InputEventsQueue: ImVector_ImGuiInputEvent,
+    pub InputEventsTrail: ImVector_ImGuiInputEvent,
     pub Style: ImGuiStyle,
     pub ConfigFlagsCurrFrame: ImGuiConfigFlags,
     pub ConfigFlagsLastFrame: ImGuiConfigFlags,
@@ -3731,17 +4037,14 @@ pub struct ImGuiContext {
     pub CurrentWindow: *mut ImGuiWindow,
     pub HoveredWindow: *mut ImGuiWindow,
     pub HoveredWindowUnderMovingWindow: *mut ImGuiWindow,
-    pub HoveredDockNode: *mut ImGuiDockNode,
     pub MovingWindow: *mut ImGuiWindow,
     pub WheelingWindow: *mut ImGuiWindow,
     pub WheelingWindowRefMousePos: ImVec2,
-    pub WheelingWindowTimer: f32,
+    pub WheelingWindowReleaseTimer: f32,
     pub DebugHookIdInfo: ImGuiID,
     pub HoveredId: ImGuiID,
     pub HoveredIdPreviousFrame: ImGuiID,
     pub HoveredIdAllowOverlap: bool,
-    pub HoveredIdUsingMouseWheel: bool,
-    pub HoveredIdPreviousFrameUsingMouseWheel: bool,
     pub HoveredIdDisabled: bool,
     pub HoveredIdTimer: f32,
     pub HoveredIdNotActiveTimer: f32,
@@ -3754,10 +4057,6 @@ pub struct ImGuiContext {
     pub ActiveIdHasBeenPressedBefore: bool,
     pub ActiveIdHasBeenEditedBefore: bool,
     pub ActiveIdHasBeenEditedThisFrame: bool,
-    pub ActiveIdUsingMouseWheel: bool,
-    pub ActiveIdUsingNavDirMask: ImU32,
-    pub ActiveIdUsingNavInputMask: ImU32,
-    pub ActiveIdUsingKeyInputMask: ImU64,
     pub ActiveIdClickOffset: ImVec2,
     pub ActiveIdWindow: *mut ImGuiWindow,
     pub ActiveIdSource: ImGuiInputSource,
@@ -3768,7 +4067,14 @@ pub struct ImGuiContext {
     pub ActiveIdPreviousFrameWindow: *mut ImGuiWindow,
     pub LastActiveId: ImGuiID,
     pub LastActiveIdTimer: f32,
+    pub KeysOwnerData: [ImGuiKeyOwnerData; 140usize],
+    pub KeysRoutingTable: ImGuiKeyRoutingTable,
+    pub ActiveIdUsingNavDirMask: ImU32,
+    pub ActiveIdUsingAllKeyboardKeys: bool,
+    pub ActiveIdUsingNavInputMask: ImU32,
+    pub CurrentFocusScopeId: ImGuiID,
     pub CurrentItemFlags: ImGuiItemFlags,
+    pub DebugLocateId: ImGuiID,
     pub NextItemData: ImGuiNextItemData,
     pub LastItemData: ImGuiLastItemData,
     pub NextWindowData: ImGuiNextWindowData,
@@ -3799,7 +4105,7 @@ pub struct ImGuiContext {
     pub NavActivateFlags: ImGuiActivateFlags,
     pub NavJustMovedToId: ImGuiID,
     pub NavJustMovedToFocusScopeId: ImGuiID,
-    pub NavJustMovedToKeyMods: ImGuiKeyModFlags,
+    pub NavJustMovedToKeyMods: ImGuiKeyChord,
     pub NavNextActivateId: ImGuiID,
     pub NavNextActivateFlags: ImGuiActivateFlags,
     pub NavInputSource: ImGuiInputSource,
@@ -3818,7 +4124,7 @@ pub struct ImGuiContext {
     pub NavMoveForwardToNextFrame: bool,
     pub NavMoveFlags: ImGuiNavMoveFlags,
     pub NavMoveScrollFlags: ImGuiScrollFlags,
-    pub NavMoveKeyMods: ImGuiKeyModFlags,
+    pub NavMoveKeyMods: ImGuiKeyChord,
     pub NavMoveDir: ImGuiDir,
     pub NavMoveDirForDebug: ImGuiDir,
     pub NavMoveClipDir: ImGuiDir,
@@ -3831,12 +4137,16 @@ pub struct ImGuiContext {
     pub NavMoveResultLocalVisible: ImGuiNavItemData,
     pub NavMoveResultOther: ImGuiNavItemData,
     pub NavTabbingResultFirst: ImGuiNavItemData,
+    pub ConfigNavWindowingKeyNext: ImGuiKeyChord,
+    pub ConfigNavWindowingKeyPrev: ImGuiKeyChord,
     pub NavWindowingTarget: *mut ImGuiWindow,
     pub NavWindowingTargetAnim: *mut ImGuiWindow,
     pub NavWindowingListWindow: *mut ImGuiWindow,
     pub NavWindowingTimer: f32,
     pub NavWindowingHighlightAlpha: f32,
     pub NavWindowingToggleLayer: bool,
+    pub NavWindowingAccumDeltaPos: ImVec2,
+    pub NavWindowingAccumDeltaSize: ImVec2,
     pub DimBgRatio: f32,
     pub MouseCursor: ImGuiMouseCursor,
     pub DragDropActive: bool,
@@ -3868,6 +4178,10 @@ pub struct ImGuiContext {
     pub TabBars: ImPool_ImGuiTabBar,
     pub CurrentTabBarStack: ImVector_ImGuiPtrOrIndex,
     pub ShrinkWidthBuffer: ImVector_ImGuiShrinkWidthItem,
+    pub HoverDelayId: ImGuiID,
+    pub HoverDelayIdPreviousFrame: ImGuiID,
+    pub HoverDelayTimer: f32,
+    pub HoverDelayClearTimer: f32,
     pub MouseLastValidPos: ImVec2,
     pub InputTextState: ImGuiInputTextState,
     pub InputTextPasswordFont: ImFont,
@@ -3878,6 +4192,7 @@ pub struct ImGuiContext {
     pub ColorEditLastColor: ImU32,
     pub ColorPickerRef: ImVec4,
     pub ComboPreviewData: ImGuiComboPreviewData,
+    pub SliderGrabClickOffset: f32,
     pub SliderCurrentAccum: f32,
     pub SliderCurrentAccumDirty: bool,
     pub DragCurrentAccumDirty: bool,
@@ -3887,12 +4202,11 @@ pub struct ImGuiContext {
     pub DisabledAlphaBackup: f32,
     pub DisabledStackSize: cty::c_short,
     pub TooltipOverrideCount: cty::c_short,
-    pub TooltipSlowDelay: f32,
     pub ClipboardHandlerData: ImVector_char,
     pub MenusIdSubmittedThisFrame: ImVector_ImGuiID,
-    pub PlatformImePos: ImVec2,
-    pub PlatformImeLastPos: ImVec2,
-    pub PlatformImePosViewport: *mut ImGuiViewportP,
+    pub PlatformImeData: ImGuiPlatformImeData,
+    pub PlatformImeDataPrev: ImGuiPlatformImeData,
+    pub PlatformImeViewport: ImGuiID,
     pub PlatformLocaleDecimalPoint: cty::c_char,
     pub DockContext: ImGuiDockContext,
     pub SettingsLoaded: bool,
@@ -3903,6 +4217,7 @@ pub struct ImGuiContext {
     pub SettingsTables: ImChunkStream_ImGuiTableSettings,
     pub Hooks: ImVector_ImGuiContextHook,
     pub HookIdNext: ImGuiID,
+    pub LocalizationTable: [*const cty::c_char; 8usize],
     pub LogEnabled: bool,
     pub LogType: ImGuiLogType,
     pub LogFile: ImFileHandle,
@@ -3914,18 +4229,24 @@ pub struct ImGuiContext {
     pub LogDepthRef: cty::c_int,
     pub LogDepthToExpand: cty::c_int,
     pub LogDepthToExpandDefault: cty::c_int,
+    pub DebugLogFlags: ImGuiDebugLogFlags,
+    pub DebugLogBuf: ImGuiTextBuffer,
+    pub DebugLogIndex: ImGuiTextIndex,
+    pub DebugLocateFrames: ImU8,
     pub DebugItemPickerActive: bool,
+    pub DebugItemPickerMouseButton: ImU8,
     pub DebugItemPickerBreakId: ImGuiID,
     pub DebugMetricsConfig: ImGuiMetricsConfig,
     pub DebugStackTool: ImGuiStackTool,
-    pub FramerateSecPerFrame: [f32; 120usize],
+    pub DebugHoveredDockNode: *mut ImGuiDockNode,
+    pub FramerateSecPerFrame: [f32; 60usize],
     pub FramerateSecPerFrameIdx: cty::c_int,
     pub FramerateSecPerFrameCount: cty::c_int,
     pub FramerateSecPerFrameAccum: f32,
     pub WantCaptureMouseNextFrame: cty::c_int,
     pub WantCaptureKeyboardNextFrame: cty::c_int,
     pub WantTextInputNextFrame: cty::c_int,
-    pub TempBuffer: [cty::c_char; 3073usize],
+    pub TempBuffer: ImVector_char,
 }
 impl Default for ImGuiContext {
     fn default() -> Self {
@@ -3948,6 +4269,8 @@ pub struct ImGuiWindowTempData {
     pub PrevLineSize: ImVec2,
     pub CurrLineTextBaseOffset: f32,
     pub PrevLineTextBaseOffset: f32,
+    pub IsSameLine: bool,
+    pub IsSetPos: bool,
     pub Indent: ImVec1,
     pub ColumnsOffset: ImVec1,
     pub GroupOffset: ImVec1,
@@ -3955,7 +4278,6 @@ pub struct ImGuiWindowTempData {
     pub NavLayerCurrent: ImGuiNavLayer,
     pub NavLayersActiveMask: cty::c_short,
     pub NavLayersActiveMaskNext: cty::c_short,
-    pub NavFocusScopeIdCurrent: ImGuiID,
     pub NavHideHighlightOneFrame: bool,
     pub NavHasScroll: bool,
     pub MenuBarAppending: bool,
@@ -3975,6 +4297,22 @@ pub struct ImGuiWindowTempData {
     pub TextWrapPosStack: ImVector_float,
 }
 impl Default for ImGuiWindowTempData {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub struct ImVector_ImGuiOldColumns {
+    pub Size: cty::c_int,
+    pub Capacity: cty::c_int,
+    pub Data: *mut ImGuiOldColumns,
+}
+impl Default for ImVector_ImGuiOldColumns {
     fn default() -> Self {
         let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
         unsafe {
@@ -4006,6 +4344,7 @@ pub struct ImGuiWindow {
     pub WindowBorderSize: f32,
     pub NameBufLen: cty::c_int,
     pub MoveId: ImGuiID,
+    pub TabId: ImGuiID,
     pub ChildId: ImGuiID,
     pub Scroll: ImVec2,
     pub ScrollMax: ImVec2,
@@ -4029,6 +4368,7 @@ pub struct ImGuiWindow {
     pub HasCloseButton: bool,
     pub ResizeBorderHeld: cty::c_schar,
     pub BeginCount: cty::c_short,
+    pub BeginCountPreviousFrame: cty::c_short,
     pub BeginOrderWithinParent: cty::c_short,
     pub BeginOrderWithinContext: cty::c_short,
     pub FocusOrder: cty::c_short,
@@ -4078,6 +4418,7 @@ pub struct ImGuiWindow {
     pub NavLastChildNavWindow: *mut ImGuiWindow,
     pub NavLastIds: [ImGuiID; 2usize],
     pub NavRectRel: [ImRect; 2usize],
+    pub NavRootFocusScopeId: ImGuiID,
     pub MemoryDrawListIdxCapacity: cty::c_int,
     pub MemoryDrawListVtxCapacity: cty::c_int,
     pub MemoryCompacted: bool,
@@ -4267,12 +4608,29 @@ pub struct ImGuiTabItem {
     pub Offset: f32,
     pub Width: f32,
     pub ContentWidth: f32,
+    pub RequestedWidth: f32,
     pub NameOffset: ImS32,
     pub BeginOrder: ImS16,
     pub IndexDuringLayout: ImS16,
     pub WantClose: bool,
 }
 impl Default for ImGuiTabItem {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub struct ImVector_ImGuiTabItem {
+    pub Size: cty::c_int,
+    pub Capacity: cty::c_int,
+    pub Data: *mut ImGuiTabItem,
+}
+impl Default for ImVector_ImGuiTabItem {
     fn default() -> Self {
         let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
         unsafe {
@@ -4325,6 +4683,8 @@ impl Default for ImGuiTabBar {
         }
     }
 }
+pub type ImGuiTableColumnIdx = ImS8;
+pub type ImGuiTableDrawChannelIdx = ImU8;
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone, PartialEq)]
 pub struct ImGuiTableColumn {
@@ -4434,6 +4794,89 @@ pub struct ImGuiTableCellData {
     pub Column: ImGuiTableColumnIdx,
 }
 #[repr(C)]
+#[derive(Debug, Default, Copy, Clone, PartialEq)]
+pub struct ImGuiTableInstanceData {
+    pub LastOuterHeight: f32,
+    pub LastFirstRowHeight: f32,
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub struct ImSpan_ImGuiTableColumn {
+    pub Data: *mut ImGuiTableColumn,
+    pub DataEnd: *mut ImGuiTableColumn,
+}
+impl Default for ImSpan_ImGuiTableColumn {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub struct ImSpan_ImGuiTableColumnIdx {
+    pub Data: *mut ImGuiTableColumnIdx,
+    pub DataEnd: *mut ImGuiTableColumnIdx,
+}
+impl Default for ImSpan_ImGuiTableColumnIdx {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub struct ImSpan_ImGuiTableCellData {
+    pub Data: *mut ImGuiTableCellData,
+    pub DataEnd: *mut ImGuiTableCellData,
+}
+impl Default for ImSpan_ImGuiTableCellData {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub struct ImVector_ImGuiTableInstanceData {
+    pub Size: cty::c_int,
+    pub Capacity: cty::c_int,
+    pub Data: *mut ImGuiTableInstanceData,
+}
+impl Default for ImVector_ImGuiTableInstanceData {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub struct ImVector_ImGuiTableColumnSortSpecs {
+    pub Size: cty::c_int,
+    pub Capacity: cty::c_int,
+    pub Data: *mut ImGuiTableColumnSortSpecs,
+}
+impl Default for ImVector_ImGuiTableColumnSortSpecs {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub struct ImGuiTable {
     pub ID: ImGuiID,
@@ -4475,11 +4918,10 @@ pub struct ImGuiTable {
     pub CellPaddingY: f32,
     pub CellSpacingX1: f32,
     pub CellSpacingX2: f32,
-    pub LastOuterHeight: f32,
-    pub LastFirstRowHeight: f32,
     pub InnerWidth: f32,
     pub ColumnsGivenWidth: f32,
     pub ColumnsAutoFitWidth: f32,
+    pub ColumnsStretchSumWeights: f32,
     pub ResizedColumnNextWidth: f32,
     pub ResizeLockMinContentsX2: f32,
     pub RefScale: f32,
@@ -4496,6 +4938,8 @@ pub struct ImGuiTable {
     pub InnerWindow: *mut ImGuiWindow,
     pub ColumnsNames: ImGuiTextBuffer,
     pub DrawSplitter: *mut ImDrawListSplitter,
+    pub InstanceDataFirst: ImGuiTableInstanceData,
+    pub InstanceDataExtra: ImVector_ImGuiTableInstanceData,
     pub SortSpecsSingle: ImGuiTableColumnSortSpecs,
     pub SortSpecsMulti: ImVector_ImGuiTableColumnSortSpecs,
     pub SortSpecs: ImGuiTableSortSpecs,
@@ -4699,7 +5143,7 @@ pub struct ImFontBuilderIO {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn ImVec2_ImVec2Nil() -> *mut ImVec2;
+    pub fn ImVec2_ImVec2_Nil() -> *mut ImVec2;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
@@ -4707,11 +5151,11 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn ImVec2_ImVec2Float(_x: f32, _y: f32) -> *mut ImVec2;
+    pub fn ImVec2_ImVec2_Float(_x: f32, _y: f32) -> *mut ImVec2;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn ImVec4_ImVec4Nil() -> *mut ImVec4;
+    pub fn ImVec4_ImVec4_Nil() -> *mut ImVec4;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
@@ -4719,7 +5163,7 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn ImVec4_ImVec4Float(_x: f32, _y: f32, _z: f32, _w: f32) -> *mut ImVec4;
+    pub fn ImVec4_ImVec4_Float(_x: f32, _y: f32, _z: f32, _w: f32) -> *mut ImVec4;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
@@ -4771,6 +5215,10 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
+    pub fn igShowDebugLogWindow(p_open: *mut bool);
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
     pub fn igShowStackToolWindow(p_open: *mut bool);
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
@@ -4819,7 +5267,7 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igBeginChildStr(
+    pub fn igBeginChild_Str(
         str_id: *const cty::c_char,
         size: ImVec2,
         border: bool,
@@ -4828,8 +5276,12 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igBeginChildID(id: ImGuiID, size: ImVec2, border: bool, flags: ImGuiWindowFlags)
-        -> bool;
+    pub fn igBeginChild_ID(
+        id: ImGuiID,
+        size: ImVec2,
+        border: bool,
+        flags: ImGuiWindowFlags,
+    ) -> bool;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
@@ -4910,6 +5362,10 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
+    pub fn igSetNextWindowScroll(scroll: ImVec2);
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
     pub fn igSetNextWindowBgAlpha(alpha: f32);
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
@@ -4918,19 +5374,19 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igSetWindowPosVec2(pos: ImVec2, cond: ImGuiCond);
+    pub fn igSetWindowPos_Vec2(pos: ImVec2, cond: ImGuiCond);
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igSetWindowSizeVec2(size: ImVec2, cond: ImGuiCond);
+    pub fn igSetWindowSize_Vec2(size: ImVec2, cond: ImGuiCond);
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igSetWindowCollapsedBool(collapsed: bool, cond: ImGuiCond);
+    pub fn igSetWindowCollapsed_Bool(collapsed: bool, cond: ImGuiCond);
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igSetWindowFocusNil();
+    pub fn igSetWindowFocus_Nil();
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
@@ -4938,19 +5394,19 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igSetWindowPosStr(name: *const cty::c_char, pos: ImVec2, cond: ImGuiCond);
+    pub fn igSetWindowPos_Str(name: *const cty::c_char, pos: ImVec2, cond: ImGuiCond);
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igSetWindowSizeStr(name: *const cty::c_char, size: ImVec2, cond: ImGuiCond);
+    pub fn igSetWindowSize_Str(name: *const cty::c_char, size: ImVec2, cond: ImGuiCond);
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igSetWindowCollapsedStr(name: *const cty::c_char, collapsed: bool, cond: ImGuiCond);
+    pub fn igSetWindowCollapsed_Str(name: *const cty::c_char, collapsed: bool, cond: ImGuiCond);
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igSetWindowFocusStr(name: *const cty::c_char);
+    pub fn igSetWindowFocus_Str(name: *const cty::c_char);
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
@@ -4978,11 +5434,11 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igSetScrollXFloat(scroll_x: f32);
+    pub fn igSetScrollX_Float(scroll_x: f32);
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igSetScrollYFloat(scroll_y: f32);
+    pub fn igSetScrollY_Float(scroll_y: f32);
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
@@ -5002,11 +5458,11 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igSetScrollFromPosXFloat(local_x: f32, center_x_ratio: f32);
+    pub fn igSetScrollFromPosX_Float(local_x: f32, center_x_ratio: f32);
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igSetScrollFromPosYFloat(local_y: f32, center_y_ratio: f32);
+    pub fn igSetScrollFromPosY_Float(local_y: f32, center_y_ratio: f32);
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
@@ -5018,11 +5474,11 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igPushStyleColorU32(idx: ImGuiCol, col: ImU32);
+    pub fn igPushStyleColor_U32(idx: ImGuiCol, col: ImU32);
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igPushStyleColorVec4(idx: ImGuiCol, col: ImVec4);
+    pub fn igPushStyleColor_Vec4(idx: ImGuiCol, col: ImVec4);
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
@@ -5030,11 +5486,11 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igPushStyleVarFloat(idx: ImGuiStyleVar, val: f32);
+    pub fn igPushStyleVar_Float(idx: ImGuiStyleVar, val: f32);
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igPushStyleVarVec2(idx: ImGuiStyleVar, val: ImVec2);
+    pub fn igPushStyleVar_Vec2(idx: ImGuiStyleVar, val: ImVec2);
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
@@ -5094,15 +5550,15 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igGetColorU32Col(idx: ImGuiCol, alpha_mul: f32) -> ImU32;
+    pub fn igGetColorU32_Col(idx: ImGuiCol, alpha_mul: f32) -> ImU32;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igGetColorU32Vec4(col: ImVec4) -> ImU32;
+    pub fn igGetColorU32_Vec4(col: ImVec4) -> ImU32;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igGetColorU32U32(col: ImU32) -> ImU32;
+    pub fn igGetColorU32_U32(col: ImU32) -> ImU32;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
@@ -5202,19 +5658,19 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igPushIDStr(str_id: *const cty::c_char);
+    pub fn igPushID_Str(str_id: *const cty::c_char);
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igPushIDStrStr(str_id_begin: *const cty::c_char, str_id_end: *const cty::c_char);
+    pub fn igPushID_StrStr(str_id_begin: *const cty::c_char, str_id_end: *const cty::c_char);
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igPushIDPtr(ptr_id: *const cty::c_void);
+    pub fn igPushID_Ptr(ptr_id: *const cty::c_void);
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igPushIDInt(int_id: cty::c_int);
+    pub fn igPushID_Int(int_id: cty::c_int);
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
@@ -5222,18 +5678,18 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igGetIDStr(str_id: *const cty::c_char) -> ImGuiID;
+    pub fn igGetID_Str(str_id: *const cty::c_char) -> ImGuiID;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igGetIDStrStr(
+    pub fn igGetID_StrStr(
         str_id_begin: *const cty::c_char,
         str_id_end: *const cty::c_char,
     ) -> ImGuiID;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igGetIDPtr(ptr_id: *const cty::c_void) -> ImGuiID;
+    pub fn igGetID_Ptr(ptr_id: *const cty::c_void) -> ImGuiID;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
@@ -5285,34 +5741,11 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igImage(
-        user_texture_id: ImTextureID,
-        size: ImVec2,
-        uv0: ImVec2,
-        uv1: ImVec2,
-        tint_col: ImVec4,
-        border_col: ImVec4,
-    );
-}
-#[link(wasm_import_module = "imgui-sys-v0")]
-extern "C" {
-    pub fn igImageButton(
-        user_texture_id: ImTextureID,
-        size: ImVec2,
-        uv0: ImVec2,
-        uv1: ImVec2,
-        frame_padding: cty::c_int,
-        bg_col: ImVec4,
-        tint_col: ImVec4,
-    ) -> bool;
-}
-#[link(wasm_import_module = "imgui-sys-v0")]
-extern "C" {
     pub fn igCheckbox(label: *const cty::c_char, v: *mut bool) -> bool;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igCheckboxFlagsIntPtr(
+    pub fn igCheckboxFlags_IntPtr(
         label: *const cty::c_char,
         flags: *mut cty::c_int,
         flags_value: cty::c_int,
@@ -5320,7 +5753,7 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igCheckboxFlagsUintPtr(
+    pub fn igCheckboxFlags_UintPtr(
         label: *const cty::c_char,
         flags: *mut cty::c_uint,
         flags_value: cty::c_uint,
@@ -5328,11 +5761,11 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igRadioButtonBool(label: *const cty::c_char, active: bool) -> bool;
+    pub fn igRadioButton_Bool(label: *const cty::c_char, active: bool) -> bool;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igRadioButtonIntPtr(
+    pub fn igRadioButton_IntPtr(
         label: *const cty::c_char,
         v: *mut cty::c_int,
         v_button: cty::c_int,
@@ -5348,6 +5781,29 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
+    pub fn igImage(
+        user_texture_id: ImTextureID,
+        size: ImVec2,
+        uv0: ImVec2,
+        uv1: ImVec2,
+        tint_col: ImVec4,
+        border_col: ImVec4,
+    );
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
+    pub fn igImageButton(
+        str_id: *const cty::c_char,
+        user_texture_id: ImTextureID,
+        size: ImVec2,
+        uv0: ImVec2,
+        uv1: ImVec2,
+        bg_col: ImVec4,
+        tint_col: ImVec4,
+    ) -> bool;
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
     pub fn igBeginCombo(
         label: *const cty::c_char,
         preview_value: *const cty::c_char,
@@ -5360,7 +5816,7 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igComboStr_arr(
+    pub fn igCombo_Str_arr(
         label: *const cty::c_char,
         current_item: *mut cty::c_int,
         items: *const *const cty::c_char,
@@ -5370,7 +5826,7 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igComboStr(
+    pub fn igCombo_Str(
         label: *const cty::c_char,
         current_item: *mut cty::c_int,
         items_separated_by_zeros: *const cty::c_char,
@@ -5379,7 +5835,7 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igComboFnBoolPtr(
+    pub fn igCombo_FnBoolPtr(
         label: *const cty::c_char,
         current_item: *mut cty::c_int,
         items_getter: ::core::option::Option<
@@ -5897,23 +6353,23 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igTreeNodeStr(label: *const cty::c_char) -> bool;
+    pub fn igTreeNode_Str(label: *const cty::c_char) -> bool;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igTreeNodeStrStr(str_id: *const cty::c_char, fmt: *const cty::c_char, ...) -> bool;
+    pub fn igTreeNode_StrStr(str_id: *const cty::c_char, fmt: *const cty::c_char, ...) -> bool;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igTreeNodePtr(ptr_id: *const cty::c_void, fmt: *const cty::c_char, ...) -> bool;
+    pub fn igTreeNode_Ptr(ptr_id: *const cty::c_void, fmt: *const cty::c_char, ...) -> bool;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igTreeNodeExStr(label: *const cty::c_char, flags: ImGuiTreeNodeFlags) -> bool;
+    pub fn igTreeNodeEx_Str(label: *const cty::c_char, flags: ImGuiTreeNodeFlags) -> bool;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igTreeNodeExStrStr(
+    pub fn igTreeNodeEx_StrStr(
         str_id: *const cty::c_char,
         flags: ImGuiTreeNodeFlags,
         fmt: *const cty::c_char,
@@ -5922,7 +6378,7 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igTreeNodeExPtr(
+    pub fn igTreeNodeEx_Ptr(
         ptr_id: *const cty::c_void,
         flags: ImGuiTreeNodeFlags,
         fmt: *const cty::c_char,
@@ -5931,11 +6387,11 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igTreePushStr(str_id: *const cty::c_char);
+    pub fn igTreePush_Str(str_id: *const cty::c_char);
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igTreePushPtr(ptr_id: *const cty::c_void);
+    pub fn igTreePush_Ptr(ptr_id: *const cty::c_void);
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
@@ -5947,14 +6403,14 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igCollapsingHeaderTreeNodeFlags(
+    pub fn igCollapsingHeader_TreeNodeFlags(
         label: *const cty::c_char,
         flags: ImGuiTreeNodeFlags,
     ) -> bool;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igCollapsingHeaderBoolPtr(
+    pub fn igCollapsingHeader_BoolPtr(
         label: *const cty::c_char,
         p_visible: *mut bool,
         flags: ImGuiTreeNodeFlags,
@@ -5966,7 +6422,7 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igSelectableBool(
+    pub fn igSelectable_Bool(
         label: *const cty::c_char,
         selected: bool,
         flags: ImGuiSelectableFlags,
@@ -5975,7 +6431,7 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igSelectableBoolPtr(
+    pub fn igSelectable_BoolPtr(
         label: *const cty::c_char,
         p_selected: *mut bool,
         flags: ImGuiSelectableFlags,
@@ -5992,7 +6448,7 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igListBoxStr_arr(
+    pub fn igListBox_Str_arr(
         label: *const cty::c_char,
         current_item: *mut cty::c_int,
         items: *const *const cty::c_char,
@@ -6002,7 +6458,7 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igListBoxFnBoolPtr(
+    pub fn igListBox_FnBoolPtr(
         label: *const cty::c_char,
         current_item: *mut cty::c_int,
         items_getter: ::core::option::Option<
@@ -6019,7 +6475,7 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igPlotLinesFloatPtr(
+    pub fn igPlotLines_FloatPtr(
         label: *const cty::c_char,
         values: *const f32,
         values_count: cty::c_int,
@@ -6033,7 +6489,7 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igPlotLinesFnFloatPtr(
+    pub fn igPlotLines_FnFloatPtr(
         label: *const cty::c_char,
         values_getter: ::core::option::Option<
             unsafe extern "C" fn(data: *mut cty::c_void, idx: cty::c_int) -> f32,
@@ -6049,7 +6505,7 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igPlotHistogramFloatPtr(
+    pub fn igPlotHistogram_FloatPtr(
         label: *const cty::c_char,
         values: *const f32,
         values_count: cty::c_int,
@@ -6063,7 +6519,7 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igPlotHistogramFnFloatPtr(
+    pub fn igPlotHistogram_FnFloatPtr(
         label: *const cty::c_char,
         values_getter: ::core::option::Option<
             unsafe extern "C" fn(data: *mut cty::c_void, idx: cty::c_int) -> f32,
@@ -6079,19 +6535,19 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igValueBool(prefix: *const cty::c_char, b: bool);
+    pub fn igValue_Bool(prefix: *const cty::c_char, b: bool);
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igValueInt(prefix: *const cty::c_char, v: cty::c_int);
+    pub fn igValue_Int(prefix: *const cty::c_char, v: cty::c_int);
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igValueUint(prefix: *const cty::c_char, v: cty::c_uint);
+    pub fn igValue_Uint(prefix: *const cty::c_char, v: cty::c_uint);
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igValueFloat(prefix: *const cty::c_char, v: f32, float_format: *const cty::c_char);
+    pub fn igValue_Float(prefix: *const cty::c_char, v: f32, float_format: *const cty::c_char);
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
@@ -6119,7 +6575,7 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igMenuItemBool(
+    pub fn igMenuItem_Bool(
         label: *const cty::c_char,
         shortcut: *const cty::c_char,
         selected: bool,
@@ -6128,7 +6584,7 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igMenuItemBoolPtr(
+    pub fn igMenuItem_BoolPtr(
         label: *const cty::c_char,
         shortcut: *const cty::c_char,
         p_selected: *mut bool,
@@ -6165,11 +6621,11 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igOpenPopupStr(str_id: *const cty::c_char, popup_flags: ImGuiPopupFlags);
+    pub fn igOpenPopup_Str(str_id: *const cty::c_char, popup_flags: ImGuiPopupFlags);
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igOpenPopupID(id: ImGuiID, popup_flags: ImGuiPopupFlags);
+    pub fn igOpenPopup_ID(id: ImGuiID, popup_flags: ImGuiPopupFlags);
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
@@ -6202,7 +6658,7 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igIsPopupOpenStr(str_id: *const cty::c_char, flags: ImGuiPopupFlags) -> bool;
+    pub fn igIsPopupOpen_Str(str_id: *const cty::c_char, flags: ImGuiPopupFlags) -> bool;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
@@ -6269,7 +6725,7 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igTableGetColumnNameInt(column_n: cty::c_int) -> *const cty::c_char;
+    pub fn igTableGetColumnName_Int(column_n: cty::c_int) -> *const cty::c_char;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
@@ -6534,11 +6990,27 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igIsRectVisibleNil(size: ImVec2) -> bool;
+    pub fn igGetBackgroundDrawList_Nil() -> *mut ImDrawList;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igIsRectVisibleVec2(rect_min: ImVec2, rect_max: ImVec2) -> bool;
+    pub fn igGetForegroundDrawList_Nil() -> *mut ImDrawList;
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
+    pub fn igGetBackgroundDrawList_ViewportPtr(viewport: *mut ImGuiViewport) -> *mut ImDrawList;
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
+    pub fn igGetForegroundDrawList_ViewportPtr(viewport: *mut ImGuiViewport) -> *mut ImDrawList;
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
+    pub fn igIsRectVisible_Nil(size: ImVec2) -> bool;
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
+    pub fn igIsRectVisible_Vec2(rect_min: ImVec2, rect_max: ImVec2) -> bool;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
@@ -6547,22 +7019,6 @@ extern "C" {
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igGetFrameCount() -> cty::c_int;
-}
-#[link(wasm_import_module = "imgui-sys-v0")]
-extern "C" {
-    pub fn igGetBackgroundDrawListNil() -> *mut ImDrawList;
-}
-#[link(wasm_import_module = "imgui-sys-v0")]
-extern "C" {
-    pub fn igGetForegroundDrawListNil() -> *mut ImDrawList;
-}
-#[link(wasm_import_module = "imgui-sys-v0")]
-extern "C" {
-    pub fn igGetBackgroundDrawListViewportPtr(viewport: *mut ImGuiViewport) -> *mut ImDrawList;
-}
-#[link(wasm_import_module = "imgui-sys-v0")]
-extern "C" {
-    pub fn igGetForegroundDrawListViewportPtr(viewport: *mut ImGuiViewport) -> *mut ImDrawList;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
@@ -6630,40 +7086,39 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igGetKeyIndex(imgui_key: ImGuiKey) -> cty::c_int;
+    pub fn igIsKeyDown_Nil(key: ImGuiKey) -> bool;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igIsKeyDown(user_key_index: cty::c_int) -> bool;
+    pub fn igIsKeyPressed_Bool(key: ImGuiKey, repeat: bool) -> bool;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igIsKeyPressed(user_key_index: cty::c_int, repeat: bool) -> bool;
+    pub fn igIsKeyReleased_Nil(key: ImGuiKey) -> bool;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igIsKeyReleased(user_key_index: cty::c_int) -> bool;
+    pub fn igGetKeyPressedAmount(key: ImGuiKey, repeat_delay: f32, rate: f32) -> cty::c_int;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igGetKeyPressedAmount(key_index: cty::c_int, repeat_delay: f32, rate: f32)
-        -> cty::c_int;
+    pub fn igGetKeyName(key: ImGuiKey) -> *const cty::c_char;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igCaptureKeyboardFromApp(want_capture_keyboard_value: bool);
+    pub fn igSetNextFrameWantCaptureKeyboard(want_capture_keyboard: bool);
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igIsMouseDown(button: ImGuiMouseButton) -> bool;
+    pub fn igIsMouseDown_Nil(button: ImGuiMouseButton) -> bool;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igIsMouseClicked(button: ImGuiMouseButton, repeat: bool) -> bool;
+    pub fn igIsMouseClicked_Bool(button: ImGuiMouseButton, repeat: bool) -> bool;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igIsMouseReleased(button: ImGuiMouseButton) -> bool;
+    pub fn igIsMouseReleased_Nil(button: ImGuiMouseButton) -> bool;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
@@ -6715,7 +7170,7 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igCaptureMouseFromApp(want_capture_mouse_value: bool);
+    pub fn igSetNextFrameWantCaptureMouse(want_capture_mouse: bool);
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
@@ -6740,6 +7195,10 @@ extern "C" {
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igSaveIniSettingsToMemory(out_ini_size: *mut usize) -> *const cty::c_char;
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
+    pub fn igDebugTextEncoding(text: *const cty::c_char);
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
@@ -6818,6 +7277,34 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
+    pub fn ImGuiIO_AddKeyEvent(self_: *mut ImGuiIO, key: ImGuiKey, down: bool);
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
+    pub fn ImGuiIO_AddKeyAnalogEvent(self_: *mut ImGuiIO, key: ImGuiKey, down: bool, v: f32);
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
+    pub fn ImGuiIO_AddMousePosEvent(self_: *mut ImGuiIO, x: f32, y: f32);
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
+    pub fn ImGuiIO_AddMouseButtonEvent(self_: *mut ImGuiIO, button: cty::c_int, down: bool);
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
+    pub fn ImGuiIO_AddMouseWheelEvent(self_: *mut ImGuiIO, wh_x: f32, wh_y: f32);
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
+    pub fn ImGuiIO_AddMouseViewportEvent(self_: *mut ImGuiIO, id: ImGuiID);
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
+    pub fn ImGuiIO_AddFocusEvent(self_: *mut ImGuiIO, focused: bool);
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
     pub fn ImGuiIO_AddInputCharacter(self_: *mut ImGuiIO, c: cty::c_uint);
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
@@ -6830,7 +7317,17 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn ImGuiIO_AddFocusEvent(self_: *mut ImGuiIO, focused: bool);
+    pub fn ImGuiIO_SetKeyEventNativeData(
+        self_: *mut ImGuiIO,
+        key: ImGuiKey,
+        native_keycode: cty::c_int,
+        native_scancode: cty::c_int,
+        native_legacy_index: cty::c_int,
+    );
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
+    pub fn ImGuiIO_SetAppAcceptingEvents(self_: *mut ImGuiIO, accepting_events: bool);
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
@@ -6981,7 +7478,7 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn ImGuiTextRange_ImGuiTextRangeNil() -> *mut ImGuiTextRange;
+    pub fn ImGuiTextRange_ImGuiTextRange_Nil() -> *mut ImGuiTextRange;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
@@ -6989,7 +7486,7 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn ImGuiTextRange_ImGuiTextRangeStr(
+    pub fn ImGuiTextRange_ImGuiTextRange_Str(
         _b: *const cty::c_char,
         _e: *const cty::c_char,
     ) -> *mut ImGuiTextRange;
@@ -7052,7 +7549,7 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn ImGuiStoragePair_ImGuiStoragePairInt(
+    pub fn ImGuiStoragePair_ImGuiStoragePair_Int(
         _key: ImGuiID,
         _val_i: cty::c_int,
     ) -> *mut ImGuiStoragePair;
@@ -7063,14 +7560,14 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn ImGuiStoragePair_ImGuiStoragePairFloat(
+    pub fn ImGuiStoragePair_ImGuiStoragePair_Float(
         _key: ImGuiID,
         _val_f: f32,
     ) -> *mut ImGuiStoragePair;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn ImGuiStoragePair_ImGuiStoragePairPtr(
+    pub fn ImGuiStoragePair_ImGuiStoragePair_Ptr(
         _key: ImGuiID,
         _val_p: *mut cty::c_void,
     ) -> *mut ImGuiStoragePair;
@@ -7189,7 +7686,7 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn ImColor_ImColorNil() -> *mut ImColor;
+    pub fn ImColor_ImColor_Nil() -> *mut ImColor;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
@@ -7197,7 +7694,15 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn ImColor_ImColorInt(
+    pub fn ImColor_ImColor_Float(r: f32, g: f32, b: f32, a: f32) -> *mut ImColor;
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
+    pub fn ImColor_ImColor_Vec4(col: ImVec4) -> *mut ImColor;
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
+    pub fn ImColor_ImColor_Int(
         r: cty::c_int,
         g: cty::c_int,
         b: cty::c_int,
@@ -7206,15 +7711,7 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn ImColor_ImColorU32(rgba: ImU32) -> *mut ImColor;
-}
-#[link(wasm_import_module = "imgui-sys-v0")]
-extern "C" {
-    pub fn ImColor_ImColorFloat(r: f32, g: f32, b: f32, a: f32) -> *mut ImColor;
-}
-#[link(wasm_import_module = "imgui-sys-v0")]
-extern "C" {
-    pub fn ImColor_ImColorVec4(col: ImVec4) -> *mut ImColor;
+    pub fn ImColor_ImColor_U32(rgba: ImU32) -> *mut ImColor;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
@@ -7274,7 +7771,7 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn ImDrawList_ImDrawList(shared_data: *const ImDrawListSharedData) -> *mut ImDrawList;
+    pub fn ImDrawList_ImDrawList(shared_data: *mut ImDrawListSharedData) -> *mut ImDrawList;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
@@ -7446,7 +7943,7 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn ImDrawList_AddTextVec2(
+    pub fn ImDrawList_AddText_Vec2(
         self_: *mut ImDrawList,
         pos: ImVec2,
         col: ImU32,
@@ -7456,7 +7953,7 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn ImDrawList_AddTextFontPtr(
+    pub fn ImDrawList_AddText_FontPtr(
         self_: *mut ImDrawList,
         font: *const ImFont,
         font_size: f32,
@@ -7977,6 +8474,10 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
+    pub fn ImFontAtlas_GetGlyphRangesGreek(self_: *mut ImFontAtlas) -> *const ImWchar;
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
     pub fn ImFontAtlas_GetGlyphRangesKorean(self_: *mut ImFontAtlas) -> *const ImWchar;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
@@ -8208,6 +8709,18 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
+    pub fn ImGuiPlatformImeData_ImGuiPlatformImeData() -> *mut ImGuiPlatformImeData;
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
+    pub fn ImGuiPlatformImeData_destroy(self_: *mut ImGuiPlatformImeData);
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
+    pub fn igGetKeyIndex(key: ImGuiKey) -> ImGuiKey;
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
     pub fn igImHashData(data: *const cty::c_void, data_size: usize, seed: ImU32) -> ImGuiID;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
@@ -8231,11 +8744,11 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igImIsPowerOfTwoInt(v: cty::c_int) -> bool;
+    pub fn igImIsPowerOfTwo_Int(v: cty::c_int) -> bool;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igImIsPowerOfTwoU64(v: ImU64) -> bool;
+    pub fn igImIsPowerOfTwo_U64(v: ImU64) -> bool;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
@@ -8311,12 +8824,33 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
+    pub fn igImToUpper(c: cty::c_char) -> cty::c_char;
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
+    pub fn igImCharIsBlankA(c: cty::c_char) -> bool;
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
+    pub fn igImCharIsBlankW(c: cty::c_uint) -> bool;
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
     pub fn igImFormatString(
         buf: *mut cty::c_char,
         buf_size: usize,
         fmt: *const cty::c_char,
         ...
     ) -> cty::c_int;
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
+    pub fn igImFormatStringToTempBuffer(
+        out_buf: *mut *const cty::c_char,
+        out_buf_end: *mut *const cty::c_char,
+        fmt: *const cty::c_char,
+        ...
+    );
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
@@ -8336,18 +8870,26 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
+    pub fn igImParseFormatSanitizeForPrinting(
+        fmt_in: *const cty::c_char,
+        fmt_out: *mut cty::c_char,
+        fmt_out_size: usize,
+    );
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
+    pub fn igImParseFormatSanitizeForScanning(
+        fmt_in: *const cty::c_char,
+        fmt_out: *mut cty::c_char,
+        fmt_out_size: usize,
+    ) -> *const cty::c_char;
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
     pub fn igImParseFormatPrecision(
         format: *const cty::c_char,
         default_value: cty::c_int,
     ) -> cty::c_int;
-}
-#[link(wasm_import_module = "imgui-sys-v0")]
-extern "C" {
-    pub fn igImCharIsBlankA(c: cty::c_char) -> bool;
-}
-#[link(wasm_import_module = "imgui-sys-v0")]
-extern "C" {
-    pub fn igImCharIsBlankW(c: cty::c_uint) -> bool;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
@@ -8442,47 +8984,47 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igImPowFloat(x: f32, y: f32) -> f32;
+    pub fn igImPow_Float(x: f32, y: f32) -> f32;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igImPowdouble(x: f64, y: f64) -> f64;
+    pub fn igImPow_double(x: f64, y: f64) -> f64;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igImLogFloat(x: f32) -> f32;
+    pub fn igImLog_Float(x: f32) -> f32;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igImLogdouble(x: f64) -> f64;
+    pub fn igImLog_double(x: f64) -> f64;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igImAbsInt(x: cty::c_int) -> cty::c_int;
+    pub fn igImAbs_Int(x: cty::c_int) -> cty::c_int;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igImAbsFloat(x: f32) -> f32;
+    pub fn igImAbs_Float(x: f32) -> f32;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igImAbsdouble(x: f64) -> f64;
+    pub fn igImAbs_double(x: f64) -> f64;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igImSignFloat(x: f32) -> f32;
+    pub fn igImSign_Float(x: f32) -> f32;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igImSigndouble(x: f64) -> f64;
+    pub fn igImSign_double(x: f64) -> f64;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igImRsqrtFloat(x: f32) -> f32;
+    pub fn igImRsqrt_Float(x: f32) -> f32;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igImRsqrtdouble(x: f64) -> f64;
+    pub fn igImRsqrt_double(x: f64) -> f64;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
@@ -8498,15 +9040,15 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igImLerpVec2Float(pOut: *mut ImVec2, a: ImVec2, b: ImVec2, t: f32);
+    pub fn igImLerp_Vec2Float(pOut: *mut ImVec2, a: ImVec2, b: ImVec2, t: f32);
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igImLerpVec2Vec2(pOut: *mut ImVec2, a: ImVec2, b: ImVec2, t: ImVec2);
+    pub fn igImLerp_Vec2Vec2(pOut: *mut ImVec2, a: ImVec2, b: ImVec2, t: ImVec2);
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igImLerpVec4(pOut: *mut ImVec4, a: ImVec4, b: ImVec4, t: f32);
+    pub fn igImLerp_Vec4(pOut: *mut ImVec4, a: ImVec4, b: ImVec4, t: f32);
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
@@ -8514,11 +9056,11 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igImLengthSqrVec2(lhs: ImVec2) -> f32;
+    pub fn igImLengthSqr_Vec2(lhs: ImVec2) -> f32;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igImLengthSqrVec4(lhs: ImVec4) -> f32;
+    pub fn igImLengthSqr_Vec4(lhs: ImVec4) -> f32;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
@@ -8526,15 +9068,19 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igImFloorFloat(f: f32) -> f32;
+    pub fn igImFloor_Float(f: f32) -> f32;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igImFloorSigned(f: f32) -> f32;
+    pub fn igImFloorSigned_Float(f: f32) -> f32;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igImFloorVec2(pOut: *mut ImVec2, v: ImVec2);
+    pub fn igImFloor_Vec2(pOut: *mut ImVec2, v: ImVec2);
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
+    pub fn igImFloorSigned_Vec2(pOut: *mut ImVec2, v: ImVec2);
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
@@ -8633,7 +9179,7 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn ImVec1_ImVec1Nil() -> *mut ImVec1;
+    pub fn ImVec1_ImVec1_Nil() -> *mut ImVec1;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
@@ -8641,11 +9187,11 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn ImVec1_ImVec1Float(_x: f32) -> *mut ImVec1;
+    pub fn ImVec1_ImVec1_Float(_x: f32) -> *mut ImVec1;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn ImVec2ih_ImVec2ihNil() -> *mut ImVec2ih;
+    pub fn ImVec2ih_ImVec2ih_Nil() -> *mut ImVec2ih;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
@@ -8653,15 +9199,15 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn ImVec2ih_ImVec2ihshort(_x: cty::c_short, _y: cty::c_short) -> *mut ImVec2ih;
+    pub fn ImVec2ih_ImVec2ih_short(_x: cty::c_short, _y: cty::c_short) -> *mut ImVec2ih;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn ImVec2ih_ImVec2ihVec2(rhs: ImVec2) -> *mut ImVec2ih;
+    pub fn ImVec2ih_ImVec2ih_Vec2(rhs: ImVec2) -> *mut ImVec2ih;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn ImRect_ImRectNil() -> *mut ImRect;
+    pub fn ImRect_ImRect_Nil() -> *mut ImRect;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
@@ -8669,15 +9215,15 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn ImRect_ImRectVec2(min: ImVec2, max: ImVec2) -> *mut ImRect;
+    pub fn ImRect_ImRect_Vec2(min: ImVec2, max: ImVec2) -> *mut ImRect;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn ImRect_ImRectVec4(v: ImVec4) -> *mut ImRect;
+    pub fn ImRect_ImRect_Vec4(v: ImVec4) -> *mut ImRect;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn ImRect_ImRectFloat(x1: f32, y1: f32, x2: f32, y2: f32) -> *mut ImRect;
+    pub fn ImRect_ImRect_Float(x1: f32, y1: f32, x2: f32, y2: f32) -> *mut ImRect;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
@@ -8717,11 +9263,11 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn ImRect_ContainsVec2(self_: *mut ImRect, p: ImVec2) -> bool;
+    pub fn ImRect_Contains_Vec2(self_: *mut ImRect, p: ImVec2) -> bool;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn ImRect_ContainsRect(self_: *mut ImRect, r: ImRect) -> bool;
+    pub fn ImRect_Contains_Rect(self_: *mut ImRect, r: ImRect) -> bool;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
@@ -8729,19 +9275,19 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn ImRect_AddVec2(self_: *mut ImRect, p: ImVec2);
+    pub fn ImRect_Add_Vec2(self_: *mut ImRect, p: ImVec2);
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn ImRect_AddRect(self_: *mut ImRect, r: ImRect);
+    pub fn ImRect_Add_Rect(self_: *mut ImRect, r: ImRect);
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn ImRect_ExpandFloat(self_: *mut ImRect, amount: f32);
+    pub fn ImRect_Expand_Float(self_: *mut ImRect, amount: f32);
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn ImRect_ExpandVec2(self_: *mut ImRect, amount: ImVec2);
+    pub fn ImRect_Expand_Vec2(self_: *mut ImRect, amount: ImVec2);
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
@@ -8813,6 +9359,39 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
+    pub fn ImGuiTextIndex_clear(self_: *mut ImGuiTextIndex);
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
+    pub fn ImGuiTextIndex_size(self_: *mut ImGuiTextIndex) -> cty::c_int;
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
+    pub fn ImGuiTextIndex_get_line_begin(
+        self_: *mut ImGuiTextIndex,
+        base: *const cty::c_char,
+        n: cty::c_int,
+    ) -> *const cty::c_char;
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
+    pub fn ImGuiTextIndex_get_line_end(
+        self_: *mut ImGuiTextIndex,
+        base: *const cty::c_char,
+        n: cty::c_int,
+    ) -> *const cty::c_char;
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
+    pub fn ImGuiTextIndex_append(
+        self_: *mut ImGuiTextIndex,
+        base: *const cty::c_char,
+        old_size: cty::c_int,
+        new_size: cty::c_int,
+    );
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
     pub fn ImDrawListSharedData_ImDrawListSharedData() -> *mut ImDrawListSharedData;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
@@ -8844,7 +9423,8 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn ImGuiStyleMod_ImGuiStyleModInt(idx: ImGuiStyleVar, v: cty::c_int) -> *mut ImGuiStyleMod;
+    pub fn ImGuiStyleMod_ImGuiStyleMod_Int(idx: ImGuiStyleVar, v: cty::c_int)
+        -> *mut ImGuiStyleMod;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
@@ -8852,11 +9432,11 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn ImGuiStyleMod_ImGuiStyleModFloat(idx: ImGuiStyleVar, v: f32) -> *mut ImGuiStyleMod;
+    pub fn ImGuiStyleMod_ImGuiStyleMod_Float(idx: ImGuiStyleVar, v: f32) -> *mut ImGuiStyleMod;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn ImGuiStyleMod_ImGuiStyleModVec2(idx: ImGuiStyleVar, v: ImVec2) -> *mut ImGuiStyleMod;
+    pub fn ImGuiStyleMod_ImGuiStyleMod_Vec2(idx: ImGuiStyleVar, v: ImVec2) -> *mut ImGuiStyleMod;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
@@ -9014,7 +9594,7 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn ImGuiPtrOrIndex_ImGuiPtrOrIndexPtr(ptr: *mut cty::c_void) -> *mut ImGuiPtrOrIndex;
+    pub fn ImGuiPtrOrIndex_ImGuiPtrOrIndex_Ptr(ptr: *mut cty::c_void) -> *mut ImGuiPtrOrIndex;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
@@ -9022,7 +9602,43 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn ImGuiPtrOrIndex_ImGuiPtrOrIndexInt(index: cty::c_int) -> *mut ImGuiPtrOrIndex;
+    pub fn ImGuiPtrOrIndex_ImGuiPtrOrIndex_Int(index: cty::c_int) -> *mut ImGuiPtrOrIndex;
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
+    pub fn ImGuiInputEvent_ImGuiInputEvent() -> *mut ImGuiInputEvent;
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
+    pub fn ImGuiInputEvent_destroy(self_: *mut ImGuiInputEvent);
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
+    pub fn ImGuiKeyRoutingData_ImGuiKeyRoutingData() -> *mut ImGuiKeyRoutingData;
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
+    pub fn ImGuiKeyRoutingData_destroy(self_: *mut ImGuiKeyRoutingData);
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
+    pub fn ImGuiKeyRoutingTable_ImGuiKeyRoutingTable() -> *mut ImGuiKeyRoutingTable;
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
+    pub fn ImGuiKeyRoutingTable_destroy(self_: *mut ImGuiKeyRoutingTable);
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
+    pub fn ImGuiKeyRoutingTable_Clear(self_: *mut ImGuiKeyRoutingTable);
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
+    pub fn ImGuiKeyOwnerData_ImGuiKeyOwnerData() -> *mut ImGuiKeyOwnerData;
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
+    pub fn ImGuiKeyOwnerData_destroy(self_: *mut ImGuiKeyOwnerData);
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
@@ -9265,7 +9881,7 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn ImGuiWindow_GetIDStr(
+    pub fn ImGuiWindow_GetID_Str(
         self_: *mut ImGuiWindow,
         str_: *const cty::c_char,
         str_end: *const cty::c_char,
@@ -9273,30 +9889,11 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn ImGuiWindow_GetIDPtr(self_: *mut ImGuiWindow, ptr: *const cty::c_void) -> ImGuiID;
+    pub fn ImGuiWindow_GetID_Ptr(self_: *mut ImGuiWindow, ptr: *const cty::c_void) -> ImGuiID;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn ImGuiWindow_GetIDInt(self_: *mut ImGuiWindow, n: cty::c_int) -> ImGuiID;
-}
-#[link(wasm_import_module = "imgui-sys-v0")]
-extern "C" {
-    pub fn ImGuiWindow_GetIDNoKeepAliveStr(
-        self_: *mut ImGuiWindow,
-        str_: *const cty::c_char,
-        str_end: *const cty::c_char,
-    ) -> ImGuiID;
-}
-#[link(wasm_import_module = "imgui-sys-v0")]
-extern "C" {
-    pub fn ImGuiWindow_GetIDNoKeepAlivePtr(
-        self_: *mut ImGuiWindow,
-        ptr: *const cty::c_void,
-    ) -> ImGuiID;
-}
-#[link(wasm_import_module = "imgui-sys-v0")]
-extern "C" {
-    pub fn ImGuiWindow_GetIDNoKeepAliveInt(self_: *mut ImGuiWindow, n: cty::c_int) -> ImGuiID;
+    pub fn ImGuiWindow_GetID_Int(self_: *mut ImGuiWindow, n: cty::c_int) -> ImGuiID;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
@@ -9361,6 +9958,14 @@ extern "C" {
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn ImGuiTableColumn_destroy(self_: *mut ImGuiTableColumn);
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
+    pub fn ImGuiTableInstanceData_ImGuiTableInstanceData() -> *mut ImGuiTableInstanceData;
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
+    pub fn ImGuiTableInstanceData_destroy(self_: *mut ImGuiTableInstanceData);
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
@@ -9457,15 +10062,15 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igSetWindowPosWindowPtr(window: *mut ImGuiWindow, pos: ImVec2, cond: ImGuiCond);
+    pub fn igSetWindowPos_WindowPtr(window: *mut ImGuiWindow, pos: ImVec2, cond: ImGuiCond);
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igSetWindowSizeWindowPtr(window: *mut ImGuiWindow, size: ImVec2, cond: ImGuiCond);
+    pub fn igSetWindowSize_WindowPtr(window: *mut ImGuiWindow, size: ImVec2, cond: ImGuiCond);
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igSetWindowCollapsedWindowPtr(
+    pub fn igSetWindowCollapsed_WindowPtr(
         window: *mut ImGuiWindow,
         collapsed: bool,
         cond: ImGuiCond,
@@ -9530,15 +10135,19 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igGetForegroundDrawListWindowPtr(window: *mut ImGuiWindow) -> *mut ImDrawList;
+    pub fn igGetForegroundDrawList_WindowPtr(window: *mut ImGuiWindow) -> *mut ImDrawList;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igInitialize(context: *mut ImGuiContext);
+    pub fn igInitialize();
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igShutdown(context: *mut ImGuiContext);
+    pub fn igShutdown();
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
+    pub fn igUpdateInputEvents(trickle_fast_inputs: bool);
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
@@ -9594,6 +10203,10 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
+    pub fn igSetWindowViewport(window: *mut ImGuiWindow, viewport: *mut ImGuiViewportP);
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
     pub fn igSetCurrentViewport(window: *mut ImGuiWindow, viewport: *mut ImGuiViewportP);
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
@@ -9604,11 +10217,17 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igMarkIniSettingsDirtyNil();
+    pub fn igFindHoveredViewportFromPlatformWindowStack(
+        mouse_platform_pos: ImVec2,
+    ) -> *mut ImGuiViewportP;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igMarkIniSettingsDirtyWindowPtr(window: *mut ImGuiWindow);
+    pub fn igMarkIniSettingsDirty_Nil();
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
+    pub fn igMarkIniSettingsDirty_WindowPtr(window: *mut ImGuiWindow);
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
@@ -9628,23 +10247,35 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
+    pub fn igAddSettingsHandler(handler: *const ImGuiSettingsHandler);
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
+    pub fn igRemoveSettingsHandler(type_name: *const cty::c_char);
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
     pub fn igFindSettingsHandler(type_name: *const cty::c_char) -> *mut ImGuiSettingsHandler;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igSetNextWindowScroll(scroll: ImVec2);
+    pub fn igLocalizeRegisterEntries(entries: *const ImGuiLocEntry, count: cty::c_int);
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igSetScrollXWindowPtr(window: *mut ImGuiWindow, scroll_x: f32);
+    pub fn igLocalizeGetMsg(key: ImGuiLocKey) -> *const cty::c_char;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igSetScrollYWindowPtr(window: *mut ImGuiWindow, scroll_y: f32);
+    pub fn igSetScrollX_WindowPtr(window: *mut ImGuiWindow, scroll_x: f32);
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igSetScrollFromPosXWindowPtr(
+    pub fn igSetScrollY_WindowPtr(window: *mut ImGuiWindow, scroll_y: f32);
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
+    pub fn igSetScrollFromPosX_WindowPtr(
         window: *mut ImGuiWindow,
         local_x: f32,
         center_x_ratio: f32,
@@ -9652,7 +10283,7 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igSetScrollFromPosYWindowPtr(
+    pub fn igSetScrollFromPosY_WindowPtr(
         window: *mut ImGuiWindow,
         local_y: f32,
         center_y_ratio: f32,
@@ -9741,11 +10372,11 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igItemSizeVec2(size: ImVec2, text_baseline_y: f32);
+    pub fn igItemSize_Vec2(size: ImVec2, text_baseline_y: f32);
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igItemSizeRect(bb: ImRect, text_baseline_y: f32);
+    pub fn igItemSize_Rect(bb: ImRect, text_baseline_y: f32);
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
@@ -9856,7 +10487,7 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igIsPopupOpenID(id: ImGuiID, popup_flags: ImGuiPopupFlags) -> bool;
+    pub fn igIsPopupOpen_ID(id: ImGuiID, popup_flags: ImGuiPopupFlags) -> bool;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
@@ -9982,30 +10613,11 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igGetNavInputAmount(n: ImGuiNavInput, mode: ImGuiInputReadMode) -> f32;
-}
-#[link(wasm_import_module = "imgui-sys-v0")]
-extern "C" {
-    pub fn igGetNavInputAmount2d(
-        pOut: *mut ImVec2,
-        dir_sources: ImGuiNavDirSourceFlags,
-        mode: ImGuiInputReadMode,
-        slow_factor: f32,
-        fast_factor: f32,
-    );
-}
-#[link(wasm_import_module = "imgui-sys-v0")]
-extern "C" {
-    pub fn igCalcTypematicRepeatAmount(
-        t0: f32,
-        t1: f32,
-        repeat_delay: f32,
-        repeat_rate: f32,
-    ) -> cty::c_int;
-}
-#[link(wasm_import_module = "imgui-sys-v0")]
-extern "C" {
     pub fn igActivateItem(id: ImGuiID);
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
+    pub fn igSetNavWindow(window: *mut ImGuiWindow);
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
@@ -10018,39 +10630,51 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igPushFocusScope(id: ImGuiID);
+    pub fn igIsNamedKey(key: ImGuiKey) -> bool;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igPopFocusScope();
+    pub fn igIsNamedKeyOrModKey(key: ImGuiKey) -> bool;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igGetFocusedFocusScope() -> ImGuiID;
+    pub fn igIsLegacyKey(key: ImGuiKey) -> bool;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igGetFocusScope() -> ImGuiID;
+    pub fn igIsKeyboardKey(key: ImGuiKey) -> bool;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igSetItemUsingMouseWheel();
+    pub fn igIsGamepadKey(key: ImGuiKey) -> bool;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igSetActiveIdUsingNavAndKeys();
+    pub fn igIsMouseKey(key: ImGuiKey) -> bool;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igIsActiveIdUsingNavDir(dir: ImGuiDir) -> bool;
+    pub fn igIsAliasKey(key: ImGuiKey) -> bool;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igIsActiveIdUsingNavInput(input: ImGuiNavInput) -> bool;
+    pub fn igConvertSingleModFlagToKey(key: ImGuiKey) -> ImGuiKey;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igIsActiveIdUsingKey(key: ImGuiKey) -> bool;
+    pub fn igGetKeyData(key: ImGuiKey) -> *mut ImGuiKeyData;
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
+    pub fn igGetKeyChordName(
+        key_chord: ImGuiKeyChord,
+        out_buf: *mut cty::c_char,
+        out_buf_size: cty::c_int,
+    );
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
+    pub fn igMouseButtonToKey(button: ImGuiMouseButton) -> ImGuiKey;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
@@ -10058,19 +10682,110 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igIsKeyPressedMap(key: ImGuiKey, repeat: bool) -> bool;
+    pub fn igGetKeyVector2d(
+        pOut: *mut ImVec2,
+        key_left: ImGuiKey,
+        key_right: ImGuiKey,
+        key_up: ImGuiKey,
+        key_down: ImGuiKey,
+    );
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igIsNavInputDown(n: ImGuiNavInput) -> bool;
+    pub fn igGetNavTweakPressedAmount(axis: ImGuiAxis) -> f32;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igIsNavInputTest(n: ImGuiNavInput, rm: ImGuiInputReadMode) -> bool;
+    pub fn igCalcTypematicRepeatAmount(
+        t0: f32,
+        t1: f32,
+        repeat_delay: f32,
+        repeat_rate: f32,
+    ) -> cty::c_int;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igGetMergedKeyModFlags() -> ImGuiKeyModFlags;
+    pub fn igGetTypematicRepeatRate(
+        flags: ImGuiInputFlags,
+        repeat_delay: *mut f32,
+        repeat_rate: *mut f32,
+    );
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
+    pub fn igSetActiveIdUsingAllKeyboardKeys();
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
+    pub fn igIsActiveIdUsingNavDir(dir: ImGuiDir) -> bool;
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
+    pub fn igGetKeyOwner(key: ImGuiKey) -> ImGuiID;
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
+    pub fn igSetKeyOwner(key: ImGuiKey, owner_id: ImGuiID, flags: ImGuiInputFlags);
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
+    pub fn igSetItemKeyOwner(key: ImGuiKey, flags: ImGuiInputFlags);
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
+    pub fn igTestKeyOwner(key: ImGuiKey, owner_id: ImGuiID) -> bool;
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
+    pub fn igGetKeyOwnerData(key: ImGuiKey) -> *mut ImGuiKeyOwnerData;
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
+    pub fn igIsKeyDown_ID(key: ImGuiKey, owner_id: ImGuiID) -> bool;
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
+    pub fn igIsKeyPressed_ID(key: ImGuiKey, owner_id: ImGuiID, flags: ImGuiInputFlags) -> bool;
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
+    pub fn igIsKeyReleased_ID(key: ImGuiKey, owner_id: ImGuiID) -> bool;
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
+    pub fn igIsMouseDown_ID(button: ImGuiMouseButton, owner_id: ImGuiID) -> bool;
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
+    pub fn igIsMouseClicked_ID(
+        button: ImGuiMouseButton,
+        owner_id: ImGuiID,
+        flags: ImGuiInputFlags,
+    ) -> bool;
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
+    pub fn igIsMouseReleased_ID(button: ImGuiMouseButton, owner_id: ImGuiID) -> bool;
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
+    pub fn igShortcut(key_chord: ImGuiKeyChord, owner_id: ImGuiID, flags: ImGuiInputFlags) -> bool;
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
+    pub fn igSetShortcutRouting(
+        key_chord: ImGuiKeyChord,
+        owner_id: ImGuiID,
+        flags: ImGuiInputFlags,
+    ) -> bool;
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
+    pub fn igTestShortcutRouting(key_chord: ImGuiKeyChord, owner_id: ImGuiID) -> bool;
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
+    pub fn igGetShortcutRoutingData(key_chord: ImGuiKeyChord) -> *mut ImGuiKeyRoutingData;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
@@ -10133,11 +10848,16 @@ extern "C" {
     pub fn igDockContextCalcDropPosForDocking(
         target: *mut ImGuiWindow,
         target_node: *mut ImGuiDockNode,
-        payload: *mut ImGuiWindow,
+        payload_window: *mut ImGuiWindow,
+        payload_node: *mut ImGuiDockNode,
         split_dir: ImGuiDir,
         split_outer: bool,
         out_pos: *mut ImVec2,
     ) -> bool;
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
+    pub fn igDockContextFindNodeByID(ctx: *mut ImGuiContext, id: ImGuiID) -> *mut ImGuiDockNode;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
@@ -10262,6 +10982,22 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
+    pub fn igPushFocusScope(id: ImGuiID);
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
+    pub fn igPopFocusScope();
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
+    pub fn igGetCurrentFocusScope() -> ImGuiID;
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
+    pub fn igIsDragDropActive() -> bool;
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
     pub fn igBeginDragDropTargetCustom(bb: ImRect, id: ImGuiID) -> bool;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
@@ -10271,6 +11007,10 @@ extern "C" {
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igIsDragDropPayloadBeingAccepted() -> bool;
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
+    pub fn igRenderDragDropTargetRect(bb: ImRect);
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
@@ -10401,7 +11141,18 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
+    pub fn igTableBeginContextMenuPopup(table: *mut ImGuiTable) -> bool;
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
     pub fn igTableMergeDrawChannels(table: *mut ImGuiTable);
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
+    pub fn igTableGetInstanceData(
+        table: *mut ImGuiTable,
+        instance_no: cty::c_int,
+    ) -> *mut ImGuiTableInstanceData;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
@@ -10445,7 +11196,7 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igTableGetColumnNameTablePtr(
+    pub fn igTableGetColumnName_TablePtr(
         table: *const ImGuiTable,
         column_n: cty::c_int,
     ) -> *const cty::c_char;
@@ -10476,11 +11227,11 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igTableGcCompactTransientBuffersTablePtr(table: *mut ImGuiTable);
+    pub fn igTableGcCompactTransientBuffers_TablePtr(table: *mut ImGuiTable);
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igTableGcCompactTransientBuffersTableTempDataPtr(table: *mut ImGuiTableTempData);
+    pub fn igTableGcCompactTransientBuffers_TableTempDataPtr(table: *mut ImGuiTableTempData);
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
@@ -10504,7 +11255,7 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igTableSettingsInstallHandler(context: *mut ImGuiContext);
+    pub fn igTableSettingsAddSettingsHandler();
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
@@ -10582,7 +11333,15 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igTabItemCalcSize(pOut: *mut ImVec2, label: *const cty::c_char, has_close_button: bool);
+    pub fn igTabItemCalcSize_Str(
+        pOut: *mut ImVec2,
+        label: *const cty::c_char,
+        has_close_button_or_unsaved_marker: bool,
+    );
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
+    pub fn igTabItemCalcSize_WindowPtr(pOut: *mut ImVec2, window: *mut ImGuiWindow);
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
@@ -10704,6 +11463,17 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
+    pub fn igRenderMouseCursor(
+        pos: ImVec2,
+        scale: f32,
+        mouse_cursor: ImGuiMouseCursor,
+        col_fill: ImU32,
+        col_border: ImU32,
+        col_shadow: ImU32,
+    );
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
     pub fn igRenderArrow(
         draw_list: *mut ImDrawList,
         pos: ImVec2,
@@ -10719,18 +11489,6 @@ extern "C" {
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igRenderCheckMark(draw_list: *mut ImDrawList, pos: ImVec2, col: ImU32, sz: f32);
-}
-#[link(wasm_import_module = "imgui-sys-v0")]
-extern "C" {
-    pub fn igRenderMouseCursor(
-        draw_list: *mut ImDrawList,
-        pos: ImVec2,
-        scale: f32,
-        mouse_cursor: ImGuiMouseCursor,
-        col_fill: ImU32,
-        col_border: ImU32,
-        col_shadow: ImU32,
-    );
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
@@ -10825,7 +11583,6 @@ extern "C" {
         size: ImVec2,
         uv0: ImVec2,
         uv1: ImVec2,
-        padding: ImVec2,
         bg_col: ImVec4,
         tint_col: ImVec4,
     ) -> bool;
@@ -10852,7 +11609,7 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igCheckboxFlagsS64Ptr(
+    pub fn igCheckboxFlags_S64Ptr(
         label: *const cty::c_char,
         flags: *mut ImS64,
         flags_value: ImS64,
@@ -10860,7 +11617,7 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igCheckboxFlagsU64Ptr(
+    pub fn igCheckboxFlags_U64Ptr(
         label: *const cty::c_char,
         flags: *mut ImU64,
         flags_value: ImU64,
@@ -10929,11 +11686,15 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igTreeNodeBehaviorIsOpen(id: ImGuiID, flags: ImGuiTreeNodeFlags) -> bool;
+    pub fn igTreePushOverrideID(id: ImGuiID);
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igTreePushOverrideID(id: ImGuiID);
+    pub fn igTreeNodeSetOpen(id: ImGuiID, open: bool);
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
+    pub fn igTreeNodeUpdateNextOpen(id: ImGuiID, flags: ImGuiTreeNodeFlags) -> bool;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
@@ -10961,9 +11722,8 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igDataTypeApplyOpFromText(
+    pub fn igDataTypeApplyFromText(
         buf: *const cty::c_char,
-        initial_value_buf: *const cty::c_char,
         data_type: ImGuiDataType,
         p_data: *mut cty::c_void,
         format: *const cty::c_char,
@@ -11099,6 +11859,10 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
+    pub fn igDebugLog(fmt: *const cty::c_char, ...);
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
     pub fn igErrorCheckEndFrameRecover(
         log_callback: ImGuiErrorLogCallback,
         user_data: *mut cty::c_void,
@@ -11110,6 +11874,22 @@ extern "C" {
         log_callback: ImGuiErrorLogCallback,
         user_data: *mut cty::c_void,
     );
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
+    pub fn igErrorCheckUsingSetCursorPosToExtendParentBoundaries();
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
+    pub fn igDebugLocateItem(target_id: ImGuiID);
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
+    pub fn igDebugLocateItemOnHover(target_id: ImGuiID);
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
+    pub fn igDebugLocateItemResolveWithLastItem();
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
@@ -11165,6 +11945,10 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
+    pub fn igDebugNodeFontGlyph(font: *mut ImFont, glyph: *const ImFontGlyph);
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
     pub fn igDebugNodeStorage(storage: *mut ImGuiStorage, label: *const cty::c_char);
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
@@ -11178,6 +11962,10 @@ extern "C" {
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igDebugNodeTableSettings(settings: *mut ImGuiTableSettings);
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
+    pub fn igDebugNodeInputTextState(state: *mut ImGuiInputTextState);
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
@@ -11210,6 +11998,10 @@ extern "C" {
         viewport: *mut ImGuiViewportP,
         bb: ImRect,
     );
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
+    pub fn igIsKeyPressedMap(key: ImGuiKey, repeat: bool) -> bool;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {

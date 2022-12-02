@@ -93,10 +93,6 @@ pub enum NavInput {
     LStickRight = sys::ImGuiNavInput_LStickRight,
     LStickUp = sys::ImGuiNavInput_LStickUp,
     LStickDown = sys::ImGuiNavInput_LStickDown,
-    FocusPrev = sys::ImGuiNavInput_FocusPrev,
-    FocusNext = sys::ImGuiNavInput_FocusNext,
-    TweakSlow = sys::ImGuiNavInput_TweakSlow,
-    TweakFast = sys::ImGuiNavInput_TweakFast,
 }
 
 impl NavInput {
@@ -114,11 +110,7 @@ impl NavInput {
         NavInput::LStickRight,
         NavInput::LStickUp,
         NavInput::LStickDown,
-        NavInput::FocusPrev,
-        NavInput::FocusNext,
-        NavInput::TweakSlow,
-        NavInput::TweakFast,
-    ];
+        ];
     /// Amount of internal/hidden variants (not exposed by imgui-rs)
     const INTERNAL_COUNT: usize = 4;
     /// Total count of `NavInput` variants
@@ -155,13 +147,13 @@ pub struct Io {
     pub mouse_double_click_max_dist: f32,
     /// Distance threshold before considering we are dragging
     pub mouse_drag_threshold: f32,
-    /// Map of indices into the `keys_down` entries array, which represent your "native" keyboard
-    /// state
-    pub key_map: [u32; sys::ImGuiKey_COUNT as usize],
     /// When holding a key/button, time before it starts repeating, in seconds
     pub key_repeat_delay: f32,
     /// When holding a key/button, rate at which it repeats, in seconds
     pub key_repeat_rate: f32,
+
+    pub hover_delay_normal: f32,
+    pub hover_delay_short: f32,
 
     user_data: *mut c_void,
     pub(crate) fonts: *mut FontAtlas,
@@ -206,8 +198,10 @@ pub struct Io {
     /// * Double-click selects by word instead of selecting the whole text
     /// * Multi-selection in lists uses Cmd/Super instead of Ctrl
     pub config_mac_os_behaviors: bool,
+    pub config_input_trickle_event_queue: bool,
     /// Set to false to disable blinking cursor
     pub config_input_text_cursor_blink: bool,
+    pub config_input_text_enter_keep_active: bool,
     /// Enable turning DragXXX widgets into text input with a simple mouse
     /// click-release (without moving). Not desirable on devices without a
     /// keyboard.
@@ -235,43 +229,9 @@ pub struct Io {
     pub(crate) set_clipboard_text_fn:
         Option<unsafe extern "C" fn(user_data: *mut c_void, text: *const c_char)>,
     pub(crate) clipboard_user_data: *mut c_void,
-    #[cfg(not(feature = "docking"))]
-    ime_set_input_screen_pos_fn:
-        Option<unsafe extern "C" fn(x: std::os::raw::c_int, y: std::os::raw::c_int)>,
-    #[cfg(not(feature = "docking"))]
-    ime_window_handle: *mut c_void,
-    /// Mouse position, in pixels.
-    ///
-    /// Set to [f32::MAX, f32::MAX] if mouse is unavailable (on another screen, etc.).
-    pub mouse_pos: [f32; 2],
-    /// Mouse buttons: 0=left, 1=right, 2=middle + extras
-    pub mouse_down: [bool; 5],
-    /// Mouse wheel (vertical).
-    ///
-    /// 1 unit scrolls about 5 lines of text.
-    pub mouse_wheel: f32,
-    /// Mouse wheel (horizontal).
-    ///
-    /// Most users don't have a mouse with a horizontal wheel, and may not be filled by all
-    /// backends.
-    pub mouse_wheel_h: f32,
-    #[cfg(feature = "docking")]
-    pub mouse_hovered_viewport: sys::ImGuiID,
-    /// Keyboard modifier pressed: Control
-    pub key_ctrl: bool,
-    /// Keyboard modifier pressed: Shift
-    pub key_shift: bool,
-    /// Keyboard modifier pressed: Alt
-    pub key_alt: bool,
-    /// Keyboard modifier pressed: Cmd/Super/Windows
-    pub key_super: bool,
-    /// Keyboard keys that are pressed (indexing defined by the user/application)
-    pub keys_down: [bool; 512],
-    /// Gamepad inputs.
-    ///
-    /// Cleared back to zero after each frame. Keyboard keys will be auto-mapped and written
-    /// here by `frame()`.
-    pub nav_inputs: [f32; NavInput::COUNT + NavInput::INTERNAL_COUNT],
+    set_platform_ime_data_fn: Option<unsafe extern "C" fn(viewport: *mut sys::ImGuiViewport, data: *mut sys::ImGuiPlatformImeData),>,
+    _unused_padding: *mut c_void,
+
     /// When true, imgui-rs will use the mouse inputs, so do not dispatch them to your main
     /// game/application
     pub want_capture_mouse: bool,
@@ -315,11 +275,46 @@ pub struct Io {
     /// Note that this is zero if either current or previous position is invalid ([f32::MAX,
     /// f32::MAX]), so a disappearing/reappearing mouse won't have a huge delta.
     pub mouse_delta: [f32; 2],
+    /// Map of indices into the `keys_down` entries array, which represent your "native" keyboard
+    /// state
+    pub key_map: [u32; sys::ImGuiKey_COUNT as usize],
+    pub keys_down: [bool; sys::ImGuiKey_COUNT as usize],
+    /// Keyboard keys that are pressed (indexing defined by the user/application)
+    /// Gamepad inputs.
+    ///
+    /// Cleared back to zero after each frame. Keyboard keys will be auto-mapped and written
+    /// here by `frame()`.
+    pub nav_inputs: [f32; NavInput::COUNT + NavInput::INTERNAL_COUNT],
+    /// Mouse position, in pixels.
+    ///
+    /// Set to [f32::MAX, f32::MAX] if mouse is unavailable (on another screen, etc.).
+    pub mouse_pos: [f32; 2],
+    /// Mouse buttons: 0=left, 1=right, 2=middle + extras
+    pub mouse_down: [bool; 5],
+    /// Mouse wheel (vertical).
+    ///
+    /// 1 unit scrolls about 5 lines of text.
+    pub mouse_wheel: f32,
+    /// Mouse wheel (horizontal).
+    ///
+    /// Most users don't have a mouse with a horizontal wheel, and may not be filled by all
+    /// backends.
+    pub mouse_wheel_h: f32,
+    #[cfg(feature = "docking")]
+    pub mouse_hovered_viewport: sys::ImGuiID,
+    /// Keyboard modifier pressed: Control
+    pub key_ctrl: bool,
+    /// Keyboard modifier pressed: Shift
+    pub key_shift: bool,
+    /// Keyboard modifier pressed: Alt
+    pub key_alt: bool,
+    /// Keyboard modifier pressed: Cmd/Super/Windows
+    pub key_super: bool,
+    pub key_mods: sys::ImGuiKeyChord,// FIXME
+    pub keys_data: [sys::ImGuiKeyData; 652usize], // FIXME
 
     pub want_capture_mouse_unless_popup_close: bool,
 
-    key_mods: sys::ImGuiKeyModFlags,
-    key_mods_prev: sys::ImGuiKeyModFlags,
     mouse_pos_prev: [f32; 2],
     mouse_clicked_pos: [[f32; 2]; 5],
     mouse_clicked_time: [f64; 5],
@@ -332,18 +327,18 @@ pub struct Io {
     mouse_down_owned_unless_popup_close: [bool; 5],
     mouse_down_duration: [f32; 5],
     mouse_down_duration_prev: [f32; 5],
-    mouse_drag_max_distance_abs: [[f32; 2]; 5],
     mouse_drag_max_distance_sqr: [f32; 5],
-    keys_down_duration: [f32; 512],
-    keys_down_duration_prev: [f32; 512],
-    nav_inputs_down_duration: [f32; NavInput::COUNT + NavInput::INTERNAL_COUNT],
-    nav_inputs_down_duration_prev: [f32; NavInput::COUNT + NavInput::INTERNAL_COUNT],
     pen_pressure: f32,
 
     /// Clear buttons state when focus is lost (this is useful so
     /// e.g. releasing Alt after focus loss on Alt-Tab doesn't trigger
     /// the Alt menu toggle)
     pub app_focus_lost: bool,
+
+    pub app_accepting_events: bool,
+
+    backend_using_legacy_key_arrays: sys::ImS8,
+    backend_using_legacy_nav_input_array: bool,
     input_queue_surrogate: sys::ImWchar16,
     input_queue_characters: ImVector<sys::ImWchar>,
 }
@@ -485,10 +480,6 @@ fn test_io_memory_layout() {
     assert_field_offset!(get_clipboard_text_fn, GetClipboardTextFn);
     assert_field_offset!(set_clipboard_text_fn, SetClipboardTextFn);
     assert_field_offset!(clipboard_user_data, ClipboardUserData);
-    #[cfg(not(feature = "docking"))]
-    assert_field_offset!(ime_set_input_screen_pos_fn, ImeSetInputScreenPosFn);
-    #[cfg(not(feature = "docking"))]
-    assert_field_offset!(ime_window_handle, ImeWindowHandle);
     assert_field_offset!(mouse_pos, MousePos);
     assert_field_offset!(mouse_down, MouseDown);
     assert_field_offset!(mouse_wheel, MouseWheel);
@@ -513,8 +504,6 @@ fn test_io_memory_layout() {
     assert_field_offset!(metrics_active_windows, MetricsActiveWindows);
     assert_field_offset!(metrics_active_allocations, MetricsActiveAllocations);
     assert_field_offset!(mouse_delta, MouseDelta);
-    assert_field_offset!(key_mods, KeyMods);
-    assert_field_offset!(key_mods_prev, KeyModsPrev);
     assert_field_offset!(mouse_pos_prev, MousePosPrev);
     assert_field_offset!(mouse_clicked_pos, MouseClickedPos);
     assert_field_offset!(mouse_clicked_time, MouseClickedTime);
@@ -526,12 +515,7 @@ fn test_io_memory_layout() {
     assert_field_offset!(mouse_down_owned, MouseDownOwned);
     assert_field_offset!(mouse_down_duration, MouseDownDuration);
     assert_field_offset!(mouse_down_duration_prev, MouseDownDurationPrev);
-    assert_field_offset!(mouse_drag_max_distance_abs, MouseDragMaxDistanceAbs);
     assert_field_offset!(mouse_drag_max_distance_sqr, MouseDragMaxDistanceSqr);
-    assert_field_offset!(keys_down_duration, KeysDownDuration);
-    assert_field_offset!(keys_down_duration_prev, KeysDownDurationPrev);
-    assert_field_offset!(nav_inputs_down_duration, NavInputsDownDuration);
-    assert_field_offset!(nav_inputs_down_duration_prev, NavInputsDownDurationPrev);
     assert_field_offset!(pen_pressure, PenPressure);
     assert_field_offset!(input_queue_surrogate, InputQueueSurrogate);
     assert_field_offset!(input_queue_characters, InputQueueCharacters);
