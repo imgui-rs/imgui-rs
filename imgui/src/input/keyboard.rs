@@ -298,13 +298,6 @@ impl Key {
     pub const COUNT: usize = sys::ImGuiKey_COUNT as usize;
 }
 
-#[test]
-fn test_key_variants() {
-    for (idx, &value) in Key::VARIANTS.iter().enumerate() {
-        assert_eq!(idx, value as usize);
-    }
-}
-
 /// Target widget selection for keyboard focus
 #[derive(Copy, Clone, Debug, Hash, Eq, PartialEq)]
 pub enum FocusedWidget {
