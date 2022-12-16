@@ -196,8 +196,7 @@ where
     /// Constructs a new vertical slider builder with the given size and range.
     ///
     /// ```rust
-    /// # use imgui::im_str;
-    /// imgui::VerticalSlider::new(im_str!("Example"), [20.0, 20.0], i8::MIN, i8::MAX)
+    /// imgui::VerticalSlider::new("Example", [20.0, 20.0], i8::MIN, i8::MAX)
     ///     .range(4, 8)
     ///     // Remember to call .build(&ui)
     ///     ;
@@ -227,8 +226,7 @@ where
     /// Sets the range for the vertical slider.
     ///
     /// ```rust
-    /// # use imgui::im_str;
-    /// imgui::VerticalSlider::new(im_str!("Example"), [20.0, 20.0], i8::MIN, i8::MAX)
+    /// imgui::VerticalSlider::new("Example", [20.0, 20.0], i8::MIN, i8::MAX)
     ///     .range(4, 8)
     ///     // Remember to call .build(&ui)
     ///     ;
@@ -320,8 +318,7 @@ where
 {
     /// Sets the range in degrees (inclusive)
     /// ```rust
-    /// # use imgui::im_str;
-    /// imgui::AngleSlider::new(im_str!("Example"))
+    /// imgui::AngleSlider::new("Example")
     ///     .range_degrees(-20.0, 20.0)
     ///     // Remember to call .build(&ui)
     ///     ;

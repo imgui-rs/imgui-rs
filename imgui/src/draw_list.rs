@@ -426,7 +426,7 @@ impl<'ui> DrawListMut<'ui> {
     /// # use imgui::*;
     /// fn custom_button(ui: &Ui, img_id: TextureId) {
     ///     // Invisible button is good widget to customise with image
-    ///     ui.invisible_button(im_str!("custom_button"), [100.0, 20.0]);
+    ///     ui.invisible_button("custom_button", [100.0, 20.0]);
     ///
     ///     // Get draw list and draw image over invisible button
     ///     let draw_list = ui.get_window_draw_list();

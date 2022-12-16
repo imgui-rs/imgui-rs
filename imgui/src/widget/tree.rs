@@ -287,17 +287,16 @@ impl<'a, T: AsRef<str>, L: AsRef<str>> TreeNode<'a, T, L> {
                 sys::igSetNextItemOpen(self.opened, self.opened_cond as i32);
             }
             match self.id {
-                TreeNodeId::Str(id) => {
-                    let (id, label) = match self.label {
-                        Some(label) => self.ui.scratch_txt_two(id, label),
-                        None => {
-                            let v = self.ui.scratch_txt(id);
-                            (v, v)
-                        }
-                    };
-
-                    sys::igTreeNodeExStrStr(id, self.flags.bits() as i32, fmt_ptr(), label)
-                }
+                TreeNodeId::Str(id) => match self.label {
+                    Some(label) => {
+                        let (id, label) = self.ui.scratch_txt_two(id, label);
+                        sys::igTreeNodeExStrStr(id, self.flags.bits() as i32, fmt_ptr(), label)
+                    }
+                    None => {
+                        let id = self.ui.scratch_txt(id);
+                        sys::igTreeNodeExStr(id, self.flags.bits() as i32)
+                    }
+                },
                 TreeNodeId::Ptr(id) => sys::igTreeNodeExPtr(
                     id,
                     self.flags.bits() as i32,

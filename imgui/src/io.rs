@@ -369,7 +369,11 @@ pub struct Io {
     nav_inputs_down_duration: [f32; NavInput::COUNT + NavInput::INTERNAL_COUNT],
     nav_inputs_down_duration_prev: [f32; NavInput::COUNT + NavInput::INTERNAL_COUNT],
     pen_pressure: f32,
-    app_focus_lost: bool,
+
+    /// Clear buttons state when focus is lost (this is useful so
+    /// e.g. releasing Alt after focus loss on Alt-Tab doesn't trigger
+    /// the Alt menu toggle)
+    pub app_focus_lost: bool,
     input_queue_surrogate: sys::ImWchar16,
     input_queue_characters: ImVector<sys::ImWchar>,
 }

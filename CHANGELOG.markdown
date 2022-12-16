@@ -1,10 +1,19 @@
 # Change Log
 
-## Unreleased
+## [unreleased]
+- Removed `im_str!` macro - deprecated since v0.8.
 
-- MSRV is now **1.54**. We soft-updated to this in 0.8.0 with a feature `min-const-generics`, which has now been removed (and as such, we resume having no default features).
+  `ui.button(im_str!("Example"))` just becomes `ui.button("Example")` and `ui.button(&im_str!("My age is {}", 100))` becomes `ui.button!(format!("My age is {}", 100))`
+
+## [0.9.0] - 2022-11-30
+
+- MSRV is now **1.57**. We soft-updated to this to Rust 1.54 in the v0.8.0 release (with a feature `min-const-generics`), which has now been removed (and as such, we resume having no default features). Rust 1.56 is required for the Rust 2021 edition, and 1.57 is required by some dependencies
 
 - Upgraded from Dear ImGui 1.84.2 to 1.86. See [the 1.85](https://github.com/ocornut/imgui/releases/tag/v1.85) and [the 1.86](https://github.com/ocornut/imgui/releases/tag/v1.86) release notes
+
+- Upgraded winit version to `v0.27` for `imgu-winit-support`
+
+- The `imgui-winit-support` and `imgui-glow-renderer` re-export `winit` and `glow` respectively to make setup easier for simple projects. [PR #676](https://github.com/imgui-rs/imgui-rs/pull/676)
 
 - BREAKING: Removed `push_style_colors` and `push_style_vars`. Instead, use `push_style_color` in a loop. This was deprecated in `0.7.0` and should have been removed in `0.8.0`. This also removes their associated tokens.
 
@@ -35,6 +44,10 @@
 - Added `docking` feature which builds against the upstream docking branch. Only basic API is exposed currently, just enough to enable the docking `imgui_context.io_mut().config_flags |= imgui::ConfigFlags::DOCKING_ENABLE;` - a safe API for programtically docking windows and so on will be added later (until then the internal docking API can be accessed, `imgui::sys::igDockBuilderDockWindow` and so on)
 
 - Fixed dpi related issues when not in `HiDpiMode::Default` mode. The wrong scale factor was used when converting winit physical size to logical size, causing the imgui display size to be incorrect.
+
+- Fixed creation of `.crate` (published to crates.io) so required files for freetype feature are included
+
+- Added binding to TextFilter API. [PR #658](https://github.com/imgui-rs/imgui-rs/pull/658)
 
 ## [0.8.0] - 2021-09-17
 
@@ -771,7 +784,8 @@ As mentioned, the 0.6.1 release of `imgui-winit-support` has been yanked.
 
 - Initial release with cimgui/imgui 1.44, glium 0.9
 
-[unreleased]: https://github.com/Gekkio/imgui-rs/compare/v0.8.0...HEAD
+[unreleased]: https://github.com/Gekkio/imgui-rs/compare/v0.9.0...HEAD
+[0.9.0]: https://github.com/Gekkio/imgui-rs/compare/v0.8.0...v0.9.0
 [0.8.0]: https://github.com/Gekkio/imgui-rs/compare/v0.7.0...v0.8.0
 [0.7.0]: https://github.com/Gekkio/imgui-rs/compare/v0.6.1...v0.7.0
 [0.6.1]: https://github.com/Gekkio/imgui-rs/compare/v0.6.0...v0.6.1

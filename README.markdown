@@ -3,9 +3,7 @@
 [![Build Status](https://github.com/imgui-rs/imgui-rs/workflows/ci/badge.svg)](https://github.com/imgui-rs/imgui-rs/actions)
 [![Latest release on crates.io](https://img.shields.io/crates/v/imgui.svg)](https://crates.io/crates/imgui)
 [![Documentation on docs.rs](https://docs.rs/imgui/badge.svg)](https://docs.rs/imgui)
-[![Wrapped Dear ImGui Version](https://img.shields.io/badge/Dear%20ImGui%20Version-1.84.2-blue.svg)](https://github.com/ocornut/imgui)
-
-(Recently under new maintenance, things subject to change)
+[![Wrapped Dear ImGui Version](https://img.shields.io/badge/Dear%20ImGui%20Version-1.86.0-blue.svg)](https://github.com/ocornut/imgui)
 
 ![Hello world](hello_world.png)
 
@@ -34,11 +32,6 @@ ui.window("Hello world")
 - imgui-glium-renderer: Renderer implementation that uses the `glium` crate
 - imgui-sys: Low-level unsafe API (automatically generated)
 
-Additionally, the following are no longer maintained, but might work still:
-
-- imgui-gfx-renderer: Renderer implementation that uses the `gfx` crate (_not
-   the new gfx-hal crate_). This can be found at [imgui-rs/imgui-gfx-renderer](https://github.com/imgui-rs/imgui-gfx-renderer)
-
 ## Features
 
 - Bindings for Dear ImGui that can be used with safe Rust. Note: API coverage
@@ -51,7 +44,7 @@ Additionally, the following are no longer maintained, but might work still:
 
 ## Minimum Support Rust Version (MSRV)
 
-The MSRV for `imgui-rs` and all of the backend crates is **1.54**. We update our MSRV periodically, and issue a minor bump for it.
+The MSRV for `imgui-rs` and all of the backend crates is **1.57**. We update our MSRV periodically, and issue a minor bump for it.
 
 ## Choosing a backend platform and a renderer
 
@@ -90,6 +83,8 @@ Additionally, there are other libraries which provide other kinds of renderers, 
  1. [`imgui-wgpu`](https://github.com/Yatekii/imgui-wgpu-rs)
  2. [`imgui-d3d12-renderer`](https://github.com/curldivergence/imgui-d3d12-renderer)
  3. [`imgui-dx11-renderer`](https://github.com/veykril/imgui-dx11-renderer)
+ 4. [`imgui-gfx-renderer`](https://github.com/imgui-rs/imgui-gfx-renderer): Deprecated (no longer maintained beyond imgui-rs v0.8). Renderer implementation that uses the `gfx` crate (_not the new gfx-hal crate_)
+
 
 You can also write your own support code if you have a more advanced use case, because **imgui-rs is not tied to any specific graphics / OS API**.
 

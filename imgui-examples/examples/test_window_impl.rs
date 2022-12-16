@@ -53,6 +53,7 @@ struct State {
     stacked_modals_item: usize,
     stacked_modals_color: [f32; 4],
     app_log: Vec<String>,
+    filter: imgui::TextFilter,
 
     tabs: TabState,
 }
@@ -117,6 +118,7 @@ impl Default for State {
             stacked_modals_item: 0,
             stacked_modals_color: [0.4, 0.7, 0.0, 0.5],
             app_log: Vec::new(),
+            filter: TextFilter::new(String::from("Test")),
             tabs: TabState::default(),
         }
     }
@@ -389,13 +391,28 @@ fn show_test_window(ui: &Ui, state: &mut State, opened: &mut bool) {
         }
         if CollapsingHeader::new("Widgets").build(ui) {
             if let Some(_t) = ui.tree_node("Tree") {
-                for i in 0..5 {
+                let num_child = 4;
+                for i in 0..num_child {
                     if let Some(_t) = ui.tree_node(format!("Child {}", i)) {
                         ui.text("blah blah");
                         ui.same_line();
                         if ui.small_button("print") {
                             println!("Child {} pressed", i);
                         }
+                    }
+                }
+
+                {
+                    let tree_node_stack = ui.tree_node_config("##HideTreeNodeLabel")
+                        .allow_item_overlap(true)
+                        .push();
+                    ui.same_line();
+                    if ui.small_button(format!("Child {} is a button", num_child)) {
+                        println!("TreeNode Button pressed.");
+                    }
+
+                    if tree_node_stack.is_some() {
+                        ui.text("blah blah")
                     }
                 }
             }
@@ -728,6 +745,30 @@ CTRL+click on individual component to input value.\n",
                         });
                     });
 
+                }
+            }
+        }
+
+        if CollapsingHeader::new("Filtering").build(ui) {
+            ui.text_wrapped(
+                "Filter usage:\n\
+                 \"\"         display all lines\n\
+                 \"xxx\"      display lines containing \"xxx\"\n\
+                 \"xxx,yyy\"  display lines containing \"xxx\" or \"yyy\"\n\
+                 \"-xxx\"     hide lines containing \"xxx\""
+            );
+
+            state.filter.draw();
+            let lines = vec!["aaa1.c", "bbb1.c", "ccc1.c", "aaa2.cpp", "bbb2.cpp", "ccc2.cpp", "abc.h", "hello, world!"];
+
+            ui.same_line();
+            if ui.button("Clear##clear_filter") {
+                state.filter.clear();
+            }
+
+            for i in lines.iter() {
+                if state.filter.pass_filter(i) {
+                    ui.bullet_text(i);
                 }
             }
         }

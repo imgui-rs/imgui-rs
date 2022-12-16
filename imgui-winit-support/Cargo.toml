@@ -1,32 +1,17 @@
 [package]
 name = "imgui-winit-support"
-version = "0.8.1-alpha.0"
+version = "0.9.0"
 edition = "2018"
-authors = ["The imgui-rs Developers"]
 description = "winit support code for the imgui crate"
 homepage = "https://github.com/imgui-rs/imgui-rs"
 repository = "https://github.com/imgui-rs/imgui-rs"
+documentation = "https://docs.rs/imgui-winit-support"
 license = "MIT/Apache-2.0"
 categories = ["gui"]
 
 [dependencies]
-imgui = { version = "0.8.1-alpha.0", path = "../imgui" }
-winit-19 = { version = ">= 0.16, < 0.20", package = "winit", optional = true }
-winit-20 = { version = ">= 0.20, < 0.22", package = "winit", optional = true }
-winit-22 = { version = "0.22", package = "winit", optional = true }
-winit-23 = { version = "0.23", package = "winit", default-features = false, optional = true }
-winit-24 = { version = "0.24", package = "winit", default-features = false, optional = true }
-winit-25 = { version = "0.25", package = "winit", default-features = false, optional = true }
-winit-26 = { version = "0.26", package = "winit", default-features = false, optional = true }
+imgui = { version = "0.9.0", path = "../imgui" }
+winit = { version = "0.27.2", default-features = false }
 
 [features]
-default = ["winit-26/default"]
-test = ["winit-23/default", "winit-24/default", "winit-25/default", "winit-26/default"]
-
 viewports = [ "imgui/docking" ]
-
-# This is phrased as a negative (unlike most features) so that it needs to be
-# explicitly disabled (and `default-features = false` won't do it). To avoid
-# problems from this we don't expose this in the public API in any way, keeping
-# things additive.
-no-warn-on-multiple = []

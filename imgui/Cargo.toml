@@ -1,11 +1,11 @@
 [package]
 name = "imgui"
-version = "0.8.1-alpha.0"
+version = "0.9.0"
 edition = "2018"
-authors = ["The imgui-rs Developers"]
 description = "High-level Rust bindings to dear imgui"
 homepage = "https://github.com/imgui-rs/imgui-rs"
 repository = "https://github.com/imgui-rs/imgui-rs"
+documentation = "https://docs.rs/imgui"
 license = "MIT/Apache-2.0"
 categories = ["gui", "api-bindings"]
 readme = "../README.markdown"
@@ -17,9 +17,9 @@ features = ["freetype", "docking", "tables-api"]
 
 [dependencies]
 bitflags = "1"
-imgui-sys = { version = "0.8.1-alpha.0", path = "../imgui-sys" }
+imgui-sys = { version = "0.9.0", path = "../imgui-sys" }
 mint = "0.5.6"
-parking_lot = "0.11"
+parking_lot = "0.12"
 cfg-if = "1"
 
 [features]

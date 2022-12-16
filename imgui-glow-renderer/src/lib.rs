@@ -26,7 +26,10 @@
 //! Consider this an example renderer. It is intended to be sufficent for simple
 //! applications running imgui-rs as the final rendering step. If your application
 //! has more specific needs, it's probably best to write your own renderer, in
-//! which case this can be a useful starting point.
+//! which case this can be a useful starting point. This renderer is also not
+//! foolproof (largely due to the global nature of the OpenGL state). For example,
+//! a few "internal" functions are marked `pub` to allow the user more
+//! fine-grained control at the cost of allowing potential rendering errors.
 //!
 //! # sRGB
 //!
@@ -47,6 +50,9 @@ use std::{borrow::Cow, error::Error, fmt::Display, mem::size_of};
 use imgui::{internal::RawWrapper, DrawCmd, DrawData, DrawVert};
 
 use crate::versions::{GlVersion, GlslVersion};
+
+// Re-export glow to make it easier for users to use the correct version.
+pub use glow;
 use glow::{Context, HasContext};
 
 pub mod versions;
@@ -276,6 +282,16 @@ impl Renderer {
         gl_debug_message(gl, "imgui-rs-glow: start render");
         self.state_backup.pre_render(gl, self.gl_version);
 
+        #[cfg(feature = "bind_vertex_array_support")]
+        if self.gl_version.bind_vertex_array_support() {
+            unsafe {
+                self.vertex_array_object = gl
+                    .create_vertex_array()
+                    .map_err(|err| format!("Error creating vertex array object: {}", err))?;
+                gl.bind_vertex_array(Some(self.vertex_array_object));
+            }
+        }
+
         self.set_up_render_state(gl, draw_data, fb_width, fb_height)?;
 
         gl_debug_message(gl, "start loop over draw lists");
@@ -394,16 +410,6 @@ impl Renderer {
         #[cfg(feature = "bind_sampler_support")]
         if self.gl_version.bind_sampler_support() {
             unsafe { gl.bind_sampler(0, None) };
-        }
-
-        #[cfg(feature = "bind_vertex_array_support")]
-        if self.gl_version.bind_vertex_array_support() {
-            unsafe {
-                self.vertex_array_object = gl
-                    .create_vertex_array()
-                    .map_err(|err| format!("Error creating vertex array object: {}", err))?;
-                gl.bind_vertex_array(Some(self.vertex_array_object));
-            }
         }
 
         // TODO: soon it should be possible for these to be `const` functions

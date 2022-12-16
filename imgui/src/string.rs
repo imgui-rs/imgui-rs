@@ -74,36 +74,6 @@ impl UiBuffer {
     }
 }
 
-#[macro_export]
-#[deprecated = "all functions take AsRef<str> now -- use inline strings or `format` instead"]
-macro_rules! im_str {
-    ($e:literal $(,)?) => {{
-        const __INPUT: &str = concat!($e, "\0");
-        {
-            // Trigger a compile error if there's an interior NUL character.
-            const _CHECK_NUL: [(); 0] = [(); {
-                let bytes = __INPUT.as_bytes();
-                let mut i = 0;
-                let mut found_nul = 0;
-                while i < bytes.len() - 1 && found_nul == 0 {
-                    if bytes[i] == 0 {
-                        found_nul = 1;
-                    }
-                    i += 1;
-                }
-                found_nul
-            }];
-            const RESULT: &'static $crate::ImStr = unsafe {
-                $crate::__core::mem::transmute::<&'static [u8], &'static $crate::ImStr>(__INPUT.as_bytes())
-            };
-            RESULT
-        }
-    }};
-    ($e:literal, $($arg:tt)+) => ({
-        $crate::ImString::new(format!($e, $($arg)*))
-    });
-}
-
 /// A UTF-8 encoded, growable, implicitly nul-terminated string.
 #[derive(Clone, Hash, Ord, Eq, PartialOrd, PartialEq)]
 pub struct ImString(pub(crate) Vec<u8>);

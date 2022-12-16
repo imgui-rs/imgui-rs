@@ -167,25 +167,29 @@ impl SdlPlatform {
     ///
     /// * keyboard state is updated
     /// * mouse state is updated
-    pub fn handle_event(&mut self, context: &mut Context, event: &Event) {
+    pub fn handle_event(&mut self, context: &mut Context, event: &Event) -> bool {
         let io = context.io_mut();
 
         match *event {
             Event::MouseWheel { x, y, .. } => {
                 io.mouse_wheel = y as f32;
                 io.mouse_wheel_h = x as f32;
+                true
             }
 
             Event::MouseButtonDown { mouse_btn, .. } => {
                 self.handle_mouse_button(&mouse_btn, true);
+                true
             }
 
             Event::MouseButtonUp { mouse_btn, .. } => {
                 self.handle_mouse_button(&mouse_btn, false);
+                true
             }
 
             Event::TextInput { ref text, .. } => {
                 text.chars().for_each(|c| io.add_input_character(c));
+                true
             }
 
             Event::KeyDown {
@@ -195,6 +199,7 @@ impl SdlPlatform {
             } => {
                 io.keys_down[key as usize] = true;
                 handle_key_modifier(io, &keymod);
+                true
             }
 
             Event::KeyUp {
@@ -204,9 +209,10 @@ impl SdlPlatform {
             } => {
                 io.keys_down[key as usize] = false;
                 handle_key_modifier(io, &keymod);
+                true
             }
 
-            _ => {}
+            _ => false,
         }
     }
 

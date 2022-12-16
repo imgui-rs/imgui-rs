@@ -37,6 +37,7 @@ pub use self::style::*;
 
 #[cfg(feature = "tables-api")]
 pub use self::tables::*;
+pub use self::text_filter::*;
 pub use self::utils::*;
 pub use self::widget::color_editors::*;
 pub use self::widget::combo_box::*;
@@ -89,6 +90,7 @@ mod style;
 mod tables;
 #[cfg(test)]
 mod test;
+pub mod text_filter;
 mod utils;
 mod widget;
 mod window;
@@ -465,6 +467,7 @@ impl Ui {
 
 // Widgets: Input
 impl<'ui> Ui {
+    /// Edits text in a single line input widget
     #[doc(alias = "InputText", alias = "InputTextWithHint")]
     pub fn input_text<'p, L: AsRef<str>>(
         &'ui self,
@@ -473,6 +476,8 @@ impl<'ui> Ui {
     ) -> InputText<'ui, 'p, L> {
         InputText::new(self, label, buf)
     }
+
+    /// Edits text in a multi line widget
     #[doc(alias = "InputText", alias = "InputTextMultiline")]
     pub fn input_text_multiline<'p, L: AsRef<str>>(
         &'ui self,
@@ -482,6 +487,8 @@ impl<'ui> Ui {
     ) -> InputTextMultiline<'ui, 'p, L> {
         InputTextMultiline::new(self, label, buf, size)
     }
+
+    /// Simple floating point number widget
     #[doc(alias = "InputFloat2")]
     pub fn input_float<'p, L: AsRef<str>>(
         &'ui self,
@@ -618,7 +625,7 @@ impl Ui {
     ///     ui.text("Hover over me");
     ///     if ui.is_item_hovered() {
     ///         ui.tooltip(|| {
-    ///             ui.text_colored([1.0, 0.0, 0.0, 1.0], im_str!("I'm red!"));
+    ///             ui.text_colored([1.0, 0.0, 0.0, 1.0], "I'm red!");
     ///         });
     ///     }
     /// }
@@ -685,7 +692,7 @@ impl Ui {
     /// fn user_interface(ui: &Ui) {
     ///     let disable_buttons = true;
     ///     let _d = ui.begin_disabled(disable_buttons);
-    ///     ui.button(im_str!("Dangerous button"));
+    ///     ui.button("Dangerous button");
     /// }
     /// ```
 
@@ -712,7 +719,7 @@ impl Ui {
     /// fn user_interface(ui: &Ui) {
     ///     let safe_mode = true;
     ///     ui.disabled(safe_mode, || {
-    ///         ui.button(im_str!("Dangerous button"));
+    ///         ui.button("Dangerous button");
     ///     });
     /// }
     /// ```
@@ -727,9 +734,7 @@ impl Ui {
     /// [`Ui::begin_enabled`].
     #[doc(alias = "BeginDisabled", alias = "EndDisabled")]
     pub fn enabled<F: FnOnce()>(&self, enabled: bool, f: F) {
-        unsafe { sys::igBeginDisabled(!enabled) };
-        f();
-        unsafe { sys::igEndDisabled() };
+        self.disabled(!enabled, f)
     }
 }
 
@@ -802,6 +807,7 @@ impl Ui {
 }
 
 impl<'ui> Ui {
+    /// Plot a list of floats as a "sparkline" style plot
     #[doc(alias = "PlotLines")]
     pub fn plot_lines<'p, Label: AsRef<str>>(
         &'ui self,
@@ -811,6 +817,7 @@ impl<'ui> Ui {
         PlotLines::new(self, label, values)
     }
 
+    /// Plot a list of floats as a histogram
     #[doc(alias = "PlotHistogram")]
     pub fn plot_histogram<'p, Label: AsRef<str>>(
         &'ui self,
@@ -863,7 +870,11 @@ impl<'ui> Ui {
 
 /// # Draw list for custom drawing
 impl Ui {
-    /// Get access to drawing API
+    /// Get access to drawing API.
+    ///
+    /// The window draw list draws within the current
+    /// window. Coordinates are within the current window coordinates,
+    /// so `[0.0, 0.0]` would be at beginning of window
     ///
     /// # Examples
     ///
@@ -898,12 +909,24 @@ impl Ui {
         DrawListMut::window(self)
     }
 
+    /// Get draw list to draw behind all windows
+    ///
+    /// Coordinates are in window coordinates, so `[0.0, 0.0]` is at
+    /// top left of the Dear ImGui window
+    ///
+    /// See [`Self::get_window_draw_list`] for more details
     #[must_use]
     #[doc(alias = "GetBackgroundDrawList")]
     pub fn get_background_draw_list(&self) -> DrawListMut<'_> {
         DrawListMut::background(self)
     }
 
+    /// Get draw list instance to draw above all window content
+    ///
+    /// Coordinates are in window coordinates, so `[0.0, 0.0]` is at
+    /// top left of the Dear ImGui window
+    ///
+    /// See [`Self::get_window_draw_list`] for more details
     #[must_use]
     #[doc(alias = "GetForegroundDrawList")]
     pub fn get_foreground_draw_list(&self) -> DrawListMut<'_> {

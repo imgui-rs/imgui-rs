@@ -22,7 +22,7 @@ jobs:
 
     strategy:
       matrix:
-        rust: ["1.54"]
+        rust: ["1.57"]
 
     env:
       RUSTFLAGS: -D warnings
@@ -67,15 +67,8 @@ jobs:
       - name: freetype and docking
         run: cargo clippy --workspace --all-targets --features freetype,docking
 
-      # supported winit versions (with otherwise default features)
-      - run: cargo doc
-      - run: cargo clippy --manifest-path imgui-winit-support/Cargo.toml --no-default-features --features winit-19 --all-targets
-      - run: cargo clippy --manifest-path imgui-winit-support/Cargo.toml --no-default-features --features winit-20 --all-targets
-      - run: cargo clippy --manifest-path imgui-winit-support/Cargo.toml --no-default-features --features winit-22 --all-targets
-      - run: cargo clippy --manifest-path imgui-winit-support/Cargo.toml --no-default-features --features winit-23/default --all-targets
-      - run: cargo clippy --manifest-path imgui-winit-support/Cargo.toml --no-default-features --features winit-24/default --all-targets
-      - run: cargo clippy --manifest-path imgui-winit-support/Cargo.toml --no-default-features --features winit-25/default --all-targets
-      - run: cargo clippy --manifest-path imgui-winit-support/Cargo.toml --no-default-features --features winit-26/default --all-targets
+      - name: all features
+        run: cargo clippy --workspace --all-targets --features docking,freetype
 
   test:
     name: Run tests
@@ -89,7 +82,7 @@ jobs:
         rust:
           - stable
           - beta
-          - "1.54"
+          - "1.57"
         os:
           - ubuntu-latest
           - macos-latest
@@ -147,20 +140,17 @@ jobs:
         if: matrix.os != 'windows-latest'
         run: cargo test --workspace --all-targets --features freetype
 
-      - name: freetype and docking
+      - name: all features
         if: matrix.os != 'windows-latest'
-        run: cargo test --workspace --all-targets --features freetype,docking
+        run: cargo test --workspace --all-targets --features docking,freetype
 
-      - run: cargo test --workspace --doc
+      - name: doc tests
+        run: cargo test --workspace --doc
+
       # run to check for lint problems
-      - run: cargo doc
-      - run: cargo test --manifest-path imgui-winit-support/Cargo.toml --no-default-features --features winit-19
-      - run: cargo test --manifest-path imgui-winit-support/Cargo.toml --no-default-features --features winit-20
-      - run: cargo test --manifest-path imgui-winit-support/Cargo.toml --no-default-features --features winit-22
-      - run: cargo test --manifest-path imgui-winit-support/Cargo.toml --no-default-features --features winit-23/default
-      - run: cargo test --manifest-path imgui-winit-support/Cargo.toml --no-default-features --features winit-24/default
-      - run: cargo test --manifest-path imgui-winit-support/Cargo.toml --no-default-features --features winit-25/default
-      - run: cargo test --manifest-path imgui-winit-support/Cargo.toml --no-default-features --features winit-26/default
+      - name: build documentation
+        run: cargo doc
+
       # Run unreasonably slow tests under release, but only the crates that have
       # them, and don't bother doing this on most platforms.
       - run: cargo test -p imgui --release -- --ignored
