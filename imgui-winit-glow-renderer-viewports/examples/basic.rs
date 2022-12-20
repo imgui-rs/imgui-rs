@@ -1,4 +1,4 @@
-use std::{ffi::CString, num::NonZeroU32};
+use std::{ffi::CString, num::NonZeroU32, time::Instant};
 
 use glow::{Context, HasContext};
 use glutin::{
@@ -12,7 +12,7 @@ use glutin_winit::DisplayBuilder;
 use imgui::ConfigFlags;
 use imgui_winit_glow_renderer_viewports::Renderer;
 use raw_window_handle::HasRawWindowHandle;
-use winit::{dpi::LogicalSize, event_loop::EventLoop, window::WindowBuilder};
+use winit::{dpi::LogicalSize, event_loop::EventLoop, window::WindowBuilder, event::WindowEvent};
 
 fn main() {
     let event_loop = EventLoop::new();
@@ -74,8 +74,11 @@ fn main() {
         .io_mut()
         .config_flags
         .insert(ConfigFlags::VIEWPORTS_ENABLE);
+    imgui.set_ini_filename(None);
 
     let mut renderer = Renderer::new(&mut imgui, &window, &glow).expect("Failed to init Renderer");
+
+    let mut last_frame = Instant::now();
 
     event_loop.run(move |event, window_target, control_flow| {
         control_flow.set_poll();
@@ -83,13 +86,26 @@ fn main() {
         renderer.handle_event(&mut imgui, &window, &event);
 
         match event {
+            winit::event::Event::NewEvents(_) => {
+                let now = Instant::now();
+                imgui.io_mut().update_delta_time(now - last_frame);
+                last_frame = now;
+            },
+            winit::event::Event::WindowEvent { window_id, event: WindowEvent::CloseRequested } if window_id == window.id() => {
+                control_flow.set_exit();
+            },
             winit::event::Event::MainEventsCleared => {
                 window.request_redraw();
             },
             winit::event::Event::RedrawRequested(_) => {
                 let ui = imgui.frame();
 
+                ui.dockspace_over_main_viewport();
+
                 ui.show_demo_window(&mut true);
+                ui.window("Style Editor").build(|| {
+                    ui.show_default_style_editor();
+                });
 
                 ui.end_frame_early();
 
@@ -98,9 +114,14 @@ fn main() {
 
                 let draw_data = imgui.render();
 
-                context.make_current(&surface).expect("Failed to make current");
+                if let Err(e) = context.make_current(&surface) {
+                    // For some reason make_current randomly throws errors on windows.
+                    // Until the reason for this is found, we just print it out instead of panicing.
+                    eprintln!("Failed to make current: {e}");
+                }
 
                 unsafe {
+                    glow.disable(glow::SCISSOR_TEST);
                     glow.clear(glow::COLOR_BUFFER_BIT);
                 }
 

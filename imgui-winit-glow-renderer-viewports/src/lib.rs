@@ -3,7 +3,8 @@ use std::{
     collections::{HashMap, VecDeque},
     num::NonZeroU32,
     ptr::null_mut,
-    rc::Rc, slice,
+    rc::Rc,
+    slice,
 };
 
 use glow::HasContext;
@@ -12,7 +13,7 @@ use glutin::{
     context::{ContextAttributesBuilder, NotCurrentContext},
     display::GetGlDisplay,
     prelude::{GlDisplay, NotCurrentGlContextSurfaceAccessor, PossiblyCurrentGlContext},
-    surface::{Surface, SurfaceAttributesBuilder, WindowSurface, GlSurface},
+    surface::{GlSurface, Surface, SurfaceAttributesBuilder, WindowSurface},
 };
 use glutin_winit::DisplayBuilder;
 use imgui::{BackendFlags, Id, Key, ViewportFlags};
@@ -160,22 +161,6 @@ impl GlObjects {
             tex
         };
 
-        let vao = unsafe {
-            let vao = glow
-                .create_vertex_array()
-                .map_err(|e| RendererError::GlObjectCreationError(e))?;
-
-            glow.bind_vertex_array(Some(vao));
-            glow.enable_vertex_attrib_array(0);
-            glow.enable_vertex_attrib_array(1);
-            glow.enable_vertex_attrib_array(2);
-            glow.vertex_attrib_pointer_f32(0, 2, glow::FLOAT, false, 20, 0);
-            glow.vertex_attrib_pointer_f32(0, 2, glow::FLOAT, false, 20, 8);
-            glow.vertex_attrib_pointer_f32(0, 4, glow::UNSIGNED_BYTE, true, 20, 16);
-
-            vao
-        };
-
         let vbo = unsafe {
             glow.create_buffer()
                 .map_err(|e| RendererError::GlObjectCreationError(e))?
@@ -183,6 +168,25 @@ impl GlObjects {
         let ibo = unsafe {
             glow.create_buffer()
                 .map_err(|e| RendererError::GlObjectCreationError(e))?
+        };
+
+        let vao = unsafe {
+            let vao = glow
+                .create_vertex_array()
+                .map_err(|e| RendererError::GlObjectCreationError(e))?;
+
+            glow.bind_vertex_array(Some(vao));
+            glow.bind_buffer(glow::ARRAY_BUFFER, Some(vbo));
+            glow.bind_buffer(glow::ELEMENT_ARRAY_BUFFER, Some(ibo));
+            glow.enable_vertex_attrib_array(0);
+            glow.enable_vertex_attrib_array(1);
+            glow.enable_vertex_attrib_array(2);
+            glow.vertex_attrib_pointer_f32(0, 2, glow::FLOAT, false, 20, 0);
+            glow.vertex_attrib_pointer_f32(1, 2, glow::FLOAT, false, 20, 8);
+            glow.vertex_attrib_pointer_f32(2, 4, glow::UNSIGNED_BYTE, true, 20, 16);
+            glow.bind_vertex_array(None);
+
+            vao
         };
 
         Ok(Self {
@@ -295,7 +299,7 @@ impl Renderer {
             gl_objects,
             glutin_config: None,
             extra_windows: HashMap::new(),
-            event_queue: Rc::new(RefCell::new(VecDeque::new())),
+            event_queue,
             font_width: font_tex.width,
             font_height: font_tex.height,
             font_pixels: font_tex.data.to_vec(),
@@ -313,18 +317,20 @@ impl Renderer {
                 window_id,
                 ref event,
             } => {
-                let viewport = if window_id == main_window.id() {
-                    imgui.main_viewport_mut()
+                let (window, viewport) = if window_id == main_window.id() {
+                    (main_window, imgui.main_viewport_mut())
                 } else {
-                    if let Some(id) = self.extra_windows.iter().find_map(|(id, (wnd, _, _, _))| {
-                        if wnd.id() == window_id {
-                            Some(*id)
-                        } else {
-                            None
-                        }
-                    }) {
+                    if let Some((id, wnd)) =
+                        self.extra_windows.iter().find_map(|(id, (wnd, _, _, _))| {
+                            if wnd.id() == window_id {
+                                Some((*id, wnd))
+                            } else {
+                                None
+                            }
+                        })
+                    {
                         if let Some(viewport) = imgui.viewport_by_id_mut(id) {
-                            viewport
+                            (wnd, viewport)
                         } else {
                             return;
                         }
@@ -335,18 +341,21 @@ impl Renderer {
 
                 match *event {
                     winit::event::WindowEvent::Resized(new_size) => {
-                        viewport.size = [new_size.width as f32, new_size.height as f32];
-                        viewport.work_size = viewport.size;
+                        unsafe {
+                            (*(viewport.platform_user_data.cast::<ViewportData>())).size =
+                                [new_size.width as f32, new_size.height as f32];
+                        }
 
                         if window_id == main_window.id() {
                             imgui.io_mut().display_size =
                                 [new_size.width as f32, new_size.height as f32];
                         }
                     }
-                    winit::event::WindowEvent::Moved(new_pos) => {
-                        viewport.pos = [new_pos.x as f32, new_pos.y as f32];
-                        viewport.work_pos = viewport.pos;
-                    }
+                    winit::event::WindowEvent::Moved(_) => unsafe {
+                        let new_pos = window.inner_position().unwrap().cast::<f32>();
+                        (*(viewport.platform_user_data.cast::<ViewportData>())).pos =
+                            [new_pos.x as f32, new_pos.y as f32];
+                    },
                     winit::event::WindowEvent::CloseRequested if window_id != main_window.id() => {
                         viewport.platform_request_close = true;
                     }
@@ -368,7 +377,11 @@ impl Renderer {
                         imgui.io_mut().keys_down[key as usize] = true;
                     }
                     winit::event::WindowEvent::CursorMoved { position, .. } => {
-                        imgui.io_mut().mouse_pos = [position.x as f32, position.y as f32];
+                        let window_pos = window.inner_position().unwrap().cast::<f32>();
+                        imgui.io_mut().mouse_pos = [
+                            position.x as f32 + window_pos.x,
+                            position.y as f32 + window_pos.y,
+                        ];
                     }
                     winit::event::WindowEvent::MouseWheel {
                         delta,
@@ -582,13 +595,20 @@ impl Renderer {
     ) -> Result<(), RendererError> {
         for (id, (wnd, context, surface, gl_objects)) in &mut self.extra_windows {
             if let Some(viewport) = imgui.viewport_by_id(*id) {
-                let current_context = context.take().unwrap().make_current(surface).map_err(|_| RendererError::GlutinDisplay)?;
+                let current_context = context
+                    .take()
+                    .unwrap()
+                    .make_current(surface)
+                    .map_err(|_| RendererError::GlutinDisplay)?;
 
                 unsafe {
+                    glow.disable(glow::SCISSOR_TEST);
                     glow.clear(glow::COLOR_BUFFER_BIT);
                 }
                 Self::render_window(wnd, glow, viewport.draw_data(), gl_objects)?;
-                surface.swap_buffers(&current_context).map_err(|_| RendererError::GlutinDisplay)?;
+                surface
+                    .swap_buffers(&current_context)
+                    .map_err(|_| RendererError::GlutinDisplay)?;
 
                 *context = Some(current_context.make_not_current().unwrap());
             }
@@ -608,6 +628,10 @@ impl Renderer {
 
             glow.viewport(0, 0, window_size.width as i32, window_size.height as i32);
 
+            glow.enable(glow::BLEND);
+            glow.blend_func(glow::SRC_ALPHA, glow::ONE_MINUS_SRC_ALPHA);
+            glow.enable(glow::SCISSOR_TEST);
+
             glow.bind_vertex_array(Some(gl_objects.vao));
             glow.bind_buffer(glow::ARRAY_BUFFER, Some(gl_objects.vbo));
             glow.bind_buffer(glow::ELEMENT_ARRAY_BUFFER, Some(gl_objects.ibo));
@@ -619,28 +643,67 @@ impl Renderer {
             let right = draw_data.display_pos[0] + draw_data.display_size[0];
             let top = draw_data.display_pos[1];
             let bottom = draw_data.display_pos[1] + draw_data.display_size[1];
-            
 
             let matrix = [
-            2.0 / (right - left)           , 0.0                            , 0.0 , 0.0,
-            0.0                            , (2.0 / (top - bottom))         , 0.0 , 0.0,
-            0.0                            , 0.0                            , -1.0, 0.0,
-            (right + left) / (left - right), (top + bottom) / (bottom - top), 0.0 , 1.0,
+                2.0 / (right - left),
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                (2.0 / (top - bottom)),
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                -1.0,
+                0.0,
+                (right + left) / (left - right),
+                (top + bottom) / (bottom - top),
+                0.0,
+                1.0,
             ];
 
-            let loc = glow.get_uniform_location(gl_objects.program, "u_Matrix").unwrap();
+            let loc = glow
+                .get_uniform_location(gl_objects.program, "u_Matrix")
+                .unwrap();
             glow.uniform_matrix_4_f32_slice(Some(&loc), false, &matrix);
 
             for list in draw_data.draw_lists() {
-                glow.buffer_data_u8_slice(glow::ARRAY_BUFFER, slice::from_raw_parts(list.vtx_buffer().as_ptr().cast(), list.vtx_buffer().len() * 20), glow::STREAM_DRAW);
-                glow.buffer_data_u8_slice(glow::ELEMENT_ARRAY_BUFFER, slice::from_raw_parts(list.idx_buffer().as_ptr().cast(), list.idx_buffer().len() * 2), glow::STREAM_DRAW);
+                glow.buffer_data_u8_slice(
+                    glow::ARRAY_BUFFER,
+                    slice::from_raw_parts(
+                        list.vtx_buffer().as_ptr().cast(),
+                        list.vtx_buffer().len() * 20,
+                    ),
+                    glow::STREAM_DRAW,
+                );
+                glow.buffer_data_u8_slice(
+                    glow::ELEMENT_ARRAY_BUFFER,
+                    slice::from_raw_parts(
+                        list.idx_buffer().as_ptr().cast(),
+                        list.idx_buffer().len() * 2,
+                    ),
+                    glow::STREAM_DRAW,
+                );
 
                 for cmd in list.commands() {
                     match cmd {
                         imgui::DrawCmd::Elements { count, cmd_params } => {
-                            glow.draw_elements_base_vertex(glow::TRIANGLES, count as i32, glow::UNSIGNED_SHORT, (cmd_params.idx_offset * 2) as i32, cmd_params.vtx_offset as i32);
-                        },
-                        _ => {},
+                            let clip_x1 = (cmd_params.clip_rect[0] - draw_data.display_pos[0]) as i32;
+                            let clip_y1 = (cmd_params.clip_rect[1] - draw_data.display_pos[1]) as i32;
+                            let clip_x2 = (cmd_params.clip_rect[2] - draw_data.display_pos[0]) as i32;
+                            let clip_y2 = (cmd_params.clip_rect[3] - draw_data.display_pos[1]) as i32;
+
+                            glow.scissor(clip_x1, window_size.height as i32 - clip_y2, clip_x2 - clip_x1, clip_y2 - clip_y1);
+                            glow.draw_elements_base_vertex(
+                                glow::TRIANGLES,
+                                count as i32,
+                                glow::UNSIGNED_SHORT,
+                                (cmd_params.idx_offset * 2) as i32,
+                                cmd_params.vtx_offset as i32,
+                            );
+                        }
+                        _ => {}
                     }
                 }
             }
