@@ -75,28 +75,35 @@ impl Image {
 /// Builder for an image button widget
 #[derive(Copy, Clone, Debug)]
 #[must_use]
-pub struct ImageButton {
+pub struct ImageButton<'ui, StrId> {
+    str_id: StrId,
     texture_id: TextureId,
     size: [f32; 2],
     uv0: [f32; 2],
     uv1: [f32; 2],
-    frame_padding: i32,
     bg_col: [f32; 4],
     tint_col: [f32; 4],
+    ui: &'ui Ui,
 }
 
-impl ImageButton {
+impl<'ui, StrId: AsRef<str>> ImageButton<'ui, StrId> {
     /// Creates a new image button builder with the given texture and size
-    #[doc(alias = "ImageButton")]
-    pub fn new(texture_id: TextureId, size: impl Into<MintVec2>) -> ImageButton {
-        ImageButton {
+    #[deprecated(since = "0.10.0", note = "Use `ui.image_button_config(...)` instead")]
+    pub fn new(
+        ui: &'ui Ui,
+        str_id: StrId,
+        texture_id: TextureId,
+        size: impl Into<MintVec2>,
+    ) -> Self {
+        Self {
+            str_id,
             texture_id,
             size: size.into().into(),
             uv0: [0.0, 0.0],
             uv1: [1.0, 1.0],
-            frame_padding: -1,
             bg_col: [0.0, 0.0, 0.0, 0.0],
             tint_col: [1.0, 1.0, 1.0, 1.0],
+            ui,
         }
     }
 
@@ -116,15 +123,6 @@ impl ImageButton {
         self.uv1 = uv1.into().into();
         self
     }
-    /// Sets the frame padding (default: uses frame padding from style).
-    ///
-    /// - `< 0`: uses frame padding from style (default)
-    /// - `= 0`: no framing
-    /// - `> 0`: set framing size
-    pub fn frame_padding(mut self, frame_padding: i32) -> Self {
-        self.frame_padding = frame_padding;
-        self
-    }
     /// Sets the background color (default: no background color)
     pub fn background_col(mut self, bg_col: impl Into<MintVec4>) -> Self {
         self.bg_col = bg_col.into().into();
@@ -136,17 +134,56 @@ impl ImageButton {
         self
     }
     /// Builds the image button
-    pub fn build(self, _: &Ui) -> bool {
+    pub fn build(self) -> bool {
         unsafe {
             sys::igImageButton(
+                self.ui.scratch_txt(self.str_id),
                 self.texture_id.id() as *mut c_void,
                 self.size.into(),
                 self.uv0.into(),
                 self.uv1.into(),
-                self.frame_padding,
                 self.bg_col.into(),
                 self.tint_col.into(),
             )
+        }
+    }
+}
+
+impl Ui {
+    pub fn image_button(
+        &self,
+        str_id: impl AsRef<str>,
+        texture_id: TextureId,
+        size: impl Into<MintVec2>,
+    ) -> bool {
+        ImageButton {
+            str_id,
+            texture_id,
+            size: size.into().into(),
+            uv0: [0.0, 0.0],
+            uv1: [1.0, 1.0],
+            bg_col: [0.0, 0.0, 0.0, 0.0],
+            tint_col: [1.0, 1.0, 1.0, 1.0],
+            ui: self,
+        }
+        .build()
+    }
+
+    pub fn image_button_config<IdStr: AsRef<str>>(
+        &self,
+        str_id: IdStr,
+        texture_id: TextureId,
+        size: impl Into<MintVec2>,
+    ) -> ImageButton<'_, IdStr> {
+        ImageButton {
+            str_id,
+            texture_id,
+            size: size.into().into(),
+            uv0: [0.0, 0.0],
+            uv1: [1.0, 1.0],
+            bg_col: [0.0, 0.0, 0.0, 0.0],
+            tint_col: [1.0, 1.0, 1.0, 1.0],
+            ui: self,
         }
     }
 }

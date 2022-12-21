@@ -203,6 +203,42 @@ impl HiDpiMode {
     }
 }
 
+fn to_imgui_key(keycode: VirtualKeyCode) -> Option<Key> {
+    match keycode {
+        VirtualKeyCode::Tab => Some(Key::Tab),
+        VirtualKeyCode::Left => Some(Key::LeftArrow),
+        VirtualKeyCode::Right => Some(Key::RightArrow),
+        VirtualKeyCode::Up => Some(Key::UpArrow),
+        VirtualKeyCode::Down => Some(Key::DownArrow),
+        VirtualKeyCode::PageUp => Some(Key::PageUp),
+        VirtualKeyCode::PageDown => Some(Key::PageDown),
+        VirtualKeyCode::Home => Some(Key::Home),
+        VirtualKeyCode::End => Some(Key::End),
+        VirtualKeyCode::Insert => Some(Key::Insert),
+        VirtualKeyCode::Delete => Some(Key::Delete),
+        VirtualKeyCode::Back => Some(Key::Backspace),
+        VirtualKeyCode::Space => Some(Key::Space),
+        VirtualKeyCode::Return => Some(Key::Enter),
+        VirtualKeyCode::Escape => Some(Key::Escape),
+        VirtualKeyCode::NumpadEnter => Some(Key::KeypadEnter),
+        VirtualKeyCode::A => Some(Key::A),
+        VirtualKeyCode::C => Some(Key::C),
+        VirtualKeyCode::V => Some(Key::V),
+        VirtualKeyCode::X => Some(Key::X),
+        VirtualKeyCode::Y => Some(Key::Y),
+        VirtualKeyCode::Z => Some(Key::Z),
+        VirtualKeyCode::LControl => Some(Key::LeftCtrl),
+        VirtualKeyCode::RControl => Some(Key::RightCtrl),
+        VirtualKeyCode::LShift => Some(Key::LeftShift),
+        VirtualKeyCode::RShift => Some(Key::RightShift),
+        VirtualKeyCode::LAlt => Some(Key::LeftAlt),
+        VirtualKeyCode::RAlt => Some(Key::RightAlt),
+        VirtualKeyCode::LWin => Some(Key::LeftSuper),
+        VirtualKeyCode::RWin => Some(Key::RightSuper),
+        _ => None,
+    }
+}
+
 impl WinitPlatform {
     /// Initializes a winit platform instance and configures imgui.
     ///
@@ -215,28 +251,6 @@ impl WinitPlatform {
         let io = imgui.io_mut();
         io.backend_flags.insert(BackendFlags::HAS_MOUSE_CURSORS);
         io.backend_flags.insert(BackendFlags::HAS_SET_MOUSE_POS);
-        io[Key::Tab] = VirtualKeyCode::Tab as _;
-        io[Key::LeftArrow] = VirtualKeyCode::Left as _;
-        io[Key::RightArrow] = VirtualKeyCode::Right as _;
-        io[Key::UpArrow] = VirtualKeyCode::Up as _;
-        io[Key::DownArrow] = VirtualKeyCode::Down as _;
-        io[Key::PageUp] = VirtualKeyCode::PageUp as _;
-        io[Key::PageDown] = VirtualKeyCode::PageDown as _;
-        io[Key::Home] = VirtualKeyCode::Home as _;
-        io[Key::End] = VirtualKeyCode::End as _;
-        io[Key::Insert] = VirtualKeyCode::Insert as _;
-        io[Key::Delete] = VirtualKeyCode::Delete as _;
-        io[Key::Backspace] = VirtualKeyCode::Back as _;
-        io[Key::Space] = VirtualKeyCode::Space as _;
-        io[Key::Enter] = VirtualKeyCode::Return as _;
-        io[Key::Escape] = VirtualKeyCode::Escape as _;
-        io[Key::KeyPadEnter] = VirtualKeyCode::NumpadEnter as _;
-        io[Key::A] = VirtualKeyCode::A as _;
-        io[Key::C] = VirtualKeyCode::C as _;
-        io[Key::V] = VirtualKeyCode::V as _;
-        io[Key::X] = VirtualKeyCode::X as _;
-        io[Key::Y] = VirtualKeyCode::Y as _;
-        io[Key::Z] = VirtualKeyCode::Z as _;
         imgui.set_platform_name(Some(format!(
             "imgui-winit-support {}",
             env!("CARGO_PKG_VERSION")
@@ -353,7 +367,9 @@ impl WinitPlatform {
                     }),
                 ..
             } => {
-                io.keys_down[key as usize] = false;
+                if let Some(key) = to_imgui_key(key) {
+                    io.add_key_event(key, false);
+                }
             }
             _ => (),
         }
@@ -395,19 +411,9 @@ impl WinitPlatform {
                     },
                 ..
             } => {
-                let pressed = state == ElementState::Pressed;
-                io.keys_down[key as usize] = pressed;
-
-                // This is a bit redundant here, but we'll leave it in. The OS occasionally
-                // fails to send modifiers keys, but it doesn't seem to send false-positives,
-                // so double checking isn't terrible in case some system *doesn't* send
-                // device events sometimes.
-                match key {
-                    VirtualKeyCode::LShift | VirtualKeyCode::RShift => io.key_shift = pressed,
-                    VirtualKeyCode::LControl | VirtualKeyCode::RControl => io.key_ctrl = pressed,
-                    VirtualKeyCode::LAlt | VirtualKeyCode::RAlt => io.key_alt = pressed,
-                    VirtualKeyCode::LWin | VirtualKeyCode::RWin => io.key_super = pressed,
-                    _ => (),
+                if let Some(key) = to_imgui_key(key) {
+                    let pressed = state == ElementState::Pressed;
+                    io.add_key_event(key, pressed);
                 }
             }
             WindowEvent::ReceivedCharacter(ch) => {
@@ -420,7 +426,8 @@ impl WinitPlatform {
             WindowEvent::CursorMoved { position, .. } => {
                 let position = position.to_logical(window.scale_factor());
                 let position = self.scale_pos_from_winit(window, position);
-                io.mouse_pos = [position.x as f32, position.y as f32];
+                //io.mouse_pos = [position.x as f32, position.y as f32];
+                io.add_mouse_pos_event([position.x as f32, position.y as f32]);
             }
             WindowEvent::MouseWheel {
                 delta,

@@ -121,7 +121,7 @@ fn generate_binding_file(
         "--use-core",
     ];
     cmd.args(a);
-    cmd.args(&["--blacklist-type", "__darwin_size_t"]);
+    cmd.args(&["--blocklist-type", "__darwin_size_t"]);
     cmd.args(&["--raw-line", "#![allow(nonstandard_style, clippy::all)]"]);
     cmd.arg("--output").arg(output);
     cmd.args(&["--ctypes-prefix", "cty"]);
@@ -130,10 +130,10 @@ fn generate_binding_file(
         cmd.args(&["--wasm-import-module-name", name]);
     }
     for t in types {
-        cmd.args(&["--whitelist-type", t]);
+        cmd.args(&["--allowlist-type", t]);
     }
     for f in funcs {
-        cmd.args(&["--whitelist-function", f]);
+        cmd.args(&["--allowlist-function", f]);
     }
     cmd.arg(header);
     cmd.args(&["--", "-DCIMGUI_DEFINE_ENUMS_AND_STRUCTS=1"]);

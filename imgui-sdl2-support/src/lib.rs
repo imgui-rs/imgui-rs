@@ -141,7 +141,7 @@ impl SdlPlatform {
         io[Key::Space] = Scancode::Space as _;
         io[Key::Enter] = Scancode::Return as _;
         io[Key::Escape] = Scancode::Escape as _;
-        io[Key::KeyPadEnter] = Scancode::KpEnter as _;
+        io[Key::KeypadEnter] = Scancode::KpEnter as _;
         io[Key::A] = Scancode::A as _;
         io[Key::C] = Scancode::C as _;
         io[Key::V] = Scancode::V as _;

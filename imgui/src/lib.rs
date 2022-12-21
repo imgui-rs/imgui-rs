@@ -306,20 +306,20 @@ impl Id {
 impl Ui {
     pub fn new_id(&self, input: usize) -> Id {
         let p = input as *const std::os::raw::c_void;
-        let value = unsafe { sys::igGetIDPtr(p) };
+        let value = unsafe { sys::igGetID_Ptr(p) };
 
         Id(value)
     }
 
     pub fn new_id_int(&self, input: i32) -> Id {
         let p = input as *const std::os::raw::c_void;
-        let value = unsafe { sys::igGetIDPtr(p) };
+        let value = unsafe { sys::igGetID_Ptr(p) };
         Id(value)
     }
 
     pub fn new_id_ptr<T>(&self, input: &T) -> Id {
         let p = input as *const T as *const sys::cty::c_void;
-        let value = unsafe { sys::igGetIDPtr(p) };
+        let value = unsafe { sys::igGetID_Ptr(p) };
         Id(value)
     }
 
@@ -329,7 +329,7 @@ impl Ui {
         let s1 = s.as_ptr() as *const std::os::raw::c_char;
         let value = unsafe {
             let s2 = s1.add(s.len());
-            sys::igGetIDStrStr(s1, s2)
+            sys::igGetID_StrStr(s1, s2)
         };
         Id(value)
     }
@@ -751,7 +751,7 @@ impl Ui {
         };
 
         unsafe {
-            sys::igListBoxStr_arr(
+            sys::igListBox_Str_arr(
                 label_ptr,
                 current_item,
                 items_inner.as_ptr() as *mut *const c_char,

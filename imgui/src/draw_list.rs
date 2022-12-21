@@ -348,7 +348,7 @@ impl<'ui> DrawListMut<'ui> {
         unsafe {
             let start = text.as_ptr() as *const c_char;
             let end = (start as usize + text.len()) as *const c_char;
-            sys::ImDrawList_AddTextVec2(
+            sys::ImDrawList_AddText_Vec2(
                 self.draw_list,
                 pos.into().into(),
                 col.into().into(),
