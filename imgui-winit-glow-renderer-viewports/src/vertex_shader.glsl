@@ -1,5 +1,3 @@
-#version 450
-
 layout(location = 0) in vec2 in_Position;
 layout(location = 1) in vec2 in_UV;
 layout(location = 2) in vec4 in_Color;

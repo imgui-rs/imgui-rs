@@ -1,9 +1,7 @@
-#version 450 core
-
 in vec2 v2f_UV;
 in vec4 v2f_Color;
 
-layout(location = 0) uniform sampler2D u_FontTexture;
+uniform sampler2D u_FontTexture;
 
 layout(location = 0) out vec4 out_Color;
 
