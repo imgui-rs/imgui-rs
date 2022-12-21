@@ -188,7 +188,7 @@ pub struct Io {
     #[cfg(feature = "docking")]
     pub config_viewports_no_auto_merge: bool,
     #[cfg(feature = "docking")]
-    pub config_viewports_notask_bar_icon: bool,
+    pub config_viewports_no_task_bar_icon: bool,
     #[cfg(feature = "docking")]
     pub config_viewports_no_decoration: bool,
     #[cfg(feature = "docking")]
@@ -312,6 +312,8 @@ pub struct Io {
     /// Most users don't have a mouse with a horizontal wheel, and may not be filled by all
     /// backends.
     pub mouse_wheel_h: f32,
+    #[cfg(feature = "docking")]
+    mouse_hovered_viewport: sys::ImGuiID,
     /// Keyboard modifier pressed: Control
     pub key_ctrl: bool,
     /// Keyboard modifier pressed: Shift
@@ -337,6 +339,8 @@ pub struct Io {
     mouse_down_owned_unless_popup_close: [bool; 5],
     mouse_down_duration: [f32; 5],
     mouse_down_duration_prev: [f32; 5],
+    #[cfg(feature = "docking")]
+    mouse_drag_max_distance_abs: [sys::ImVec2; 5],
     mouse_drag_max_distance_sqr: [f32; 5],
     pen_pressure: f32,
 

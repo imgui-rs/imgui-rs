@@ -345,7 +345,13 @@ impl Ui {
     #[inline]
     #[doc(alias = "IsKeyDown")]
     pub fn is_key_index_down(&self, key_index: u32) -> bool {
-        unsafe { sys::igIsKeyDown(key_index) }
+        cfg_if::cfg_if!{
+            if #[cfg(feature = "docking")] {
+                unsafe { sys::igIsKeyDown_Nil(key_index) }
+            } else {
+                unsafe { sys::igIsKeyDown(key_index) }
+            }
+        }
     }
 
     /// Returns true if the key was pressed (went from !down to down).
@@ -365,7 +371,13 @@ impl Ui {
     #[inline]
     #[doc(alias = "IsKeyPressed")]
     pub fn is_key_index_pressed(&self, key_index: u32) -> bool {
-        unsafe { sys::igIsKeyPressed(key_index, true) }
+        cfg_if::cfg_if!{
+            if #[cfg(feature = "docking")] {
+                unsafe { sys::igIsKeyPressed_Bool(key_index, true) }
+            } else {
+                unsafe { sys::igIsKeyPressed(key_index, true) }
+            }
+        }
     }
 
     /// Returns true if the key was pressed (went from !down to down).
@@ -386,7 +398,13 @@ impl Ui {
     #[inline]
     #[doc(alias = "IsKeyPressed")]
     pub fn is_key_index_pressed_no_repeat(&self, key_index: u32) -> bool {
-        unsafe { sys::igIsKeyPressed(key_index, false) }
+        cfg_if::cfg_if!{
+            if #[cfg(feature = "docking")] {
+                unsafe { sys::igIsKeyPressed_Bool(key_index, false) }
+            } else {
+                unsafe { sys::igIsKeyPressed(key_index, false) }
+            }
+        }
     }
 
     /// Returns true if the key was released (went from down to !down)
@@ -404,7 +422,13 @@ impl Ui {
     #[inline]
     #[doc(alias = "IsKeyReleased")]
     pub fn is_key_index_released(&self, key_index: u32) -> bool {
-        unsafe { sys::igIsKeyReleased(key_index) }
+        cfg_if::cfg_if!{
+            if #[cfg(feature = "docking")] {
+                unsafe { sys::igIsKeyReleased_Nil(key_index) }
+            } else {
+                unsafe { sys::igIsKeyReleased(key_index) }
+            }
+        }
     }
 
     /// Returns a count of key presses using the given repeat rate/delay settings.
