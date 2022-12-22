@@ -74,7 +74,6 @@
 //! ```
 
 use imgui::{self, BackendFlags, ConfigFlags, Context, Io, Key, Ui};
-use std::cell::Cell;
 use std::cmp::Ordering;
 
 // Re-export winit to make it easier for users to use the correct version.
@@ -90,45 +89,12 @@ use winit::{
     window::{CursorIcon as MouseCursor, Window},
 };
 
-/// State of a single mouse button. Used so that we can detect cases where mouse
-/// press and release occur on the same frame (seems surprisingly frequent on
-/// macOS now...)
-#[derive(Debug, Clone, Default)]
-struct Button {
-    pressed_this_frame: Cell<bool>,
-    state: Cell<bool>,
-}
-
-impl Button {
-    // we can use this in an array initializer, unlike `Default::default()` or a
-    // `const fn new()`.
-    #[allow(clippy::declare_interior_mutable_const)]
-    const INIT: Button = Self {
-        pressed_this_frame: Cell::new(false),
-        state: Cell::new(false),
-    };
-    fn set(&self, pressed: bool) {
-        self.state.set(pressed);
-        if pressed {
-            self.pressed_this_frame.set(true);
-        }
-    }
-    fn get(&self) -> bool {
-        // If we got a press this frame, record it even if we got a release
-        // too — this way we don't drop mouse clicks where the release comes
-        // in on the same frame as the press. (This mirrors what Dear ImGUI
-        // seems to do in the `imgui_impl_*`)
-        self.pressed_this_frame.replace(false) || self.state.get()
-    }
-}
-
 /// winit backend platform state
 #[derive(Debug)]
 pub struct WinitPlatform {
     hidpi_mode: ActiveHiDpiMode,
     hidpi_factor: f64,
     cursor_cache: Option<CursorSettings>,
-    mouse_buttons: [Button; 5],
 }
 
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
@@ -200,6 +166,17 @@ impl HiDpiMode {
             HiDpiMode::Rounded => (ActiveHiDpiMode::Rounded, hidpi_factor.round()),
             HiDpiMode::Locked(value) => (ActiveHiDpiMode::Locked, value),
         }
+    }
+}
+
+fn to_imgui_mouse_button(button: MouseButton) -> Option<imgui::MouseButton> {
+    match button {
+        MouseButton::Left | MouseButton::Other(0) => Some(imgui::MouseButton::Left),
+        MouseButton::Right | MouseButton::Other(1) => Some(imgui::MouseButton::Right),
+        MouseButton::Middle | MouseButton::Other(2) => Some(imgui::MouseButton::Middle),
+        MouseButton::Other(3) => Some(imgui::MouseButton::Extra1),
+        MouseButton::Other(4) => Some(imgui::MouseButton::Extra2),
+        _ => None,
     }
 }
 
@@ -334,7 +311,6 @@ impl WinitPlatform {
             hidpi_mode: ActiveHiDpiMode::Default,
             hidpi_factor: 1.0,
             cursor_cache: None,
-            mouse_buttons: [Button::INIT; 5],
         }
     }
     /// Attaches the platform instance to a winit window.
@@ -501,42 +477,36 @@ impl WinitPlatform {
             WindowEvent::CursorMoved { position, .. } => {
                 let position = position.to_logical(window.scale_factor());
                 let position = self.scale_pos_from_winit(window, position);
-                //io.mouse_pos = [position.x as f32, position.y as f32];
                 io.add_mouse_pos_event([position.x as f32, position.y as f32]);
             }
             WindowEvent::MouseWheel {
                 delta,
                 phase: TouchPhase::Moved,
                 ..
-            } => match delta {
-                MouseScrollDelta::LineDelta(h, v) => {
-                    io.mouse_wheel_h = h;
-                    io.mouse_wheel = v;
-                }
-                MouseScrollDelta::PixelDelta(pos) => {
-                    let pos = pos.to_logical::<f64>(self.hidpi_factor);
-                    match pos.x.partial_cmp(&0.0) {
-                        Some(Ordering::Greater) => io.mouse_wheel_h += 1.0,
-                        Some(Ordering::Less) => io.mouse_wheel_h -= 1.0,
-                        _ => (),
+            } => {
+                let (h, v) = match delta {
+                    MouseScrollDelta::LineDelta(h, v) => (h, v),
+                    MouseScrollDelta::PixelDelta(pos) => {
+                        let pos = pos.to_logical::<f64>(self.hidpi_factor);
+                        let h = match pos.x.partial_cmp(&0.0) {
+                            Some(Ordering::Greater) => 1.0,
+                            Some(Ordering::Less) => -1.0,
+                            _ => 0.0,
+                        };
+                        let v = match pos.y.partial_cmp(&0.0) {
+                            Some(Ordering::Greater) => 1.0,
+                            Some(Ordering::Less) => -1.0,
+                            _ => 0.0,
+                        };
+                        (h, v)
                     }
-                    match pos.y.partial_cmp(&0.0) {
-                        Some(Ordering::Greater) => io.mouse_wheel += 1.0,
-                        Some(Ordering::Less) => io.mouse_wheel -= 1.0,
-                        _ => (),
-                    }
-                }
-            },
+                };
+                io.add_mouse_wheel_event([h, v]);
+            }
             WindowEvent::MouseInput { state, button, .. } => {
-                let pressed = state == ElementState::Pressed;
-                match button {
-                    MouseButton::Left => self.mouse_buttons[0].set(pressed),
-                    MouseButton::Right => self.mouse_buttons[1].set(pressed),
-                    MouseButton::Middle => self.mouse_buttons[2].set(pressed),
-                    MouseButton::Other(idx @ 0..=4) => {
-                        self.mouse_buttons[idx as usize].set(pressed)
-                    }
-                    _ => (),
+                if let Some(mb) = to_imgui_mouse_button(button) {
+                    let pressed = state == ElementState::Pressed;
+                    io.add_mouse_button_event(mb, pressed);
                 }
             }
             WindowEvent::Focused(newly_focused) => {
@@ -556,7 +526,6 @@ impl WinitPlatform {
     ///
     /// * mouse cursor is repositioned (if requested by imgui-rs)
     pub fn prepare_frame(&self, io: &mut Io, window: &Window) -> Result<(), ExternalError> {
-        self.copy_mouse_to_io(&mut io.mouse_down);
         if io.want_set_mouse_pos {
             let logical_pos = self.scale_pos_for_winit(
                 window,
@@ -565,12 +534,6 @@ impl WinitPlatform {
             window.set_cursor_position(logical_pos)
         } else {
             Ok(())
-        }
-    }
-
-    fn copy_mouse_to_io(&self, io_mouse_down: &mut [bool]) {
-        for (io_down, button) in io_mouse_down.iter_mut().zip(&self.mouse_buttons) {
-            *io_down = button.get();
         }
     }
 
