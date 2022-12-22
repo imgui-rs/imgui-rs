@@ -1,3 +1,5 @@
+#version 330
+
 in vec2 v2f_UV;
 in vec4 v2f_Color;
 
