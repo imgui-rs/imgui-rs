@@ -160,7 +160,9 @@ pub struct Io {
     /// When holding a key/button, rate at which it repeats, in seconds
     pub key_repeat_rate: f32,
 
+    /// Delay on hover before [`ui.is_item_hovered_with_flags(ItemHoveredFlags::DELAY_NORMAL)`](crate::Ui::is_item_hovered_with_flags) returns true
     pub hover_delay_normal: f32,
+    /// Delay on hover before [`ui.is_item_hovered_with_flags(ItemHoveredFlags::DELAY_SHORT)`](crate::Ui::is_item_hovered_with_flags) returns true
     pub hover_delay_short: f32,
 
     user_data: *mut c_void,
@@ -206,9 +208,12 @@ pub struct Io {
     /// * Double-click selects by word instead of selecting the whole text
     /// * Multi-selection in lists uses Cmd/Super instead of Ctrl
     pub config_mac_os_behaviors: bool,
+    /// Enable input queue trickling: some types of events submitted during the same frame (e.g. button down + up) 
+    /// will be spread over multiple frames, improving interactions with low framerates.
     pub config_input_trickle_event_queue: bool,
     /// Set to false to disable blinking cursor
     pub config_input_text_cursor_blink: bool,
+    /// Pressing Enter will keep item active and select contents (single-line only).
     pub config_input_text_enter_keep_active: bool,
     /// Enable turning DragXXX widgets into text input with a simple mouse
     /// click-release (without moving). Not desirable on devices without a

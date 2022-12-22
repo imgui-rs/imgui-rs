@@ -21,6 +21,8 @@ bitflags! {
         /// Return true even if the item is disabled
         const ALLOW_WHEN_DISABLED = sys::ImGuiHoveredFlags_AllowWhenDisabled;
         const RECT_ONLY = sys::ImGuiHoveredFlags_RectOnly;
+        const DELAY_NORMAL = sys::ImGuiHoveredFlags_DelayNormal;
+        const DELAY_SHORT = sys::ImGuiHoveredFlags_DelayShort;
     }
 }
 
