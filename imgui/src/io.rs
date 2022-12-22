@@ -480,106 +480,109 @@ fn test_io_memory_layout() {
             );
         };
     }
-    assert_field_offset!(config_flags, ConfigFlags);
-    assert_field_offset!(backend_flags, BackendFlags);
-    assert_field_offset!(display_size, DisplaySize);
-    assert_field_offset!(delta_time, DeltaTime);
-    assert_field_offset!(ini_saving_rate, IniSavingRate);
-    assert_field_offset!(ini_filename, IniFilename);
-    assert_field_offset!(log_filename, LogFilename);
-    assert_field_offset!(mouse_double_click_time, MouseDoubleClickTime);
-    assert_field_offset!(mouse_double_click_max_dist, MouseDoubleClickMaxDist);
-    assert_field_offset!(mouse_drag_threshold, MouseDragThreshold);
-    assert_field_offset!(key_repeat_delay, KeyRepeatDelay);
-    assert_field_offset!(key_repeat_rate, KeyRepeatRate);
-    assert_field_offset!(hover_delay_normal, HoverDelayNormal);
-    assert_field_offset!(hover_delay_short, HoverDelayShort);
-    assert_field_offset!(user_data, UserData);
-    assert_field_offset!(fonts, Fonts);
-    assert_field_offset!(font_global_scale, FontGlobalScale);
-    assert_field_offset!(font_allow_user_scaling, FontAllowUserScaling);
-    assert_field_offset!(font_default, FontDefault);
-    assert_field_offset!(display_framebuffer_scale, DisplayFramebufferScale);
-    assert_field_offset!(mouse_draw_cursor, MouseDrawCursor);
-    assert_field_offset!(config_mac_os_behaviors, ConfigMacOSXBehaviors);
-    assert_field_offset!(
-        config_input_trickle_event_queue,
-        ConfigInputTrickleEventQueue
-    );
-    assert_field_offset!(config_input_text_cursor_blink, ConfigInputTextCursorBlink);
-    assert_field_offset!(
-        config_input_text_enter_keep_active,
-        ConfigInputTextEnterKeepActive
-    );
-    assert_field_offset!(
-        config_windows_resize_from_edges,
-        ConfigWindowsResizeFromEdges
-    );
-    assert_field_offset!(
-        config_windows_move_from_title_bar_only,
-        ConfigWindowsMoveFromTitleBarOnly
-    );
-    assert_field_offset!(backend_platform_name, BackendPlatformName);
-    assert_field_offset!(backend_renderer_name, BackendRendererName);
-    assert_field_offset!(backend_platform_user_data, BackendPlatformUserData);
-    assert_field_offset!(backend_renderer_user_data, BackendRendererUserData);
-    assert_field_offset!(backend_language_user_data, BackendLanguageUserData);
-    assert_field_offset!(get_clipboard_text_fn, GetClipboardTextFn);
-    assert_field_offset!(set_clipboard_text_fn, SetClipboardTextFn);
-    assert_field_offset!(clipboard_user_data, ClipboardUserData);
-    assert_field_offset!(set_platform_ime_data_fn, SetPlatformImeDataFn);
-    assert_field_offset!(unused_padding, _UnusedPadding);
-    assert_field_offset!(want_capture_mouse, WantCaptureMouse);
-    assert_field_offset!(want_capture_keyboard, WantCaptureKeyboard);
-    assert_field_offset!(want_text_input, WantTextInput);
-    assert_field_offset!(want_set_mouse_pos, WantSetMousePos);
-    assert_field_offset!(want_save_ini_settings, WantSaveIniSettings);
-    assert_field_offset!(nav_active, NavActive);
-    assert_field_offset!(nav_visible, NavVisible);
-    assert_field_offset!(framerate, Framerate);
-    assert_field_offset!(metrics_render_vertices, MetricsRenderVertices);
-    assert_field_offset!(metrics_render_indices, MetricsRenderIndices);
-    assert_field_offset!(metrics_render_windows, MetricsRenderWindows);
-    assert_field_offset!(metrics_active_windows, MetricsActiveWindows);
-    assert_field_offset!(metrics_active_allocations, MetricsActiveAllocations);
-    assert_field_offset!(mouse_delta, MouseDelta);
-    assert_field_offset!(key_map, KeyMap);
-    assert_field_offset!(keys_down, KeysDown);
-    assert_field_offset!(nav_inputs, NavInputs);
-    assert_field_offset!(mouse_pos, MousePos);
-    assert_field_offset!(mouse_down, MouseDown);
-    assert_field_offset!(mouse_wheel, MouseWheel);
-    assert_field_offset!(mouse_wheel_h, MouseWheelH);
-    assert_field_offset!(key_ctrl, KeyCtrl);
-    assert_field_offset!(key_shift, KeyShift);
-    assert_field_offset!(key_alt, KeyAlt);
-    assert_field_offset!(key_super, KeySuper);
-    assert_field_offset!(key_mods, KeyMods);
-    assert_field_offset!(keys_data, KeysData);
-    assert_field_offset!(
-        want_capture_mouse_unless_popup_close,
-        WantCaptureMouseUnlessPopupClose
-    );
-    assert_field_offset!(mouse_pos_prev, MousePosPrev);
-    assert_field_offset!(mouse_clicked_pos, MouseClickedPos);
-    assert_field_offset!(mouse_clicked_time, MouseClickedTime);
-    assert_field_offset!(mouse_clicked, MouseClicked);
-    assert_field_offset!(mouse_double_clicked, MouseDoubleClicked);
-    assert_field_offset!(mouse_clicked_count, MouseClickedCount);
-    assert_field_offset!(mouse_clicked_last_count, MouseClickedLastCount);
-    assert_field_offset!(mouse_released, MouseReleased);
-    assert_field_offset!(mouse_down_owned, MouseDownOwned);
-    assert_field_offset!(mouse_down_duration, MouseDownDuration);
-    assert_field_offset!(mouse_down_duration_prev, MouseDownDurationPrev);
-    assert_field_offset!(mouse_drag_max_distance_sqr, MouseDragMaxDistanceSqr);
-    assert_field_offset!(pen_pressure, PenPressure);
-    assert_field_offset!(app_focus_lost, AppFocusLost);
-    assert_field_offset!(app_accepting_events, AppAcceptingEvents);
-    assert_field_offset!(backend_using_legacy_key_arrays, BackendUsingLegacyKeyArrays);
-    assert_field_offset!(
-        backend_using_legacy_nav_input_array,
-        BackendUsingLegacyNavInputArray
-    );
-    assert_field_offset!(input_queue_surrogate, InputQueueSurrogate);
-    assert_field_offset!(input_queue_characters, InputQueueCharacters);
+
+    std::thread::Builder::new().stack_size(4 * 1024 * 1024).spawn(|| {
+        assert_field_offset!(config_flags, ConfigFlags);
+        assert_field_offset!(backend_flags, BackendFlags);
+        assert_field_offset!(display_size, DisplaySize);
+        assert_field_offset!(delta_time, DeltaTime);
+        assert_field_offset!(ini_saving_rate, IniSavingRate);
+        assert_field_offset!(ini_filename, IniFilename);
+        assert_field_offset!(log_filename, LogFilename);
+        assert_field_offset!(mouse_double_click_time, MouseDoubleClickTime);
+        assert_field_offset!(mouse_double_click_max_dist, MouseDoubleClickMaxDist);
+        assert_field_offset!(mouse_drag_threshold, MouseDragThreshold);
+        assert_field_offset!(key_repeat_delay, KeyRepeatDelay);
+        assert_field_offset!(key_repeat_rate, KeyRepeatRate);
+        assert_field_offset!(hover_delay_normal, HoverDelayNormal);
+        assert_field_offset!(hover_delay_short, HoverDelayShort);
+        assert_field_offset!(user_data, UserData);
+        assert_field_offset!(fonts, Fonts);
+        assert_field_offset!(font_global_scale, FontGlobalScale);
+        assert_field_offset!(font_allow_user_scaling, FontAllowUserScaling);
+        assert_field_offset!(font_default, FontDefault);
+        assert_field_offset!(display_framebuffer_scale, DisplayFramebufferScale);
+        assert_field_offset!(mouse_draw_cursor, MouseDrawCursor);
+        assert_field_offset!(config_mac_os_behaviors, ConfigMacOSXBehaviors);
+        assert_field_offset!(
+            config_input_trickle_event_queue,
+            ConfigInputTrickleEventQueue
+        );
+        assert_field_offset!(config_input_text_cursor_blink, ConfigInputTextCursorBlink);
+        assert_field_offset!(
+            config_input_text_enter_keep_active,
+            ConfigInputTextEnterKeepActive
+        );
+        assert_field_offset!(
+            config_windows_resize_from_edges,
+            ConfigWindowsResizeFromEdges
+        );
+        assert_field_offset!(
+            config_windows_move_from_title_bar_only,
+            ConfigWindowsMoveFromTitleBarOnly
+        );
+        assert_field_offset!(backend_platform_name, BackendPlatformName);
+        assert_field_offset!(backend_renderer_name, BackendRendererName);
+        assert_field_offset!(backend_platform_user_data, BackendPlatformUserData);
+        assert_field_offset!(backend_renderer_user_data, BackendRendererUserData);
+        assert_field_offset!(backend_language_user_data, BackendLanguageUserData);
+        assert_field_offset!(get_clipboard_text_fn, GetClipboardTextFn);
+        assert_field_offset!(set_clipboard_text_fn, SetClipboardTextFn);
+        assert_field_offset!(clipboard_user_data, ClipboardUserData);
+        assert_field_offset!(set_platform_ime_data_fn, SetPlatformImeDataFn);
+        assert_field_offset!(unused_padding, _UnusedPadding);
+        assert_field_offset!(want_capture_mouse, WantCaptureMouse);
+        assert_field_offset!(want_capture_keyboard, WantCaptureKeyboard);
+        assert_field_offset!(want_text_input, WantTextInput);
+        assert_field_offset!(want_set_mouse_pos, WantSetMousePos);
+        assert_field_offset!(want_save_ini_settings, WantSaveIniSettings);
+        assert_field_offset!(nav_active, NavActive);
+        assert_field_offset!(nav_visible, NavVisible);
+        assert_field_offset!(framerate, Framerate);
+        assert_field_offset!(metrics_render_vertices, MetricsRenderVertices);
+        assert_field_offset!(metrics_render_indices, MetricsRenderIndices);
+        assert_field_offset!(metrics_render_windows, MetricsRenderWindows);
+        assert_field_offset!(metrics_active_windows, MetricsActiveWindows);
+        assert_field_offset!(metrics_active_allocations, MetricsActiveAllocations);
+        assert_field_offset!(mouse_delta, MouseDelta);
+        assert_field_offset!(key_map, KeyMap);
+        assert_field_offset!(keys_down, KeysDown);
+        assert_field_offset!(nav_inputs, NavInputs);
+        assert_field_offset!(mouse_pos, MousePos);
+        assert_field_offset!(mouse_down, MouseDown);
+        assert_field_offset!(mouse_wheel, MouseWheel);
+        assert_field_offset!(mouse_wheel_h, MouseWheelH);
+        assert_field_offset!(key_ctrl, KeyCtrl);
+        assert_field_offset!(key_shift, KeyShift);
+        assert_field_offset!(key_alt, KeyAlt);
+        assert_field_offset!(key_super, KeySuper);
+        assert_field_offset!(key_mods, KeyMods);
+        assert_field_offset!(keys_data, KeysData);
+        assert_field_offset!(
+            want_capture_mouse_unless_popup_close,
+            WantCaptureMouseUnlessPopupClose
+        );
+        assert_field_offset!(mouse_pos_prev, MousePosPrev);
+        assert_field_offset!(mouse_clicked_pos, MouseClickedPos);
+        assert_field_offset!(mouse_clicked_time, MouseClickedTime);
+        assert_field_offset!(mouse_clicked, MouseClicked);
+        assert_field_offset!(mouse_double_clicked, MouseDoubleClicked);
+        assert_field_offset!(mouse_clicked_count, MouseClickedCount);
+        assert_field_offset!(mouse_clicked_last_count, MouseClickedLastCount);
+        assert_field_offset!(mouse_released, MouseReleased);
+        assert_field_offset!(mouse_down_owned, MouseDownOwned);
+        assert_field_offset!(mouse_down_duration, MouseDownDuration);
+        assert_field_offset!(mouse_down_duration_prev, MouseDownDurationPrev);
+        assert_field_offset!(mouse_drag_max_distance_sqr, MouseDragMaxDistanceSqr);
+        assert_field_offset!(pen_pressure, PenPressure);
+        assert_field_offset!(app_focus_lost, AppFocusLost);
+        assert_field_offset!(app_accepting_events, AppAcceptingEvents);
+        assert_field_offset!(backend_using_legacy_key_arrays, BackendUsingLegacyKeyArrays);
+        assert_field_offset!(
+            backend_using_legacy_nav_input_array,
+            BackendUsingLegacyNavInputArray
+        );
+        assert_field_offset!(input_queue_surrogate, InputQueueSurrogate);
+        assert_field_offset!(input_queue_characters, InputQueueCharacters);
+    }).unwrap().join().unwrap();
 }
