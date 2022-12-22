@@ -95,7 +95,7 @@ impl Ui {
     /// Equivalent to indexing the Io struct with the button, e.g. `ui.io()[button]`.
     #[doc(alias = "IsMouseDown")]
     pub fn is_mouse_down(&self, button: MouseButton) -> bool {
-        cfg_if::cfg_if!{
+        cfg_if::cfg_if! {
             if #[cfg(feature = "docking")] {
                 unsafe { sys::igIsMouseDown_Nil(button as i32) }
             } else {
@@ -111,7 +111,7 @@ impl Ui {
     /// Returns true if the given mouse button was clicked (went from !down to down)
     #[doc(alias = "IsMouseClicked")]
     pub fn is_mouse_clicked(&self, button: MouseButton) -> bool {
-        cfg_if::cfg_if!{
+        cfg_if::cfg_if! {
             if #[cfg(feature = "docking")] {
                 unsafe { sys::igIsMouseClicked_Bool(button as i32, false) }
             } else {
@@ -127,7 +127,7 @@ impl Ui {
     /// Returns true if the given mouse button was released (went from down to !down)
     #[doc(alias = "IsMouseReleased")]
     pub fn is_mouse_released(&self, button: MouseButton) -> bool {
-        cfg_if::cfg_if!{
+        cfg_if::cfg_if! {
             if #[cfg(feature = "docking")] {
                 unsafe { sys::igIsMouseReleased_Nil(button as i32) }
             } else {

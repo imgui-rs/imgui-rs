@@ -345,7 +345,7 @@ impl Ui {
     #[inline]
     #[doc(alias = "IsKeyDown")]
     pub fn is_key_index_down(&self, key_index: u32) -> bool {
-        cfg_if::cfg_if!{
+        cfg_if::cfg_if! {
             if #[cfg(feature = "docking")] {
                 unsafe { sys::igIsKeyDown_Nil(key_index) }
             } else {
@@ -371,7 +371,7 @@ impl Ui {
     #[inline]
     #[doc(alias = "IsKeyPressed")]
     pub fn is_key_index_pressed(&self, key_index: u32) -> bool {
-        cfg_if::cfg_if!{
+        cfg_if::cfg_if! {
             if #[cfg(feature = "docking")] {
                 unsafe { sys::igIsKeyPressed_Bool(key_index, true) }
             } else {
@@ -398,7 +398,7 @@ impl Ui {
     #[inline]
     #[doc(alias = "IsKeyPressed")]
     pub fn is_key_index_pressed_no_repeat(&self, key_index: u32) -> bool {
-        cfg_if::cfg_if!{
+        cfg_if::cfg_if! {
             if #[cfg(feature = "docking")] {
                 unsafe { sys::igIsKeyPressed_Bool(key_index, false) }
             } else {
@@ -422,7 +422,7 @@ impl Ui {
     #[inline]
     #[doc(alias = "IsKeyReleased")]
     pub fn is_key_index_released(&self, key_index: u32) -> bool {
-        cfg_if::cfg_if!{
+        cfg_if::cfg_if! {
             if #[cfg(feature = "docking")] {
                 unsafe { sys::igIsKeyReleased_Nil(key_index) }
             } else {
