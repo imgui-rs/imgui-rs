@@ -52,13 +52,15 @@ enum ViewportEvent {
 pub struct Renderer {
     gl_objects: GlObjects,
     glutin_config: Option<glutin::config::Config>,
+    /// The tuple members have to stay in exactly this order
+    /// to ensure that surface, context and window are dropped in this order
     extra_windows: HashMap<
         Id,
         (
-            Window,
-            Option<NotCurrentContext>,
-            Surface<WindowSurface>,
             GlObjects,
+            Surface<WindowSurface>,
+            Option<NotCurrentContext>,
+            Window,
         ),
     >,
     event_queue: Rc<RefCell<VecDeque<ViewportEvent>>>,
@@ -321,7 +323,7 @@ impl Renderer {
                     (main_window, imgui.main_viewport_mut())
                 } else {
                     if let Some((id, wnd)) =
-                        self.extra_windows.iter().find_map(|(id, (wnd, _, _, _))| {
+                        self.extra_windows.iter().find_map(|(id, (_, _, _, wnd))| {
                             if wnd.id() == window_id {
                                 Some((*id, wnd))
                             } else {
@@ -476,27 +478,27 @@ impl Renderer {
                     self.extra_windows.remove(&id);
                 }
                 ViewportEvent::SetPos(id, pos) => {
-                    if let Some((wnd, _, _, _)) = self.extra_windows.get(&id) {
+                    if let Some((_, _, _, wnd)) = self.extra_windows.get(&id) {
                         wnd.set_outer_position(PhysicalPosition::new(pos[0], pos[1]));
                     }
                 }
                 ViewportEvent::SetSize(id, size) => {
-                    if let Some((wnd, _, _, _)) = self.extra_windows.get(&id) {
+                    if let Some((_, _, _, wnd)) = self.extra_windows.get(&id) {
                         wnd.set_inner_size(PhysicalSize::new(size[0], size[1]));
                     }
                 }
                 ViewportEvent::SetVisible(id) => {
-                    if let Some((wnd, _, _, _)) = self.extra_windows.get(&id) {
+                    if let Some((_, _, _, wnd)) = self.extra_windows.get(&id) {
                         wnd.set_visible(true);
                     }
                 }
                 ViewportEvent::SetFocus(id) => {
-                    if let Some((wnd, _, _, _)) = self.extra_windows.get(&id) {
+                    if let Some((_, _, _, wnd)) = self.extra_windows.get(&id) {
                         wnd.focus_window();
                     }
                 }
                 ViewportEvent::SetTitle(id, title) => {
-                    if let Some((wnd, _, _, _)) = self.extra_windows.get(&id) {
+                    if let Some((_, _, _, wnd)) = self.extra_windows.get(&id) {
                         wnd.set_title(&title);
                     }
                 }
@@ -513,10 +515,10 @@ impl Renderer {
         glow: &glow::Context,
     ) -> Result<
         (
-            Window,
-            Option<NotCurrentContext>,
-            Surface<WindowSurface>,
             GlObjects,
+            Surface<WindowSurface>,
+            Option<NotCurrentContext>,
+            Window,
         ),
         RendererError,
     > {
@@ -576,10 +578,10 @@ impl Renderer {
             GlObjects::new(self.font_width, self.font_height, &self.font_pixels, glow)?;
 
         Ok((
-            window,
-            Some(context.make_not_current().unwrap()),
-            surface,
             gl_objects,
+            surface,
+            Some(context.make_not_current().unwrap()),
+            window,
         ))
     }
 
@@ -597,7 +599,7 @@ impl Renderer {
         glow: &glow::Context,
         imgui: &mut imgui::Context,
     ) -> Result<(), RendererError> {
-        for (id, (wnd, context, surface, gl_objects)) in &mut self.extra_windows {
+        for (id, (gl_objects, surface, context, wnd)) in &mut self.extra_windows {
             if let Some(viewport) = imgui.viewport_by_id(*id) {
                 let current_context = context
                     .take()
@@ -693,12 +695,21 @@ impl Renderer {
                 for cmd in list.commands() {
                     match cmd {
                         imgui::DrawCmd::Elements { count, cmd_params } => {
-                            let clip_x1 = (cmd_params.clip_rect[0] - draw_data.display_pos[0]) as i32;
-                            let clip_y1 = (cmd_params.clip_rect[1] - draw_data.display_pos[1]) as i32;
-                            let clip_x2 = (cmd_params.clip_rect[2] - draw_data.display_pos[0]) as i32;
-                            let clip_y2 = (cmd_params.clip_rect[3] - draw_data.display_pos[1]) as i32;
+                            let clip_x1 =
+                                (cmd_params.clip_rect[0] - draw_data.display_pos[0]) as i32;
+                            let clip_y1 =
+                                (cmd_params.clip_rect[1] - draw_data.display_pos[1]) as i32;
+                            let clip_x2 =
+                                (cmd_params.clip_rect[2] - draw_data.display_pos[0]) as i32;
+                            let clip_y2 =
+                                (cmd_params.clip_rect[3] - draw_data.display_pos[1]) as i32;
 
-                            glow.scissor(clip_x1, window_size.height as i32 - clip_y2, clip_x2 - clip_x1, clip_y2 - clip_y1);
+                            glow.scissor(
+                                clip_x1,
+                                window_size.height as i32 - clip_y2,
+                                clip_x2 - clip_x1,
+                                clip_y2 - clip_y1,
+                            );
                             glow.draw_elements_base_vertex(
                                 glow::TRIANGLES,
                                 count as i32,
