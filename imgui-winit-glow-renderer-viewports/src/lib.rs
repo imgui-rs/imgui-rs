@@ -346,6 +346,8 @@ impl Renderer {
                                 [new_size.width as f32, new_size.height as f32];
                         }
 
+                        viewport.platform_request_resize = true;
+
                         if window_id == main_window.id() {
                             imgui.io_mut().display_size =
                                 [new_size.width as f32, new_size.height as f32];
@@ -355,6 +357,8 @@ impl Renderer {
                         let new_pos = window.inner_position().unwrap().cast::<f32>();
                         (*(viewport.platform_user_data.cast::<ViewportData>())).pos =
                             [new_pos.x as f32, new_pos.y as f32];
+
+                        viewport.platform_request_move = true;
                     },
                     winit::event::WindowEvent::CloseRequested if window_id != main_window.id() => {
                         viewport.platform_request_close = true;
