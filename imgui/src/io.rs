@@ -486,6 +486,9 @@ fn test_io_memory_layout() {
         };
     }
 
+    // We move this test into a Thread with a larger stack
+    // since the stack size of the default thread is not large enough in
+    // debug mode.
     std::thread::Builder::new()
         .stack_size(4 * 1024 * 1024)
         .spawn(|| {
