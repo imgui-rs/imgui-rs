@@ -109,6 +109,8 @@ fn main() {
 
                 ui.end_frame_early();
 
+                renderer.prepare_render(&mut imgui, &window);
+
                 imgui.update_platform_windows();
                 renderer.update_viewports(&mut imgui, window_target, &glow).expect("Failed to update viewports");
 

@@ -23,7 +23,7 @@ use winit::{
     dpi::{PhysicalPosition, PhysicalSize},
     event::{DeviceEvent, ElementState, KeyboardInput, TouchPhase, VirtualKeyCode},
     event_loop::EventLoopWindowTarget,
-    window::{Window, WindowBuilder},
+    window::{Window, WindowBuilder, CursorIcon},
 };
 
 const VERTEX_SHADER: &str = include_str!("vertex_shader.glsl");
@@ -67,6 +67,7 @@ pub struct Renderer {
     font_width: u32,
     font_height: u32,
     font_pixels: Vec<u8>,
+    last_cursor: CursorIcon,
 }
 
 #[derive(Debug)]
@@ -305,6 +306,7 @@ impl Renderer {
             font_width: font_tex.width,
             font_height: font_tex.height,
             font_pixels: font_tex.data.to_vec(),
+            last_cursor: CursorIcon::Default,
         })
     }
 
@@ -506,6 +508,36 @@ impl Renderer {
         }
 
         Ok(())
+    }
+
+    fn to_winit_cursor(cursor: imgui::MouseCursor) -> winit::window::CursorIcon {
+        match cursor {
+            imgui::MouseCursor::Arrow => winit::window::CursorIcon::Default,
+            imgui::MouseCursor::TextInput => winit::window::CursorIcon::Text,
+            imgui::MouseCursor::ResizeAll => winit::window::CursorIcon::Move,
+            imgui::MouseCursor::ResizeNS => winit::window::CursorIcon::NsResize,
+            imgui::MouseCursor::ResizeEW => winit::window::CursorIcon::EwResize,
+            imgui::MouseCursor::ResizeNESW => winit::window::CursorIcon::NeswResize,
+            imgui::MouseCursor::ResizeNWSE => winit::window::CursorIcon::NwseResize,
+            imgui::MouseCursor::Hand => winit::window::CursorIcon::Hand,
+            imgui::MouseCursor::NotAllowed => winit::window::CursorIcon::NotAllowed,
+        }
+    }
+
+    pub fn prepare_render(&mut self, imgui: &mut imgui::Context, main_window: &Window) {
+        if let Some(cursor) = imgui.mouse_cursor() {
+            let cursor = Self::to_winit_cursor(cursor);
+
+            if self.last_cursor != cursor {
+                main_window.set_cursor_icon(cursor);
+
+                for (_, (_, _, _, wnd)) in &self.extra_windows {
+                    wnd.set_cursor_icon(cursor);
+                }
+
+                self.last_cursor = cursor;
+            }
+        }
     }
 
     fn create_extra_window<T>(
