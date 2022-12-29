@@ -31,10 +31,26 @@ const FRAGMENT_SHADER: &str = include_str!("fragment_shader.glsl");
 
 #[derive(Debug, Error)]
 pub enum RendererError {
-    #[error("OpenGL object creation failed: {0}")]
-    GlObjectCreationError(String),
-    #[error("Failed to create glutin Display")]
-    GlutinDisplay,
+    #[error("OpenGL shader creation failed: {0}")]
+    GlShaderCreationFailed(String),
+    #[error("OpenGL program creation failed: {0}")]
+    GlProgramCreationFailed(String),
+    #[error("OpenGL texture creation failed: {0}")]
+    GlTextureCreationFailed(String),
+    #[error("OpenGL buffer creation failed: {0}")]
+    GlBufferCreationFailed(String),
+    #[error("OpenGL vertex array creation failed: {0}")]
+    GlVertexArrayCreationFailed(String),
+    #[error("Failed to create viewport window")]
+    WindowCreationFailed,
+    #[error("Failed to create viewport window context")]
+    WindowContextCreationFailed,
+    #[error("Failed to create viewport window surface")]
+    WindowSurfaceCreationFailed,
+    #[error("Failed to make viewport context current")]
+    MakeCurrentFailed,
+    #[error("Failed to make swap buffers on surface")]
+    SwapBuffersFailed,
 }
 
 #[derive(Debug)]
@@ -89,7 +105,7 @@ impl GlObjects {
         let program = unsafe {
             let vertex_shader = glow
                 .create_shader(glow::VERTEX_SHADER)
-                .map_err(|e| RendererError::GlObjectCreationError(e))?;
+                .map_err(|e| RendererError::GlShaderCreationFailed(e))?;
             glow.shader_source(vertex_shader, VERTEX_SHADER);
             glow.compile_shader(vertex_shader);
             assert!(
@@ -99,7 +115,7 @@ impl GlObjects {
 
             let fragment_shader = glow
                 .create_shader(glow::FRAGMENT_SHADER)
-                .map_err(|e| RendererError::GlObjectCreationError(e))?;
+                .map_err(|e| RendererError::GlShaderCreationFailed(e))?;
             glow.shader_source(fragment_shader, FRAGMENT_SHADER);
             glow.compile_shader(fragment_shader);
             assert!(
@@ -109,7 +125,7 @@ impl GlObjects {
 
             let program = glow
                 .create_program()
-                .map_err(|e| RendererError::GlObjectCreationError(e))?;
+                .map_err(|e| RendererError::GlProgramCreationFailed(e))?;
             glow.attach_shader(program, vertex_shader);
             glow.attach_shader(program, fragment_shader);
             glow.link_program(program);
@@ -127,7 +143,7 @@ impl GlObjects {
         let font_texture = unsafe {
             let tex = glow
                 .create_texture()
-                .map_err(|e| RendererError::GlObjectCreationError(e))?;
+                .map_err(|e| RendererError::GlTextureCreationFailed(e))?;
             glow.bind_texture(glow::TEXTURE_2D, Some(tex));
             glow.tex_parameter_i32(
                 glow::TEXTURE_2D,
@@ -166,17 +182,17 @@ impl GlObjects {
 
         let vbo = unsafe {
             glow.create_buffer()
-                .map_err(|e| RendererError::GlObjectCreationError(e))?
+                .map_err(|e| RendererError::GlBufferCreationFailed(e))?
         };
         let ibo = unsafe {
             glow.create_buffer()
-                .map_err(|e| RendererError::GlObjectCreationError(e))?
+                .map_err(|e| RendererError::GlBufferCreationFailed(e))?
         };
 
         let vao = unsafe {
             let vao = glow
                 .create_vertex_array()
-                .map_err(|e| RendererError::GlObjectCreationError(e))?;
+                .map_err(|e| RendererError::GlVertexArrayCreationFailed(e))?;
 
             glow.bind_vertex_array(Some(vao));
             glow.bind_buffer(glow::ARRAY_BUFFER, Some(vbo));
@@ -563,7 +579,7 @@ impl Renderer {
 
         let window = if let Some(glutin_config) = &self.glutin_config {
             glutin_winit::finalize_window(window_target, window_builder, glutin_config)
-                .map_err(|_| RendererError::GlutinDisplay)?
+                .map_err(|_| RendererError::WindowCreationFailed)?
         } else {
             let template_builder = ConfigTemplateBuilder::new();
 
@@ -572,7 +588,7 @@ impl Renderer {
                 .build(window_target, template_builder, |mut configs| {
                     configs.next().unwrap()
                 })
-                .map_err(|_| RendererError::GlutinDisplay)?;
+                .map_err(|_| RendererError::WindowCreationFailed)?;
 
             self.glutin_config = Some(cfg);
 
@@ -587,7 +603,7 @@ impl Renderer {
             glutin_config
                 .display()
                 .create_context(&glutin_config, &context_attribs)
-                .map_err(|_| RendererError::GlutinDisplay)?
+                .map_err(|_| RendererError::WindowContextCreationFailed)?
         };
 
         let surface_attribs = SurfaceAttributesBuilder::<WindowSurface>::new().build(
@@ -599,12 +615,12 @@ impl Renderer {
             glutin_config
                 .display()
                 .create_window_surface(glutin_config, &surface_attribs)
-                .map_err(|_| RendererError::GlutinDisplay)?
+                .map_err(|_| RendererError::WindowSurfaceCreationFailed)?
         };
 
         let context = context
             .make_current(&surface)
-            .map_err(|_| RendererError::GlutinDisplay)?;
+            .map_err(|_| RendererError::MakeCurrentFailed)?;
 
         let gl_objects =
             GlObjects::new(self.font_width, self.font_height, &self.font_pixels, glow)?;
@@ -637,7 +653,7 @@ impl Renderer {
                     .take()
                     .unwrap()
                     .make_current(surface)
-                    .map_err(|_| RendererError::GlutinDisplay)?;
+                    .map_err(|_| RendererError::MakeCurrentFailed)?;
 
                 unsafe {
                     glow.disable(glow::SCISSOR_TEST);
@@ -646,7 +662,7 @@ impl Renderer {
                 Self::render_window(wnd, glow, viewport.draw_data(), gl_objects)?;
                 surface
                     .swap_buffers(&current_context)
-                    .map_err(|_| RendererError::GlutinDisplay)?;
+                    .map_err(|_| RendererError::SwapBuffersFailed)?;
 
                 *context = Some(current_context.make_not_current().unwrap());
             }
