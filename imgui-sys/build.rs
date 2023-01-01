@@ -55,6 +55,7 @@ fn main() -> std::io::Result<()> {
             }
             // Set flag for dear imgui
             build.define("IMGUI_ENABLE_FREETYPE", None);
+            build.define("CIMGUI_FREETYPE", None);
             println!("cargo:DEFINE_IMGUI_ENABLE_FREETYPE=");
 
             // imgui_freetype.cpp needs access to `#include "imgui.h"`.
