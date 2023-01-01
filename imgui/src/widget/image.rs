@@ -101,6 +101,7 @@ pub struct ImageButtonDeprecated {
 impl ImageButton<'static, ()> {
     /// Creates a new image button builder with the given texture and size
     #[deprecated(since = "0.10.0", note = "Use `ui.image_button_config(...)` instead")]
+    #[allow(clippy::new_ret_no_self)]
     pub fn new(texture_id: TextureId, size: impl Into<MintVec2>) -> ImageButtonDeprecated {
         ImageButtonDeprecated {
             texture_id,
