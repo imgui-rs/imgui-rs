@@ -208,7 +208,7 @@ pub struct Io {
     /// * Double-click selects by word instead of selecting the whole text
     /// * Multi-selection in lists uses Cmd/Super instead of Ctrl
     pub config_mac_os_behaviors: bool,
-    /// Enable input queue trickling: some types of events submitted during the same frame (e.g. button down + up) 
+    /// Enable input queue trickling: some types of events submitted during the same frame (e.g. button down + up)
     /// will be spread over multiple frames, improving interactions with low framerates.
     pub config_input_trickle_event_queue: bool,
     /// Set to false to disable blinking cursor
