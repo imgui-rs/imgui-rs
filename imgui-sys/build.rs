@@ -40,6 +40,9 @@ fn main() -> std::io::Result<()> {
         let mut build = cc::Build::new();
         build.cpp(true);
 
+        // imgui uses C++11 stuff from v1.87 onwards
+        build.cpp_link_stdlib("c++11");
+
         // Set defines for compiler
         for (key, value) in DEFINES.iter() {
             build.define(key, *value);
@@ -80,7 +83,6 @@ fn main() -> std::io::Result<()> {
         }
 
         // Build imgui lib, suppressing warnings.
-        // TODO: disable linking C++ stdlib? Not sure if it's allowed.
         build.warnings(false).file(imgui_cpp).compile("libcimgui.a");
     }
     Ok(())
