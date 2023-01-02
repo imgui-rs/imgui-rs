@@ -41,7 +41,7 @@ fn main() -> std::io::Result<()> {
         build.cpp(true);
 
         // imgui uses C++11 stuff from v1.87 onwards
-        build.cpp_link_stdlib("c++11");
+        build.flag_if_supported("-std=c++11");
 
         // Set defines for compiler
         for (key, value) in DEFINES.iter() {
