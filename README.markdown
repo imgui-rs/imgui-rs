@@ -30,7 +30,7 @@ The core of imgui-rs consists of:
 - `imgui`: High-level safe API
 - `imgui-sys`: Low-level unsafe API (automatically generated)
 
-Next, we provide two renderers, and two backend platform implementations:
+Next, we provide two example renderers, and two example backend platform implementations:
 
 - `imgui-winit-support`: Backend platform implementation that uses the `winit` crate
 - `imgui-sdl2-support`: Backend platform using SDL2
