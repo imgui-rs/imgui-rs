@@ -17,26 +17,33 @@ impl Bindgen {
             .unwrap_or_else(|| "imgui-sys-v0".to_string());
 
         for variant in ["master", "docking"] {
-            let cimgui_output = root.join(&format!("imgui-sys/third-party/imgui-{}", variant));
+            for flag in [None, Some("freetype")] {
+                let additional = match flag {
+                    None => "".to_string(),
+                    Some(x) => format!("-{}", x),
+                };
+                let cimgui_output = root.join(&format!("imgui-sys/third-party/imgui-{}{}", variant, additional));
 
-            let types = get_types(&cimgui_output.join("structs_and_enums.json"))?;
-            let funcs = get_definitions(&cimgui_output.join("definitions.json"))?;
-            let header = cimgui_output.join("cimgui.h");
+                let types = get_types(&cimgui_output.join("structs_and_enums.json"))?;
+                let funcs = get_definitions(&cimgui_output.join("definitions.json"))?;
+                let header = cimgui_output.join("cimgui.h");
 
-            let output_name = if variant != "master" {
-                format!("{}_bindings.rs", variant)
-            } else {
-                "bindings.rs".into()
-            };
+                let output_name = match (variant, flag) {
+                    ("master", None) => format!("bindings.rs"),
+                    ("master", Some(f)) => format!("{}_bindings.rs", f),
+                    (var, None) => format!("{}_bindings.rs", var),
+                    (var, Some(f)) => format!("{}_{}_bindings.rs", var, f),
+                };
 
-            generate_binding_file(&header, &output.join(&output_name), &types, &funcs, None)?;
-            generate_binding_file(
-                &header,
-                &output.join(&format!("wasm_{}", &output_name)),
-                &types,
-                &funcs,
-                Some(&wasm_name),
-            )?;
+                generate_binding_file(&header, &output.join(&output_name), &types, &funcs, None)?;
+                generate_binding_file(
+                    &header,
+                    &output.join(&format!("wasm_{}", &output_name)),
+                    &types,
+                    &funcs,
+                    Some(&wasm_name),
+                )?;
+            }
         }
 
         Ok(())

@@ -21,13 +21,15 @@ fn main() -> std::io::Result<()> {
     // Feature flags - no extra dependencies, so these are queried as
     // env-vars to avoid recompilation of build.rs
     let docking_enabled = std::env::var_os("CARGO_FEATURE_DOCKING").is_some();
+    let freetype_enabled = std::env::var_os("CARGO_FEATURE_FREETYPE").is_some();
     let wasm_enabled = std::env::var_os("CARGO_FEATURE_WASM").is_some();
 
-    let cimgui_dir = if docking_enabled {
-        manifest_dir.join("third-party/imgui-docking")
-    } else {
-        manifest_dir.join("third-party/imgui-master")
-    };
+    let cimgui_dir = manifest_dir.join(match (docking_enabled, freetype_enabled) {
+        (false, false) => "third-party/imgui-master",
+        (true, false) => "third-party/imgui-docking",
+        (false, true) => "third-party/imgui-master-freetype",
+        (true, true) => "third-party/imgui-docking-freetype",
+    });
 
     // For projects like implot-rs we expose the path to our cimgui
     // files, via `DEP_IMGUI_THIRD_PARTY` env-var, so they can build
@@ -63,14 +65,15 @@ fn main() -> std::io::Result<()> {
 
             // imgui_freetype.cpp needs access to `#include "imgui.h"`.
             // So we include something like '[...]/third-party/imgui-master/imgui/'
-            build.include(cimgui_dir.join("imgui"));
+            build.include(dbg!(cimgui_dir.join("imgui")));
         }
 
         // Which "all imgui" file to use
-        let imgui_cpp = if docking_enabled {
-            "include_imgui_docking.cpp"
-        } else {
-            "include_imgui_master.cpp"
+        let imgui_cpp = match (docking_enabled, freetype_enabled) {
+            (false, false) => "include_imgui_master.cpp",
+            (true, false) => "include_imgui_docking.cpp",
+            (false, true) => "include_imgui_master_freetype.cpp",
+            (true, true) => "include_imgui_docking_freetype.cpp",
         };
 
         // Set up compiler
