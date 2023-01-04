@@ -52,8 +52,8 @@ buttons, etc etc.
 - Builder structs for use cases where the original C++ library uses optional
   function parameters
 - Easy integration with `glow`/ `glium`
-- Easy integration with winit (backend platform)
-- Optional support for the freetype font rasterizer
+- Easy integration with winit and sdl2 (backend platform)
+- Optional support for the freetype font rasterizer and the docking branch
 
 ## Minimum Support Rust Version (MSRV)
 
