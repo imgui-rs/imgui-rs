@@ -38,12 +38,15 @@ Next, we provide two example renderers, and two example backend platform impleme
 - `imgui-glium-renderer`: Renderer implementation that uses the `glium` crate
 
 Each of these contain an `examples` folder showing their usage. Check
-the `[dev-dependencies]` section of their respective `Cargo.toml` to
-find the versions of dependencies used (e.g `imgui-glow-renderer/Cargo.toml`)
+their respective `Cargo.toml` to find compatible versions (e.g
+`imgui-glow-renderer/Cargo.toml` the `[dependencies]` describes the
+compatible `glow` version and `[dev-dependencies]` describes the
+compatible `glutin` version)
 
 Finally the `imgui-examples` folder contains examples of how to use
-the `imgui` crate itself - covers general topics like how to show
-text, how to create buttons, etc etc.
+the `imgui` crate itself - this covers general topics like how to show
+text, how to create buttons, etc - and should be applicable to usage
+with any backend/renderer.
 
 ## Features
 
@@ -97,6 +100,7 @@ Additionally, there are other libraries which provide other kinds of renderers, 
  2. [`imgui-d3d12-renderer`](https://github.com/curldivergence/imgui-d3d12-renderer)
  3. [`imgui-dx11-renderer`](https://github.com/veykril/imgui-dx11-renderer)
  4. [`imgui-gfx-renderer`](https://github.com/imgui-rs/imgui-gfx-renderer): Deprecated (no longer maintained beyond imgui-rs v0.8). Renderer implementation that uses the `gfx` crate (_not the new gfx-hal crate_)
+ 5. Many more can be found on [crates.io](https://crates.io) either using search or the ["dependents" page](https://crates.io/crates/imgui/reverse_dependencies) (the "depends on" text indicates if the crate has been updated for current versions of imgui-rs)
 
 
 You can also write your own support code if you have a more advanced use case, because **imgui-rs is not tied to any specific graphics / OS API**.
