@@ -42,8 +42,8 @@ the `[dev-dependencies]` section of their respective `Cargo.toml` to
 find the versions of dependencies used (e.g `imgui-glow-renderer/Cargo.toml`)
 
 Finally the `imgui-examples` folder contains examples of how to use
-the `imgui` crate itself - things like how to show text, how to create
-buttons, etc etc.
+the `imgui` crate itself - covers general topics like how to show
+text, how to create buttons, etc etc.
 
 ## Features
 
