@@ -24,7 +24,7 @@ rm ${CIMGUI_DIR}/imgui || :
 ln -s ${SCRIPT_DIR}/imgui ${CIMGUI_DIR}/imgui
 
 # Run the generator
-luajit generator.lua gcc freetype -DIMGUI_USE_WCHAR32
+luajit generator.lua gcc "internal,freetype" -DIMGUI_USE_WCHAR32
 
 # Tidy up
 rm ${CIMGUI_DIR}/imgui # Remove symlink (no recursive rm)

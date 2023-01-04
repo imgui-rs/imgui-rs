@@ -8,16 +8,64 @@ ImColor_ImColor	5
 ImDrawList_AddText	2
 1	void	ImDrawList_AddText_Vec2 (const ImVec2,ImU32,const char*,const char*)
 2	void	ImDrawList_AddText_FontPtr (const ImFont*,float,const ImVec2,ImU32,const char*,const char*,float,const ImVec4*)
+ImGuiPtrOrIndex_ImGuiPtrOrIndex	2
+1	nil	ImGuiPtrOrIndex_ImGuiPtrOrIndex_Ptr (void*)
+2	nil	ImGuiPtrOrIndex_ImGuiPtrOrIndex_Int (int)
 ImGuiStoragePair_ImGuiStoragePair	3
 1	nil	ImGuiStoragePair_ImGuiStoragePair_Int (ImGuiID,int)
 2	nil	ImGuiStoragePair_ImGuiStoragePair_Float (ImGuiID,float)
 3	nil	ImGuiStoragePair_ImGuiStoragePair_Ptr (ImGuiID,void*)
+ImGuiStyleMod_ImGuiStyleMod	3
+1	nil	ImGuiStyleMod_ImGuiStyleMod_Int (ImGuiStyleVar,int)
+2	nil	ImGuiStyleMod_ImGuiStyleMod_Float (ImGuiStyleVar,float)
+3	nil	ImGuiStyleMod_ImGuiStyleMod_Vec2 (ImGuiStyleVar,ImVec2)
 ImGuiTextRange_ImGuiTextRange	2
 1	nil	ImGuiTextRange_ImGuiTextRange_Nil ()
 2	nil	ImGuiTextRange_ImGuiTextRange_Str (const char*,const char*)
+ImGuiWindow_GetID	3
+1	ImGuiID	ImGuiWindow_GetID_Str (const char*,const char*)
+2	ImGuiID	ImGuiWindow_GetID_Ptr (const void*)
+3	ImGuiID	ImGuiWindow_GetID_Int (int)
+ImPool_Remove	2
+1	void	ImPool_Remove_TPtr (ImGuiID,const T*)
+2	void	ImPool_Remove_PoolIdx (ImGuiID,ImPoolIdx)
+ImRect_Add	2
+1	void	ImRect_Add_Vec2 (const ImVec2)
+2	void	ImRect_Add_Rect (const ImRect)
+ImRect_Contains	2
+1	bool	ImRect_Contains_Vec2 (const ImVec2)const
+2	bool	ImRect_Contains_Rect (const ImRect)const
+ImRect_Expand	2
+1	void	ImRect_Expand_Float (const float)
+2	void	ImRect_Expand_Vec2 (const ImVec2)
+ImRect_ImRect	4
+1	nil	ImRect_ImRect_Nil ()
+2	nil	ImRect_ImRect_Vec2 (const ImVec2,const ImVec2)
+3	nil	ImRect_ImRect_Vec4 (const ImVec4)
+4	nil	ImRect_ImRect_Float (float,float,float,float)
+ImSpan_ImSpan	3
+1	nil	ImSpan_ImSpan_Nil ()
+2	nil	ImSpan_ImSpan_TPtrInt (T*,int)
+3	nil	ImSpan_ImSpan_TPtrTPtr (T*,T*)
+ImSpan_begin	2
+1	T*	ImSpan_begin_Nil ()
+2	const T*	ImSpan_begin__const ()const
+ImSpan_end	2
+1	T*	ImSpan_end_Nil ()
+2	const T*	ImSpan_end__const ()const
+ImSpan_set	2
+1	void	ImSpan_set_Int (T*,int)
+2	void	ImSpan_set_TPtr (T*,T*)
+ImVec1_ImVec1	2
+1	nil	ImVec1_ImVec1_Nil ()
+2	nil	ImVec1_ImVec1_Float (float)
 ImVec2_ImVec2	2
 1	nil	ImVec2_ImVec2_Nil ()
 2	nil	ImVec2_ImVec2_Float (float,float)
+ImVec2ih_ImVec2ih	3
+1	nil	ImVec2ih_ImVec2ih_Nil ()
+2	nil	ImVec2ih_ImVec2ih_short (short,short)
+3	nil	ImVec2ih_ImVec2ih_Vec2 (const ImVec2)
 ImVec4_ImVec4	2
 1	nil	ImVec4_ImVec4_Nil ()
 2	nil	ImVec4_ImVec4_Float (float,float,float,float)
@@ -48,9 +96,11 @@ ImVector_resize	2
 igBeginChild	2
 1	bool	igBeginChild_Str (const char*,const ImVec2,bool,ImGuiWindowFlags)
 2	bool	igBeginChild_ID (ImGuiID,const ImVec2,bool,ImGuiWindowFlags)
-igCheckboxFlags	2
+igCheckboxFlags	4
 1	bool	igCheckboxFlags_IntPtr (const char*,int*,int)
 2	bool	igCheckboxFlags_UintPtr (const char*,unsigned int*,unsigned int)
+3	bool	igCheckboxFlags_S64Ptr (const char*,ImS64*,ImS64)
+4	bool	igCheckboxFlags_U64Ptr (const char*,ImU64*,ImU64)
 igCollapsingHeader	2
 1	bool	igCollapsingHeader_TreeNodeFlags (const char*,ImGuiTreeNodeFlags)
 2	bool	igCollapsingHeader_BoolPtr (const char*,bool*,ImGuiTreeNodeFlags)
@@ -65,19 +115,79 @@ igGetColorU32	3
 1	ImU32	igGetColorU32_Col (ImGuiCol,float)
 2	ImU32	igGetColorU32_Vec4 (const ImVec4)
 3	ImU32	igGetColorU32_U32 (ImU32)
-igGetForegroundDrawList	2
+igGetForegroundDrawList	3
 1	ImDrawList*	igGetForegroundDrawList_Nil ()
 2	ImDrawList*	igGetForegroundDrawList_ViewportPtr (ImGuiViewport*)
+3	ImDrawList*	igGetForegroundDrawList_WindowPtr (ImGuiWindow*)
 igGetID	3
 1	ImGuiID	igGetID_Str (const char*)
 2	ImGuiID	igGetID_StrStr (const char*,const char*)
 3	ImGuiID	igGetID_Ptr (const void*)
+igImAbs	3
+1	int	igImAbs_Int (int)
+2	float	igImAbs_Float (float)
+3	double	igImAbs_double (double)
+igImFloor	2
+1	float	igImFloor_Float (float)
+2	ImVec2	igImFloor_Vec2 (const ImVec2)
+igImFloorSigned	2
+1	float	igImFloorSigned_Float (float)
+2	ImVec2	igImFloorSigned_Vec2 (const ImVec2)
+igImIsPowerOfTwo	2
+1	bool	igImIsPowerOfTwo_Int (int)
+2	bool	igImIsPowerOfTwo_U64 (ImU64)
+igImLengthSqr	2
+1	float	igImLengthSqr_Vec2 (const ImVec2)
+2	float	igImLengthSqr_Vec4 (const ImVec4)
+igImLerp	3
+1	ImVec2	igImLerp_Vec2Float (const ImVec2,const ImVec2,float)
+2	ImVec2	igImLerp_Vec2Vec2 (const ImVec2,const ImVec2,const ImVec2)
+3	ImVec4	igImLerp_Vec4 (const ImVec4,const ImVec4,float)
+igImLog	2
+1	float	igImLog_Float (float)
+2	double	igImLog_double (double)
+igImPow	2
+1	float	igImPow_Float (float,float)
+2	double	igImPow_double (double,double)
+igImRsqrt	2
+1	float	igImRsqrt_Float (float)
+2	double	igImRsqrt_double (double)
+igImSign	2
+1	float	igImSign_Float (float)
+2	double	igImSign_double (double)
+igIsKeyDown	2
+1	bool	igIsKeyDown_Nil (ImGuiKey)
+2	bool	igIsKeyDown_ID (ImGuiKey,ImGuiID)
+igIsKeyPressed	2
+1	bool	igIsKeyPressed_Bool (ImGuiKey,bool)
+2	bool	igIsKeyPressed_ID (ImGuiKey,ImGuiID,ImGuiInputFlags)
+igIsKeyReleased	2
+1	bool	igIsKeyReleased_Nil (ImGuiKey)
+2	bool	igIsKeyReleased_ID (ImGuiKey,ImGuiID)
+igIsMouseClicked	2
+1	bool	igIsMouseClicked_Bool (ImGuiMouseButton,bool)
+2	bool	igIsMouseClicked_ID (ImGuiMouseButton,ImGuiID,ImGuiInputFlags)
+igIsMouseDown	2
+1	bool	igIsMouseDown_Nil (ImGuiMouseButton)
+2	bool	igIsMouseDown_ID (ImGuiMouseButton,ImGuiID)
+igIsMouseReleased	2
+1	bool	igIsMouseReleased_Nil (ImGuiMouseButton)
+2	bool	igIsMouseReleased_ID (ImGuiMouseButton,ImGuiID)
+igIsPopupOpen	2
+1	bool	igIsPopupOpen_Str (const char*,ImGuiPopupFlags)
+2	bool	igIsPopupOpen_ID (ImGuiID,ImGuiPopupFlags)
 igIsRectVisible	2
 1	bool	igIsRectVisible_Nil (const ImVec2)
 2	bool	igIsRectVisible_Vec2 (const ImVec2,const ImVec2)
+igItemSize	2
+1	void	igItemSize_Vec2 (const ImVec2,float)
+2	void	igItemSize_Rect (const ImRect,float)
 igListBox	2
 1	bool	igListBox_Str_arr (const char*,int*,const char* const[],int,int)
 2	bool	igListBox_FnBoolPtr (const char*,int*,bool(*)(void*,int,const char**),void*,int,int)
+igMarkIniSettingsDirty	2
+1	void	igMarkIniSettingsDirty_Nil ()
+2	void	igMarkIniSettingsDirty_WindowPtr (ImGuiWindow*)
 igMenuItem	2
 1	bool	igMenuItem_Bool (const char*,const char*,bool,bool)
 2	bool	igMenuItem_BoolPtr (const char*,const char*,bool*,bool)
@@ -107,18 +217,42 @@ igRadioButton	2
 igSelectable	2
 1	bool	igSelectable_Bool (const char*,bool,ImGuiSelectableFlags,const ImVec2)
 2	bool	igSelectable_BoolPtr (const char*,bool*,ImGuiSelectableFlags,const ImVec2)
-igSetWindowCollapsed	2
+igSetScrollFromPosX	2
+1	void	igSetScrollFromPosX_Float (float,float)
+2	void	igSetScrollFromPosX_WindowPtr (ImGuiWindow*,float,float)
+igSetScrollFromPosY	2
+1	void	igSetScrollFromPosY_Float (float,float)
+2	void	igSetScrollFromPosY_WindowPtr (ImGuiWindow*,float,float)
+igSetScrollX	2
+1	void	igSetScrollX_Float (float)
+2	void	igSetScrollX_WindowPtr (ImGuiWindow*,float)
+igSetScrollY	2
+1	void	igSetScrollY_Float (float)
+2	void	igSetScrollY_WindowPtr (ImGuiWindow*,float)
+igSetWindowCollapsed	3
 1	void	igSetWindowCollapsed_Bool (bool,ImGuiCond)
 2	void	igSetWindowCollapsed_Str (const char*,bool,ImGuiCond)
+3	void	igSetWindowCollapsed_WindowPtr (ImGuiWindow*,bool,ImGuiCond)
 igSetWindowFocus	2
 1	void	igSetWindowFocus_Nil ()
 2	void	igSetWindowFocus_Str (const char*)
-igSetWindowPos	2
+igSetWindowPos	3
 1	void	igSetWindowPos_Vec2 (const ImVec2,ImGuiCond)
 2	void	igSetWindowPos_Str (const char*,const ImVec2,ImGuiCond)
-igSetWindowSize	2
+3	void	igSetWindowPos_WindowPtr (ImGuiWindow*,const ImVec2,ImGuiCond)
+igSetWindowSize	3
 1	void	igSetWindowSize_Vec2 (const ImVec2,ImGuiCond)
 2	void	igSetWindowSize_Str (const char*,const ImVec2,ImGuiCond)
+3	void	igSetWindowSize_WindowPtr (ImGuiWindow*,const ImVec2,ImGuiCond)
+igTabItemCalcSize	2
+1	ImVec2	igTabItemCalcSize_Str (const char*,bool)
+2	ImVec2	igTabItemCalcSize_WindowPtr (ImGuiWindow*)
+igTableGcCompactTransientBuffers	2
+1	void	igTableGcCompactTransientBuffers_TablePtr (ImGuiTable*)
+2	void	igTableGcCompactTransientBuffers_TableTempDataPtr (ImGuiTableTempData*)
+igTableGetColumnName	2
+1	const char*	igTableGetColumnName_Int (int)
+2	const char*	igTableGetColumnName_TablePtr (const ImGuiTable*,int)
 igTreeNode	3
 1	bool	igTreeNode_Str (const char*)
 2	bool	igTreeNode_StrStr (const char*,const char*,...)
@@ -141,4 +275,4 @@ igValue	4
 2	void	igValue_Int (const char*,int)
 3	void	igValue_Uint (const char*,unsigned int)
 4	void	igValue_Float (const char*,float,const char*)
-99 overloaded
+193 overloaded
