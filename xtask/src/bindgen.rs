@@ -22,7 +22,10 @@ impl Bindgen {
                     None => "".to_string(),
                     Some(x) => format!("-{}", x),
                 };
-                let cimgui_output = root.join(&format!("imgui-sys/third-party/imgui-{}{}", variant, additional));
+                let cimgui_output = root.join(&format!(
+                    "imgui-sys/third-party/imgui-{}{}",
+                    variant, additional
+                ));
 
                 let types = get_types(&cimgui_output.join("structs_and_enums.json"))?;
                 let funcs = get_definitions(&cimgui_output.join("definitions.json"))?;
