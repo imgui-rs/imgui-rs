@@ -25,12 +25,25 @@ ui.window("Hello world")
 
 ## Main library crates
 
-- imgui: High-level safe API
-- imgui-winit-support: Backend platform implementation that uses the `winit`
-  crate (latest by default, but earlier versions are supported via feature flags)
-- imgui-glow-renderer: Renderer implementation that uses the `glow` crate
-- imgui-glium-renderer: Renderer implementation that uses the `glium` crate
-- imgui-sys: Low-level unsafe API (automatically generated)
+The core of imgui-rs consists of:
+
+- `imgui`: High-level safe API
+- `imgui-sys`: Low-level unsafe API (automatically generated)
+
+Next, we provide two renderers, and two backend platform implementations:
+
+- `imgui-winit-support`: Backend platform implementation that uses the `winit` crate
+- `imgui-sdl2-support`: Backend platform using SDL2
+- `imgui-glow-renderer`: Renderer implementation that uses the `glow` crate
+- `imgui-glium-renderer`: Renderer implementation that uses the `glium` crate
+
+Each of these contain an `examples` folder showing their usage. Check
+the `[dev-dependencies]` section of their respective `Cargo.toml` to
+find the versions of dependencies used (e.g `imgui-glow-renderer/Cargo.toml`)
+
+Finally the `imgui-examples` folder contains examples of how to use
+the `imgui` crate itself - things like how to show text, how to create
+buttons, etc etc.
 
 ## Features
 
