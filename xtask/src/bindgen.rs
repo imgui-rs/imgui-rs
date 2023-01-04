@@ -32,7 +32,7 @@ impl Bindgen {
                 let header = cimgui_output.join("cimgui.h");
 
                 let output_name = match (variant, flag) {
-                    ("master", None) => format!("bindings.rs"),
+                    ("master", None) => "bindings.rs".to_string(),
                     ("master", Some(f)) => format!("{}_bindings.rs", f),
                     (var, None) => format!("{}_bindings.rs", var),
                     (var, Some(f)) => format!("{}_{}_bindings.rs", var, f),
