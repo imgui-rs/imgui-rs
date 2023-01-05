@@ -27,15 +27,15 @@ ui.window("Hello world")
 
 The core of imgui-rs consists of:
 
-- `imgui`: High-level safe API
-- `imgui-sys`: Low-level unsafe API (automatically generated)
+- [`imgui`](./imgui): High-level safe API
+- [`imgui-sys`](./imgui-sys): Low-level unsafe API (automatically generated)
 
 Next, we provide two example renderers, and two example backend platform implementations:
 
-- `imgui-winit-support`: Backend platform implementation that uses the `winit` crate
-- `imgui-sdl2-support`: Backend platform using SDL2
-- `imgui-glow-renderer`: Renderer implementation that uses the `glow` crate
-- `imgui-glium-renderer`: Renderer implementation that uses the `glium` crate
+- [`imgui-winit-support`](./imgui-winit-support): Backend platform implementation that uses the `winit` crate
+- [`imgui-sdl2-support`])(./imgui-sdl2-support): Backend platform using SDL2
+- [`imgui-glow-renderer`](./imgui-glow-renderer): Renderer implementation that uses the `glow` crate
+- [`imgui-glium-renderer`](./imgui-glium-renderer): Renderer implementation that uses the `glium` crate
 
 Each of these contain an `examples` folder showing their usage. Check
 their respective `Cargo.toml` to find compatible versions (e.g
