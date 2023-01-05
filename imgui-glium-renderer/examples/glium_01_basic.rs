@@ -12,55 +12,56 @@ fn main() {
     let (mut winit_platform, mut imgui_context) = imgui_init(&display);
 
     // Create renderer from this crate
-    let mut renderer = imgui_glium_renderer::Renderer::init(&mut imgui_context, &display).expect("Failed to initialize renderer");
+    let mut renderer = imgui_glium_renderer::Renderer::init(&mut imgui_context, &display)
+        .expect("Failed to initialize renderer");
 
     // Timer for FPS calculation
     let mut last_frame = std::time::Instant::now();
 
     // Standard winit event loop
     event_loop.run(move |event, _, control_flow| match event {
-            Event::NewEvents(_) => {
-                let now = std::time::Instant::now();
-                imgui_context.io_mut().update_delta_time(now - last_frame);
-                last_frame = now;
-            }
-            Event::MainEventsCleared => {
-                let gl_window = display.gl_window();
-                winit_platform
-                    .prepare_frame(imgui_context.io_mut(), gl_window.window())
-                    .expect("Failed to prepare frame");
-                gl_window.window().request_redraw();
-            }
-            Event::RedrawRequested(_) => {
-                // Create frame for the all important `&imgui::Ui`
-                let ui = imgui_context.frame();
+        Event::NewEvents(_) => {
+            let now = std::time::Instant::now();
+            imgui_context.io_mut().update_delta_time(now - last_frame);
+            last_frame = now;
+        }
+        Event::MainEventsCleared => {
+            let gl_window = display.gl_window();
+            winit_platform
+                .prepare_frame(imgui_context.io_mut(), gl_window.window())
+                .expect("Failed to prepare frame");
+            gl_window.window().request_redraw();
+        }
+        Event::RedrawRequested(_) => {
+            // Create frame for the all important `&imgui::Ui`
+            let ui = imgui_context.frame();
 
-                // Draw our example content
-                ui.show_demo_window(&mut true);
+            // Draw our example content
+            ui.show_demo_window(&mut true);
 
-                // Setup for drawing
-                let gl_window = display.gl_window();
-                let mut target = display.draw();
+            // Setup for drawing
+            let gl_window = display.gl_window();
+            let mut target = display.draw();
 
-                // Renderer doesn't automatically clear window
-                target.clear_color_srgb(1.0, 1.0, 1.0, 1.0);
+            // Renderer doesn't automatically clear window
+            target.clear_color_srgb(1.0, 1.0, 1.0, 1.0);
 
-                // Perform rendering
-                winit_platform.prepare_render(ui, gl_window.window());
-                let draw_data = imgui_context.render();
-                renderer
-                    .render(&mut target, draw_data)
-                    .expect("Rendering failed");
-                target.finish().expect("Failed to swap buffers");
-            }
-            Event::WindowEvent {
-                event: WindowEvent::CloseRequested,
-                ..
-            } => *control_flow = ControlFlow::Exit,
-            event => {
-                let gl_window = display.gl_window();
-                winit_platform.handle_event(imgui_context.io_mut(), gl_window.window(), &event);
-            }
+            // Perform rendering
+            winit_platform.prepare_render(ui, gl_window.window());
+            let draw_data = imgui_context.render();
+            renderer
+                .render(&mut target, draw_data)
+                .expect("Rendering failed");
+            target.finish().expect("Failed to swap buffers");
+        }
+        Event::WindowEvent {
+            event: WindowEvent::CloseRequested,
+            ..
+        } => *control_flow = ControlFlow::Exit,
+        event => {
+            let gl_window = display.gl_window();
+            winit_platform.handle_event(imgui_context.io_mut(), gl_window.window(), &event);
+        }
     });
 }
 
@@ -75,7 +76,6 @@ fn create_window() -> (EventLoop<()>, glium::Display) {
 
     (event_loop, display)
 }
-
 
 fn imgui_init(display: &glium::Display) -> (imgui_winit_support::WinitPlatform, imgui::Context) {
     let mut imgui_context = imgui::Context::create();
