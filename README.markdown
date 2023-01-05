@@ -43,10 +43,10 @@ their respective `Cargo.toml` to find compatible versions (e.g
 compatible `glow` version and `[dev-dependencies]` describes the
 compatible `glutin` version)
 
-Finally the `imgui-examples` folder contains examples of how to use
-the `imgui` crate itself - this covers general topics like how to show
-text, how to create buttons, etc - and should be applicable to usage
-with any backend/renderer.
+Finally the [`imgui-examples`](./imgui-examples) folder contains
+examples of how to use the `imgui` crate itself - this covers general
+topics like how to show text, how to create buttons, etc - and should
+be applicable to usage with any backend/renderer.
 
 ## Features
 
