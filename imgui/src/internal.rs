@@ -165,3 +165,43 @@ unsafe impl DataTypeKind for f32 {
 unsafe impl DataTypeKind for f64 {
     const KIND: DataType = DataType::F64;
 }
+
+unsafe impl DataTypeKind for usize {
+    #[cfg(target_pointer_width = "16")]
+    const KIND: DataType = DataType::U16;
+
+    #[cfg(target_pointer_width = "32")]
+    const KIND: DataType = DataType::U32;
+
+    #[cfg(target_pointer_width = "64")]
+    const KIND: DataType = DataType::U64;
+
+    // Fallback for when we are on a weird system width
+    //
+    #[cfg(not(any(
+        target_pointer_width = "16",
+        target_pointer_width = "32",
+        target_pointer_width = "64"
+    )))]
+    compile_error!("cannot impl DataTypeKind for usize: unsupported target pointer width. supported values are 16, 32, 64");
+}
+
+unsafe impl DataTypeKind for isize {
+    #[cfg(target_pointer_width = "16")]
+    const KIND: DataType = DataType::I16;
+
+    #[cfg(target_pointer_width = "32")]
+    const KIND: DataType = DataType::I32;
+
+    #[cfg(target_pointer_width = "64")]
+    const KIND: DataType = DataType::I64;
+
+    // Fallback for when we are on a weird system width
+    //
+    #[cfg(not(any(
+        target_pointer_width = "16",
+        target_pointer_width = "32",
+        target_pointer_width = "64"
+    )))]
+    compile_error!("cannot impl DataTypeKind for isize: unsupported target pointer width. supported values are 16, 32, 64");
+}
