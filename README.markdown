@@ -33,7 +33,7 @@ The core of imgui-rs consists of:
 Next, we provide two example renderers, and two example backend platform implementations:
 
 - [`imgui-winit-support`](./imgui-winit-support): Backend platform implementation that uses the `winit` crate
-- [`imgui-sdl2-support`])(./imgui-sdl2-support): Backend platform using SDL2
+- [`imgui-sdl2-support`](./imgui-sdl2-support): Backend platform using SDL2
 - [`imgui-glow-renderer`](./imgui-glow-renderer): Renderer implementation that uses the `glow` crate
 - [`imgui-glium-renderer`](./imgui-glium-renderer): Renderer implementation that uses the `glium` crate
 
