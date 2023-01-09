@@ -14,8 +14,8 @@ links = "imgui"
 # exclude json, lua, and the imgui subdirs (imgui/examples, imgui/docs, etc)
 # ..but we need imgui/misc/freetype/ for the freetype feature
 exclude = [
-    "third-party/*.json",
-    "third-party/*.lua",
+    "third-party/*/*.json",
+    "third-party/*/*.lua",
     "third-party/imgui/backends/",
     "third-party/imgui/docs/",
     "third-party/imgui/examples/",

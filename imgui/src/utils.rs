@@ -21,6 +21,8 @@ bitflags! {
         /// Return true even if the item is disabled
         const ALLOW_WHEN_DISABLED = sys::ImGuiHoveredFlags_AllowWhenDisabled;
         const RECT_ONLY = sys::ImGuiHoveredFlags_RectOnly;
+        const DELAY_NORMAL = sys::ImGuiHoveredFlags_DelayNormal;
+        const DELAY_SHORT = sys::ImGuiHoveredFlags_DelayShort;
     }
 }
 
@@ -146,7 +148,7 @@ impl Ui {
     /// Returns `true` if the rectangle (of given size, starting from cursor position) is visible
     #[doc(alias = "IsRectVisibleNil")]
     pub fn is_cursor_rect_visible(&self, size: impl Into<MintVec2>) -> bool {
-        unsafe { sys::igIsRectVisibleNil(size.into().into()) }
+        unsafe { sys::igIsRectVisible_Nil(size.into().into()) }
     }
     /// Returns `true` if the rectangle (in screen coordinates) is visible
     #[doc(alias = "IsRectVisibleNilVec2")]
@@ -155,7 +157,7 @@ impl Ui {
         rect_min: impl Into<MintVec2>,
         rect_max: impl Into<MintVec2>,
     ) -> bool {
-        unsafe { sys::igIsRectVisibleVec2(rect_min.into().into(), rect_max.into().into()) }
+        unsafe { sys::igIsRectVisible_Vec2(rect_min.into().into(), rect_max.into().into()) }
     }
     /// Returns the global imgui-rs time.
     ///
