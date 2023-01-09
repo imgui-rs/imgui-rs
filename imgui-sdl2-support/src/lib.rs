@@ -140,8 +140,7 @@ impl SdlPlatform {
 
         match *event {
             Event::MouseWheel { x, y, .. } => {
-                io.mouse_wheel = y as f32;
-                io.mouse_wheel_h = x as f32;
+                io.add_mouse_wheel_event([x as f32, y as f32]);
                 true
             }
 
