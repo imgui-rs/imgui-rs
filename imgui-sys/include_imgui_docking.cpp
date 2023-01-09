@@ -8,9 +8,3 @@
 #include "./third-party/imgui-docking/imgui/imgui_widgets.cpp"
 #include "./third-party/imgui-docking/imgui/imgui_tables.cpp"
 #include "./third-party/imgui-docking/cimgui.cpp"
-
-#ifdef IMGUI_ENABLE_FREETYPE
-#include "./third-party/imgui-docking/imgui/misc/freetype/imgui_freetype.cpp"
-#endif
-
-

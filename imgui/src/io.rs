@@ -150,7 +150,7 @@ impl NavInput {
         NavInput::TweakFast,
     ];
     /// Amount of internal/hidden variants (not exposed by imgui-rs)
-    const INTERNAL_COUNT: usize = 4;
+    const INTERNAL_COUNT: usize = 0;
     /// Total count of `NavInput` variants
     pub const COUNT: usize = sys::ImGuiNavInput_COUNT as usize - NavInput::INTERNAL_COUNT;
 }
@@ -185,13 +185,15 @@ pub struct Io {
     pub mouse_double_click_max_dist: f32,
     /// Distance threshold before considering we are dragging
     pub mouse_drag_threshold: f32,
-    /// Map of indices into the `keys_down` entries array, which represent your "native" keyboard
-    /// state
-    pub key_map: [u32; sys::ImGuiKey_COUNT as usize],
     /// When holding a key/button, time before it starts repeating, in seconds
     pub key_repeat_delay: f32,
     /// When holding a key/button, rate at which it repeats, in seconds
     pub key_repeat_rate: f32,
+
+    /// Delay on hover before [`ui.is_item_hovered_with_flags(ItemHoveredFlags::DELAY_NORMAL)`](crate::Ui::is_item_hovered_with_flags) returns true
+    pub hover_delay_normal: f32,
+    /// Delay on hover before [`ui.is_item_hovered_with_flags(ItemHoveredFlags::DELAY_SHORT)`](crate::Ui::is_item_hovered_with_flags) returns true
+    pub hover_delay_short: f32,
 
     user_data: *mut c_void,
     pub(crate) fonts: *mut FontAtlas,
@@ -218,7 +220,7 @@ pub struct Io {
     #[cfg(feature = "docking")]
     pub config_viewports_no_auto_merge: bool,
     #[cfg(feature = "docking")]
-    pub config_viewports_notask_bar_icon: bool,
+    pub config_viewports_no_task_bar_icon: bool,
     #[cfg(feature = "docking")]
     pub config_viewports_no_decoration: bool,
     #[cfg(feature = "docking")]
@@ -236,8 +238,13 @@ pub struct Io {
     /// * Double-click selects by word instead of selecting the whole text
     /// * Multi-selection in lists uses Cmd/Super instead of Ctrl
     pub config_mac_os_behaviors: bool,
+    /// Enable input queue trickling: some types of events submitted during the same frame (e.g. button down + up)
+    /// will be spread over multiple frames, improving interactions with low framerates.
+    pub config_input_trickle_event_queue: bool,
     /// Set to false to disable blinking cursor
     pub config_input_text_cursor_blink: bool,
+    /// Pressing Enter will keep item active and select contents (single-line only).
+    pub config_input_text_enter_keep_active: bool,
     /// Enable turning DragXXX widgets into text input with a simple mouse
     /// click-release (without moving). Not desirable on devices without a
     /// keyboard.
@@ -265,43 +272,13 @@ pub struct Io {
     pub(crate) set_clipboard_text_fn:
         Option<unsafe extern "C" fn(user_data: *mut c_void, text: *const c_char)>,
     pub(crate) clipboard_user_data: *mut c_void,
-    #[cfg(not(feature = "docking"))]
-    ime_set_input_screen_pos_fn:
-        Option<unsafe extern "C" fn(x: std::os::raw::c_int, y: std::os::raw::c_int)>,
-    #[cfg(not(feature = "docking"))]
-    ime_window_handle: *mut c_void,
-    /// Mouse position, in pixels.
-    ///
-    /// Set to [f32::MAX, f32::MAX] if mouse is unavailable (on another screen, etc.).
-    pub mouse_pos: [f32; 2],
-    /// Mouse buttons: 0=left, 1=right, 2=middle + extras
-    pub mouse_down: [bool; 5],
-    /// Mouse wheel (vertical).
-    ///
-    /// 1 unit scrolls about 5 lines of text.
-    pub mouse_wheel: f32,
-    /// Mouse wheel (horizontal).
-    ///
-    /// Most users don't have a mouse with a horizontal wheel, and may not be filled by all
-    /// backends.
-    pub mouse_wheel_h: f32,
-    #[cfg(feature = "docking")]
-    pub mouse_hovered_viewport: sys::ImGuiID,
-    /// Keyboard modifier pressed: Control
-    pub key_ctrl: bool,
-    /// Keyboard modifier pressed: Shift
-    pub key_shift: bool,
-    /// Keyboard modifier pressed: Alt
-    pub key_alt: bool,
-    /// Keyboard modifier pressed: Cmd/Super/Windows
-    pub key_super: bool,
-    /// Keyboard keys that are pressed (indexing defined by the user/application)
-    pub keys_down: [bool; 512],
-    /// Gamepad inputs.
-    ///
-    /// Cleared back to zero after each frame. Keyboard keys will be auto-mapped and written
-    /// here by `frame()`.
-    pub nav_inputs: [f32; NavInput::COUNT + NavInput::INTERNAL_COUNT],
+    pub set_platform_ime_data_fn: Option<
+        unsafe extern "C" fn(
+            viewport: *mut sys::ImGuiViewport,
+            data: *mut sys::ImGuiPlatformImeData,
+        ),
+    >,
+    unused_padding: *mut c_void,
     /// When true, imgui-rs will use the mouse inputs, so do not dispatch them to your main
     /// game/application
     pub want_capture_mouse: bool,
@@ -345,11 +322,46 @@ pub struct Io {
     /// Note that this is zero if either current or previous position is invalid ([f32::MAX,
     /// f32::MAX]), so a disappearing/reappearing mouse won't have a huge delta.
     pub mouse_delta: [f32; 2],
+    /// Map of indices into the `keys_down` entries array, which represent your "native" keyboard
+    /// state
+    pub key_map: [u32; sys::ImGuiKey_COUNT as usize],
+    /// Keyboard keys that are pressed (indexing defined by the user/application)
+    pub keys_down: [bool; sys::ImGuiKey_COUNT as usize],
+    /// Gamepad inputs.
+    ///
+    /// Cleared back to zero after each frame. Keyboard keys will be auto-mapped and written
+    /// here by `frame()`.
+    pub nav_inputs: [f32; NavInput::COUNT + NavInput::INTERNAL_COUNT],
+    /// Mouse position, in pixels.
+    ///
+    /// Set to [f32::MAX, f32::MAX] if mouse is unavailable (on another screen, etc.).
+    pub mouse_pos: [f32; 2],
+    /// Mouse buttons: 0=left, 1=right, 2=middle + extras
+    pub mouse_down: [bool; 5],
+    /// Mouse wheel (vertical).
+    ///
+    /// 1 unit scrolls about 5 lines of text.
+    pub mouse_wheel: f32,
+    /// Mouse wheel (horizontal).
+    ///
+    /// Most users don't have a mouse with a horizontal wheel, and may not be filled by all
+    /// backends.
+    pub mouse_wheel_h: f32,
+    #[cfg(feature = "docking")]
+    mouse_hovered_viewport: sys::ImGuiID,
+    /// Keyboard modifier pressed: Control
+    pub key_ctrl: bool,
+    /// Keyboard modifier pressed: Shift
+    pub key_shift: bool,
+    /// Keyboard modifier pressed: Alt
+    pub key_alt: bool,
+    /// Keyboard modifier pressed: Cmd/Super/Windows
+    pub key_super: bool,
+    key_mods: sys::ImGuiKeyChord,
+    keys_data: [sys::ImGuiKeyData; sys::ImGuiKey_COUNT as usize],
 
     pub want_capture_mouse_unless_popup_close: bool,
 
-    key_mods: sys::ImGuiKeyModFlags,
-    key_mods_prev: sys::ImGuiKeyModFlags,
     mouse_pos_prev: [f32; 2],
     mouse_clicked_pos: [[f32; 2]; 5],
     mouse_clicked_time: [f64; 5],
@@ -362,18 +374,20 @@ pub struct Io {
     mouse_down_owned_unless_popup_close: [bool; 5],
     mouse_down_duration: [f32; 5],
     mouse_down_duration_prev: [f32; 5],
-    mouse_drag_max_distance_abs: [[f32; 2]; 5],
+    #[cfg(feature = "docking")]
+    mouse_drag_max_distance_abs: [sys::ImVec2; 5],
     mouse_drag_max_distance_sqr: [f32; 5],
-    keys_down_duration: [f32; 512],
-    keys_down_duration_prev: [f32; 512],
-    nav_inputs_down_duration: [f32; NavInput::COUNT + NavInput::INTERNAL_COUNT],
-    nav_inputs_down_duration_prev: [f32; NavInput::COUNT + NavInput::INTERNAL_COUNT],
     pen_pressure: f32,
 
     /// Clear buttons state when focus is lost (this is useful so
     /// e.g. releasing Alt after focus loss on Alt-Tab doesn't trigger
     /// the Alt menu toggle)
     pub app_focus_lost: bool,
+
+    app_accepting_events: bool,
+    backend_using_legacy_key_arrays: sys::ImS8,
+    backend_using_legacy_nav_input_array: bool,
+
     input_queue_surrogate: sys::ImWchar16,
     input_queue_characters: ImVector<sys::ImWchar>,
 }
@@ -420,6 +434,30 @@ impl Io {
 
     pub fn update_delta_time(&mut self, delta: Duration) {
         self.delta_time = delta.as_secs_f32().max(f32::MIN_POSITIVE);
+    }
+
+    pub fn add_mouse_pos_event(&mut self, pos: [f32; 2]) {
+        unsafe {
+            sys::ImGuiIO_AddMousePosEvent(self.raw_mut(), pos[0], pos[1]);
+        }
+    }
+
+    pub fn add_mouse_button_event(&mut self, button: MouseButton, down: bool) {
+        unsafe {
+            sys::ImGuiIO_AddMouseButtonEvent(self.raw_mut(), button as i32, down);
+        }
+    }
+
+    pub fn add_mouse_wheel_event(&mut self, wheel: [f32; 2]) {
+        unsafe {
+            sys::ImGuiIO_AddMouseWheelEvent(self.raw_mut(), wheel[0], wheel[1]);
+        }
+    }
+
+    pub fn add_key_event(&mut self, key: Key, down: bool) {
+        unsafe {
+            sys::ImGuiIO_AddKeyEvent(self.raw_mut(), key as u32, down);
+        }
     }
 }
 
@@ -477,92 +515,117 @@ fn test_io_memory_layout() {
             );
         };
     }
-    assert_field_offset!(config_flags, ConfigFlags);
-    assert_field_offset!(backend_flags, BackendFlags);
-    assert_field_offset!(display_size, DisplaySize);
-    assert_field_offset!(delta_time, DeltaTime);
-    assert_field_offset!(ini_saving_rate, IniSavingRate);
-    assert_field_offset!(ini_filename, IniFilename);
-    assert_field_offset!(log_filename, LogFilename);
-    assert_field_offset!(mouse_double_click_time, MouseDoubleClickTime);
-    assert_field_offset!(mouse_double_click_max_dist, MouseDoubleClickMaxDist);
-    assert_field_offset!(mouse_drag_threshold, MouseDragThreshold);
-    assert_field_offset!(key_map, KeyMap);
-    assert_field_offset!(key_repeat_delay, KeyRepeatDelay);
-    assert_field_offset!(key_repeat_rate, KeyRepeatRate);
-    assert_field_offset!(user_data, UserData);
-    assert_field_offset!(fonts, Fonts);
-    assert_field_offset!(font_global_scale, FontGlobalScale);
-    assert_field_offset!(font_allow_user_scaling, FontAllowUserScaling);
-    assert_field_offset!(font_default, FontDefault);
-    assert_field_offset!(display_framebuffer_scale, DisplayFramebufferScale);
-    assert_field_offset!(mouse_draw_cursor, MouseDrawCursor);
-    assert_field_offset!(config_mac_os_behaviors, ConfigMacOSXBehaviors);
-    assert_field_offset!(config_input_text_cursor_blink, ConfigInputTextCursorBlink);
-    assert_field_offset!(
-        config_windows_resize_from_edges,
-        ConfigWindowsResizeFromEdges
-    );
-    assert_field_offset!(
-        config_windows_move_from_title_bar_only,
-        ConfigWindowsMoveFromTitleBarOnly
-    );
-    assert_field_offset!(backend_platform_name, BackendPlatformName);
-    assert_field_offset!(backend_renderer_name, BackendRendererName);
-    assert_field_offset!(backend_platform_user_data, BackendPlatformUserData);
-    assert_field_offset!(backend_renderer_user_data, BackendRendererUserData);
-    assert_field_offset!(backend_language_user_data, BackendLanguageUserData);
-    assert_field_offset!(get_clipboard_text_fn, GetClipboardTextFn);
-    assert_field_offset!(set_clipboard_text_fn, SetClipboardTextFn);
-    assert_field_offset!(clipboard_user_data, ClipboardUserData);
-    #[cfg(not(feature = "docking"))]
-    assert_field_offset!(ime_set_input_screen_pos_fn, ImeSetInputScreenPosFn);
-    #[cfg(not(feature = "docking"))]
-    assert_field_offset!(ime_window_handle, ImeWindowHandle);
-    assert_field_offset!(mouse_pos, MousePos);
-    assert_field_offset!(mouse_down, MouseDown);
-    assert_field_offset!(mouse_wheel, MouseWheel);
-    assert_field_offset!(mouse_wheel_h, MouseWheelH);
-    assert_field_offset!(key_ctrl, KeyCtrl);
-    assert_field_offset!(key_shift, KeyShift);
-    assert_field_offset!(key_alt, KeyAlt);
-    assert_field_offset!(key_super, KeySuper);
-    assert_field_offset!(keys_down, KeysDown);
-    assert_field_offset!(nav_inputs, NavInputs);
-    assert_field_offset!(want_capture_mouse, WantCaptureMouse);
-    assert_field_offset!(want_capture_keyboard, WantCaptureKeyboard);
-    assert_field_offset!(want_text_input, WantTextInput);
-    assert_field_offset!(want_set_mouse_pos, WantSetMousePos);
-    assert_field_offset!(want_save_ini_settings, WantSaveIniSettings);
-    assert_field_offset!(nav_active, NavActive);
-    assert_field_offset!(nav_visible, NavVisible);
-    assert_field_offset!(framerate, Framerate);
-    assert_field_offset!(metrics_render_vertices, MetricsRenderVertices);
-    assert_field_offset!(metrics_render_indices, MetricsRenderIndices);
-    assert_field_offset!(metrics_render_windows, MetricsRenderWindows);
-    assert_field_offset!(metrics_active_windows, MetricsActiveWindows);
-    assert_field_offset!(metrics_active_allocations, MetricsActiveAllocations);
-    assert_field_offset!(mouse_delta, MouseDelta);
-    assert_field_offset!(key_mods, KeyMods);
-    assert_field_offset!(key_mods_prev, KeyModsPrev);
-    assert_field_offset!(mouse_pos_prev, MousePosPrev);
-    assert_field_offset!(mouse_clicked_pos, MouseClickedPos);
-    assert_field_offset!(mouse_clicked_time, MouseClickedTime);
-    assert_field_offset!(mouse_clicked, MouseClicked);
-    assert_field_offset!(mouse_double_clicked, MouseDoubleClicked);
-    assert_field_offset!(mouse_clicked_count, MouseClickedCount);
-    assert_field_offset!(mouse_clicked_last_count, MouseClickedLastCount);
-    assert_field_offset!(mouse_released, MouseReleased);
-    assert_field_offset!(mouse_down_owned, MouseDownOwned);
-    assert_field_offset!(mouse_down_duration, MouseDownDuration);
-    assert_field_offset!(mouse_down_duration_prev, MouseDownDurationPrev);
-    assert_field_offset!(mouse_drag_max_distance_abs, MouseDragMaxDistanceAbs);
-    assert_field_offset!(mouse_drag_max_distance_sqr, MouseDragMaxDistanceSqr);
-    assert_field_offset!(keys_down_duration, KeysDownDuration);
-    assert_field_offset!(keys_down_duration_prev, KeysDownDurationPrev);
-    assert_field_offset!(nav_inputs_down_duration, NavInputsDownDuration);
-    assert_field_offset!(nav_inputs_down_duration_prev, NavInputsDownDurationPrev);
-    assert_field_offset!(pen_pressure, PenPressure);
-    assert_field_offset!(input_queue_surrogate, InputQueueSurrogate);
-    assert_field_offset!(input_queue_characters, InputQueueCharacters);
+
+    // We move this test into a Thread with a larger stack
+    // since the stack size of the default thread is not large enough in
+    // debug mode.
+    std::thread::Builder::new()
+        .stack_size(4 * 1024 * 1024)
+        .spawn(|| {
+            assert_field_offset!(config_flags, ConfigFlags);
+            assert_field_offset!(backend_flags, BackendFlags);
+            assert_field_offset!(display_size, DisplaySize);
+            assert_field_offset!(delta_time, DeltaTime);
+            assert_field_offset!(ini_saving_rate, IniSavingRate);
+            assert_field_offset!(ini_filename, IniFilename);
+            assert_field_offset!(log_filename, LogFilename);
+            assert_field_offset!(mouse_double_click_time, MouseDoubleClickTime);
+            assert_field_offset!(mouse_double_click_max_dist, MouseDoubleClickMaxDist);
+            assert_field_offset!(mouse_drag_threshold, MouseDragThreshold);
+            assert_field_offset!(key_repeat_delay, KeyRepeatDelay);
+            assert_field_offset!(key_repeat_rate, KeyRepeatRate);
+            assert_field_offset!(hover_delay_normal, HoverDelayNormal);
+            assert_field_offset!(hover_delay_short, HoverDelayShort);
+            assert_field_offset!(user_data, UserData);
+            assert_field_offset!(fonts, Fonts);
+            assert_field_offset!(font_global_scale, FontGlobalScale);
+            assert_field_offset!(font_allow_user_scaling, FontAllowUserScaling);
+            assert_field_offset!(font_default, FontDefault);
+            assert_field_offset!(display_framebuffer_scale, DisplayFramebufferScale);
+            assert_field_offset!(mouse_draw_cursor, MouseDrawCursor);
+            assert_field_offset!(config_mac_os_behaviors, ConfigMacOSXBehaviors);
+            assert_field_offset!(
+                config_input_trickle_event_queue,
+                ConfigInputTrickleEventQueue
+            );
+            assert_field_offset!(config_input_text_cursor_blink, ConfigInputTextCursorBlink);
+            assert_field_offset!(
+                config_input_text_enter_keep_active,
+                ConfigInputTextEnterKeepActive
+            );
+            assert_field_offset!(
+                config_windows_resize_from_edges,
+                ConfigWindowsResizeFromEdges
+            );
+            assert_field_offset!(
+                config_windows_move_from_title_bar_only,
+                ConfigWindowsMoveFromTitleBarOnly
+            );
+            assert_field_offset!(backend_platform_name, BackendPlatformName);
+            assert_field_offset!(backend_renderer_name, BackendRendererName);
+            assert_field_offset!(backend_platform_user_data, BackendPlatformUserData);
+            assert_field_offset!(backend_renderer_user_data, BackendRendererUserData);
+            assert_field_offset!(backend_language_user_data, BackendLanguageUserData);
+            assert_field_offset!(get_clipboard_text_fn, GetClipboardTextFn);
+            assert_field_offset!(set_clipboard_text_fn, SetClipboardTextFn);
+            assert_field_offset!(clipboard_user_data, ClipboardUserData);
+            assert_field_offset!(set_platform_ime_data_fn, SetPlatformImeDataFn);
+            assert_field_offset!(unused_padding, _UnusedPadding);
+            assert_field_offset!(want_capture_mouse, WantCaptureMouse);
+            assert_field_offset!(want_capture_keyboard, WantCaptureKeyboard);
+            assert_field_offset!(want_text_input, WantTextInput);
+            assert_field_offset!(want_set_mouse_pos, WantSetMousePos);
+            assert_field_offset!(want_save_ini_settings, WantSaveIniSettings);
+            assert_field_offset!(nav_active, NavActive);
+            assert_field_offset!(nav_visible, NavVisible);
+            assert_field_offset!(framerate, Framerate);
+            assert_field_offset!(metrics_render_vertices, MetricsRenderVertices);
+            assert_field_offset!(metrics_render_indices, MetricsRenderIndices);
+            assert_field_offset!(metrics_render_windows, MetricsRenderWindows);
+            assert_field_offset!(metrics_active_windows, MetricsActiveWindows);
+            assert_field_offset!(metrics_active_allocations, MetricsActiveAllocations);
+            assert_field_offset!(mouse_delta, MouseDelta);
+            assert_field_offset!(key_map, KeyMap);
+            assert_field_offset!(keys_down, KeysDown);
+            assert_field_offset!(nav_inputs, NavInputs);
+            assert_field_offset!(mouse_pos, MousePos);
+            assert_field_offset!(mouse_down, MouseDown);
+            assert_field_offset!(mouse_wheel, MouseWheel);
+            assert_field_offset!(mouse_wheel_h, MouseWheelH);
+            assert_field_offset!(key_ctrl, KeyCtrl);
+            assert_field_offset!(key_shift, KeyShift);
+            assert_field_offset!(key_alt, KeyAlt);
+            assert_field_offset!(key_super, KeySuper);
+            assert_field_offset!(key_mods, KeyMods);
+            assert_field_offset!(keys_data, KeysData);
+            assert_field_offset!(
+                want_capture_mouse_unless_popup_close,
+                WantCaptureMouseUnlessPopupClose
+            );
+            assert_field_offset!(mouse_pos_prev, MousePosPrev);
+            assert_field_offset!(mouse_clicked_pos, MouseClickedPos);
+            assert_field_offset!(mouse_clicked_time, MouseClickedTime);
+            assert_field_offset!(mouse_clicked, MouseClicked);
+            assert_field_offset!(mouse_double_clicked, MouseDoubleClicked);
+            assert_field_offset!(mouse_clicked_count, MouseClickedCount);
+            assert_field_offset!(mouse_clicked_last_count, MouseClickedLastCount);
+            assert_field_offset!(mouse_released, MouseReleased);
+            assert_field_offset!(mouse_down_owned, MouseDownOwned);
+            assert_field_offset!(mouse_down_duration, MouseDownDuration);
+            assert_field_offset!(mouse_down_duration_prev, MouseDownDurationPrev);
+            assert_field_offset!(mouse_drag_max_distance_sqr, MouseDragMaxDistanceSqr);
+            assert_field_offset!(pen_pressure, PenPressure);
+            assert_field_offset!(app_focus_lost, AppFocusLost);
+            assert_field_offset!(app_accepting_events, AppAcceptingEvents);
+            assert_field_offset!(backend_using_legacy_key_arrays, BackendUsingLegacyKeyArrays);
+            assert_field_offset!(
+                backend_using_legacy_nav_input_array,
+                BackendUsingLegacyNavInputArray
+            );
+            assert_field_offset!(input_queue_surrogate, InputQueueSurrogate);
+            assert_field_offset!(input_queue_characters, InputQueueCharacters);
+        })
+        .unwrap()
+        .join()
+        .unwrap();
 }

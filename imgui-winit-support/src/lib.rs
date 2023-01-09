@@ -74,7 +74,6 @@
 //! ```
 
 use imgui::{self, BackendFlags, ConfigFlags, Context, Io, Key, Ui};
-use std::cell::Cell;
 use std::cmp::Ordering;
 
 // Re-export winit to make it easier for users to use the correct version.
@@ -90,45 +89,12 @@ use winit::{
     window::{CursorIcon as MouseCursor, Window},
 };
 
-/// State of a single mouse button. Used so that we can detect cases where mouse
-/// press and release occur on the same frame (seems surprisingly frequent on
-/// macOS now...)
-#[derive(Debug, Clone, Default)]
-struct Button {
-    pressed_this_frame: Cell<bool>,
-    state: Cell<bool>,
-}
-
-impl Button {
-    // we can use this in an array initializer, unlike `Default::default()` or a
-    // `const fn new()`.
-    #[allow(clippy::declare_interior_mutable_const)]
-    const INIT: Button = Self {
-        pressed_this_frame: Cell::new(false),
-        state: Cell::new(false),
-    };
-    fn set(&self, pressed: bool) {
-        self.state.set(pressed);
-        if pressed {
-            self.pressed_this_frame.set(true);
-        }
-    }
-    fn get(&self) -> bool {
-        // If we got a press this frame, record it even if we got a release
-        // too — this way we don't drop mouse clicks where the release comes
-        // in on the same frame as the press. (This mirrors what Dear ImGUI
-        // seems to do in the `imgui_impl_*`)
-        self.pressed_this_frame.replace(false) || self.state.get()
-    }
-}
-
 /// winit backend platform state
 #[derive(Debug)]
 pub struct WinitPlatform {
     hidpi_mode: ActiveHiDpiMode,
     hidpi_factor: f64,
     cursor_cache: Option<CursorSettings>,
-    mouse_buttons: [Button; 5],
 }
 
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
@@ -203,6 +169,128 @@ impl HiDpiMode {
     }
 }
 
+fn to_imgui_mouse_button(button: MouseButton) -> Option<imgui::MouseButton> {
+    match button {
+        MouseButton::Left | MouseButton::Other(0) => Some(imgui::MouseButton::Left),
+        MouseButton::Right | MouseButton::Other(1) => Some(imgui::MouseButton::Right),
+        MouseButton::Middle | MouseButton::Other(2) => Some(imgui::MouseButton::Middle),
+        MouseButton::Other(3) => Some(imgui::MouseButton::Extra1),
+        MouseButton::Other(4) => Some(imgui::MouseButton::Extra2),
+        _ => None,
+    }
+}
+
+fn to_imgui_key(keycode: VirtualKeyCode) -> Option<Key> {
+    match keycode {
+        VirtualKeyCode::Tab => Some(Key::Tab),
+        VirtualKeyCode::Left => Some(Key::LeftArrow),
+        VirtualKeyCode::Right => Some(Key::RightArrow),
+        VirtualKeyCode::Up => Some(Key::UpArrow),
+        VirtualKeyCode::Down => Some(Key::DownArrow),
+        VirtualKeyCode::PageUp => Some(Key::PageUp),
+        VirtualKeyCode::PageDown => Some(Key::PageDown),
+        VirtualKeyCode::Home => Some(Key::Home),
+        VirtualKeyCode::End => Some(Key::End),
+        VirtualKeyCode::Insert => Some(Key::Insert),
+        VirtualKeyCode::Delete => Some(Key::Delete),
+        VirtualKeyCode::Back => Some(Key::Backspace),
+        VirtualKeyCode::Space => Some(Key::Space),
+        VirtualKeyCode::Return => Some(Key::Enter),
+        VirtualKeyCode::Escape => Some(Key::Escape),
+        VirtualKeyCode::LControl => Some(Key::LeftCtrl),
+        VirtualKeyCode::LShift => Some(Key::LeftShift),
+        VirtualKeyCode::LAlt => Some(Key::LeftAlt),
+        VirtualKeyCode::LWin => Some(Key::LeftSuper),
+        VirtualKeyCode::RControl => Some(Key::RightCtrl),
+        VirtualKeyCode::RShift => Some(Key::RightShift),
+        VirtualKeyCode::RAlt => Some(Key::RightAlt),
+        VirtualKeyCode::RWin => Some(Key::RightSuper),
+        //VirtualKeyCode::Menu => Some(Key::Menu), // TODO: find out if there is a Menu key in winit
+        VirtualKeyCode::Key0 => Some(Key::Alpha0),
+        VirtualKeyCode::Key1 => Some(Key::Alpha1),
+        VirtualKeyCode::Key2 => Some(Key::Alpha2),
+        VirtualKeyCode::Key3 => Some(Key::Alpha3),
+        VirtualKeyCode::Key4 => Some(Key::Alpha4),
+        VirtualKeyCode::Key5 => Some(Key::Alpha5),
+        VirtualKeyCode::Key6 => Some(Key::Alpha6),
+        VirtualKeyCode::Key7 => Some(Key::Alpha7),
+        VirtualKeyCode::Key8 => Some(Key::Alpha8),
+        VirtualKeyCode::Key9 => Some(Key::Alpha9),
+        VirtualKeyCode::A => Some(Key::A),
+        VirtualKeyCode::B => Some(Key::B),
+        VirtualKeyCode::C => Some(Key::C),
+        VirtualKeyCode::D => Some(Key::D),
+        VirtualKeyCode::E => Some(Key::E),
+        VirtualKeyCode::F => Some(Key::F),
+        VirtualKeyCode::G => Some(Key::G),
+        VirtualKeyCode::H => Some(Key::H),
+        VirtualKeyCode::I => Some(Key::I),
+        VirtualKeyCode::J => Some(Key::J),
+        VirtualKeyCode::K => Some(Key::K),
+        VirtualKeyCode::L => Some(Key::L),
+        VirtualKeyCode::M => Some(Key::M),
+        VirtualKeyCode::N => Some(Key::N),
+        VirtualKeyCode::O => Some(Key::O),
+        VirtualKeyCode::P => Some(Key::P),
+        VirtualKeyCode::Q => Some(Key::Q),
+        VirtualKeyCode::R => Some(Key::R),
+        VirtualKeyCode::S => Some(Key::S),
+        VirtualKeyCode::T => Some(Key::T),
+        VirtualKeyCode::U => Some(Key::U),
+        VirtualKeyCode::V => Some(Key::V),
+        VirtualKeyCode::W => Some(Key::W),
+        VirtualKeyCode::X => Some(Key::X),
+        VirtualKeyCode::Y => Some(Key::Y),
+        VirtualKeyCode::Z => Some(Key::Z),
+        VirtualKeyCode::F1 => Some(Key::F1),
+        VirtualKeyCode::F2 => Some(Key::F2),
+        VirtualKeyCode::F3 => Some(Key::F3),
+        VirtualKeyCode::F4 => Some(Key::F4),
+        VirtualKeyCode::F5 => Some(Key::F5),
+        VirtualKeyCode::F6 => Some(Key::F6),
+        VirtualKeyCode::F7 => Some(Key::F7),
+        VirtualKeyCode::F8 => Some(Key::F8),
+        VirtualKeyCode::F9 => Some(Key::F9),
+        VirtualKeyCode::F10 => Some(Key::F10),
+        VirtualKeyCode::F11 => Some(Key::F11),
+        VirtualKeyCode::F12 => Some(Key::F12),
+        VirtualKeyCode::Apostrophe => Some(Key::Apostrophe),
+        VirtualKeyCode::Comma => Some(Key::Comma),
+        VirtualKeyCode::Minus => Some(Key::Minus),
+        VirtualKeyCode::Period => Some(Key::Period),
+        VirtualKeyCode::Slash => Some(Key::Slash),
+        VirtualKeyCode::Semicolon => Some(Key::Semicolon),
+        VirtualKeyCode::Equals => Some(Key::Equal),
+        VirtualKeyCode::LBracket => Some(Key::LeftBracket),
+        VirtualKeyCode::Backslash => Some(Key::Backslash),
+        VirtualKeyCode::RBracket => Some(Key::RightBracket),
+        VirtualKeyCode::Grave => Some(Key::GraveAccent),
+        VirtualKeyCode::Capital => Some(Key::CapsLock),
+        VirtualKeyCode::Scroll => Some(Key::ScrollLock),
+        VirtualKeyCode::Numlock => Some(Key::NumLock),
+        VirtualKeyCode::Snapshot => Some(Key::PrintScreen),
+        VirtualKeyCode::Pause => Some(Key::Pause),
+        VirtualKeyCode::Numpad0 => Some(Key::Keypad0),
+        VirtualKeyCode::Numpad1 => Some(Key::Keypad1),
+        VirtualKeyCode::Numpad2 => Some(Key::Keypad2),
+        VirtualKeyCode::Numpad3 => Some(Key::Keypad3),
+        VirtualKeyCode::Numpad4 => Some(Key::Keypad4),
+        VirtualKeyCode::Numpad5 => Some(Key::Keypad5),
+        VirtualKeyCode::Numpad6 => Some(Key::Keypad6),
+        VirtualKeyCode::Numpad7 => Some(Key::Keypad7),
+        VirtualKeyCode::Numpad8 => Some(Key::Keypad8),
+        VirtualKeyCode::Numpad9 => Some(Key::Keypad9),
+        VirtualKeyCode::NumpadDecimal => Some(Key::KeypadDecimal),
+        VirtualKeyCode::NumpadDivide => Some(Key::KeypadDivide),
+        VirtualKeyCode::NumpadMultiply => Some(Key::KeypadMultiply),
+        VirtualKeyCode::NumpadSubtract => Some(Key::KeypadSubtract),
+        VirtualKeyCode::NumpadAdd => Some(Key::KeypadAdd),
+        VirtualKeyCode::NumpadEnter => Some(Key::KeypadEnter),
+        VirtualKeyCode::NumpadEquals => Some(Key::KeypadEqual),
+        _ => None,
+    }
+}
+
 impl WinitPlatform {
     /// Initializes a winit platform instance and configures imgui.
     ///
@@ -215,28 +303,6 @@ impl WinitPlatform {
         let io = imgui.io_mut();
         io.backend_flags.insert(BackendFlags::HAS_MOUSE_CURSORS);
         io.backend_flags.insert(BackendFlags::HAS_SET_MOUSE_POS);
-        io[Key::Tab] = VirtualKeyCode::Tab as _;
-        io[Key::LeftArrow] = VirtualKeyCode::Left as _;
-        io[Key::RightArrow] = VirtualKeyCode::Right as _;
-        io[Key::UpArrow] = VirtualKeyCode::Up as _;
-        io[Key::DownArrow] = VirtualKeyCode::Down as _;
-        io[Key::PageUp] = VirtualKeyCode::PageUp as _;
-        io[Key::PageDown] = VirtualKeyCode::PageDown as _;
-        io[Key::Home] = VirtualKeyCode::Home as _;
-        io[Key::End] = VirtualKeyCode::End as _;
-        io[Key::Insert] = VirtualKeyCode::Insert as _;
-        io[Key::Delete] = VirtualKeyCode::Delete as _;
-        io[Key::Backspace] = VirtualKeyCode::Back as _;
-        io[Key::Space] = VirtualKeyCode::Space as _;
-        io[Key::Enter] = VirtualKeyCode::Return as _;
-        io[Key::Escape] = VirtualKeyCode::Escape as _;
-        io[Key::KeyPadEnter] = VirtualKeyCode::NumpadEnter as _;
-        io[Key::A] = VirtualKeyCode::A as _;
-        io[Key::C] = VirtualKeyCode::C as _;
-        io[Key::V] = VirtualKeyCode::V as _;
-        io[Key::X] = VirtualKeyCode::X as _;
-        io[Key::Y] = VirtualKeyCode::Y as _;
-        io[Key::Z] = VirtualKeyCode::Z as _;
         imgui.set_platform_name(Some(format!(
             "imgui-winit-support {}",
             env!("CARGO_PKG_VERSION")
@@ -245,7 +311,6 @@ impl WinitPlatform {
             hidpi_mode: ActiveHiDpiMode::Default,
             hidpi_factor: 1.0,
             cursor_cache: None,
-            mouse_buttons: [Button::INIT; 5],
         }
     }
     /// Attaches the platform instance to a winit window.
@@ -353,7 +418,9 @@ impl WinitPlatform {
                     }),
                 ..
             } => {
-                io.keys_down[key as usize] = false;
+                if let Some(key) = to_imgui_key(key) {
+                    io.add_key_event(key, false);
+                }
             }
             _ => (),
         }
@@ -395,19 +462,9 @@ impl WinitPlatform {
                     },
                 ..
             } => {
-                let pressed = state == ElementState::Pressed;
-                io.keys_down[key as usize] = pressed;
-
-                // This is a bit redundant here, but we'll leave it in. The OS occasionally
-                // fails to send modifiers keys, but it doesn't seem to send false-positives,
-                // so double checking isn't terrible in case some system *doesn't* send
-                // device events sometimes.
-                match key {
-                    VirtualKeyCode::LShift | VirtualKeyCode::RShift => io.key_shift = pressed,
-                    VirtualKeyCode::LControl | VirtualKeyCode::RControl => io.key_ctrl = pressed,
-                    VirtualKeyCode::LAlt | VirtualKeyCode::RAlt => io.key_alt = pressed,
-                    VirtualKeyCode::LWin | VirtualKeyCode::RWin => io.key_super = pressed,
-                    _ => (),
+                if let Some(key) = to_imgui_key(key) {
+                    let pressed = state == ElementState::Pressed;
+                    io.add_key_event(key, pressed);
                 }
             }
             WindowEvent::ReceivedCharacter(ch) => {
@@ -420,41 +477,36 @@ impl WinitPlatform {
             WindowEvent::CursorMoved { position, .. } => {
                 let position = position.to_logical(window.scale_factor());
                 let position = self.scale_pos_from_winit(window, position);
-                io.mouse_pos = [position.x as f32, position.y as f32];
+                io.add_mouse_pos_event([position.x as f32, position.y as f32]);
             }
             WindowEvent::MouseWheel {
                 delta,
                 phase: TouchPhase::Moved,
                 ..
-            } => match delta {
-                MouseScrollDelta::LineDelta(h, v) => {
-                    io.mouse_wheel_h = h;
-                    io.mouse_wheel = v;
-                }
-                MouseScrollDelta::PixelDelta(pos) => {
-                    let pos = pos.to_logical::<f64>(self.hidpi_factor);
-                    match pos.x.partial_cmp(&0.0) {
-                        Some(Ordering::Greater) => io.mouse_wheel_h += 1.0,
-                        Some(Ordering::Less) => io.mouse_wheel_h -= 1.0,
-                        _ => (),
+            } => {
+                let (h, v) = match delta {
+                    MouseScrollDelta::LineDelta(h, v) => (h, v),
+                    MouseScrollDelta::PixelDelta(pos) => {
+                        let pos = pos.to_logical::<f64>(self.hidpi_factor);
+                        let h = match pos.x.partial_cmp(&0.0) {
+                            Some(Ordering::Greater) => 1.0,
+                            Some(Ordering::Less) => -1.0,
+                            _ => 0.0,
+                        };
+                        let v = match pos.y.partial_cmp(&0.0) {
+                            Some(Ordering::Greater) => 1.0,
+                            Some(Ordering::Less) => -1.0,
+                            _ => 0.0,
+                        };
+                        (h, v)
                     }
-                    match pos.y.partial_cmp(&0.0) {
-                        Some(Ordering::Greater) => io.mouse_wheel += 1.0,
-                        Some(Ordering::Less) => io.mouse_wheel -= 1.0,
-                        _ => (),
-                    }
-                }
-            },
+                };
+                io.add_mouse_wheel_event([h, v]);
+            }
             WindowEvent::MouseInput { state, button, .. } => {
-                let pressed = state == ElementState::Pressed;
-                match button {
-                    MouseButton::Left => self.mouse_buttons[0].set(pressed),
-                    MouseButton::Right => self.mouse_buttons[1].set(pressed),
-                    MouseButton::Middle => self.mouse_buttons[2].set(pressed),
-                    MouseButton::Other(idx @ 0..=4) => {
-                        self.mouse_buttons[idx as usize].set(pressed)
-                    }
-                    _ => (),
+                if let Some(mb) = to_imgui_mouse_button(button) {
+                    let pressed = state == ElementState::Pressed;
+                    io.add_mouse_button_event(mb, pressed);
                 }
             }
             WindowEvent::Focused(newly_focused) => {
@@ -474,7 +526,6 @@ impl WinitPlatform {
     ///
     /// * mouse cursor is repositioned (if requested by imgui-rs)
     pub fn prepare_frame(&self, io: &mut Io, window: &Window) -> Result<(), ExternalError> {
-        self.copy_mouse_to_io(&mut io.mouse_down);
         if io.want_set_mouse_pos {
             let logical_pos = self.scale_pos_for_winit(
                 window,
@@ -483,12 +534,6 @@ impl WinitPlatform {
             window.set_cursor_position(logical_pos)
         } else {
             Ok(())
-        }
-    }
-
-    fn copy_mouse_to_io(&self, io_mouse_down: &mut [bool]) {
-        for (io_down, button) in io_mouse_down.iter_mut().zip(&self.mouse_buttons) {
-            *io_down = button.get();
         }
     }
 

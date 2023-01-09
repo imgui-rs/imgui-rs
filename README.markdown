@@ -3,7 +3,7 @@
 [![Build Status](https://github.com/imgui-rs/imgui-rs/workflows/ci/badge.svg)](https://github.com/imgui-rs/imgui-rs/actions)
 [![Latest release on crates.io](https://img.shields.io/crates/v/imgui.svg)](https://crates.io/crates/imgui)
 [![Documentation on docs.rs](https://docs.rs/imgui/badge.svg)](https://docs.rs/imgui)
-[![Wrapped Dear ImGui Version](https://img.shields.io/badge/Dear%20ImGui%20Version-1.86.0-blue.svg)](https://github.com/ocornut/imgui)
+[![Wrapped Dear ImGui Version](https://img.shields.io/badge/Dear%20ImGui%20Version-1.89.1-blue.svg)](https://github.com/ocornut/imgui)
 
 ![Hello world](hello_world.png)
 
@@ -25,12 +25,28 @@ ui.window("Hello world")
 
 ## Main library crates
 
-- imgui: High-level safe API
-- imgui-winit-support: Backend platform implementation that uses the `winit`
-  crate (latest by default, but earlier versions are supported via feature flags)
-- imgui-glow-renderer: Renderer implementation that uses the `glow` crate
-- imgui-glium-renderer: Renderer implementation that uses the `glium` crate
-- imgui-sys: Low-level unsafe API (automatically generated)
+The core of imgui-rs consists of:
+
+- [`imgui`](./imgui): High-level safe API
+- [`imgui-sys`](./imgui-sys): Low-level unsafe API (automatically generated)
+
+Next, we provide two example renderers, and two example backend platform implementations:
+
+- [`imgui-winit-support`](./imgui-winit-support): Backend platform implementation that uses the `winit` crate
+- [`imgui-sdl2-support`](./imgui-sdl2-support): Backend platform using SDL2
+- [`imgui-glow-renderer`](./imgui-glow-renderer): Renderer implementation that uses the `glow` crate
+- [`imgui-glium-renderer`](./imgui-glium-renderer): Renderer implementation that uses the `glium` crate
+
+Each of these contain an `examples` folder showing their usage. Check
+their respective `Cargo.toml` to find compatible versions (e.g
+`imgui-glow-renderer/Cargo.toml` the `[dependencies]` describes the
+compatible `glow` version and `[dev-dependencies]` describes the
+compatible `glutin` version)
+
+Finally the [`imgui-examples`](./imgui-examples) folder contains
+examples of how to use the `imgui` crate itself - this covers general
+topics like how to show text, how to create buttons, etc - and should
+be applicable to usage with any backend/renderer.
 
 ## Features
 
@@ -39,8 +55,8 @@ ui.window("Hello world")
 - Builder structs for use cases where the original C++ library uses optional
   function parameters
 - Easy integration with `glow`/ `glium`
-- Easy integration with winit (backend platform)
-- Optional support for the freetype font rasterizer
+- Easy integration with winit and sdl2 (backend platform)
+- Optional support for the freetype font rasterizer and the docking branch
 
 ## Minimum Support Rust Version (MSRV)
 
@@ -84,6 +100,7 @@ Additionally, there are other libraries which provide other kinds of renderers, 
  2. [`imgui-d3d12-renderer`](https://github.com/curldivergence/imgui-d3d12-renderer)
  3. [`imgui-dx11-renderer`](https://github.com/veykril/imgui-dx11-renderer)
  4. [`imgui-gfx-renderer`](https://github.com/imgui-rs/imgui-gfx-renderer): Deprecated (no longer maintained beyond imgui-rs v0.8). Renderer implementation that uses the `gfx` crate (_not the new gfx-hal crate_)
+ 5. Many more can be found on [crates.io](https://crates.io) either using search or the ["dependents" page](https://crates.io/crates/imgui/reverse_dependencies) (the "depends on" text indicates if the crate has been updated for current versions of imgui-rs)
 
 
 You can also write your own support code if you have a more advanced use case, because **imgui-rs is not tied to any specific graphics / OS API**.

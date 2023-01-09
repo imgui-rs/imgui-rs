@@ -12,6 +12,7 @@ In short, there are a few steps:
 2. Run cimgui to generate C wrapper for imgui
 3. Run bindgen
 4. Fix up the imgui-rs wrapper
+5. Update version in README badge (edit the URL)
 
 ## Step by step
 
