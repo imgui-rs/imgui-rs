@@ -1,9 +1,25 @@
 # Change Log
 
 ## [unreleased]
-- Removed `im_str!` macro - deprecated since v0.8.
+- Breaking: Removed `im_str!` macro - deprecated since v0.8.
 
   `ui.button(im_str!("Example"))` just becomes `ui.button("Example")` and `ui.button(&im_str!("My age is {}", 100))` becomes `ui.button!(format!("My age is {}", 100))`
+
+- Breaking: Updated to Dear ImGui 1.89.1.
+
+  This introduces some breaking changes like the `imgui::Key` now contains a full set of keys (previously it was a small subset of to cover copy/paste/undo)
+
+- Breaking (partially): `ImageButton::new` is now deprecated, replaced by `ui.image_button_config(...)`.
+
+  The old `new` method should be backwards-compatible in most common situations. Exception is if the `ImageButton` builder struct was explicitly specified, say in a method like `fn configure_my_button(button: &mut imgui::ImageButton)` (in which case either change `ImageButton` to `ImageButtonDeprecated`, or update to the new constructor)
+
+- Updated `imgui-winit-support` to use new "event based IO" (detailed in the Dear ImGui 1.87 release notes, but basically it aims to improve behaviour at low frame rates). Existing custom backends should work without changes, but are advised to update to the new API.
+
+- Accept `usize` and `isize` for parameters which use `DataTypeKind` (such as `Ui::input_scalar`). This treats them as `u64`/`i64` (or `u32`/`i32`) as appropriate
+
+- The `examples` directories have been reorganized slightly.
+
+  There is now an example in `imgui-glium-renderer` showing basic usage, consistent with the glow.
 
 ## [0.9.0] - 2022-11-30
 
