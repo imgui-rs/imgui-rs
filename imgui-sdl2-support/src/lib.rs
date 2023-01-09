@@ -19,40 +19,10 @@ use imgui::{BackendFlags, ConfigFlags, Context, Io, Key, MouseCursor};
 use sdl2::{
     event::Event,
     keyboard::{Mod, Scancode},
-    mouse::{Cursor, MouseButton, MouseState, SystemCursor},
+    mouse::{Cursor, MouseState, SystemCursor},
     video::Window,
     EventPump,
 };
-
-/// State of a single mouse button. Used so that we can detect cases where mouse
-/// press and release occur on the same frame (seems surprisingly frequent on
-/// macOS now...)
-#[derive(Debug, Clone, Copy, Default)]
-struct Button {
-    pub pressed_this_frame: bool,
-    state: bool,
-}
-
-impl Button {
-    const fn new() -> Button {
-        Button {
-            pressed_this_frame: false,
-            state: false,
-        }
-    }
-
-    fn get(&self) -> bool {
-        self.pressed_this_frame || self.state
-    }
-
-    fn set(&mut self, pressed: bool) {
-        self.state = pressed;
-
-        if pressed {
-            self.pressed_this_frame = true;
-        }
-    }
-}
 
 /// Handle changes in the key modifier states.
 fn handle_key_modifier(io: &mut Io, keymod: &Mod) {
@@ -109,7 +79,6 @@ pub fn filter_event(window: &Window, event: &Event) -> bool {
 pub struct SdlPlatform {
     cursor_instance: Option<Cursor>, /* to avoid dropping cursor instances */
     last_frame: Instant,
-    mouse_buttons: [Button; 5],
 }
 
 impl SdlPlatform {
@@ -157,7 +126,6 @@ impl SdlPlatform {
         SdlPlatform {
             cursor_instance: None,
             last_frame: Instant::now(),
-            mouse_buttons: [Button::new(); 5],
         }
     }
 
@@ -178,12 +146,12 @@ impl SdlPlatform {
             }
 
             Event::MouseButtonDown { mouse_btn, .. } => {
-                self.handle_mouse_button(&mouse_btn, true);
+                self.handle_mouse_button(io, &mouse_btn, true);
                 true
             }
 
             Event::MouseButtonUp { mouse_btn, .. } => {
-                self.handle_mouse_button(&mouse_btn, false);
+                self.handle_mouse_button(io, &mouse_btn, false);
                 true
             }
 
@@ -252,16 +220,6 @@ impl SdlPlatform {
             (window_drawable_size.1 as f32) / (window_size.1 as f32),
         ];
 
-        // Update mouse button state
-        for (io_down, button) in io.mouse_down.iter_mut().zip(&mut self.mouse_buttons) {
-            *io_down = button.get();
-
-            // this frame is now "over" and we can set pressed_this_frame to false, but
-            // the state cannot be set to false due to actions that require multi-frame inputs
-            // ie: dragging, resizing and this is handled by the `MouseButtonDown` event.
-            button.pressed_this_frame = false;
-        }
-
         // Set mouse position if requested by imgui-rs
         if io.want_set_mouse_pos {
             let mouse_util = window.subsystem().sdl().mouse();
@@ -297,14 +255,13 @@ impl SdlPlatform {
 }
 
 impl SdlPlatform {
-    fn handle_mouse_button(&mut self, button: &MouseButton, pressed: bool) {
+    fn handle_mouse_button(&mut self, io: &mut Io, button: &sdl2::mouse::MouseButton, pressed: bool) {
         match button {
-            MouseButton::Left => self.mouse_buttons[0].set(pressed),
-            MouseButton::Right => self.mouse_buttons[1].set(pressed),
-            MouseButton::Middle => self.mouse_buttons[2].set(pressed),
-            MouseButton::X1 => self.mouse_buttons[3].set(pressed),
-            MouseButton::X2 => self.mouse_buttons[4].set(pressed),
-
+            sdl2::mouse::MouseButton::Left => io.add_mouse_button_event(imgui::MouseButton::Left, pressed),
+            sdl2::mouse::MouseButton::Right => io.add_mouse_button_event(imgui::MouseButton::Right, pressed),
+            sdl2::mouse::MouseButton::Middle => io.add_mouse_button_event(imgui::MouseButton::Middle, pressed),
+            sdl2::mouse::MouseButton::X1 => io.add_mouse_button_event(imgui::MouseButton::Extra1, pressed),
+            sdl2::mouse::MouseButton::X2 => io.add_mouse_button_event(imgui::MouseButton::Extra2, pressed),
             _ => {}
         }
     }
