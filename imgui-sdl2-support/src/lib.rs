@@ -15,7 +15,7 @@
 
 use std::time::Instant;
 
-use imgui::{BackendFlags, ConfigFlags, Context, Io, Key, MouseCursor};
+use imgui::{BackendFlags, ConfigFlags, Context, Io, MouseCursor};
 use sdl2::{
     event::Event,
     keyboard::{Mod, Scancode},
@@ -348,13 +348,28 @@ impl SdlPlatform {
 }
 
 impl SdlPlatform {
-    fn handle_mouse_button(&mut self, io: &mut Io, button: &sdl2::mouse::MouseButton, pressed: bool) {
+    fn handle_mouse_button(
+        &mut self,
+        io: &mut Io,
+        button: &sdl2::mouse::MouseButton,
+        pressed: bool,
+    ) {
         match button {
-            sdl2::mouse::MouseButton::Left => io.add_mouse_button_event(imgui::MouseButton::Left, pressed),
-            sdl2::mouse::MouseButton::Right => io.add_mouse_button_event(imgui::MouseButton::Right, pressed),
-            sdl2::mouse::MouseButton::Middle => io.add_mouse_button_event(imgui::MouseButton::Middle, pressed),
-            sdl2::mouse::MouseButton::X1 => io.add_mouse_button_event(imgui::MouseButton::Extra1, pressed),
-            sdl2::mouse::MouseButton::X2 => io.add_mouse_button_event(imgui::MouseButton::Extra2, pressed),
+            sdl2::mouse::MouseButton::Left => {
+                io.add_mouse_button_event(imgui::MouseButton::Left, pressed)
+            }
+            sdl2::mouse::MouseButton::Right => {
+                io.add_mouse_button_event(imgui::MouseButton::Right, pressed)
+            }
+            sdl2::mouse::MouseButton::Middle => {
+                io.add_mouse_button_event(imgui::MouseButton::Middle, pressed)
+            }
+            sdl2::mouse::MouseButton::X1 => {
+                io.add_mouse_button_event(imgui::MouseButton::Extra1, pressed)
+            }
+            sdl2::mouse::MouseButton::X2 => {
+                io.add_mouse_button_event(imgui::MouseButton::Extra2, pressed)
+            }
             _ => {}
         }
     }
