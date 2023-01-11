@@ -136,17 +136,23 @@ jobs:
       - name: docking feature
         run: cargo test --workspace --all-targets --features docking
 
-      - name: freetype feature
+      - name: freetype feature (non-Windows, pkg-config)
         if: matrix.os != 'windows-latest'
         run: cargo test --workspace --all-targets --features freetype
 
-      - name: all features
+      - name: freetype and docking (non-Windows, pkg-config)
         if: matrix.os != 'windows-latest'
-        run: cargo test --workspace --all-targets --features docking,freetype
+        run: cargo test --workspace --all-targets --features freetype,docking
 
-      - name: doc tests
-        run: cargo test --workspace --doc
+      - name: freetype feature (Windows, vcpkg)
+        if: matrix.os == 'windows-latest'
+        run: cargo test --workspace --all-targets --features freetype,use-vcpkg
 
+      - name: freetype and docking (Windows, vcpkg)
+        if: matrix.os == 'windows-latest'
+        run: cargo test --workspace --all-targets --features freetype,docking,use-vcpkg
+
+      - run: cargo test --workspace --doc
       # run to check for lint problems
       - name: build documentation
         run: cargo doc

@@ -33,9 +33,11 @@ cfg-if = "1"
 [build-dependencies]
 cc = "1.0"
 pkg-config = { version="0.3", optional=true }
+vcpkg = { version="0.2.15", optional=true }
 
 [features]
 default = []
 wasm = []
-freetype = ["pkg-config"]
 docking = []
+freetype = ["pkg-config"]
+use-vcpkg = ["vcpkg"]
