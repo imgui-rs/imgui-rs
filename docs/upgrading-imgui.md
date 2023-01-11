@@ -84,6 +84,8 @@ In short, there are a few steps:
         cargo run --example test_window_impl
     ```
 
+9. Update README to reference correct Dear ImGui (updating the URL in the badge)
+
 ## Common sources of problems
 
 ### Function changes
