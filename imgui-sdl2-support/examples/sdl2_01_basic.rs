@@ -45,7 +45,10 @@ fn main() {
     /* create new glow and imgui contexts */
     let gl = glow_context(&window);
 
+    /* create context */
     let mut imgui = Context::create();
+
+    /* disable creation of files on disc */
     imgui.set_ini_filename(None);
     imgui.set_log_filename(None);
 
@@ -54,8 +57,11 @@ fn main() {
         .fonts()
         .add_font(&[imgui::FontSource::DefaultFontData { config: None }]);
 
+    /* create platform and renderer */
     let mut platform = SdlPlatform::init(&mut imgui);
     let mut renderer = AutoRenderer::initialize(gl, &mut imgui).unwrap();
+
+    /* start main loop */
     let mut event_pump = sdl.event_pump().unwrap();
 
     'main: loop {
@@ -72,8 +78,10 @@ fn main() {
         platform.prepare_frame(&mut imgui, &window, &event_pump);
 
         let ui = imgui.new_frame();
+        /* create imgui UI here */
         ui.show_demo_window(&mut true);
 
+        /* render */
         let draw_data = imgui.render();
 
         unsafe { renderer.gl_context().clear(glow::COLOR_BUFFER_BIT) };

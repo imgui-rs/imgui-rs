@@ -15,43 +15,130 @@
 
 use std::time::Instant;
 
-use imgui::{BackendFlags, ConfigFlags, Context, Io, Key, MouseCursor};
+use imgui::{BackendFlags, ConfigFlags, Context, Io, MouseCursor};
 use sdl2::{
     event::Event,
     keyboard::{Mod, Scancode},
-    mouse::{Cursor, MouseButton, MouseState, SystemCursor},
+    mouse::{Cursor, MouseState, SystemCursor},
     video::Window,
     EventPump,
 };
 
-/// State of a single mouse button. Used so that we can detect cases where mouse
-/// press and release occur on the same frame (seems surprisingly frequent on
-/// macOS now...)
-#[derive(Debug, Clone, Copy, Default)]
-struct Button {
-    pub pressed_this_frame: bool,
-    state: bool,
-}
-
-impl Button {
-    const fn new() -> Button {
-        Button {
-            pressed_this_frame: false,
-            state: false,
+/// Handle changes in the key states.
+fn handle_key(io: &mut Io, key: &Scancode, pressed: bool) {
+    let igkey = match key {
+        Scancode::A => imgui::Key::A,
+        Scancode::B => imgui::Key::B,
+        Scancode::C => imgui::Key::C,
+        Scancode::D => imgui::Key::D,
+        Scancode::E => imgui::Key::E,
+        Scancode::F => imgui::Key::F,
+        Scancode::G => imgui::Key::G,
+        Scancode::H => imgui::Key::H,
+        Scancode::I => imgui::Key::I,
+        Scancode::J => imgui::Key::J,
+        Scancode::K => imgui::Key::K,
+        Scancode::L => imgui::Key::L,
+        Scancode::M => imgui::Key::M,
+        Scancode::N => imgui::Key::N,
+        Scancode::O => imgui::Key::O,
+        Scancode::P => imgui::Key::P,
+        Scancode::Q => imgui::Key::Q,
+        Scancode::R => imgui::Key::R,
+        Scancode::S => imgui::Key::S,
+        Scancode::T => imgui::Key::T,
+        Scancode::U => imgui::Key::U,
+        Scancode::V => imgui::Key::V,
+        Scancode::W => imgui::Key::W,
+        Scancode::X => imgui::Key::X,
+        Scancode::Y => imgui::Key::Y,
+        Scancode::Z => imgui::Key::Z,
+        Scancode::Num1 => imgui::Key::Keypad1,
+        Scancode::Num2 => imgui::Key::Keypad2,
+        Scancode::Num3 => imgui::Key::Keypad3,
+        Scancode::Num4 => imgui::Key::Keypad4,
+        Scancode::Num5 => imgui::Key::Keypad5,
+        Scancode::Num6 => imgui::Key::Keypad6,
+        Scancode::Num7 => imgui::Key::Keypad7,
+        Scancode::Num8 => imgui::Key::Keypad8,
+        Scancode::Num9 => imgui::Key::Keypad9,
+        Scancode::Num0 => imgui::Key::Keypad0,
+        Scancode::Return => imgui::Key::Enter, // TODO: Should this be treated as alias?
+        Scancode::Escape => imgui::Key::Escape,
+        Scancode::Backspace => imgui::Key::Backspace,
+        Scancode::Tab => imgui::Key::Tab,
+        Scancode::Space => imgui::Key::Space,
+        Scancode::Minus => imgui::Key::Minus,
+        Scancode::Equals => imgui::Key::Equal,
+        Scancode::LeftBracket => imgui::Key::LeftBracket,
+        Scancode::RightBracket => imgui::Key::RightBracket,
+        Scancode::Backslash => imgui::Key::Backslash,
+        Scancode::Semicolon => imgui::Key::Semicolon,
+        Scancode::Apostrophe => imgui::Key::Apostrophe,
+        Scancode::Grave => imgui::Key::GraveAccent,
+        Scancode::Comma => imgui::Key::Comma,
+        Scancode::Period => imgui::Key::Period,
+        Scancode::Slash => imgui::Key::Slash,
+        Scancode::CapsLock => imgui::Key::CapsLock,
+        Scancode::F1 => imgui::Key::F1,
+        Scancode::F2 => imgui::Key::F2,
+        Scancode::F3 => imgui::Key::F3,
+        Scancode::F4 => imgui::Key::F4,
+        Scancode::F5 => imgui::Key::F5,
+        Scancode::F6 => imgui::Key::F6,
+        Scancode::F7 => imgui::Key::F7,
+        Scancode::F8 => imgui::Key::F8,
+        Scancode::F9 => imgui::Key::F9,
+        Scancode::F10 => imgui::Key::F10,
+        Scancode::F11 => imgui::Key::F11,
+        Scancode::F12 => imgui::Key::F12,
+        Scancode::PrintScreen => imgui::Key::PrintScreen,
+        Scancode::ScrollLock => imgui::Key::ScrollLock,
+        Scancode::Pause => imgui::Key::Pause,
+        Scancode::Insert => imgui::Key::Insert,
+        Scancode::Home => imgui::Key::Home,
+        Scancode::PageUp => imgui::Key::PageUp,
+        Scancode::Delete => imgui::Key::Delete,
+        Scancode::End => imgui::Key::End,
+        Scancode::PageDown => imgui::Key::PageDown,
+        Scancode::Right => imgui::Key::RightArrow,
+        Scancode::Left => imgui::Key::LeftArrow,
+        Scancode::Down => imgui::Key::DownArrow,
+        Scancode::Up => imgui::Key::UpArrow,
+        Scancode::KpDivide => imgui::Key::KeypadDivide,
+        Scancode::KpMultiply => imgui::Key::KeypadMultiply,
+        Scancode::KpMinus => imgui::Key::KeypadSubtract,
+        Scancode::KpPlus => imgui::Key::KeypadAdd,
+        Scancode::KpEnter => imgui::Key::KeypadEnter,
+        Scancode::Kp1 => imgui::Key::Keypad1,
+        Scancode::Kp2 => imgui::Key::Keypad2,
+        Scancode::Kp3 => imgui::Key::Keypad3,
+        Scancode::Kp4 => imgui::Key::Keypad4,
+        Scancode::Kp5 => imgui::Key::Keypad5,
+        Scancode::Kp6 => imgui::Key::Keypad6,
+        Scancode::Kp7 => imgui::Key::Keypad7,
+        Scancode::Kp8 => imgui::Key::Keypad8,
+        Scancode::Kp9 => imgui::Key::Keypad9,
+        Scancode::Kp0 => imgui::Key::Keypad0,
+        Scancode::KpPeriod => imgui::Key::KeypadDecimal,
+        Scancode::Application => imgui::Key::Menu,
+        Scancode::KpEquals => imgui::Key::KeypadEqual,
+        Scancode::Menu => imgui::Key::Menu,
+        Scancode::LCtrl => imgui::Key::LeftCtrl,
+        Scancode::LShift => imgui::Key::LeftShift,
+        Scancode::LAlt => imgui::Key::LeftAlt,
+        Scancode::LGui => imgui::Key::LeftSuper,
+        Scancode::RCtrl => imgui::Key::RightCtrl,
+        Scancode::RShift => imgui::Key::RightShift,
+        Scancode::RAlt => imgui::Key::RightAlt,
+        Scancode::RGui => imgui::Key::RightSuper,
+        _ => {
+            // Ignore unknown keys
+            return;
         }
-    }
+    };
 
-    fn get(&self) -> bool {
-        self.pressed_this_frame || self.state
-    }
-
-    fn set(&mut self, pressed: bool) {
-        self.state = pressed;
-
-        if pressed {
-            self.pressed_this_frame = true;
-        }
-    }
+    io.add_key_event(igkey, pressed);
 }
 
 /// Handle changes in the key modifier states.
@@ -109,7 +196,6 @@ pub fn filter_event(window: &Window, event: &Event) -> bool {
 pub struct SdlPlatform {
     cursor_instance: Option<Cursor>, /* to avoid dropping cursor instances */
     last_frame: Instant,
-    mouse_buttons: [Button; 5],
 }
 
 impl SdlPlatform {
@@ -126,29 +212,6 @@ impl SdlPlatform {
         io.backend_flags.insert(BackendFlags::HAS_MOUSE_CURSORS);
         io.backend_flags.insert(BackendFlags::HAS_SET_MOUSE_POS);
 
-        io[Key::Tab] = Scancode::Tab as _;
-        io[Key::LeftArrow] = Scancode::Left as _;
-        io[Key::RightArrow] = Scancode::Right as _;
-        io[Key::UpArrow] = Scancode::Up as _;
-        io[Key::DownArrow] = Scancode::Down as _;
-        io[Key::PageUp] = Scancode::PageUp as _;
-        io[Key::PageDown] = Scancode::PageDown as _;
-        io[Key::Home] = Scancode::Home as _;
-        io[Key::End] = Scancode::End as _;
-        io[Key::Insert] = Scancode::Insert as _;
-        io[Key::Delete] = Scancode::Delete as _;
-        io[Key::Backspace] = Scancode::Backspace as _;
-        io[Key::Space] = Scancode::Space as _;
-        io[Key::Enter] = Scancode::Return as _;
-        io[Key::Escape] = Scancode::Escape as _;
-        io[Key::KeypadEnter] = Scancode::KpEnter as _;
-        io[Key::A] = Scancode::A as _;
-        io[Key::C] = Scancode::C as _;
-        io[Key::V] = Scancode::V as _;
-        io[Key::X] = Scancode::X as _;
-        io[Key::Y] = Scancode::Y as _;
-        io[Key::Z] = Scancode::Z as _;
-
         imgui.set_platform_name(Some(format!(
             "imgui-sdl2-support {}",
             env!("CARGO_PKG_VERSION")
@@ -157,7 +220,6 @@ impl SdlPlatform {
         SdlPlatform {
             cursor_instance: None,
             last_frame: Instant::now(),
-            mouse_buttons: [Button::new(); 5],
         }
     }
 
@@ -172,18 +234,17 @@ impl SdlPlatform {
 
         match *event {
             Event::MouseWheel { x, y, .. } => {
-                io.mouse_wheel = y as f32;
-                io.mouse_wheel_h = x as f32;
+                io.add_mouse_wheel_event([x as f32, y as f32]);
                 true
             }
 
             Event::MouseButtonDown { mouse_btn, .. } => {
-                self.handle_mouse_button(&mouse_btn, true);
+                self.handle_mouse_button(io, &mouse_btn, true);
                 true
             }
 
             Event::MouseButtonUp { mouse_btn, .. } => {
-                self.handle_mouse_button(&mouse_btn, false);
+                self.handle_mouse_button(io, &mouse_btn, false);
                 true
             }
 
@@ -197,8 +258,8 @@ impl SdlPlatform {
                 keymod,
                 ..
             } => {
-                io.keys_down[key as usize] = true;
                 handle_key_modifier(io, &keymod);
+                handle_key(io, &key, true);
                 true
             }
 
@@ -207,8 +268,8 @@ impl SdlPlatform {
                 keymod,
                 ..
             } => {
-                io.keys_down[key as usize] = false;
                 handle_key_modifier(io, &keymod);
+                handle_key(io, &key, false);
                 true
             }
 
@@ -252,16 +313,6 @@ impl SdlPlatform {
             (window_drawable_size.1 as f32) / (window_size.1 as f32),
         ];
 
-        // Update mouse button state
-        for (io_down, button) in io.mouse_down.iter_mut().zip(&mut self.mouse_buttons) {
-            *io_down = button.get();
-
-            // this frame is now "over" and we can set pressed_this_frame to false, but
-            // the state cannot be set to false due to actions that require multi-frame inputs
-            // ie: dragging, resizing and this is handled by the `MouseButtonDown` event.
-            button.pressed_this_frame = false;
-        }
-
         // Set mouse position if requested by imgui-rs
         if io.want_set_mouse_pos {
             let mouse_util = window.subsystem().sdl().mouse();
@@ -297,14 +348,28 @@ impl SdlPlatform {
 }
 
 impl SdlPlatform {
-    fn handle_mouse_button(&mut self, button: &MouseButton, pressed: bool) {
+    fn handle_mouse_button(
+        &mut self,
+        io: &mut Io,
+        button: &sdl2::mouse::MouseButton,
+        pressed: bool,
+    ) {
         match button {
-            MouseButton::Left => self.mouse_buttons[0].set(pressed),
-            MouseButton::Right => self.mouse_buttons[1].set(pressed),
-            MouseButton::Middle => self.mouse_buttons[2].set(pressed),
-            MouseButton::X1 => self.mouse_buttons[3].set(pressed),
-            MouseButton::X2 => self.mouse_buttons[4].set(pressed),
-
+            sdl2::mouse::MouseButton::Left => {
+                io.add_mouse_button_event(imgui::MouseButton::Left, pressed)
+            }
+            sdl2::mouse::MouseButton::Right => {
+                io.add_mouse_button_event(imgui::MouseButton::Right, pressed)
+            }
+            sdl2::mouse::MouseButton::Middle => {
+                io.add_mouse_button_event(imgui::MouseButton::Middle, pressed)
+            }
+            sdl2::mouse::MouseButton::X1 => {
+                io.add_mouse_button_event(imgui::MouseButton::Extra1, pressed)
+            }
+            sdl2::mouse::MouseButton::X2 => {
+                io.add_mouse_button_event(imgui::MouseButton::Extra2, pressed)
+            }
             _ => {}
         }
     }
