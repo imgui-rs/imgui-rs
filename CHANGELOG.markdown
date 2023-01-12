@@ -15,7 +15,7 @@
 
   The old `new` method should be backwards-compatible in most common situations. Exception is if the `ImageButton` builder struct was explicitly specified, say in a method like `fn configure_my_button(button: &mut imgui::ImageButton)` (in which case either change `ImageButton` to `ImageButtonDeprecated`, or update to the new constructor)
 
-- Updated `imgui-winit-support` to use new "event based IO" (detailed in the Dear ImGui 1.87 release notes, but basically it aims to improve behaviour at low frame rates). Existing custom backends should work without changes, but are advised to update to the new API.
+- Updated `imgui-winit-support` and `imgui-sdl2-support` to use new "event based IO" (detailed in the Dear ImGui 1.87 release notes, but basically it aims to improve behaviour at low frame rates). Existing custom backends should work without changes, but are advised to update to the new API.
 
 - Accept `usize` and `isize` for parameters which use `DataTypeKind` (such as `Ui::input_scalar`). This treats them as `u64`/`i64` (or `u32`/`i32`) as appropriate
 
