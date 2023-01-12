@@ -47,6 +47,7 @@ pub struct FontAtlas {
     pub tex_glyph_padding: i32,
 
     locked: bool,
+    user_data: *mut c_void,
     text_ready: bool,
     tex_pixels_use_colors: bool,
     tex_pixels_alpha8: *mut u8,

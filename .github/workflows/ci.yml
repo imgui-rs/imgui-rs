@@ -81,7 +81,6 @@ jobs:
       matrix:
         rust:
           - stable
-          - beta
           - "1.57"
         os:
           - ubuntu-latest
@@ -125,9 +124,9 @@ jobs:
             ${{ runner.os }}-target-test-${{ matrix.rust }}-${{ hashFiles('**/Cargo.toml') }}
             ${{ runner.os }}-target-test-${{ matrix.rust }}-
 
-      # - name: Setup vcpkg
-      #   if: matrix.os == 'windows-latest'
-      #   run: vcpkg integrate install; vcpkg install freetype;
+      - name: Setup vcpkg
+        if: matrix.os == 'windows-latest'
+        run: vcpkg integrate install; vcpkg install freetype:x64-windows-static-md
 
       # feature testing
       - name: no features
