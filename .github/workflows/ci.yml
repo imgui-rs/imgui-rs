@@ -127,7 +127,7 @@ jobs:
 
       - name: Setup vcpkg
         if: matrix.os == 'windows-latest'
-        run: vcpkg integrate install; vcpkg install freetype;
+        run: vcpkg integrate install; vcpkg install freetype:x64-windows-static
 
       # feature testing
       - name: no features
