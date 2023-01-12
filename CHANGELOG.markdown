@@ -5,9 +5,11 @@
 
   `ui.button(im_str!("Example"))` just becomes `ui.button("Example")` and `ui.button(&im_str!("My age is {}", 100))` becomes `ui.button!(format!("My age is {}", 100))`
 
-- Breaking: Updated to Dear ImGui 1.89.1.
+- Breaking: Updated to Dear ImGui 1.89.2.
 
   This introduces some breaking changes like the `imgui::Key` now contains a full set of keys (previously it was a small subset of to cover copy/paste/undo)
+
+- freetype feature can now locate required libraries either via `pkg-config` or `vcpkg`
 
 - Breaking (partially): `ImageButton::new` is now deprecated, replaced by `ui.image_button_config(...)`.
 
