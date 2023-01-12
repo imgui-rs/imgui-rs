@@ -81,7 +81,6 @@ jobs:
       matrix:
         rust:
           - stable
-          - beta
           - "1.57"
         os:
           - ubuntu-latest
