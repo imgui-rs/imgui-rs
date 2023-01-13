@@ -71,12 +71,18 @@ fn main() -> std::io::Result<()> {
         // Freetype font rasterizer feature
         #[cfg(feature = "freetype")]
         {
+            // Supress warnings:
+            // warning: ‘ImFontBuildSrcGlyphFT’ has a field ‘ImFontBuildSrcGlyphFT::Info’ whose type uses the anonymous namespace
+            // warning: ‘ImFontBuildSrcDataFT’ has a field ‘ImFontBuildSrcDataFT::Font’ whose type uses the anonymous namespace
+            build.flag_if_supported("-Wno-subobject-linkage");
+
+            // Include freetype headers
             for include in find_freetype() {
                 build.include(include);
             }
+
             // Set flag for dear imgui
-            build.define("IMGUI_ENABLE_FREETYPE", None);
-            build.define("CIMGUI_FREETYPE", None);
+            build.define("CIMGUI_FREETYPE", None); // Sets IMGUI_ENABLE_FREETYPE
             println!("cargo:DEFINE_IMGUI_ENABLE_FREETYPE=");
 
             // imgui_freetype.cpp needs access to `#include "imgui.h"`.
