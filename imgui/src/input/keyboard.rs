@@ -5,6 +5,7 @@ use crate::Ui;
 #[repr(u32)]
 #[derive(Copy, Clone, Debug, Hash, Eq, PartialEq)]
 #[allow(missing_docs)] // Self-describing
+#[non_exhaustive]
 pub enum Key {
     Tab = sys::ImGuiKey_Tab,
     LeftArrow = sys::ImGuiKey_LeftArrow,
