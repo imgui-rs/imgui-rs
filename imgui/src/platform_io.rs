@@ -29,7 +29,6 @@ pub struct PlatformIo {
     pub(crate) platform_swap_buffers: Option<unsafe extern "C" fn(*mut Viewport, *mut c_void)>,
     pub(crate) platform_get_window_dpi_scale: Option<unsafe extern "C" fn(*mut Viewport) -> f32>,
     pub(crate) platform_on_changed_viewport: Option<unsafe extern "C" fn(*mut Viewport)>,
-    pub(crate) platform_set_ime_input_pos: Option<unsafe extern "C" fn(*mut Viewport, sys::ImVec2)>,
     pub(crate) platform_create_vk_surface:
         Option<unsafe extern "C" fn(*mut Viewport, u64, *const c_void, *mut u64) -> c_int>,
 
@@ -87,7 +86,6 @@ fn test_platform_io_memory_layout() {
     assert_field_offset!(platform_swap_buffers, Platform_SwapBuffers);
     assert_field_offset!(platform_get_window_dpi_scale, Platform_GetWindowDpiScale);
     assert_field_offset!(platform_on_changed_viewport, Platform_OnChangedViewport);
-    assert_field_offset!(platform_set_ime_input_pos, Platform_SetImeInputPos);
     assert_field_offset!(platform_create_vk_surface, Platform_CreateVkSurface);
 
     assert_field_offset!(renderer_create_window, Renderer_CreateWindow);
@@ -446,6 +444,7 @@ pub struct Viewport {
     pub platform_user_data: *mut c_void,
     pub platform_handle: *mut c_void,
     pub platform_handle_raw: *mut c_void,
+    pub platform_window_created: bool,
     pub platform_request_move: bool,
     pub platform_request_resize: bool,
     pub platform_request_close: bool,
@@ -494,6 +493,7 @@ fn test_viewport_memory_layout() {
     assert_field_offset!(platform_user_data, PlatformUserData);
     assert_field_offset!(platform_handle, PlatformHandle);
     assert_field_offset!(platform_handle_raw, PlatformHandleRaw);
+    assert_field_offset!(platform_window_created, PlatformWindowCreated);
     assert_field_offset!(platform_request_move, PlatformRequestMove);
     assert_field_offset!(platform_request_resize, PlatformRequestResize);
     assert_field_offset!(platform_request_close, PlatformRequestClose);
