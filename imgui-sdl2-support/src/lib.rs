@@ -143,10 +143,10 @@ fn handle_key(io: &mut Io, key: &Scancode, pressed: bool) {
 
 /// Handle changes in the key modifier states.
 fn handle_key_modifier(io: &mut Io, keymod: &Mod) {
-    io.key_shift = keymod.intersects(Mod::LSHIFTMOD | Mod::RSHIFTMOD);
-    io.key_ctrl = keymod.intersects(Mod::LCTRLMOD | Mod::RCTRLMOD);
-    io.key_alt = keymod.intersects(Mod::LALTMOD | Mod::RALTMOD);
-    io.key_super = keymod.intersects(Mod::LGUIMOD | Mod::RGUIMOD);
+    io.add_key_event(Key::ModShift, keymod.intersects(Mod::LSHIFTMOD | Mod::RSHIFTMOD));
+    io.add_key_event(Key::ModCtrl, keymod.intersects(Mod::LCTRLMOD | Mod::RCTRLMOD));
+    io.add_key_event(Key::ModAlt, keymod.intersects(Mod::LALTMOD | Mod::RALTMOD));
+    io.add_key_event(Key::ModSuper, keymod.intersects(Mod::LGUIMOD | Mod::RGUIMOD));
 }
 
 /// Map an imgui::MouseCursor to an equivalent sdl2::mouse::SystemCursor.

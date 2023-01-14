@@ -147,6 +147,11 @@ pub enum Key {
     ReservedForModShift = sys::ImGuiKey_ReservedForModShift,
     ReservedForModAlt = sys::ImGuiKey_ReservedForModAlt,
     ReservedForModSuper = sys::ImGuiKey_ReservedForModSuper,
+    ModCtrl = sys::ImGuiMod_Ctrl,
+    ModShift = sys::ImGuiMod_Shift,
+    ModAlt = sys::ImGuiMod_Alt,
+    ModSuper = sys::ImGuiMod_Super,
+    ModShortcut = sys::ImGuiMod_Shortcut,
 }
 
 impl Key {
