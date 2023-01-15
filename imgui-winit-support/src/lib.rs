@@ -399,10 +399,10 @@ impl WinitPlatform {
                 // not reliably send modifier states during certain events like ScreenCapture.
                 // Gotta let the people show off their pretty imgui widgets!
                 if let WindowEvent::ModifiersChanged(modifiers) = event {
-                    io.key_shift = modifiers.shift();
-                    io.key_ctrl = modifiers.ctrl();
-                    io.key_alt = modifiers.alt();
-                    io.key_super = modifiers.logo();
+                    io.add_key_event(Key::ModShift, modifiers.shift());
+                    io.add_key_event(Key::ModCtrl, modifiers.ctrl());
+                    io.add_key_event(Key::ModAlt, modifiers.alt());
+                    io.add_key_event(Key::ModSuper, modifiers.logo());
                 }
 
                 self.handle_window_event(io, window, event);
