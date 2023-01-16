@@ -1,6 +1,6 @@
 #![cfg_attr(test, allow(clippy::float_cmp))]
 #![deny(rust_2018_idioms)]
-// #![deny(missing_docs)]
+//#![deny(missing_docs)]
 
 pub extern crate imgui_sys as sys;
 
@@ -407,8 +407,9 @@ impl Ui {
     }
 }
 
-// Widgets: Input
 impl<'ui> Ui {
+    /// # Widgets: Input
+
     /// Edits text in a single line input widget
     #[doc(alias = "InputText", alias = "InputTextWithHint")]
     pub fn input_text<'p, L: AsRef<str>>(
@@ -419,7 +420,9 @@ impl<'ui> Ui {
         InputText::new(self, label, buf)
     }
 
-    /// Edits text in a multi line widget
+    /// Edits text in a multi line widget. Similar to [`input_text`]
+    /// but requires specifying a size. [`Ui::content_region_avail`]
+    /// can be useful to make this take up all avaialble space
     #[doc(alias = "InputText", alias = "InputTextMultiline")]
     pub fn input_text_multiline<'p, L: AsRef<str>>(
         &'ui self,
@@ -431,7 +434,7 @@ impl<'ui> Ui {
     }
 
     /// Simple floating point number widget
-    #[doc(alias = "InputFloat2")]
+    #[doc(alias = "InputFloat")]
     pub fn input_float<'p, L: AsRef<str>>(
         &'ui self,
         label: L,
@@ -439,6 +442,8 @@ impl<'ui> Ui {
     ) -> InputScalar<'ui, 'p, f32, L> {
         self.input_scalar(label, value)
     }
+
+    /// Widget to edit two floats
     #[doc(alias = "InputFloat2")]
     pub fn input_float2<'p, L, T>(
         &'ui self,
@@ -452,6 +457,8 @@ impl<'ui> Ui {
     {
         InputFloat2::new(self, label, value)
     }
+
+    /// Widget to edit 3 floats
     #[doc(alias = "InputFloat3")]
     pub fn input_float3<'p, L, T>(
         &'ui self,
@@ -465,6 +472,8 @@ impl<'ui> Ui {
     {
         InputFloat3::new(self, label, value)
     }
+
+    /// Widget to edit 4 floats
     #[doc(alias = "InputFloat4")]
     pub fn input_float4<'p, L, T>(
         &'ui self,
@@ -478,6 +487,8 @@ impl<'ui> Ui {
     {
         InputFloat4::new(self, label, value)
     }
+
+    /// Shortcut for [`Ui::input_scalar`]
     #[doc(alias = "InputInt")]
     pub fn input_int<'p, L: AsRef<str>>(
         &'ui self,
@@ -486,6 +497,8 @@ impl<'ui> Ui {
     ) -> InputScalar<'ui, 'p, i32, L> {
         self.input_scalar(label, value).step(1)
     }
+
+    /// Shortcut for [`Ui::input_scalar`]
     #[doc(alias = "InputInt2")]
     pub fn input_int2<'p, L, T>(&'ui self, label: L, value: &'p mut T) -> InputInt2<'ui, 'p, L, T>
     where
@@ -495,6 +508,8 @@ impl<'ui> Ui {
     {
         InputInt2::new(self, label, value)
     }
+
+    /// Shortcut for [`Ui::input_scalar`]
     #[doc(alias = "InputInt3")]
     pub fn input_int3<'p, L, T>(&'ui self, label: L, value: &'p mut T) -> InputInt3<'ui, 'p, L, T>
     where
@@ -504,6 +519,8 @@ impl<'ui> Ui {
     {
         InputInt3::new(self, label, value)
     }
+
+    /// Shortcut for [`Ui::input_scalar`]
     #[doc(alias = "InputInt4")]
     pub fn input_int4<'p, L, T>(&'ui self, label: L, value: &'p mut T) -> InputInt4<'ui, 'p, L, T>
     where
@@ -513,6 +530,7 @@ impl<'ui> Ui {
     {
         InputInt4::new(self, label, value)
     }
+
     /// Shows an input field for a scalar value. This is not limited to `f32` and `i32` and can be used with
     /// any primitive scalar type e.g. `u8` and `f64`.
     #[doc(alias = "InputScalar")]
@@ -527,6 +545,7 @@ impl<'ui> Ui {
     {
         InputScalar::new(self, label, value)
     }
+
     /// Shows a horizontal array of scalar value input fields. See [`input_scalar`].
     ///
     /// [`input_scalar`]: Self::input_scalar
@@ -586,9 +605,8 @@ impl Ui {
         unsafe { sys::igBeginTooltip() };
         TooltipToken::new(self)
     }
-    /// Construct a tooltip window with simple text content.
-    ///
-    /// Typically used with `Ui::is_item_hovered()` or some other conditional check.
+
+    /// Shortcut to call [`Self::tooltip`] with simple text content.
     ///
     /// # Examples
     ///
