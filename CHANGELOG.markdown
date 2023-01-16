@@ -9,6 +9,8 @@
 
   This introduces some breaking changes like the `imgui::Key` now contains a full set of keys (previously it was a small subset of to cover copy/paste/undo)
 
+  Also note `Key::KeyPadEnter` was renamed to `KeypadEnter`
+
 - freetype feature can now locate required libraries either via `pkg-config` or `vcpkg`
 
 - Breaking (partially): `ImageButton::new` is now deprecated, replaced by `ui.image_button_config(...)`.
