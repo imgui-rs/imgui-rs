@@ -420,8 +420,8 @@ impl<'ui> Ui {
         InputText::new(self, label, buf)
     }
 
-    /// Edits text in a multi line widget. Similar to [`input_text`]
-    /// but requires specifying a size. [`Ui::content_region_avail`]
+    /// Edits text in a multi line widget. Similar to [`Self::input_text`]
+    /// but requires specifying a size. [`Self::content_region_avail`]
     /// can be useful to make this take up all avaialble space
     #[doc(alias = "InputText", alias = "InputTextMultiline")]
     pub fn input_text_multiline<'p, L: AsRef<str>>(
