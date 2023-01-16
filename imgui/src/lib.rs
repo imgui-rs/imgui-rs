@@ -278,25 +278,29 @@ impl Ui {
 /// This represents a hash of the current stack of Ids used in ImGui + the
 /// input provided. It is only used in a few places directly in the
 /// codebase, but you can think of it as effectively allowing you to
-/// run your Id hashing yourself.
+/// run your Id hashing yourself. More often [`Ui::push_id`] and the likes
+/// are used instead.
 ///
-/// Previously, this was erroneously constructed with `From` implementations.
-/// Now, however, it is made from the `Ui` object directly, with a few
-/// deprecated helper methods here.
+/// Previously, in v0.7, this was erroneously constructed with `From`
+/// implementations.  Now, however, it is made from the `Ui` object
+/// directly, with a few deprecated helper methods here.
 #[derive(Copy, Clone, Debug, Eq, PartialEq, Default)]
 pub struct Id(pub(crate) u32);
 
 impl Id {
+    #[deprecated(since="0.8", note="Use ui.new_id_int(...)")]
     #[allow(non_snake_case)]
     pub fn Int(input: i32, ui: &Ui) -> Self {
         ui.new_id_int(input)
     }
 
+    #[deprecated(since="0.8", note="Use ui.new_id_str(...)")]
     #[allow(non_snake_case)]
     pub fn Str(input: impl AsRef<str>, ui: &Ui) -> Self {
         ui.new_id_str(input)
     }
 
+    #[deprecated(since="0.8", note="Use ui.new_id_ptr(...)")]
     #[allow(non_snake_case)]
     pub fn Ptr<T>(input: &T, ui: &Ui) -> Self {
         ui.new_id_ptr(input)
@@ -304,6 +308,7 @@ impl Id {
 }
 
 impl Ui {
+    /// Create new [`Id`] from a `usize`. See [`Id`] for details.
     pub fn new_id(&self, input: usize) -> Id {
         let p = input as *const std::os::raw::c_void;
         let value = unsafe { sys::igGetID_Ptr(p) };
@@ -311,18 +316,21 @@ impl Ui {
         Id(value)
     }
 
+    /// Create [`Id`] from i32
     pub fn new_id_int(&self, input: i32) -> Id {
         let p = input as *const std::os::raw::c_void;
         let value = unsafe { sys::igGetID_Ptr(p) };
         Id(value)
     }
 
+    /// Create [`Id`] from a pointer
     pub fn new_id_ptr<T>(&self, input: &T) -> Id {
         let p = input as *const T as *const sys::cty::c_void;
         let value = unsafe { sys::igGetID_Ptr(p) };
         Id(value)
     }
 
+    /// Create [`Id`] from string
     pub fn new_id_str(&self, s: impl AsRef<str>) -> Id {
         let s = s.as_ref();
 
@@ -334,63 +342,6 @@ impl Ui {
         Id(value)
     }
 }
-
-// /// Unique ID used by widgets
-// pub enum Id<'a> {
-//     Int(i32),
-//     Str(&'a str),
-//     Ptr(*const c_void),
-// }
-
-// impl From<i32> for Id<'static> {
-//     #[inline]
-//     fn from(i: i32) -> Self {
-//         Id::Int(i)
-//     }
-// }
-
-// impl<'a, T: ?Sized + AsRef<str>> From<&'a T> for Id<'a> {
-//     #[inline]
-//     fn from(s: &'a T) -> Self {
-//         Id::Str(s.as_ref())
-//     }
-// }
-
-// impl<T> From<*const T> for Id<'static> {
-//     #[inline]
-//     fn from(p: *const T) -> Self {
-//         Id::Ptr(p as *const c_void)
-//     }
-// }
-
-// impl<T> From<*mut T> for Id<'static> {
-//     #[inline]
-//     fn from(p: *mut T) -> Self {
-//         Id::Ptr(p as *const T as *const c_void)
-//     }
-// }
-
-// impl<'a> Id<'a> {
-//     // this is used in the tables-api and possibly elsewhere,
-//     // but not with just default features...
-//     #[allow(dead_code)]
-//     fn as_imgui_id(&self) -> sys::ImGuiID {
-//         unsafe {
-//             match self {
-//                 Id::Ptr(p) => sys::igGetID_Ptr(*p),
-//                 Id::Str(s) => {
-//                     let s1 = s.as_ptr() as *const std::os::raw::c_char;
-//                     let s2 = s1.add(s.len());
-//                     sys::igGetID_StrStr(s1, s2)
-//                 }
-//                 Id::Int(i) => {
-//                     let p = *i as *const std::os::raw::c_void;
-//                     sys::igGetID_Ptr(p)
-//                 } // Id::ImGuiID(n) => *n,
-//             }
-//         }
-//     }
-// }
 
 impl Ui {
     /// # Windows
