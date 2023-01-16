@@ -288,19 +288,19 @@ impl Ui {
 pub struct Id(pub(crate) u32);
 
 impl Id {
-    #[deprecated(since="0.8", note="Use ui.new_id_int(...)")]
+    #[deprecated(since = "0.8", note = "Use ui.new_id_int(...)")]
     #[allow(non_snake_case)]
     pub fn Int(input: i32, ui: &Ui) -> Self {
         ui.new_id_int(input)
     }
 
-    #[deprecated(since="0.8", note="Use ui.new_id_str(...)")]
+    #[deprecated(since = "0.8", note = "Use ui.new_id_str(...)")]
     #[allow(non_snake_case)]
     pub fn Str(input: impl AsRef<str>, ui: &Ui) -> Self {
         ui.new_id_str(input)
     }
 
-    #[deprecated(since="0.8", note="Use ui.new_id_ptr(...)")]
+    #[deprecated(since = "0.8", note = "Use ui.new_id_ptr(...)")]
     #[allow(non_snake_case)]
     pub fn Ptr<T>(input: &T, ui: &Ui) -> Self {
         ui.new_id_ptr(input)
