@@ -1,6 +1,9 @@
 # Change Log
 
 ## [unreleased]
+
+## [0.10.0] - 2023-01-16
+
 - Breaking: Removed `im_str!` macro - deprecated since v0.8.
 
   `ui.button(im_str!("Example"))` just becomes `ui.button("Example")` and `ui.button(&im_str!("My age is {}", 100))` becomes `ui.button!(format!("My age is {}", 100))`
@@ -806,7 +809,8 @@ As mentioned, the 0.6.1 release of `imgui-winit-support` has been yanked.
 
 - Initial release with cimgui/imgui 1.44, glium 0.9
 
-[unreleased]: https://github.com/Gekkio/imgui-rs/compare/v0.9.0...HEAD
+[unreleased]: https://github.com/Gekkio/imgui-rs/compare/v0.10.0...HEAD
+[0.10.0]: https://github.com/Gekkio/imgui-rs/compare/v0.9.0...v0.10.0
 [0.9.0]: https://github.com/Gekkio/imgui-rs/compare/v0.8.0...v0.9.0
 [0.8.0]: https://github.com/Gekkio/imgui-rs/compare/v0.7.0...v0.8.0
 [0.7.0]: https://github.com/Gekkio/imgui-rs/compare/v0.6.1...v0.7.0
