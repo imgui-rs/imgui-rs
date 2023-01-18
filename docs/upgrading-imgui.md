@@ -34,7 +34,7 @@ In short, there are a few steps:
        git clone --recursive https://github.com/cimgui/cimgui.git /tmp/cimgui
    ```
 
-    Make sure the checkout is updated and on a reasonable a reasonably recent version. Old versions can produce differently named symbols which can make updates more tediuos than they need to be! Generally the tag corresponding to the latest imgui release is a good choice.
+    Make sure the checkout is updated and on a reasonable a reasonably recent version. Old versions can produce differently named symbols which can make updates more tedious than they need to be! Generally the tag corresponding to the latest imgui release is a good choice.
 
 4. For each of the branches, run the corresponding `update-cimgui-output.sh` script.
 
@@ -54,7 +54,7 @@ In short, there are a few steps:
 
    This updates various files like `cimgui.cpp`, `definitions.json` and so on
 
-   With this step, we now have new C bindings to the desired verison of Dear ImGui.
+   With this step, we now have new C bindings to the desired version of Dear ImGui.
 
 5. Back in the root of the imgui-rs repo, run `cargo xtask bindgen`
 
