@@ -94,6 +94,9 @@ fn main() {
             winit::event::Event::WindowEvent { window_id, event: WindowEvent::CloseRequested } if window_id == window.id() => {
                 control_flow.set_exit();
             },
+            winit::event::Event::WindowEvent { window_id, event: WindowEvent::Resized(new_size) } if window_id == window.id() => {
+                surface.resize(&context, NonZeroU32::new(new_size.width).unwrap(), NonZeroU32::new(new_size.height).unwrap());
+            },
             winit::event::Event::MainEventsCleared => {
                 window.request_redraw();
             },
