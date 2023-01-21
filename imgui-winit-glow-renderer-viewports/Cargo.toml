@@ -6,7 +6,7 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-imgui = { version="0.9.0", path="../imgui", features=["docking"] }
+imgui = { version="0.10.0", path="../imgui", features=["docking"] }
 
 glow = "0.11.2"
 glutin = "0.30.3"

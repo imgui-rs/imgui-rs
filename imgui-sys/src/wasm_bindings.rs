@@ -566,8 +566,8 @@ pub const ImGuiMod_Ctrl: ImGuiKey = 4096;
 pub const ImGuiMod_Shift: ImGuiKey = 8192;
 pub const ImGuiMod_Alt: ImGuiKey = 16384;
 pub const ImGuiMod_Super: ImGuiKey = 32768;
-pub const ImGuiMod_Mask_: ImGuiKey = 61440;
-pub const ImGuiMod_Shortcut: ImGuiKey = 4096;
+pub const ImGuiMod_Shortcut: ImGuiKey = 2048;
+pub const ImGuiMod_Mask_: ImGuiKey = 63488;
 pub const ImGuiKey_NamedKey_BEGIN: ImGuiKey = 512;
 pub const ImGuiKey_NamedKey_END: ImGuiKey = 652;
 pub const ImGuiKey_NamedKey_COUNT: ImGuiKey = 140;
@@ -1709,6 +1709,7 @@ pub struct ImFontAtlas {
     pub TexDesiredWidth: cty::c_int,
     pub TexGlyphPadding: cty::c_int,
     pub Locked: bool,
+    pub UserData: *mut cty::c_void,
     pub TexReady: bool,
     pub TexPixelsUseColors: bool,
     pub TexPixelsAlpha8: *mut cty::c_uchar,
@@ -3610,6 +3611,10 @@ extern "C" {
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igIsAnyItemFocused() -> bool;
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
+    pub fn igGetItemID() -> ImGuiID;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {

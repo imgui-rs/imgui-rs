@@ -35,6 +35,7 @@ impl UiBuffer {
         }
     }
 
+    /// Helper method, same as [`Self::scratch_txt`] but for two strings
     pub fn scratch_txt_two(
         &mut self,
         txt_0: impl AsRef<str>,
@@ -44,6 +45,7 @@ impl UiBuffer {
         (self.push(txt_0), self.push(txt_1))
     }
 
+    /// Helper method, same as [`Self::scratch_txt`] but with one optional value
     pub fn scratch_txt_with_opt(
         &mut self,
         txt_0: impl AsRef<str>,

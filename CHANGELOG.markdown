@@ -1,19 +1,28 @@
 # Change Log
 
 ## [unreleased]
+
+## [0.10.0] - 2023-01-16
+
 - Breaking: Removed `im_str!` macro - deprecated since v0.8.
 
   `ui.button(im_str!("Example"))` just becomes `ui.button("Example")` and `ui.button(&im_str!("My age is {}", 100))` becomes `ui.button!(format!("My age is {}", 100))`
 
-- Breaking: Updated to Dear ImGui 1.89.1.
+- Breaking: Updated to Dear ImGui 1.89.2.
 
   This introduces some breaking changes like the `imgui::Key` now contains a full set of keys (previously it was a small subset of to cover copy/paste/undo)
+
+  Also note `Key::KeyPadEnter` was renamed to `KeypadEnter`
+
+- freetype feature can now locate required libraries either via `pkg-config` or `vcpkg`
 
 - Breaking (partially): `ImageButton::new` is now deprecated, replaced by `ui.image_button_config(...)`.
 
   The old `new` method should be backwards-compatible in most common situations. Exception is if the `ImageButton` builder struct was explicitly specified, say in a method like `fn configure_my_button(button: &mut imgui::ImageButton)` (in which case either change `ImageButton` to `ImageButtonDeprecated`, or update to the new constructor)
 
-- Updated `imgui-winit-support` to use new "event based IO" (detailed in the Dear ImGui 1.87 release notes, but basically it aims to improve behaviour at low frame rates). Existing custom backends should work without changes, but are advised to update to the new API.
+- Breaking: `Key`, `StyleColor`, and `StyleVar` enums are now marked [as non-exhaustive](https://doc.rust-lang.org/reference/attributes/type_system.html#the-non_exhaustive-attribute).
+
+- Updated `imgui-winit-support` and `imgui-sdl2-support` to use new "event based IO" (detailed in the Dear ImGui 1.87 release notes, but basically it aims to improve behaviour at low frame rates). Existing custom backends should work without changes, but are advised to update to the new API.
 
 - Accept `usize` and `isize` for parameters which use `DataTypeKind` (such as `Ui::input_scalar`). This treats them as `u64`/`i64` (or `u32`/`i32`) as appropriate
 
@@ -800,7 +809,8 @@ As mentioned, the 0.6.1 release of `imgui-winit-support` has been yanked.
 
 - Initial release with cimgui/imgui 1.44, glium 0.9
 
-[unreleased]: https://github.com/Gekkio/imgui-rs/compare/v0.9.0...HEAD
+[unreleased]: https://github.com/Gekkio/imgui-rs/compare/v0.10.0...HEAD
+[0.10.0]: https://github.com/Gekkio/imgui-rs/compare/v0.9.0...v0.10.0
 [0.9.0]: https://github.com/Gekkio/imgui-rs/compare/v0.8.0...v0.9.0
 [0.8.0]: https://github.com/Gekkio/imgui-rs/compare/v0.7.0...v0.8.0
 [0.7.0]: https://github.com/Gekkio/imgui-rs/compare/v0.6.1...v0.7.0

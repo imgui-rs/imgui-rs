@@ -9,11 +9,29 @@ const DEFINES: &[(&str, Option<&str>)] = &[
     ("IMGUI_DISABLE_OSX_FUNCTIONS", None),
 ];
 
+#[cfg(feature = "freetype")]
+fn find_freetype() -> Vec<impl AsRef<std::path::Path>> {
+    #[cfg(not(feature = "use-vcpkg"))]
+    match pkg_config::Config::new().find("freetype2") {
+        Ok(freetype) => freetype.include_paths,
+        Err(err) => panic!("cannot find freetype: {}", err),
+    }
+    #[cfg(feature = "use-vcpkg")]
+    match vcpkg::find_package("freetype") {
+        Ok(freetype) => freetype.include_paths,
+        Err(err) => panic!("cannot find freetype: {}", err),
+    }
+}
+
+// Output define args for compiler
 fn main() -> std::io::Result<()> {
     // Root of imgui-sys
     let manifest_dir = std::path::Path::new(env!("CARGO_MANIFEST_DIR"));
 
-    // Output define args for compiler
+    println!(
+        "cargo:THIRD_PARTY={}",
+        manifest_dir.join("third-party").display()
+    );
     for (key, value) in DEFINES.iter() {
         println!("cargo:DEFINE_{}={}", key, value.unwrap_or(""));
     }
@@ -53,14 +71,18 @@ fn main() -> std::io::Result<()> {
         // Freetype font rasterizer feature
         #[cfg(feature = "freetype")]
         {
-            // Find library
-            let freetype = pkg_config::Config::new().find("freetype2").unwrap();
-            for include in freetype.include_paths.iter() {
+            // Supress warnings:
+            // warning: ‘ImFontBuildSrcGlyphFT’ has a field ‘ImFontBuildSrcGlyphFT::Info’ whose type uses the anonymous namespace
+            // warning: ‘ImFontBuildSrcDataFT’ has a field ‘ImFontBuildSrcDataFT::Font’ whose type uses the anonymous namespace
+            build.flag_if_supported("-Wno-subobject-linkage");
+
+            // Include freetype headers
+            for include in find_freetype() {
                 build.include(include);
             }
+
             // Set flag for dear imgui
-            build.define("IMGUI_ENABLE_FREETYPE", None);
-            build.define("CIMGUI_FREETYPE", None);
+            build.define("CIMGUI_FREETYPE", None); // Sets IMGUI_ENABLE_FREETYPE
             println!("cargo:DEFINE_IMGUI_ENABLE_FREETYPE=");
 
             // imgui_freetype.cpp needs access to `#include "imgui.h"`.

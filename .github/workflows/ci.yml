@@ -81,7 +81,6 @@ jobs:
       matrix:
         rust:
           - stable
-          - beta
           - "1.57"
         os:
           - ubuntu-latest
@@ -125,9 +124,9 @@ jobs:
             ${{ runner.os }}-target-test-${{ matrix.rust }}-${{ hashFiles('**/Cargo.toml') }}
             ${{ runner.os }}-target-test-${{ matrix.rust }}-
 
-      # - name: Setup vcpkg
-      #   if: matrix.os == 'windows-latest'
-      #   run: vcpkg integrate install; vcpkg install freetype;
+      - name: Setup vcpkg
+        if: matrix.os == 'windows-latest'
+        run: vcpkg integrate install; vcpkg install freetype:x64-windows-static-md
 
       # feature testing
       - name: no features
@@ -136,17 +135,23 @@ jobs:
       - name: docking feature
         run: cargo test --workspace --all-targets --features docking
 
-      - name: freetype feature
+      - name: freetype feature (non-Windows, pkg-config)
         if: matrix.os != 'windows-latest'
         run: cargo test --workspace --all-targets --features freetype
 
-      - name: all features
+      - name: freetype and docking (non-Windows, pkg-config)
         if: matrix.os != 'windows-latest'
-        run: cargo test --workspace --all-targets --features docking,freetype
+        run: cargo test --workspace --all-targets --features freetype,docking
 
-      - name: doc tests
-        run: cargo test --workspace --doc
+      - name: freetype feature (Windows, vcpkg)
+        if: matrix.os == 'windows-latest'
+        run: cargo test --workspace --all-targets --features freetype,use-vcpkg
 
+      - name: freetype and docking (Windows, vcpkg)
+        if: matrix.os == 'windows-latest'
+        run: cargo test --workspace --all-targets --features freetype,docking,use-vcpkg
+
+      - run: cargo test --workspace --doc
       # run to check for lint problems
       - name: build documentation
         run: cargo doc

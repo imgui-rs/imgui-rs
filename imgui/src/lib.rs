@@ -1,6 +1,6 @@
 #![cfg_attr(test, allow(clippy::float_cmp))]
 #![deny(rust_2018_idioms)]
-// #![deny(missing_docs)]
+//#![deny(missing_docs)]
 
 pub extern crate imgui_sys as sys;
 
@@ -286,26 +286,30 @@ impl Ui {
 /// This represents a hash of the current stack of Ids used in ImGui + the
 /// input provided. It is only used in a few places directly in the
 /// codebase, but you can think of it as effectively allowing you to
-/// run your Id hashing yourself.
+/// run your Id hashing yourself. More often [`Ui::push_id`] and the likes
+/// are used instead.
 ///
-/// Previously, this was erroneously constructed with `From` implementations.
-/// Now, however, it is made from the `Ui` object directly, with a few
-/// deprecated helper methods here.
+/// Previously, in v0.7, this was erroneously constructed with `From`
+/// implementations.  Now, however, it is made from the `Ui` object
+/// directly, with a few deprecated helper methods here.
 #[repr(transparent)]
 #[derive(Copy, Clone, Debug, Eq, PartialEq, Default, Hash)]
 pub struct Id(pub(crate) u32);
 
 impl Id {
+    #[deprecated(since = "0.8.0", note = "Use ui.new_id_int(...)")]
     #[allow(non_snake_case)]
     pub fn Int(input: i32, ui: &Ui) -> Self {
         ui.new_id_int(input)
     }
 
+    #[deprecated(since = "0.8.0", note = "Use ui.new_id_str(...)")]
     #[allow(non_snake_case)]
     pub fn Str(input: impl AsRef<str>, ui: &Ui) -> Self {
         ui.new_id_str(input)
     }
 
+    #[deprecated(since = "0.8.0", note = "Use ui.new_id_ptr(...)")]
     #[allow(non_snake_case)]
     pub fn Ptr<T>(input: &T, ui: &Ui) -> Self {
         ui.new_id_ptr(input)
@@ -313,6 +317,7 @@ impl Id {
 }
 
 impl Ui {
+    /// Create new [`Id`] from a `usize`. See [`Id`] for details.
     pub fn new_id(&self, input: usize) -> Id {
         let p = input as *const std::os::raw::c_void;
         let value = unsafe { sys::igGetID_Ptr(p) };
@@ -320,18 +325,21 @@ impl Ui {
         Id(value)
     }
 
+    /// Create [`Id`] from i32
     pub fn new_id_int(&self, input: i32) -> Id {
         let p = input as *const std::os::raw::c_void;
         let value = unsafe { sys::igGetID_Ptr(p) };
         Id(value)
     }
 
+    /// Create [`Id`] from a pointer
     pub fn new_id_ptr<T>(&self, input: &T) -> Id {
         let p = input as *const T as *const sys::cty::c_void;
         let value = unsafe { sys::igGetID_Ptr(p) };
         Id(value)
     }
 
+    /// Create [`Id`] from string
     pub fn new_id_str(&self, s: impl AsRef<str>) -> Id {
         let s = s.as_ref();
 
@@ -343,63 +351,6 @@ impl Ui {
         Id(value)
     }
 }
-
-// /// Unique ID used by widgets
-// pub enum Id<'a> {
-//     Int(i32),
-//     Str(&'a str),
-//     Ptr(*const c_void),
-// }
-
-// impl From<i32> for Id<'static> {
-//     #[inline]
-//     fn from(i: i32) -> Self {
-//         Id::Int(i)
-//     }
-// }
-
-// impl<'a, T: ?Sized + AsRef<str>> From<&'a T> for Id<'a> {
-//     #[inline]
-//     fn from(s: &'a T) -> Self {
-//         Id::Str(s.as_ref())
-//     }
-// }
-
-// impl<T> From<*const T> for Id<'static> {
-//     #[inline]
-//     fn from(p: *const T) -> Self {
-//         Id::Ptr(p as *const c_void)
-//     }
-// }
-
-// impl<T> From<*mut T> for Id<'static> {
-//     #[inline]
-//     fn from(p: *mut T) -> Self {
-//         Id::Ptr(p as *const T as *const c_void)
-//     }
-// }
-
-// impl<'a> Id<'a> {
-//     // this is used in the tables-api and possibly elsewhere,
-//     // but not with just default features...
-//     #[allow(dead_code)]
-//     fn as_imgui_id(&self) -> sys::ImGuiID {
-//         unsafe {
-//             match self {
-//                 Id::Ptr(p) => sys::igGetID_Ptr(*p),
-//                 Id::Str(s) => {
-//                     let s1 = s.as_ptr() as *const std::os::raw::c_char;
-//                     let s2 = s1.add(s.len());
-//                     sys::igGetID_StrStr(s1, s2)
-//                 }
-//                 Id::Int(i) => {
-//                     let p = *i as *const std::os::raw::c_void;
-//                     sys::igGetID_Ptr(p)
-//                 } // Id::ImGuiID(n) => *n,
-//             }
-//         }
-//     }
-// }
 
 impl Ui {
     /// # Windows
@@ -465,8 +416,9 @@ impl Ui {
     }
 }
 
-// Widgets: Input
 impl<'ui> Ui {
+    /// # Widgets: Input
+
     /// Edits text in a single line input widget
     #[doc(alias = "InputText", alias = "InputTextWithHint")]
     pub fn input_text<'p, L: AsRef<str>>(
@@ -477,7 +429,9 @@ impl<'ui> Ui {
         InputText::new(self, label, buf)
     }
 
-    /// Edits text in a multi line widget
+    /// Edits text in a multi line widget. Similar to [`Self::input_text`]
+    /// but requires specifying a size. [`Self::content_region_avail`]
+    /// can be useful to make this take up all avaialble space
     #[doc(alias = "InputText", alias = "InputTextMultiline")]
     pub fn input_text_multiline<'p, L: AsRef<str>>(
         &'ui self,
@@ -489,7 +443,7 @@ impl<'ui> Ui {
     }
 
     /// Simple floating point number widget
-    #[doc(alias = "InputFloat2")]
+    #[doc(alias = "InputFloat")]
     pub fn input_float<'p, L: AsRef<str>>(
         &'ui self,
         label: L,
@@ -497,6 +451,8 @@ impl<'ui> Ui {
     ) -> InputScalar<'ui, 'p, f32, L> {
         self.input_scalar(label, value)
     }
+
+    /// Widget to edit two floats
     #[doc(alias = "InputFloat2")]
     pub fn input_float2<'p, L, T>(
         &'ui self,
@@ -510,6 +466,8 @@ impl<'ui> Ui {
     {
         InputFloat2::new(self, label, value)
     }
+
+    /// Widget to edit 3 floats
     #[doc(alias = "InputFloat3")]
     pub fn input_float3<'p, L, T>(
         &'ui self,
@@ -523,6 +481,8 @@ impl<'ui> Ui {
     {
         InputFloat3::new(self, label, value)
     }
+
+    /// Widget to edit 4 floats
     #[doc(alias = "InputFloat4")]
     pub fn input_float4<'p, L, T>(
         &'ui self,
@@ -536,6 +496,8 @@ impl<'ui> Ui {
     {
         InputFloat4::new(self, label, value)
     }
+
+    /// Shortcut for [`Ui::input_scalar`]
     #[doc(alias = "InputInt")]
     pub fn input_int<'p, L: AsRef<str>>(
         &'ui self,
@@ -544,6 +506,8 @@ impl<'ui> Ui {
     ) -> InputScalar<'ui, 'p, i32, L> {
         self.input_scalar(label, value).step(1)
     }
+
+    /// Shortcut for [`Ui::input_scalar`]
     #[doc(alias = "InputInt2")]
     pub fn input_int2<'p, L, T>(&'ui self, label: L, value: &'p mut T) -> InputInt2<'ui, 'p, L, T>
     where
@@ -553,6 +517,8 @@ impl<'ui> Ui {
     {
         InputInt2::new(self, label, value)
     }
+
+    /// Shortcut for [`Ui::input_scalar`]
     #[doc(alias = "InputInt3")]
     pub fn input_int3<'p, L, T>(&'ui self, label: L, value: &'p mut T) -> InputInt3<'ui, 'p, L, T>
     where
@@ -562,6 +528,8 @@ impl<'ui> Ui {
     {
         InputInt3::new(self, label, value)
     }
+
+    /// Shortcut for [`Ui::input_scalar`]
     #[doc(alias = "InputInt4")]
     pub fn input_int4<'p, L, T>(&'ui self, label: L, value: &'p mut T) -> InputInt4<'ui, 'p, L, T>
     where
@@ -571,6 +539,7 @@ impl<'ui> Ui {
     {
         InputInt4::new(self, label, value)
     }
+
     /// Shows an input field for a scalar value. This is not limited to `f32` and `i32` and can be used with
     /// any primitive scalar type e.g. `u8` and `f64`.
     #[doc(alias = "InputScalar")]
@@ -585,6 +554,7 @@ impl<'ui> Ui {
     {
         InputScalar::new(self, label, value)
     }
+
     /// Shows a horizontal array of scalar value input fields. See [`input_scalar`].
     ///
     /// [`input_scalar`]: Self::input_scalar
@@ -644,9 +614,8 @@ impl Ui {
         unsafe { sys::igBeginTooltip() };
         TooltipToken::new(self)
     }
-    /// Construct a tooltip window with simple text content.
-    ///
-    /// Typically used with `Ui::is_item_hovered()` or some other conditional check.
+
+    /// Shortcut to call [`Self::tooltip`] with simple text content.
     ///
     /// # Examples
     ///

@@ -212,6 +212,7 @@ impl IndexMut<StyleColor> for Style {
 /// [`crate::Ui::show_demo_window`] until you spot it
 #[repr(u32)]
 #[derive(Copy, Clone, Debug, Hash, Eq, PartialEq)]
+#[non_exhaustive]
 pub enum StyleColor {
     /// Default color of text througout application
     Text = sys::ImGuiCol_Text,
@@ -500,6 +501,7 @@ impl std::error::Error for InvalidStyleColorValue {}
 
 /// A temporary change in user interface style
 #[derive(Copy, Clone, Debug, PartialEq)]
+#[non_exhaustive]
 pub enum StyleVar {
     /// Global alpha applies to everything
     Alpha(f32),

@@ -654,8 +654,8 @@ pub const ImGuiMod_Ctrl: ImGuiKey = 4096;
 pub const ImGuiMod_Shift: ImGuiKey = 8192;
 pub const ImGuiMod_Alt: ImGuiKey = 16384;
 pub const ImGuiMod_Super: ImGuiKey = 32768;
-pub const ImGuiMod_Mask_: ImGuiKey = 61440;
-pub const ImGuiMod_Shortcut: ImGuiKey = 4096;
+pub const ImGuiMod_Shortcut: ImGuiKey = 2048;
+pub const ImGuiMod_Mask_: ImGuiKey = 63488;
 pub const ImGuiKey_NamedKey_BEGIN: ImGuiKey = 512;
 pub const ImGuiKey_NamedKey_END: ImGuiKey = 652;
 pub const ImGuiKey_NamedKey_COUNT: ImGuiKey = 140;
@@ -1829,6 +1829,7 @@ pub struct ImFontAtlas {
     pub TexDesiredWidth: cty::c_int,
     pub TexGlyphPadding: cty::c_int,
     pub Locked: bool,
+    pub UserData: *mut cty::c_void,
     pub TexReady: bool,
     pub TexPixelsUseColors: bool,
     pub TexPixelsAlpha8: *mut cty::c_uchar,
@@ -2339,10 +2340,9 @@ pub const ImGuiSelectableFlags_SelectOnNav: ImGuiSelectableFlagsPrivate_ = 20971
 pub const ImGuiSelectableFlags_SelectOnClick: ImGuiSelectableFlagsPrivate_ = 4194304;
 pub const ImGuiSelectableFlags_SelectOnRelease: ImGuiSelectableFlagsPrivate_ = 8388608;
 pub const ImGuiSelectableFlags_SpanAvailWidth: ImGuiSelectableFlagsPrivate_ = 16777216;
-pub const ImGuiSelectableFlags_DrawHoveredWhenHeld: ImGuiSelectableFlagsPrivate_ = 33554432;
-pub const ImGuiSelectableFlags_SetNavIdOnHover: ImGuiSelectableFlagsPrivate_ = 67108864;
-pub const ImGuiSelectableFlags_NoPadWithHalfSpacing: ImGuiSelectableFlagsPrivate_ = 134217728;
-pub const ImGuiSelectableFlags_NoSetKeyOwner: ImGuiSelectableFlagsPrivate_ = 268435456;
+pub const ImGuiSelectableFlags_SetNavIdOnHover: ImGuiSelectableFlagsPrivate_ = 33554432;
+pub const ImGuiSelectableFlags_NoPadWithHalfSpacing: ImGuiSelectableFlagsPrivate_ = 67108864;
+pub const ImGuiSelectableFlags_NoSetKeyOwner: ImGuiSelectableFlagsPrivate_ = 134217728;
 pub type ImGuiSelectableFlagsPrivate_ = cty::c_uint;
 pub const ImGuiTreeNodeFlags_ClipLabelForTrailingButton: ImGuiTreeNodeFlagsPrivate_ = 1048576;
 pub type ImGuiTreeNodeFlagsPrivate_ = cty::c_uint;
@@ -2493,6 +2493,7 @@ pub struct ImGuiMenuColumns {
 #[repr(C)]
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub struct ImGuiInputTextState {
+    pub Ctx: *mut ImGuiContext,
     pub ID: ImGuiID,
     pub CurLenW: cty::c_int,
     pub CurLenA: cty::c_int,
@@ -4040,7 +4041,10 @@ pub struct ImGuiContext {
     pub MovingWindow: *mut ImGuiWindow,
     pub WheelingWindow: *mut ImGuiWindow,
     pub WheelingWindowRefMousePos: ImVec2,
+    pub WheelingWindowStartFrame: cty::c_int,
     pub WheelingWindowReleaseTimer: f32,
+    pub WheelingWindowWheelRemainder: ImVec2,
+    pub WheelingAxisAvg: ImVec2,
     pub DebugHookIdInfo: ImGuiID,
     pub HoveredId: ImGuiID,
     pub HoveredIdPreviousFrame: ImGuiID,
@@ -4342,6 +4346,12 @@ pub struct ImGuiWindow {
     pub WindowPadding: ImVec2,
     pub WindowRounding: f32,
     pub WindowBorderSize: f32,
+    pub DecoOuterSizeX1: f32,
+    pub DecoOuterSizeY1: f32,
+    pub DecoOuterSizeX2: f32,
+    pub DecoOuterSizeY2: f32,
+    pub DecoInnerSizeX1: f32,
+    pub DecoInnerSizeY1: f32,
     pub NameBufLen: cty::c_int,
     pub MoveId: ImGuiID,
     pub TabId: ImGuiID,
@@ -4798,6 +4808,7 @@ pub struct ImGuiTableCellData {
 pub struct ImGuiTableInstanceData {
     pub LastOuterHeight: f32,
     pub LastFirstRowHeight: f32,
+    pub LastFrozenHeight: f32,
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
@@ -4981,6 +4992,8 @@ pub struct ImGuiTable {
     pub IsResetDisplayOrderRequest: bool,
     pub IsUnfrozenRows: bool,
     pub IsDefaultSizingPolicy: bool,
+    pub HasScrollbarYCurr: bool,
+    pub HasScrollbarYPrev: bool,
     pub MemoryCompacted: bool,
     pub HostSkipItems: bool,
 }
@@ -6978,6 +6991,10 @@ extern "C" {
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igIsAnyItemFocused() -> bool;
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
+    pub fn igGetItemID() -> ImGuiID;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
@@ -9119,6 +9136,10 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
+    pub fn igImExponentialMovingAverage(avg: f32, sample: f32, n: cty::c_int) -> f32;
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
     pub fn igImBezierCubicCalc(
         pOut: *mut ImVec2,
         p1: ImVec2,
@@ -9489,7 +9510,9 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn ImGuiInputTextState_ImGuiInputTextState() -> *mut ImGuiInputTextState;
+    pub fn ImGuiInputTextState_ImGuiInputTextState(
+        ctx: *mut ImGuiContext,
+    ) -> *mut ImGuiInputTextState;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
@@ -10323,10 +10346,6 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igGetItemID() -> ImGuiID;
-}
-#[link(wasm_import_module = "imgui-sys-v0")]
-extern "C" {
     pub fn igGetItemStatusFlags() -> ImGuiItemStatusFlags;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
@@ -10669,6 +10688,10 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
+    pub fn igConvertShortcutMod(key_chord: ImGuiKeyChord) -> ImGuiKeyChord;
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
     pub fn igConvertSingleModFlagToKey(key: ImGuiKey) -> ImGuiKey;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
@@ -10693,7 +10716,7 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igGetKeyVector2d(
+    pub fn igGetKeyMagnitude2d(
         pOut: *mut ImVec2,
         key_left: ImGuiKey,
         key_right: ImGuiKey,
@@ -11555,35 +11578,11 @@ extern "C" {
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
-    pub fn igCloseButton(id: ImGuiID, pos: ImVec2) -> bool;
-}
-#[link(wasm_import_module = "imgui-sys-v0")]
-extern "C" {
-    pub fn igCollapseButton(id: ImGuiID, pos: ImVec2, dock_node: *mut ImGuiDockNode) -> bool;
-}
-#[link(wasm_import_module = "imgui-sys-v0")]
-extern "C" {
     pub fn igArrowButtonEx(
         str_id: *const cty::c_char,
         dir: ImGuiDir,
         size_arg: ImVec2,
         flags: ImGuiButtonFlags,
-    ) -> bool;
-}
-#[link(wasm_import_module = "imgui-sys-v0")]
-extern "C" {
-    pub fn igScrollbar(axis: ImGuiAxis);
-}
-#[link(wasm_import_module = "imgui-sys-v0")]
-extern "C" {
-    pub fn igScrollbarEx(
-        bb: ImRect,
-        id: ImGuiID,
-        axis: ImGuiAxis,
-        p_scroll_v: *mut ImS64,
-        avail_v: ImS64,
-        contents_v: ImS64,
-        flags: ImDrawFlags,
     ) -> bool;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
@@ -11597,22 +11596,6 @@ extern "C" {
         bg_col: ImVec4,
         tint_col: ImVec4,
     ) -> bool;
-}
-#[link(wasm_import_module = "imgui-sys-v0")]
-extern "C" {
-    pub fn igGetWindowScrollbarRect(pOut: *mut ImRect, window: *mut ImGuiWindow, axis: ImGuiAxis);
-}
-#[link(wasm_import_module = "imgui-sys-v0")]
-extern "C" {
-    pub fn igGetWindowScrollbarID(window: *mut ImGuiWindow, axis: ImGuiAxis) -> ImGuiID;
-}
-#[link(wasm_import_module = "imgui-sys-v0")]
-extern "C" {
-    pub fn igGetWindowResizeCornerID(window: *mut ImGuiWindow, n: cty::c_int) -> ImGuiID;
-}
-#[link(wasm_import_module = "imgui-sys-v0")]
-extern "C" {
-    pub fn igGetWindowResizeBorderID(window: *mut ImGuiWindow, dir: ImGuiDir) -> ImGuiID;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
@@ -11633,6 +11616,46 @@ extern "C" {
         flags: *mut ImU64,
         flags_value: ImU64,
     ) -> bool;
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
+    pub fn igCloseButton(id: ImGuiID, pos: ImVec2) -> bool;
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
+    pub fn igCollapseButton(id: ImGuiID, pos: ImVec2, dock_node: *mut ImGuiDockNode) -> bool;
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
+    pub fn igScrollbar(axis: ImGuiAxis);
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
+    pub fn igScrollbarEx(
+        bb: ImRect,
+        id: ImGuiID,
+        axis: ImGuiAxis,
+        p_scroll_v: *mut ImS64,
+        avail_v: ImS64,
+        contents_v: ImS64,
+        flags: ImDrawFlags,
+    ) -> bool;
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
+    pub fn igGetWindowScrollbarRect(pOut: *mut ImRect, window: *mut ImGuiWindow, axis: ImGuiAxis);
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
+    pub fn igGetWindowScrollbarID(window: *mut ImGuiWindow, axis: ImGuiAxis) -> ImGuiID;
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
+    pub fn igGetWindowResizeCornerID(window: *mut ImGuiWindow, n: cty::c_int) -> ImGuiID;
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
+    pub fn igGetWindowResizeBorderID(window: *mut ImGuiWindow, dir: ImGuiDir) -> ImGuiID;
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
@@ -12001,6 +12024,10 @@ extern "C" {
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
     pub fn igDebugNodeViewport(viewport: *mut ImGuiViewportP);
+}
+#[link(wasm_import_module = "imgui-sys-v0")]
+extern "C" {
+    pub fn igDebugRenderKeyboardPreview(draw_list: *mut ImDrawList);
 }
 #[link(wasm_import_module = "imgui-sys-v0")]
 extern "C" {
