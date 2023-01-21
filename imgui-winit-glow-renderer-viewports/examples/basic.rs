@@ -5,14 +5,16 @@ use glutin::{
     config::ConfigTemplateBuilder,
     context::ContextAttributesBuilder,
     display::GetGlDisplay,
-    prelude::{GlDisplay, NotCurrentGlContextSurfaceAccessor, PossiblyCurrentContextGlSurfaceAccessor},
-    surface::{SurfaceAttributesBuilder, WindowSurface, GlSurface},
+    prelude::{
+        GlDisplay, NotCurrentGlContextSurfaceAccessor, PossiblyCurrentContextGlSurfaceAccessor,
+    },
+    surface::{GlSurface, SurfaceAttributesBuilder, WindowSurface},
 };
 use glutin_winit::DisplayBuilder;
 use imgui::ConfigFlags;
 use imgui_winit_glow_renderer_viewports::Renderer;
 use raw_window_handle::HasRawWindowHandle;
-use winit::{dpi::LogicalSize, event_loop::EventLoop, window::WindowBuilder, event::WindowEvent};
+use winit::{dpi::LogicalSize, event::WindowEvent, event_loop::EventLoop, window::WindowBuilder};
 
 fn main() {
     let event_loop = EventLoop::new();
@@ -90,16 +92,26 @@ fn main() {
                 let now = Instant::now();
                 imgui.io_mut().update_delta_time(now - last_frame);
                 last_frame = now;
-            },
-            winit::event::Event::WindowEvent { window_id, event: WindowEvent::CloseRequested } if window_id == window.id() => {
+            }
+            winit::event::Event::WindowEvent {
+                window_id,
+                event: WindowEvent::CloseRequested,
+            } if window_id == window.id() => {
                 control_flow.set_exit();
-            },
-            winit::event::Event::WindowEvent { window_id, event: WindowEvent::Resized(new_size) } if window_id == window.id() => {
-                surface.resize(&context, NonZeroU32::new(new_size.width).unwrap(), NonZeroU32::new(new_size.height).unwrap());
-            },
+            }
+            winit::event::Event::WindowEvent {
+                window_id,
+                event: WindowEvent::Resized(new_size),
+            } if window_id == window.id() => {
+                surface.resize(
+                    &context,
+                    NonZeroU32::new(new_size.width).unwrap(),
+                    NonZeroU32::new(new_size.height).unwrap(),
+                );
+            }
             winit::event::Event::MainEventsCleared => {
                 window.request_redraw();
-            },
+            }
             winit::event::Event::RedrawRequested(_) => {
                 let ui = imgui.frame();
 
@@ -115,7 +127,9 @@ fn main() {
                 renderer.prepare_render(&mut imgui, &window);
 
                 imgui.update_platform_windows();
-                renderer.update_viewports(&mut imgui, window_target, &glow).expect("Failed to update viewports");
+                renderer
+                    .update_viewports(&mut imgui, window_target, &glow)
+                    .expect("Failed to update viewports");
 
                 let draw_data = imgui.render();
 
@@ -130,13 +144,19 @@ fn main() {
                     glow.clear(glow::COLOR_BUFFER_BIT);
                 }
 
-                renderer.render(&window, &glow, draw_data).expect("Failed to render main viewport");
-                
-                surface.swap_buffers(&context).expect("Failed to swap buffers");
+                renderer
+                    .render(&window, &glow, draw_data)
+                    .expect("Failed to render main viewport");
 
-                renderer.render_viewports(&glow, &mut imgui).expect("Failed to render viewports");
-            },
-            _ => {},
+                surface
+                    .swap_buffers(&context)
+                    .expect("Failed to swap buffers");
+
+                renderer
+                    .render_viewports(&glow, &mut imgui)
+                    .expect("Failed to render viewports");
+            }
+            _ => {}
         }
     });
 }

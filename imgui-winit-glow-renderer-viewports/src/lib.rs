@@ -273,7 +273,10 @@ impl Renderer {
 
         let viewport = imgui.main_viewport_mut();
 
-        let main_pos = main_window.inner_position().unwrap_or_default().cast::<f32>();
+        let main_pos = main_window
+            .inner_position()
+            .unwrap_or_default()
+            .cast::<f32>();
 
         viewport.pos = [main_pos.x, main_pos.y];
         viewport.work_pos = viewport.pos;
@@ -415,7 +418,8 @@ impl Renderer {
                             .config_flags
                             .contains(ConfigFlags::VIEWPORTS_ENABLE)
                         {
-                            let window_pos = window.inner_position().unwrap_or_default().cast::<f32>();
+                            let window_pos =
+                                window.inner_position().unwrap_or_default().cast::<f32>();
                             imgui.io_mut().mouse_pos = [
                                 position.x as f32 + window_pos.x,
                                 position.y as f32 + window_pos.y,
