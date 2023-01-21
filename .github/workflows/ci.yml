@@ -8,6 +8,23 @@ on:
     - cron: "0 0 * * 1"
 
 jobs:
+  semver-checks:
+    name: Check for Semver breaking changes
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        crate: [ imgui, imgui-sys ]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Check ${{ matrix.crate }}
+        uses: obi1kenobi/cargo-semver-checks-action@v1
+        with:
+          crate-name: ${{ matrix.crate }}
+
   rustfmt:
     name: Check rustfmt
     runs-on: ubuntu-latest
