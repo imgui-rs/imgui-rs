@@ -16,7 +16,7 @@ use glutin::{
     surface::{GlSurface, Surface, SurfaceAttributesBuilder, WindowSurface},
 };
 use glutin_winit::DisplayBuilder;
-use imgui::{BackendFlags, ConfigFlags, Id, Key, ViewportFlags};
+use imgui::{BackendFlags, ConfigFlags, Id, Key, MouseButton, ViewportFlags};
 use raw_window_handle::{HasRawWindowHandle, RawWindowHandle};
 use thiserror::Error;
 use winit::{
@@ -370,29 +370,6 @@ impl Renderer {
         io.backend_flags
             .insert(BackendFlags::RENDERER_HAS_VTX_OFFSET);
 
-        io[Key::Tab] = VirtualKeyCode::Tab as _;
-        io[Key::LeftArrow] = VirtualKeyCode::Left as _;
-        io[Key::RightArrow] = VirtualKeyCode::Right as _;
-        io[Key::UpArrow] = VirtualKeyCode::Up as _;
-        io[Key::DownArrow] = VirtualKeyCode::Down as _;
-        io[Key::PageUp] = VirtualKeyCode::PageUp as _;
-        io[Key::PageDown] = VirtualKeyCode::PageDown as _;
-        io[Key::Home] = VirtualKeyCode::Home as _;
-        io[Key::End] = VirtualKeyCode::End as _;
-        io[Key::Insert] = VirtualKeyCode::Insert as _;
-        io[Key::Delete] = VirtualKeyCode::Delete as _;
-        io[Key::Backspace] = VirtualKeyCode::Back as _;
-        io[Key::Space] = VirtualKeyCode::Space as _;
-        io[Key::Enter] = VirtualKeyCode::Return as _;
-        io[Key::Escape] = VirtualKeyCode::Escape as _;
-        io[Key::KeypadEnter] = VirtualKeyCode::NumpadEnter as _;
-        io[Key::A] = VirtualKeyCode::A as _;
-        io[Key::C] = VirtualKeyCode::C as _;
-        io[Key::V] = VirtualKeyCode::V as _;
-        io[Key::X] = VirtualKeyCode::X as _;
-        io[Key::Y] = VirtualKeyCode::Y as _;
-        io[Key::Z] = VirtualKeyCode::Z as _;
-
         let window_size = main_window.inner_size().cast::<f32>();
         io.display_size = [window_size.width, window_size.height];
         io.display_framebuffer_scale = [1.0, 1.0];
@@ -536,7 +513,19 @@ impl Renderer {
                             },
                         ..
                     } => {
-                        imgui.io_mut().keys_down[key as usize] = true;
+                        if let Some(key) = to_imgui_key(key) {
+                            imgui.io_mut().add_key_event(key, true);
+                        }
+                    }
+                    winit::event::WindowEvent::ModifiersChanged(modifiers) => {
+                        imgui
+                            .io_mut()
+                            .add_key_event(Key::ModShift, modifiers.shift());
+                        imgui.io_mut().add_key_event(Key::ModCtrl, modifiers.ctrl());
+                        imgui.io_mut().add_key_event(Key::ModAlt, modifiers.alt());
+                        imgui
+                            .io_mut()
+                            .add_key_event(Key::ModSuper, modifiers.logo());
                     }
                     winit::event::WindowEvent::CursorMoved { position, .. } => {
                         if imgui
@@ -546,12 +535,14 @@ impl Renderer {
                         {
                             let window_pos =
                                 window.inner_position().unwrap_or_default().cast::<f32>();
-                            imgui.io_mut().mouse_pos = [
+                            imgui.io_mut().add_mouse_pos_event([
                                 position.x as f32 + window_pos.x,
                                 position.y as f32 + window_pos.y,
-                            ];
+                            ]);
                         } else {
-                            imgui.io_mut().mouse_pos = [position.x as f32, position.y as f32];
+                            imgui
+                                .io_mut()
+                                .add_mouse_pos_event([position.x as f32, position.y as f32]);
                         }
                     }
                     winit::event::WindowEvent::MouseWheel {
@@ -560,43 +551,31 @@ impl Renderer {
                         ..
                     } => match delta {
                         winit::event::MouseScrollDelta::LineDelta(h, v) => {
-                            imgui.io_mut().mouse_wheel_h = h;
-                            imgui.io_mut().mouse_wheel = v;
+                            imgui.io_mut().add_mouse_wheel_event([h, v]);
                         }
                         winit::event::MouseScrollDelta::PixelDelta(pos) => {
-                            imgui.io_mut().mouse_wheel_h += if pos.x > 0.0 {
+                            let h = if pos.x > 0.0 {
                                 1.0
                             } else if pos.x < 0.0 {
                                 -1.0
                             } else {
                                 0.0
                             };
-                            imgui.io_mut().mouse_wheel += if pos.y > 0.0 {
+                            let v = if pos.y > 0.0 {
                                 1.0
                             } else if pos.y < 0.0 {
                                 -1.0
                             } else {
                                 0.0
                             };
+                            imgui.io_mut().add_mouse_wheel_event([h, v]);
                         }
                     },
                     winit::event::WindowEvent::MouseInput { state, button, .. } => {
                         let state = state == ElementState::Pressed;
 
-                        match button {
-                            winit::event::MouseButton::Left => {
-                                imgui.io_mut().mouse_down[0] = state;
-                            }
-                            winit::event::MouseButton::Right => {
-                                imgui.io_mut().mouse_down[1] = state;
-                            }
-                            winit::event::MouseButton::Middle => {
-                                imgui.io_mut().mouse_down[2] = state;
-                            }
-                            winit::event::MouseButton::Other(index @ 0..=4) => {
-                                imgui.io_mut().mouse_down[index as usize] = state;
-                            }
-                            _ => {}
+                        if let Some(button) = to_imgui_mouse_button(button) {
+                            imgui.io_mut().add_mouse_button_event(button, state);
                         }
                     }
                     _ => {}
@@ -611,7 +590,9 @@ impl Renderer {
                     }),
                 ..
             } => {
-                imgui.io_mut().keys_down[key as usize] = false;
+                if let Some(key) = to_imgui_key(key) {
+                    imgui.io_mut().add_key_event(key, false);
+                }
             }
             _ => {}
         }
@@ -1040,4 +1021,132 @@ impl imgui::RendererViewportBackend for RendererBackend {
     fn render_window(&mut self, _viewport: &mut imgui::Viewport) {}
 
     fn swap_buffers(&mut self, _viewport: &mut imgui::Viewport) {}
+}
+
+fn to_imgui_key(keycode: VirtualKeyCode) -> Option<Key> {
+    match keycode {
+        VirtualKeyCode::Tab => Some(Key::Tab),
+        VirtualKeyCode::Left => Some(Key::LeftArrow),
+        VirtualKeyCode::Right => Some(Key::RightArrow),
+        VirtualKeyCode::Up => Some(Key::UpArrow),
+        VirtualKeyCode::Down => Some(Key::DownArrow),
+        VirtualKeyCode::PageUp => Some(Key::PageUp),
+        VirtualKeyCode::PageDown => Some(Key::PageDown),
+        VirtualKeyCode::Home => Some(Key::Home),
+        VirtualKeyCode::End => Some(Key::End),
+        VirtualKeyCode::Insert => Some(Key::Insert),
+        VirtualKeyCode::Delete => Some(Key::Delete),
+        VirtualKeyCode::Back => Some(Key::Backspace),
+        VirtualKeyCode::Space => Some(Key::Space),
+        VirtualKeyCode::Return => Some(Key::Enter),
+        VirtualKeyCode::Escape => Some(Key::Escape),
+        VirtualKeyCode::LControl => Some(Key::LeftCtrl),
+        VirtualKeyCode::LShift => Some(Key::LeftShift),
+        VirtualKeyCode::LAlt => Some(Key::LeftAlt),
+        VirtualKeyCode::LWin => Some(Key::LeftSuper),
+        VirtualKeyCode::RControl => Some(Key::RightCtrl),
+        VirtualKeyCode::RShift => Some(Key::RightShift),
+        VirtualKeyCode::RAlt => Some(Key::RightAlt),
+        VirtualKeyCode::RWin => Some(Key::RightSuper),
+        //VirtualKeyCode::Menu => Some(Key::Menu), // TODO: find out if there is a Menu key in winit
+        VirtualKeyCode::Key0 => Some(Key::Alpha0),
+        VirtualKeyCode::Key1 => Some(Key::Alpha1),
+        VirtualKeyCode::Key2 => Some(Key::Alpha2),
+        VirtualKeyCode::Key3 => Some(Key::Alpha3),
+        VirtualKeyCode::Key4 => Some(Key::Alpha4),
+        VirtualKeyCode::Key5 => Some(Key::Alpha5),
+        VirtualKeyCode::Key6 => Some(Key::Alpha6),
+        VirtualKeyCode::Key7 => Some(Key::Alpha7),
+        VirtualKeyCode::Key8 => Some(Key::Alpha8),
+        VirtualKeyCode::Key9 => Some(Key::Alpha9),
+        VirtualKeyCode::A => Some(Key::A),
+        VirtualKeyCode::B => Some(Key::B),
+        VirtualKeyCode::C => Some(Key::C),
+        VirtualKeyCode::D => Some(Key::D),
+        VirtualKeyCode::E => Some(Key::E),
+        VirtualKeyCode::F => Some(Key::F),
+        VirtualKeyCode::G => Some(Key::G),
+        VirtualKeyCode::H => Some(Key::H),
+        VirtualKeyCode::I => Some(Key::I),
+        VirtualKeyCode::J => Some(Key::J),
+        VirtualKeyCode::K => Some(Key::K),
+        VirtualKeyCode::L => Some(Key::L),
+        VirtualKeyCode::M => Some(Key::M),
+        VirtualKeyCode::N => Some(Key::N),
+        VirtualKeyCode::O => Some(Key::O),
+        VirtualKeyCode::P => Some(Key::P),
+        VirtualKeyCode::Q => Some(Key::Q),
+        VirtualKeyCode::R => Some(Key::R),
+        VirtualKeyCode::S => Some(Key::S),
+        VirtualKeyCode::T => Some(Key::T),
+        VirtualKeyCode::U => Some(Key::U),
+        VirtualKeyCode::V => Some(Key::V),
+        VirtualKeyCode::W => Some(Key::W),
+        VirtualKeyCode::X => Some(Key::X),
+        VirtualKeyCode::Y => Some(Key::Y),
+        VirtualKeyCode::Z => Some(Key::Z),
+        VirtualKeyCode::F1 => Some(Key::F1),
+        VirtualKeyCode::F2 => Some(Key::F2),
+        VirtualKeyCode::F3 => Some(Key::F3),
+        VirtualKeyCode::F4 => Some(Key::F4),
+        VirtualKeyCode::F5 => Some(Key::F5),
+        VirtualKeyCode::F6 => Some(Key::F6),
+        VirtualKeyCode::F7 => Some(Key::F7),
+        VirtualKeyCode::F8 => Some(Key::F8),
+        VirtualKeyCode::F9 => Some(Key::F9),
+        VirtualKeyCode::F10 => Some(Key::F10),
+        VirtualKeyCode::F11 => Some(Key::F11),
+        VirtualKeyCode::F12 => Some(Key::F12),
+        VirtualKeyCode::Apostrophe => Some(Key::Apostrophe),
+        VirtualKeyCode::Comma => Some(Key::Comma),
+        VirtualKeyCode::Minus => Some(Key::Minus),
+        VirtualKeyCode::Period => Some(Key::Period),
+        VirtualKeyCode::Slash => Some(Key::Slash),
+        VirtualKeyCode::Semicolon => Some(Key::Semicolon),
+        VirtualKeyCode::Equals => Some(Key::Equal),
+        VirtualKeyCode::LBracket => Some(Key::LeftBracket),
+        VirtualKeyCode::Backslash => Some(Key::Backslash),
+        VirtualKeyCode::RBracket => Some(Key::RightBracket),
+        VirtualKeyCode::Grave => Some(Key::GraveAccent),
+        VirtualKeyCode::Capital => Some(Key::CapsLock),
+        VirtualKeyCode::Scroll => Some(Key::ScrollLock),
+        VirtualKeyCode::Numlock => Some(Key::NumLock),
+        VirtualKeyCode::Snapshot => Some(Key::PrintScreen),
+        VirtualKeyCode::Pause => Some(Key::Pause),
+        VirtualKeyCode::Numpad0 => Some(Key::Keypad0),
+        VirtualKeyCode::Numpad1 => Some(Key::Keypad1),
+        VirtualKeyCode::Numpad2 => Some(Key::Keypad2),
+        VirtualKeyCode::Numpad3 => Some(Key::Keypad3),
+        VirtualKeyCode::Numpad4 => Some(Key::Keypad4),
+        VirtualKeyCode::Numpad5 => Some(Key::Keypad5),
+        VirtualKeyCode::Numpad6 => Some(Key::Keypad6),
+        VirtualKeyCode::Numpad7 => Some(Key::Keypad7),
+        VirtualKeyCode::Numpad8 => Some(Key::Keypad8),
+        VirtualKeyCode::Numpad9 => Some(Key::Keypad9),
+        VirtualKeyCode::NumpadDecimal => Some(Key::KeypadDecimal),
+        VirtualKeyCode::NumpadDivide => Some(Key::KeypadDivide),
+        VirtualKeyCode::NumpadMultiply => Some(Key::KeypadMultiply),
+        VirtualKeyCode::NumpadSubtract => Some(Key::KeypadSubtract),
+        VirtualKeyCode::NumpadAdd => Some(Key::KeypadAdd),
+        VirtualKeyCode::NumpadEnter => Some(Key::KeypadEnter),
+        VirtualKeyCode::NumpadEquals => Some(Key::KeypadEqual),
+        _ => None,
+    }
+}
+
+fn to_imgui_mouse_button(button: winit::event::MouseButton) -> Option<MouseButton> {
+    match button {
+        winit::event::MouseButton::Left | winit::event::MouseButton::Other(0) => {
+            Some(imgui::MouseButton::Left)
+        }
+        winit::event::MouseButton::Right | winit::event::MouseButton::Other(1) => {
+            Some(imgui::MouseButton::Right)
+        }
+        winit::event::MouseButton::Middle | winit::event::MouseButton::Other(2) => {
+            Some(imgui::MouseButton::Middle)
+        }
+        winit::event::MouseButton::Other(3) => Some(imgui::MouseButton::Extra1),
+        winit::event::MouseButton::Other(4) => Some(imgui::MouseButton::Extra2),
+        _ => None,
+    }
 }
