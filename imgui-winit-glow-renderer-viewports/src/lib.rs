@@ -16,14 +16,14 @@ use glutin::{
     surface::{GlSurface, Surface, SurfaceAttributesBuilder, WindowSurface},
 };
 use glutin_winit::DisplayBuilder;
-use imgui::{BackendFlags, Id, Key, ViewportFlags, ConfigFlags};
-use raw_window_handle::HasRawWindowHandle;
+use imgui::{BackendFlags, ConfigFlags, Id, Key, ViewportFlags};
+use raw_window_handle::{HasRawWindowHandle, RawWindowHandle};
 use thiserror::Error;
 use winit::{
     dpi::{PhysicalPosition, PhysicalSize},
     event::{DeviceEvent, ElementState, KeyboardInput, TouchPhase, VirtualKeyCode},
     event_loop::EventLoopWindowTarget,
-    window::{Window, WindowBuilder, CursorIcon},
+    window::{CursorIcon, Window, WindowBuilder},
 };
 
 const VERTEX_SHADER: &str = include_str!("vertex_shader.glsl");
@@ -226,12 +226,21 @@ impl Renderer {
     ) -> Result<Self, RendererError> {
         let io = imgui.io_mut();
 
+        // there is no good way to handle viewports on wayland,
+        // so we disable them
+        match main_window.raw_window_handle() {
+            RawWindowHandle::Wayland(_) => {}
+            _ => {
+                io.backend_flags
+                    .insert(BackendFlags::PLATFORM_HAS_VIEWPORTS);
+                io.backend_flags
+                    .insert(BackendFlags::RENDERER_HAS_VIEWPORTS);
+            }
+        }
+
         io.backend_flags.insert(BackendFlags::HAS_MOUSE_CURSORS);
         io.backend_flags.insert(BackendFlags::HAS_SET_MOUSE_POS);
-        io.backend_flags
-            .insert(BackendFlags::PLATFORM_HAS_VIEWPORTS);
-        io.backend_flags
-            .insert(BackendFlags::RENDERER_HAS_VIEWPORTS);
+
         io.backend_flags
             .insert(BackendFlags::RENDERER_HAS_VTX_OFFSET);
 
@@ -262,37 +271,42 @@ impl Renderer {
         io.display_size = [window_size.width, window_size.height];
         io.display_framebuffer_scale = [1.0, 1.0];
 
-        let viewport = imgui.main_viewport_mut();
+        if io
+            .backend_flags
+            .contains(BackendFlags::RENDERER_HAS_VIEWPORTS)
+        {
+            let viewport = imgui.main_viewport_mut();
 
-        let main_pos = main_window.inner_position().unwrap().cast::<f32>();
+            let main_pos = main_window.inner_position().unwrap().cast::<f32>();
 
-        viewport.pos = [main_pos.x, main_pos.y];
-        viewport.work_pos = viewport.pos;
-        viewport.size = [window_size.width, window_size.height];
-        viewport.work_size = viewport.size;
-        viewport.dpi_scale = 1.0;
-        viewport.platform_user_data = Box::into_raw(Box::new(ViewportData {
-            pos: [main_pos.x, main_pos.y],
-            size: [window_size.width, window_size.height],
-            focus: true,
-            minimized: false,
-        }))
-        .cast();
+            viewport.pos = [main_pos.x, main_pos.y];
+            viewport.work_pos = viewport.pos;
+            viewport.size = [window_size.width, window_size.height];
+            viewport.work_size = viewport.size;
+            viewport.dpi_scale = 1.0;
+            viewport.platform_user_data = Box::into_raw(Box::new(ViewportData {
+                pos: [main_pos.x, main_pos.y],
+                size: [window_size.width, window_size.height],
+                focus: true,
+                minimized: false,
+            }))
+            .cast();
 
-        let mut monitors = Vec::new();
-        for monitor in main_window.available_monitors() {
-            monitors.push(imgui::PlatformMonitor {
-                main_pos: [monitor.position().x as f32, monitor.position().y as f32],
-                main_size: [monitor.size().width as f32, monitor.size().height as f32],
-                work_pos: [monitor.position().x as f32, monitor.position().y as f32],
-                work_size: [monitor.size().width as f32, monitor.size().height as f32],
-                dpi_scale: 1.0,
-            });
+            let mut monitors = Vec::new();
+            for monitor in main_window.available_monitors() {
+                monitors.push(imgui::PlatformMonitor {
+                    main_pos: [monitor.position().x as f32, monitor.position().y as f32],
+                    main_size: [monitor.size().width as f32, monitor.size().height as f32],
+                    work_pos: [monitor.position().x as f32, monitor.position().y as f32],
+                    work_size: [monitor.size().width as f32, monitor.size().height as f32],
+                    dpi_scale: 1.0,
+                });
+            }
+            imgui
+                .platform_io_mut()
+                .monitors
+                .replace_from_slice(&monitors);
         }
-        imgui
-            .platform_io_mut()
-            .monitors
-            .replace_from_slice(&monitors);
 
         imgui.set_platform_name(Some(format!(
             "imgui-winit-glow-renderer-viewports {}",
@@ -401,17 +415,22 @@ impl Renderer {
                         imgui.io_mut().keys_down[key as usize] = true;
                     }
                     winit::event::WindowEvent::CursorMoved { position, .. } => {
-                        if imgui.io().config_flags.contains(ConfigFlags::VIEWPORTS_ENABLE) {
+                        if imgui
+                            .io()
+                            .config_flags
+                            .contains(ConfigFlags::VIEWPORTS_ENABLE)
+                            && imgui
+                                .io()
+                                .backend_flags
+                                .contains(BackendFlags::RENDERER_HAS_VIEWPORTS)
+                        {
                             let window_pos = window.inner_position().unwrap().cast::<f32>();
                             imgui.io_mut().mouse_pos = [
                                 position.x as f32 + window_pos.x,
                                 position.y as f32 + window_pos.y,
                             ];
                         } else {
-                            imgui.io_mut().mouse_pos = [
-                                position.x as f32,
-                                position.y as f32,
-                            ];
+                            imgui.io_mut().mouse_pos = [position.x as f32, position.y as f32];
                         }
                     }
                     winit::event::WindowEvent::MouseWheel {
