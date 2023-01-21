@@ -218,6 +218,132 @@ impl GlObjects {
     }
 }
 
+#[derive(Debug)]
+struct GlStateBackup {
+    viewport: [i32; 4],
+    blend_enabled: bool,
+    blend_func_src: i32,
+    blend_func_dst: i32,
+    scissor_enabled: bool,
+    scissor: [i32; 4],
+    vao: i32,
+    vbo: i32,
+    ibo: i32,
+    active_texture: i32,
+    texture: i32,
+    program: i32,
+}
+
+impl GlStateBackup {
+    fn backup(context: &glow::Context) -> Self {
+        unsafe {
+            let mut viewport = [0; 4];
+            context.get_parameter_i32_slice(glow::VIEWPORT, &mut viewport);
+
+            let blend_enabled = context.is_enabled(glow::BLEND);
+            let blend_func_src = context.get_parameter_i32(glow::BLEND_SRC);
+            let blend_func_dst = context.get_parameter_i32(glow::BLEND_DST);
+
+            let scissor_enabled = context.is_enabled(glow::SCISSOR_TEST);
+            let mut scissor = [0; 4];
+            context.get_parameter_i32_slice(glow::SCISSOR_BOX, &mut scissor);
+
+            let vao = context.get_parameter_i32(glow::VERTEX_ARRAY_BINDING);
+            let vbo = context.get_parameter_i32(glow::ARRAY_BUFFER_BINDING);
+            let ibo = context.get_parameter_i32(glow::ELEMENT_ARRAY_BUFFER_BINDING);
+
+            let active_texture = context.get_parameter_i32(glow::ACTIVE_TEXTURE);
+            context.active_texture(0);
+            let texture = context.get_parameter_i32(glow::TEXTURE_BINDING_2D);
+
+            let program = context.get_parameter_i32(glow::CURRENT_PROGRAM);
+
+            Self {
+                viewport,
+                blend_enabled,
+                blend_func_src,
+                blend_func_dst,
+                scissor_enabled,
+                scissor,
+                vao,
+                vbo,
+                ibo,
+                active_texture,
+                texture,
+                program,
+            }
+        }
+    }
+
+    fn restore(&self, context: &glow::Context) {
+        unsafe {
+            context.viewport(
+                self.viewport[0],
+                self.viewport[1],
+                self.viewport[2],
+                self.viewport[3],
+            );
+
+            Self::enable(context, glow::BLEND, self.blend_enabled);
+            context.blend_func(self.blend_func_src as _, self.blend_func_dst as _);
+
+            Self::enable(context, glow::SCISSOR_TEST, self.scissor_enabled);
+            context.scissor(
+                self.scissor[0],
+                self.scissor[1],
+                self.scissor[2],
+                self.scissor[3],
+            );
+
+            if self.vao != 0 {
+                let vao = std::mem::transmute(self.vao);
+                context.bind_vertex_array(Some(vao));
+            } else {
+                context.bind_vertex_array(None);
+            }
+
+            if self.vbo != 0 {
+                let vbo = std::mem::transmute(self.vbo);
+                context.bind_buffer(glow::ARRAY_BUFFER, Some(vbo));
+            } else {
+                context.bind_buffer(glow::ARRAY_BUFFER, None);
+            }
+
+            if self.ibo != 0 {
+                let ibo = std::mem::transmute(self.ibo);
+                context.bind_buffer(glow::ELEMENT_ARRAY_BUFFER, Some(ibo));
+            } else {
+                context.bind_buffer(glow::ELEMENT_ARRAY_BUFFER, None);
+            }
+
+            if self.texture != 0 {
+                let texture = std::mem::transmute(self.texture);
+                context.bind_texture(glow::TEXTURE_2D, Some(texture));
+            } else {
+                context.bind_texture(glow::TEXTURE_2D, None);
+            }
+            context.active_texture(self.active_texture as _);
+
+            if self.program != 0 {
+                let program = std::mem::transmute(self.program);
+                context.use_program(Some(program));
+            } else {
+                context.use_program(None);
+            }
+        }
+    }
+
+    fn enable(context: &glow::Context, feature: u32, value: bool) {
+        unsafe {
+            if value {
+                context.enable(feature);
+            } else {
+                context.disable(feature);
+            }
+        }
+    }
+}
+
 impl Renderer {
     pub fn new(
         imgui: &mut imgui::Context,
@@ -660,7 +786,10 @@ impl Renderer {
         glow: &glow::Context,
         draw_data: &imgui::DrawData,
     ) -> Result<(), RendererError> {
-        Self::render_window(main_window, glow, draw_data, &self.gl_objects)
+        let backup = GlStateBackup::backup(glow);
+        let res = Self::render_window(main_window, glow, draw_data, &self.gl_objects);
+        backup.restore(glow);
+        res
     }
 
     pub fn render_viewports(
