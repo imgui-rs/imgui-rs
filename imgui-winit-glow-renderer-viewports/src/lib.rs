@@ -16,7 +16,7 @@ use glutin::{
     surface::{GlSurface, Surface, SurfaceAttributesBuilder, WindowSurface},
 };
 use glutin_winit::DisplayBuilder;
-use imgui::{BackendFlags, Id, Key, ViewportFlags};
+use imgui::{BackendFlags, Id, Key, ViewportFlags, ConfigFlags};
 use raw_window_handle::HasRawWindowHandle;
 use thiserror::Error;
 use winit::{
@@ -401,11 +401,18 @@ impl Renderer {
                         imgui.io_mut().keys_down[key as usize] = true;
                     }
                     winit::event::WindowEvent::CursorMoved { position, .. } => {
-                        let window_pos = window.inner_position().unwrap().cast::<f32>();
-                        imgui.io_mut().mouse_pos = [
-                            position.x as f32 + window_pos.x,
-                            position.y as f32 + window_pos.y,
-                        ];
+                        if imgui.io().config_flags.contains(ConfigFlags::VIEWPORTS_ENABLE) {
+                            let window_pos = window.inner_position().unwrap().cast::<f32>();
+                            imgui.io_mut().mouse_pos = [
+                                position.x as f32 + window_pos.x,
+                                position.y as f32 + window_pos.y,
+                            ];
+                        } else {
+                            imgui.io_mut().mouse_pos = [
+                                position.x as f32,
+                                position.y as f32,
+                            ];
+                        }
                     }
                     winit::event::WindowEvent::MouseWheel {
                         delta,
