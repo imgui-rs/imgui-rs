@@ -105,7 +105,7 @@ impl GlObjects {
         let program = unsafe {
             let vertex_shader = glow
                 .create_shader(glow::VERTEX_SHADER)
-                .map_err(|e| RendererError::GlShaderCreationFailed(e))?;
+                .map_err(RendererError::GlShaderCreationFailed)?;
             glow.shader_source(vertex_shader, VERTEX_SHADER);
             glow.compile_shader(vertex_shader);
             assert!(
@@ -115,7 +115,7 @@ impl GlObjects {
 
             let fragment_shader = glow
                 .create_shader(glow::FRAGMENT_SHADER)
-                .map_err(|e| RendererError::GlShaderCreationFailed(e))?;
+                .map_err(RendererError::GlShaderCreationFailed)?;
             glow.shader_source(fragment_shader, FRAGMENT_SHADER);
             glow.compile_shader(fragment_shader);
             assert!(
@@ -125,7 +125,7 @@ impl GlObjects {
 
             let program = glow
                 .create_program()
-                .map_err(|e| RendererError::GlProgramCreationFailed(e))?;
+                .map_err(RendererError::GlProgramCreationFailed)?;
             glow.attach_shader(program, vertex_shader);
             glow.attach_shader(program, fragment_shader);
             glow.link_program(program);
@@ -143,7 +143,7 @@ impl GlObjects {
         let font_texture = unsafe {
             let tex = glow
                 .create_texture()
-                .map_err(|e| RendererError::GlTextureCreationFailed(e))?;
+                .map_err(RendererError::GlTextureCreationFailed)?;
             glow.bind_texture(glow::TEXTURE_2D, Some(tex));
             glow.tex_parameter_i32(
                 glow::TEXTURE_2D,
@@ -182,17 +182,17 @@ impl GlObjects {
 
         let vbo = unsafe {
             glow.create_buffer()
-                .map_err(|e| RendererError::GlBufferCreationFailed(e))?
+                .map_err(RendererError::GlBufferCreationFailed)?
         };
         let ibo = unsafe {
             glow.create_buffer()
-                .map_err(|e| RendererError::GlBufferCreationFailed(e))?
+                .map_err(RendererError::GlBufferCreationFailed)?
         };
 
         let vao = unsafe {
             let vao = glow
                 .create_vertex_array()
-                .map_err(|e| RendererError::GlVertexArrayCreationFailed(e))?;
+                .map_err(RendererError::GlVertexArrayCreationFailed)?;
 
             glow.bind_vertex_array(Some(vao));
             glow.bind_buffer(glow::ARRAY_BUFFER, Some(vbo));
@@ -454,24 +454,22 @@ impl Renderer {
             } => {
                 let (window, viewport) = if window_id == main_window.id() {
                     (main_window, imgui.main_viewport_mut())
-                } else {
-                    if let Some((id, wnd)) =
-                        self.extra_windows.iter().find_map(|(id, (_, _, _, wnd))| {
-                            if wnd.id() == window_id {
-                                Some((*id, wnd))
-                            } else {
-                                None
-                            }
-                        })
-                    {
-                        if let Some(viewport) = imgui.viewport_by_id_mut(id) {
-                            (wnd, viewport)
+                } else if let Some((id, wnd)) =
+                    self.extra_windows.iter().find_map(|(id, (_, _, _, wnd))| {
+                        if wnd.id() == window_id {
+                            Some((*id, wnd))
                         } else {
-                            return;
+                            None
                         }
+                    })
+                {
+                    if let Some(viewport) = imgui.viewport_by_id_mut(id) {
+                        (wnd, viewport)
                     } else {
                         return;
                     }
+                } else {
+                    return;
                 };
 
                 match *event {
@@ -675,7 +673,7 @@ impl Renderer {
             if self.last_cursor != cursor {
                 main_window.set_cursor_icon(cursor);
 
-                for (_, (_, _, _, wnd)) in &self.extra_windows {
+                for (_, _, _, wnd) in self.extra_windows.values() {
                     wnd.set_cursor_icon(cursor);
                 }
 
@@ -730,7 +728,7 @@ impl Renderer {
         let context = unsafe {
             glutin_config
                 .display()
-                .create_context(&glutin_config, &context_attribs)
+                .create_context(glutin_config, &context_attribs)
                 .map_err(|_| RendererError::WindowContextCreationFailed)?
         };
 
@@ -872,32 +870,25 @@ impl Renderer {
                 );
 
                 for cmd in list.commands() {
-                    match cmd {
-                        imgui::DrawCmd::Elements { count, cmd_params } => {
-                            let clip_x1 =
-                                (cmd_params.clip_rect[0] - draw_data.display_pos[0]) as i32;
-                            let clip_y1 =
-                                (cmd_params.clip_rect[1] - draw_data.display_pos[1]) as i32;
-                            let clip_x2 =
-                                (cmd_params.clip_rect[2] - draw_data.display_pos[0]) as i32;
-                            let clip_y2 =
-                                (cmd_params.clip_rect[3] - draw_data.display_pos[1]) as i32;
+                    if let imgui::DrawCmd::Elements { count, cmd_params } = cmd {
+                        let clip_x1 = (cmd_params.clip_rect[0] - draw_data.display_pos[0]) as i32;
+                        let clip_y1 = (cmd_params.clip_rect[1] - draw_data.display_pos[1]) as i32;
+                        let clip_x2 = (cmd_params.clip_rect[2] - draw_data.display_pos[0]) as i32;
+                        let clip_y2 = (cmd_params.clip_rect[3] - draw_data.display_pos[1]) as i32;
 
-                            glow.scissor(
-                                clip_x1,
-                                window_size.height as i32 - clip_y2,
-                                clip_x2 - clip_x1,
-                                clip_y2 - clip_y1,
-                            );
-                            glow.draw_elements_base_vertex(
-                                glow::TRIANGLES,
-                                count as i32,
-                                glow::UNSIGNED_SHORT,
-                                (cmd_params.idx_offset * 2) as i32,
-                                cmd_params.vtx_offset as i32,
-                            );
-                        }
-                        _ => {}
+                        glow.scissor(
+                            clip_x1,
+                            window_size.height as i32 - clip_y2,
+                            clip_x2 - clip_x1,
+                            clip_y2 - clip_y1,
+                        );
+                        glow.draw_elements_base_vertex(
+                            glow::TRIANGLES,
+                            count as i32,
+                            glow::UNSIGNED_SHORT,
+                            (cmd_params.idx_offset * 2) as i32,
+                            cmd_params.vtx_offset as i32,
+                        );
                     }
                 }
             }
