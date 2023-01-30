@@ -659,7 +659,7 @@ impl Context {
     /// Returns an iterator containing every [`Viewport`](crate::Viewport) that currently exists.
     pub fn viewports_mut(&mut self) -> impl Iterator<Item = &mut crate::Viewport> {
         let slice = self.platform_io_mut().viewports.as_slice();
-        // safe because &self ensures exclusive ownership
+        // safe because &mut self ensures exclusive ownership
         unsafe { slice.iter().map(|ptr| &mut **ptr) }
     }
 
