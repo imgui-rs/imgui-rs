@@ -395,16 +395,6 @@ impl WinitPlatform {
                 window_id,
                 ref event,
             } if window_id == window.id() => {
-                // We need to track modifiers separately because some system like macOS, will
-                // not reliably send modifier states during certain events like ScreenCapture.
-                // Gotta let the people show off their pretty imgui widgets!
-                if let WindowEvent::ModifiersChanged(modifiers) = event {
-                    io.add_key_event(Key::ModShift, modifiers.shift());
-                    io.add_key_event(Key::ModCtrl, modifiers.ctrl());
-                    io.add_key_event(Key::ModAlt, modifiers.alt());
-                    io.add_key_event(Key::ModSuper, modifiers.logo());
-                }
-
                 self.handle_window_event(io, window, event);
             }
             // Track key release events outside our window. If we don't do this,
@@ -452,6 +442,15 @@ impl WinitPlatform {
                 let logical_size = window.inner_size().to_logical(scale_factor);
                 let logical_size = self.scale_size_from_winit(window, logical_size);
                 io.display_size = [logical_size.width as f32, logical_size.height as f32];
+            }
+            WindowEvent::ModifiersChanged(modifiers) => {
+                // We need to track modifiers separately because some system like macOS, will
+                // not reliably send modifier states during certain events like ScreenCapture.
+                // Gotta let the people show off their pretty imgui widgets!
+                io.add_key_event(Key::ModShift, modifiers.shift());
+                io.add_key_event(Key::ModCtrl, modifiers.ctrl());
+                io.add_key_event(Key::ModAlt, modifiers.alt());
+                io.add_key_event(Key::ModSuper, modifiers.logo());
             }
             WindowEvent::KeyboardInput {
                 input:
