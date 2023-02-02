@@ -4,8 +4,10 @@ mod support;
 
 fn main() {
     let system = support::init(file!());
+
     let mut value = 0;
     let choices = ["test test this is 1", "test test this is 2"];
+
     system.main_loop(move |_, ui| {
         ui.window("Hello world")
             .size([300.0, 110.0], Condition::FirstUseEver)

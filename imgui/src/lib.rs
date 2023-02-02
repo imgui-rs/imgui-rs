@@ -10,6 +10,8 @@ use std::os::raw::c_char;
 pub use self::clipboard::*;
 pub use self::color::ImColor32;
 pub use self::context::*;
+#[cfg(feature = "docking")]
+pub use self::dock_space::*;
 pub use self::drag_drop::{DragDropFlags, DragDropSource, DragDropTarget};
 pub use self::draw_list::{ChannelsSplit, DrawListMut};
 pub use self::fonts::atlas::*;
@@ -22,6 +24,8 @@ pub use self::input_widget::*;
 pub use self::io::*;
 pub use self::layout::*;
 pub use self::list_clipper::ListClipper;
+#[cfg(feature = "docking")]
+pub use self::platform_io::*;
 pub use self::plothistogram::PlotHistogram;
 pub use self::plotlines::PlotLines;
 pub use self::popups::*;
@@ -62,6 +66,8 @@ mod clipboard;
 pub mod color;
 mod columns;
 mod context;
+#[cfg(feature = "docking")]
+mod dock_space;
 pub mod drag_drop;
 pub mod draw_list;
 mod fonts;
@@ -72,6 +78,8 @@ mod io;
 mod layout;
 mod list_clipper;
 mod math;
+#[cfg(feature = "docking")]
+mod platform_io;
 mod plothistogram;
 mod plotlines;
 mod popups;
@@ -284,7 +292,8 @@ impl Ui {
 /// Previously, in v0.7, this was erroneously constructed with `From`
 /// implementations.  Now, however, it is made from the `Ui` object
 /// directly, with a few deprecated helper methods here.
-#[derive(Copy, Clone, Debug, Eq, PartialEq, Default)]
+#[repr(transparent)]
+#[derive(Copy, Clone, Debug, Eq, PartialEq, Default, Hash)]
 pub struct Id(pub(crate) u32);
 
 impl Id {

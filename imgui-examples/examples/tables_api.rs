@@ -190,7 +190,7 @@ struct HumanData {
 }
 
 impl HumanData {
-    pub fn sort_humans(humans: &mut Vec<Self>, specs: Specs<'_>) {
+    pub fn sort_humans(humans: &mut [Self], specs: Specs<'_>) {
         let spec = specs.iter().next().unwrap();
         if let Some(kind) = spec.sort_direction() {
             match kind {

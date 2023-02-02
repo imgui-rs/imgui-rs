@@ -60,6 +60,13 @@ pub struct Context {
     // imgui a mutable pointer to it.
     clipboard_ctx: Box<UnsafeCell<ClipboardContext>>,
 
+    // we need to store an owning reference to our PlatformViewportBackend and PlatformRendererBackend,
+    // so that it is ensured that PlatformIo::backend_platform_user_data and PlatformIo::backend_renderer_user_data remain valid
+    #[cfg(feature = "docking")]
+    platform_viewport_ctx: Box<UnsafeCell<crate::PlatformViewportContext>>,
+    #[cfg(feature = "docking")]
+    renderer_viewport_ctx: Box<UnsafeCell<crate::RendererViewportContext>>,
+
     ui: Ui,
 }
 
@@ -239,6 +246,14 @@ impl Context {
             platform_name: None,
             renderer_name: None,
             clipboard_ctx: Box::new(ClipboardContext::dummy().into()),
+            #[cfg(feature = "docking")]
+            platform_viewport_ctx: Box::new(UnsafeCell::new(
+                crate::PlatformViewportContext::dummy(),
+            )),
+            #[cfg(feature = "docking")]
+            renderer_viewport_ctx: Box::new(UnsafeCell::new(
+                crate::RendererViewportContext::dummy(),
+            )),
             ui: Ui {
                 buffer: UnsafeCell::new(crate::string::UiBuffer::new(1024)),
             },
@@ -328,6 +343,14 @@ impl SuspendedContext {
             platform_name: None,
             renderer_name: None,
             clipboard_ctx: Box::new(ClipboardContext::dummy().into()),
+            #[cfg(feature = "docking")]
+            platform_viewport_ctx: Box::new(UnsafeCell::new(
+                crate::PlatformViewportContext::dummy(),
+            )),
+            #[cfg(feature = "docking")]
+            renderer_viewport_ctx: Box::new(UnsafeCell::new(
+                crate::RendererViewportContext::dummy(),
+            )),
             ui: Ui {
                 buffer: UnsafeCell::new(crate::string::UiBuffer::new(1024)),
             },
@@ -565,6 +588,154 @@ impl Context {
             sys::ImGuiMouseCursor_Hand => Some(MouseCursor::Hand),
             sys::ImGuiMouseCursor_NotAllowed => Some(MouseCursor::NotAllowed),
             _ => None,
+        }
+    }
+}
+
+#[cfg(feature = "docking")]
+impl Context {
+    /// Returns an immutable reference to the Context's [`PlatformIo`](crate::PlatformIo) object.
+    pub fn platform_io(&self) -> &crate::PlatformIo {
+        unsafe {
+            // safe because PlatformIo is a transparent wrapper around sys::ImGuiPlatformIO
+            // and &self ensures we have shared ownership of PlatformIo.
+            &*(sys::igGetPlatformIO() as *const crate::PlatformIo)
+        }
+    }
+    /// Returns a mutable reference to the Context's [`PlatformIo`](crate::PlatformIo) object.
+    pub fn platform_io_mut(&mut self) -> &mut crate::PlatformIo {
+        unsafe {
+            // safe because PlatformIo is a transparent wrapper around sys::ImGuiPlatformIO
+            // and &mut self ensures exclusive ownership of PlatformIo.
+            &mut *(sys::igGetPlatformIO() as *mut crate::PlatformIo)
+        }
+    }
+    /// Returns an immutable reference to the main [`Viewport`](crate::Viewport)
+    pub fn main_viewport(&self) -> &crate::Viewport {
+        unsafe {
+            // safe because Viewport is a transparent wrapper around sys::ImGuiViewport
+            // and &self ensures we have shared ownership.
+            &*(sys::igGetMainViewport() as *mut crate::Viewport)
+        }
+    }
+    /// Returns a mutable reference to the main [`Viewport`](crate::Viewport)
+    pub fn main_viewport_mut(&mut self) -> &mut crate::Viewport {
+        unsafe {
+            // safe because Viewport is a transparent wrapper around sys::ImGuiViewport
+            // and &mut self ensures we have exclusive ownership.
+            &mut *(sys::igGetMainViewport() as *mut crate::Viewport)
+        }
+    }
+    /// Tries to find and return a Viewport identified by `id`.
+    ///
+    /// # Returns
+    /// A [`Viewport`](crate::Viewport) with the given `id`
+    /// or `None` if no [`Viewport`](crate::Viewport) exists.
+    pub fn viewport_by_id(&self, id: crate::Id) -> Option<&crate::Viewport> {
+        unsafe {
+            // safe because Viewport is a transparent wrapper around sys::ImGuiViewport
+            // and &self ensures shared ownership.
+            (sys::igFindViewportByID(id.0) as *const crate::Viewport).as_ref()
+        }
+    }
+    /// Tries to find and return a Viewport identified by `id`.
+    ///
+    /// # Returns
+    /// A [`Viewport`](crate::Viewport) with the given `id`
+    /// or `None` if no [`Viewport`](crate::Viewport) exists.
+    pub fn viewport_by_id_mut(&mut self, id: crate::Id) -> Option<&mut crate::Viewport> {
+        unsafe {
+            // safe because Viewport is a transparent wrapper around sys::ImGuiViewport
+            // and &mut self ensures exclusive ownership.
+            (sys::igFindViewportByID(id.0) as *mut crate::Viewport).as_mut()
+        }
+    }
+    /// Returns an iterator containing every [`Viewport`](crate::Viewport) that currently exists.
+    pub fn viewports(&self) -> impl Iterator<Item = &crate::Viewport> {
+        let slice = self.platform_io().viewports.as_slice();
+        // safe because &self ensures shared ownership
+        unsafe { slice.iter().map(|ptr| &**ptr) }
+    }
+    /// Returns an iterator containing every [`Viewport`](crate::Viewport) that currently exists.
+    pub fn viewports_mut(&mut self) -> impl Iterator<Item = &mut crate::Viewport> {
+        let slice = self.platform_io_mut().viewports.as_slice();
+        // safe because &mut self ensures exclusive ownership
+        unsafe { slice.iter().map(|ptr| &mut **ptr) }
+    }
+
+    /// Installs a [`PlatformViewportBackend`](crate::PlatformViewportBackend) that is used to
+    /// create platform windows on demand if a window is dragged outside of the main viewport.
+    pub fn set_platform_backend<T: crate::PlatformViewportBackend>(&mut self, backend: T) {
+        let ctx = Box::new(UnsafeCell::new(crate::PlatformViewportContext {
+            backend: Box::new(backend),
+        }));
+
+        let io = self.io_mut();
+        io.backend_platform_user_data = ctx.get() as *mut _;
+
+        let pio = self.platform_io_mut();
+        pio.platform_create_window = Some(crate::platform_io::platform_create_window);
+        pio.platform_destroy_window = Some(crate::platform_io::platform_destroy_window);
+        pio.platform_show_window = Some(crate::platform_io::platform_show_window);
+        pio.platform_set_window_pos = Some(crate::platform_io::platform_set_window_pos);
+        // since pio.platform_get_window_pos is not a C compatible function, cimgui provides an extra function to set it.
+        unsafe {
+            crate::platform_io::ImGuiPlatformIO_Set_Platform_GetWindowPos(
+                pio,
+                crate::platform_io::platform_get_window_pos,
+            );
+        }
+        pio.platform_set_window_size = Some(crate::platform_io::platform_set_window_size);
+        // since pio.platform_get_window_size is not a C compatible function, cimgui provides an extra function to set it.
+        unsafe {
+            crate::platform_io::ImGuiPlatformIO_Set_Platform_GetWindowSize(
+                pio,
+                crate::platform_io::platform_get_window_size,
+            );
+        }
+        pio.platform_set_window_focus = Some(crate::platform_io::platform_set_window_focus);
+        pio.platform_get_window_focus = Some(crate::platform_io::platform_get_window_focus);
+        pio.platform_get_window_minimized = Some(crate::platform_io::platform_get_window_minimized);
+        pio.platform_set_window_title = Some(crate::platform_io::platform_set_window_title);
+        pio.platform_set_window_alpha = Some(crate::platform_io::platform_set_window_alpha);
+        pio.platform_update_window = Some(crate::platform_io::platform_update_window);
+        pio.platform_render_window = Some(crate::platform_io::platform_render_window);
+        pio.platform_swap_buffers = Some(crate::platform_io::platform_swap_buffers);
+        pio.platform_create_vk_surface = Some(crate::platform_io::platform_create_vk_surface);
+
+        self.platform_viewport_ctx = ctx;
+    }
+    /// Installs a [`RendererViewportBackend`](crate::RendererViewportBackend) that is used to
+    /// render extra viewports created by ImGui.
+    pub fn set_renderer_backend<T: crate::RendererViewportBackend>(&mut self, backend: T) {
+        let ctx = Box::new(UnsafeCell::new(crate::RendererViewportContext {
+            backend: Box::new(backend),
+        }));
+
+        let io = self.io_mut();
+        io.backend_renderer_user_data = ctx.get() as *mut _;
+
+        let pio = self.platform_io_mut();
+        pio.renderer_create_window = Some(crate::platform_io::renderer_create_window);
+        pio.renderer_destroy_window = Some(crate::platform_io::renderer_destroy_window);
+        pio.renderer_set_window_size = Some(crate::platform_io::renderer_set_window_size);
+        pio.renderer_render_window = Some(crate::platform_io::renderer_render_window);
+        pio.renderer_swap_buffers = Some(crate::platform_io::renderer_swap_buffers);
+
+        self.renderer_viewport_ctx = ctx;
+    }
+    /// Updates the extra Viewports created by ImGui.
+    /// Has to be called every frame if Viewports are enabled.
+    pub fn update_platform_windows(&mut self) {
+        unsafe {
+            sys::igUpdatePlatformWindows();
+        }
+    }
+    /// Basically just calls the [`PlatformViewportBackend`](crate::PlatformViewportBackend) and [`RendererViewportBackend`](crate::RendererViewportBackend)
+    /// functions. If you render your extra viewports manually this function is not needed at all.
+    pub fn render_platform_windows_default(&mut self) {
+        unsafe {
+            sys::igRenderPlatformWindowsDefault(std::ptr::null_mut(), std::ptr::null_mut());
         }
     }
 }

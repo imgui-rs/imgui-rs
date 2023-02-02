@@ -1,6 +1,6 @@
 //! Internal raw utilities (don't use unless you know what you're doing!)
 
-use std::slice;
+use std::{mem::size_of, slice};
 
 /// A generic version of the raw imgui-sys ImVector struct types
 #[repr(C)]
@@ -14,6 +14,24 @@ impl<T> ImVector<T> {
     #[inline]
     pub fn as_slice(&self) -> &[T] {
         unsafe { slice::from_raw_parts(self.data, self.size as usize) }
+    }
+
+    #[inline]
+    pub fn as_slice_mut(&mut self) -> &mut [T] {
+        unsafe { slice::from_raw_parts_mut(self.data, self.size as usize) }
+    }
+
+    pub fn replace_from_slice(&mut self, data: &[T]) {
+        unsafe {
+            sys::igMemFree(self.data as *mut _);
+
+            let buffer_ptr = sys::igMemAlloc(size_of::<T>() * data.len()) as *mut T;
+            buffer_ptr.copy_from_nonoverlapping(data.as_ptr(), data.len());
+
+            self.size = data.len() as i32;
+            self.capacity = data.len() as i32;
+            self.data = buffer_ptr;
+        }
     }
 }
 

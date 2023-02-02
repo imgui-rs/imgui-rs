@@ -55,6 +55,29 @@ bitflags! {
 
         #[cfg(feature = "docking")]
         const DOCKING_ENABLE = sys::ImGuiConfigFlags_DockingEnable;
+
+        #[cfg(feature = "docking")]
+        const VIEWPORTS_ENABLE = sys::ImGuiConfigFlags_ViewportsEnable;
+    }
+}
+
+#[cfg(feature = "docking")]
+bitflags! {
+    #[repr(transparent)]
+    pub struct ViewportFlags: u32 {
+        const IS_PLATFORM_WINDOW = sys::ImGuiViewportFlags_IsPlatformWindow;
+        const IS_PLATFORM_MONITOR = sys::ImGuiViewportFlags_IsPlatformMonitor;
+        const OWNED_BY_APP = sys::ImGuiViewportFlags_OwnedByApp;
+        const NO_DECORATION = sys::ImGuiViewportFlags_NoDecoration;
+        const NO_TASK_BAR_ICON = sys::ImGuiViewportFlags_NoTaskBarIcon;
+        const NO_FOCUS_ON_APPEARING = sys::ImGuiViewportFlags_NoFocusOnAppearing;
+        const NO_FOCUS_ON_CLICK = sys::ImGuiViewportFlags_NoFocusOnClick;
+        const NO_INPUTS = sys::ImGuiViewportFlags_NoInputs;
+        const NO_RENDERER_CLEAR = sys::ImGuiViewportFlags_NoRendererClear;
+        const TOP_MOST = sys::ImGuiViewportFlags_TopMost;
+        const MINIMIZED = sys::ImGuiViewportFlags_Minimized;
+        const NO_AUTO_MERGE = sys::ImGuiViewportFlags_NoAutoMerge;
+        const CAN_HOST_OTHER_WINDOWS = sys::ImGuiViewportFlags_CanHostOtherWindows;
     }
 }
 
@@ -74,6 +97,13 @@ bitflags! {
         ///
         /// This enables output of large meshes (64K+ vertices) while still using 16-bits indices.
         const RENDERER_HAS_VTX_OFFSET = sys::ImGuiBackendFlags_RendererHasVtxOffset;
+
+        #[cfg(feature = "docking")]
+        /// Set if the platform backend supports viewports.
+        const PLATFORM_HAS_VIEWPORTS = sys::ImGuiBackendFlags_PlatformHasViewports;
+        #[cfg(feature = "docking")]
+        /// Set if the renderer backend supports viewports.
+        const RENDERER_HAS_VIEWPORTS = sys::ImGuiBackendFlags_RendererHasViewports;
     }
 }
 
@@ -234,8 +264,8 @@ pub struct Io {
 
     pub(crate) backend_platform_name: *const c_char,
     pub(crate) backend_renderer_name: *const c_char,
-    backend_platform_user_data: *mut c_void,
-    backend_renderer_user_data: *mut c_void,
+    pub(crate) backend_platform_user_data: *mut c_void,
+    pub(crate) backend_renderer_user_data: *mut c_void,
     backend_language_user_data: *mut c_void,
     pub(crate) get_clipboard_text_fn:
         Option<unsafe extern "C" fn(user_data: *mut c_void) -> *const c_char>,
