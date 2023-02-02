@@ -54,10 +54,22 @@ fn test_texture_id_memory_layout() {
 }
 
 /// Generic texture mapping for use by renderers.
-#[derive(Debug, Default)]
+#[derive(Debug)]
 pub struct Textures<T> {
     textures: HashMap<usize, T>,
     next: usize,
+}
+
+/// We manually impl Default as `#[derive(Default)]`
+/// incorrectly requires `T: Default` which is
+/// not necessary at all.
+impl<T> Default for Textures<T> {
+    fn default() -> Self {
+        Self {
+            textures: Default::default(),
+            next: Default::default(),
+        }
+    }
 }
 
 impl<T> Textures<T> {
