@@ -11,4 +11,4 @@ categories = ["gui"]
 
 [dependencies]
 imgui = { version = "0.10.0", path = "../imgui" }
-winit = { version = "0.27.2", default-features = false }
+winit = { version = "0.28.0", default-features = false }

@@ -45,7 +45,7 @@
 //! is sRGB (if you don't know, it probably is) the `internal_format` is
 //! one of the `SRGB*` values.
 
-use std::{borrow::Cow, error::Error, fmt::Display, mem::size_of};
+use std::{borrow::Cow, error::Error, fmt::Display, mem::size_of, num::NonZeroU32};
 
 use imgui::{internal::RawWrapper, DrawCmd, DrawData, DrawVert};
 
@@ -61,7 +61,7 @@ pub type GlBuffer = <Context as HasContext>::Buffer;
 pub type GlTexture = <Context as HasContext>::Texture;
 pub type GlVertexArray = <Context as HasContext>::VertexArray;
 type GlProgram = <Context as HasContext>::Program;
-type GlUniformLocation = <Context as HasContext>::Program;
+type GlUniformLocation = <Context as HasContext>::UniformLocation;
 
 /// Renderer which owns the OpenGL context and handles textures itself. Also
 /// converts all output colors to sRGB for display. Useful for simple applications,
@@ -135,11 +135,11 @@ impl Drop for AutoRenderer {
 pub struct Renderer {
     shaders: Shaders,
     state_backup: GlStateBackup,
-    pub vbo_handle: GlBuffer,
-    pub ebo_handle: GlBuffer,
-    pub font_atlas_texture: GlTexture,
+    pub vbo_handle: Option<GlBuffer>,
+    pub ebo_handle: Option<GlBuffer>,
+    pub font_atlas_texture: Option<GlTexture>,
     #[cfg(feature = "bind_vertex_array_support")]
-    pub vertex_array_object: GlVertexArray,
+    pub vertex_array_object: Option<GlVertexArray>,
     pub gl_version: GlVersion,
     pub has_clip_origin_support: bool,
     pub is_destroyed: bool,
@@ -205,11 +205,13 @@ impl Renderer {
         let mut state_backup = GlStateBackup::default();
         state_backup.pre_init(gl);
 
-        let font_atlas_texture = prepare_font_atlas(gl, imgui_context.fonts(), texture_map)?;
+        let font_atlas_texture = Some(prepare_font_atlas(gl, imgui_context.fonts(), texture_map)?);
 
         let shaders = Shaders::new(gl, gl_version, output_srgb)?;
-        let vbo_handle = unsafe { gl.create_buffer() }.map_err(InitError::CreateBufferObject)?;
-        let ebo_handle = unsafe { gl.create_buffer() }.map_err(InitError::CreateBufferObject)?;
+        let vbo_handle =
+            Some(unsafe { gl.create_buffer() }.map_err(InitError::CreateBufferObject)?);
+        let ebo_handle =
+            Some(unsafe { gl.create_buffer() }.map_err(InitError::CreateBufferObject)?);
 
         state_backup.post_init(gl);
 
@@ -220,7 +222,7 @@ impl Renderer {
             ebo_handle,
             font_atlas_texture,
             #[cfg(feature = "bind_vertex_array_support")]
-            vertex_array_object: 0,
+            vertex_array_object: None,
             gl_version,
             has_clip_origin_support,
             is_destroyed: false,
@@ -240,21 +242,17 @@ impl Renderer {
             return;
         }
 
-        if self.vbo_handle != 0 {
-            unsafe { gl.delete_buffer(self.vbo_handle) };
-            self.vbo_handle = 0;
+        if let Some(vbo) = self.vbo_handle.take() {
+            unsafe { gl.delete_buffer(vbo) };
         }
-        if self.ebo_handle != 0 {
-            unsafe { gl.delete_buffer(self.ebo_handle) };
-            self.ebo_handle = 0;
+        if let Some(ebo) = self.ebo_handle.take() {
+            unsafe { gl.delete_buffer(ebo) };
         }
-        let program = self.shaders.program;
-        if program != 0 {
+        if let Some(program) = self.shaders.program.take() {
             unsafe { gl.delete_program(program) };
         }
-        if self.font_atlas_texture != 0 {
-            unsafe { gl.delete_texture(self.font_atlas_texture) };
-            self.font_atlas_texture = 0;
+        if let Some(atlas) = self.font_atlas_texture.take() {
+            unsafe { gl.delete_texture(atlas) };
         }
 
         self.is_destroyed = true;
@@ -285,10 +283,11 @@ impl Renderer {
         #[cfg(feature = "bind_vertex_array_support")]
         if self.gl_version.bind_vertex_array_support() {
             unsafe {
-                self.vertex_array_object = gl
+                let vao = gl
                     .create_vertex_array()
                     .map_err(|err| format!("Error creating vertex array object: {}", err))?;
-                gl.bind_vertex_array(Some(self.vertex_array_object));
+                self.vertex_array_object = Some(vao);
+                gl.bind_vertex_array(self.vertex_array_object);
             }
         }
 
@@ -333,7 +332,9 @@ impl Renderer {
 
         #[cfg(feature = "bind_vertex_array_support")]
         if self.gl_version.bind_vertex_array_support() {
-            unsafe { gl.delete_vertex_array(self.vertex_array_object) };
+            if let Some(vao) = self.vertex_array_object.take() {
+                unsafe { gl.delete_vertex_array(vao) };
+            }
         }
 
         self.state_backup.post_render(gl, self.gl_version);
@@ -398,7 +399,7 @@ impl Renderer {
         let projection_matrix = calculate_matrix(draw_data, clip_origin_is_lower_left);
 
         unsafe {
-            gl.use_program(Some(self.shaders.program));
+            gl.use_program(self.shaders.program);
             gl.uniform_1_i32(Some(&self.shaders.texture_uniform_location), 0);
             gl.uniform_matrix_4_f32_slice(
                 Some(&self.shaders.matrix_uniform_location),
@@ -418,8 +419,8 @@ impl Renderer {
         let color_field_offset = memoffset::offset_of!(DrawVert, col) as _;
 
         unsafe {
-            gl.bind_buffer(glow::ARRAY_BUFFER, Some(self.vbo_handle));
-            gl.bind_buffer(glow::ELEMENT_ARRAY_BUFFER, Some(self.ebo_handle));
+            gl.bind_buffer(glow::ARRAY_BUFFER, self.vbo_handle);
+            gl.bind_buffer(glow::ELEMENT_ARRAY_BUFFER, self.ebo_handle);
             gl.enable_vertex_attrib_array(self.shaders.position_attribute_index);
             gl.vertex_attrib_pointer_f32(
                 self.shaders.position_attribute_index,
@@ -483,7 +484,13 @@ impl Renderer {
         let clip_x2 = (clip_rect[2] - clip_off[0]) * scale[0];
         let clip_y2 = (clip_rect[3] - clip_off[1]) * scale[1];
 
-        if clip_x1 >= fb_width || clip_y1 >= fb_height || clip_x2 < 0.0 || clip_y2 < 0.0 {
+        if clip_x1 >= fb_width
+            || clip_y1 >= fb_height
+            || clip_x2 < 0.0
+            || clip_y2 < 0.0
+            || clip_x2 <= clip_x1
+            || clip_y2 <= clip_y1
+        {
             return;
         }
 
@@ -565,13 +572,13 @@ pub struct SimpleTextureMap();
 impl TextureMap for SimpleTextureMap {
     #[inline(always)]
     fn register(&mut self, gl_texture: glow::Texture) -> Option<imgui::TextureId> {
-        Some(imgui::TextureId::new(gl_texture as _))
+        Some(imgui::TextureId::new(gl_texture.0.get() as usize))
     }
 
     #[inline(always)]
     fn gl_texture(&self, imgui_texture: imgui::TextureId) -> Option<glow::Texture> {
         #[allow(clippy::cast_possible_truncation)]
-        Some(imgui_texture.id() as _)
+        NonZeroU32::new(imgui_texture.id() as u32).map(glow::NativeTexture)
     }
 }
 
@@ -637,7 +644,10 @@ impl GlStateBackup {
     fn post_init(&mut self, gl: &Context) {
         #[allow(clippy::cast_sign_loss)]
         unsafe {
-            gl.bind_texture(glow::TEXTURE_2D, Some(self.texture as _));
+            gl.bind_texture(
+                glow::TEXTURE_2D,
+                NonZeroU32::new(self.texture as u32).map(glow::NativeTexture),
+            );
         }
     }
 
@@ -658,7 +668,8 @@ impl GlStateBackup {
             #[cfg(feature = "bind_vertex_array_support")]
             if gl_version.bind_vertex_array_support() {
                 self.vertex_array_object =
-                    Some(gl.get_parameter_i32(glow::VERTEX_ARRAY_BINDING) as _);
+                    NonZeroU32::new(gl.get_parameter_i32(glow::VERTEX_ARRAY_BINDING) as _)
+                        .map(glow::NativeVertexArray)
             }
 
             #[cfg(feature = "polygon_mode_support")]
@@ -695,18 +706,24 @@ impl GlStateBackup {
     fn post_render(&mut self, gl: &Context, _gl_version: GlVersion) {
         #![allow(clippy::cast_sign_loss)]
         unsafe {
-            gl.use_program(Some(self.program as _));
-            gl.bind_texture(glow::TEXTURE_2D, Some(self.texture as _));
+            gl.use_program(NonZeroU32::new(self.program as _).map(glow::NativeProgram));
+            gl.bind_texture(
+                glow::TEXTURE_2D,
+                NonZeroU32::new(self.texture as _).map(glow::NativeTexture),
+            );
             #[cfg(feature = "bind_sampler_support")]
             if let Some(sampler) = self.sampler {
-                gl.bind_sampler(0, Some(sampler as _));
+                gl.bind_sampler(0, NonZeroU32::new(sampler as _).map(glow::NativeSampler));
             }
             gl.active_texture(self.active_texture as _);
             #[cfg(feature = "bind_vertex_array_support")]
             if let Some(vao) = self.vertex_array_object {
                 gl.bind_vertex_array(Some(vao));
             }
-            gl.bind_buffer(glow::ARRAY_BUFFER, Some(self.array_buffer as _));
+            gl.bind_buffer(
+                glow::ARRAY_BUFFER,
+                NonZeroU32::new(self.array_buffer as _).map(glow::NativeBuffer),
+            );
             gl.blend_equation_separate(
                 self.blend_equation_rgb as _,
                 self.blend_equation_alpha as _,
@@ -774,7 +791,7 @@ impl GlStateBackup {
 /// generate shaders which should work on a wide variety of modern devices
 /// (GL >= 3.3 and GLES >= 2.0 are expected to work).
 struct Shaders {
-    program: GlProgram,
+    program: Option<GlProgram>,
     texture_uniform_location: GlUniformLocation,
     matrix_uniform_location: GlUniformLocation,
     position_attribute_index: u32,
@@ -829,7 +846,7 @@ impl Shaders {
 
         Ok(unsafe {
             Self {
-                program,
+                program: Some(program),
                 texture_uniform_location: gl
                     .get_uniform_location(program, "tex")
                     .ok_or_else(|| ShaderError::UniformNotFound("tex".into()))?,
