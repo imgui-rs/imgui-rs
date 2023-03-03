@@ -497,7 +497,7 @@ impl Renderer {
                         input:
                             KeyboardInput {
                                 virtual_keycode: Some(key),
-                                state: ElementState::Pressed,
+                                state,
                                 ..
                             },
                         ..
@@ -510,7 +510,7 @@ impl Renderer {
                         // applications to use either general "ctrl" or a
                         // specific key. Same applies to other modifiers.
                         // https://github.com/ocornut/imgui/issues/5047
-                        handle_key_modifier(io, key, pressed);
+                        handle_key_modifier(imgui.io_mut(), key, pressed);
 
                         // Add main key event
                         if let Some(key) = to_imgui_key(key) {
@@ -911,7 +911,7 @@ struct PlatformBackend {
     event_queue: Rc<RefCell<VecDeque<ViewportEvent>>>,
 }
 
-fn handle_key_modifier(io: &mut Io, key: VirtualKeyCode, down: bool) {
+fn handle_key_modifier(io: &mut imgui::Io, key: VirtualKeyCode, down: bool) {
     if key == VirtualKeyCode::LShift || key == VirtualKeyCode::RShift {
         io.add_key_event(imgui::Key::ModShift, down);
     } else if key == VirtualKeyCode::LControl || key == VirtualKeyCode::RControl {
