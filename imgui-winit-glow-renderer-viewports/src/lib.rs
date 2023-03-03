@@ -305,10 +305,19 @@ impl GlStateBackup {
 
             context.bind_vertex_array(to_native_gl(self.vao, glow::NativeVertexArray));
 
-            context.bind_buffer(glow::ARRAY_BUFFER, to_native_gl(self.vbo, glow::NativeBuffer));
-            context.bind_buffer(glow::ELEMENT_ARRAY_BUFFER, to_native_gl(self.ibo, glow::NativeBuffer));
+            context.bind_buffer(
+                glow::ARRAY_BUFFER,
+                to_native_gl(self.vbo, glow::NativeBuffer),
+            );
+            context.bind_buffer(
+                glow::ELEMENT_ARRAY_BUFFER,
+                to_native_gl(self.ibo, glow::NativeBuffer),
+            );
 
-            context.bind_texture(glow::TEXTURE_2D, to_native_gl(self.texture, glow::NativeTexture));
+            context.bind_texture(
+                glow::TEXTURE_2D,
+                to_native_gl(self.texture, glow::NativeTexture),
+            );
             context.active_texture(self.active_texture);
 
             context.use_program(to_native_gl(self.program, glow::NativeProgram));
@@ -488,13 +497,24 @@ impl Renderer {
                         input:
                             KeyboardInput {
                                 virtual_keycode: Some(key),
-                                state: ElementState::Pressed,
+                                state,
                                 ..
                             },
                         ..
                     } => {
+                        let pressed = state == ElementState::Pressed;
+
+                        // We map both left and right ctrl to `ModCtrl`, etc.
+                        // imgui is told both "left control is pressed" and
+                        // "consider the control key is pressed". Allows
+                        // applications to use either general "ctrl" or a
+                        // specific key. Same applies to other modifiers.
+                        // https://github.com/ocornut/imgui/issues/5047
+                        handle_key_modifier(imgui.io_mut(), key, pressed);
+
+                        // Add main key event
                         if let Some(key) = to_imgui_key(key) {
-                            imgui.io_mut().add_key_event(key, true);
+                            imgui.io_mut().add_key_event(key, pressed);
                         }
                     }
                     winit::event::WindowEvent::ModifiersChanged(modifiers) => {
@@ -889,6 +909,18 @@ struct ViewportData {
 
 struct PlatformBackend {
     event_queue: Rc<RefCell<VecDeque<ViewportEvent>>>,
+}
+
+fn handle_key_modifier(io: &mut imgui::Io, key: VirtualKeyCode, down: bool) {
+    if key == VirtualKeyCode::LShift || key == VirtualKeyCode::RShift {
+        io.add_key_event(imgui::Key::ModShift, down);
+    } else if key == VirtualKeyCode::LControl || key == VirtualKeyCode::RControl {
+        io.add_key_event(imgui::Key::ModCtrl, down);
+    } else if key == VirtualKeyCode::LAlt || key == VirtualKeyCode::RAlt {
+        io.add_key_event(imgui::Key::ModAlt, down);
+    } else if key == VirtualKeyCode::LWin || key == VirtualKeyCode::RWin {
+        io.add_key_event(imgui::Key::ModSuper, down);
+    }
 }
 
 impl imgui::PlatformViewportBackend for PlatformBackend {

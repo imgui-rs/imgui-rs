@@ -291,6 +291,18 @@ fn to_imgui_key(keycode: VirtualKeyCode) -> Option<Key> {
     }
 }
 
+fn handle_key_modifier(io: &mut Io, key: VirtualKeyCode, down: bool) {
+    if key == VirtualKeyCode::LShift || key == VirtualKeyCode::RShift {
+        io.add_key_event(imgui::Key::ModShift, down);
+    } else if key == VirtualKeyCode::LControl || key == VirtualKeyCode::RControl {
+        io.add_key_event(imgui::Key::ModCtrl, down);
+    } else if key == VirtualKeyCode::LAlt || key == VirtualKeyCode::RAlt {
+        io.add_key_event(imgui::Key::ModAlt, down);
+    } else if key == VirtualKeyCode::LWin || key == VirtualKeyCode::RWin {
+        io.add_key_event(imgui::Key::ModSuper, down);
+    }
+}
+
 impl WinitPlatform {
     /// Initializes a winit platform instance and configures imgui.
     ///
@@ -395,16 +407,6 @@ impl WinitPlatform {
                 window_id,
                 ref event,
             } if window_id == window.id() => {
-                // We need to track modifiers separately because some system like macOS, will
-                // not reliably send modifier states during certain events like ScreenCapture.
-                // Gotta let the people show off their pretty imgui widgets!
-                if let WindowEvent::ModifiersChanged(modifiers) = event {
-                    io.add_key_event(Key::ModShift, modifiers.shift());
-                    io.add_key_event(Key::ModCtrl, modifiers.ctrl());
-                    io.add_key_event(Key::ModAlt, modifiers.alt());
-                    io.add_key_event(Key::ModSuper, modifiers.logo());
-                }
-
                 self.handle_window_event(io, window, event);
             }
             // Track key release events outside our window. If we don't do this,
@@ -453,6 +455,15 @@ impl WinitPlatform {
                 let logical_size = self.scale_size_from_winit(window, logical_size);
                 io.display_size = [logical_size.width as f32, logical_size.height as f32];
             }
+            WindowEvent::ModifiersChanged(modifiers) => {
+                // We need to track modifiers separately because some system like macOS, will
+                // not reliably send modifier states during certain events like ScreenCapture.
+                // Gotta let the people show off their pretty imgui widgets!
+                io.add_key_event(Key::ModShift, modifiers.shift());
+                io.add_key_event(Key::ModCtrl, modifiers.ctrl());
+                io.add_key_event(Key::ModAlt, modifiers.alt());
+                io.add_key_event(Key::ModSuper, modifiers.logo());
+            }
             WindowEvent::KeyboardInput {
                 input:
                     KeyboardInput {
@@ -462,8 +473,18 @@ impl WinitPlatform {
                     },
                 ..
             } => {
+                let pressed = state == ElementState::Pressed;
+
+                // We map both left and right ctrl to `ModCtrl`, etc.
+                // imgui is told both "left control is pressed" and
+                // "consider the control key is pressed". Allows
+                // applications to use either general "ctrl" or a
+                // specific key. Same applies to other modifiers.
+                // https://github.com/ocornut/imgui/issues/5047
+                handle_key_modifier(io, key, pressed);
+
+                // Add main key event
                 if let Some(key) = to_imgui_key(key) {
-                    let pressed = state == ElementState::Pressed;
                     io.add_key_event(key, pressed);
                 }
             }
