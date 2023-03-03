@@ -493,8 +493,19 @@ impl Renderer {
                             },
                         ..
                     } => {
+                        let pressed = state == ElementState::Pressed;
+
+                        // We map both left and right ctrl to `ModCtrl`, etc.
+                        // imgui is told both "left control is pressed" and
+                        // "consider the control key is pressed". Allows
+                        // applications to use either general "ctrl" or a
+                        // specific key. Same applies to other modifiers.
+                        // https://github.com/ocornut/imgui/issues/5047
+                        handle_key_modifier(io, key, pressed);
+
+                        // Add main key event
                         if let Some(key) = to_imgui_key(key) {
-                            imgui.io_mut().add_key_event(key, true);
+                            imgui.io_mut().add_key_event(key, pressed);
                         }
                     }
                     winit::event::WindowEvent::ModifiersChanged(modifiers) => {
@@ -889,6 +900,18 @@ struct ViewportData {
 
 struct PlatformBackend {
     event_queue: Rc<RefCell<VecDeque<ViewportEvent>>>,
+}
+
+fn handle_key_modifier(io: &mut Io, key: VirtualKeyCode, down: bool) {
+    if key == VirtualKeyCode::LShift || key == VirtualKeyCode::RShift {
+        io.add_key_event(imgui::Key::ModShift, down);
+    } else if key == VirtualKeyCode::LControl || key == VirtualKeyCode::RControl {
+        io.add_key_event(imgui::Key::ModCtrl, down);
+    } else if key == VirtualKeyCode::LAlt || key == VirtualKeyCode::RAlt {
+        io.add_key_event(imgui::Key::ModAlt, down);
+    } else if key == VirtualKeyCode::LWin || key == VirtualKeyCode::RWin {
+        io.add_key_event(imgui::Key::ModSuper, down);
+    }
 }
 
 impl imgui::PlatformViewportBackend for PlatformBackend {
