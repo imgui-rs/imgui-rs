@@ -285,9 +285,10 @@ impl Renderer {
         #[cfg(feature = "bind_vertex_array_support")]
         if self.gl_version.bind_vertex_array_support() {
             unsafe {
-                self.vertex_array_object = Some(gl
-                    .create_vertex_array()
-                    .map_err(|err| format!("Error creating vertex array object: {}", err))?);
+                self.vertex_array_object = Some(
+                    gl.create_vertex_array()
+                        .map_err(|err| format!("Error creating vertex array object: {}", err))?,
+                );
                 gl.bind_vertex_array(self.vertex_array_object);
             }
         }
@@ -572,7 +573,9 @@ impl TextureMap for SimpleTextureMap {
     #[inline(always)]
     fn gl_texture(&self, imgui_texture: imgui::TextureId) -> Option<glow::Texture> {
         #[allow(clippy::cast_possible_truncation)]
-        Some(glow::NativeTexture(NonZeroU32::new(imgui_texture.id() as _).unwrap()))
+        Some(glow::NativeTexture(
+            NonZeroU32::new(imgui_texture.id() as _).unwrap(),
+        ))
     }
 }
 
@@ -646,7 +649,10 @@ impl GlStateBackup {
     fn post_init(&mut self, gl: &Context) {
         #[allow(clippy::cast_sign_loss)]
         unsafe {
-            gl.bind_texture(glow::TEXTURE_2D, to_native_gl(self.texture, glow::NativeTexture));
+            gl.bind_texture(
+                glow::TEXTURE_2D,
+                to_native_gl(self.texture, glow::NativeTexture),
+            );
         }
     }
 
@@ -705,7 +711,10 @@ impl GlStateBackup {
         #![allow(clippy::cast_sign_loss)]
         unsafe {
             gl.use_program(to_native_gl(self.program, glow::NativeProgram));
-            gl.bind_texture(glow::TEXTURE_2D, to_native_gl(self.texture, glow::NativeTexture));
+            gl.bind_texture(
+                glow::TEXTURE_2D,
+                to_native_gl(self.texture, glow::NativeTexture),
+            );
             #[cfg(feature = "bind_sampler_support")]
             if let Some(sampler) = self.sampler {
                 gl.bind_sampler(0, to_native_gl(sampler, glow::NativeSampler));
@@ -715,7 +724,10 @@ impl GlStateBackup {
             if let Some(vao) = self.vertex_array_object {
                 gl.bind_vertex_array(to_native_gl(vao, glow::NativeVertexArray));
             }
-            gl.bind_buffer(glow::ARRAY_BUFFER, to_native_gl(self.array_buffer, glow::NativeBuffer));
+            gl.bind_buffer(
+                glow::ARRAY_BUFFER,
+                to_native_gl(self.array_buffer, glow::NativeBuffer),
+            );
             gl.blend_equation_separate(
                 self.blend_equation_rgb as _,
                 self.blend_equation_alpha as _,

@@ -305,10 +305,19 @@ impl GlStateBackup {
 
             context.bind_vertex_array(to_native_gl(self.vao, glow::NativeVertexArray));
 
-            context.bind_buffer(glow::ARRAY_BUFFER, to_native_gl(self.vbo, glow::NativeBuffer));
-            context.bind_buffer(glow::ELEMENT_ARRAY_BUFFER, to_native_gl(self.ibo, glow::NativeBuffer));
+            context.bind_buffer(
+                glow::ARRAY_BUFFER,
+                to_native_gl(self.vbo, glow::NativeBuffer),
+            );
+            context.bind_buffer(
+                glow::ELEMENT_ARRAY_BUFFER,
+                to_native_gl(self.ibo, glow::NativeBuffer),
+            );
 
-            context.bind_texture(glow::TEXTURE_2D, to_native_gl(self.texture, glow::NativeTexture));
+            context.bind_texture(
+                glow::TEXTURE_2D,
+                to_native_gl(self.texture, glow::NativeTexture),
+            );
             context.active_texture(self.active_texture);
 
             context.use_program(to_native_gl(self.program, glow::NativeProgram));
