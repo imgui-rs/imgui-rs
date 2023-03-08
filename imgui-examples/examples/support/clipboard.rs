@@ -1,4 +1,4 @@
-use clipboard::{ClipboardContext, ClipboardProvider};
+use copypasta::{ClipboardContext, ClipboardProvider};
 use imgui::ClipboardBackend;
 
 pub struct ClipboardSupport(pub ClipboardContext);
