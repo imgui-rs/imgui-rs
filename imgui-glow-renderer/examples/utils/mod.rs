@@ -1,6 +1,6 @@
 use glow::HasContext;
 use glutin::{event_loop::EventLoop, GlRequest};
-use imgui_winit_support::WinitPlatform;
+use imgui_winit_support_27::WinitPlatform;
 
 pub type Window = glutin::WindowedContext<glutin::PossiblyCurrent>;
 
@@ -34,7 +34,7 @@ pub fn imgui_init(window: &Window) -> (WinitPlatform, imgui::Context) {
     winit_platform.attach_window(
         imgui_context.io_mut(),
         window.window(),
-        imgui_winit_support::HiDpiMode::Rounded,
+        imgui_winit_support_27::HiDpiMode::Rounded,
     );
 
     imgui_context

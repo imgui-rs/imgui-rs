@@ -5,7 +5,7 @@ use glium::glutin::window::WindowBuilder;
 use glium::{Display, Surface};
 use imgui::{Context, FontConfig, FontGlyphRanges, FontSource, Ui};
 use imgui_glium_renderer::Renderer;
-use imgui_winit_support::{HiDpiMode, WinitPlatform};
+use imgui_winit_support_27::{HiDpiMode, WinitPlatform};
 use std::path::Path;
 use std::time::Instant;
 
