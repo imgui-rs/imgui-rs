@@ -77,16 +77,16 @@ fn create_window() -> (EventLoop<()>, glium::Display) {
     (event_loop, display)
 }
 
-fn imgui_init(display: &glium::Display) -> (imgui_winit_support::WinitPlatform, imgui::Context) {
+fn imgui_init(display: &glium::Display) -> (imgui_winit_support_27::WinitPlatform, imgui::Context) {
     let mut imgui_context = imgui::Context::create();
     imgui_context.set_ini_filename(None);
 
-    let mut winit_platform = imgui_winit_support::WinitPlatform::init(&mut imgui_context);
+    let mut winit_platform = imgui_winit_support_27::WinitPlatform::init(&mut imgui_context);
 
     let gl_window = display.gl_window();
     let window = gl_window.window();
 
-    let dpi_mode = imgui_winit_support::HiDpiMode::Default;
+    let dpi_mode = imgui_winit_support_27::HiDpiMode::Default;
 
     winit_platform.attach_window(imgui_context.io_mut(), window, dpi_mode);
 

@@ -19,11 +19,11 @@ macro_rules! create_token {
     ) => {
         #[must_use]
         $(#[$struct_meta])*
-        pub struct $token_name<'a>($crate::__core::marker::PhantomData<&'a crate::Ui>);
+        pub struct $token_name<'a>($crate::__core::marker::PhantomData<&'a $crate::Ui>);
 
         impl<'a> $token_name<'a> {
             /// Creates a new token type.
-            pub(crate) fn new(_: &'a crate::Ui) -> Self {
+            pub(crate) fn new(_: &'a $crate::Ui) -> Self {
                 Self(std::marker::PhantomData)
             }
 

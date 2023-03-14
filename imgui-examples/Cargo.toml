@@ -14,7 +14,7 @@ glium = { version = "0.32.1", default-features = true }
 image = "0.23"
 imgui = { path = "../imgui", features = ["tables-api"] }
 imgui-glium-renderer = { path = "../imgui-glium-renderer" }
-imgui-winit-support = { path = "../imgui-winit-support" }
+imgui-winit-support-27 = { path = "../imgui-winit-support-27" }
 
 # Pin indirect dependency scoped-tls to 1.0.0
 # as 1.0.1 bumped MSRV to 1.59

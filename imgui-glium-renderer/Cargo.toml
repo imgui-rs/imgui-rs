@@ -14,4 +14,4 @@ glium = { version = "0.32.1", default-features = false }
 imgui = { version = "0.10.0", path = "../imgui" }
 
 [dev-dependencies]
-imgui-winit-support = {path = "../imgui-winit-support"}
+imgui-winit-support-27 = { path = "../imgui-winit-support-27" }
