@@ -2,6 +2,8 @@
 
 ## [unreleased]
 
+- Breaking: Updated winit to `0.28` for `imgui-winit-support`.
+
 ## [0.10.0] - 2023-01-16
 
 - Breaking: Removed `im_str!` macro - deprecated since v0.8.
