@@ -289,7 +289,7 @@ impl Ui {
 }
 
 /// A temporary change in item flags
-#[derive(Copy, Clone, Debug, PartialEq)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq)]
 pub enum ItemFlag {
     AllowKeyboardFocus(bool),
     ButtonRepeat(bool),
