@@ -1,6 +1,6 @@
 #![allow(clippy::must_use_candidate)]
 
-#[derive(PartialEq, Clone, Copy)]
+#[derive(PartialEq, Clone, Copy, Eq)]
 pub struct GlVersion {
     pub major: u16,
     pub minor: u16,
