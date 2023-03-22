@@ -376,7 +376,7 @@ impl IdStackToken<'_> {
 }
 
 /// # ID stack
-impl<'ui> Ui {
+impl Ui {
     /// Pushes an identifier to the ID stack.
     ///
     /// Returns an `IdStackToken` that can be popped by calling `.end()`

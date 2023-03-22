@@ -1268,7 +1268,7 @@ extern "C" fn callback<T: InputTextCallbackHandler>(
         }
         InputTextFlags::CALLBACK_HISTORY => {
             let key = unsafe {
-                let key = (*data).EventKey as u32;
+                let key = (*data).EventKey;
                 match key {
                     sys::ImGuiKey_UpArrow => HistoryDirection::Up,
                     sys::ImGuiKey_DownArrow => HistoryDirection::Down,

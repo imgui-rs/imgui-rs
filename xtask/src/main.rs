@@ -17,7 +17,7 @@ fn main() {
 
 fn try_main() -> Result<()> {
     let root = project_root();
-    let _d = xshell::pushd(&root)?;
+    let _d = xshell::pushd(root)?;
     let flags = flags::Xtask::from_env()?;
     if flags.verbose {
         VERBOSE.store(true, std::sync::atomic::Ordering::Relaxed);

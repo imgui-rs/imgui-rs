@@ -482,7 +482,7 @@ impl Ui {
     pub fn table_set_column_index(&self, column_index: usize) -> bool {
         #[cfg(debug_assertions)]
         {
-            let size = self.table_column_count() as usize;
+            let size = self.table_column_count();
             if column_index >= size {
                 panic!(
                     "column_index >= self.table_get_column_count().\
@@ -760,7 +760,7 @@ pub struct TableColumnSetup<Name> {
     pub user_id: Id,
 }
 
-impl<'a, Name: AsRef<str>> TableColumnSetup<Name> {
+impl<Name: AsRef<str>> TableColumnSetup<Name> {
     pub fn new(name: Name) -> Self {
         Self {
             name,

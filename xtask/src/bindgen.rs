@@ -131,22 +131,22 @@ fn generate_binding_file(
         "--use-core",
     ];
     cmd.args(a);
-    cmd.args(&["--blocklist-type", "__darwin_size_t"]);
-    cmd.args(&["--raw-line", "#![allow(nonstandard_style, clippy::all)]"]);
+    cmd.args(["--blocklist-type", "__darwin_size_t"]);
+    cmd.args(["--raw-line", "#![allow(nonstandard_style, clippy::all)]"]);
     cmd.arg("--output").arg(output);
-    cmd.args(&["--ctypes-prefix", "cty"]);
+    cmd.args(["--ctypes-prefix", "cty"]);
 
     if let Some(name) = wasm_import_mod {
-        cmd.args(&["--wasm-import-module-name", name]);
+        cmd.args(["--wasm-import-module-name", name]);
     }
     for t in types {
-        cmd.args(&["--allowlist-type", t]);
+        cmd.args(["--allowlist-type", t]);
     }
     for f in funcs {
-        cmd.args(&["--allowlist-function", f]);
+        cmd.args(["--allowlist-function", f]);
     }
     cmd.arg(header);
-    cmd.args(&["--", "-DCIMGUI_DEFINE_ENUMS_AND_STRUCTS=1"]);
+    cmd.args(["--", "-DCIMGUI_DEFINE_ENUMS_AND_STRUCTS=1"]);
     eprintln!("Executing bindgen [output = {}]", output.display());
     let status = cmd.status().context("Failed to execute bindgen")?;
     if !status.success() {
