@@ -480,7 +480,7 @@ impl Renderer {
                     winit::event::WindowEvent::Moved(_) => unsafe {
                         let new_pos = window.inner_position().unwrap().cast::<f32>();
                         (*(viewport.platform_user_data.cast::<ViewportData>())).pos =
-                            [new_pos.x as f32, new_pos.y as f32];
+                            [new_pos.x, new_pos.y];
 
                         viewport.platform_request_move = true;
                     },
