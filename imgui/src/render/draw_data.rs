@@ -394,7 +394,7 @@ fn test_owneddrawdata_from_drawdata() {
     // Build a dummy draw data object
     let mut draw_list = sys::ImDrawList::default();
     let mut draw_lists_raw = [std::ptr::addr_of_mut!(draw_list)];
-    let mut draw_data_raw = sys::ImDrawData {
+    let draw_data_raw = sys::ImDrawData {
         Valid: true,
         CmdListsCount: 1,
         CmdLists: draw_lists_raw.as_mut_ptr(),
@@ -406,7 +406,7 @@ fn test_owneddrawdata_from_drawdata() {
         #[cfg(feature = "docking")]
         OwnerViewport: unsafe { (std::ptr::null_mut() as *mut sys::ImGuiViewport).offset(123) },
     };
-    let draw_data = unsafe { DrawData::from_raw(&mut draw_data_raw) };
+    let draw_data = unsafe { DrawData::from_raw(&draw_data_raw) };
 
     // Clone it, and ensure the underlying properties have been cloned
     let owned_draw_data: OwnedDrawData = draw_data.into();
@@ -445,13 +445,12 @@ fn test_owneddrawdata_from_drawdata() {
 #[cfg(test)]
 fn test_owneddrawdata_drop() {
     let (_guard, _ctx) = crate::test::test_ctx();
-    let initial_allocation_count =
-        unsafe { (*sys::igGetCurrentContext()).IO.MetricsActiveAllocations };
+    let initial_allocation_count = unsafe { (*sys::igGetIO()).MetricsActiveAllocations };
 
     // Build a dummy draw data object
     let mut draw_list = sys::ImDrawList::default();
     let mut draw_lists_raw = [std::ptr::addr_of_mut!(draw_list)];
-    let mut draw_data_raw = sys::ImDrawData {
+    let draw_data_raw = sys::ImDrawData {
         Valid: true,
         CmdListsCount: 1,
         CmdLists: draw_lists_raw.as_mut_ptr(),
@@ -463,17 +462,15 @@ fn test_owneddrawdata_drop() {
         #[cfg(feature = "docking")]
         OwnerViewport: std::ptr::null_mut(),
     };
-    let draw_data = unsafe { DrawData::from_raw(&mut draw_data_raw) };
+    let draw_data = unsafe { DrawData::from_raw(&draw_data_raw) };
 
     // Clone it, then drop it, and ensure all allocations are returned
     {
         let _owned_draw_data: OwnedDrawData = draw_data.into();
-        let cloned_allocation_count =
-            unsafe { (*sys::igGetCurrentContext()).IO.MetricsActiveAllocations };
+        let cloned_allocation_count = unsafe { (*sys::igGetIO()).MetricsActiveAllocations };
         assert!(cloned_allocation_count > initial_allocation_count);
         // owned_draw_data is dropped here...
     }
-    let final_allocation_count =
-        unsafe { (*sys::igGetCurrentContext()).IO.MetricsActiveAllocations };
+    let final_allocation_count = unsafe { (*sys::igGetIO()).MetricsActiveAllocations };
     assert_eq!(initial_allocation_count, final_allocation_count);
 }
