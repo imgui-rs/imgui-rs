@@ -1,3 +1,4 @@
+use std::mem::size_of;
 use std::slice;
 
 use crate::internal::{RawCast, RawWrapper};
@@ -286,4 +287,190 @@ fn test_drawvert_memory_layout() {
     assert_field_offset!(pos, pos);
     assert_field_offset!(uv, uv);
     assert_field_offset!(col, col);
+}
+
+/// A container for a heap-allocated deep copy of a `DrawData` struct.
+///
+/// Can be used to retain draw data for rendering on a different thread.
+/// The underlying copy is released when this struct is dropped.
+pub struct OwnedDrawData {
+    draw_data: *mut sys::ImDrawData,
+}
+
+impl OwnedDrawData {
+    /// If this struct contains a `DrawData` object, then this function returns a reference to it.
+    ///
+    /// Otherwise, this struct is empty and so this function returns `None`.
+    #[inline]
+    pub fn draw_data(&self) -> Option<&DrawData> {
+        if !self.draw_data.is_null() {
+            Some(unsafe { DrawData::from_raw(&*self.draw_data) })
+        } else {
+            None
+        }
+    }
+
+    #[cfg(feature = "docking")]
+    unsafe fn copy_docking_properties(source: &sys::ImDrawData, dest: *mut sys::ImDrawData) {
+        (*dest).OwnerViewport = source.OwnerViewport;
+    }
+    #[cfg(not(feature = "docking"))]
+    unsafe fn copy_docking_properties(_source: &sys::ImDrawData, _dest: *mut sys::ImDrawData) {}
+}
+
+impl Default for OwnedDrawData {
+    /// The default `OwnedDrawData` struct is empty.
+    #[inline]
+    fn default() -> Self {
+        Self {
+            draw_data: std::ptr::null_mut(),
+        }
+    }
+}
+
+impl From<&DrawData> for OwnedDrawData {
+    /// Construct `OwnedDrawData` from `DrawData` by creating a heap-allocated deep copy of the given `DrawData`
+    fn from(value: &DrawData) -> Self {
+        OwnedDrawData {
+            draw_data: unsafe {
+                let other_ptr = value.raw();
+                let mut result = sys::ImDrawData_ImDrawData();
+                (*result).Valid = other_ptr.Valid;
+                (*result).TotalIdxCount = other_ptr.TotalIdxCount;
+                (*result).TotalVtxCount = other_ptr.TotalVtxCount;
+                (*result).DisplayPos = other_ptr.DisplayPos;
+                (*result).DisplaySize = other_ptr.DisplaySize;
+                (*result).FramebufferScale = other_ptr.FramebufferScale;
+                (*result).CmdListsCount = other_ptr.CmdListsCount;
+                (*result).CmdLists = sys::igMemAlloc(
+                    size_of::<*mut sys::ImDrawList>() * other_ptr.CmdListsCount as usize,
+                ) as *mut *mut sys::ImDrawList;
+                OwnedDrawData::copy_docking_properties(other_ptr, result);
+
+                let mut current_draw_list = (*result).CmdLists;
+                for i in 0..other_ptr.CmdListsCount as usize {
+                    *current_draw_list = sys::ImDrawList_CloneOutput(*other_ptr.CmdLists.add(i));
+                    current_draw_list = current_draw_list.add(1);
+                }
+                result
+            },
+        }
+    }
+}
+
+impl Drop for OwnedDrawData {
+    /// Releases any heap-allocated memory consumed by this `OwnedDrawData` object
+    fn drop(&mut self) {
+        unsafe {
+            if !self.draw_data.is_null() {
+                if !(*self.draw_data).CmdLists.is_null() {
+                    for i in 0..(*self.draw_data).CmdListsCount as usize {
+                        let ptr = *(*self.draw_data).CmdLists.add(i);
+                        if !ptr.is_null() {
+                            sys::ImDrawList_destroy(ptr);
+                        }
+                    }
+                    sys::igMemFree((*self.draw_data).CmdLists as *mut std::ffi::c_void);
+                }
+                sys::ImDrawData_destroy(self.draw_data);
+                self.draw_data = std::ptr::null_mut();
+            }
+        }
+    }
+}
+
+#[test]
+#[cfg(test)]
+fn test_owneddrawdata_default() {
+    let default = OwnedDrawData::default();
+    assert!(default.draw_data().is_none());
+}
+
+#[test]
+#[cfg(test)]
+fn test_owneddrawdata_from_drawdata() {
+    let (_guard, _ctx) = crate::test::test_ctx();
+
+    // Build a dummy draw data object
+    let mut draw_list = sys::ImDrawList::default();
+    let mut draw_lists_raw = [std::ptr::addr_of_mut!(draw_list)];
+    let draw_data_raw = sys::ImDrawData {
+        Valid: true,
+        CmdListsCount: 1,
+        CmdLists: draw_lists_raw.as_mut_ptr(),
+        TotalIdxCount: 123,
+        TotalVtxCount: 456,
+        DisplayPos: sys::ImVec2 { x: 123.0, y: 456.0 },
+        DisplaySize: sys::ImVec2 { x: 789.0, y: 012.0 },
+        FramebufferScale: sys::ImVec2 { x: 3.0, y: 7.0 },
+        #[cfg(feature = "docking")]
+        OwnerViewport: unsafe { (std::ptr::null_mut() as *mut sys::ImGuiViewport).offset(123) },
+    };
+    let draw_data = unsafe { DrawData::from_raw(&draw_data_raw) };
+
+    // Clone it, and ensure the underlying properties have been cloned
+    let owned_draw_data: OwnedDrawData = draw_data.into();
+    let inner_draw_data = owned_draw_data.draw_data();
+    assert!(inner_draw_data.is_some());
+    let owned_draw_data_raw = unsafe { inner_draw_data.unwrap().raw() };
+    assert_eq!(draw_data_raw.Valid, owned_draw_data_raw.Valid);
+    assert_eq!(
+        draw_data_raw.CmdListsCount,
+        owned_draw_data_raw.CmdListsCount
+    );
+    assert!(!draw_data_raw.CmdLists.is_null());
+    assert_eq!(
+        draw_data_raw.TotalIdxCount,
+        owned_draw_data_raw.TotalIdxCount
+    );
+    assert_eq!(
+        draw_data_raw.TotalVtxCount,
+        owned_draw_data_raw.TotalVtxCount
+    );
+    assert_eq!(draw_data_raw.DisplayPos, owned_draw_data_raw.DisplayPos);
+    assert_eq!(draw_data_raw.DisplaySize, owned_draw_data_raw.DisplaySize);
+    assert_eq!(
+        draw_data_raw.FramebufferScale,
+        owned_draw_data_raw.FramebufferScale
+    );
+
+    #[cfg(feature = "docking")]
+    assert_eq!(
+        draw_data_raw.OwnerViewport,
+        owned_draw_data_raw.OwnerViewport
+    );
+}
+
+#[test]
+#[cfg(test)]
+fn test_owneddrawdata_drop() {
+    let (_guard, _ctx) = crate::test::test_ctx();
+    let initial_allocation_count = unsafe { (*sys::igGetIO()).MetricsActiveAllocations };
+
+    // Build a dummy draw data object
+    let mut draw_list = sys::ImDrawList::default();
+    let mut draw_lists_raw = [std::ptr::addr_of_mut!(draw_list)];
+    let draw_data_raw = sys::ImDrawData {
+        Valid: true,
+        CmdListsCount: 1,
+        CmdLists: draw_lists_raw.as_mut_ptr(),
+        TotalIdxCount: 0,
+        TotalVtxCount: 0,
+        DisplayPos: sys::ImVec2 { x: 0.0, y: 0.0 },
+        DisplaySize: sys::ImVec2 { x: 800.0, y: 600.0 },
+        FramebufferScale: sys::ImVec2 { x: 1.0, y: 1.0 },
+        #[cfg(feature = "docking")]
+        OwnerViewport: std::ptr::null_mut(),
+    };
+    let draw_data = unsafe { DrawData::from_raw(&draw_data_raw) };
+
+    // Clone it, then drop it, and ensure all allocations are returned
+    {
+        let _owned_draw_data: OwnedDrawData = draw_data.into();
+        let cloned_allocation_count = unsafe { (*sys::igGetIO()).MetricsActiveAllocations };
+        assert!(cloned_allocation_count > initial_allocation_count);
+        // owned_draw_data is dropped here...
+    }
+    let final_allocation_count = unsafe { (*sys::igGetIO()).MetricsActiveAllocations };
+    assert_eq!(initial_allocation_count, final_allocation_count);
 }
