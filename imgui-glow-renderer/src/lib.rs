@@ -45,7 +45,7 @@
 //! is sRGB (if you don't know, it probably is) the `internal_format` is
 //! one of the `SRGB*` values.
 
-use std::{borrow::Cow, error::Error, fmt::Display, mem::size_of, num::NonZeroU32};
+use std::{borrow::Cow, error::Error, fmt::Display, mem::size_of, num::NonZeroU32, rc::Rc};
 
 use imgui::{internal::RawWrapper, DrawCmd, DrawData, DrawVert};
 
@@ -71,7 +71,7 @@ type GlUniformLocation = <Context as HasContext>::UniformLocation;
 /// OpenGL context is still available to the rest of the application through
 /// the [`gl_context`](Self::gl_context) method.
 pub struct AutoRenderer {
-    gl: glow::Context,
+    gl: Rc<glow::Context>,
     texture_map: SimpleTextureMap,
     renderer: Renderer,
 }
@@ -87,7 +87,7 @@ impl AutoRenderer {
         let mut texture_map = SimpleTextureMap::default();
         let renderer = Renderer::initialize(&gl, imgui_context, &mut texture_map, true)?;
         Ok(Self {
-            gl,
+            gl: Rc::new(gl),
             texture_map,
             renderer,
         })
@@ -96,7 +96,7 @@ impl AutoRenderer {
     /// Note: no need to provide a `mut` version of this, as all methods on
     /// [`glow::HasContext`] are immutable.
     #[inline]
-    pub fn gl_context(&self) -> &glow::Context {
+    pub fn gl_context(&self) -> &Rc<glow::Context> {
         &self.gl
     }
 
