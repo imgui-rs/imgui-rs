@@ -1,6 +1,6 @@
 # Change Log
 
-## [unreleased]
+## [0.11.0] - 2023-04-05
 
 - Added API to add callbacks to draw list for advanced custom drawing - [PR#702](https://github.com/imgui-rs/imgui-rs/pull/702)
 - Added `OwnedDrawData` API for usage like multithreaded renderers - [PR#721](https://github.com/imgui-rs/imgui-rs/pull/721)
