@@ -16,7 +16,7 @@
 use bitflags::bitflags;
 
 use crate::{math::MintVec2, ImColor32};
-use sys::ImDrawList;
+use sys::{ImDrawCmd, ImDrawList};
 
 use super::Ui;
 use crate::render::renderer::TextureId;
@@ -467,6 +467,14 @@ impl<'ui> DrawListMut<'ui> {
         rounding: f32,
     ) -> ImageRounded<'_> {
         ImageRounded::new(self, texture_id, p_min, p_max, rounding)
+    }
+
+    /// Draw the specified callback.
+    ///
+    /// Note: if this DrawList is never rendered the callback will leak because DearImGui
+    /// does not provide a method to clean registered callbacks.
+    pub fn add_callback<F: FnOnce() + 'static>(&'ui self, callback: F) -> Callback<'ui, F> {
+        Callback::new(self, callback)
     }
 }
 
@@ -1184,5 +1192,47 @@ impl<'ui> ImageRounded<'ui> {
                 self.draw_flags.bits() as i32,
             );
         }
+    }
+}
+
+#[must_use = "should call .build() to draw the object"]
+pub struct Callback<'ui, F> {
+    draw_list: &'ui DrawListMut<'ui>,
+    callback: F,
+}
+
+impl<'ui, F: FnOnce() + 'static> Callback<'ui, F> {
+    /// Typically constructed by [`DrawListMut::add_callback`]
+    pub fn new(draw_list: &'ui DrawListMut<'_>, callback: F) -> Self {
+        Callback {
+            draw_list,
+            callback,
+        }
+    }
+    /// Adds the callback to the draw-list so it will be run when the window is drawn
+    pub fn build(self) {
+        use std::os::raw::c_void;
+        // F is Sized, so *mut F must be a thin pointer.
+        let callback: *mut F = Box::into_raw(Box::new(self.callback));
+
+        unsafe {
+            sys::ImDrawList_AddCallback(
+                self.draw_list.draw_list,
+                Some(Self::run_callback),
+                callback as *mut c_void,
+            );
+        }
+    }
+    unsafe extern "C" fn run_callback(_parent_list: *const ImDrawList, cmd: *const ImDrawCmd) {
+        // We are modifying through a C const pointer, but that should be harmless.
+        let cmd = &mut *(cmd as *mut ImDrawCmd);
+        // Consume the pointer and leave a NULL behind to avoid a double-free or
+        // calling twice an FnOnce. It should not happen, but better safe than sorry.
+        let callback = std::mem::replace(&mut cmd.UserCallbackData, std::ptr::null_mut());
+        if callback.is_null() {
+            return;
+        }
+        let callback = Box::from_raw(callback as *mut F);
+        callback();
     }
 }
