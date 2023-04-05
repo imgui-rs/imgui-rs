@@ -2,6 +2,14 @@
 
 ## [unreleased]
 
+- Added API to add callbacks to draw list for advanced custom drawing - [PR#702](https://github.com/imgui-rs/imgui-rs/pull/702)
+- Added `OwnedDrawData` API for usage like multithreaded renderers - [PR#721](https://github.com/imgui-rs/imgui-rs/pull/721)
+- MSRV bumped to 1.64 (will likely still work in 1.60 with pinning of some indirect dependencies) - [PR#718](https://github.com/imgui-rs/imgui-rs/pull/718)
+- Examples now use `copypasta` crate for clipboard handling, as it is more maintained - [PR#715](https://github.com/imgui-rs/imgui-rs/pull/715)
+- Update glow to 0.12 (from v0.10)- [PR#711](https://github.com/imgui-rs/imgui-rs/pull/711) (and also [PR#712](https://github.com/imgui-rs/imgui-rs/pull/712))
+- Fixed handling of modifiers keys - [PR#710](https://github.com/imgui-rs/imgui-rs/pull/710)
+- There is a new "viewport" renderer which uses the docking branch's multi-viewport handling! - [PR#619](https://github.com/imgui-rs/imgui-rs/pull/619)
+
 ## [0.10.0] - 2023-01-16
 
 - Breaking: Removed `im_str!` macro - deprecated since v0.8.
