@@ -459,6 +459,12 @@ impl Io {
             sys::ImGuiIO_AddKeyEvent(self.raw_mut(), key as u32, down);
         }
     }
+
+    pub fn add_key_analog_event(&mut self, key: Key, down: bool, value: f32) {
+        unsafe {
+            sys::ImGuiIO_AddKeyAnalogEvent(self.raw_mut(), key as u32, down, value);
+        }
+    }
 }
 
 impl Index<Key> for Io {
