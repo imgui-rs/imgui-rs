@@ -7,7 +7,7 @@ description = "sdl2 support code for the imgui crate"
 homepage = "https://github.com/imgui-rs/imgui-rs"
 repository = "https://github.com/imgui-rs/imgui-rs"
 documentation = "https://docs.rs/imgui-sdl2-support"
-license = "MIT/Apache-2.0"
+license = "MIT OR Apache-2.0"
 categories = ["gui"]
 
 [dependencies]
