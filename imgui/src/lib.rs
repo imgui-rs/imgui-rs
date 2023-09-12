@@ -721,9 +721,16 @@ impl Ui {
             let handle = &mut *self.scratch_buffer().get();
 
             handle.refresh_buffer();
-            let label_ptr = handle.push(label);
+            let label_start = handle.push(label);
 
-            let items_inner: Vec<_> = items.iter().map(|&v| handle.push(v)).collect();
+            // we do this in two allocations
+            let items_inner: Vec<usize> = items.iter().map(|&v| handle.push(v)).collect();
+            let items_inner: Vec<*const _> = items_inner
+                .into_iter()
+                .map(|v| handle.buffer.as_ptr().add(v) as *const _)
+                .collect();
+
+            let label_ptr = handle.buffer.as_ptr().add(label_start) as *const _;
 
             (label_ptr, items_inner)
         };

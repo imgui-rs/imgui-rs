@@ -209,22 +209,22 @@ where
     /// Returns true if the slider value was changed.
     #[doc(alias = "DragFloatRange2")]
     pub fn build(self, ui: &Ui, min: &mut f32, max: &mut f32) -> bool {
-        let label;
-        let mut display_format = std::ptr::null();
-        let mut max_display_format = std::ptr::null();
-
         // we do this ourselves the long way...
         unsafe {
             let buffer = &mut *ui.scratch_buffer().get();
             buffer.refresh_buffer();
 
-            label = buffer.push(self.label);
-            if let Some(v) = self.display_format {
-                display_format = buffer.push(v);
-            }
-            if let Some(v) = self.max_display_format {
-                max_display_format = buffer.push(v);
-            }
+            let label_start = buffer.push(self.label);
+            let display_format = self.display_format.as_ref().map(|v| buffer.push(v));
+            let max_display_format = self.max_display_format.as_ref().map(|v| buffer.push(v));
+
+            let label = buffer.offset(label_start);
+            let display_format = display_format
+                .map(|v| buffer.offset(v))
+                .unwrap_or_else(std::ptr::null);
+            let max_display_format = max_display_format
+                .map(|v| buffer.offset(v))
+                .unwrap_or_else(std::ptr::null);
 
             sys::igDragFloatRange2(
                 label,
@@ -253,20 +253,21 @@ where
     #[doc(alias = "DragIntRange2")]
     pub fn build(self, ui: &Ui, min: &mut i32, max: &mut i32) -> bool {
         unsafe {
-            let mut display_format = std::ptr::null();
-            let mut max_display_format = std::ptr::null();
-
             // we do this ourselves the long way...
             let buffer = &mut *ui.scratch_buffer().get();
             buffer.refresh_buffer();
 
-            let label = buffer.push(self.label);
-            if let Some(v) = self.display_format {
-                display_format = buffer.push(v);
-            }
-            if let Some(v) = self.max_display_format {
-                max_display_format = buffer.push(v);
-            }
+            let label_start = buffer.push(self.label);
+            let display_format = self.display_format.as_ref().map(|v| buffer.push(v));
+            let max_display_format = self.max_display_format.as_ref().map(|v| buffer.push(v));
+
+            let label = buffer.offset(label_start);
+            let display_format = display_format
+                .map(|v| buffer.offset(v))
+                .unwrap_or_else(std::ptr::null);
+            let max_display_format = max_display_format
+                .map(|v| buffer.offset(v))
+                .unwrap_or_else(std::ptr::null);
 
             sys::igDragIntRange2(
                 label,
