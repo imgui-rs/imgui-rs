@@ -1,6 +1,6 @@
 //! Internal raw utilities (don't use unless you know what you're doing!)
 
-use std::{mem::size_of, slice};
+use std::slice;
 
 /// A generic version of the raw imgui-sys ImVector struct types
 #[repr(C)]
@@ -25,7 +25,7 @@ impl<T> ImVector<T> {
         unsafe {
             sys::igMemFree(self.data as *mut _);
 
-            let buffer_ptr = sys::igMemAlloc(size_of::<T>() * data.len()) as *mut T;
+            let buffer_ptr = sys::igMemAlloc(std::mem::size_of_val(data)) as *mut T;
             buffer_ptr.copy_from_nonoverlapping(data.as_ptr(), data.len());
 
             self.size = data.len() as i32;

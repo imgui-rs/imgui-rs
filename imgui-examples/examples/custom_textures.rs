@@ -189,8 +189,8 @@ impl Lenna {
         decoder.read_image(&mut image)?;
         let raw = RawImage2d {
             data: Cow::Owned(image),
-            width: width as u32,
-            height: height as u32,
+            width,
+            height,
             format: ClientFormat::U8U8U8,
         };
         let gl_texture = Texture2d::new(gl_ctx, raw)?;

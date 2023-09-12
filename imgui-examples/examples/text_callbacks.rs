@@ -106,7 +106,7 @@ fn main() {
                                 if !data.str().is_empty() {
                                     data.remove_chars(0, 1);
 
-                                    if let Some((idx, _)) = data.str().char_indices().rev().next() {
+                                    if let Some((idx, _)) = data.str().char_indices().next_back() {
                                         data.remove_chars(idx, 1);
                                     }
                                 }
@@ -118,7 +118,7 @@ fn main() {
                                 }
 
                                 // insert last char
-                                if let Some((idx, _)) = self.1.char_indices().rev().next() {
+                                if let Some((idx, _)) = self.1.char_indices().next_back() {
                                     data.push_str(&self.1[idx..]);
                                 }
                             }

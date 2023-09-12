@@ -759,7 +759,7 @@ CTRL+click on individual component to input value.\n",
             );
 
             state.filter.draw();
-            let lines = vec!["aaa1.c", "bbb1.c", "ccc1.c", "aaa2.cpp", "bbb2.cpp", "ccc2.cpp", "abc.h", "hello, world!"];
+            let lines = ["aaa1.c", "bbb1.c", "ccc1.c", "aaa2.cpp", "bbb2.cpp", "ccc2.cpp", "abc.h", "hello, world!"];
 
             ui.same_line();
             if ui.button("Clear##clear_filter") {
@@ -1285,7 +1285,7 @@ fn show_app_log(ui: &Ui, app_log: &mut Vec<String>) {
             }
             ui.same_line();
             if ui.button("Copy") {
-                ui.set_clipboard_text(&ImString::from(app_log.join("\n")));
+                ui.set_clipboard_text(ImString::from(app_log.join("\n")));
             }
             ui.separator();
             ui.child_window("logwindow")

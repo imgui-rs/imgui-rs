@@ -523,7 +523,7 @@ impl Context {
         // we take this with an `&mut Self` here, which means
         // that we can't get the sharedfontatlas through safe code
         // otherwise
-        unsafe { &mut *(self.io_mut().fonts as *mut FontAtlas) }
+        unsafe { &mut *self.io_mut().fonts }
     }
 
     /// Attempts to clone the interior shared font atlas **if it exists**.
