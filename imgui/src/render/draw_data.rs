@@ -334,7 +334,7 @@ impl From<&DrawData> for OwnedDrawData {
         OwnedDrawData {
             draw_data: unsafe {
                 let other_ptr = value.raw();
-                let mut result = sys::ImDrawData_ImDrawData();
+                let result = sys::ImDrawData_ImDrawData();
                 (*result).Valid = other_ptr.Valid;
                 (*result).TotalIdxCount = other_ptr.TotalIdxCount;
                 (*result).TotalVtxCount = other_ptr.TotalVtxCount;
@@ -404,7 +404,7 @@ fn test_owneddrawdata_from_drawdata() {
         DisplaySize: sys::ImVec2 { x: 789.0, y: 012.0 },
         FramebufferScale: sys::ImVec2 { x: 3.0, y: 7.0 },
         #[cfg(feature = "docking")]
-        OwnerViewport: unsafe { (std::ptr::null_mut() as *mut sys::ImGuiViewport).offset(123) },
+        OwnerViewport: unsafe { std::ptr::null_mut::<sys::ImGuiViewport>().offset(123) },
     };
     let draw_data = unsafe { DrawData::from_raw(&draw_data_raw) };
 

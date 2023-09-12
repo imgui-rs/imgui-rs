@@ -1152,7 +1152,7 @@ fn calculate_matrix(draw_data: &DrawData, clip_origin_is_lower_left: bool) -> [f
 }
 
 unsafe fn to_byte_slice<T>(slice: &[T]) -> &[u8] {
-    std::slice::from_raw_parts(slice.as_ptr().cast(), slice.len() * size_of::<T>())
+    std::slice::from_raw_parts(slice.as_ptr().cast(), std::mem::size_of_val(slice))
 }
 
 const fn imgui_index_type_as_gl() -> u32 {

@@ -17,10 +17,6 @@ enum FontGlyphRangeData {
 #[derive(Clone, Eq, PartialEq, Debug)]
 pub struct FontGlyphRanges(FontGlyphRangeData);
 impl FontGlyphRanges {
-    /// The default set of glyph ranges used by imgui.
-    pub fn default() -> FontGlyphRanges {
-        FontGlyphRanges(FontGlyphRangeData::Default)
-    }
     /// A set of glyph ranges appropriate for use with simplified common Chinese text.
     pub fn chinese_simplified_common() -> FontGlyphRanges {
         FontGlyphRanges(FontGlyphRangeData::ChineseSimplifiedCommon)
@@ -160,5 +156,12 @@ impl FontGlyphRanges {
             FontGlyphRangeData::Vietnamese => sys::ImFontAtlas_GetGlyphRangesVietnamese(atlas),
             FontGlyphRangeData::Custom(ptr) => ptr,
         }
+    }
+}
+
+impl Default for FontGlyphRanges {
+    /// The default set of glyph ranges used by imgui.
+    fn default() -> Self {
+        FontGlyphRanges(FontGlyphRangeData::Default)
     }
 }

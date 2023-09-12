@@ -27,7 +27,6 @@ bitflags!(
     /// Options for some DrawList operations.
     #[repr(C)]
     pub struct DrawFlags: u32 {
-        const NONE = sys::ImDrawFlags_None;
         const CLOSED = sys::ImDrawFlags_Closed;
         const ROUND_CORNERS_TOP_LEFT = sys::ImDrawFlags_RoundCornersTopLeft;
         const ROUND_CORNERS_TOP_RIGHT = sys::ImDrawFlags_RoundCornersTopRight;
@@ -46,7 +45,6 @@ bitflags!(
     /// Draw list flags
     #[repr(C)]
     pub struct DrawListFlags: u32 {
-        const NONE = sys::ImDrawListFlags_None;
         /// Enable anti-aliased lines/borders (*2 the number of triangles for 1.0f wide line or lines
         /// thin enough to be drawn using textures, otherwise *3 the number of triangles)
         const ANTI_ALIASED_LINES = sys::ImDrawListFlags_AntiAliasedLines;
