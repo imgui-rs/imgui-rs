@@ -4,13 +4,12 @@ on:
   push:
     branches:
       - main
-  schedule:
-    - cron: "0 0 * * 1"
 
 jobs:
   rustfmt:
     name: Check rustfmt
     runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -19,10 +18,11 @@ jobs:
   clippy:
     name: Run linter
     runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
 
     strategy:
       matrix:
-        rust: ["1.64"]
+        rust: ["1.70"]
 
     env:
       RUSTFLAGS: -D warnings
@@ -81,7 +81,7 @@ jobs:
       matrix:
         rust:
           - stable
-          - "1.64"
+          - "1.70"
         os:
           - ubuntu-latest
           - macos-latest

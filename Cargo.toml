@@ -10,3 +10,6 @@ members = [
     "imgui-examples",
     "xtask",
 ]
+
+package.rust-version = "1.70"
+resolver = "2"

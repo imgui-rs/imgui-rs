@@ -52,7 +52,6 @@ impl DrawData {
     /// Returns the number of draw lists included in the draw data.
     #[inline]
     pub fn draw_lists_count(&self) -> usize {
-        use std::convert::TryInto;
         self.cmd_lists_count.try_into().unwrap()
     }
     #[inline]
