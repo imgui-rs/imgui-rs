@@ -252,7 +252,7 @@ impl Ui {
     ///
     /// This does not take a label, which means that multiple calls **in a row** will use the same label, which
     /// is based on the last node which had a label. Text and other non-interactive elements generally don't have
-    /// ids, so you'll need to use [begin_popup_context_with_label] for them.
+    /// ids, so you'll need to use [begin_popup_context_with_label](Self::begin_popup_context_with_label) for them.
     #[doc(alias = "BeginPopupContextItem")]
     pub fn begin_popup_context_item(&self) -> Option<PopupToken<'_>> {
         let render = unsafe {
@@ -272,7 +272,7 @@ impl Ui {
     /// Open and begin popup when clicked with the right mouse button on the given item with a dedicated label.
     ///
     /// If you want to use the label of the previous popup (outside of `Text` and other non-interactive cases, that
-    /// is the more normal case), use [begin_popup_context_item].
+    /// is the more normal case), use [begin_popup_context_item](Self::begin_popup_context_item).
     #[doc(alias = "BeginPopupContextItem")]
     pub fn begin_popup_context_with_label<Label: AsRef<str>>(
         &self,
@@ -296,7 +296,7 @@ impl Ui {
     ///
     /// This does not take a label, which means that multiple calls will use the same provided label.
     /// If you want an explicit label, such as having two different kinds of windows popups in your program,
-    /// use [begin_popup_context_window_with_label].
+    /// use [begin_popup_context_window_with_label](Self::begin_popup_context_window_with_label).
     #[doc(alias = "BeginPopupContextWindow")]
     pub fn begin_popup_context_window(&self) -> Option<PopupToken<'_>> {
         let render = unsafe {
@@ -340,7 +340,7 @@ impl Ui {
     ///
     /// This does not take a label, which means that multiple calls will use the same provided label.
     /// If you want an explicit label, such as having two different kinds of void popups in your program,
-    /// use [begin_popup_context_void_with_label].
+    /// use [begin_popup_context_void_with_label](Self::begin_popup_context_void_with_label).
     #[doc(alias = "BeginPopupContextWindow")]
     pub fn begin_popup_context_void(&self) -> Option<PopupToken<'_>> {
         let render = unsafe {
