@@ -248,7 +248,7 @@ impl Ui {
         unsafe { sys::igCloseCurrentPopup() };
     }
 
-    /// Open+begin popup when clicked with the right mouse button on last item.
+    /// Open and begin popup when clicked with the right mouse button on last item.
     /// If you want to use that on a non-interactive item such as text() use [`Self::begin_popup_context_item_id`].
     #[doc(alias = "BeginPopupContextItem")]
     pub fn begin_popup_context_item(&self) -> Option<PopupToken<'_>> {
@@ -266,7 +266,7 @@ impl Ui {
         }
     }
 
-    /// Open+begin popup when clicked with the right mouse button on the given item.
+    /// Open and begin popup when clicked with the right mouse button on the given item.
     /// If you want to use the last item and it has an id you, you can use [`Self::begin_popup_context_item`].
     #[doc(alias = "BeginPopupContextItem")]
     pub fn begin_popup_context_item_id<Label: AsRef<str>>(
@@ -287,7 +287,7 @@ impl Ui {
         }
     }
 
-    /// Open+begin popup when clicked on current window.
+    /// Open and begin popup when clicked on current window.
     #[doc(alias = "BeginPopupContextWindow")]
     pub fn begin_popup_context_window<Label: AsRef<str>>(
         &self,
@@ -307,14 +307,14 @@ impl Ui {
         }
     }
 
-    /// Open+begin popup when clicked in void (where there are no windows).
+    /// Open and begin popup when right clicked in void (where there are no windows).
     #[doc(alias = "BeginPopupContextVoid")]
     pub fn begin_popup_context_void<Label: AsRef<str>>(
         &self,
         str_id: Label,
     ) -> Option<PopupToken<'_>> {
         let render = unsafe {
-            sys::igBeginPopupContextWindow(
+            sys::igBeginPopupContextVoid(
                 self.scratch_txt(str_id),
                 imgui_sys::ImGuiPopupFlags_MouseButtonRight as i32,
             )
