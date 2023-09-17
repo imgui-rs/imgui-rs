@@ -1,7 +1,7 @@
 [package]
 name = "imgui-sdl2-support"
 version = "0.11.0"
-edition = "2018"
+edition = "2021"
 authors = ["The imgui-rs Developers"]
 description = "sdl2 support code for the imgui crate"
 homepage = "https://github.com/imgui-rs/imgui-rs"

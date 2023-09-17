@@ -1,7 +1,7 @@
 [package]
 name = "imgui"
 version = "0.11.0"
-edition = "2018"
+edition = "2021"
 description = "High-level Rust bindings to dear imgui"
 homepage = "https://github.com/imgui-rs/imgui-rs"
 repository = "https://github.com/imgui-rs/imgui-rs"
