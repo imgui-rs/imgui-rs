@@ -19,11 +19,6 @@ jobs:
     name: Run linter
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
-
-    strategy:
-      matrix:
-        rust: ["1.70"]
-
     env:
       RUSTFLAGS: -D warnings
       RUSTDOCFLAGS: -D warnings
@@ -33,7 +28,6 @@ jobs:
       - uses: hecrj/setup-rust-action@v1
         with:
           components: clippy
-          rust-version: ${{ matrix.rust }}
       - name: Cache cargo directories
         uses: actions/cache@v2
         with:
@@ -80,7 +74,6 @@ jobs:
       fail-fast: false
       matrix:
         rust:
-          - stable
           - "1.70"
         os:
           - ubuntu-latest
