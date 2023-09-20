@@ -9,48 +9,46 @@ impl Bindgen {
         let output = self
             .output_path
             .map(PathBuf::from)
-            .unwrap_or_else(|| root.join("imgui-sys/src"));
+            .unwrap_or_else(|| root.join("imgui-sys2/src"));
 
-        let wasm_name = self
-            .wasm_import_name
-            .or_else(|| std::env::var("IMGUI_RS_WASM_IMPORT_NAME").ok())
-            .unwrap_or_else(|| "imgui-sys-v0".to_string());
+        for variant in ["master" /* "docking" */] {
+            // let additional = match flag {
+            //     None => "".to_string(),
+            //     Some(x) => format!("-{}", x),
+            // };
+            let dear_bindings = root.join(&format!(
+                "imgui-sys2/third-party/imgui-{}",
+                variant,
+                // additional
+            ));
 
-        for variant in ["master", "docking"] {
-            for flag in [None, Some("freetype")] {
-                let additional = match flag {
-                    None => "".to_string(),
-                    Some(x) => format!("-{}", x),
-                };
-                let cimgui_output = root.join(&format!(
-                    "imgui-sys/third-party/imgui-{}{}",
-                    variant, additional
-                ));
+            let types = get_types(&dear_bindings.join("structs_and_enums.json"))?;
+            let funcs = get_definitions(&dear_bindings.join("definitions.json"))?;
+            let header = dear_bindings.join("cimgui.h");
 
-                let types = get_types(&cimgui_output.join("structs_and_enums.json"))?;
-                let funcs = get_definitions(&cimgui_output.join("definitions.json"))?;
-                let header = cimgui_output.join("cimgui.h");
+            let output_name = "exp_bindings.rs";
 
-                let output_name = match (variant, flag) {
-                    ("master", None) => "bindings.rs".to_string(),
-                    ("master", Some(f)) => format!("{}_bindings.rs", f),
-                    (var, None) => format!("{}_bindings.rs", var),
-                    (var, Some(f)) => format!("{}_{}_bindings.rs", var, f),
-                };
+            // let output_name = match (variant, flag) {
+            //     ("master", None) => "bindings.rs".to_string(),
+            //     ("master", Some(f)) => format!("{}_bindings.rs", f),
+            //     (var, None) => format!("{}_bindings.rs", var),
+            //     (var, Some(f)) => format!("{}_{}_bindings.rs", var, f),
+            // };
 
-                generate_binding_file(&header, &output.join(&output_name), &types, &funcs, None)?;
-                generate_binding_file(
-                    &header,
-                    &output.join(&format!("wasm_{}", &output_name)),
-                    &types,
-                    &funcs,
-                    Some(&wasm_name),
-                )?;
-            }
+            generate_binding_file(&header, &output.join(output_name), &types, &funcs, None)?;
         }
 
         Ok(())
     }
+}
+
+#[derive(serde::Deserialize)]
+struct DearBindingsJson {
+    defines: [],
+    enums: [],
+    typedefs: [],
+    structs: [],
+    functions: [],
 }
 
 fn get_types(structs_and_enums: &Path) -> Result<Vec<String>> {
