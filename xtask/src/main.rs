@@ -1,9 +1,17 @@
-mod bindgen;
-mod flags;
-
 use anyhow::Result;
-use flags::*;
-use std::path::{Path, PathBuf};
+use camino::Utf8Path;
+use clap::Parser;
+
+/// This is a build utility for generating bindings for a new imgui file.
+/// We use this, rather than a shell or bash file, since contributors know Rust,
+/// and we want to allow the use of Rust to maintain this project.
+#[derive(Parser)]
+struct Cli {
+    #[clap(default_value = "./imgui-sys2/third-party")]
+    third_party: camino::Utf8PathBuf,
+    #[clap(default_value = "./imgui-sys2/src")]
+    output_folder: camino::Utf8PathBuf,
+}
 
 fn main() {
     if let Err(e) = try_main() {
@@ -11,64 +19,126 @@ fn main() {
         for cause in e.chain().skip(1) {
             eprintln!("Caused By: {}", cause);
         }
-        std::process::exit(-1);
+        std::process::exit(1);
     }
 }
 
 fn try_main() -> Result<()> {
-    let root = project_root();
-    let _d = xshell::pushd(root)?;
-    let flags = flags::Xtask::from_env()?;
-    if flags.verbose {
-        VERBOSE.store(true, std::sync::atomic::Ordering::Relaxed);
+    let cli = Cli::parse();
+
+    for variant in ["master" /* "docking" */] {
+        // let additional = match flag {
+        //     None => "".to_string(),
+        //     Some(x) => format!("-{}", x),
+        // };
+        let dear_bindings = cli.third_party.join(&format!(
+            "imgui-{}",
+            variant,
+            // additional
+        ));
+
+        let data: DearBindingsJson = serde_json::from_str(
+            &std::fs::read_to_string(dear_bindings.join("cimgui.json"))
+                .expect("no dear_bindings.json"),
+        )
+        .expect("bad bindings?");
+        let mut types: Vec<String> = data.structs.into_iter().map(|v| v.name).collect();
+        types.extend(data.enums.into_iter().map(|v| v.name));
+
+        let funcs: Vec<_> = data
+            .functions
+            .into_iter()
+            .filter_map(|func| {
+                let valid = !func.arguments.iter().any(|arg| arg.is_varargs);
+                valid.then_some(func.name)
+            })
+            .collect();
+        let header = dear_bindings.join("cimgui.h");
+        let output_name = "exp_bindings.rs";
+
+        // let output_name = match (variant, flag) {
+        //     ("master", None) => "bindings.rs".to_string(),
+        //     ("master", Some(f)) => format!("{}_bindings.rs", f),
+        //     (var, None) => format!("{}_bindings.rs", var),
+        //     (var, Some(f)) => format!("{}_{}_bindings.rs", var, f),
+        // };
+
+        generate_binding_file(
+            &header,
+            &cli.output_folder.join(output_name),
+            &types,
+            &funcs,
+        )?;
     }
-    match flags.subcommand {
-        XtaskCmd::Help(_) => eprintln!("{}", flags::Xtask::HELP),
-        XtaskCmd::Lint(_) => lint_all()?,
-        XtaskCmd::Test(_) => test_all()?,
-        XtaskCmd::Bindgen(cmd) => cmd.run()?,
+
+    Ok(())
+}
+
+#[derive(serde::Deserialize)]
+struct DearBindingsJson {
+    enums: Vec<StringHolder>,
+    structs: Vec<StringHolder>,
+    functions: Vec<Function>,
+}
+
+/// We don't need the rest that serde can parse, so we just bind a name
+#[derive(serde::Deserialize)]
+struct StringHolder {
+    name: String,
+}
+
+#[derive(serde::Deserialize)]
+struct Function {
+    name: String,
+    arguments: Vec<Argument>,
+}
+
+#[derive(serde::Deserialize)]
+struct Argument {
+    is_varargs: bool,
+}
+
+fn generate_binding_file(
+    header: &Utf8Path,
+    output: &Utf8Path,
+    types: &[String],
+    funcs: &[String],
+) -> Result<()> {
+    let mut builder = bindgen::Builder::default()
+        .size_t_is_usize(true)
+        .prepend_enum_name(false)
+        .layout_tests(false)
+        .derive_default(true)
+        .derive_partialeq(true)
+        .derive_eq(true)
+        .derive_hash(true)
+        .impl_debug(true)
+        .use_core()
+        .blocklist_type("__darwin_size_t")
+        .raw_line("#![allow(nonstandard_style, clippy::all)]")
+        .ctypes_prefix("cty")
+        .header(header.as_str());
+
+    for t in types {
+        builder = builder.allowlist_type(t);
     }
+
+    for t in funcs {
+        builder = builder.allowlist_function(t);
+    }
+
+    eprintln!("Executing bindgen...");
+    let bindgen_output = builder.generate();
+
+    match bindgen_output {
+        Ok(v) => {
+            v.write_to_file(output).unwrap();
+            eprintln!("Success [output = {}]", output);
+        }
+        Err(e) => {
+            anyhow::bail!("Failed to execute bindgen: {}, see output for details", e);
+        }
+    }
+
     Ok(())
-}
-
-fn lint_all() -> Result<()> {
-    // Lint with only default, only docking, and only freetype, and everything
-    xshell::cmd!("cargo clippy --workspace --all-targets").run()?;
-    xshell::cmd!("cargo clippy --workspace --all-targets --features docking").run()?;
-    xshell::cmd!("cargo clippy --workspace --all-targets --features freetype").run()?;
-    xshell::cmd!("cargo clippy --workspace --all-targets --all-features").run()?;
-
-    // Check formatting
-    xshell::cmd!("cargo fmt --all -- --check").run()?;
-    Ok(())
-}
-
-fn test_all() -> Result<()> {
-    // Test with default/docking/freetype features
-    xshell::cmd!("cargo test --workspace --all-targets").run()?;
-    xshell::cmd!("cargo test --workspace --all-targets --features docking").run()?;
-    xshell::cmd!("cargo test --workspace --all-targets --features freetype").run()?;
-
-    // Test doc examples
-    xshell::cmd!("cargo test --workspace --doc").run()?;
-
-    // Run heavy tests in release mode
-    xshell::cmd!("cargo test -p imgui --release -- --ignored").run()?;
-    Ok(())
-}
-
-static VERBOSE: std::sync::atomic::AtomicBool = std::sync::atomic::AtomicBool::new(false);
-pub fn verbose() -> bool {
-    VERBOSE.load(std::sync::atomic::Ordering::Relaxed)
-}
-
-pub fn project_root() -> PathBuf {
-    Path::new(
-        &std::env::var("CARGO_MANIFEST_DIR")
-            .unwrap_or_else(|_| env!("CARGO_MANIFEST_DIR").to_owned()),
-    )
-    .ancestors()
-    .nth(1)
-    .unwrap()
-    .to_path_buf()
 }
