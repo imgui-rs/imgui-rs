@@ -2,15 +2,15 @@
 // **DO NOT EDIT DIRECTLY**
 // https://github.com/dearimgui/dear_bindings
 
-#include "imgui.h"
-#include "imgui_internal.h"
+#include "imgui/imgui.h"
+#include "imgui/imgui_internal.h"
 
 #include <stdio.h>
 
 // Wrap this in a namespace to keep it separate from the C++ API
 namespace cimgui
 {
-#include "cimgui.h"
+    #include "cimgui.h"
 }
 
 // Manual helpers

@@ -64,7 +64,7 @@ extern "C"
 #ifdef IMGUI_USER_CONFIG
 #include IMGUI_USER_CONFIG
 #endif // #ifdef IMGUI_USER_CONFIG
-#include "imconfig.h"  //-----------------------------------------------------------------------------
+#include "imgui/imconfig.h"  //-----------------------------------------------------------------------------
 #ifndef IMGUI_DISABLE
 // [SECTION] Header mess
 //-----------------------------------------------------------------------------
