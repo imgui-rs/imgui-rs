@@ -31,22 +31,22 @@ impl Ui {
     /// Returns `true` if the last item is hovered
     #[doc(alias = "IsItemHovered")]
     pub fn is_item_hovered(&self) -> bool {
-        unsafe { sys::igIsItemHovered(0) }
+        unsafe { sys::ImGui_IsItemHovered(0) }
     }
     /// Returns `true` if the last item is hovered based on the given flags
     #[doc(alias = "IsItemHovered")]
     pub fn is_item_hovered_with_flags(&self, flags: ItemHoveredFlags) -> bool {
-        unsafe { sys::igIsItemHovered(flags.bits() as i32) }
+        unsafe { sys::ImGui_IsItemHovered(flags.bits() as i32) }
     }
     /// Returns `true` if the last item is active
     #[doc(alias = "IsItemActive")]
     pub fn is_item_active(&self) -> bool {
-        unsafe { sys::igIsItemActive() }
+        unsafe { sys::ImGui_IsItemActive() }
     }
     #[doc(alias = "IsItemFocused")]
     /// Returns `true` if the last item is focused for keyboard/gamepad navigation
     pub fn is_item_focused(&self) -> bool {
-        unsafe { sys::igIsItemFocused() }
+        unsafe { sys::ImGui_IsItemFocused() }
     }
     /// Returns `true` if the last item is being clicked by `MouseButton::Left`.
     ///
@@ -60,86 +60,80 @@ impl Ui {
     /// Returns `true` if the last item is being clicked
     #[doc(alias = "IsItemClicked")]
     pub fn is_item_clicked_with_button(&self, button: MouseButton) -> bool {
-        unsafe { sys::igIsItemClicked(button as i32) }
+        unsafe { sys::ImGui_IsItemClickedEx(button as i32) }
     }
     /// Returns `true` if the last item is visible
     #[doc(alias = "IsItemVisible")]
     pub fn is_item_visible(&self) -> bool {
-        unsafe { sys::igIsItemVisible() }
+        unsafe { sys::ImGui_IsItemVisible() }
     }
     /// Returns `true` if the last item modified its underlying value this frame or was pressed
     #[doc(alias = "IsItemEdited")]
     pub fn is_item_edited(&self) -> bool {
-        unsafe { sys::igIsItemEdited() }
+        unsafe { sys::ImGui_IsItemEdited() }
     }
     /// Returns `true` if the last item was just made active
     #[doc(alias = "IsItemActivated")]
     pub fn is_item_activated(&self) -> bool {
-        unsafe { sys::igIsItemActivated() }
+        unsafe { sys::ImGui_IsItemActivated() }
     }
     /// Returns `true` if the last item was just made inactive
     #[doc(alias = "IsItemDeactivated")]
     pub fn is_item_deactivated(&self) -> bool {
-        unsafe { sys::igIsItemDeactivated() }
+        unsafe { sys::ImGui_IsItemDeactivated() }
     }
     /// Returns `true` if the last item was just made inactive and made a value change when it was
     #[doc(alias = "IsItemDeactivatedAfterEdit")]
     /// active
     pub fn is_item_deactivated_after_edit(&self) -> bool {
-        unsafe { sys::igIsItemDeactivatedAfterEdit() }
+        unsafe { sys::ImGui_IsItemDeactivatedAfterEdit() }
     }
     /// Returns `true` if the last item open state was toggled
     #[doc(alias = "IsItemToggledOpen")]
     pub fn is_item_toggled_open(&self) -> bool {
-        unsafe { sys::igIsItemToggledOpen() }
+        unsafe { sys::ImGui_IsItemToggledOpen() }
     }
     /// Returns `true` if any item is hovered
     #[doc(alias = "IsAnyItemHovered")]
     pub fn is_any_item_hovered(&self) -> bool {
-        unsafe { sys::igIsAnyItemHovered() }
+        unsafe { sys::ImGui_IsAnyItemHovered() }
     }
     /// Returns `true` if any item is active
     #[doc(alias = "IsAnyItemActive")]
     pub fn is_any_item_active(&self) -> bool {
-        unsafe { sys::igIsAnyItemActive() }
+        unsafe { sys::ImGui_IsAnyItemActive() }
     }
     /// Returns `true` if any item is focused
     #[doc(alias = "IsAnyItemFocused")]
     pub fn is_any_item_focused(&self) -> bool {
-        unsafe { sys::igIsAnyItemFocused() }
+        unsafe { sys::ImGui_IsAnyItemFocused() }
     }
     /// Returns the upper-left bounding rectangle of the last item (in screen coordinates)
     #[doc(alias = "GetItemRectMin")]
     pub fn item_rect_min(&self) -> [f32; 2] {
-        let mut out = sys::ImVec2::zero();
-        unsafe { sys::igGetItemRectMin(&mut out) }
-        out.into()
+        unsafe { sys::ImGui_GetItemRectMin().into() }
     }
     /// Returns the lower-right bounding rectangle of the last item (in screen coordinates)
     #[doc(alias = "GetItemRectMax")]
     pub fn item_rect_max(&self) -> [f32; 2] {
-        let mut out = sys::ImVec2::zero();
-        unsafe { sys::igGetItemRectMax(&mut out) }
-        out.into()
+        unsafe { sys::ImGui_GetItemRectMax().into() }
     }
     /// Returns the size of the last item
     #[doc(alias = "GetItemRectSize")]
     pub fn item_rect_size(&self) -> [f32; 2] {
-        let mut out = sys::ImVec2::zero();
-        unsafe { sys::igGetItemRectSize(&mut out) }
-        out.into()
+        unsafe { sys::ImGui_GetItemRectSize().into() }
     }
     /// Allows the last item to be overlapped by a subsequent item.
     ///
     /// Both may be activated during the same frame before the later one takes priority.
     #[doc(alias = "SetItemAllowOverlap")]
     pub fn set_item_allow_overlap(&self) {
-        unsafe { sys::igSetItemAllowOverlap() };
+        unsafe { sys::ImGui_SetItemAllowOverlap() };
     }
     /// Makes the last item the default focused item of the window
     #[doc(alias = "SetItemDefaultFocus")]
     pub fn set_item_default_focus(&self) {
-        unsafe { sys::igSetItemDefaultFocus() };
+        unsafe { sys::ImGui_SetItemDefaultFocus() };
     }
 }
 
@@ -148,7 +142,7 @@ impl Ui {
     /// Returns `true` if the rectangle (of given size, starting from cursor position) is visible
     #[doc(alias = "IsRectVisibleNil")]
     pub fn is_cursor_rect_visible(&self, size: impl Into<MintVec2>) -> bool {
-        unsafe { sys::igIsRectVisible_Nil(size.into().into()) }
+        unsafe { sys::ImGui_IsRectVisibleBySize(size.into().into()) }
     }
     /// Returns `true` if the rectangle (in screen coordinates) is visible
     #[doc(alias = "IsRectVisibleNilVec2")]
@@ -157,21 +151,21 @@ impl Ui {
         rect_min: impl Into<MintVec2>,
         rect_max: impl Into<MintVec2>,
     ) -> bool {
-        unsafe { sys::igIsRectVisible_Vec2(rect_min.into().into(), rect_max.into().into()) }
+        unsafe { sys::ImGui_IsRectVisible(rect_min.into().into(), rect_max.into().into()) }
     }
     /// Returns the global imgui-rs time.
     ///
     /// Incremented by Io::delta_time every frame.
     #[doc(alias = "GetTime")]
     pub fn time(&self) -> f64 {
-        unsafe { sys::igGetTime() }
+        unsafe { sys::ImGui_GetTime() }
     }
     /// Returns the global imgui-rs frame count.
     ///
     /// Incremented by 1 every frame.
     #[doc(alias = "GetFrameCount")]
     pub fn frame_count(&self) -> i32 {
-        unsafe { sys::igGetFrameCount() }
+        unsafe { sys::ImGui_GetFrameCount() }
     }
     /// Returns a single style color from the user interface style.
     ///
@@ -206,6 +200,6 @@ impl Ui {
     #[doc(alias = "GetStyle")]
     pub unsafe fn style(&self) -> &Style {
         // safe because Style is a transparent wrapper around sys::ImGuiStyle
-        &*(sys::igGetStyle() as *const Style)
+        &*(sys::ImGui_GetStyle() as *const Style)
     }
 }

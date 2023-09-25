@@ -8,28 +8,28 @@ impl Ui {
     /// Value is between 0.0 and self.scroll_max_x().
     #[doc(alias = "GetScrollX")]
     pub fn scroll_x(&self) -> f32 {
-        unsafe { sys::igGetScrollX() }
+        unsafe { sys::ImGui_GetScrollX() }
     }
     /// Returns the vertical scrolling position.
     ///
     /// Value is between 0.0 and self.scroll_max_y().
     #[doc(alias = "GetScrollY")]
     pub fn scroll_y(&self) -> f32 {
-        unsafe { sys::igGetScrollY() }
+        unsafe { sys::ImGui_GetScrollY() }
     }
     /// Returns the maximum horizontal scrolling position.
     ///
     /// Roughly equal to content size X - window size X.
     #[doc(alias = "GetScrollMaxX")]
     pub fn scroll_max_x(&self) -> f32 {
-        unsafe { sys::igGetScrollMaxX() }
+        unsafe { sys::ImGui_GetScrollMaxX() }
     }
     /// Returns the maximum vertical scrolling position.
     ///
     /// Roughly equal to content size Y - window size Y.
     #[doc(alias = "GetScrollMaxY")]
     pub fn scroll_max_y(&self) -> f32 {
-        unsafe { sys::igGetScrollMaxY() }
+        unsafe { sys::ImGui_GetScrollMaxY() }
     }
     /// Sets the horizontal scrolling position
     #[doc(alias = "SetScrollX")]
@@ -37,9 +37,9 @@ impl Ui {
         unsafe {
             cfg_if::cfg_if! {
                 if #[cfg(feature = "docking")] {
-                    sys::igSetScrollX_Float(scroll_x);
+                    sys::ImGui_SetScrollX_Float(scroll_x);
                 } else {
-                    sys::igSetScrollX(scroll_x);
+                    sys::ImGui_SetScrollX(scroll_x);
                 }
             }
         }
@@ -50,9 +50,9 @@ impl Ui {
         unsafe {
             cfg_if::cfg_if! {
                 if #[cfg(feature = "docking")] {
-                    sys::igSetScrollY_Float(scroll_y);
+                    sys::ImGui_SetScrollY_Float(scroll_y);
                 } else {
-                    sys::igSetScrollY(scroll_y);
+                    sys::ImGui_SetScrollY(scroll_y);
                 }
             }
         }
@@ -73,7 +73,7 @@ impl Ui {
     /// - `1.0`: right
     #[doc(alias = "SetScrollHereX")]
     pub fn set_scroll_here_x_with_ratio(&self, center_x_ratio: f32) {
-        unsafe { sys::igSetScrollHereX(center_x_ratio) };
+        unsafe { sys::ImGui_SetScrollHereX(center_x_ratio) };
     }
     /// Adjusts the vertical scroll position to make the current cursor position visible
     ///
@@ -91,7 +91,7 @@ impl Ui {
     /// - `1.0`: bottom
     #[doc(alias = "SetScrollHereY")]
     pub fn set_scroll_here_y_with_ratio(&self, center_y_ratio: f32) {
-        unsafe { sys::igSetScrollHereY(center_y_ratio) };
+        unsafe { sys::ImGui_SetScrollHereY(center_y_ratio) };
     }
     #[doc(alias = "SetScrollFromPosX")]
     /// Adjusts the horizontal scroll position to make the given position visible
@@ -113,9 +113,9 @@ impl Ui {
         unsafe {
             cfg_if::cfg_if! {
                 if #[cfg(feature = "docking")] {
-                    sys::igSetScrollFromPosX_Float(local_x, center_x_ratio)
+                    sys::ImGui_SetScrollFromPosX_Float(local_x, center_x_ratio)
                 } else {
-                    sys::igSetScrollFromPosX(local_x, center_x_ratio)
+                    sys::ImGui_SetScrollFromPosX(local_x, center_x_ratio)
                 }
             }
         };
@@ -140,9 +140,9 @@ impl Ui {
         unsafe {
             cfg_if::cfg_if! {
                 if #[cfg(feature = "docking")] {
-                    sys::igSetScrollFromPosY_Float(local_y, center_y_ratio);
+                    sys::ImGui_SetScrollFromPosY_Float(local_y, center_y_ratio);
                 } else {
-                    sys::igSetScrollFromPosY(local_y, center_y_ratio);
+                    sys::ImGui_SetScrollFromPosY(local_y, center_y_ratio);
                 }
             }
         }

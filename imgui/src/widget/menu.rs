@@ -13,7 +13,7 @@ impl Ui {
     #[must_use]
     #[doc(alias = "BeginMainMenuBar")]
     pub fn begin_main_menu_bar(&self) -> Option<MainMenuBarToken<'_>> {
-        if unsafe { sys::igBeginMainMenuBar() } {
+        if unsafe { sys::ImGui_BeginMainMenuBar() } {
             Some(MainMenuBarToken::new(self))
         } else {
             None
@@ -37,7 +37,7 @@ impl Ui {
     #[must_use]
     #[doc(alias = "BeginMenuBar")]
     pub fn begin_menu_bar(&self) -> Option<MenuBarToken<'_>> {
-        if unsafe { sys::igBeginMenuBar() } {
+        if unsafe { sys::ImGui_BeginMenuBar() } {
             Some(MenuBarToken::new(self))
         } else {
             None
@@ -81,7 +81,7 @@ impl Ui {
         label: impl AsRef<str>,
         enabled: bool,
     ) -> Option<MenuToken<'_>> {
-        if unsafe { sys::igBeginMenu(self.scratch_txt(label), enabled) } {
+        if unsafe { sys::ImGui_BeginMenu(self.scratch_txt(label), enabled) } {
             Some(MenuToken::new(self))
         } else {
             None
@@ -204,7 +204,7 @@ impl<'ui, Label: AsRef<str>, Shortcut: AsRef<str>> MenuItem<'ui, Label, Shortcut
     pub fn build(self) -> bool {
         unsafe {
             let (label, shortcut) = self.ui.scratch_txt_with_opt(self.label, self.shortcut);
-            sys::igMenuItem_Bool(label, shortcut, self.selected, self.enabled)
+            sys::ImGui_MenuItem_Bool(label, shortcut, self.selected, self.enabled)
         }
     }
 
@@ -226,7 +226,7 @@ create_token!(
     pub struct MainMenuBarToken<'ui>;
 
     /// Ends a main menu bar
-    drop { sys::igEndMainMenuBar() }
+    drop { sys::ImGui_EndMainMenuBar() }
 );
 
 create_token!(
@@ -235,7 +235,7 @@ create_token!(
     pub struct MenuBarToken<'ui>;
 
     /// Ends a menu bar
-    drop { sys::igEndMenuBar() }
+    drop { sys::ImGui_EndMenuBar() }
 );
 
 create_token!(
@@ -244,5 +244,5 @@ create_token!(
     pub struct MenuToken<'ui>;
 
     /// Ends a menu
-    drop { sys::igEndMenu() }
+    drop { sys::ImGui_EndMenu() }
 );

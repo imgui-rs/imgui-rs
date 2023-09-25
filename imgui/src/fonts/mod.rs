@@ -12,25 +12,23 @@ impl Ui {
     /// Returns the current font
     #[doc(alias = "GetFont")]
     pub fn current_font(&self) -> &Font {
-        unsafe { Font::from_raw(&*sys::igGetFont()) }
+        unsafe { Font::from_raw(&*sys::ImGui_GetFont()) }
     }
     /// Returns the current font size (= height in pixels) with font scale applied
     #[doc(alias = "GetFontSize")]
     pub fn current_font_size(&self) -> f32 {
-        unsafe { sys::igGetFontSize() }
+        unsafe { sys::ImGui_GetFontSize() }
     }
     /// Returns the UV coordinate for a white pixel.
     ///
     /// Useful for drawing custom shapes with the draw list API.
     #[doc(alias = "FontTexUvWhitePixel")]
     pub fn font_tex_uv_white_pixel(&self) -> [f32; 2] {
-        let mut out = sys::ImVec2::zero();
-        unsafe { sys::igGetFontTexUvWhitePixel(&mut out) };
-        out.into()
+        unsafe { sys::ImGui_GetFontTexUvWhitePixel().into() }
     }
     /// Sets the font scale of the current window
     #[doc(alias = "SetWindowFontScale")]
     pub fn set_window_font_scale(&self, scale: f32) {
-        unsafe { sys::igSetWindowFontScale(scale) }
+        unsafe { sys::ImGui_SetWindowFontScale(scale) }
     }
 }

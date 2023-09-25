@@ -71,7 +71,7 @@ impl<'ui, 'p, Label: AsRef<str>, Overlay: AsRef<str>> PlotLines<'ui, 'p, Label, 
         unsafe {
             let (label, overlay) = self.ui.scratch_txt_with_opt(self.label, self.overlay_text);
 
-            sys::igPlotLines_FloatPtr(
+            sys::ImGui_PlotLines_FloatPtr(
                 label,
                 self.values.as_ptr() as *const c_float,
                 self.values.len() as i32,

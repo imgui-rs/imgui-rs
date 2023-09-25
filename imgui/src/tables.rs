@@ -304,7 +304,7 @@ impl Ui {
         inner_width: f32,
     ) -> Option<TableToken<'_>> {
         unsafe {
-            sys::igBeginTable(
+            sys::ImGui_BeginTableEx(
                 self.scratch_txt(str_id),
                 column as i32,
                 flags.bits() as i32,
@@ -402,7 +402,7 @@ impl Ui {
     #[inline]
     pub fn table_next_row_with_height(&self, flags: TableRowFlags, min_row_height: f32) {
         unsafe {
-            sys::igTableNextRow(flags.bits() as i32, min_row_height);
+            sys::ImGui_TableNextRowEx(flags.bits() as i32, min_row_height);
         }
     }
 
@@ -439,7 +439,7 @@ impl Ui {
     /// marked as must use, as you can still render commands into the not-visible column,
     /// though you can choose to not as an optimization.
     pub fn table_next_column(&self) -> bool {
-        unsafe { sys::igTableNextColumn() }
+        unsafe { sys::ImGui_TableNextColumn() }
     }
 
     /// Moves onto the given column.
@@ -492,7 +492,7 @@ impl Ui {
             }
         }
 
-        unsafe { sys::igTableSetColumnIndex(column_index as i32) }
+        unsafe { sys::ImGui_TableSetColumnIndex(column_index as i32) }
     }
 
     /// Specify label per column, with no flags and default sizing. You can avoid calling
@@ -535,7 +535,7 @@ impl Ui {
     /// the context menu can also be made available in columns body using [TableFlags::CONTEXT_MENU_IN_BODY].
     pub fn table_setup_column_with<N: AsRef<str>>(&self, data: TableColumnSetup<N>) {
         unsafe {
-            sys::igTableSetupColumn(
+            sys::ImGui_TableSetupColumnEx(
                 self.scratch_txt(data.name),
                 data.flags.bits() as i32,
                 data.init_width_or_weight,
@@ -569,7 +569,7 @@ impl Ui {
     /// trying to make too many columns.
     pub fn table_setup_scroll_freeze(&self, locked_columns: usize, locked_rows: usize) {
         unsafe {
-            sys::igTableSetupScrollFreeze(locked_columns as i32, locked_rows as i32);
+            sys::ImGui_TableSetupScrollFreeze(locked_columns as i32, locked_rows as i32);
         }
     }
 
@@ -589,7 +589,7 @@ impl Ui {
     /// [table_header]: Self::table_header
     pub fn table_headers_row(&self) {
         unsafe {
-            sys::igTableHeadersRow();
+            sys::ImGui_TableHeadersRow();
         }
     }
 
@@ -600,23 +600,23 @@ impl Ui {
     /// and [table_setup_column](Self::table_setup_column).
     pub fn table_header(&self, label: impl AsRef<str>) {
         unsafe {
-            sys::igTableHeader(self.scratch_txt(label));
+            sys::ImGui_TableHeader(self.scratch_txt(label));
         }
     }
 
     /// Gets the numbers of columns in the current table.
     pub fn table_column_count(&self) -> usize {
-        unsafe { sys::igTableGetColumnCount() as usize }
+        unsafe { sys::ImGui_TableGetColumnCount() as usize }
     }
 
     /// Gets the current column index in the current table.
     pub fn table_column_index(&self) -> usize {
-        unsafe { sys::igTableGetColumnIndex() as usize }
+        unsafe { sys::ImGui_TableGetColumnIndex() as usize }
     }
 
     /// Gets the current row index in the current table.
     pub fn table_row_index(&self) -> usize {
-        unsafe { sys::igTableGetRowIndex() as usize }
+        unsafe { sys::ImGui_TableGetRowIndex() as usize }
     }
 
     /// Gets the name of the current column. If there is no currently bound name
@@ -629,11 +629,11 @@ impl Ui {
             // imgui uses utf8...though that is a continuous process there.
             cfg_if::cfg_if! {
                 if #[cfg(feature = "docking")] {
-                    CStr::from_ptr(sys::igTableGetColumnName_Int(-1))
+                    CStr::from_ptr(sys::ImGui_TableGetColumnName_Int(-1))
                         .to_str()
                         .unwrap()
                 } else {
-                    CStr::from_ptr(sys::igTableGetColumnName(-1))
+                    CStr::from_ptr(sys::ImGui_TableGetColumnName(-1))
                         .to_str()
                         .unwrap()
                 }
@@ -650,11 +650,11 @@ impl Ui {
             // imgui uses utf8...though that is a continuous process there.
             cfg_if::cfg_if! {
                 if #[cfg(feature="docking")] {
-                    CStr::from_ptr(sys::igTableGetColumnName_Int(column as i32))
+                    CStr::from_ptr(sys::ImGui_TableGetColumnName_Int(column as i32))
                         .to_str()
                         .unwrap()
                 } else {
-                    CStr::from_ptr(sys::igTableGetColumnName(column as i32))
+                    CStr::from_ptr(sys::ImGui_TableGetColumnName(column as i32))
                         .to_str()
                         .unwrap()
                 }
@@ -665,7 +665,7 @@ impl Ui {
     /// Gets the flags on the current column in the current table.
     pub fn table_column_flags(&self) -> TableColumnFlags {
         unsafe {
-            TableColumnFlags::from_bits(sys::igTableGetColumnFlags(-1) as u32)
+            TableColumnFlags::from_bits(sys::ImGui_TableGetColumnFlags(-1) as u32)
                 .expect("bad column flags")
         }
     }
@@ -675,7 +675,7 @@ impl Ui {
     /// [table_column_flags](Self::table_column_flags).
     pub fn table_column_flags_with_column(&self, column_n: usize) -> TableColumnFlags {
         unsafe {
-            TableColumnFlags::from_bits(sys::igTableGetColumnFlags(column_n as i32) as u32)
+            TableColumnFlags::from_bits(sys::ImGui_TableGetColumnFlags(column_n as i32) as u32)
                 .expect("bad column flags")
         }
     }
@@ -687,7 +687,7 @@ impl Ui {
     /// for arbitrary indices.
     pub fn table_set_bg_color(&self, target: TableBgTarget, color: impl Into<ImColor32>) {
         unsafe {
-            sys::igTableSetBgColor(target.bits() as i32, color.into().into(), -1);
+            sys::ImGui_TableSetBgColor(target.bits() as i32, color.into().into(), -1);
         }
     }
 
@@ -702,7 +702,7 @@ impl Ui {
         column_index: usize,
     ) {
         unsafe {
-            sys::igTableSetBgColor(
+            sys::ImGui_TableSetBgColor(
                 target.bits() as i32,
                 color.into().into(),
                 column_index as i32,
@@ -719,7 +719,7 @@ impl Ui {
     /// Use [table_set_enabled_with_column](Self::table_set_enabled_with_column) to set
     /// for arbitrary indices.
     pub fn table_set_enabled(&self, enabled: bool) {
-        unsafe { sys::igTableSetColumnEnabled(-1, enabled) }
+        unsafe { sys::ImGui_TableSetColumnEnabled(-1, enabled) }
     }
 
     /// Change user accessible enabled/disabled state of the current column.
@@ -728,7 +728,7 @@ impl Ui {
     /// this themselves by right-clicking in headers, or right-clicking in columns body
     /// if [TableFlags::CONTEXT_MENU_IN_BODY].
     pub fn table_set_enabled_with_column(&self, enabled: bool, column_idx: usize) {
-        unsafe { sys::igTableSetColumnEnabled(column_idx as i32, enabled) }
+        unsafe { sys::ImGui_TableSetColumnEnabled(column_idx as i32, enabled) }
     }
 
     /// Gets the sorting data for a table. This will be `None` when not sorting.
@@ -736,7 +736,7 @@ impl Ui {
     /// See the examples folder for how to use the sorting API.
     pub fn table_sort_specs_mut(&self) -> Option<TableSortSpecsMut<'_>> {
         unsafe {
-            let value = sys::igTableGetSortSpecs();
+            let value = sys::ImGui_TableGetSortSpecs();
             if value.is_null() {
                 None
             } else {
@@ -882,5 +882,5 @@ create_token!(
     pub struct TableToken<'ui>;
 
     /// Ends the table.
-    drop { sys::igEndTable() }
+    drop { sys::ImGui_EndTable() }
 );

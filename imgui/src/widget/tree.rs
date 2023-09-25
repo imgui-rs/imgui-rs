@@ -284,20 +284,20 @@ impl<'a, T: AsRef<str>, L: AsRef<str>> TreeNode<'a, T, L> {
     pub fn push(self) -> Option<TreeNodeToken<'a>> {
         let open = unsafe {
             if self.opened_cond != Condition::Never {
-                sys::igSetNextItemOpen(self.opened, self.opened_cond as i32);
+                sys::ImGui_SetNextItemOpen(self.opened, self.opened_cond as i32);
             }
             match self.id {
                 TreeNodeId::Str(id) => match self.label {
                     Some(label) => {
                         let (id, label) = self.ui.scratch_txt_two(id, label);
-                        sys::igTreeNodeEx_StrStr(id, self.flags.bits() as i32, fmt_ptr(), label)
+                        sys::ImGui_TreeNodeEx_StrStr(id, self.flags.bits() as i32, fmt_ptr(), label)
                     }
                     None => {
                         let id = self.ui.scratch_txt(id);
-                        sys::igTreeNodeEx_Str(id, self.flags.bits() as i32)
+                        sys::ImGui_TreeNodeEx_Str(id, self.flags.bits() as i32)
                     }
                 },
-                TreeNodeId::Ptr(id) => sys::igTreeNodeEx_Ptr(
+                TreeNodeId::Ptr(id) => sys::ImGui_TreeNodeEx_Ptr(
                     id,
                     self.flags.bits() as i32,
                     fmt_ptr(),
@@ -357,7 +357,7 @@ impl Drop for TreeNodeToken<'_> {
     #[doc(alias = "TreePop")]
     fn drop(&mut self) {
         if self.1 {
-            unsafe { sys::igTreePop() }
+            unsafe { sys::ImGui_TreePop() }
         }
     }
 }
@@ -470,7 +470,7 @@ impl<T: AsRef<str>> CollapsingHeader<T> {
     #[inline]
     pub fn build(self, ui: &Ui) -> bool {
         unsafe {
-            sys::igCollapsingHeader_TreeNodeFlags(
+            sys::ImGui_CollapsingHeader_TreeNodeFlags(
                 ui.scratch_txt(self.label),
                 self.flags.bits() as i32,
             )
@@ -484,7 +484,7 @@ impl<T: AsRef<str>> CollapsingHeader<T> {
     #[inline]
     pub fn build_with_close_button(self, ui: &Ui, opened: &mut bool) -> bool {
         unsafe {
-            sys::igCollapsingHeader_BoolPtr(
+            sys::ImGui_CollapsingHeader_BoolPtr(
                 ui.scratch_txt(self.label),
                 opened as *mut bool,
                 self.flags.bits() as i32,

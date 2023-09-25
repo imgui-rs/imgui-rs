@@ -106,7 +106,7 @@ create_token!(
     pub struct TabBarToken<'ui>;
 
     /// Ends a tab bar.
-    drop { sys::igEndTabBar() }
+    drop { sys::ImGui_EndTabBar() }
 );
 
 pub struct TabItem<'a, T> {
@@ -163,7 +163,7 @@ create_token!(
     pub struct TabItemToken<'ui>;
 
     /// Ends a tab bar item.
-    drop { sys::igEndTabItem() }
+    drop { sys::ImGui_EndTabItem() }
 );
 
 impl Ui {
@@ -182,12 +182,12 @@ impl Ui {
         flags: TabBarFlags,
     ) -> Option<TabBarToken<'_>> {
         let should_render =
-            unsafe { sys::igBeginTabBar(self.scratch_txt(id), flags.bits() as i32) };
+            unsafe { sys::ImGui_BeginTabBar(self.scratch_txt(id), flags.bits() as i32) };
 
         if should_render {
             Some(TabBarToken::new(self))
         } else {
-            unsafe { sys::igEndTabBar() };
+            unsafe { sys::ImGui_EndTabBar() };
             None
         }
     }
@@ -222,7 +222,7 @@ impl Ui {
         flags: TabItemFlags,
     ) -> Option<TabItemToken<'_>> {
         let should_render = unsafe {
-            sys::igBeginTabItem(
+            sys::ImGui_BeginTabItem(
                 self.scratch_txt(label),
                 opened.map(|x| x as *mut bool).unwrap_or(ptr::null_mut()),
                 flags.bits() as i32,

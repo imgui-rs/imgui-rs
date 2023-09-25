@@ -341,7 +341,7 @@ impl From<&DrawData> for OwnedDrawData {
                 (*result).DisplaySize = other_ptr.DisplaySize;
                 (*result).FramebufferScale = other_ptr.FramebufferScale;
                 (*result).CmdListsCount = other_ptr.CmdListsCount;
-                (*result).CmdLists = sys::igMemAlloc(
+                (*result).CmdLists = sys::ImGui_MemAlloc(
                     size_of::<*mut sys::ImDrawList>() * other_ptr.CmdListsCount as usize,
                 ) as *mut *mut sys::ImDrawList;
                 OwnedDrawData::copy_docking_properties(other_ptr, result);
@@ -369,7 +369,7 @@ impl Drop for OwnedDrawData {
                             sys::ImDrawList_destroy(ptr);
                         }
                     }
-                    sys::igMemFree((*self.draw_data).CmdLists as *mut std::ffi::c_void);
+                    sys::ImGui_MemFree((*self.draw_data).CmdLists as *mut std::ffi::c_void);
                 }
                 sys::ImDrawData_destroy(self.draw_data);
                 self.draw_data = std::ptr::null_mut();
@@ -444,7 +444,7 @@ fn test_owneddrawdata_from_drawdata() {
 #[cfg(test)]
 fn test_owneddrawdata_drop() {
     let (_guard, _ctx) = crate::test::test_ctx();
-    let initial_allocation_count = unsafe { (*sys::igGetIO()).MetricsActiveAllocations };
+    let initial_allocation_count = unsafe { (*sys::ImGui_GetIO()).MetricsActiveAllocations };
 
     // Build a dummy draw data object
     let mut draw_list = sys::ImDrawList::default();
@@ -466,10 +466,10 @@ fn test_owneddrawdata_drop() {
     // Clone it, then drop it, and ensure all allocations are returned
     {
         let _owned_draw_data: OwnedDrawData = draw_data.into();
-        let cloned_allocation_count = unsafe { (*sys::igGetIO()).MetricsActiveAllocations };
+        let cloned_allocation_count = unsafe { (*sys::ImGui_GetIO()).MetricsActiveAllocations };
         assert!(cloned_allocation_count > initial_allocation_count);
         // owned_draw_data is dropped here...
     }
-    let final_allocation_count = unsafe { (*sys::igGetIO()).MetricsActiveAllocations };
+    let final_allocation_count = unsafe { (*sys::ImGui_GetIO()).MetricsActiveAllocations };
     assert_eq!(initial_allocation_count, final_allocation_count);
 }

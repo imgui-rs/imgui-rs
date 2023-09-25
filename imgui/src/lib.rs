@@ -2,7 +2,7 @@
 #![deny(rust_2018_idioms)]
 //#![deny(missing_docs)]
 
-pub extern crate imgui_sys as sys;
+pub extern crate imgui_sys2 as sys;
 
 use std::cell;
 use std::os::raw::c_char;
@@ -104,7 +104,7 @@ pub use core as __core;
 #[doc(alias = "GetVersion")]
 pub fn dear_imgui_version() -> &'static str {
     unsafe {
-        let bytes = std::ffi::CStr::from_ptr(sys::igGetVersion()).to_bytes();
+        let bytes = std::ffi::CStr::from_ptr(sys::ImGui_GetVersion()).to_bytes();
         std::str::from_utf8_unchecked(bytes)
     }
 }
@@ -115,14 +115,14 @@ impl Context {
     /// Incremented by Io::delta_time every frame.
     #[doc(alias = "GetTime")]
     pub fn time(&self) -> f64 {
-        unsafe { sys::igGetTime() }
+        unsafe { sys::ImGui_GetTime() }
     }
     /// Returns the global imgui-rs frame count.
     ///
     /// Incremented by 1 every frame.
     #[doc(alias = "GetFrameCount")]
     pub fn frame_count(&self) -> i32 {
-        unsafe { sys::igGetFrameCount() }
+        unsafe { sys::ImGui_GetFrameCount() }
     }
 }
 
@@ -192,7 +192,7 @@ impl Ui {
     /// Returns an immutable reference to the inputs/outputs object
     #[doc(alias = "GetIO")]
     pub fn io(&self) -> &Io {
-        unsafe { &*(sys::igGetIO() as *const Io) }
+        unsafe { &*(sys::ImGui_GetIO() as *const Io) }
     }
 
     /// Returns an immutable reference to the font atlas.
@@ -228,7 +228,7 @@ impl Ui {
     /// You probably *don't want this function.* If you want to render your data, use `Context::render` now.
     pub fn end_frame_early(&mut self) {
         unsafe {
-            sys::igEndFrame();
+            sys::ImGui_EndFrame();
         }
     }
 }
@@ -240,7 +240,7 @@ impl Ui {
     #[doc(alias = "ShowDemoWindow")]
     pub fn show_demo_window(&self, opened: &mut bool) {
         unsafe {
-            sys::igShowDemoWindow(opened);
+            sys::ImGui_ShowDemoWindow(opened);
         }
     }
     /// Renders an about window.
@@ -249,7 +249,7 @@ impl Ui {
     #[doc(alias = "ShowAboutWindow")]
     pub fn show_about_window(&self, opened: &mut bool) {
         unsafe {
-            sys::igShowAboutWindow(opened);
+            sys::ImGui_ShowAboutWindow(opened);
         }
     }
     /// Renders a metrics/debug window.
@@ -259,25 +259,25 @@ impl Ui {
     #[doc(alias = "ShowMetricsWindow")]
     pub fn show_metrics_window(&self, opened: &mut bool) {
         unsafe {
-            sys::igShowMetricsWindow(opened);
+            sys::ImGui_ShowMetricsWindow(opened);
         }
     }
     /// Renders a style editor block (not a window) for the given `Style` structure
     #[doc(alias = "ShowStyleEditor")]
     pub fn show_style_editor(&self, style: &mut Style) {
         unsafe {
-            sys::igShowStyleEditor(style.raw_mut());
+            sys::ImGui_ShowStyleEditor(style.raw_mut());
         }
     }
     /// Renders a style editor block (not a window) for the currently active style
     #[doc(alias = "ShowStyleEditor")]
     pub fn show_default_style_editor(&self) {
-        unsafe { sys::igShowStyleEditor(std::ptr::null_mut()) };
+        unsafe { sys::ImGui_ShowStyleEditor(std::ptr::null_mut()) };
     }
     /// Renders a basic help/info block (not a window)
     #[doc(alias = "ShowUserGuide")]
     pub fn show_user_guide(&self) {
-        unsafe { sys::igShowUserGuide() };
+        unsafe { sys::ImGui_ShowUserGuide() };
     }
 }
 
@@ -320,7 +320,7 @@ impl Ui {
     /// Create new [`Id`] from a `usize`. See [`Id`] for details.
     pub fn new_id(&self, input: usize) -> Id {
         let p = input as *const std::os::raw::c_void;
-        let value = unsafe { sys::igGetID_Ptr(p) };
+        let value = unsafe { sys::ImGui_GetIDPtr(p) };
 
         Id(value)
     }
@@ -328,14 +328,14 @@ impl Ui {
     /// Create [`Id`] from i32
     pub fn new_id_int(&self, input: i32) -> Id {
         let p = input as *const std::os::raw::c_void;
-        let value = unsafe { sys::igGetID_Ptr(p) };
+        let value = unsafe { sys::ImGui_GetIDPtr(p) };
         Id(value)
     }
 
     /// Create [`Id`] from a pointer
     pub fn new_id_ptr<T>(&self, input: &T) -> Id {
         let p = input as *const T as *const sys::cty::c_void;
-        let value = unsafe { sys::igGetID_Ptr(p) };
+        let value = unsafe { sys::ImGui_GetIDPtr(p) };
         Id(value)
     }
 
@@ -346,7 +346,7 @@ impl Ui {
         let s1 = s.as_ptr() as *const std::os::raw::c_char;
         let value = unsafe {
             let s2 = s1.add(s.len());
-            sys::igGetID_StrStr(s1, s2)
+            sys::ImGui_GetIDStr(s1, s2)
         };
         Id(value)
     }
@@ -578,7 +578,7 @@ create_token!(
 
     /// Drops the layout tooltip manually. You can also just allow this token
     /// to drop on its own.
-    drop { sys::igEndTooltip() }
+    drop { sys::ImGui_EndTooltip() }
 );
 
 /// # Tooltips
@@ -602,16 +602,16 @@ impl Ui {
     /// ```
     #[doc(alias = "BeginTooltip", alias = "EndTootip")]
     pub fn tooltip<F: FnOnce()>(&self, f: F) {
-        unsafe { sys::igBeginTooltip() };
+        unsafe { sys::ImGui_BeginTooltip() };
         f();
-        unsafe { sys::igEndTooltip() };
+        unsafe { sys::ImGui_EndTooltip() };
     }
     /// Construct a tooltip window that can have any kind of content.
     ///
     /// Returns a `TooltipToken` that must be ended by calling `.end()`
     #[doc(alias = "BeginTooltip")]
     pub fn begin_tooltip(&self) -> TooltipToken<'_> {
-        unsafe { sys::igBeginTooltip() };
+        unsafe { sys::ImGui_BeginTooltip() };
         TooltipToken::new(self)
     }
 
@@ -640,7 +640,7 @@ create_token!(
 
     /// Drops the layout tooltip manually. You can also just allow this token
     /// to drop on its own.
-    drop { sys::igEndDisabled() }
+    drop { sys::ImGui_EndDisabled() }
 );
 
 /// # Disabling widgets
@@ -667,7 +667,7 @@ impl Ui {
 
     #[doc(alias = "BeginDisabled")]
     pub fn begin_disabled(&self, disabled: bool) -> DisabledToken<'_> {
-        unsafe { sys::igBeginDisabled(disabled) };
+        unsafe { sys::ImGui_BeginDisabled(disabled) };
         DisabledToken::new(self)
     }
 
@@ -694,9 +694,9 @@ impl Ui {
     /// ```
     #[doc(alias = "BeginDisabled", alias = "EndDisabled")]
     pub fn disabled<F: FnOnce()>(&self, disabled: bool, f: F) {
-        unsafe { sys::igBeginDisabled(disabled) };
+        unsafe { sys::ImGui_BeginDisabled(disabled) };
         f();
-        unsafe { sys::igEndDisabled() };
+        unsafe { sys::ImGui_EndDisabled() };
     }
 
     /// Same as [`Ui::disabled`] but with logic reversed. See
@@ -736,7 +736,7 @@ impl Ui {
         };
 
         unsafe {
-            sys::igListBox_Str_arr(
+            sys::ImGui_ListBox(
                 label_ptr,
                 current_item,
                 items_inner.as_ptr() as *mut *const c_char,
@@ -771,7 +771,7 @@ impl Ui {
     //     };
 
     //     unsafe {
-    //         sys::igListBoxStr_arr(
+    //         sys::ImGui_ListBoxStr_arr(
     //             label_ptr,
     //             current_item,
     //             items_inner.as_ptr() as *mut *const c_char,
@@ -825,22 +825,20 @@ impl<'ui> Ui {
         hide_text_after_double_hash: bool,
         wrap_width: f32,
     ) -> [f32; 2] {
-        let mut out = sys::ImVec2::zero();
         let text = text.as_ref();
 
         unsafe {
             let start = text.as_ptr();
             let end = start.add(text.len());
 
-            sys::igCalcTextSize(
-                &mut out,
+            sys::ImGui_CalcTextSizeEx(
                 start as *const c_char,
                 end as *const c_char,
                 hide_text_after_double_hash,
                 wrap_width,
             )
-        };
-        out.into()
+            .into()
+        }
     }
 }
 

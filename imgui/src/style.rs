@@ -167,7 +167,7 @@ impl Style {
     #[doc(alias = "StyleColors", alias = "StlyeColorsClassic")]
     pub fn use_classic_colors(&mut self) -> &mut Self {
         unsafe {
-            sys::igStyleColorsClassic(self.raw_mut());
+            sys::ImGui_StyleColorsClassic(self.raw_mut());
         }
         self
     }
@@ -175,7 +175,7 @@ impl Style {
     #[doc(alias = "StyleColors", alias = "StyleColorsDark")]
     pub fn use_dark_colors(&mut self) -> &mut Self {
         unsafe {
-            sys::igStyleColorsDark(self.raw_mut());
+            sys::ImGui_StyleColorsDark(self.raw_mut());
         }
         self
     }
@@ -184,7 +184,7 @@ impl Style {
     #[doc(alias = "StyleColors", alias = "StyleColorsLight")]
     pub fn use_light_colors(&mut self) -> &mut Self {
         unsafe {
-            sys::igStyleColorsLight(self.raw_mut());
+            sys::ImGui_StyleColorsLight(self.raw_mut());
         }
         self
     }
@@ -685,7 +685,7 @@ fn test_style_color_variant_names() {
     for idx in StyleColor::VARIANTS.iter() {
         let our_name = idx.name();
         let their_name = unsafe {
-            let ptr = sys::igGetStyleColorName(*idx as i32);
+            let ptr = sys::ImGui_GetStyleColorName(*idx as i32);
             std::ffi::CStr::from_ptr(ptr as *const _).to_str().unwrap()
         };
 

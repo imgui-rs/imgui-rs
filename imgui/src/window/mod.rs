@@ -118,46 +118,42 @@ impl Ui {
     /// Returns true if the current window appeared during this frame
     #[doc(alias = "IsWindowAppearing")]
     pub fn is_window_appearing(&self) -> bool {
-        unsafe { sys::igIsWindowAppearing() }
+        unsafe { sys::ImGui_IsWindowAppearing() }
     }
     /// Returns true if the current window is in collapsed state (= only the title bar is visible)
     #[doc(alias = "IsWindowCollapsed")]
     pub fn is_window_collapsed(&self) -> bool {
-        unsafe { sys::igIsWindowCollapsed() }
+        unsafe { sys::ImGui_IsWindowCollapsed() }
     }
     /// Returns true if the current window is focused
     #[doc(alias = "IsWindowFocused")]
     pub fn is_window_focused(&self) -> bool {
-        unsafe { sys::igIsWindowFocused(0) }
+        unsafe { sys::ImGui_IsWindowFocused(0) }
     }
     /// Returns true if the current window is focused based on the given flags
     #[doc(alias = "IsWindowFocused")]
     pub fn is_window_focused_with_flags(&self, flags: WindowFocusedFlags) -> bool {
-        unsafe { sys::igIsWindowFocused(flags.bits() as i32) }
+        unsafe { sys::ImGui_IsWindowFocused(flags.bits() as i32) }
     }
     /// Returns true if the current window is hovered
     #[doc(alias = "IsWindowHovered")]
     pub fn is_window_hovered(&self) -> bool {
-        unsafe { sys::igIsWindowHovered(0) }
+        unsafe { sys::ImGui_IsWindowHovered(0) }
     }
     /// Returns true if the current window is hovered based on the given flags
     #[doc(alias = "IsWindowHovered")]
     pub fn is_window_hovered_with_flags(&self, flags: WindowHoveredFlags) -> bool {
-        unsafe { sys::igIsWindowHovered(flags.bits() as i32) }
+        unsafe { sys::ImGui_IsWindowHovered(flags.bits() as i32) }
     }
     /// Returns the position of the current window (in screen space)
     #[doc(alias = "GetWindowPos")]
     pub fn window_pos(&self) -> [f32; 2] {
-        let mut out = sys::ImVec2::zero();
-        unsafe { sys::igGetWindowPos(&mut out) };
-        out.into()
+        unsafe { sys::ImGui_GetWindowPos().into() }
     }
     /// Returns the size of the current window
     #[doc(alias = "GetWindowPos")]
     pub fn window_size(&self) -> [f32; 2] {
-        let mut out = sys::ImVec2::zero();
-        unsafe { sys::igGetWindowSize(&mut out) };
-        out.into()
+        unsafe { sys::ImGui_GetWindowSize().into() }
     }
 }
 
@@ -501,7 +497,7 @@ impl<'ui, 'a, Label: AsRef<str>> Window<'ui, 'a, Label> {
     pub fn begin(self) -> Option<WindowToken<'ui>> {
         if self.pos_cond != Condition::Never {
             unsafe {
-                sys::igSetNextWindowPos(
+                sys::ImGui_SetNextWindowPosEx(
                     self.pos.into(),
                     self.pos_cond as i32,
                     self.pos_pivot.into(),
@@ -509,12 +505,12 @@ impl<'ui, 'a, Label: AsRef<str>> Window<'ui, 'a, Label> {
             };
         }
         if self.size_cond != Condition::Never {
-            unsafe { sys::igSetNextWindowSize(self.size.into(), self.size_cond as i32) };
+            unsafe { sys::ImGui_SetNextWindowSize(self.size.into(), self.size_cond as i32) };
         }
         if let Some((size_min, size_max)) = self.size_constraints {
             // TODO: callback support
             unsafe {
-                sys::igSetNextWindowSizeConstraints(
+                sys::ImGui_SetNextWindowSizeConstraints(
                     size_min.into(),
                     size_max.into(),
                     None,
@@ -523,19 +519,21 @@ impl<'ui, 'a, Label: AsRef<str>> Window<'ui, 'a, Label> {
             };
         }
         if self.content_size.x != 0.0 || self.content_size.y != 0.0 {
-            unsafe { sys::igSetNextWindowContentSize(self.content_size.into()) };
+            unsafe { sys::ImGui_SetNextWindowContentSize(self.content_size.into()) };
         }
         if self.collapsed_cond != Condition::Never {
-            unsafe { sys::igSetNextWindowCollapsed(self.collapsed, self.collapsed_cond as i32) };
+            unsafe {
+                sys::ImGui_SetNextWindowCollapsed(self.collapsed, self.collapsed_cond as i32)
+            };
         }
         if self.focused {
-            unsafe { sys::igSetNextWindowFocus() };
+            unsafe { sys::ImGui_SetNextWindowFocus() };
         }
         if self.bg_alpha.is_finite() {
-            unsafe { sys::igSetNextWindowBgAlpha(self.bg_alpha) };
+            unsafe { sys::ImGui_SetNextWindowBgAlpha(self.bg_alpha) };
         }
         let should_render = unsafe {
-            sys::igBegin(
+            sys::ImGui_Begin(
                 self.ui.scratch_txt(self.name),
                 self.opened
                     .map(|x| x as *mut bool)
@@ -546,7 +544,7 @@ impl<'ui, 'a, Label: AsRef<str>> Window<'ui, 'a, Label> {
         if should_render {
             Some(WindowToken::new(self.ui))
         } else {
-            unsafe { sys::igEnd() };
+            unsafe { sys::ImGui_End() };
             None
         }
     }
@@ -566,5 +564,5 @@ create_token!(
     pub struct WindowToken<'ui>;
 
     /// Ends a window
-    drop { sys::igEnd() }
+    drop { sys::ImGui_End() }
 );

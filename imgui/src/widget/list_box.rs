@@ -41,7 +41,7 @@ impl<T: AsRef<str>> ListBox<T> {
     #[must_use]
     pub fn begin(self, ui: &Ui) -> Option<ListBoxToken<'_>> {
         let should_render =
-            unsafe { sys::igBeginListBox(ui.scratch_txt(self.label), self.size.into()) };
+            unsafe { sys::ImGui_BeginListBox(ui.scratch_txt(self.label), self.size.into()) };
         if should_render {
             Some(ListBoxToken::new(ui))
         } else {
@@ -63,7 +63,7 @@ create_token!(
     pub struct ListBoxToken<'ui>;
 
     /// Ends a list box
-    drop { sys::igEndListBox() }
+    drop { sys::ImGui_EndListBox() }
 );
 
 /// # Convenience functions

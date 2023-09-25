@@ -162,7 +162,7 @@ pub trait PlatformViewportBackend: 'static {
 fn get_platform_ctx() -> &'static mut PlatformViewportContext {
     unsafe {
         // should be safe as it is impossible to call any imgui function on a non-active context.
-        &mut *((*(sys::igGetIO() as *const Io)).backend_platform_user_data
+        &mut *((*(sys::ImGui_GetIO() as *const Io)).backend_platform_user_data
             as *mut PlatformViewportContext)
     }
 }
@@ -171,7 +171,7 @@ fn get_platform_ctx() -> &'static mut PlatformViewportContext {
 fn get_renderer_ctx() -> &'static mut RendererViewportContext {
     unsafe {
         // should be safe as it is impossible to call any imgui function on a non-active context.
-        &mut *((*(sys::igGetIO() as *const Io)).backend_renderer_user_data
+        &mut *((*(sys::ImGui_GetIO() as *const Io)).backend_renderer_user_data
             as *mut RendererViewportContext)
     }
 }

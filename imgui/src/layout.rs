@@ -8,7 +8,7 @@ create_token!(
 
     /// Drops the layout group manually. You can also just allow this token
     /// to drop on its own.
-    drop { sys::igEndGroup() }
+    drop { sys::ImGui_EndGroup() }
 );
 
 /// # Cursor / Layout
@@ -18,7 +18,7 @@ impl Ui {
     /// This becomes a vertical separator inside a menu bar or in horizontal layout mode.
     #[doc(alias = "Separator")]
     pub fn separator(&self) {
-        unsafe { sys::igSeparator() }
+        unsafe { sys::ImGui_Separator() }
     }
 
     /// Call between widgets or groups to layout them horizontally.
@@ -48,25 +48,25 @@ impl Ui {
     /// X position is given in window coordinates.
     #[doc(alias = "SameLine")]
     pub fn same_line_with_spacing(&self, pos_x: f32, spacing_w: f32) {
-        unsafe { sys::igSameLine(pos_x, spacing_w) }
+        unsafe { sys::ImGui_SameLineEx(pos_x, spacing_w) }
     }
 
     /// Undo a `same_line` call or force a new line when in horizontal layout mode
     #[doc(alias = "NewLine")]
     pub fn new_line(&self) {
-        unsafe { sys::igNewLine() }
+        unsafe { sys::ImGui_NewLine() }
     }
     /// Adds vertical spacing
     #[doc(alias = "Spacing")]
     pub fn spacing(&self) {
-        unsafe { sys::igSpacing() }
+        unsafe { sys::ImGui_Spacing() }
     }
     /// Fills a space of `size` in pixels with nothing on the current window.
     ///
     /// Can be used to move the cursor on the window.
     #[doc(alias = "Dummy")]
     pub fn dummy(&self, size: impl Into<MintVec2>) {
-        unsafe { sys::igDummy(size.into().into()) }
+        unsafe { sys::ImGui_Dummy(size.into().into()) }
     }
 
     /// Moves content position to the right by `Style::indent_spacing`
@@ -81,7 +81,7 @@ impl Ui {
     /// Moves content position to the right by `width`
     #[doc(alias = "Indent")]
     pub fn indent_by(&self, width: f32) {
-        unsafe { sys::igIndent(width) };
+        unsafe { sys::ImGui_IndentEx(width) };
     }
     /// Moves content position to the left by `Style::indent_spacing`
     ///
@@ -94,7 +94,7 @@ impl Ui {
     /// Moves content position to the left by `width`
     #[doc(alias = "Unindent")]
     pub fn unindent_by(&self, width: f32) {
-        unsafe { sys::igUnindent(width) };
+        unsafe { sys::ImGui_UnindentEx(width) };
     }
     /// Groups items together as a single item.
     ///
@@ -103,7 +103,7 @@ impl Ui {
     /// Returns a `GroupToken` that must be ended by calling `.end()`
     #[doc(alias = "BeginGroup")]
     pub fn begin_group(&self) -> GroupToken<'_> {
-        unsafe { sys::igBeginGroup() };
+        unsafe { sys::ImGui_BeginGroup() };
         GroupToken::new(self)
     }
     /// Creates a layout group and runs a closure to construct the contents.
@@ -119,59 +119,53 @@ impl Ui {
     /// Returns the cursor position (in window coordinates)
     #[doc(alias = "GetCursorPos")]
     pub fn cursor_pos(&self) -> [f32; 2] {
-        let mut out = sys::ImVec2::zero();
-        unsafe { sys::igGetCursorPos(&mut out) };
-        out.into()
+        unsafe { sys::ImGui_GetCursorPos().into() }
     }
     /// Sets the cursor position (in window coordinates).
     ///
     /// This sets the point on which the next widget will be drawn.
     #[doc(alias = "SetCursorPos")]
     pub fn set_cursor_pos(&self, pos: impl Into<MintVec2>) {
-        unsafe { sys::igSetCursorPos(pos.into().into()) };
+        unsafe { sys::ImGui_SetCursorPos(pos.into().into()) };
     }
     /// Returns the initial cursor position (in window coordinates)
     #[doc(alias = "GetCursorStartPos")]
     pub fn cursor_start_pos(&self) -> [f32; 2] {
-        let mut out = sys::ImVec2::zero();
-        unsafe { sys::igGetCursorStartPos(&mut out) };
-        out.into()
+        unsafe { sys::ImGui_GetCursorStartPos().into() }
     }
     /// Returns the cursor position (in absolute screen coordinates).
     ///
     /// This is especially useful for drawing, as the drawing API uses screen coordinates.
     #[doc(alias = "GetCursorScreenPos")]
     pub fn cursor_screen_pos(&self) -> [f32; 2] {
-        let mut out = sys::ImVec2::zero();
-        unsafe { sys::igGetCursorScreenPos(&mut out) };
-        out.into()
+        unsafe { sys::ImGui_GetCursorScreenPos().into() }
     }
     /// Sets the cursor position (in absolute screen coordinates)
     #[doc(alias = "SetCursorScreenPos")]
     pub fn set_cursor_screen_pos(&self, pos: impl Into<MintVec2>) {
-        unsafe { sys::igSetCursorScreenPos(pos.into().into()) }
+        unsafe { sys::ImGui_SetCursorScreenPos(pos.into().into()) }
     }
     /// Vertically aligns text baseline so that it will align properly to regularly frame items.
     ///
     /// Call this if you have text on a line before a framed item.
     #[doc(alias = "AlignTextToFramePadding")]
     pub fn align_text_to_frame_padding(&self) {
-        unsafe { sys::igAlignTextToFramePadding() };
+        unsafe { sys::ImGui_AlignTextToFramePadding() };
     }
     #[doc(alias = "GetTextLineHeight")]
     pub fn text_line_height(&self) -> f32 {
-        unsafe { sys::igGetTextLineHeight() }
+        unsafe { sys::ImGui_GetTextLineHeight() }
     }
     #[doc(alias = "GetTextLineHeightWithSpacing")]
     pub fn text_line_height_with_spacing(&self) -> f32 {
-        unsafe { sys::igGetTextLineHeightWithSpacing() }
+        unsafe { sys::ImGui_GetTextLineHeightWithSpacing() }
     }
     #[doc(alias = "GetFrameHeight")]
     pub fn frame_height(&self) -> f32 {
-        unsafe { sys::igGetFrameHeight() }
+        unsafe { sys::ImGui_GetFrameHeight() }
     }
     #[doc(alias = "GetFrameLineHeightWithSpacing")]
     pub fn frame_height_with_spacing(&self) -> f32 {
-        unsafe { sys::igGetFrameHeightWithSpacing() }
+        unsafe { sys::ImGui_GetFrameHeightWithSpacing() }
     }
 }

@@ -298,7 +298,7 @@ where
         let o = unsafe {
             if let Some(hint) = self.hint {
                 let (label, hint) = self.ui.scratch_txt_two(self.label, hint);
-                sys::igInputTextWithHint(
+                sys::ImGui_InputTextWithHintEx(
                     label,
                     hint,
                     ptr as *mut sys::cty::c_char,
@@ -310,7 +310,7 @@ where
             } else {
                 let label = self.ui.scratch_txt(self.label);
 
-                sys::igInputText(
+                sys::ImGui_InputTextEx(
                     label,
                     ptr as *mut sys::cty::c_char,
                     capacity,
@@ -456,7 +456,7 @@ impl<'ui, 'p, T: InputTextCallbackHandler, L: AsRef<str>> InputTextMultiline<'ui
         let data = &mut data as *mut _ as *mut c_void;
 
         let o = unsafe {
-            sys::igInputTextMultiline(
+            sys::ImGui_InputTextMultilineEx(
                 self.ui.scratch_txt(self.label),
                 ptr as *mut sys::cty::c_char,
                 capacity,
@@ -519,7 +519,7 @@ impl<'ui, 'p, L: AsRef<str>> InputInt<'ui, 'p, L> {
 
     pub fn build(self) -> bool {
         unsafe {
-            sys::igInputInt(
+            sys::ImGui_InputIntEx(
                 self.ui.scratch_txt(self.label),
                 self.value as *mut i32,
                 self.step,
@@ -579,7 +579,7 @@ impl<'ui, 'p, L: AsRef<str>> InputFloat<'ui, 'p, L> {
             .scratch_txt_with_opt(self.label, self.display_format);
 
         unsafe {
-            sys::igInputFloat(
+            sys::ImGui_InputFloatEx(
                 one,
                 self.value as *mut f32,
                 self.step,
@@ -659,9 +659,9 @@ macro_rules! impl_input_floatn {
     };
 }
 
-impl_input_floatn!(InputFloat2, MintVec2, 2, igInputFloat2);
-impl_input_floatn!(InputFloat3, MintVec3, 3, igInputFloat3);
-impl_input_floatn!(InputFloat4, MintVec4, 4, igInputFloat4);
+impl_input_floatn!(InputFloat2, MintVec2, 2, ImGui_InputFloat2Ex);
+impl_input_floatn!(InputFloat3, MintVec3, 3, ImGui_InputFloat3Ex);
+impl_input_floatn!(InputFloat4, MintVec4, 4, ImGui_InputFloat4Ex);
 
 macro_rules! impl_input_intn {
     ($InputIntN:ident, $MINT_TARGET:ident, $N:expr, $igInputIntN:ident) => {
@@ -713,9 +713,9 @@ macro_rules! impl_input_intn {
     };
 }
 
-impl_input_intn!(InputInt2, MintIVec2, 2, igInputInt2);
-impl_input_intn!(InputInt3, MintIVec3, 3, igInputInt3);
-impl_input_intn!(InputInt4, MintIVec4, 4, igInputInt4);
+impl_input_intn!(InputInt2, MintIVec2, 2, ImGui_InputInt2);
+impl_input_intn!(InputInt3, MintIVec3, 3, ImGui_InputInt3);
+impl_input_intn!(InputInt4, MintIVec4, 4, ImGui_InputInt4);
 
 /// Builder for an input scalar widget.
 #[must_use]
@@ -770,7 +770,7 @@ impl<'ui, 'p, L: AsRef<str>, T: DataTypeKind, F: AsRef<str>> InputScalar<'ui, 'p
                 .ui
                 .scratch_txt_with_opt(self.label, self.display_format);
 
-            sys::igInputScalar(
+            sys::ImGui_InputScalarEx(
                 one,
                 T::KIND as i32,
                 self.value as *mut T as *mut c_void,
@@ -856,7 +856,7 @@ impl<'ui, 'p, L: AsRef<str>, T: DataTypeKind, F: AsRef<str>> InputScalarN<'ui, '
                 .ui
                 .scratch_txt_with_opt(self.label, self.display_format);
 
-            sys::igInputScalarN(
+            sys::ImGui_InputScalarNEx(
                 one,
                 T::KIND as i32,
                 self.values.as_mut_ptr() as *mut c_void,

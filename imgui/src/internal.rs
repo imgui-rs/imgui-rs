@@ -23,9 +23,9 @@ impl<T> ImVector<T> {
 
     pub fn replace_from_slice(&mut self, data: &[T]) {
         unsafe {
-            sys::igMemFree(self.data as *mut _);
+            sys::ImGui_MemFree(self.data as *mut _);
 
-            let buffer_ptr = sys::igMemAlloc(std::mem::size_of_val(data)) as *mut T;
+            let buffer_ptr = sys::ImGui_MemAlloc(std::mem::size_of_val(data)) as *mut T;
             buffer_ptr.copy_from_nonoverlapping(data.as_ptr(), data.len());
 
             self.size = data.len() as i32;

@@ -149,7 +149,7 @@ impl<'ui, T: AsRef<str>, Preview: AsRef<str>> ComboBox<'ui, T, Preview> {
     pub fn begin(self) -> Option<ComboBoxToken<'ui>> {
         let should_render = unsafe {
             let (ptr_one, ptr_two) = self.ui.scratch_txt_with_opt(self.label, self.preview_value);
-            sys::igBeginCombo(ptr_one, ptr_two, self.flags.bits() as i32)
+            sys::ImGui_BeginCombo(ptr_one, ptr_two, self.flags.bits() as i32)
         };
         if should_render {
             Some(ComboBoxToken::new(self.ui))
@@ -172,7 +172,7 @@ create_token!(
     pub struct ComboBoxToken<'ui>;
 
     /// Ends a combo box
-    drop { sys::igEndCombo() }
+    drop { sys::ImGui_EndCombo() }
 );
 
 /// # Convenience functions

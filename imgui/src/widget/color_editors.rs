@@ -334,7 +334,7 @@ where
         let mut as_vec3: [f32; 3] = as_vec3.into();
 
         let changed = unsafe {
-            sys::igColorEdit3(
+            sys::ImGui_ColorEdit3(
                 self.ui.scratch_txt(self.label),
                 as_vec3.as_mut_ptr(),
                 self.flags.bits() as _,
@@ -552,7 +552,7 @@ where
         let mut as_vec4: [f32; 4] = as_vec4.into();
 
         let changed = unsafe {
-            sys::igColorEdit4(
+            sys::ImGui_ColorEdit4(
                 self.ui.scratch_txt(self.label),
                 as_vec4.as_mut_ptr(),
                 self.flags.bits() as _,
@@ -776,7 +776,7 @@ where
         self.flags.insert(ColorEditFlags::NO_ALPHA);
         let mut value: [f32; 3] = (*self.value).into().into();
         let changed = unsafe {
-            sys::igColorPicker3(
+            sys::ImGui_ColorPicker3(
                 self.ui.scratch_txt(self.label),
                 value.as_mut_ptr(),
                 self.flags.bits() as _,
@@ -1008,7 +1008,7 @@ where
         let ref_color = self.ref_color.map(|c| c.as_ptr()).unwrap_or(ptr::null());
 
         let changed = unsafe {
-            sys::igColorPicker4(
+            sys::ImGui_ColorPicker4(
                 self.ui.scratch_txt(self.label),
                 value.as_mut_ptr(),
                 self.flags.bits() as _,
@@ -1171,7 +1171,7 @@ impl<'ui, T: AsRef<str>> ColorButton<'ui, T> {
     /// Returns true if this color button was clicked.
     pub fn build(self) -> bool {
         unsafe {
-            sys::igColorButton(
+            sys::ImGui_ColorButton(
                 self.ui.scratch_txt(self.desc_id),
                 self.color.into(),
                 self.flags.bits() as _,
@@ -1224,7 +1224,7 @@ impl Ui {
     #[doc(alias = "SetColorEditOptions")]
     pub fn set_color_edit_options(&self, flags: ColorEditFlags) {
         unsafe {
-            sys::igSetColorEditOptions(flags.bits() as i32);
+            sys::ImGui_SetColorEditOptions(flags.bits() as i32);
         }
     }
 }

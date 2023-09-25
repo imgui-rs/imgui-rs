@@ -126,7 +126,7 @@ impl<'ui> DrawListMut<'ui> {
         Self::lock_draw_list(DrawListType::Window);
 
         Self {
-            draw_list: unsafe { sys::igGetWindowDrawList() },
+            draw_list: unsafe { sys::ImGui_GetWindowDrawList() },
             draw_list_type: DrawListType::Window,
             _phantom: PhantomData,
         }
@@ -140,9 +140,9 @@ impl<'ui> DrawListMut<'ui> {
                 cfg_if::cfg_if! {
                     if #[cfg(feature = "docking")] {
                         // Has extra overload in docking branch
-                        sys::igGetBackgroundDrawList_Nil()
+                        sys::ImGui_GetBackgroundDrawList_Nil()
                     } else {
-                        sys::igGetBackgroundDrawList()
+                        sys::ImGui_GetBackgroundDrawList()
                     }
                 }
             },
@@ -159,9 +159,9 @@ impl<'ui> DrawListMut<'ui> {
                 cfg_if::cfg_if! {
                     if #[cfg(feature = "docking")] {
                         // Has extra overload in docking branch
-                        sys::igGetForegroundDrawList_Nil()
+                        sys::ImGui_GetForegroundDrawList_Nil()
                     } else {
-                        sys::igGetForegroundDrawList()
+                        sys::ImGui_GetForegroundDrawList()
                     }
                 }
             },
@@ -346,7 +346,7 @@ impl<'ui> DrawListMut<'ui> {
         unsafe {
             let start = text.as_ptr() as *const c_char;
             let end = (start as usize + text.len()) as *const c_char;
-            sys::ImDrawList_AddText_Vec2(
+            sys::ImDrawList_AddTextEx(
                 self.draw_list,
                 pos.into().into(),
                 col.into().into(),
@@ -514,7 +514,7 @@ impl<'ui> Line<'ui> {
     /// Draw the line on the window
     pub fn build(self) {
         unsafe {
-            sys::ImDrawList_AddLine(
+            sys::ImDrawList_AddLineEx(
                 self.draw_list.draw_list,
                 self.p1.into(),
                 self.p2.into(),
@@ -671,7 +671,7 @@ impl<'ui> Rect<'ui> {
     pub fn build(self) {
         if self.filled {
             unsafe {
-                sys::ImDrawList_AddRectFilled(
+                sys::ImDrawList_AddRectFilledEx(
                     self.draw_list.draw_list,
                     self.p1.into(),
                     self.p2.into(),
@@ -682,7 +682,7 @@ impl<'ui> Rect<'ui> {
             }
         } else {
             unsafe {
-                sys::ImDrawList_AddRect(
+                sys::ImDrawList_AddRectEx(
                     self.draw_list.draw_list,
                     self.p1.into(),
                     self.p2.into(),
@@ -756,7 +756,7 @@ impl<'ui> Triangle<'ui> {
             }
         } else {
             unsafe {
-                sys::ImDrawList_AddTriangle(
+                sys::ImDrawList_AddTriangleEx(
                     self.draw_list.draw_list,
                     self.p1.into(),
                     self.p2.into(),
@@ -836,7 +836,7 @@ impl<'ui> Circle<'ui> {
             }
         } else {
             unsafe {
-                sys::ImDrawList_AddCircle(
+                sys::ImDrawList_AddCircleEx(
                     self.draw_list.draw_list,
                     self.center.into(),
                     self.radius,
@@ -975,7 +975,7 @@ impl<'ui> Image<'ui> {
         use std::os::raw::c_void;
 
         unsafe {
-            sys::ImDrawList_AddImage(
+            sys::ImDrawList_AddImageEx(
                 self.draw_list.draw_list,
                 self.texture_id.id() as *mut c_void,
                 self.p_min.into(),
@@ -1065,7 +1065,7 @@ impl<'ui> ImageQuad<'ui> {
         use std::os::raw::c_void;
 
         unsafe {
-            sys::ImDrawList_AddImageQuad(
+            sys::ImDrawList_AddImageQuadEx(
                 self.draw_list.draw_list,
                 self.texture_id.id() as *mut c_void,
                 self.p1.into(),

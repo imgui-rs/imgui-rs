@@ -22,7 +22,7 @@ impl TextFilter {
         let ptr = filter.as_mut_ptr();
         Self {
             id: label,
-            raw: unsafe { sys::ImGuiTextFilter_ImGuiTextFilter(ptr as *mut sys::cty::c_char) },
+            raw: unsafe { sys::ImGuiTextFilter_Build(ptr as *mut sys::cty::c_char) },
         }
     }
 

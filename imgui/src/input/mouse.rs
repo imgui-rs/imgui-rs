@@ -97,48 +97,48 @@ impl Ui {
     pub fn is_mouse_down(&self, button: MouseButton) -> bool {
         cfg_if::cfg_if! {
             if #[cfg(feature = "docking")] {
-                unsafe { sys::igIsMouseDown_Nil(button as i32) }
+                unsafe { sys::ImGui_IsMouseDown_Nil(button as i32) }
             } else {
-                unsafe { sys::igIsMouseDown(button as i32) }
+                unsafe { sys::ImGui_IsMouseDown(button as i32) }
             }
         }
     }
     /// Returns true if any mouse button is held down
     #[doc(alias = "IsAnyMouseDown")]
     pub fn is_any_mouse_down(&self) -> bool {
-        unsafe { sys::igIsAnyMouseDown() }
+        unsafe { sys::ImGui_IsAnyMouseDown() }
     }
     /// Returns true if the given mouse button was clicked (went from !down to down)
     #[doc(alias = "IsMouseClicked")]
     pub fn is_mouse_clicked(&self, button: MouseButton) -> bool {
         cfg_if::cfg_if! {
             if #[cfg(feature = "docking")] {
-                unsafe { sys::igIsMouseClicked_Bool(button as i32, false) }
+                unsafe { sys::ImGui_IsMouseClicked_Bool(button as i32, false) }
             } else {
-                unsafe { sys::igIsMouseClicked(button as i32, false) }
+                unsafe { sys::ImGui_IsMouseClickedEx(button as i32, false) }
             }
         }
     }
     /// Returns true if the given mouse button was double-clicked
     #[doc(alias = "IsMouseDoubleClicked")]
     pub fn is_mouse_double_clicked(&self, button: MouseButton) -> bool {
-        unsafe { sys::igIsMouseDoubleClicked(button as i32) }
+        unsafe { sys::ImGui_IsMouseDoubleClicked(button as i32) }
     }
     /// Returns true if the given mouse button was released (went from down to !down)
     #[doc(alias = "IsMouseReleased")]
     pub fn is_mouse_released(&self, button: MouseButton) -> bool {
         cfg_if::cfg_if! {
             if #[cfg(feature = "docking")] {
-                unsafe { sys::igIsMouseReleased_Nil(button as i32) }
+                unsafe { sys::ImGui_IsMouseReleased_Nil(button as i32) }
             } else {
-                unsafe { sys::igIsMouseReleased(button as i32) }
+                unsafe { sys::ImGui_IsMouseReleased(button as i32) }
             }
         }
     }
     /// Returns true if the mouse is currently dragging with the given mouse button held down
     #[doc(alias = "IsMouseDragging")]
     pub fn is_mouse_dragging(&self, button: MouseButton) -> bool {
-        unsafe { sys::igIsMouseDragging(button as i32, -1.0) }
+        unsafe { sys::ImGui_IsMouseDragging(button as i32, -1.0) }
     }
     /// Returns true if the mouse is currently dragging with the given mouse button held down.
     ///
@@ -146,7 +146,7 @@ impl Ui {
     /// (`io.mouse_drag_threshold`).
     #[doc(alias = "IsMouseDragging")]
     pub fn is_mouse_dragging_with_threshold(&self, button: MouseButton, threshold: f32) -> bool {
-        unsafe { sys::igIsMouseDragging(button as i32, threshold) }
+        unsafe { sys::ImGui_IsMouseDragging(button as i32, threshold) }
     }
     /// Returns true if the mouse is hovering over the given bounding rect.
     ///
@@ -157,14 +157,12 @@ impl Ui {
         r_min: impl Into<MintVec2>,
         r_max: impl Into<MintVec2>,
     ) -> bool {
-        unsafe { sys::igIsMouseHoveringRect(r_min.into().into(), r_max.into().into(), true) }
+        unsafe { sys::ImGui_IsMouseHoveringRectEx(r_min.into().into(), r_max.into().into(), true) }
     }
     /// Returns the mouse position backed up at the time of opening a popup
     #[doc(alias = "GetMousePosOnOpeningCurrentPopup")]
     pub fn mouse_pos_on_opening_current_popup(&self) -> [f32; 2] {
-        let mut out = sys::ImVec2::zero();
-        unsafe { sys::igGetMousePosOnOpeningCurrentPopup(&mut out) };
-        out.into()
+        unsafe { sys::ImGui_GetMousePosOnOpeningCurrentPopup().into() }
     }
 
     /// Returns the delta from the initial position when the left mouse button clicked.
@@ -197,23 +195,21 @@ impl Ui {
     /// (`io.mouse_drag_threshold`).
     #[doc(alias = "GetMouseDragDelta")]
     pub fn mouse_drag_delta_with_threshold(&self, button: MouseButton, threshold: f32) -> [f32; 2] {
-        let mut out = sys::ImVec2::zero();
-        unsafe { sys::igGetMouseDragDelta(&mut out, button as i32, threshold) };
-        out.into()
+        unsafe { sys::ImGui_GetMouseDragDelta(button as i32, threshold).into() }
     }
     /// Resets the current delta from initial clicking position.
     #[doc(alias = "ResetMouseDragDelta")]
     pub fn reset_mouse_drag_delta(&self, button: MouseButton) {
         // This mutates the Io struct, but targets an internal field so there can't be any
         // references to it
-        unsafe { sys::igResetMouseDragDelta(button as i32) }
+        unsafe { sys::ImGui_ResetMouseDragDeltaEx(button as i32) }
     }
     /// Returns the currently desired mouse cursor type.
     ///
     /// Returns `None` if no cursor should be displayed
     #[doc(alias = "GetMouseCursor")]
     pub fn mouse_cursor(&self) -> Option<MouseCursor> {
-        match unsafe { sys::igGetMouseCursor() } {
+        match unsafe { sys::ImGui_GetMouseCursor() } {
             sys::ImGuiMouseCursor_Arrow => Some(MouseCursor::Arrow),
             sys::ImGuiMouseCursor_TextInput => Some(MouseCursor::TextInput),
             sys::ImGuiMouseCursor_ResizeAll => Some(MouseCursor::ResizeAll),
@@ -232,7 +228,7 @@ impl Ui {
     #[doc(alias = "SetMouseCursor")]
     pub fn set_mouse_cursor(&self, cursor_type: Option<MouseCursor>) {
         unsafe {
-            sys::igSetMouseCursor(
+            sys::ImGui_SetMouseCursor(
                 cursor_type
                     .map(|x| x as i32)
                     .unwrap_or(sys::ImGuiMouseCursor_None),
@@ -241,11 +237,11 @@ impl Ui {
     }
     #[doc(alias = "IsMousePosValid")]
     pub fn is_current_mouse_pos_valid(&self) -> bool {
-        unsafe { sys::igIsMousePosValid(ptr::null()) }
+        unsafe { sys::ImGui_IsMousePosValid(ptr::null()) }
     }
     #[doc(alias = "IsMousePosValid")]
     pub fn is_mouse_pos_valid(&self, mouse_pos: impl Into<MintVec2>) -> bool {
-        unsafe { sys::igIsMousePosValid(&mouse_pos.into().into()) }
+        unsafe { sys::ImGui_IsMousePosValid(&mouse_pos.into().into()) }
     }
 }
 

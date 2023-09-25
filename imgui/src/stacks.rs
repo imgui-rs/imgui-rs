@@ -37,7 +37,7 @@ impl Ui {
         let font = fonts
             .get_font(id)
             .expect("Font atlas did not contain the given font");
-        unsafe { sys::igPushFont(font.raw() as *const _ as *mut _) };
+        unsafe { sys::ImGui_PushFont(font.raw() as *const _ as *mut _) };
         FontStackToken::new(self)
     }
     /// Changes a style color by pushing a change to the color stack.
@@ -61,7 +61,7 @@ impl Ui {
         style_color: StyleColor,
         color: impl Into<MintVec4>,
     ) -> ColorStackToken<'_> {
-        unsafe { sys::igPushStyleColor_Vec4(style_color as i32, color.into().into()) };
+        unsafe { sys::ImGui_PushStyleColorImVec4(style_color as i32, color.into().into()) };
         ColorStackToken::new(self)
     }
 
@@ -93,7 +93,7 @@ create_token!(
     pub struct FontStackToken<'ui>;
 
     /// Pops a change from the font stack.
-    drop { sys::igPopFont() }
+    drop { sys::ImGui_PopFont() }
 );
 
 impl FontStackToken<'_> {
@@ -109,7 +109,7 @@ create_token!(
     pub struct ColorStackToken<'ui>;
 
     /// Pops a change from the color stack.
-    drop { sys::igPopStyleColor(1) }
+    drop { sys::ImGui_PopStyleColor() }
 );
 
 impl ColorStackToken<'_> {
@@ -125,7 +125,7 @@ create_token!(
     pub struct StyleStackToken<'ui>;
 
     /// Pops a change from the style stack.
-    drop { sys::igPopStyleVar(1) }
+    drop { sys::ImGui_PopStyleVar() }
 );
 
 impl StyleStackToken<'_> {
@@ -138,42 +138,46 @@ impl StyleStackToken<'_> {
 #[inline]
 unsafe fn push_style_var(style_var: StyleVar) {
     use crate::style::StyleVar::*;
-    use crate::sys::{igPushStyleVar_Float, igPushStyleVar_Vec2};
+    use crate::sys::{ImGui_PushStyleVar, ImGui_PushStyleVarImVec2};
     match style_var {
-        Alpha(v) => igPushStyleVar_Float(sys::ImGuiStyleVar_Alpha as i32, v),
-        WindowPadding(v) => igPushStyleVar_Vec2(sys::ImGuiStyleVar_WindowPadding as i32, v.into()),
-        WindowRounding(v) => igPushStyleVar_Float(sys::ImGuiStyleVar_WindowRounding as i32, v),
-        WindowBorderSize(v) => igPushStyleVar_Float(sys::ImGuiStyleVar_WindowBorderSize as i32, v),
-        WindowMinSize(v) => igPushStyleVar_Vec2(sys::ImGuiStyleVar_WindowMinSize as i32, v.into()),
+        Alpha(v) => ImGui_PushStyleVar(sys::ImGuiStyleVar_Alpha as i32, v),
+        WindowPadding(v) => {
+            ImGui_PushStyleVarImVec2(sys::ImGuiStyleVar_WindowPadding as i32, v.into())
+        }
+        WindowRounding(v) => ImGui_PushStyleVar(sys::ImGuiStyleVar_WindowRounding as i32, v),
+        WindowBorderSize(v) => ImGui_PushStyleVar(sys::ImGuiStyleVar_WindowBorderSize as i32, v),
+        WindowMinSize(v) => {
+            ImGui_PushStyleVarImVec2(sys::ImGuiStyleVar_WindowMinSize as i32, v.into())
+        }
         WindowTitleAlign(v) => {
-            igPushStyleVar_Vec2(sys::ImGuiStyleVar_WindowTitleAlign as i32, v.into())
+            ImGui_PushStyleVarImVec2(sys::ImGuiStyleVar_WindowTitleAlign as i32, v.into())
         }
-        ChildRounding(v) => igPushStyleVar_Float(sys::ImGuiStyleVar_ChildRounding as i32, v),
-        ChildBorderSize(v) => igPushStyleVar_Float(sys::ImGuiStyleVar_ChildBorderSize as i32, v),
-        PopupRounding(v) => igPushStyleVar_Float(sys::ImGuiStyleVar_PopupRounding as i32, v),
-        PopupBorderSize(v) => igPushStyleVar_Float(sys::ImGuiStyleVar_PopupBorderSize as i32, v),
-        FramePadding(v) => igPushStyleVar_Vec2(sys::ImGuiStyleVar_FramePadding as i32, v.into()),
-        FrameRounding(v) => igPushStyleVar_Float(sys::ImGuiStyleVar_FrameRounding as i32, v),
-        FrameBorderSize(v) => igPushStyleVar_Float(sys::ImGuiStyleVar_FrameBorderSize as i32, v),
-        ItemSpacing(v) => igPushStyleVar_Vec2(sys::ImGuiStyleVar_ItemSpacing as i32, v.into()),
+        ChildRounding(v) => ImGui_PushStyleVar(sys::ImGuiStyleVar_ChildRounding as i32, v),
+        ChildBorderSize(v) => ImGui_PushStyleVar(sys::ImGuiStyleVar_ChildBorderSize as i32, v),
+        PopupRounding(v) => ImGui_PushStyleVar(sys::ImGuiStyleVar_PopupRounding as i32, v),
+        PopupBorderSize(v) => ImGui_PushStyleVar(sys::ImGuiStyleVar_PopupBorderSize as i32, v),
+        FramePadding(v) => {
+            ImGui_PushStyleVarImVec2(sys::ImGuiStyleVar_FramePadding as i32, v.into())
+        }
+        FrameRounding(v) => ImGui_PushStyleVar(sys::ImGuiStyleVar_FrameRounding as i32, v),
+        FrameBorderSize(v) => ImGui_PushStyleVar(sys::ImGuiStyleVar_FrameBorderSize as i32, v),
+        ItemSpacing(v) => ImGui_PushStyleVarImVec2(sys::ImGuiStyleVar_ItemSpacing as i32, v.into()),
         ItemInnerSpacing(v) => {
-            igPushStyleVar_Vec2(sys::ImGuiStyleVar_ItemInnerSpacing as i32, v.into())
+            ImGui_PushStyleVarImVec2(sys::ImGuiStyleVar_ItemInnerSpacing as i32, v.into())
         }
-        IndentSpacing(v) => igPushStyleVar_Float(sys::ImGuiStyleVar_IndentSpacing as i32, v),
-        ScrollbarSize(v) => igPushStyleVar_Float(sys::ImGuiStyleVar_ScrollbarSize as i32, v),
-        ScrollbarRounding(v) => {
-            igPushStyleVar_Float(sys::ImGuiStyleVar_ScrollbarRounding as i32, v)
-        }
-        GrabMinSize(v) => igPushStyleVar_Float(sys::ImGuiStyleVar_GrabMinSize as i32, v),
-        GrabRounding(v) => igPushStyleVar_Float(sys::ImGuiStyleVar_GrabRounding as i32, v),
-        TabRounding(v) => igPushStyleVar_Float(sys::ImGuiStyleVar_TabRounding as i32, v),
+        IndentSpacing(v) => ImGui_PushStyleVar(sys::ImGuiStyleVar_IndentSpacing as i32, v),
+        ScrollbarSize(v) => ImGui_PushStyleVar(sys::ImGuiStyleVar_ScrollbarSize as i32, v),
+        ScrollbarRounding(v) => ImGui_PushStyleVar(sys::ImGuiStyleVar_ScrollbarRounding as i32, v),
+        GrabMinSize(v) => ImGui_PushStyleVar(sys::ImGuiStyleVar_GrabMinSize as i32, v),
+        GrabRounding(v) => ImGui_PushStyleVar(sys::ImGuiStyleVar_GrabRounding as i32, v),
+        TabRounding(v) => ImGui_PushStyleVar(sys::ImGuiStyleVar_TabRounding as i32, v),
         ButtonTextAlign(v) => {
-            igPushStyleVar_Vec2(sys::ImGuiStyleVar_ButtonTextAlign as i32, v.into())
+            ImGui_PushStyleVarImVec2(sys::ImGuiStyleVar_ButtonTextAlign as i32, v.into())
         }
         SelectableTextAlign(v) => {
-            igPushStyleVar_Vec2(sys::ImGuiStyleVar_SelectableTextAlign as i32, v.into())
+            ImGui_PushStyleVarImVec2(sys::ImGuiStyleVar_SelectableTextAlign as i32, v.into())
         }
-        CellPadding(v) => igPushStyleVar_Vec2(sys::ImGuiStyleVar_CellPadding as i32, v.into()),
+        CellPadding(v) => ImGui_PushStyleVarImVec2(sys::ImGuiStyleVar_CellPadding as i32, v.into()),
     }
 }
 
@@ -190,7 +194,7 @@ impl Ui {
     /// the right side)
     #[doc(alias = "PushItemWith")]
     pub fn push_item_width(&self, item_width: f32) -> ItemWidthStackToken<'_> {
-        unsafe { sys::igPushItemWidth(item_width) };
+        unsafe { sys::ImGui_PushItemWidth(item_width) };
         ItemWidthStackToken::new(self)
     }
     /// Sets the width of the next item.
@@ -201,14 +205,14 @@ impl Ui {
     /// the right side)
     #[doc(alias = "SetNextItemWidth")]
     pub fn set_next_item_width(&self, item_width: f32) {
-        unsafe { sys::igSetNextItemWidth(item_width) };
+        unsafe { sys::ImGui_SetNextItemWidth(item_width) };
     }
     /// Returns the width of the item given the pushed settings and the current cursor position.
     ///
     /// This is NOT necessarily the width of last item.
     #[doc(alias = "CalcItemWidth")]
     pub fn calc_item_width(&self) -> f32 {
-        unsafe { sys::igCalcItemWidth() }
+        unsafe { sys::ImGui_CalcItemWidth() }
     }
 
     /// Makes the text wrap at the end of window/column (which is generally the default), by
@@ -234,7 +238,7 @@ impl Ui {
     /// - `< 0.0`: no wrapping
     #[doc(alias = "PushTextWrapPos")]
     pub fn push_text_wrap_pos_with_pos(&self, wrap_pos_x: f32) -> TextWrapPosStackToken<'_> {
-        unsafe { sys::igPushTextWrapPos(wrap_pos_x) };
+        unsafe { sys::ImGui_PushTextWrapPos(wrap_pos_x) };
         TextWrapPosStackToken::new(self)
     }
 
@@ -245,7 +249,7 @@ impl Ui {
     /// Returns a [PushAllowKeyboardFocusToken] that should be dropped.
     #[doc(alias = "PushAllowKeyboardFocus")]
     pub fn push_allow_keyboard_focus(&self, allow: bool) -> PushAllowKeyboardFocusToken<'_> {
-        unsafe { sys::igPushAllowKeyboardFocus(allow) };
+        unsafe { sys::ImGui_PushAllowKeyboardFocus(allow) };
         PushAllowKeyboardFocusToken::new(self)
     }
 
@@ -257,7 +261,7 @@ impl Ui {
     /// Returns a [PushButtonRepeatToken] that should be dropped.
     #[doc(alias = "PushAllowKeyboardFocus")]
     pub fn push_button_repeat(&self, allow: bool) -> PushButtonRepeatToken<'_> {
-        unsafe { sys::igPushButtonRepeat(allow) };
+        unsafe { sys::ImGui_PushButtonRepeat(allow) };
         PushButtonRepeatToken::new(self)
     }
 
@@ -281,8 +285,8 @@ impl Ui {
     pub fn push_item_flag(&self, item_flag: ItemFlag) -> ItemFlagsStackToken<'_> {
         use self::ItemFlag::*;
         match item_flag {
-            AllowKeyboardFocus(v) => unsafe { sys::igPushAllowKeyboardFocus(v) },
-            ButtonRepeat(v) => unsafe { sys::igPushButtonRepeat(v) },
+            AllowKeyboardFocus(v) => unsafe { sys::ImGui_PushAllowKeyboardFocus(v) },
+            ButtonRepeat(v) => unsafe { sys::ImGui_PushButtonRepeat(v) },
         }
         ItemFlagsStackToken::new(self, item_flag)
     }
@@ -299,28 +303,28 @@ create_token!(
     pub struct ItemWidthStackToken<'ui>;
 
     #[doc(alias = "PopItemWidth")]
-    drop { sys::igPopItemWidth() }
+    drop { sys::ImGui_PopItemWidth() }
 );
 
 create_token!(
     pub struct TextWrapPosStackToken<'ui>;
 
     #[doc(alias = "PopTextWrapPos")]
-    drop { sys::igPopTextWrapPos() }
+    drop { sys::ImGui_PopTextWrapPos() }
 );
 
 create_token!(
     pub struct PushAllowKeyboardFocusToken<'ui>;
 
     #[doc(alias = "PopAllowKeyboardFocus")]
-    drop { sys::igPopAllowKeyboardFocus() }
+    drop { sys::ImGui_PopAllowKeyboardFocus() }
 );
 
 create_token!(
     pub struct PushButtonRepeatToken<'ui>;
 
     #[doc(alias = "PopButtonRepeat")]
-    drop { sys::igPopButtonRepeat() }
+    drop { sys::ImGui_PopButtonRepeat() }
 );
 
 /// Tracks a change pushed to the item flags stack.
@@ -349,9 +353,9 @@ impl Drop for ItemFlagsStackToken<'_> {
     fn drop(&mut self) {
         unsafe {
             if self.1 == mem::discriminant(&ItemFlag::AllowKeyboardFocus(true)) {
-                sys::igPopAllowKeyboardFocus();
+                sys::ImGui_PopAllowKeyboardFocus();
             } else if self.1 == mem::discriminant(&ItemFlag::ButtonRepeat(true)) {
-                sys::igPopButtonRepeat();
+                sys::ImGui_PopButtonRepeat();
             } else {
                 unreachable!();
             }
@@ -365,7 +369,7 @@ create_token!(
     pub struct IdStackToken<'ui>;
 
     /// Pops a change from the ID stack
-    drop { sys::igPopID() }
+    drop { sys::ImGui_PopID() }
 );
 
 impl IdStackToken<'_> {
@@ -462,7 +466,7 @@ impl Ui {
             let s = s.as_ref();
             let start = s.as_ptr() as *const c_char;
             let end = start.add(s.len());
-            sys::igPushID_StrStr(start, end)
+            sys::ImGui_PushIDStr(start, end)
         }
         IdStackToken::new(self)
     }
@@ -477,7 +481,7 @@ impl Ui {
     /// [push_id]: Self::push_id
     #[doc(alias = "PushId")]
     pub fn push_id_usize(&self, id: usize) -> IdStackToken<'_> {
-        unsafe { sys::igPushID_Ptr(id as *const _) }
+        unsafe { sys::ImGui_PushIDPtr(id as *const _) }
         IdStackToken::new(self)
     }
 
@@ -491,7 +495,7 @@ impl Ui {
     /// [push_id]: Self::push_id
     #[doc(alias = "PushId")]
     pub fn push_id_int(&self, id: i32) -> IdStackToken<'_> {
-        unsafe { sys::igPushID_Int(id) }
+        unsafe { sys::ImGui_PushIDInt(id) }
         IdStackToken::new(self)
     }
 
@@ -505,7 +509,7 @@ impl Ui {
     /// [push_id]: Self::push_id
     #[doc(alias = "PushId")]
     pub fn push_id_ptr<T>(&self, value: &T) -> IdStackToken<'_> {
-        unsafe { sys::igPushID_Ptr(value as *const T as *const _) }
+        unsafe { sys::ImGui_PushIDPtr(value as *const T as *const _) }
         IdStackToken::new(self)
     }
 }

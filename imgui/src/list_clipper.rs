@@ -127,7 +127,7 @@ impl<'ui> ListClipperToken<'ui> {
 impl<'ui> Drop for ListClipperToken<'ui> {
     fn drop(&mut self) {
         unsafe {
-            sys::ImGuiListClipper_destroy(self.list_clipper);
+            sys::ImGuiListClipper_End(self.list_clipper);
         };
     }
 }

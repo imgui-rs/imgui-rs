@@ -40,21 +40,21 @@ impl Ui {
     /// the current style.
     #[doc(alias = "Button")]
     pub fn button_with_size(&self, label: impl AsRef<str>, size: impl Into<MintVec2>) -> bool {
-        unsafe { sys::igButton(self.scratch_txt(label), size.into().into()) }
+        unsafe { sys::ImGui_Button(self.scratch_txt(label), size.into().into()) }
     }
     /// Renders a small clickable button that is easy to embed in text.
     ///
     /// Returns true if this button was clicked.
     #[doc(alias = "SmallButton")]
     pub fn small_button(&self, label: impl AsRef<str>) -> bool {
-        unsafe { sys::igSmallButton(self.scratch_txt(label)) }
+        unsafe { sys::ImGui_SmallButton(self.scratch_txt(label)) }
     }
     /// Renders a widget with button behaviour without the visual look.
     ///
     /// Returns true if this button was clicked.
     #[doc(alias = "InvisibleButton")]
     pub fn invisible_button(&self, id: impl AsRef<str>, size: impl Into<MintVec2>) -> bool {
-        unsafe { sys::igInvisibleButton(self.scratch_txt(id), size.into().into(), 0) }
+        unsafe { sys::ImGui_InvisibleButton(self.scratch_txt(id), size.into().into(), 0) }
     }
     /// Renders a widget with button behaviour without the visual look.
     ///
@@ -67,7 +67,7 @@ impl Ui {
         flags: ButtonFlags,
     ) -> bool {
         unsafe {
-            sys::igInvisibleButton(
+            sys::ImGui_InvisibleButton(
                 self.scratch_txt(id),
                 size.into().into(),
                 flags.bits() as i32,
@@ -79,14 +79,14 @@ impl Ui {
     /// Returns true if this button was clicked.
     #[doc(alias = "ArrowButton")]
     pub fn arrow_button(&self, id: impl AsRef<str>, direction: Direction) -> bool {
-        unsafe { sys::igArrowButton(self.scratch_txt(id), direction as i32) }
+        unsafe { sys::ImGui_ArrowButton(self.scratch_txt(id), direction as i32) }
     }
     /// Renders a simple checkbox.
     ///
     /// Returns true if this checkbox was clicked.
     #[doc(alias = "Checkbox")]
     pub fn checkbox(&self, label: impl AsRef<str>, value: &mut bool) -> bool {
-        unsafe { sys::igCheckbox(self.scratch_txt(label), value as *mut bool) }
+        unsafe { sys::ImGui_Checkbox(self.scratch_txt(label), value as *mut bool) }
     }
     /// Renders a checkbox suitable for toggling bit flags using a mask.
     ///
@@ -111,7 +111,7 @@ impl Ui {
     /// Returns true if this radio button was clicked.
     #[doc(alias = "RadioButtonBool")]
     pub fn radio_button_bool(&self, label: impl AsRef<str>, active: bool) -> bool {
-        unsafe { sys::igRadioButton_Bool(self.scratch_txt(label), active) }
+        unsafe { sys::ImGui_RadioButton_Bool(self.scratch_txt(label), active) }
     }
     /// Renders a radio button suitable for choosing an arbitrary value.
     ///
@@ -130,6 +130,6 @@ impl Ui {
     /// Renders a small circle and keeps the cursor on the same line
     #[doc(alias = "Bullet")]
     pub fn bullet(&self) {
-        unsafe { sys::igBullet() };
+        unsafe { sys::ImGui_Bullet() };
     }
 }

@@ -9,8 +9,12 @@ use clap::Parser;
 struct Cli {
     #[clap(default_value = "./imgui-sys2/third-party")]
     third_party: camino::Utf8PathBuf,
+
     #[clap(default_value = "./imgui-sys2/src")]
     output_folder: camino::Utf8PathBuf,
+
+    #[clap(short)]
+    verbose: bool,
 }
 
 fn main() {
@@ -26,6 +30,7 @@ fn main() {
 fn try_main() -> Result<()> {
     let cli = Cli::parse();
 
+    #[allow(clippy::single_element_loop)]
     for variant in ["master" /* "docking" */] {
         // let additional = match flag {
         //     None => "".to_string(),
@@ -43,7 +48,16 @@ fn try_main() -> Result<()> {
         )
         .expect("bad bindings?");
         let mut types: Vec<String> = data.structs.into_iter().map(|v| v.name).collect();
+        if cli.verbose {
+            println!("generating the following structs: \n{:#?}", types);
+            println!(
+                "generating the following enums: \n{:#?}",
+                Vec::from_iter(data.enums.iter().map(|v| &v.name))
+            );
+        }
+
         types.extend(data.enums.into_iter().map(|v| v.name));
+        types.push("ImGuiKey_".to_string());
 
         let funcs: Vec<_> = data
             .functions
@@ -105,7 +119,6 @@ fn generate_binding_file(
     funcs: &[String],
 ) -> Result<()> {
     let mut builder = bindgen::Builder::default()
-        .size_t_is_usize(true)
         .prepend_enum_name(false)
         .layout_tests(false)
         .derive_default(true)
@@ -117,6 +130,7 @@ fn generate_binding_file(
         .blocklist_type("__darwin_size_t")
         .raw_line("#![allow(nonstandard_style, clippy::all)]")
         .ctypes_prefix("cty")
+        .clang_arg("-DIMGUI_USE_WCHAR32=1")
         .header(header.as_str());
 
     for t in types {

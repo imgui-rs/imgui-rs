@@ -258,16 +258,16 @@ impl<'ui> ChildWindow<'ui> {
     /// Returns `None` if the window is not visible and no content should be rendered.
     pub fn begin(self) -> Option<ChildWindowToken<'ui>> {
         if self.content_size[0] != 0.0 || self.content_size[1] != 0.0 {
-            unsafe { sys::igSetNextWindowContentSize(self.content_size.into()) };
+            unsafe { sys::ImGui_SetNextWindowContentSize(self.content_size.into()) };
         }
         if self.focused {
-            unsafe { sys::igSetNextWindowFocus() };
+            unsafe { sys::ImGui_SetNextWindowFocus() };
         }
         if self.bg_alpha.is_finite() {
-            unsafe { sys::igSetNextWindowBgAlpha(self.bg_alpha) };
+            unsafe { sys::ImGui_SetNextWindowBgAlpha(self.bg_alpha) };
         }
         let should_render = unsafe {
-            sys::igBeginChild_ID(
+            sys::ImGui_BeginChildID(
                 self.id,
                 self.size.into(),
                 self.border,
@@ -277,7 +277,7 @@ impl<'ui> ChildWindow<'ui> {
         if should_render {
             Some(ChildWindowToken::new(self.ui))
         } else {
-            unsafe { sys::igEndChild() };
+            unsafe { sys::ImGui_EndChild() };
             None
         }
     }
@@ -297,5 +297,5 @@ create_token!(
     pub struct ChildWindowToken<'ui>;
 
     /// Ends a window
-    drop { sys::igEndChild() }
+    drop { sys::ImGui_EndChild() }
 );

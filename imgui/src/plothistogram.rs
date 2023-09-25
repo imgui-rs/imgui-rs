@@ -71,7 +71,7 @@ impl<'ui, 'p, Label: AsRef<str>, Overlay: AsRef<str>> PlotHistogram<'ui, 'p, Lab
         unsafe {
             let (label, overlay_text) = self.ui.scratch_txt_with_opt(self.label, self.overlay_text);
 
-            sys::igPlotHistogram_FloatPtr(
+            sys::ImGui_PlotHistogram_FloatPtr(
                 label,
                 self.values.as_ptr() as *const c_float,
                 self.values.len() as i32,

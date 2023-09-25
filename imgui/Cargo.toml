@@ -17,15 +17,15 @@ features = ["freetype", "docking", "tables-api"]
 
 [dependencies]
 bitflags = "1"
-imgui-sys = { version = "0.11.0", path = "../imgui-sys" }
+imgui-sys2 = { version = "0.11.0", path = "../imgui-sys2" }
 mint = "0.5.6"
 parking_lot = "0.12"
 cfg-if = "1"
 
 [features]
-wasm = ["imgui-sys/wasm"]
-freetype = ["imgui-sys/freetype"]
-docking = ["imgui-sys/docking"]
+wasm = ["imgui-sys2/wasm"]
+freetype = ["imgui-sys2/freetype"]
+docking = ["imgui-sys2/docking"]
 # this api is in beta in the upstream imgui crate. See issue #524 for more info.
 # it should be stable and fine to use though.
 tables-api = []

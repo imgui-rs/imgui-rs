@@ -60,7 +60,7 @@ impl Image {
     /// Builds the image
     pub fn build(self, _: &Ui) {
         unsafe {
-            sys::igImage(
+            sys::ImGui_Image(
                 self.texture_id.id() as *mut c_void,
                 self.size.into(),
                 self.uv0.into(),
@@ -165,7 +165,7 @@ impl<'ui, StrId: AsRef<str>> ImageButton<'ui, StrId> {
     /// Builds the image button
     pub fn build(self) -> bool {
         unsafe {
-            sys::igImageButton(
+            sys::ImGui_ImageButton(
                 self.ui.scratch_txt(self.str_id),
                 self.texture_id.id() as *mut c_void,
                 self.size.into(),
@@ -217,16 +217,16 @@ impl ImageButtonDeprecated {
     /// Builds the image button
     pub fn build(self, _: &Ui) -> bool {
         unsafe {
-            sys::igPushID_Ptr(self.texture_id.id() as *const _);
+            sys::ImGui_PushID_Ptr(self.texture_id.id() as *const _);
 
             if self.frame_padding >= 0 {
-                sys::igPushStyleVar_Vec2(
+                sys::ImGui_PushStyleVar_Vec2(
                     sys::ImGuiStyleVar_FramePadding as i32,
                     [self.frame_padding as f32, self.frame_padding as f32].into(),
                 );
             }
 
-            let res = sys::igImageButton(
+            let res = sys::ImGui_ImageButton(
                 b"#image".as_ptr().cast(),
                 self.texture_id.id() as *mut c_void,
                 self.size.into(),
@@ -237,10 +237,10 @@ impl ImageButtonDeprecated {
             );
 
             if self.frame_padding >= 0 {
-                sys::igPopStyleVar(1);
+                sys::ImGui_PopStyleVar(1);
             }
 
-            sys::igPopID();
+            sys::ImGui_PopID();
 
             res
         }

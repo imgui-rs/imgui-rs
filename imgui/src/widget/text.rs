@@ -21,7 +21,7 @@ impl Ui {
         unsafe {
             let start = s.as_ptr();
             let end = start.add(s.len());
-            sys::igTextUnformatted(start as *const c_char, end as *const c_char);
+            sys::ImGui_TextUnformatted(start as *const c_char, end as *const c_char);
         }
     }
     /// Renders simple text using the given text color
@@ -40,17 +40,17 @@ impl Ui {
     /// Renders text wrapped to the end of window (or column)
     #[doc(alias = "TextWrapperd")]
     pub fn text_wrapped(&self, text: impl AsRef<str>) {
-        unsafe { sys::igTextWrapped(fmt_ptr(), self.scratch_txt(text)) }
+        unsafe { sys::ImGui_TextWrapped(fmt_ptr(), self.scratch_txt(text)) }
     }
     /// Render a text + label combination aligned the same way as value+label widgets
     #[doc(alias = "LabelText")]
     pub fn label_text(&self, label: impl AsRef<str>, text: impl AsRef<str>) {
         let (ptr_one, ptr_two) = self.scratch_txt_two(label, text);
-        unsafe { sys::igLabelText(ptr_one, fmt_ptr(), ptr_two) }
+        unsafe { sys::ImGui_LabelText(ptr_one, fmt_ptr(), ptr_two) }
     }
     /// Renders text with a little bullet aligned to the typical tree node
     #[doc(alias = "BulletText")]
     pub fn bullet_text(&self, text: impl AsRef<str>) {
-        unsafe { sys::igBulletText(fmt_ptr(), self.scratch_txt(text)) }
+        unsafe { sys::ImGui_BulletText(fmt_ptr(), self.scratch_txt(text)) }
     }
 }

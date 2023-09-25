@@ -334,7 +334,7 @@ impl Ui {
     #[inline]
     #[doc(alias = "GetKeyIndex")]
     fn key_index(&self, key: Key) -> u32 {
-        unsafe { sys::igGetKeyIndex(key as u32) }
+        unsafe { sys::ImGui_GetKeyIndex(key as u32) }
     }
     /// Returns true if the key is being held.
     ///
@@ -353,9 +353,9 @@ impl Ui {
     pub fn is_key_index_down(&self, key_index: u32) -> bool {
         cfg_if::cfg_if! {
             if #[cfg(feature = "docking")] {
-                unsafe { sys::igIsKeyDown_Nil(key_index) }
+                unsafe { sys::ImGui_IsKeyDown_Nil(key_index) }
             } else {
-                unsafe { sys::igIsKeyDown(key_index) }
+                unsafe { sys::ImGui_IsKeyDown(key_index) }
             }
         }
     }
@@ -379,9 +379,9 @@ impl Ui {
     pub fn is_key_index_pressed(&self, key_index: u32) -> bool {
         cfg_if::cfg_if! {
             if #[cfg(feature = "docking")] {
-                unsafe { sys::igIsKeyPressed_Bool(key_index, true) }
+                unsafe { sys::ImGui_IsKeyPressed_Bool(key_index, true) }
             } else {
-                unsafe { sys::igIsKeyPressed(key_index, true) }
+                unsafe { sys::ImGui_IsKeyPressed(key_index, true) }
             }
         }
     }
@@ -406,9 +406,9 @@ impl Ui {
     pub fn is_key_index_pressed_no_repeat(&self, key_index: u32) -> bool {
         cfg_if::cfg_if! {
             if #[cfg(feature = "docking")] {
-                unsafe { sys::igIsKeyPressed_Bool(key_index, false) }
+                unsafe { sys::ImGui_IsKeyPressed_Bool(key_index, false) }
             } else {
-                unsafe { sys::igIsKeyPressed(key_index, false) }
+                unsafe { sys::ImGui_IsKeyPressed(key_index, false) }
             }
         }
     }
@@ -430,9 +430,9 @@ impl Ui {
     pub fn is_key_index_released(&self, key_index: u32) -> bool {
         cfg_if::cfg_if! {
             if #[cfg(feature = "docking")] {
-                unsafe { sys::igIsKeyReleased_Nil(key_index) }
+                unsafe { sys::ImGui_IsKeyReleased_Nil(key_index) }
             } else {
-                unsafe { sys::igIsKeyReleased(key_index) }
+                unsafe { sys::ImGui_IsKeyReleased(key_index) }
             }
         }
     }
@@ -452,7 +452,7 @@ impl Ui {
     #[inline]
     #[doc(alias = "GetKeyPressedAmount")]
     pub fn key_index_pressed_amount(&self, key_index: u32, repeat_delay: f32, rate: f32) -> u32 {
-        unsafe { sys::igGetKeyPressedAmount(key_index, repeat_delay, rate) as u32 }
+        unsafe { sys::ImGui_GetKeyPressedAmount(key_index, repeat_delay, rate) as u32 }
     }
 
     /// Focuses keyboard on the next widget.
@@ -470,7 +470,7 @@ impl Ui {
     #[doc(alias = "SetKeyboardFocusHere")]
     pub fn set_keyboard_focus_here_with_offset(&self, target_widget: FocusedWidget) {
         unsafe {
-            sys::igSetKeyboardFocusHere(target_widget.as_offset());
+            sys::ImGui_SetKeyboardFocusHere(target_widget.as_offset());
         }
     }
 }

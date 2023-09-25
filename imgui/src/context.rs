@@ -76,11 +76,11 @@ static CTX_MUTEX: ReentrantMutex<()> = parking_lot::const_reentrant_mutex(());
 
 fn clear_current_context() {
     unsafe {
-        sys::igSetCurrentContext(ptr::null_mut());
+        sys::ImGui_SetCurrentContext(ptr::null_mut());
     }
 }
 fn no_current_context() -> bool {
-    let ctx = unsafe { sys::igGetCurrentContext() };
+    let ctx = unsafe { sys::ImGui_GetCurrentContext() };
     ctx.is_null()
 }
 
@@ -205,12 +205,12 @@ impl Context {
     /// Loads settings from a string slice containing settings in .Ini file format
     #[doc(alias = "LoadIniSettingsFromMemory")]
     pub fn load_ini_settings(&mut self, data: &str) {
-        unsafe { sys::igLoadIniSettingsFromMemory(data.as_ptr() as *const _, data.len()) }
+        unsafe { sys::ImGui_LoadIniSettingsFromMemory(data.as_ptr() as *const _, data.len()) }
     }
     /// Saves settings to a mutable string buffer in .Ini file format
     #[doc(alias = "SaveInitSettingsToMemory")]
     pub fn save_ini_settings(&mut self, buf: &mut String) {
-        let data = unsafe { CStr::from_ptr(sys::igSaveIniSettingsToMemory(ptr::null_mut())) };
+        let data = unsafe { CStr::from_ptr(sys::ImGui_SaveIniSettingsToMemory(ptr::null_mut())) };
         buf.push_str(&data.to_string_lossy());
     }
     /// Sets the clipboard backend used for clipboard operations
@@ -236,7 +236,7 @@ impl Context {
         };
         // Dear ImGui implicitly sets the current context during igCreateContext if the current
         // context doesn't exist
-        let raw = unsafe { sys::igCreateContext(shared_font_atlas_ptr) };
+        let raw = unsafe { sys::ImGui_CreateContext(shared_font_atlas_ptr) };
 
         Context {
             raw,
@@ -260,7 +260,7 @@ impl Context {
         }
     }
     fn is_current_context(&self) -> bool {
-        let ctx = unsafe { sys::igGetCurrentContext() };
+        let ctx = unsafe { sys::ImGui_GetCurrentContext() };
         self.raw == ctx
     }
 }
@@ -273,10 +273,10 @@ impl Drop for Context {
         // destruction
         unsafe {
             // end the frame if necessary...
-            if !sys::igGetCurrentContext().is_null() && sys::igGetFrameCount() > 0 {
-                sys::igEndFrame();
+            if !sys::ImGui_GetCurrentContext().is_null() && sys::ImGui_GetFrameCount() > 0 {
+                sys::ImGui_EndFrame();
             }
-            sys::igDestroyContext(self.raw);
+            sys::ImGui_DestroyContext(self.raw);
         }
     }
 }
@@ -325,7 +325,7 @@ impl SuspendedContext {
         let _guard = CTX_MUTEX.lock();
         if no_current_context() {
             unsafe {
-                sys::igSetCurrentContext(self.0.raw);
+                sys::ImGui_SetCurrentContext(self.0.raw);
             }
             Ok(self.0)
         } else {
@@ -334,7 +334,7 @@ impl SuspendedContext {
     }
     fn create_internal(shared_font_atlas: Option<SharedFontAtlas>) -> Self {
         let _guard = CTX_MUTEX.lock();
-        let raw = unsafe { sys::igCreateContext(ptr::null_mut()) };
+        let raw = unsafe { sys::ImGui_CreateContext(ptr::null_mut()) };
         let ctx = Context {
             raw,
             shared_font_atlas,
@@ -492,14 +492,14 @@ impl Context {
     pub fn io(&self) -> &Io {
         unsafe {
             // safe because Io is a transparent wrapper around sys::ImGuiIO
-            &*(sys::igGetIO() as *const Io)
+            &*(sys::ImGui_GetIO() as *const Io)
         }
     }
     /// Returns a mutable reference to the inputs/outputs object
     pub fn io_mut(&mut self) -> &mut Io {
         unsafe {
             // safe because Io is a transparent wrapper around sys::ImGuiIO
-            &mut *(sys::igGetIO() as *mut Io)
+            &mut *(sys::ImGui_GetIO() as *mut Io)
         }
     }
     /// Returns an immutable reference to the user interface style
@@ -507,7 +507,7 @@ impl Context {
     pub fn style(&self) -> &Style {
         unsafe {
             // safe because Style is a transparent wrapper around sys::ImGuiStyle
-            &*(sys::igGetStyle() as *const Style)
+            &*(sys::ImGui_GetStyle() as *const Style)
         }
     }
     /// Returns a mutable reference to the user interface style
@@ -515,7 +515,7 @@ impl Context {
     pub fn style_mut(&mut self) -> &mut Style {
         unsafe {
             // safe because Style is a transparent wrapper around sys::ImGuiStyle
-            &mut *(sys::igGetStyle() as *mut Style)
+            &mut *(sys::ImGui_GetStyle() as *mut Style)
         }
     }
     /// Returns a mutable reference to the font atlas.
@@ -548,7 +548,7 @@ impl Context {
         }
         // TODO: precondition checks
         unsafe {
-            sys::igNewFrame();
+            sys::ImGui_NewFrame();
         }
 
         &mut self.ui
@@ -562,8 +562,8 @@ impl Context {
     #[doc(alias = "Render", alias = "GetDrawData")]
     pub fn render(&mut self) -> &DrawData {
         unsafe {
-            sys::igRender();
-            &*(sys::igGetDrawData() as *mut DrawData)
+            sys::ImGui_Render();
+            &*(sys::ImGui_GetDrawData() as *mut DrawData)
         }
     }
 
@@ -577,7 +577,7 @@ impl Context {
     /// [new_frame]: Self::new_frame
     #[doc(alias = "GetMouseCursor")]
     pub fn mouse_cursor(&self) -> Option<MouseCursor> {
-        match unsafe { sys::igGetMouseCursor() } {
+        match unsafe { sys::ImGui_GetMouseCursor() } {
             sys::ImGuiMouseCursor_Arrow => Some(MouseCursor::Arrow),
             sys::ImGuiMouseCursor_TextInput => Some(MouseCursor::TextInput),
             sys::ImGuiMouseCursor_ResizeAll => Some(MouseCursor::ResizeAll),
@@ -599,7 +599,7 @@ impl Context {
         unsafe {
             // safe because PlatformIo is a transparent wrapper around sys::ImGuiPlatformIO
             // and &self ensures we have shared ownership of PlatformIo.
-            &*(sys::igGetPlatformIO() as *const crate::PlatformIo)
+            &*(sys::ImGui_GetPlatformIO() as *const crate::PlatformIo)
         }
     }
     /// Returns a mutable reference to the Context's [`PlatformIo`](crate::PlatformIo) object.
@@ -607,7 +607,7 @@ impl Context {
         unsafe {
             // safe because PlatformIo is a transparent wrapper around sys::ImGuiPlatformIO
             // and &mut self ensures exclusive ownership of PlatformIo.
-            &mut *(sys::igGetPlatformIO() as *mut crate::PlatformIo)
+            &mut *(sys::ImGui_GetPlatformIO() as *mut crate::PlatformIo)
         }
     }
     /// Returns an immutable reference to the main [`Viewport`](crate::Viewport)
@@ -615,7 +615,7 @@ impl Context {
         unsafe {
             // safe because Viewport is a transparent wrapper around sys::ImGuiViewport
             // and &self ensures we have shared ownership.
-            &*(sys::igGetMainViewport() as *mut crate::Viewport)
+            &*(sys::ImGui_GetMainViewport() as *mut crate::Viewport)
         }
     }
     /// Returns a mutable reference to the main [`Viewport`](crate::Viewport)
@@ -623,7 +623,7 @@ impl Context {
         unsafe {
             // safe because Viewport is a transparent wrapper around sys::ImGuiViewport
             // and &mut self ensures we have exclusive ownership.
-            &mut *(sys::igGetMainViewport() as *mut crate::Viewport)
+            &mut *(sys::ImGui_GetMainViewport() as *mut crate::Viewport)
         }
     }
     /// Tries to find and return a Viewport identified by `id`.
@@ -635,7 +635,7 @@ impl Context {
         unsafe {
             // safe because Viewport is a transparent wrapper around sys::ImGuiViewport
             // and &self ensures shared ownership.
-            (sys::igFindViewportByID(id.0) as *const crate::Viewport).as_ref()
+            (sys::ImGui_FindViewportByID(id.0) as *const crate::Viewport).as_ref()
         }
     }
     /// Tries to find and return a Viewport identified by `id`.
@@ -647,7 +647,7 @@ impl Context {
         unsafe {
             // safe because Viewport is a transparent wrapper around sys::ImGuiViewport
             // and &mut self ensures exclusive ownership.
-            (sys::igFindViewportByID(id.0) as *mut crate::Viewport).as_mut()
+            (sys::ImGui_FindViewportByID(id.0) as *mut crate::Viewport).as_mut()
         }
     }
     /// Returns an iterator containing every [`Viewport`](crate::Viewport) that currently exists.
@@ -728,14 +728,14 @@ impl Context {
     /// Has to be called every frame if Viewports are enabled.
     pub fn update_platform_windows(&mut self) {
         unsafe {
-            sys::igUpdatePlatformWindows();
+            sys::ImGui_UpdatePlatformWindows();
         }
     }
     /// Basically just calls the [`PlatformViewportBackend`](crate::PlatformViewportBackend) and [`RendererViewportBackend`](crate::RendererViewportBackend)
     /// functions. If you render your extra viewports manually this function is not needed at all.
     pub fn render_platform_windows_default(&mut self) {
         unsafe {
-            sys::igRenderPlatformWindowsDefault(std::ptr::null_mut(), std::ptr::null_mut());
+            sys::ImGui_RenderPlatformWindowsDefault(std::ptr::null_mut(), std::ptr::null_mut());
         }
     }
 }

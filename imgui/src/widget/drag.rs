@@ -70,7 +70,7 @@ impl<L: AsRef<str>, T: DataTypeKind, F: AsRef<str>> Drag<T, L, F> {
         unsafe {
             let (one, two) = ui.scratch_txt_with_opt(self.label, self.display_format);
 
-            sys::igDragScalar(
+            sys::ImGui_DragScalar(
                 one,
                 T::KIND as i32,
                 value as *mut T as *mut c_void,
@@ -95,7 +95,7 @@ impl<L: AsRef<str>, T: DataTypeKind, F: AsRef<str>> Drag<T, L, F> {
         unsafe {
             let (one, two) = ui.scratch_txt_with_opt(self.label, self.display_format);
 
-            sys::igDragScalarN(
+            sys::ImGui_DragScalarN(
                 one,
                 T::KIND as i32,
                 values.as_mut_ptr() as *mut c_void,
@@ -226,7 +226,7 @@ where
                 .map(|v| buffer.offset(v))
                 .unwrap_or_else(std::ptr::null);
 
-            sys::igDragFloatRange2(
+            sys::ImGui_DragFloatRange2(
                 label,
                 min as *mut f32,
                 max as *mut f32,
@@ -269,7 +269,7 @@ where
                 .map(|v| buffer.offset(v))
                 .unwrap_or_else(std::ptr::null);
 
-            sys::igDragIntRange2(
+            sys::ImGui_DragIntRange2(
                 label,
                 min as *mut i32,
                 max as *mut i32,

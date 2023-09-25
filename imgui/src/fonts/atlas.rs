@@ -101,7 +101,7 @@ impl FontAtlas {
                 // We can't guarantee `data` is alive when the font atlas is built, so
                 // make a copy and move ownership of the data to the atlas
                 let data_copy = unsafe {
-                    let ptr = sys::igMemAlloc(data.len()) as *mut u8;
+                    let ptr = sys::ImGui_MemAlloc(data.len()) as *mut u8;
                     assert!(!ptr.is_null());
                     slice::from_raw_parts_mut(ptr, data.len())
                 };

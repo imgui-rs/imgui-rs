@@ -133,7 +133,7 @@ impl<'ui, 'p, Label: AsRef<str>> PopupModal<'ui, 'p, Label> {
     #[doc(alias = "BeginPopupModal")]
     pub fn begin_popup(self) -> Option<PopupToken<'ui>> {
         let render = unsafe {
-            sys::igBeginPopupModal(
+            sys::ImGui_BeginPopupModal(
                 self.ui.scratch_txt(self.label),
                 self.opened
                     .map(|x| x as *mut bool)
@@ -164,7 +164,7 @@ impl Ui {
     /// The confusing aspect to popups is that ImGui holds control over the popup itself.
     #[doc(alias = "OpenPopup")]
     pub fn open_popup(&self, str_id: impl AsRef<str>) {
-        unsafe { sys::igOpenPopup_Str(self.scratch_txt(str_id), 0) };
+        unsafe { sys::ImGui_OpenPopup_Str(self.scratch_txt(str_id), 0) };
     }
 
     /// Construct a popup that can have any kind of content.
@@ -174,7 +174,7 @@ impl Ui {
     #[doc(alias = "BeginPopup")]
     pub fn begin_popup(&self, str_id: impl AsRef<str>) -> Option<PopupToken<'_>> {
         let render = unsafe {
-            sys::igBeginPopup(self.scratch_txt(str_id), WindowFlags::empty().bits() as i32)
+            sys::ImGui_BeginPopup(self.scratch_txt(str_id), WindowFlags::empty().bits() as i32)
         };
 
         if render {
@@ -245,7 +245,7 @@ impl Ui {
     /// [`Ui::popup`] or [`Ui::modal_popup`].
     #[doc(alias = "CloseCurrentPopup")]
     pub fn close_current_popup(&self) {
-        unsafe { sys::igCloseCurrentPopup() };
+        unsafe { sys::ImGui_CloseCurrentPopup() };
     }
 }
 
@@ -255,5 +255,5 @@ create_token!(
 
     /// Drops the popup token manually. You can also just allow this token
     /// to drop on its own.
-    drop { sys::igEndPopup() }
+    drop { sys::ImGui_EndPopup() }
 );
