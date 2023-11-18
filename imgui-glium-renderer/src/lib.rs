@@ -113,7 +113,7 @@ impl glium::vertex::Vertex for GliumDrawVert {
     #[inline]
     fn build_bindings() -> glium::vertex::VertexFormat {
         use std::borrow::Cow::*;
-        Borrowed(&[
+        &[
             (
                 Borrowed("pos"),
                 0,
@@ -135,7 +135,7 @@ impl glium::vertex::Vertex for GliumDrawVert {
                 glium::vertex::AttributeType::U8U8U8U8,
                 false,
             ),
-        ])
+        ]
     }
 }
 

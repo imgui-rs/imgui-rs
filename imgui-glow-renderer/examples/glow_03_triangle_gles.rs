@@ -4,19 +4,23 @@
 //! Note this example uses `Renderer` rather than `AutoRenderer` and
 //! therefore requries more lifetime-management of the OpenGL context.
 
-use std::time::Instant;
+use std::{num::NonZeroU32, time::Instant};
 
 mod utils;
 
+use glutin::{
+    context::{ContextApi, Version},
+    surface::GlSurface,
+};
 use utils::Triangler;
 
 fn main() {
-    let (event_loop, window) = utils::create_window(
+    let (event_loop, window, surface, context) = utils::create_window(
         "Hello, triangle! (GLES 3.0)",
-        glutin::GlRequest::Specific(glutin::Api::OpenGlEs, (3, 0)),
+        Some(ContextApi::Gles(Some(Version::new(3, 0)))),
     );
     let (mut winit_platform, mut imgui_context) = utils::imgui_init(&window);
-    let gl = utils::glow_context(&window);
+    let gl = utils::glow_context(&context);
 
     // When using `Renderer`, we need to create a texture map
     let mut texture_map = imgui_glow_renderer::SimpleTextureMap::default();
@@ -31,54 +35,74 @@ fn main() {
     let tri_renderer = Triangler::new(&gl, "#version 300 es\nprecision mediump float;");
 
     let mut last_frame = Instant::now();
-    event_loop.run(move |event, _, control_flow| {
-        match event {
-            glutin::event::Event::NewEvents(_) => {
-                let now = Instant::now();
-                imgui_context
-                    .io_mut()
-                    .update_delta_time(now.duration_since(last_frame));
-                last_frame = now;
-            }
-            glutin::event::Event::MainEventsCleared => {
-                winit_platform
-                    .prepare_frame(imgui_context.io_mut(), window.window())
-                    .unwrap();
+    event_loop
+        .run(move |event, window_target| {
+            match event {
+                winit::event::Event::NewEvents(_) => {
+                    let now = Instant::now();
+                    imgui_context
+                        .io_mut()
+                        .update_delta_time(now.duration_since(last_frame));
+                    last_frame = now;
+                }
+                winit::event::Event::AboutToWait => {
+                    winit_platform
+                        .prepare_frame(imgui_context.io_mut(), &window)
+                        .unwrap();
 
-                window.window().request_redraw();
-            }
-            glutin::event::Event::RedrawRequested(_) => {
-                // Draw custom scene
-                tri_renderer.render(&gl);
+                    window.request_redraw();
+                }
+                winit::event::Event::WindowEvent {
+                    event: winit::event::WindowEvent::RedrawRequested,
+                    ..
+                } => {
+                    // Draw custom scene
+                    tri_renderer.render(&gl);
 
-                let ui = imgui_context.frame();
-                ui.show_demo_window(&mut true);
+                    let ui = imgui_context.frame();
+                    ui.show_demo_window(&mut true);
 
-                winit_platform.prepare_render(ui, window.window());
-                let draw_data = imgui_context.render();
+                    winit_platform.prepare_render(ui, &window);
+                    let draw_data = imgui_context.render();
 
-                // Render imgui on top
-                ig_renderer
-                    .render(&gl, &texture_map, draw_data)
-                    .expect("error rendering imgui");
+                    // Render imgui on top
+                    ig_renderer
+                        .render(&gl, &texture_map, draw_data)
+                        .expect("error rendering imgui");
 
-                window.swap_buffers().unwrap();
+                    surface
+                        .swap_buffers(&context)
+                        .expect("Failed to swap buffers");
+                }
+                winit::event::Event::WindowEvent {
+                    event: winit::event::WindowEvent::CloseRequested,
+                    ..
+                } => {
+                    window_target.exit();
+                }
+                winit::event::Event::WindowEvent {
+                    event: winit::event::WindowEvent::Resized(new_size),
+                    ..
+                } => {
+                    if new_size.width > 0 && new_size.height > 0 {
+                        surface.resize(
+                            &context,
+                            NonZeroU32::new(new_size.width).unwrap(),
+                            NonZeroU32::new(new_size.height).unwrap(),
+                        );
+                    }
+                    winit_platform.handle_event(imgui_context.io_mut(), &window, &event);
+                }
+                winit::event::Event::LoopExiting => {
+                    tri_renderer.destroy(&gl);
+                    // Note, to be good citizens we should manually call destroy
+                    // when the renderer does not own the GL context
+                    ig_renderer.destroy(&gl);
+                }
+                event => {
+                    winit_platform.handle_event(imgui_context.io_mut(), &window, &event);
+                }
             }
-            glutin::event::Event::WindowEvent {
-                event: glutin::event::WindowEvent::CloseRequested,
-                ..
-            } => {
-                *control_flow = glutin::event_loop::ControlFlow::Exit;
-            }
-            glutin::event::Event::LoopDestroyed => {
-                tri_renderer.destroy(&gl);
-                // Note, to be good citizens we should manually call destroy
-                // when the renderer does not own the GL context
-                ig_renderer.destroy(&gl);
-            }
-            event => {
-                winit_platform.handle_event(imgui_context.io_mut(), window.window(), &event);
-            }
-        }
-    });
+        })
+        .expect("EventLoop error");
 }
