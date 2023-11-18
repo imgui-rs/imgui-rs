@@ -5,13 +5,15 @@
 //! OpenGL automatically converts colors to linear space before the shaders.
 //! The renderer assumes you set this internal format correctly like this.
 
-use std::{io::Cursor, time::Instant};
+use std::{io::Cursor, num::NonZeroU32, time::Instant};
 
 use glow::HasContext;
+use glutin::surface::GlSurface;
 use image::{jpeg::JpegDecoder, ImageDecoder};
 use imgui::Condition;
 
 use imgui_glow_renderer::Renderer;
+use winit::event_loop::ControlFlow;
 
 #[allow(dead_code)]
 mod utils;
@@ -19,9 +21,9 @@ mod utils;
 const LENNA_JPEG: &[u8] = include_bytes!("../../resources/Lenna.jpg");
 
 fn main() {
-    let (event_loop, window) = utils::create_window("Custom textures", glutin::GlRequest::Latest);
+    let (event_loop, window, surface, context) = utils::create_window("Custom textures", None);
     let (mut winit_platform, mut imgui_context) = utils::imgui_init(&window);
-    let gl = utils::glow_context(&window);
+    let gl = utils::glow_context(&context);
     // This time, we tell OpenGL this is an sRGB framebuffer and OpenGL will
     // do the conversion to sSGB space for us after the fragment shader.
     unsafe { gl.enable(glow::FRAMEBUFFER_SRGB) };
@@ -35,55 +37,75 @@ fn main() {
     let textures_ui = TexturesUi::new(&gl, &mut textures);
 
     let mut last_frame = Instant::now();
-    event_loop.run(move |event, _, control_flow| {
-        // Note we can potentially make the loop more efficient by
-        // changing the `Poll` (default) value to `ControlFlow::Wait`
-        // but be careful to test on all target platforms!
-        *control_flow = glutin::event_loop::ControlFlow::Poll;
+    event_loop
+        .run(move |event, window_target| {
+            // Note we can potentially make the loop more efficient by
+            // changing the `Poll` (default) value to `ControlFlow::Wait`
+            // but be careful to test on all target platforms!
+            window_target.set_control_flow(ControlFlow::Poll);
 
-        match event {
-            glutin::event::Event::NewEvents(_) => {
-                let now = Instant::now();
-                imgui_context
-                    .io_mut()
-                    .update_delta_time(now.duration_since(last_frame));
-                last_frame = now;
-            }
-            glutin::event::Event::MainEventsCleared => {
-                winit_platform
-                    .prepare_frame(imgui_context.io_mut(), window.window())
-                    .unwrap();
+            match event {
+                winit::event::Event::NewEvents(_) => {
+                    let now = Instant::now();
+                    imgui_context
+                        .io_mut()
+                        .update_delta_time(now.duration_since(last_frame));
+                    last_frame = now;
+                }
+                winit::event::Event::AboutToWait => {
+                    winit_platform
+                        .prepare_frame(imgui_context.io_mut(), &window)
+                        .unwrap();
 
-                window.window().request_redraw();
-            }
-            glutin::event::Event::RedrawRequested(_) => {
-                unsafe { gl.clear(glow::COLOR_BUFFER_BIT) };
+                    window.request_redraw();
+                }
+                winit::event::Event::WindowEvent {
+                    event: winit::event::WindowEvent::RedrawRequested,
+                    ..
+                } => {
+                    unsafe { gl.clear(glow::COLOR_BUFFER_BIT) };
 
-                let ui = imgui_context.frame();
-                textures_ui.show(ui);
+                    let ui = imgui_context.frame();
+                    textures_ui.show(ui);
 
-                winit_platform.prepare_render(ui, window.window());
-                let draw_data = imgui_context.render();
-                ig_renderer
-                    .render(&gl, &textures, draw_data)
-                    .expect("error rendering imgui");
+                    winit_platform.prepare_render(ui, &window);
+                    let draw_data = imgui_context.render();
+                    ig_renderer
+                        .render(&gl, &textures, draw_data)
+                        .expect("error rendering imgui");
 
-                window.swap_buffers().unwrap();
+                    surface
+                        .swap_buffers(&context)
+                        .expect("Failed to swap buffers");
+                }
+                winit::event::Event::WindowEvent {
+                    event: winit::event::WindowEvent::Resized(new_size),
+                    ..
+                } => {
+                    if new_size.width > 0 && new_size.height > 0 {
+                        surface.resize(
+                            &context,
+                            NonZeroU32::new(new_size.width).unwrap(),
+                            NonZeroU32::new(new_size.height).unwrap(),
+                        );
+                    }
+                    winit_platform.handle_event(imgui_context.io_mut(), &window, &event);
+                }
+                winit::event::Event::WindowEvent {
+                    event: winit::event::WindowEvent::CloseRequested,
+                    ..
+                } => {
+                    window_target.exit();
+                }
+                winit::event::Event::LoopExiting => {
+                    ig_renderer.destroy(&gl);
+                }
+                event => {
+                    winit_platform.handle_event(imgui_context.io_mut(), &window, &event);
+                }
             }
-            glutin::event::Event::WindowEvent {
-                event: glutin::event::WindowEvent::CloseRequested,
-                ..
-            } => {
-                *control_flow = glutin::event_loop::ControlFlow::Exit;
-            }
-            glutin::event::Event::LoopDestroyed => {
-                ig_renderer.destroy(&gl);
-            }
-            event => {
-                winit_platform.handle_event(imgui_context.io_mut(), window.window(), &event);
-            }
-        }
-    });
+        })
+        .expect("EventLoop error");
 }
 
 struct TexturesUi {

@@ -10,7 +10,7 @@ publish = false
 
 [dev-dependencies]
 copypasta = "0.8"
-glium = { version = "0.32.1", default-features = true }
+glium = { version = "0.33.0", default-features = true }
 image = "0.23"
 imgui = { path = "../imgui", features = ["tables-api"] }
 imgui-glium-renderer = { path = "../imgui-glium-renderer" }
