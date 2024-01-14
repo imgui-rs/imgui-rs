@@ -1,10 +1,11 @@
-use glium::glutin;
-use glium::glutin::event::{Event, WindowEvent};
-use glium::glutin::event_loop::{ControlFlow, EventLoop};
-use glium::glutin::window::WindowBuilder;
-use glium::{Display, Surface};
+use glium::glutin::surface::WindowSurface;
+use glium::Surface;
 use imgui::{Context, FontConfig, FontGlyphRanges, FontSource, Ui};
 use imgui_glium_renderer::Renderer;
+use imgui_winit_support::winit::dpi::LogicalSize;
+use imgui_winit_support::winit::event::{Event, WindowEvent};
+use imgui_winit_support::winit::event_loop::EventLoop;
+use imgui_winit_support::winit::window::{Window, WindowBuilder};
 use imgui_winit_support::{HiDpiMode, WinitPlatform};
 use std::path::Path;
 use std::time::Instant;
@@ -13,7 +14,8 @@ mod clipboard;
 
 pub struct System {
     pub event_loop: EventLoop<()>,
-    pub display: glium::Display,
+    pub window: Window,
+    pub display: glium::Display<WindowSurface>,
     pub imgui: Context,
     pub platform: WinitPlatform,
     pub renderer: Renderer,
@@ -25,13 +27,14 @@ pub fn init(title: &str) -> System {
         Some(file_name) => file_name.to_str().unwrap(),
         None => title,
     };
-    let event_loop = EventLoop::new();
-    let context = glutin::ContextBuilder::new().with_vsync(true);
+    let event_loop = EventLoop::new().expect("Failed to create EventLoop");
+
     let builder = WindowBuilder::new()
-        .with_title(title.to_owned())
-        .with_inner_size(glutin::dpi::LogicalSize::new(1024f64, 768f64));
-    let display =
-        Display::new(builder, context, &event_loop).expect("Failed to initialize display");
+        .with_title(title)
+        .with_inner_size(LogicalSize::new(1024, 768));
+    let (window, display) = glium::backend::glutin::SimpleWindowBuilder::new()
+        .set_window_builder(builder)
+        .build(&event_loop);
 
     let mut imgui = Context::create();
     imgui.set_ini_filename(None);
@@ -44,9 +47,6 @@ pub fn init(title: &str) -> System {
 
     let mut platform = WinitPlatform::init(&mut imgui);
     {
-        let gl_window = display.gl_window();
-        let window = gl_window.window();
-
         let dpi_mode = if let Ok(factor) = std::env::var("IMGUI_EXAMPLE_FORCE_DPI_FACTOR") {
             // Allow forcing of HiDPI factor for debugging purposes
             match factor.parse::<f64>() {
@@ -57,7 +57,7 @@ pub fn init(title: &str) -> System {
             HiDpiMode::Default
         };
 
-        platform.attach_window(imgui.io_mut(), window, dpi_mode);
+        platform.attach_window(imgui.io_mut(), &window, dpi_mode);
     }
 
     // Fixed font size. Note imgui_winit_support uses "logical
@@ -103,6 +103,7 @@ pub fn init(title: &str) -> System {
 
     System {
         event_loop,
+        window,
         display,
         imgui,
         platform,
@@ -115,6 +116,7 @@ impl System {
     pub fn main_loop<F: FnMut(&mut bool, &mut Ui) + 'static>(self, mut run_ui: F) {
         let System {
             event_loop,
+            window,
             display,
             mut imgui,
             mut platform,
@@ -123,46 +125,57 @@ impl System {
         } = self;
         let mut last_frame = Instant::now();
 
-        event_loop.run(move |event, _, control_flow| match event {
-            Event::NewEvents(_) => {
-                let now = Instant::now();
-                imgui.io_mut().update_delta_time(now - last_frame);
-                last_frame = now;
-            }
-            Event::MainEventsCleared => {
-                let gl_window = display.gl_window();
-                platform
-                    .prepare_frame(imgui.io_mut(), gl_window.window())
-                    .expect("Failed to prepare frame");
-                gl_window.window().request_redraw();
-            }
-            Event::RedrawRequested(_) => {
-                let ui = imgui.frame();
-
-                let mut run = true;
-                run_ui(&mut run, ui);
-                if !run {
-                    *control_flow = ControlFlow::Exit;
+        event_loop
+            .run(move |event, window_target| match event {
+                Event::NewEvents(_) => {
+                    let now = Instant::now();
+                    imgui.io_mut().update_delta_time(now - last_frame);
+                    last_frame = now;
                 }
+                Event::AboutToWait => {
+                    platform
+                        .prepare_frame(imgui.io_mut(), &window)
+                        .expect("Failed to prepare frame");
+                    window.request_redraw();
+                }
+                Event::WindowEvent {
+                    event: WindowEvent::RedrawRequested,
+                    ..
+                } => {
+                    let ui = imgui.frame();
 
-                let gl_window = display.gl_window();
-                let mut target = display.draw();
-                target.clear_color_srgb(1.0, 1.0, 1.0, 1.0);
-                platform.prepare_render(ui, gl_window.window());
-                let draw_data = imgui.render();
-                renderer
-                    .render(&mut target, draw_data)
-                    .expect("Rendering failed");
-                target.finish().expect("Failed to swap buffers");
-            }
-            Event::WindowEvent {
-                event: WindowEvent::CloseRequested,
-                ..
-            } => *control_flow = ControlFlow::Exit,
-            event => {
-                let gl_window = display.gl_window();
-                platform.handle_event(imgui.io_mut(), gl_window.window(), &event);
-            }
-        })
+                    let mut run = true;
+                    run_ui(&mut run, ui);
+                    if !run {
+                        window_target.exit();
+                    }
+
+                    let mut target = display.draw();
+                    target.clear_color_srgb(1.0, 1.0, 1.0, 1.0);
+                    platform.prepare_render(ui, &window);
+                    let draw_data = imgui.render();
+                    renderer
+                        .render(&mut target, draw_data)
+                        .expect("Rendering failed");
+                    target.finish().expect("Failed to swap buffers");
+                }
+                Event::WindowEvent {
+                    event: WindowEvent::Resized(new_size),
+                    ..
+                } => {
+                    if new_size.width > 0 && new_size.height > 0 {
+                        display.resize((new_size.width, new_size.height));
+                    }
+                    platform.handle_event(imgui.io_mut(), &window, &event);
+                }
+                Event::WindowEvent {
+                    event: WindowEvent::CloseRequested,
+                    ..
+                } => window_target.exit(),
+                event => {
+                    platform.handle_event(imgui.io_mut(), &window, &event);
+                }
+            })
+            .expect("EventLoop error");
     }
 }

@@ -1,29 +1,82 @@
+use std::num::NonZeroU32;
+
 use glow::HasContext;
-use glutin::{event_loop::EventLoop, GlRequest};
+use glutin::{
+    config::ConfigTemplateBuilder,
+    context::{ContextApi, ContextAttributesBuilder, NotCurrentGlContext, PossiblyCurrentContext},
+    display::{GetGlDisplay, GlDisplay},
+    surface::{GlSurface, Surface, SurfaceAttributesBuilder, SwapInterval, WindowSurface},
+};
 use imgui_winit_support::WinitPlatform;
+use raw_window_handle::HasRawWindowHandle;
+use winit::{
+    dpi::LogicalSize,
+    event_loop::EventLoop,
+    window::{Window, WindowBuilder},
+};
 
-pub type Window = glutin::WindowedContext<glutin::PossiblyCurrent>;
+pub fn create_window(
+    title: &str,
+    context_api: Option<ContextApi>,
+) -> (
+    EventLoop<()>,
+    Window,
+    Surface<WindowSurface>,
+    PossiblyCurrentContext,
+) {
+    let event_loop = EventLoop::new().unwrap();
 
-pub fn create_window(title: &str, gl_request: GlRequest) -> (EventLoop<()>, Window) {
-    let event_loop = glutin::event_loop::EventLoop::new();
-    let window = glutin::window::WindowBuilder::new()
+    let window_builder = WindowBuilder::new()
         .with_title(title)
-        .with_inner_size(glutin::dpi::LogicalSize::new(1024, 768));
-    let window = glutin::ContextBuilder::new()
-        .with_gl(gl_request)
-        .with_vsync(true)
-        .build_windowed(window, &event_loop)
-        .expect("could not create window");
-    let window = unsafe {
-        window
-            .make_current()
-            .expect("could not make window context current")
+        .with_inner_size(LogicalSize::new(1024, 768));
+    let (window, cfg) = glutin_winit::DisplayBuilder::new()
+        .with_window_builder(Some(window_builder))
+        .build(&event_loop, ConfigTemplateBuilder::new(), |mut configs| {
+            configs.next().unwrap()
+        })
+        .expect("Failed to create OpenGL window");
+
+    let window = window.unwrap();
+
+    let mut context_attribs = ContextAttributesBuilder::new();
+    if let Some(context_api) = context_api {
+        context_attribs = context_attribs.with_context_api(context_api);
+    }
+    let context_attribs = context_attribs.build(Some(window.raw_window_handle()));
+    let context = unsafe {
+        cfg.display()
+            .create_context(&cfg, &context_attribs)
+            .expect("Failed to create OpenGL context")
     };
-    (event_loop, window)
+
+    let surface_attribs = SurfaceAttributesBuilder::<WindowSurface>::new()
+        .with_srgb(Some(true))
+        .build(
+            window.raw_window_handle(),
+            NonZeroU32::new(1024).unwrap(),
+            NonZeroU32::new(768).unwrap(),
+        );
+    let surface = unsafe {
+        cfg.display()
+            .create_window_surface(&cfg, &surface_attribs)
+            .expect("Failed to create OpenGL surface")
+    };
+
+    let context = context
+        .make_current(&surface)
+        .expect("Failed to make OpenGL context current");
+
+    surface
+        .set_swap_interval(&context, SwapInterval::Wait(NonZeroU32::new(1).unwrap()))
+        .expect("Failed to set swap interval");
+
+    (event_loop, window, surface, context)
 }
 
-pub fn glow_context(window: &Window) -> glow::Context {
-    unsafe { glow::Context::from_loader_function(|s| window.get_proc_address(s).cast()) }
+pub fn glow_context(context: &PossiblyCurrentContext) -> glow::Context {
+    unsafe {
+        glow::Context::from_loader_function_cstr(|s| context.display().get_proc_address(s).cast())
+    }
 }
 
 pub fn imgui_init(window: &Window) -> (WinitPlatform, imgui::Context) {
@@ -33,7 +86,7 @@ pub fn imgui_init(window: &Window) -> (WinitPlatform, imgui::Context) {
     let mut winit_platform = WinitPlatform::init(&mut imgui_context);
     winit_platform.attach_window(
         imgui_context.io_mut(),
-        window.window(),
+        window,
         imgui_winit_support::HiDpiMode::Rounded,
     );
 
