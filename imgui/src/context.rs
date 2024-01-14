@@ -114,6 +114,12 @@ impl Context {
         clear_current_context();
         SuspendedContext(self)
     }
+    /// Sets current global imgui context, i.e. in a dynamically linked library.
+    pub fn set_current_context(&self) {
+        unsafe {
+            sys::igSetCurrentContext(self.raw);
+        }
+    }
     /// Returns the path to the ini file, or None if not set
     pub fn ini_filename(&self) -> Option<PathBuf> {
         let io = self.io();
@@ -536,6 +542,10 @@ impl Context {
     /// [`new_frame`]: Self::new_frame
     pub fn frame(&mut self) -> &mut Ui {
         self.new_frame()
+    }
+
+    pub fn current_frame(&mut self) -> &mut Ui {
+        &mut self.ui
     }
 
     /// Starts a new frame and returns an `Ui` instance for constructing a user interface.
