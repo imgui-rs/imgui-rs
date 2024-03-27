@@ -13,6 +13,3 @@ members = [
 
 package.rust-version = "1.70"
 resolver = "2"
-
-[patch.crates-io]
-glium = { git="https://github.com/glium/glium" }
