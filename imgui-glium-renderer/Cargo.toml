@@ -10,11 +10,11 @@ license = "MIT OR Apache-2.0"
 categories = ["gui", "rendering"]
 
 [dependencies]
-glium = { version = "0.33.0", default-features = false }
+glium = { version = "0.34.0", default-features = false }
 imgui = { version = "0.11.0", path = "../imgui" }
 
 [dev-dependencies]
-glium = { version = "0.33.0", default-features = false, features = ["glutin_backend"] }
+glium = { version = "0.34.0", default-features = false, features = ["glutin_backend"] }
 imgui-winit-support = {path = "../imgui-winit-support"}
 glutin = "0.31.1"
 glutin-winit = "0.4.2"
