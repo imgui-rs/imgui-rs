@@ -4,7 +4,7 @@ mod support;
 
 fn main() {
     let system = support::init(file!());
-    let mut buffers = vec![String::default(), String::default(), String::default()];
+    let mut buffers = [String::default(), String::default(), String::default()];
 
     system.main_loop(move |_, ui| {
         ui.window("Input text callbacks")
@@ -70,7 +70,7 @@ fn main() {
                 struct Wrapper<'a>(&'a mut String);
                 impl<'a> InputTextCallbackHandler for Wrapper<'a> {
                     fn on_always(&mut self, data: TextCallbackData) {
-                        *self.0 = data.str().to_owned();
+                        data.str().clone_into(self.0);
                     }
                 }
 
