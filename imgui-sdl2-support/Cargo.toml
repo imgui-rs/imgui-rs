@@ -1,6 +1,6 @@
 [package]
 name = "imgui-sdl2-support"
-version = "0.11.0"
+version = "0.12.0"
 edition = "2021"
 authors = ["The imgui-rs Developers"]
 description = "sdl2 support code for the imgui crate"
@@ -11,10 +11,10 @@ license = "MIT OR Apache-2.0"
 categories = ["gui"]
 
 [dependencies]
-imgui = { version = "0.11.0", path = "../imgui" }
+imgui = { version = "0.12.0", path = "../imgui" }
 sdl2 = "0.34.5"
 
 [dev-dependencies]
 glow = "0.13.1"
-imgui-glow-renderer = { version = "0.11.0", path = "../imgui-glow-renderer" }
+imgui-glow-renderer = { version = "0.12.0", path = "../imgui-glow-renderer" }
 sdl2 = { version = "0.34.5", features = ["bundled", "static-link"] }

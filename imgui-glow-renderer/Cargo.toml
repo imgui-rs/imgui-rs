@@ -1,6 +1,6 @@
 [package]
 name = "imgui-glow-renderer"
-version = "0.11.0"
+version = "0.12.0"
 edition = "2021"
 description = "glow renderer for the imgui crate"
 homepage = "https://github.com/imgui-rs/imgui-rs"
@@ -9,14 +9,14 @@ license = "MIT OR Apache-2.0"
 categories = ["gui", "rendering"]
 
 [dependencies]
-imgui = { version = "0.11.0", path = "../imgui" }
+imgui = { version = "0.12.0", path = "../imgui" }
 glow = "0.13.1"
 memoffset = "0.9"
 
 [dev-dependencies]
 glutin = "0.31.1"
 glutin-winit = "0.4.2"
-imgui-winit-support = { version = "0.11.0", path = "../imgui-winit-support" }
+imgui-winit-support = { version = "0.12.0", path = "../imgui-winit-support" }
 image = "0.23"
 raw-window-handle = "0.5.0"
 winit = { version = "0.29.3", features = ["rwh_05"] }
