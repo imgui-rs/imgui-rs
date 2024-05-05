@@ -59,6 +59,9 @@ bitflags!(
 
 macro_rules! impl_text_flags {
     ($InputType:ident) => {
+        /// Override all existing flags with specified flags. Note
+        /// some widgets may have flags set by default, so this should
+        /// be used with care.
         #[inline]
         pub fn flags(mut self, flags: InputTextFlags) -> Self {
             self.flags = flags;
