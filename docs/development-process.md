@@ -29,6 +29,7 @@ When it is time to make a new release, we create a `x.y-stable` branch (e.g `0.9
   cargo publish -p imgui-glium-renderer
   cargo publish -p imgui-glow-renderer
   cargo publish -p imgui-sdl2-support
+  cargo publish -p imgui-winit-glow-renderer-viewports
   ```
 6. Create annotated tag `v0.9.0` and push to github
 7. Create Release for this version on Github
