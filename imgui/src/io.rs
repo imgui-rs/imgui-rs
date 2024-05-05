@@ -423,7 +423,7 @@ impl Io {
     /// `RandomAccessIterator`, or we'd use that).
     pub fn input_queue_characters(
         &self,
-    ) -> impl Iterator<Item = char> + DoubleEndedIterator + ExactSizeIterator + Clone + '_ {
+    ) -> impl DoubleEndedIterator<Item = char> + ExactSizeIterator + Clone + '_ {
         self.input_queue_characters
             .as_slice()
             .iter()
