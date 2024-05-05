@@ -12,7 +12,7 @@ license = "MIT OR Apache-2.0"
 [dependencies]
 imgui = { version = "0.11.0", path="../imgui", features=["docking"] }
 
-glow = "0.12.0"
+glow = "0.13.1"
 glutin = "0.31.1"
 glutin-winit = "0.4.2"
 raw-window-handle = "0.5.0"
