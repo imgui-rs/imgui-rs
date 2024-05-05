@@ -1,11 +1,11 @@
 # Change Log
 
-## [0.12.0] - WIP
+## [0.12.0] - 2024-05-05
 
 - Updated many dependencies - in particular the new winit release is a bit change.
-  - winit to 0.29 ([PR](https://github.com/imgui-rs/imgui-rs/pull/754)
-  - glium to 0.34 and glow to 0.13 ([PR](https://github.com/imgui-rs/imgui-rs/pull/774))
-  - memset to 0.9 ([PR](https://github.com/imgui-rs/imgui-rs/pull/726))
+  - winit to 0.29 - [PR #754](https://github.com/imgui-rs/imgui-rs/pull/754)
+  - glium to 0.34 and glow to 0.13 - [PR #774](https://github.com/imgui-rs/imgui-rs/pull/774)
+  - memset to 0.9 - [PR #726](https://github.com/imgui-rs/imgui-rs/pull/726)
 - Fix some unsaftey issue in the handling of text - [PR #746](https://github.com/imgui-rs/imgui-rs/pull/746)
 - Added `Io::add_key_analog_event` for supporting analog key events such as gamepad sticks - [PR #728](https://github.com/imgui-rs/imgui-rs/pull/728)
 - Added `begin_popup_context_*` methods - [PR #738](https://github.com/imgui-rs/imgui-rs/pull/738)
