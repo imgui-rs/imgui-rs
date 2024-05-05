@@ -1,5 +1,17 @@
 # Change Log
 
+## [0.12.0] - WIP
+
+- Updated many dependencies - in particular the new winit release is a bit change.
+  - winit to 0.29 ([PR](https://github.com/imgui-rs/imgui-rs/pull/754)
+  - glium to 0.34 and glow to 0.13 ([PR](https://github.com/imgui-rs/imgui-rs/pull/774))
+  - memset to 0.9 ([PR](https://github.com/imgui-rs/imgui-rs/pull/726))
+- Fix some unsaftey issue in the handling of text - [PR #746](https://github.com/imgui-rs/imgui-rs/pull/746)
+- Added `Io::add_key_analog_event` for supporting analog key events such as gamepad sticks - [PR #728](https://github.com/imgui-rs/imgui-rs/pull/728)
+- Added `begin_popup_context_*` methods - [PR #738](https://github.com/imgui-rs/imgui-rs/pull/738)
+- Use correct alpha blending function ([problem described here](https://github.com/imgui-rs/imgui-rs/issues/733) - [PR #756](https://github.com/imgui-rs/imgui-rs/pull/756)
+- Minimum supported version of Rust (MSRV) is now 1.70 - [PR #747](https://github.com/imgui-rs/imgui-rs/pull/747)
+
 ## [0.11.0] - 2023-04-05
 
 - Added API to add callbacks to draw list for advanced custom drawing - [PR#702](https://github.com/imgui-rs/imgui-rs/pull/702)
