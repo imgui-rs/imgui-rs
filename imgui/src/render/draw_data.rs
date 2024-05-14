@@ -60,8 +60,8 @@ impl DrawData {
             return &[];
         }
         slice::from_raw_parts(
-            self.cmd_lists as *const *const DrawList, 
-            self.cmd_lists_count as usize
+            self.cmd_lists as *const *const DrawList,
+            self.cmd_lists_count as usize,
         )
     }
     /// Converts all buffers from indexed to non-indexed, in case you cannot render indexed
@@ -149,16 +149,14 @@ impl RawWrapper for DrawList {
 impl DrawList {
     #[inline]
     pub(crate) unsafe fn cmd_buffer(&self) -> &[sys::ImDrawCmd] {
-        unsafe {
-            if self.0.CmdBuffer.Size <= 0 || self.0.CmdBuffer.Data.is_null() {
-                return &[];
-            }
-
-            slice::from_raw_parts(
-                self.0.CmdBuffer.Data as *const sys::ImDrawCmd,
-                self.0.CmdBuffer.Size as usize,
-            )
+        if self.0.CmdBuffer.Size <= 0 || self.0.CmdBuffer.Data.is_null() {
+            return &[];
         }
+
+        slice::from_raw_parts(
+            self.0.CmdBuffer.Data as *const sys::ImDrawCmd,
+            self.0.CmdBuffer.Size as usize,
+        )
     }
 
     #[inline]
