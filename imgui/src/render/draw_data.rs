@@ -56,9 +56,12 @@ impl DrawData {
     }
     #[inline]
     pub(crate) unsafe fn cmd_lists(&self) -> &[*const DrawList] {
+        if self.cmd_lists_count <= 0 || self.cmd_lists.is_null() {
+            return &[];
+        }
         slice::from_raw_parts(
-            self.cmd_lists as *const *const DrawList,
-            self.cmd_lists_count as usize,
+            self.cmd_lists as *const *const DrawList, 
+            self.cmd_lists_count as usize
         )
     }
     /// Converts all buffers from indexed to non-indexed, in case you cannot render indexed
@@ -146,23 +149,39 @@ impl RawWrapper for DrawList {
 impl DrawList {
     #[inline]
     pub(crate) unsafe fn cmd_buffer(&self) -> &[sys::ImDrawCmd] {
-        slice::from_raw_parts(
-            self.0.CmdBuffer.Data as *const sys::ImDrawCmd,
-            self.0.CmdBuffer.Size as usize,
-        )
+        unsafe {
+            if self.0.CmdBuffer.Size <= 0 || self.0.CmdBuffer.Data.is_null() {
+                return &[];
+            }
+
+            slice::from_raw_parts(
+                self.0.CmdBuffer.Data as *const sys::ImDrawCmd,
+                self.0.CmdBuffer.Size as usize,
+            )
+        }
     }
+
     #[inline]
     pub fn idx_buffer(&self) -> &[DrawIdx] {
         unsafe {
+            if self.0.IdxBuffer.Size <= 0 || self.0.IdxBuffer.Data.is_null() {
+                return &[];
+            }
+
             slice::from_raw_parts(
                 self.0.IdxBuffer.Data as *const DrawIdx,
                 self.0.IdxBuffer.Size as usize,
             )
         }
     }
+
     #[inline]
     pub fn vtx_buffer(&self) -> &[DrawVert] {
         unsafe {
+            if self.0.VtxBuffer.Size <= 0 || self.0.VtxBuffer.Data.is_null() {
+                return &[];
+            }
+
             slice::from_raw_parts(
                 self.0.VtxBuffer.Data as *const DrawVert,
                 self.0.VtxBuffer.Size as usize,
@@ -181,7 +200,14 @@ impl DrawList {
             core::mem::size_of::<DrawVert>(),
         );
         assert!(core::mem::align_of::<VTy>() <= core::mem::align_of::<DrawVert>());
-        slice::from_raw_parts(self.0.VtxBuffer.Data.cast(), self.0.VtxBuffer.Size as usize)
+        if self.0.VtxBuffer.Size <= 0 || self.0.VtxBuffer.Data.is_null() {
+            return &[];
+        }
+
+        slice::from_raw_parts(
+            self.0.VtxBuffer.Data as *const VTy,
+            self.0.VtxBuffer.Size as usize,
+        )
     }
 
     #[inline]
