@@ -4,8 +4,7 @@ const WHITE: [f32; 4] = [1.0, 1.0, 1.0, 1.0];
 const RED: [f32; 4] = [1.0, 0.0, 0.0, 1.0];
 
 fn main() {
-    let system = support::init(file!());
-    system.main_loop(move |_, ui| {
+    support::simple_init(file!(), move |_, ui| {
         let draw_list = ui.get_window_draw_list();
         // Will draw channel 0 first, then channel 1, whatever the order of
         // the calls in the code.

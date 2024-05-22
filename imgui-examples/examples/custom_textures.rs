@@ -217,7 +217,8 @@ impl Lenna {
 fn main() {
     let mut my_app = CustomTexturesApp::default();
 
-    let mut system = support::init(file!());
+    let mut system = support::simple_init(file!());
+
     my_app
         .register_textures(system.display.get_context(), system.renderer.textures())
         .expect("Failed to register textures");

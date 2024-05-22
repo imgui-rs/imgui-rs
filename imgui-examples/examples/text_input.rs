@@ -3,11 +3,10 @@ use imgui::*;
 mod support;
 
 fn main() {
-    let system = support::init(file!());
     let mut stable_str = String::new();
     let mut callback_str = String::new();
 
-    system.main_loop(move |_, ui| {
+    support::simple_init(file!(), move |_, ui| {
         if let Some(_window) = ui
             .window("Input text callbacks")
             .size([500.0, 300.0], Condition::FirstUseEver)

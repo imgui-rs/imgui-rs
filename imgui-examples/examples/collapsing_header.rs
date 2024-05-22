@@ -6,8 +6,7 @@ fn main() {
     let mut state = State {
         render_closable: true,
     };
-    let system = support::init(file!());
-    system.main_loop(move |run, ui| {
+    support::simple_init(file!(), move |run, ui| {
         let w = ui
             .window("Collapsing header")
             .opened(run)
