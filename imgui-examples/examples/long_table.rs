@@ -3,9 +3,7 @@ use imgui::*;
 mod support;
 
 fn main() {
-    let system = support::init(file!());
-
-    system.main_loop(move |_, ui| {
+    support::simple_init(file!(), move |_, ui| {
         ui.show_demo_window(&mut true);
 
         ui.window("Table with list clipper")

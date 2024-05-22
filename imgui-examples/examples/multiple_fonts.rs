@@ -3,7 +3,7 @@ use imgui::*;
 mod support;
 
 fn main() {
-    let mut system = support::init(file!());
+    let mut system = support::simple_init(file!());
     let dokdo = system.imgui.fonts().add_font(&[FontSource::TtfData {
         data: include_bytes!("../../resources/Dokdo-Regular.ttf"),
         size_pixels: system.font_size,

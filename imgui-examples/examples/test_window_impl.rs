@@ -237,8 +237,9 @@ impl Default for CustomRenderingState {
 fn main() {
     let mut state = State::default();
 
-    let system = support::init(file!());
-    system.main_loop(move |run, ui| show_test_window(ui, &mut state, run));
+    support::simple_init(file!(), move |run, ui| {
+        show_test_window(ui, &mut state, run)
+    });
 }
 
 fn show_help_marker(ui: &Ui, desc: &str) {

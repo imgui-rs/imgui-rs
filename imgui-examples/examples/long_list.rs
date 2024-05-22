@@ -13,8 +13,7 @@ mod support;
 fn main() {
     let lots_of_words: Vec<String> = (0..10000).map(|x| format!("Line {}", x)).collect();
 
-    let system = support::init(file!());
-    system.main_loop(move |_, ui| {
+    support::simple_init(file!(), move |_, ui| {
         // Show the C++ style API
         ui.window("Hello long world")
             .size([100.0, 500.0], Condition::FirstUseEver)

@@ -1,9 +1,7 @@
 mod support;
 
 fn main() {
-    let system = support::init(file!());
-
-    system.main_loop(move |_, ui| {
+    support::simple_init(file!(), move |_, ui| {
         // If we don't explicitly create a window before creating some kind of widget, then Dear Imgui will automatically create one
         ui.text("This text will appear in a default window titled 'Debug'");
 

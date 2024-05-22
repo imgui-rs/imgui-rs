@@ -5,14 +5,11 @@ use imgui::*;
 mod support;
 
 fn main() {
-    let system = support::init(file!());
-
     let mut edit_mode = true;
     let mut safe_mode = true;
 
     let mut click_count = 0;
-
-    system.main_loop(move |_, ui| {
+    support::simple_init(file!(), move |_, ui| {
         ui.window("Disabling widgets")
             .size([300.0, 200.0], Condition::FirstUseEver)
             .build(|| {

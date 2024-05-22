@@ -1,8 +1,7 @@
 mod support;
 
 fn main() {
-    let system = support::init(file!());
-    system.main_loop(move |_, ui| {
+    support::simple_init(file!(), move |_, ui| {
         let items = vec!["a", "b", "c", "d"];
 
         ui.window("Broken Example")

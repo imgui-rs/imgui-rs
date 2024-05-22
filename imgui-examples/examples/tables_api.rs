@@ -3,8 +3,6 @@ use imgui::*;
 mod support;
 
 fn main() {
-    let system = support::init(file!());
-
     let mut humans = vec![
         HumanData {
             name: "Joonas",
@@ -28,7 +26,7 @@ fn main() {
         | TableFlags::RESIZABLE
         | TableFlags::NO_BORDERS_IN_BODY;
 
-    system.main_loop(move |_, ui| {
+    support::simple_init(file!(), move |_, ui| {
         ui.window("Input text callbacks")
             .size([800.0, 400.0], Condition::FirstUseEver)
             .build(|| {

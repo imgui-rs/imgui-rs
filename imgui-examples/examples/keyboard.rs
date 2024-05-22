@@ -3,7 +3,6 @@ use imgui::*;
 mod support;
 
 fn main() {
-    let system = support::init(file!());
     let mut press_counter = 0u32;
     let mut press_no_repeat_counter = 0u32;
     let mut release_counter = 0u32;
@@ -13,7 +12,7 @@ fn main() {
     let mut f1_release_count = 0u32;
     let mut text_buffer = String::new();
 
-    system.main_loop(move |_, ui| {
+    support::simple_init(file!(), move |_, ui| {
         ui.window("Means of accessing key state")
             .size([500.0, 300.0], Condition::FirstUseEver)
             .build(|| {

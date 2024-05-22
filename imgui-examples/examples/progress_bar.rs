@@ -3,8 +3,7 @@ use imgui::*;
 mod support;
 
 fn main() {
-    let system = support::init(file!());
-    system.main_loop(move |run, ui| {
+    support::simple_init(file!(), move |run, ui| {
         let w = ui
             .window("Progress bar")
             .opened(run)
