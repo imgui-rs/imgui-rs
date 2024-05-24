@@ -215,12 +215,19 @@ impl Lenna {
 }
 
 fn main() {
-    let mut my_app = CustomTexturesApp::default();
+    let my_app = std::rc::Rc::new(std::cell::RefCell::new(CustomTexturesApp::default()));
+    let app_clone = my_app.clone();
 
-    let mut system = support::simple_init(file!());
-
-    my_app
-        .register_textures(system.display.get_context(), system.renderer.textures())
-        .expect("Failed to register textures");
-    system.main_loop(move |_, ui| my_app.show_textures(ui));
+    support::init_with_startup(
+        file!(),
+        move |_ctx, renderer, display| {
+            app_clone
+                .borrow_mut()
+                .register_textures(display.get_context(), renderer.textures())
+                .expect("Failed to register textures");
+        },
+        move |_, ui| {
+            my_app.borrow_mut().show_textures(ui);
+        },
+    );
 }
