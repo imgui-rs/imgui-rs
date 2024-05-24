@@ -1,18 +1,29 @@
 use glium::glutin::surface::WindowSurface;
-use glium::Surface;
+use glium::{Display, Surface};
 use imgui::{Context, FontConfig, FontGlyphRanges, FontSource, Ui};
 use imgui_glium_renderer::Renderer;
 use imgui_winit_support::winit::dpi::LogicalSize;
 use imgui_winit_support::winit::event::{Event, WindowEvent};
 use imgui_winit_support::winit::event_loop::EventLoop;
-use imgui_winit_support::winit::window::{Window, WindowBuilder};
+use imgui_winit_support::winit::window::WindowBuilder;
 use imgui_winit_support::{HiDpiMode, WinitPlatform};
 use std::path::Path;
 use std::time::Instant;
 
 mod clipboard;
 
-pub fn simple_init<F: FnMut(&mut bool, &mut Ui) + 'static>(title: &str, mut run_ui: F) {
+pub const FONT_SIZE: f32 = 13.0;
+
+#[allow(dead_code)] // annoyingly, RA yells that this is unusued
+pub fn simple_init<F: FnMut(&mut bool, &mut Ui) + 'static>(title: &str, run_ui: F) {
+    init_with_startup(title, |_, _, _| {}, run_ui);
+}
+
+pub fn init_with_startup<FInit, FUi>(title: &str, mut startup: FInit, mut run_ui: FUi)
+where
+    FInit: FnMut(&mut Context, &mut Renderer, &Display<WindowSurface>) + 'static,
+    FUi: FnMut(&mut bool, &mut Ui) + 'static,
+{
     let mut imgui = create_context();
 
     let title = match Path::new(&title).file_name() {
@@ -51,6 +62,8 @@ pub fn simple_init<F: FnMut(&mut bool, &mut Ui) + 'static>(title: &str, mut run_
     }
 
     let mut last_frame = Instant::now();
+
+    startup(&mut imgui, &mut renderer, &display);
 
     event_loop
         .run(move |event, window_target| match event {
@@ -114,11 +127,10 @@ pub fn create_context() -> imgui::Context {
     // scaling factor. Meaning, 13.0 pixels should look the same size
     // on two different screens, and thus we do not need to scale this
     // value (as the scaling is handled by winit)
-    let font_size = 13.0;
     imgui.fonts().add_font(&[
         FontSource::TtfData {
             data: include_bytes!("../../../resources/Roboto-Regular.ttf"),
-            size_pixels: font_size,
+            size_pixels: FONT_SIZE,
             config: Some(FontConfig {
                 // As imgui-glium-renderer isn't gamma-correct with
                 // it's font rendering, we apply an arbitrary
@@ -134,7 +146,7 @@ pub fn create_context() -> imgui::Context {
         },
         FontSource::TtfData {
             data: include_bytes!("../../../resources/mplus-1p-regular.ttf"),
-            size_pixels: font_size,
+            size_pixels: FONT_SIZE,
             config: Some(FontConfig {
                 // Oversampling font helps improve text rendering at
                 // expense of larger font atlas texture.
@@ -149,13 +161,4 @@ pub fn create_context() -> imgui::Context {
     imgui.set_ini_filename(None);
 
     imgui
-}
-
-/// Initialize the example with imgui and the renderer
-pub fn init_with<F: FnMut(&mut bool, &mut Ui) + 'static>(
-    title: &str,
-    mut imgui: imgui::Context,
-    mut renderer: Renderer,
-    mut run_ui: F,
-) {
 }
