@@ -129,7 +129,7 @@ impl TexturesUi {
         const WIDTH: usize = 100;
         const HEIGHT: usize = 100;
 
-        let mut data = Vec::with_capacity(WIDTH * HEIGHT);
+        let mut data = Vec::with_capacity(WIDTH * HEIGHT * 3);
         for i in 0..WIDTH {
             for j in 0..HEIGHT {
                 // Insert RGB values
