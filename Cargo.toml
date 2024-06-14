@@ -2,11 +2,6 @@
 members = [
     "imgui",
     "imgui-sys",
-    "imgui-glium-renderer",
-    "imgui-glow-renderer",
-    "imgui-sdl2-support",
-    "imgui-winit-support",
-    "imgui-winit-glow-renderer-viewports",
     "imgui-examples",
     "xtask",
 ]

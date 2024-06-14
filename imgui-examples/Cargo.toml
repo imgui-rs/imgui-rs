@@ -13,13 +13,8 @@ copypasta = "0.8"
 glium = { version = "0.34.0", default-features = true }
 image = "0.23"
 imgui = { path = "../imgui", features = ["tables-api"] }
-imgui-glium-renderer = { path = "../imgui-glium-renderer" }
-imgui-winit-support = { path = "../imgui-winit-support" }
 
-# Pin indirect dependency scoped-tls to 1.0.0
-# as 1.0.1 bumped MSRV to 1.59
-# Used only in
-# imgui-examples -> glium -> glutin -> wayland-client -> scoped-tls
-# so not worth bumping MSRV for this basically to keep CI happy
-# FIXME: Remove this for imgui-rs v0.10 and bump MSRV
-scoped-tls = "=1.0.0"
+[dependencies]
+imgui-glium-renderer = "0.12.0"
+# imgui-glium-renderer = { path = "../imgui-glium-renderer" }
+# imgui-winit-support = { path = "../imgui-winit-support" }
