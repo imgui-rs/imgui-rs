@@ -132,7 +132,13 @@ fn generate_binding_file(
     ];
     cmd.args(a);
     cmd.args(["--blocklist-type", "__darwin_size_t"]);
-    cmd.args(["--raw-line", "#![allow(nonstandard_style, clippy::all)]"]);
+    cmd.args(["--blocklist-type", "__darwin_off_t"]);
+    cmd.args(["--blocklist-file", ".*stdio.h"]);
+    cmd.args([
+        "--raw-line",
+        "#![allow(nonstandard_style, private_interfaces, clippy::all)]",
+    ]);
+    cmd.args(["--raw-line", "enum FILE {}"]);
     cmd.arg("--output").arg(output);
     cmd.args(["--ctypes-prefix", "cty"]);
 
