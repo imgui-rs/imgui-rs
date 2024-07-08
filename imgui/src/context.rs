@@ -449,10 +449,16 @@ fn test_shared_font_atlas() {
 #[test]
 fn test_ini_load_save() {
     let (_guard, mut ctx) = crate::test::test_ctx();
-    let data = "[Window][Debug##Default]
+    let data = if cfg!(not(feature = "docking")) {
+         "[Window][Debug##Default]
+Pos=60,60
+Size=400,400"
+    } else {
+        "[Window][Debug##Default]
 Pos=60,60
 Size=400,400
-Collapsed=0";
+Collapsed=0"
+    };
     ctx.load_ini_settings(data);
     let mut buf = String::new();
     ctx.save_ini_settings(&mut buf);

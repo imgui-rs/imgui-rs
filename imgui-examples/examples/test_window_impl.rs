@@ -405,7 +405,7 @@ fn show_test_window(ui: &Ui, state: &mut State, opened: &mut bool) {
 
                 {
                     let tree_node_stack = ui.tree_node_config("##HideTreeNodeLabel")
-                        .allow_item_overlap(true)
+                        .allow_overlap(true)
                         .push();
                     ui.same_line();
                     if ui.small_button(format!("Child {} is a button", num_child)) {

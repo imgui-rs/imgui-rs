@@ -22,6 +22,7 @@
   "ImFontGlyphRangesBuilder": "struct ImFontGlyphRangesBuilder",
   "ImGuiBackendFlags": "int",
   "ImGuiButtonFlags": "int",
+  "ImGuiChildFlags": "int",
   "ImGuiCol": "int",
   "ImGuiColorEditFlags": "int",
   "ImGuiComboFlags": "int",

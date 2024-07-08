@@ -94,8 +94,8 @@ ImVector_resize	2
 1	void	ImVector_resize_Nil (int)
 2	void	ImVector_resize_T (int,const T)
 igBeginChild	2
-1	bool	igBeginChild_Str (const char*,const ImVec2,bool,ImGuiWindowFlags)
-2	bool	igBeginChild_ID (ImGuiID,const ImVec2,bool,ImGuiWindowFlags)
+1	bool	igBeginChild_Str (const char*,const ImVec2,ImGuiChildFlags,ImGuiWindowFlags)
+2	bool	igBeginChild_ID (ImGuiID,const ImVec2,ImGuiChildFlags,ImGuiWindowFlags)
 igCheckboxFlags	4
 1	bool	igCheckboxFlags_IntPtr (const char*,int*,int)
 2	bool	igCheckboxFlags_UintPtr (const char*,unsigned int*,unsigned int)
@@ -107,7 +107,7 @@ igCollapsingHeader	2
 igCombo	3
 1	bool	igCombo_Str_arr (const char*,int*,const char* const[],int,int)
 2	bool	igCombo_Str (const char*,int*,const char*,int)
-3	bool	igCombo_FnBoolPtr (const char*,int*,bool(*)(void*,int,const char**),void*,int,int)
+3	bool	igCombo_FnStrPtr (const char*,int*,const char*(*)(void*,int),void*,int,int)
 igGetBackgroundDrawList	2
 1	ImDrawList*	igGetBackgroundDrawList_Nil ()
 2	ImDrawList*	igGetBackgroundDrawList_ViewportPtr (ImGuiViewport*)
@@ -123,6 +123,12 @@ igGetID	3
 1	ImGuiID	igGetID_Str (const char*)
 2	ImGuiID	igGetID_StrStr (const char*,const char*)
 3	ImGuiID	igGetID_Ptr (const void*)
+igGetIDWithSeed	2
+1	ImGuiID	igGetIDWithSeed_Str (const char*,const char*,ImGuiID)
+2	ImGuiID	igGetIDWithSeed_Int (int,ImGuiID)
+igGetKeyData	2
+1	ImGuiKeyData*	igGetKeyData_ContextPtr (ImGuiContext*,ImGuiKey)
+2	ImGuiKeyData*	igGetKeyData_Key (ImGuiKey)
 igImAbs	3
 1	int	igImAbs_Int (int)
 2	float	igImAbs_Float (float)
@@ -130,9 +136,6 @@ igImAbs	3
 igImFloor	2
 1	float	igImFloor_Float (float)
 2	ImVec2	igImFloor_Vec2 (const ImVec2)
-igImFloorSigned	2
-1	float	igImFloorSigned_Float (float)
-2	ImVec2	igImFloorSigned_Vec2 (const ImVec2)
 igImIsPowerOfTwo	2
 1	bool	igImIsPowerOfTwo_Int (int)
 2	bool	igImIsPowerOfTwo_U64 (ImU64)
@@ -155,6 +158,12 @@ igImRsqrt	2
 igImSign	2
 1	float	igImSign_Float (float)
 2	double	igImSign_double (double)
+igImTrunc	2
+1	float	igImTrunc_Float (float)
+2	ImVec2	igImTrunc_Vec2 (const ImVec2)
+igIsKeyChordPressed	2
+1	bool	igIsKeyChordPressed_Nil (ImGuiKeyChord)
+2	bool	igIsKeyChordPressed_ID (ImGuiKeyChord,ImGuiID,ImGuiInputFlags)
 igIsKeyDown	2
 1	bool	igIsKeyDown_Nil (ImGuiKey)
 2	bool	igIsKeyDown_ID (ImGuiKey,ImGuiID)
@@ -167,6 +176,9 @@ igIsKeyReleased	2
 igIsMouseClicked	2
 1	bool	igIsMouseClicked_Bool (ImGuiMouseButton,bool)
 2	bool	igIsMouseClicked_ID (ImGuiMouseButton,ImGuiID,ImGuiInputFlags)
+igIsMouseDoubleClicked	2
+1	bool	igIsMouseDoubleClicked_Nil (ImGuiMouseButton)
+2	bool	igIsMouseDoubleClicked_ID (ImGuiMouseButton,ImGuiID)
 igIsMouseDown	2
 1	bool	igIsMouseDown_Nil (ImGuiMouseButton)
 2	bool	igIsMouseDown_ID (ImGuiMouseButton,ImGuiID)
@@ -184,7 +196,7 @@ igItemSize	2
 2	void	igItemSize_Rect (const ImRect,float)
 igListBox	2
 1	bool	igListBox_Str_arr (const char*,int*,const char* const[],int,int)
-2	bool	igListBox_FnBoolPtr (const char*,int*,bool(*)(void*,int,const char**),void*,int,int)
+2	bool	igListBox_FnStrPtr (const char*,int*,const char*(*)(void*,int),void*,int,int)
 igMarkIniSettingsDirty	2
 1	void	igMarkIniSettingsDirty_Nil ()
 2	void	igMarkIniSettingsDirty_WindowPtr (ImGuiWindow*)
@@ -275,4 +287,4 @@ igValue	4
 2	void	igValue_Int (const char*,int)
 3	void	igValue_Uint (const char*,unsigned int)
 4	void	igValue_Float (const char*,float,const char*)
-193 overloaded
+201 overloaded

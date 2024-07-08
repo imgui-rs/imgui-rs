@@ -134,7 +134,7 @@ impl Ui {
     /// Both may be activated during the same frame before the later one takes priority.
     #[doc(alias = "SetItemAllowOverlap")]
     pub fn set_item_allow_overlap(&self) {
-        unsafe { sys::igSetItemAllowOverlap() };
+        unsafe { sys::igSetNextItemAllowOverlap() };
     }
     /// Makes the last item the default focused item of the window
     #[doc(alias = "SetItemDefaultFocus")]

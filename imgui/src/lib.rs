@@ -600,17 +600,21 @@ impl Ui {
     /// ```
     #[doc(alias = "BeginTooltip", alias = "EndTootip")]
     pub fn tooltip<F: FnOnce()>(&self, f: F) {
-        unsafe { sys::igBeginTooltip() };
-        f();
-        unsafe { sys::igEndTooltip() };
+        if unsafe { sys::igBeginTooltip() } {
+            f();
+            unsafe { sys::igEndTooltip() };
+        }
     }
     /// Construct a tooltip window that can have any kind of content.
     ///
     /// Returns a `TooltipToken` that must be ended by calling `.end()`
     #[doc(alias = "BeginTooltip")]
-    pub fn begin_tooltip(&self) -> TooltipToken<'_> {
-        unsafe { sys::igBeginTooltip() };
-        TooltipToken::new(self)
+    pub fn begin_tooltip(&self) -> Option<TooltipToken<'_>> {
+        if unsafe { sys::igBeginTooltip() } {
+            Some(TooltipToken::new(self))
+        } else {
+            None
+        }
     }
 
     /// Shortcut to call [`Self::tooltip`] with simple text content.

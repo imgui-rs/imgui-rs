@@ -119,14 +119,6 @@ fn main() {
                     home_counter += 1;
                 }
                 ui.text(format!("Home has been pressed for {} frames", home_counter));
-                // It is important to remember that unlike using
-                // `imgui::Key`, there is nothing enforcing the index
-                // is the key you expect. For example if you hardcode
-                // your key ID's and switch backends, you may be
-                // querying different keys!
-                if ui.io().keys_down[123] {
-                    // A mystery key is down!
-                }
 
                 // It is also possible to use the `is_key_...` methods
                 // with arbitrary key indexes. For example, to check

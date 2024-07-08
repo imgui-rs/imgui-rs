@@ -1,12 +1,12 @@
 //! Internal raw utilities (don't use unless you know what you're doing!)
 
-use std::slice;
+use std::{os::raw::c_int, slice};
 
 /// A generic version of the raw imgui-sys ImVector struct types
 #[repr(C)]
 pub struct ImVector<T> {
-    size: i32,
-    capacity: i32,
+    size: c_int,
+    capacity: c_int,
     pub(crate) data: *mut T,
 }
 

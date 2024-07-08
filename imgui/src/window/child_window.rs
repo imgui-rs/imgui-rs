@@ -1,3 +1,4 @@
+use bitflags::bitflags;
 use std::f32;
 
 use crate::math::MintVec2;
@@ -5,18 +6,41 @@ use crate::window::WindowFlags;
 use crate::Ui;
 use crate::{sys, Id};
 
+bitflags! {
+    /// Configuration flags for windows
+    #[repr(transparent)]
+    pub struct ChildFlags: u32 {
+        /// Show an outer border and enable WindowPadding.
+        const BORDER = sys::ImGuiChildFlags_Border;
+        /// Pad with `style.window_padding`` even if no border are drawn (no padding by default for non-bordered child windows because it makes more sense)
+        const ALWAYS_USE_WINDOW_PADDING = sys::ImGuiChildFlags_AlwaysUseWindowPadding;
+        /// Allow resize from right border (layout direction).
+        const RESIZE_X = sys::ImGuiChildFlags_ResizeX;
+        /// Allow resize from bottom border (layout direction). Allow resize from bottom border (layout direction). Enable .ini saving (unless ImGuiWindowFlags_NoSavedSettings passed to window flags)
+        const RESIZE_Y = sys::ImGuiChildFlags_ResizeY;
+        /// Enable auto-resizing width. Read "IMPORTANT: Size measurement" details above.
+        const AUTO_RESIZE_X = sys::ImGuiChildFlags_AutoResizeX;
+        /// Enable auto-resizing height. Read "IMPORTANT: Size measurement" details above.
+        const AUTO_RESIZE_Y = sys::ImGuiChildFlags_AutoResizeY;
+        /// Combined with AutoResizeX/AutoResizeY. Always measure size even when child is hidden, always return true, always disable clipping optimization! NOT RECOMMENDED.
+        const ALWAYS_AUTO_RESIZE = sys::ImGuiChildFlags_AlwaysAutoResize;
+        /// Style the child window like a framed item: use FrameBg, FrameRounding, FrameBorderSize, FramePadding instead of ChildBg, ChildRounding, ChildBorderSize, WindowPadding.
+        const FRAME_STYLE = sys::ImGuiChildFlags_FrameStyle;
+    }
+}
+
 /// Builder for a child window
 #[derive(Copy, Clone, Debug)]
 #[must_use]
 pub struct ChildWindow<'ui> {
     ui: &'ui Ui,
     id: u32,
+    child_flags: ChildFlags,
     flags: WindowFlags,
     size: [f32; 2],
     content_size: [f32; 2],
     focused: bool,
     bg_alpha: f32,
-    border: bool,
 }
 
 impl<'ui> ChildWindow<'ui> {
@@ -34,12 +58,12 @@ impl<'ui> ChildWindow<'ui> {
         Self {
             ui,
             id: id.0,
+            child_flags: ChildFlags::empty(),
             flags: WindowFlags::empty(),
             size: [0.0, 0.0],
             content_size: [0.0, 0.0],
             focused: false,
             bg_alpha: f32::NAN,
-            border: false,
         }
     }
 
@@ -92,7 +116,7 @@ impl<'ui> ChildWindow<'ui> {
     /// Disabled by default.
     #[inline]
     pub fn border(mut self, border: bool) -> Self {
-        self.border = border;
+        self.child_flags.set(ChildFlags::BORDER, border);
         self
     }
     /// Enables/disables moving the window when child window is dragged.
@@ -204,8 +228,8 @@ impl<'ui> ChildWindow<'ui> {
     /// Disabled by default.
     #[inline]
     pub fn always_use_window_padding(mut self, value: bool) -> Self {
-        self.flags
-            .set(WindowFlags::ALWAYS_USE_WINDOW_PADDING, value);
+        self.child_flags
+            .set(ChildFlags::ALWAYS_USE_WINDOW_PADDING, value);
         self
     }
     /// Enables/disables gamepad/keyboard navigation within the window.
@@ -270,7 +294,7 @@ impl<'ui> ChildWindow<'ui> {
             sys::igBeginChild_ID(
                 self.id,
                 self.size.into(),
-                self.border,
+                self.child_flags.bits() as i32,
                 self.flags.bits() as i32,
             )
         };

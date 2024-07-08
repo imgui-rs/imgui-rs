@@ -464,10 +464,12 @@ impl WinitPlatform {
                 io.add_key_event(Key::ModSuper, state.super_key());
             }
             WindowEvent::KeyboardInput { ref event, .. } => {
-                if let Some(txt) = &event.text {
-                    for ch in txt.chars() {
-                        if ch != '\u{7f}' {
-                            io.add_input_character(ch)
+                if event.state == ElementState::Pressed {
+                    if let Some(txt) = &event.text {
+                        for ch in txt.chars() {
+                            if ch != '\u{7f}' {
+                                io.add_input_character(ch)
+                            }
                         }
                     }
                 }

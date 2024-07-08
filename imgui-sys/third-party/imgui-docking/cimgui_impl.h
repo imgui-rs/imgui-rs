@@ -10,6 +10,7 @@ CIMGUI_API void ImGui_ImplGlfw_Shutdown(void);
 CIMGUI_API void ImGui_ImplGlfw_NewFrame(void);
 CIMGUI_API void ImGui_ImplGlfw_InstallCallbacks(GLFWwindow* window);
 CIMGUI_API void ImGui_ImplGlfw_RestoreCallbacks(GLFWwindow* window);
+CIMGUI_API void ImGui_ImplGlfw_SetCallbacksChainForAllWindows(bool chain_for_all_windows);
 CIMGUI_API void ImGui_ImplGlfw_WindowFocusCallback(GLFWwindow* window,int focused);
 CIMGUI_API void ImGui_ImplGlfw_CursorEnterCallback(GLFWwindow* window,int entered);
 CIMGUI_API void ImGui_ImplGlfw_CursorPosCallback(GLFWwindow* window,double x,double y);
@@ -42,19 +43,24 @@ CIMGUI_API bool ImGui_ImplOpenGL2_CreateDeviceObjects(void);
 CIMGUI_API void ImGui_ImplOpenGL2_DestroyDeviceObjects(void);
 
 #endif
-#ifdef CIMGUI_USE_SDL
+#ifdef CIMGUI_USE_SDL2
 
 typedef struct SDL_Window SDL_Window;
 typedef struct SDL_Renderer SDL_Renderer;
+typedef struct _SDL_GameController _SDL_GameController;
 struct SDL_Window;
 struct SDL_Renderer;
-typedef union SDL_Event SDL_Event;CIMGUI_API bool ImGui_ImplSDL2_InitForOpenGL(SDL_Window* window,void* sdl_gl_context);
+struct _SDL_GameController;
+typedef union SDL_Event SDL_Event;
+typedef enum { ImGui_ImplSDL2_GamepadMode_AutoFirst, ImGui_ImplSDL2_GamepadMode_AutoAll, ImGui_ImplSDL2_GamepadMode_Manual }ImGui_ImplSDL2_GamepadMode;CIMGUI_API bool ImGui_ImplSDL2_InitForOpenGL(SDL_Window* window,void* sdl_gl_context);
 CIMGUI_API bool ImGui_ImplSDL2_InitForVulkan(SDL_Window* window);
 CIMGUI_API bool ImGui_ImplSDL2_InitForD3D(SDL_Window* window);
 CIMGUI_API bool ImGui_ImplSDL2_InitForMetal(SDL_Window* window);
 CIMGUI_API bool ImGui_ImplSDL2_InitForSDLRenderer(SDL_Window* window,SDL_Renderer* renderer);
+CIMGUI_API bool ImGui_ImplSDL2_InitForOther(SDL_Window* window);
 CIMGUI_API void ImGui_ImplSDL2_Shutdown(void);
 CIMGUI_API void ImGui_ImplSDL2_NewFrame(void);
 CIMGUI_API bool ImGui_ImplSDL2_ProcessEvent(const SDL_Event* event);
+CIMGUI_API void ImGui_ImplSDL2_SetGamepadMode(ImGui_ImplSDL2_GamepadMode mode,struct _SDL_GameController** manual_gamepads_array,int manual_gamepads_count);
 
 #endif

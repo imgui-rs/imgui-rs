@@ -16,27 +16,41 @@ In short, there are a few steps:
 
 ## Step by step
 
-1. Update the copies of `imgui` in `imgui-sys/third-party/imgui-*/imgui/` from the appropriate branches on [the upstream repo](https://github.com/ocornut/imgui)
+1. Ensure `luajit` is installed, as this is required by cimgui's generator.
+
+   $ luajit --help
+
+2. For routine updates, check out [the upstream imgui repo](https://github.com/ocornut/imgui) as well as [the upstream cimgui repo](https://github.com/cimgui/cimgui) somewhere, for example:
+
+    ```sh
+    git clone https://github.com/ocornut/imgui.git /tmp/imgui
+    git clone https://github.com/cimgui/cimgui.git /tmp/cimgui
+    rm -rf /tmp/cimgui/imgui
+    ```
+
+    Now, update the shell script to perform the updates automatically (which also serves as documentation of what revision was used):
+
+    ```sh
+    imgui-sys/third-party/update-imgui.sh /tmp/imgui /tmp/cimgui
+    ```
+
+    If this step succeeds and is sufficient for your needs, go directly to **step 6**.
+
+3. Update the copies of `imgui` in `imgui-sys/third-party/imgui-*/imgui/` from the appropriate branches on [the upstream repo](https://github.com/ocornut/imgui)
 
     Each branch should generally be from roughly the same point in time. Generally just after each imgui release the `docking` branch is updated, so it's usually easy to find an equivalent commit in both.
 
     We trim some of the "unrequired" parts of imgui, such as it's `.github` directory, the `backends` and `docs`. We are mainly just interested in the main `.cpp` and `.h` files, as well as `misc/freetype/` support files.
 
-    There's a simple shell script to perform the updates at `imgui-sys/third-party/update-imgui.sh` - this also serves as documentation of what revision was used.
-
-2. Ensure `luajit` is installed, as this is required by cimgui's generator.
-
-   $ luajit --help
-
-3. Check out the `cimgui` project somewhere:
+4. Check out the `cimgui` project somewhere:
 
    ```sh
-       git clone --recursive https://github.com/cimgui/cimgui.git /tmp/cimgui
+   git clone --recursive https://github.com/cimgui/cimgui.git /tmp/cimgui
    ```
 
     Make sure the checkout is updated and on a reasonable a reasonably recent version. Old versions can produce differently named symbols which can make updates more tedious than they need to be! Generally the tag corresponding to the latest imgui release is a good choice.
 
-4. For each of the branches, run the corresponding `update-cimgui-output.sh` script.
+5. For each of the branches, run the corresponding `update-cimgui-output.sh` script.
 
    ```sh
        $ pwd
@@ -56,7 +70,7 @@ In short, there are a few steps:
 
    With this step, we now have new C bindings to the desired version of Dear ImGui.
 
-5. Back in the root of the imgui-rs repo, run `cargo xtask bindgen`
+6. Back in the root of the imgui-rs repo, run `cargo xtask bindgen`
 
     This step generates `imgui-sys/src/bindings.rs` etc which are then used by `imgui/src/*`
 
@@ -74,17 +88,17 @@ In short, there are a few steps:
 
     Be sure to check `bindgen --version` versus the previously used version which is recoded in the first line of `imgui-sys/src/bindings.rs` - if you use a different version, you may get slightly different bindings which could also cause an update to be more work than it would otherwise be with matching bindgen versions
 
-6. Run `cargo build` and fix any errors caused by changes upstream (see next section)
+7. Run `cargo build` and fix any errors caused by changes upstream (see next section)
 
-7. Run the tests with `cargo test`.
+8. Run the tests with `cargo test`.
 
-8. Try running one of the examples
+9. Try running one of the examples
 
     ```sh
         cargo run --example test_window_impl
     ```
 
-9. Update README to reference correct Dear ImGui (updating the URL in the badge)
+10. Update README to reference correct Dear ImGui (updating the URL in the badge)
 
 ## Common sources of problems
 

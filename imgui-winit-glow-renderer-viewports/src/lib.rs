@@ -1,10 +1,5 @@
 use std::{
-    cell::RefCell,
-    collections::{HashMap, VecDeque},
-    num::NonZeroU32,
-    ptr::null_mut,
-    rc::Rc,
-    slice,
+    cell::RefCell, collections::{HashMap, VecDeque}, num::NonZeroU32, os::raw::c_void, ptr::null_mut, rc::Rc, slice
 };
 
 use glow::HasContext;
@@ -397,6 +392,7 @@ impl Renderer {
                 work_pos: [monitor.position().x as f32, monitor.position().y as f32],
                 work_size: [monitor.size().width as f32, monitor.size().height as f32],
                 dpi_scale: 1.0,
+                platform_handle: std::ptr::null_mut() as *mut c_void,
             });
         }
         imgui

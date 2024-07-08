@@ -242,11 +242,11 @@ impl Ui {
     /// Allow focusing using TAB/Shift-TAB, enabled by default but you can
     /// disable it for certain widgets
     ///
-    /// Returns a [PushAllowKeyboardFocusToken] that should be dropped.
-    #[doc(alias = "PushAllowKeyboardFocus")]
-    pub fn push_allow_keyboard_focus(&self, allow: bool) -> PushAllowKeyboardFocusToken<'_> {
-        unsafe { sys::igPushAllowKeyboardFocus(allow) };
-        PushAllowKeyboardFocusToken::new(self)
+    /// Returns a [PushTabStopToken] that should be dropped.
+    #[doc(alias = "PushTabStop")]
+    pub fn push_allow_keyboard_focus(&self, allow: bool) -> PushTabStopToken<'_> {
+        unsafe { sys::igPushTabStop(allow) };
+        PushTabStopToken::new(self)
     }
 
     /// In 'repeat' mode, button_x functions return repeated true in a typematic
@@ -281,7 +281,7 @@ impl Ui {
     pub fn push_item_flag(&self, item_flag: ItemFlag) -> ItemFlagsStackToken<'_> {
         use self::ItemFlag::*;
         match item_flag {
-            AllowKeyboardFocus(v) => unsafe { sys::igPushAllowKeyboardFocus(v) },
+            TabStop(v) => unsafe { sys::igPushTabStop(v) },
             ButtonRepeat(v) => unsafe { sys::igPushButtonRepeat(v) },
         }
         ItemFlagsStackToken::new(self, item_flag)
@@ -291,7 +291,7 @@ impl Ui {
 /// A temporary change in item flags
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
 pub enum ItemFlag {
-    AllowKeyboardFocus(bool),
+    TabStop(bool),
     ButtonRepeat(bool),
 }
 
@@ -310,10 +310,10 @@ create_token!(
 );
 
 create_token!(
-    pub struct PushAllowKeyboardFocusToken<'ui>;
+    pub struct PushTabStopToken<'ui>;
 
-    #[doc(alias = "PopAllowKeyboardFocus")]
-    drop { sys::igPopAllowKeyboardFocus() }
+    #[doc(alias = "PopTabStop")]
+    drop { sys::igPopTabStop() }
 );
 
 create_token!(
@@ -348,8 +348,8 @@ impl<'a> ItemFlagsStackToken<'a> {
 impl Drop for ItemFlagsStackToken<'_> {
     fn drop(&mut self) {
         unsafe {
-            if self.1 == mem::discriminant(&ItemFlag::AllowKeyboardFocus(true)) {
-                sys::igPopAllowKeyboardFocus();
+            if self.1 == mem::discriminant(&ItemFlag::TabStop(true)) {
+                sys::igPopTabStop();
             } else if self.1 == mem::discriminant(&ItemFlag::ButtonRepeat(true)) {
                 sys::igPopButtonRepeat();
             } else {

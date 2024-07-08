@@ -17,7 +17,7 @@ bitflags!(
         /// Cannot be selected, display greyed out text
         const DISABLED = sys::ImGuiSelectableFlags_Disabled;
         /// (WIP) Hit testing to allow subsequent willdgets to overlap this one
-        const ALLOW_ITEM_OVERLAP = sys::ImGuiSelectableFlags_AllowItemOverlap;
+        const ALLOW_OVERLAP = sys::ImGuiSelectableFlags_AllowOverlap;
     }
 );
 

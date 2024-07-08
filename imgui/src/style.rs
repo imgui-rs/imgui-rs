@@ -3,7 +3,7 @@ use std::fmt;
 use std::ops::{Index, IndexMut};
 
 use crate::internal::RawCast;
-use crate::sys;
+use crate::{sys, ItemHoveredFlags};
 use crate::Direction;
 
 /// User interface style/colors
@@ -103,6 +103,10 @@ pub struct Style {
     /// `= 0.0`: always show when hovering
     /// `= f32::MAX`: never show close button unless selected
     pub tab_min_width_for_close_button: f32,
+    /// Thickness of tab-bar separator, which takes on the tab active color to denote focus.
+    pub tab_bar_border_size: f32,
+    /// Angle of angled headers (supported values range from -50.0f degrees to +50.0f degrees).
+    pub table_angled_headers_angle: f32,
     /// Side of the color buttonton pubin color editor widgets (left/right).
     pub color_button_position: Direction,
     /// Alignment of button text when button is larger than text.
@@ -113,6 +117,12 @@ pub struct Style {
     ///
     /// Defaults to [0.5, 0.5] (top-left aligned).
     pub selectable_text_align: [f32; 2],
+    /// Thickkness of border in SeparatorText()
+    pub separator_text_border_size: f32,
+    /// Alignment of text within the separator. Defaults to (0.0f, 0.5f) (left aligned, center).
+    pub separator_text_align: [f32; 2],
+    /// Horizontal offset of text from each edge of the separator + spacing on other axis. Generally small values. .y is recommended to be == FramePadding.y.
+    pub separator_text_padding: [f32; 2],
     /// Window positions are clamped to be visible within the display area or monitors by at least
     /// this amount.
     ///
@@ -122,6 +132,9 @@ pub struct Style {
     ///
     /// Also applies to popups/tooltips in addition to regular windows.
     pub display_safe_area_padding: [f32; 2],
+    #[cfg(feature = "docking")]
+    /// Window position are clamped to be visible within the display area or monitors by at least this amount. Only applies to regular windows.
+    pub docking_separator_size: f32,
     /// Scale software-rendered mouse cursor.
     ///
     /// May be removed later.
@@ -151,6 +164,16 @@ pub struct Style {
     pub circle_tesselation_max_error: f32,
     /// Style colors.
     pub colors: [[f32; 4]; StyleColor::COUNT],
+    /// Delay for IsItemHovered(ImGuiHoveredFlags_Stationary). Time required to consider mouse stationary.
+    pub hover_stationary_delay: f32,
+    /// Delay for IsItemHovered(ImGuiHoveredFlags_DelayShort). Usually used along with HoverStationaryDelay.
+    pub hover_delay_short: f32,
+    /// Delay for IsItemHovered(ImGuiHoveredFlags_DelayNormal). Usually used along with HoverStationaryDelay.
+    pub hover_delay_normal: f32,
+    /// Default flags when using IsItemHovered(ImGuiHoveredFlags_ForTooltip) or BeginItemTooltip()/SetItemTooltip() while using mouse.
+    pub hover_flags_for_tooltip_mouse: ItemHoveredFlags,
+    /// Default flags when using IsItemHovered(ImGuiHoveredFlags_ForTooltip) or BeginItemTooltip()/SetItemTooltip() while using keyboard/gamepad.
+    pub hover_flags_for_tooltip_nav: ItemHoveredFlags,
 }
 
 unsafe impl RawCast<sys::ImGuiStyle> for Style {}
@@ -574,12 +597,15 @@ fn test_style_scaling() {
     style.scrollbar_rounding = 20.0;
     style.grab_min_size = 21.0;
     style.grab_rounding = 22.0;
-    style.log_slider_deadzone = 29.0;
-    style.tab_rounding = 23.0;
-    style.display_window_padding = [24.0, 25.0];
-    style.display_safe_area_padding = [26.0, 27.0];
-    style.mouse_cursor_scale = 28.0;
-    style.cell_padding = [29.0, 30.0];
+    style.log_slider_deadzone = 23.0;
+    style.tab_rounding = 24.0;
+    style.tab_min_width_for_close_button = 25.0;
+    style.separator_text_padding = [26.0, 27.0];
+    #[cfg(feature = "docking")]
+    { style.docking_separator_size = 28.0; }
+    style.display_window_padding = [29.0, 30.0];
+    style.display_safe_area_padding = [31.0, 32.0];
+    style.cell_padding = [33.0, 34.0];
     style.scale_all_sizes(2.0);
     assert_eq!(style.window_padding, [2.0, 4.0]);
     assert_eq!(style.window_rounding, 6.0);
@@ -597,12 +623,15 @@ fn test_style_scaling() {
     assert_eq!(style.scrollbar_rounding, 40.0);
     assert_eq!(style.grab_min_size, 42.0);
     assert_eq!(style.grab_rounding, 44.0);
-    assert_eq!(style.log_slider_deadzone, 58.0);
-    assert_eq!(style.tab_rounding, 46.0);
-    assert_eq!(style.display_window_padding, [48.0, 50.0]);
-    assert_eq!(style.display_safe_area_padding, [52.0, 54.0]);
-    assert_eq!(style.mouse_cursor_scale, 56.0);
-    assert_eq!(style.cell_padding, [58.0, 60.0]);
+    assert_eq!(style.log_slider_deadzone, 46.0);
+    assert_eq!(style.tab_rounding, 48.0);
+    assert_eq!(style.tab_min_width_for_close_button, 50.0);
+    assert_eq!(style.separator_text_padding, [52.0, 54.0]);
+    #[cfg(feature = "docking")]
+    assert_eq!(style.docking_separator_size, 56.0);
+    assert_eq!(style.display_window_padding, [58.0, 60.0]);
+    assert_eq!(style.display_safe_area_padding, [62.0, 64.0]);
+    assert_eq!(style.cell_padding, [66.0, 68.0]);
 }
 
 #[test]
@@ -659,11 +688,18 @@ fn test_style_memory_layout() {
     assert_field_offset!(tab_rounding, TabRounding);
     assert_field_offset!(tab_border_size, TabBorderSize);
     assert_field_offset!(tab_min_width_for_close_button, TabMinWidthForCloseButton);
+    assert_field_offset!(tab_bar_border_size, TabBarBorderSize);
+    assert_field_offset!(table_angled_headers_angle, TableAngledHeadersAngle);
     assert_field_offset!(color_button_position, ColorButtonPosition);
     assert_field_offset!(button_text_align, ButtonTextAlign);
     assert_field_offset!(selectable_text_align, SelectableTextAlign);
+    assert_field_offset!(separator_text_border_size, SeparatorTextBorderSize);
+    assert_field_offset!(separator_text_align, SeparatorTextAlign);
+    assert_field_offset!(separator_text_padding, SeparatorTextPadding);
     assert_field_offset!(display_window_padding, DisplayWindowPadding);
     assert_field_offset!(display_safe_area_padding, DisplaySafeAreaPadding);
+    #[cfg(feature = "docking")]
+    assert_field_offset!(docking_separator_size, DockingSeparatorSize);
     assert_field_offset!(mouse_cursor_scale, MouseCursorScale);
     assert_field_offset!(anti_aliased_lines, AntiAliasedLines);
     assert_field_offset!(anti_aliased_lines_use_tex, AntiAliasedLinesUseTex);

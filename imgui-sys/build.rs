@@ -7,6 +7,7 @@ const DEFINES: &[(&str, Option<&str>)] = &[
     ("CIMGUI_NO_EXPORT", None),
     ("IMGUI_DISABLE_WIN32_FUNCTIONS", None),
     ("IMGUI_DISABLE_OSX_FUNCTIONS", None),
+    ("IMGUI_DISABLE_OBSOLETE_KEYIO", None),
 ];
 
 #[cfg(feature = "freetype")]

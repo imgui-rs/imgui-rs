@@ -122,7 +122,13 @@ impl Ui {
     /// Returns true if the given mouse button was double-clicked
     #[doc(alias = "IsMouseDoubleClicked")]
     pub fn is_mouse_double_clicked(&self, button: MouseButton) -> bool {
-        unsafe { sys::igIsMouseDoubleClicked(button as i32) }
+        cfg_if::cfg_if! {
+            if #[cfg(feature = "docking")] {
+                unsafe { sys::igIsMouseDoubleClicked_Nil(button as i32) }
+            } else {
+                unsafe { sys::igIsMouseDoubleClicked(button as i32) }
+            }
+        }
     }
     /// Returns true if the given mouse button was released (went from down to !down)
     #[doc(alias = "IsMouseReleased")]
