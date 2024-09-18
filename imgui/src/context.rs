@@ -539,7 +539,7 @@ impl Context {
     }
 
     /// Starts a new frame and returns an `Ui` instance for constructing a user interface.
-    #[doc(alias = "NewFame")]
+    #[doc(alias = "NewFrame")]
     pub fn new_frame(&mut self) -> &mut Ui {
         // Clear default font if it no longer exists. This could be an error in the future
         let default_font = self.io().font_default;
