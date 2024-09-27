@@ -187,7 +187,7 @@ impl Ui {
     /// - `> 0.0`: width is `item_width` pixels
     /// - `= 0.0`: default to ~2/3 of window width
     /// - `< 0.0`: `item_width` pixels relative to the right of window (-1.0 always aligns width to
-    /// the right side)
+    ///   the right side)
     #[doc(alias = "PushItemWith")]
     pub fn push_item_width(&self, item_width: f32) -> ItemWidthStackToken<'_> {
         unsafe { sys::igPushItemWidth(item_width) };
@@ -198,7 +198,7 @@ impl Ui {
     /// - `> 0.0`: width is `item_width` pixels
     /// - `= 0.0`: default to ~2/3 of window width
     /// - `< 0.0`: `item_width` pixels relative to the right of window (-1.0 always aligns width to
-    /// the right side)
+    ///   the right side)
     #[doc(alias = "SetNextItemWidth")]
     pub fn set_next_item_width(&self, item_width: f32) {
         unsafe { sys::igSetNextItemWidth(item_width) };

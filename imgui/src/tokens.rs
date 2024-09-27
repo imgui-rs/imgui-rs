@@ -36,6 +36,7 @@ macro_rules! create_token {
 
         impl Drop for $token_name<'_> {
             fn drop(&mut self) {
+                #[allow(clippy::macro_metavars_in_unsafe)]
                 unsafe { $on_drop }
             }
         }
