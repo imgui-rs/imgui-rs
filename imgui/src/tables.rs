@@ -356,13 +356,11 @@ impl Ui {
         inner_width: f32,
     ) -> Option<TableToken<'_>> {
         self.begin_table_with_sizing(str_id, N, flags, outer_size, inner_width)
-            .map(|data| {
+            .inspect(|_data| {
                 for value in column_data {
                     self.table_setup_column_with(value);
                 }
                 self.table_headers_row();
-
-                data
             })
     }
 

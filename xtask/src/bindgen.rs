@@ -22,7 +22,7 @@ impl Bindgen {
                     None => "".to_string(),
                     Some(x) => format!("-{}", x),
                 };
-                let cimgui_output = root.join(&format!(
+                let cimgui_output = root.join(format!(
                     "imgui-sys/third-party/imgui-{}{}",
                     variant, additional
                 ));
@@ -41,7 +41,7 @@ impl Bindgen {
                 generate_binding_file(&header, &output.join(&output_name), &types, &funcs, None)?;
                 generate_binding_file(
                     &header,
-                    &output.join(&format!("wasm_{}", &output_name)),
+                    &output.join(format!("wasm_{}", &output_name)),
                     &types,
                     &funcs,
                     Some(&wasm_name),

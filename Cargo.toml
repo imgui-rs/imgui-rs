@@ -1,10 +1,5 @@
 [workspace]
-members = [
-    "imgui",
-    "imgui-sys",
-    "imgui-examples",
-    "xtask",
-]
+members = ["imgui", "imgui-sys", "xtask"]
 
 package.rust-version = "1.70"
 resolver = "2"

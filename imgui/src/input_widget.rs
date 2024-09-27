@@ -184,12 +184,12 @@ impl<'ui, 'p, L: AsRef<str>> InputText<'ui, 'p, L> {
     /// by appending and then removing a null terminator (`\0`) from the String you pass in.
     /// This has several consequences:
     /// 1. The string's backing buffer may be resized and relocated even without edits as result
-    /// of this pushed char.
+    ///    of this pushed char.
     /// 2. **The string will appear truncated if the string contains `\0` inside it.** This will not
-    /// cause memory *unsafety*, but it will limit your usage. If that's the case, please pre-process
-    /// your string.
+    ///    cause memory *unsafety*, but it will limit your usage. If that's the case, please pre-process
+    ///    your string.
     /// 3. Truncations by ImGui appear to be done primarily by insertions of `\0` to the truncation point.
-    /// We will handle this for you and edit the string "properly" too, but this might show up in callbacks.
+    ///    We will handle this for you and edit the string "properly" too, but this might show up in callbacks.
     pub fn new(ui: &'ui Ui, label: L, buf: &'p mut String) -> Self {
         InputText {
             label,
@@ -280,12 +280,12 @@ where
     /// by appending and then removing a null terminator (`\0`) from the String you pass in.
     /// This has several consequences:
     /// 1. The string's backing buffer may be resized and relocated even without edits as result
-    /// of this pushed char.
+    ///    of this pushed char.
     /// 2. **The string will appear truncated if the string contains `\0` inside it.** This will not
-    /// cause memory *unsafety*, but it will limit your usage. If that's the case, please pre-process
-    /// your string.
+    ///    cause memory *unsafety*, but it will limit your usage. If that's the case, please pre-process
+    ///    your string.
     /// 3. Truncations by ImGui appear to be done primarily by insertions of `\0` to the truncation point.
-    /// We will handle this for you and edit the string "properly" too, but this might show up in callbacks.
+    ///    We will handle this for you and edit the string "properly" too, but this might show up in callbacks.
     pub fn build(self) -> bool {
         // needs to be null-terminated! this is a hack!
         self.buf.push('\0');
@@ -367,12 +367,12 @@ impl<'ui, 'p, L: AsRef<str>> InputTextMultiline<'ui, 'p, L, PassthroughCallback>
     /// by appending and then removing a null terminator (`\0`) from the String you pass in.
     /// This has several consequences:
     /// 1. The string's backing buffer may be resized and relocated even without edits as result
-    /// of this pushed char.
+    ///    of this pushed char.
     /// 2. **The string will appear truncated if the string contains `\0` inside it.** This will not
-    /// cause memory *unsafety*, but it will limit your usage. If that's the case, please pre-process
-    /// your string.
+    ///    cause memory *unsafety*, but it will limit your usage. If that's the case, please pre-process
+    ///    your string.
     /// 3. Truncations by ImGui appear to be done primarily by insertions of `\0` to the truncation point.
-    /// We will handle this for you and edit the string "properly" too, but this might show up in callbacks.
+    ///    We will handle this for you and edit the string "properly" too, but this might show up in callbacks.
     pub fn new(ui: &'ui Ui, label: L, buf: &'p mut String, size: impl Into<MintVec2>) -> Self {
         InputTextMultiline {
             label,
@@ -441,12 +441,12 @@ impl<'ui, 'p, T: InputTextCallbackHandler, L: AsRef<str>> InputTextMultiline<'ui
     /// by appending and then removing a null terminator (`\0`) from the String you pass in.
     /// This has several consequences:
     /// 1. The string's backing buffer may be resized and relocated even without edits as result
-    /// of this pushed char.
+    ///    of this pushed char.
     /// 2. **The string will appear truncated if the string contains `\0` inside it.** This will not
-    /// cause memory *unsafety*, but it will limit your usage. If that's the case, please pre-process
-    /// your string.
+    ///    cause memory *unsafety*, but it will limit your usage. If that's the case, please pre-process
+    ///    your string.
     /// 3. Truncations by ImGui appear to be done primarily by insertions of `\0` to the truncation point.
-    /// We will handle this for you and edit the string "properly" too, but this might show up in callbacks.
+    ///    We will handle this for you and edit the string "properly" too, but this might show up in callbacks.
     pub fn build(self) -> bool {
         // needs to be null-terminated! this is a hack!
         self.buf.push('\0');
