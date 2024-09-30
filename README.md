@@ -23,6 +23,8 @@ ui.window("Hello world")
     });
 ```
 
+`imgui-rs` are the Rust bindings to [Dear ImGui](https://github.com/ocornut/imgui), the standard immediate mode user interface library.
+
 ## Main library crates
 
 The core of imgui-rs consists of:
@@ -30,12 +32,11 @@ The core of imgui-rs consists of:
 - [`imgui`](./imgui): High-level safe API
 - [`imgui-sys`](./imgui-sys): Low-level unsafe API (automatically generated)
 
-Next, we provide two example renderers, and two example backend platform implementations:
+Next, we provide an example renderer, and two example backend platform implementations:
 
-- [`imgui-winit-support`](./imgui-winit-support): Backend platform implementation that uses the `winit` crate
-- [`imgui-sdl2-support`](./imgui-sdl2-support): Backend platform using SDL2
-- [`imgui-glow-renderer`](./imgui-glow-renderer): Renderer implementation that uses the `glow` crate
-- [`imgui-glium-renderer`](./imgui-glium-renderer): Renderer implementation that uses the `glium` crate
+- [`imgui-glow-renderer`](https://github.com/imgui-rs/imgui-glow-renderer): Renderer implementation that uses the `glow` crate
+- [`imgui-winit-support`](https://github.com/imgui-rs/imgui-winit-support): Backend platform implementation that uses the `winit` crate
+- [`imgui-sdl2-support`](https://github.com/imgui-rs/imgui-sdl2-support): Backend platform using SDL2
 
 Each of these contain an `examples` folder showing their usage. Check
 their respective `Cargo.toml` to find compatible versions (e.g
@@ -43,10 +44,7 @@ their respective `Cargo.toml` to find compatible versions (e.g
 compatible `glow` version and `[dev-dependencies]` describes the
 compatible `glutin` version)
 
-Finally the [`imgui-examples`](./imgui-examples) folder contains
-examples of how to use the `imgui` crate itself - this covers general
-topics like how to show text, how to create buttons, etc - and should
-be applicable to usage with any backend/renderer.
+See below as well for community lead platform and renderer crates.
 
 ## Features
 
@@ -54,8 +52,8 @@ be applicable to usage with any backend/renderer.
   is not 100%, but will keep improving over time.
 - Builder structs for use cases where the original C++ library uses optional
   function parameters
-- Easy integration with `glow`/ `glium`
-- Easy integration with winit and sdl2 (backend platform)
+- Easy integration with `glow` and community integrations with `wgpu` and `glium`
+- Easy integration with `winit` and `sdl2`
 - Optional support for the freetype font rasterizer and the docking branch
 
 ## Minimum Support Rust Version (MSRV)
@@ -85,54 +83,44 @@ responsibilities include the following:
 - Handling of DPI factors and scissor rects
 - Texture management
 
-We provide the following renderers as an official source (ie, they will always be up to date and working): `imgui-glow-renderer` and `imgui-glium-renderer`.
+We provide the following renderer as an official source (ie, they will always be up to date and working): `imgui-glow-renderer`.
 
 Additionally, we provide the following backends as an official source (ie, they will always be up to date and working): `imgui-winit-support` and `imgui-sdl2-support`.
 
-The most tested platform/renderer combination is `imgui-glium-renderer` +
- `glium` + `imgui-winit-support` + `winit`, but this is not the only possible
- combination. There's also `imgui-glow-renderer`, which will increasingly replace
-`glium`.
+The most tested platform/renderer combination is `imgui-glow-renderer` +
+`imgui-winit-support` + `winit`, but this is not the only possible
+combination.
 
 Additionally, there are other libraries which provide other kinds of renderers, which may be out of date with `imgui-rs` releases, but might work well for your use case:
 
- 1. [`imgui-wgpu`](https://github.com/Yatekii/imgui-wgpu-rs)
- 2. [`imgui-d3d12-renderer`](https://github.com/curldivergence/imgui-d3d12-renderer)
- 3. [`imgui-dx11-renderer`](https://github.com/veykril/imgui-dx11-renderer)
- 4. [`imgui-gfx-renderer`](https://github.com/imgui-rs/imgui-gfx-renderer): Deprecated (no longer maintained beyond imgui-rs v0.8). Renderer implementation that uses the `gfx` crate (_not the new gfx-hal crate_)
- 5. Many more can be found on [crates.io](https://crates.io) either using search or the ["dependents" page](https://crates.io/crates/imgui/reverse_dependencies) (the "depends on" text indicates if the crate has been updated for current versions of imgui-rs)
-
+1.  [`imgui-wgpu`](https://github.com/Yatekii/imgui-wgpu-rs)
+2.  [`imgui-d3d12-renderer`](https://github.com/curldivergence/imgui-d3d12-renderer)
+3.  [`imgui-dx11-renderer`](https://github.com/veykril/imgui-dx11-renderer)
+4.  [`imgui-gfx-renderer`](https://github.com/imgui-rs/imgui-gfx-renderer): Deprecated (no longer maintained beyond imgui-rs v0.8). Renderer implementation that uses the `gfx` crate (_not the new gfx-hal crate_)
+5.  [`imgui-glium-renderer`](https://github.com/imgui-rs/imgui-glium-renderer): Deprecated implementation that uses the `glium` crate
+6.  Many more can be found on [crates.io](https://crates.io) either using search or the ["dependents" page](https://crates.io/crates/imgui/reverse_dependencies) (the "depends on" text indicates if the crate has been updated for current versions of imgui-rs)
 
 You can also write your own support code if you have a more advanced use case, because **imgui-rs is not tied to any specific graphics / OS API**.
 
 ## Compiling and running the demos
 
-```bash
-git clone https://github.com/imgui-rs/imgui-rs
-cd imgui-rs
-```
-
-Main examples are located in the `imgui-examples` directory. These can be run like so:
+Examples for `imgui` are in their own crate [`imgui-examples`](https://github.com/imgui-rs/imgui-examples).
 
 ```bash
+git clone https://github.com/imgui-rs/imgui-examples
+cd imgui-examples
+
 # At the reposity root
-cargo test
+cargo test;
 
 cargo run --example hello_world
 cargo run --example test_window
 cargo run --example test_window_impl
 ```
 
-Examples for the Glow renderer are under the `imgui-glow-renderer/examples/` directory.
-These can be run the same way as any other examples:
+## Windows Platform Notes
 
-```bash
-cargo test
-
-cargo run --example glow_01_basic
-```
-
-Note to Windows users: You will need to use the _MSVC ABI_ version of the Rust
+Windows platform users will need to use the _MSVC ABI_ version of the Rust
 compiler along with its associated
 [dependencies](https://www.rust-lang.org/en-US/downloads.html#win-foot) to
 build this libary and run the examples.
