@@ -585,7 +585,7 @@ impl<'ui> Ui {
         label: L,
         value: &'p mut i32,
     ) -> InputScalar<'ui, 'p, i32, L> {
-        self.input_scalar(label, value).step(1)
+        self.input_scalar(label, value)
     }
 
     /// Shortcut for [`Ui::input_scalar`]
