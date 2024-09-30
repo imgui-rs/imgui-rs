@@ -6,6 +6,9 @@ IMGUI_DIR=${1:?}
 COMMITISH=${2:?}
 OUT_DIR=${3:?}
 
+echo $IMGUI_DIR;
+echo $SCRIPT_DIR;
+
 # Location of temporary checkout of imgui at specified commit (or branch)
 CHECKOUT="${SCRIPT_DIR}"/_temp_imgui_worktree
 
