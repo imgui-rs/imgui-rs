@@ -46,8 +46,8 @@ ImVector_resize	2
 1	void	ImVector_resize_Nil (int)
 2	void	ImVector_resize_T (int,const T)
 igBeginChild	2
-1	bool	igBeginChild_Str (const char*,const ImVec2,bool,ImGuiWindowFlags)
-2	bool	igBeginChild_ID (ImGuiID,const ImVec2,bool,ImGuiWindowFlags)
+1	bool	igBeginChild_Str (const char*,const ImVec2,ImGuiChildFlags,ImGuiWindowFlags)
+2	bool	igBeginChild_ID (ImGuiID,const ImVec2,ImGuiChildFlags,ImGuiWindowFlags)
 igCheckboxFlags	2
 1	bool	igCheckboxFlags_IntPtr (const char*,int*,int)
 2	bool	igCheckboxFlags_UintPtr (const char*,unsigned int*,unsigned int)
@@ -57,21 +57,22 @@ igCollapsingHeader	2
 igCombo	3
 1	bool	igCombo_Str_arr (const char*,int*,const char* const[],int,int)
 2	bool	igCombo_Str (const char*,int*,const char*,int)
-3	bool	igCombo_FnBoolPtr (const char*,int*,bool(*)(void*,int,const char**),void*,int,int)
+3	bool	igCombo_FnStrPtr (const char*,int*,const char*(*)(void*,int),void*,int,int)
 igGetColorU32	3
 1	ImU32	igGetColorU32_Col (ImGuiCol,float)
 2	ImU32	igGetColorU32_Vec4 (const ImVec4)
-3	ImU32	igGetColorU32_U32 (ImU32)
-igGetID	3
+3	ImU32	igGetColorU32_U32 (ImU32,float)
+igGetID	4
 1	ImGuiID	igGetID_Str (const char*)
 2	ImGuiID	igGetID_StrStr (const char*,const char*)
 3	ImGuiID	igGetID_Ptr (const void*)
+4	ImGuiID	igGetID_Int (int)
 igIsRectVisible	2
 1	bool	igIsRectVisible_Nil (const ImVec2)
 2	bool	igIsRectVisible_Vec2 (const ImVec2,const ImVec2)
 igListBox	2
 1	bool	igListBox_Str_arr (const char*,int*,const char* const[],int,int)
-2	bool	igListBox_FnBoolPtr (const char*,int*,bool(*)(void*,int,const char**),void*,int,int)
+2	bool	igListBox_FnStrPtr (const char*,int*,const char*(*)(void*,int),void*,int,int)
 igMenuItem	2
 1	bool	igMenuItem_Bool (const char*,const char*,bool,bool)
 2	bool	igMenuItem_BoolPtr (const char*,const char*,bool*,bool)
@@ -135,4 +136,4 @@ igValue	4
 2	void	igValue_Int (const char*,int)
 3	void	igValue_Uint (const char*,unsigned int)
 4	void	igValue_Float (const char*,float,const char*)
-95 overloaded
+96 overloaded
