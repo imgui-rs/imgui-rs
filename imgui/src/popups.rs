@@ -112,11 +112,6 @@ impl<'ui, 'p, Label: AsRef<str>> PopupModal<'ui, 'p, Label> {
             .set(WindowFlags::ALWAYS_HORIZONTAL_SCROLLBAR, value);
         self
     }
-    pub fn always_use_window_padding(mut self, value: bool) -> Self {
-        self.flags
-            .set(WindowFlags::ALWAYS_USE_WINDOW_PADDING, value);
-        self
-    }
 
     /// Consume and draw the PopupModal.
     /// Returns the result of the closure, if it is called.

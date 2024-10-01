@@ -3,8 +3,8 @@ use std::fmt;
 use std::ops::{Index, IndexMut};
 
 use crate::internal::RawCast;
-use crate::sys;
 use crate::Direction;
+use crate::{sys, HoveredFlags};
 
 /// User interface style/colors
 #[repr(C)]
@@ -103,6 +103,19 @@ pub struct Style {
     /// `= 0.0`: always show when hovering
     /// `= f32::MAX`: never show close button unless selected
     pub tab_min_width_for_close_button: f32,
+
+    /// Thickness of tab-bar separator, which takes on the tab active color to denote focus.
+    pub tab_bar_border_size: f32,
+
+    /// Thickness of tab-bar overline, which highlights the selected tab-bar.
+    pub tab_bar_overline_size: f32,
+
+    /// Angle of angled headers (supported values range from -50.0f degrees to +50.0f degrees).
+    pub table_angled_headers_angle: f32,
+
+    /// Alignment of angled headers within the cell
+    pub table_angled_headers_text_align: [f32; 2],
+
     /// Side of the color buttonton pubin color editor widgets (left/right).
     pub color_button_position: Direction,
     /// Alignment of button text when button is larger than text.
@@ -113,6 +126,14 @@ pub struct Style {
     ///
     /// Defaults to [0.5, 0.5] (top-left aligned).
     pub selectable_text_align: [f32; 2],
+    /// Thickkness of border in [`Ui::separator_with_text`](crate::Ui::separator_with_text)
+    pub separator_text_border_size: f32,
+    /// Alignment of text within the separator. Defaults to `[0.0, 0.5]` (left aligned, center).
+    pub separator_text_align: [f32; 2],
+    /// Horizontal offset of text from each edge of the separator + spacing on other axis.
+    /// Generally small values. .y is recommended to be == [`StyleVar::FramePadding`].y.
+    pub separator_text_padding: [f32; 2],
+
     /// Window positions are clamped to be visible within the display area or monitors by at least
     /// this amount.
     ///
@@ -149,8 +170,28 @@ pub struct Style {
     ///
     /// Decrease for higher quality but more geometry.
     pub circle_tesselation_max_error: f32,
+
     /// Style colors.
     pub colors: [[f32; 4]; StyleColor::COUNT],
+
+    /// Delay on hover before
+    /// [`Ui::is_item_hovered_with_flags`](crate::Ui::is_item_hovered_with_flags) + [`HoveredFlags::STATIONARY`] returns true
+    pub hover_stationary_delay: f32,
+
+    /// Delay on hover before
+    /// [`Ui::is_item_hovered_with_flags`](crate::Ui::is_item_hovered_with_flags) + [`HoveredFlags::DELAY_SHORT`] returns true
+    pub hover_delay_short: f32,
+
+    /// Delay on hover before
+    /// [`Ui::is_item_hovered_with_flags`](crate::Ui::is_item_hovered_with_flags) + [`HoveredFlags::DELAY_NORMAL`] returns true
+    pub hover_delay_normal: f32,
+
+    /// Default flags when using [`HoveredFlags::FOR_TOOLTIP`] or [`Ui::begin_tooltip`](crate::Ui::begin_tooltip)
+    /// or [`Ui::tooltip_text`](crate::Ui::tooltip_text) while using mouse.
+    pub hover_flags_for_tooltip_mouse: HoveredFlags,
+    /// Default flags when using [`HoveredFlags::FOR_TOOLTIP`] or [`Ui::begin_tooltip`](crate::Ui::begin_tooltip)
+    /// or [`Ui::tooltip_text`](crate::Ui::tooltip_text) while using keyboard/gamepad.
+    pub hover_flags_for_tooltip_nav: HoveredFlags,
 }
 
 unsafe impl RawCast<sys::ImGuiStyle> for Style {}
@@ -280,24 +321,26 @@ pub enum StyleColor {
     ResizeGripHovered = sys::ImGuiCol_ResizeGripHovered,
     /// Resize handle when mouse button down
     ResizeGripActive = sys::ImGuiCol_ResizeGripActive,
-    /// Inactive tab color. Applies to both tab widgets and docked windows
-    Tab = sys::ImGuiCol_Tab,
     /// Hovered tab (applies regardless if tab is active, or is in the active window)
     TabHovered = sys::ImGuiCol_TabHovered,
+    /// Inactive tab color. Applies to both tab widgets and docked windows
+    Tab = sys::ImGuiCol_Tab,
     /// Color of currently selected tab
-    TabActive = sys::ImGuiCol_TabActive,
+    TabSelected = sys::ImGuiCol_TabSelected,
+    /// Tab horizontal overline, when tab-bar is focused & tab is selected
+    TabSelectedOverline = sys::ImGuiCol_TabSelectedOverline,
     /// Non-selected, when in an unfocused window
-    TabUnfocused = sys::ImGuiCol_TabUnfocused,
+    TabDimmed = sys::ImGuiCol_TabDimmed,
     /// Selected tab, in an unfocused window
-    TabUnfocusedActive = sys::ImGuiCol_TabUnfocusedActive,
-
+    TabDimmedSelected = sys::ImGuiCol_TabDimmedSelected,
+    /// Non-selected, when in an unfocused window
+    TabDimmedSelectedOverline = sys::ImGuiCol_TabDimmedSelectedOverline,
     /// Color of widget which appears when moving windows around, allowing splitting/etc of dock areas
     #[cfg(feature = "docking")]
     DockingPreview = sys::ImGuiCol_DockingPreview,
     /// Colour when black area is present in docking setup (e.g while dragging a window away from a split area, leaving it temporarily empty)
     #[cfg(feature = "docking")]
     DockingEmptyBg = sys::ImGuiCol_DockingEmptyBg,
-
     /// Lines in [`crate::Ui::plot_lines`]
     PlotLines = sys::ImGuiCol_PlotLines,
     /// `PlotLines` when hovered
@@ -306,7 +349,6 @@ pub enum StyleColor {
     PlotHistogram = sys::ImGuiCol_PlotHistogram,
     /// `PlotHistogram` when hovered
     PlotHistogramHovered = sys::ImGuiCol_PlotHistogramHovered,
-
     /// Background color of header rows in table widget
     TableHeaderBg = sys::ImGuiCol_TableHeaderBg,
     /// Main border color for table, used around whole table and around header cells
@@ -317,10 +359,10 @@ pub enum StyleColor {
     TableRowBg = sys::ImGuiCol_TableRowBg,
     /// Used for alternating row colors, if enabled by `TableFlags::ROW_BG`
     TableRowBgAlt = sys::ImGuiCol_TableRowBgAlt,
-
+    /// Hyperlink color
+    TextLink = sys::ImGuiCol_TextLink,
     /// The highlight color used for selection in text inputs
     TextSelectedBg = sys::ImGuiCol_TextSelectedBg,
-
     /// Used for drag-and-drop system
     DragDropTarget = sys::ImGuiCol_DragDropTarget,
     /// Gamepad/keyboard: current highlighted item
@@ -369,11 +411,13 @@ impl StyleColor {
         StyleColor::ResizeGrip,
         StyleColor::ResizeGripHovered,
         StyleColor::ResizeGripActive,
-        StyleColor::Tab,
         StyleColor::TabHovered,
-        StyleColor::TabActive,
-        StyleColor::TabUnfocused,
-        StyleColor::TabUnfocusedActive,
+        StyleColor::Tab,
+        StyleColor::TabSelected,
+        StyleColor::TabSelectedOverline,
+        StyleColor::TabDimmed,
+        StyleColor::TabDimmedSelected,
+        StyleColor::TabDimmedSelectedOverline,
         #[cfg(feature = "docking")]
         StyleColor::DockingPreview,
         #[cfg(feature = "docking")]
@@ -387,6 +431,7 @@ impl StyleColor {
         StyleColor::TableBorderLight,
         StyleColor::TableRowBg,
         StyleColor::TableRowBgAlt,
+        StyleColor::TextLink,
         StyleColor::TextSelectedBg,
         StyleColor::DragDropTarget,
         StyleColor::NavHighlight,
@@ -438,9 +483,9 @@ impl StyleColor {
             StyleColor::ResizeGripActive => "ResizeGripActive",
             StyleColor::Tab => "Tab",
             StyleColor::TabHovered => "TabHovered",
-            StyleColor::TabActive => "TabActive",
-            StyleColor::TabUnfocused => "TabUnfocused",
-            StyleColor::TabUnfocusedActive => "TabUnfocusedActive",
+            StyleColor::TabSelected => "TabSelected",
+            StyleColor::TabDimmed => "TabDimmed",
+            StyleColor::TabDimmedSelected => "TabDimmedSelected",
             StyleColor::PlotLines => "PlotLines",
             StyleColor::PlotLinesHovered => "PlotLinesHovered",
             StyleColor::PlotHistogram => "PlotHistogram",
@@ -460,6 +505,9 @@ impl StyleColor {
             StyleColor::DockingPreview => "DockingPreview",
             #[cfg(feature = "docking")]
             StyleColor::DockingEmptyBg => "DockingEmptyBg",
+            StyleColor::TabSelectedOverline => "TabSelectedOverline",
+            StyleColor::TabDimmedSelectedOverline => "TabDimmedSelectedOverline",
+            StyleColor::TextLink => "TextLink",
         }
     }
 }

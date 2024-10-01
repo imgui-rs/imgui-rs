@@ -318,6 +318,11 @@ pub struct FontConfig {
     pub font_builder_flags: u32,
     /// Brighten (>1.0) or darken (<1.0) font output
     pub rasterizer_multiply: f32,
+    /// DPI scale for rasterization, not altering other font metrics:
+    /// make it easy to swap between e.g. a 100% and a 400% fonts for a zooming display.
+    /// IMPORTANT: If you increase this it is expected that you increase font scale
+    /// accordingly, otherwise quality may look lowered.
+    pub rasterizer_density: f32,
     /// Explicitly specify the ellipsis character.
     ///
     /// With multiple font sources the first specified ellipsis is used.
@@ -329,7 +334,7 @@ impl Default for FontConfig {
     fn default() -> FontConfig {
         FontConfig {
             size_pixels: 0.0,
-            oversample_h: 3,
+            oversample_h: 2,
             oversample_v: 1,
             pixel_snap_h: false,
             glyph_extra_spacing: [0.0, 0.0],
@@ -339,6 +344,7 @@ impl Default for FontConfig {
             glyph_max_advance_x: f32::MAX,
             font_builder_flags: 0,
             rasterizer_multiply: 1.0,
+            rasterizer_density: 1.0,
             ellipsis_char: None,
             name: None,
         }
@@ -358,6 +364,7 @@ impl FontConfig {
         raw.GlyphMaxAdvanceX = self.glyph_max_advance_x;
         raw.FontBuilderFlags = self.font_builder_flags;
         raw.RasterizerMultiply = self.rasterizer_multiply;
+        raw.RasterizerMultiply = self.rasterizer_density;
         // char is used as "unset" for EllipsisChar
         raw.EllipsisChar = self.ellipsis_char.map(|c| c as u32).unwrap_or(!0);
         if let Some(name) = self.name.as_ref() {

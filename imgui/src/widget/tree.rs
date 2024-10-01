@@ -14,7 +14,7 @@ bitflags!(
         /// Full colored frame (e.g. for CollapsingHeader)
         const FRAMED = sys::ImGuiTreeNodeFlags_Framed;
         /// Hit testing to allow subsequent widgets to overlap this one
-        const ALLOW_ITEM_OVERLAP = sys::ImGuiTreeNodeFlags_AllowItemOverlap;
+        const ALLOW_OVERLAP = sys::ImGuiTreeNodeFlags_AllowOverlap;
         /// Don't push a tree node when open (e.g. for CollapsingHeader) = no extra indent nor
         /// pushing on ID stack
         const NO_TREE_PUSH_ON_OPEN = sys::ImGuiTreeNodeFlags_NoTreePushOnOpen;
@@ -195,7 +195,7 @@ impl<'a, T: AsRef<str>, L: AsRef<str>> TreeNode<'a, T, L> {
     ///
     /// Disabled by default.
     pub fn allow_item_overlap(mut self, value: bool) -> Self {
-        self.flags.set(TreeNodeFlags::ALLOW_ITEM_OVERLAP, value);
+        self.flags.set(TreeNodeFlags::ALLOW_OVERLAP, value);
         self
     }
 
@@ -390,7 +390,7 @@ impl<T: AsRef<str>> CollapsingHeader<T> {
     /// Disabled by default.
     #[inline]
     pub fn allow_item_overlap(mut self, value: bool) -> Self {
-        self.flags.set(TreeNodeFlags::ALLOW_ITEM_OVERLAP, value);
+        self.flags.set(TreeNodeFlags::ALLOW_OVERLAP, value);
         self
     }
     /// Sets the default open state for the collapsing header.

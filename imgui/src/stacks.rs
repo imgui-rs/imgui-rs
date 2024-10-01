@@ -4,7 +4,6 @@ use crate::math::MintVec4;
 use crate::style::{StyleColor, StyleVar};
 use crate::sys;
 use crate::Ui;
-use std::mem;
 use std::os::raw::c_char;
 
 /// # Parameter stacks (shared)
@@ -239,60 +238,42 @@ impl Ui {
     }
 
     /// Tab stop enable.
-    /// Allow focusing using TAB/Shift-TAB, enabled by default but you can
-    /// disable it for certain widgets
     ///
-    /// Returns a [PushAllowKeyboardFocusToken] that should be dropped.
+    /// Deprecated since `0.13.0`, use [`Ui::push_item_flag`] with [`ItemFlag::NO_TAB_STOP`]
+    /// instead.
     #[doc(alias = "PushAllowKeyboardFocus")]
-    pub fn push_allow_keyboard_focus(&self, allow: bool) -> PushAllowKeyboardFocusToken<'_> {
-        unsafe { sys::igPushAllowKeyboardFocus(allow) };
-        PushAllowKeyboardFocusToken::new(self)
-    }
-
-    /// In 'repeat' mode, button_x functions return repeated true in a typematic
-    /// manner (using io.KeyRepeatDelay/io.KeyRepeatRate setting).
-    /// Note that you can call IsItemActive() after any Button() to tell if the
-    /// button is held in the current frame.
-    ///
-    /// Returns a [PushButtonRepeatToken] that should be dropped.
-    #[doc(alias = "PushAllowKeyboardFocus")]
-    pub fn push_button_repeat(&self, allow: bool) -> PushButtonRepeatToken<'_> {
-        unsafe { sys::igPushButtonRepeat(allow) };
-        PushButtonRepeatToken::new(self)
-    }
-
-    /// Changes an item flag by pushing a change to the item flag stack.
-    ///
-    /// Returns a `ItemFlagsStackToken` that may be popped by calling `.pop()`
-    ///
-    /// ## Deprecated
-    ///
-    /// This was deprecated in `0.9.0` because it isn't part of the dear imgui design,
-    /// and supporting it required a manual implementation of its drop token.
-    ///
-    /// Instead, just use [`push_allow_keyboard_focus`] and [`push_button_repeat`].
-    ///
-    /// [`push_allow_keyboard_focus`]: Self::push_allow_keyboard_focus
-    /// [`push_button_repeat`]: Self::push_button_repeat
     #[deprecated(
-        since = "0.9.0",
-        note = "use `push_allow_keyboard_focus` or `push_button_repeat` instead"
+        since = "0.13.0",
+        note = "use `Ui::push_item_flag` with `ItemFlag::NO_TAB_STOP`"
     )]
-    pub fn push_item_flag(&self, item_flag: ItemFlag) -> ItemFlagsStackToken<'_> {
-        use self::ItemFlag::*;
-        match item_flag {
-            AllowKeyboardFocus(v) => unsafe { sys::igPushAllowKeyboardFocus(v) },
-            ButtonRepeat(v) => unsafe { sys::igPushButtonRepeat(v) },
-        }
-        ItemFlagsStackToken::new(self, item_flag)
+    pub fn push_allow_keyboard_focus(&self, tab_stop: bool) -> ItemFlagsStackToken<'_> {
+        self.push_item_flag(ItemFlag::NO_TAB_STOP, !tab_stop)
     }
-}
 
-/// A temporary change in item flags
-#[derive(Copy, Clone, Debug, PartialEq, Eq)]
-pub enum ItemFlag {
-    AllowKeyboardFocus(bool),
-    ButtonRepeat(bool),
+    /// Any button-like behavior will have repeat mode enabled
+    ///
+    /// Deprecated since `0.13.0`, use [`Ui::push_item_flag`] with [`ItemFlag::BUTTON_REPEAT`]
+    /// instead.
+    #[doc(alias = "PushButtonRepeat")]
+    #[deprecated(
+        since = "0.13.0",
+        note = "use `Ui::push_item_flag` with `ItemFlag::BUTTON_REPEAT`"
+    )]
+    pub fn push_button_repeat(&self, value: bool) -> ItemFlagsStackToken<'_> {
+        self.push_item_flag(ItemFlag::BUTTON_REPEAT, value)
+    }
+
+    /// Changes an item flag by pushing a change to the item flag stack and a boolean
+    /// on whether to enable or disable the flag.
+    ///
+    /// Returns a `ItemFlagsStackToken` that may be popped by calling `.pop()` or dropping it.
+    pub fn push_item_flag(&self, item_flag: ItemFlag, enabled: bool) -> ItemFlagsStackToken<'_> {
+        unsafe {
+            sys::igPushItemFlag(item_flag.bits() as i32, enabled);
+        }
+
+        ItemFlagsStackToken::new(self)
+    }
 }
 
 create_token!(
@@ -309,55 +290,15 @@ create_token!(
     drop { sys::igPopTextWrapPos() }
 );
 
-create_token!(
-    pub struct PushAllowKeyboardFocusToken<'ui>;
+crate::create_token!(
+    /// Tracks a change made with [`Ui::push_item_flag`] that can be popped
+    /// by calling [`ItemFlagsStackToken::end`] or dropping.
+    pub struct ItemFlagsStackToken<'ui>;
 
-    #[doc(alias = "PopAllowKeyboardFocus")]
-    drop { sys::igPopAllowKeyboardFocus() }
+    /// Pops an [`ItemFlag`] made with [`Ui::push_item_flag`].
+    #[doc(alias = "PopItemFlag")]
+    drop { sys::igPopItemFlag() }
 );
-
-create_token!(
-    pub struct PushButtonRepeatToken<'ui>;
-
-    #[doc(alias = "PopButtonRepeat")]
-    drop { sys::igPopButtonRepeat() }
-);
-
-/// Tracks a change pushed to the item flags stack.
-///
-/// The "item flags" stack was a concept invented in imgui-rs that doesn't have an
-/// ImGui equivalent. We're phasing these out to make imgui-rs feel simpler to use.
-#[must_use]
-pub struct ItemFlagsStackToken<'a>(
-    std::marker::PhantomData<&'a Ui>,
-    mem::Discriminant<ItemFlag>,
-);
-
-impl<'a> ItemFlagsStackToken<'a> {
-    /// Creates a new token type.
-    pub(crate) fn new(_: &'a crate::Ui, kind: ItemFlag) -> Self {
-        Self(std::marker::PhantomData, mem::discriminant(&kind))
-    }
-
-    #[inline]
-    pub fn end(self) {
-        // left empty for drop
-    }
-}
-
-impl Drop for ItemFlagsStackToken<'_> {
-    fn drop(&mut self) {
-        unsafe {
-            if self.1 == mem::discriminant(&ItemFlag::AllowKeyboardFocus(true)) {
-                sys::igPopAllowKeyboardFocus();
-            } else if self.1 == mem::discriminant(&ItemFlag::ButtonRepeat(true)) {
-                sys::igPopButtonRepeat();
-            } else {
-                unreachable!();
-            }
-        }
-    }
-}
 
 create_token!(
     /// Tracks an ID pushed to the ID stack that can be popped by calling `.pop()`
@@ -507,5 +448,27 @@ impl Ui {
     pub fn push_id_ptr<T>(&self, value: &T) -> IdStackToken<'_> {
         unsafe { sys::igPushID_Ptr(value as *const T as *const _) }
         IdStackToken::new(self)
+    }
+}
+
+bitflags::bitflags! {
+    /// A temporary change in item flags, used in [`Ui::push_item_flag`].
+    pub struct ItemFlag: u32 {
+        /// Disable keyboard tabbing. This is a "lighter" version of [`ItemFlag::NO_NAV`].
+        const NO_TAB_STOP = sys::ImGuiItemFlags_NoTabStop;
+        /// Disable any form of focusing (keyboard/gamepad directional navigation and
+        /// [`Ui::set_keyboard_focus_here`] calls).
+        const NO_NAV = sys::ImGuiItemFlags_NoNav;
+        /// Disable item being a candidate for default focus (e.g. used by title bar items).
+        const NO_NAV_DEFAULT_FOCUS = sys::ImGuiItemFlags_NoNavDefaultFocus;
+        /// Any button-like behavior will have repeat mode enabled (based on [`Io::key_repeat_delay`](crate::Io::key_repeat_delay)
+        /// and [`Io::key_repeat_rate`](crate::Io::key_repeat_rate) values).
+        /// Note that you can also call [`Ui::is_item_active`] after any button to tell if it is being held.
+        const BUTTON_REPEAT = sys::ImGuiItemFlags_ButtonRepeat;
+        /// [`Ui::menu_item`]/[`Ui::selectable`] automatically close their parent popup window.
+        const AUTO_CLOSE_POPUPS = sys::ImGuiItemFlags_AutoClosePopups;
+        /// Allow submitting an item with the same identifier as an item already submitted this frame without triggering
+        /// a warning tooltip if [`Io::config_debug_highlight_id_conflicts`](crate::Io::config_debug_highlight_id_conflicts) is set.
+        const ALLOW_DUPLICATE_ID = sys::ImGuiItemFlags_AllowDuplicateId;
     }
 }

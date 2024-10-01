@@ -53,4 +53,22 @@ impl Ui {
     pub fn bullet_text(&self, text: impl AsRef<str>) {
         unsafe { sys::igBulletText(fmt_ptr(), self.scratch_txt(text)) }
     }
+
+    /// Hyperlink style text button, returns true when clicked.
+    ///
+    /// See [`Ui::text_link_open_url`] for a way to open a hyperlink.
+    #[doc(alias = "TextLink")]
+    pub fn text_link(&self, text: impl AsRef<str>) -> bool {
+        unsafe { sys::igTextLink(self.scratch_txt(text)) }
+    }
+
+    /// Hyperlink style text button, opens link when clicked.
+    ///
+    /// See [`Ui::text_link_open_url`] for a text-link which
+    /// only returns true, rather than opening the link itself.
+    #[doc(alias = "TextLinkOpenURL")]
+    pub fn text_link_open_url(&self, label: impl AsRef<str>, url: impl AsRef<str>) {
+        let (label, url) = self.scratch_txt_two(label, url);
+        unsafe { sys::igTextLinkOpenURL(label, url) }
+    }
 }

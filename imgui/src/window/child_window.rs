@@ -11,12 +11,12 @@ use crate::{sys, Id};
 pub struct ChildWindow<'ui> {
     ui: &'ui Ui,
     id: u32,
+    child_flags: ChildFlags,
     flags: WindowFlags,
     size: [f32; 2],
     content_size: [f32; 2],
     focused: bool,
     bg_alpha: f32,
-    border: bool,
 }
 
 impl<'ui> ChildWindow<'ui> {
@@ -34,12 +34,12 @@ impl<'ui> ChildWindow<'ui> {
         Self {
             ui,
             id: id.0,
+            child_flags: ChildFlags::empty(),
             flags: WindowFlags::empty(),
             size: [0.0, 0.0],
             content_size: [0.0, 0.0],
             focused: false,
             bg_alpha: f32::NAN,
-            border: false,
         }
     }
 
@@ -88,11 +88,10 @@ impl<'ui> ChildWindow<'ui> {
         self
     }
     /// Enables/disables the child window border.
-    ///
-    /// Disabled by default.
+    #[deprecated(since = "0.13.0", note = "use `child_flags` instead")]
     #[inline]
     pub fn border(mut self, border: bool) -> Self {
-        self.border = border;
+        self.child_flags.set(ChildFlags::BORDERS, border);
         self
     }
     /// Enables/disables moving the window when child window is dragged.
@@ -199,15 +198,16 @@ impl<'ui> ChildWindow<'ui> {
             .set(WindowFlags::ALWAYS_HORIZONTAL_SCROLLBAR, value);
         self
     }
-    /// When enabled, ensures child windows without border use `style.window_padding`.
+
+    /// Sets the child flags on the [`ChildWindow`].
     ///
-    /// Disabled by default.
-    #[inline]
-    pub fn always_use_window_padding(mut self, value: bool) -> Self {
-        self.flags
-            .set(WindowFlags::ALWAYS_USE_WINDOW_PADDING, value);
+    /// See [`ChildFlags`] for more information on each flag.
+    /// The default flags are [`ChildFlags::empty`].
+    pub fn child_flags(mut self, child_flags: ChildFlags) -> Self {
+        self.child_flags = child_flags;
         self
     }
+
     /// Enables/disables gamepad/keyboard navigation within the window.
     ///
     /// Enabled by default.
@@ -270,7 +270,7 @@ impl<'ui> ChildWindow<'ui> {
             sys::igBeginChild_ID(
                 self.id,
                 self.size.into(),
-                self.border,
+                self.child_flags.bits() as i32,
                 self.flags.bits() as i32,
             )
         };
@@ -299,3 +299,39 @@ create_token!(
     /// Ends a window
     drop { sys::igEndChild() }
 );
+
+bitflags::bitflags! {
+    /// Configuration flags for child windows
+    /// Flags for [``]
+    /// About using AutoResizeX/AutoResizeY flags:
+    /// - May be combined with SetNextWindowSizeConstraints() to set a min/max size for each axis (see "Demo->Child->Auto-resize with Constraints").
+    /// - Size measurement for a given axis is only performed when the child window is within visible boundaries, or is just appearing.
+    ///   - This allows BeginChild() to return false when not within boundaries (e.g. when scrolling), which is more optimal. BUT it won't update its auto-size while clipped.
+    ///     While not perfect, it is a better default behavior as the always-on performance gain is more valuable than the occasional "resizing after becoming visible again" glitch.
+    ///   - You may also use ImGuiChildFlags_AlwaysAutoResize to force an update even when child window is not in view.
+    ///     HOWEVER PLEASE UNDERSTAND THAT DOING SO WILL PREVENT BeginChild() FROM EVER RETURNING FALSE, disabling benefits of coarse clipping.
+    #[repr(transparent)]
+    pub struct ChildFlags: u32 {
+        /// Show an outer border and enable WindowPadding
+        const BORDERS = sys::ImGuiChildFlags_Borders;
+        /// Pad with style.WindowPadding even if no border are drawn
+        /// (no padding by default for non-bordered child windows because it makes more sense)
+        const ALWAYS_USE_WINDOW_PADDING = sys::ImGuiChildFlags_AlwaysUseWindowPadding;
+        /// Allow resize from right border (layout direction).
+        const RESIZE_X = sys::ImGuiChildFlags_ResizeX;
+        /// Allow resize from bottom border (layout direction).
+        const RESIZE_Y = sys::ImGuiChildFlags_ResizeY;
+        /// Enable auto-resizing width. Read "IMPORTANT: Size measurement" details above.
+        const AUTO_RESIZE_X = sys::ImGuiChildFlags_AutoResizeX;
+        /// Enable auto-resizing height. Read "IMPORTANT: Size measurement" details above.
+        const AUTO_RESIZE_Y = sys::ImGuiChildFlags_AutoResizeY;
+        /// Combined with AutoResizeX/AutoResizeY.
+        /// Always measure size even when child is hidden, always return true, always disable clipping optimization! NOT RECOMMENDED.
+        const ALWAYS_AUTO_RESIZE = sys::ImGuiChildFlags_AlwaysAutoResize;
+        /// Style the child window like a framed item:
+        /// use FrameBg, FrameRounding, FrameBorderSize, FramePadding instead of ChildBg, ChildRounding, ChildBorderSize, WindowPadding.
+        const FRAME_STYLE = sys::ImGuiChildFlags_FrameStyle;
+        /// [BETA] Share focus scope, allow gamepad/keyboard navigation to cross over parent border to this child or between sibling child windows.
+        const NAV_FLATTENED = sys::ImGuiChildFlags_NavFlattened;
+    }
+}
