@@ -84,8 +84,6 @@ bitflags! {
         const ALWAYS_VERTICAL_SCROLLBAR = sys::ImGuiWindowFlags_AlwaysVerticalScrollbar;
         /// Always show horizontal scrollbar
         const ALWAYS_HORIZONTAL_SCROLLBAR = sys::ImGuiWindowFlags_AlwaysHorizontalScrollbar;
-        /// Ensure child windows without border use `style.window_padding`
-        const ALWAYS_USE_WINDOW_PADDING = sys::ImGuiWindowFlags_AlwaysUseWindowPadding;
         /// Disable gamepad/keyboard navigation within the window
         const NO_NAV_INPUTS = sys::ImGuiWindowFlags_NoNavInputs;
         /// No focusing toward this window with gamepad/keyboard navigation (e.g. skipped by
@@ -416,15 +414,6 @@ impl<'ui, 'a, Label: AsRef<str>> Window<'ui, 'a, Label> {
     pub fn always_horizontal_scrollbar(mut self, value: bool) -> Self {
         self.flags
             .set(WindowFlags::ALWAYS_HORIZONTAL_SCROLLBAR, value);
-        self
-    }
-    /// When enabled, ensures child windows without border use `style.window_padding`.
-    ///
-    /// Disabled by default.
-    #[inline]
-    pub fn always_use_window_padding(mut self, value: bool) -> Self {
-        self.flags
-            .set(WindowFlags::ALWAYS_USE_WINDOW_PADDING, value);
         self
     }
     /// Enables/disables gamepad/keyboard navigation within the window.

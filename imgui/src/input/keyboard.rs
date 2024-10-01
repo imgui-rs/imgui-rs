@@ -79,6 +79,18 @@ pub enum Key {
     F10 = sys::ImGuiKey_F10,
     F11 = sys::ImGuiKey_F11,
     F12 = sys::ImGuiKey_F12,
+    F13 = sys::ImGuiKey_F13,
+    F14 = sys::ImGuiKey_F14,
+    F15 = sys::ImGuiKey_F15,
+    F16 = sys::ImGuiKey_F16,
+    F17 = sys::ImGuiKey_F17,
+    F18 = sys::ImGuiKey_F18,
+    F19 = sys::ImGuiKey_F19,
+    F20 = sys::ImGuiKey_F20,
+    F21 = sys::ImGuiKey_F21,
+    F22 = sys::ImGuiKey_F22,
+    F23 = sys::ImGuiKey_F23,
+    F24 = sys::ImGuiKey_F24,
     Apostrophe = sys::ImGuiKey_Apostrophe,
     Comma = sys::ImGuiKey_Comma,
     Minus = sys::ImGuiKey_Minus,
@@ -112,6 +124,8 @@ pub enum Key {
     KeypadAdd = sys::ImGuiKey_KeypadAdd,
     KeypadEnter = sys::ImGuiKey_KeypadEnter,
     KeypadEqual = sys::ImGuiKey_KeypadEqual,
+    AppBack = sys::ImGuiKey_AppBack,
+    AppForward = sys::ImGuiKey_AppForward,
     GamepadStart = sys::ImGuiKey_GamepadStart,
     GamepadBack = sys::ImGuiKey_GamepadBack,
     GamepadFaceLeft = sys::ImGuiKey_GamepadFaceLeft,
@@ -147,11 +161,6 @@ pub enum Key {
     ReservedForModShift = sys::ImGuiKey_ReservedForModShift,
     ReservedForModAlt = sys::ImGuiKey_ReservedForModAlt,
     ReservedForModSuper = sys::ImGuiKey_ReservedForModSuper,
-    ModCtrl = sys::ImGuiMod_Ctrl,
-    ModShift = sys::ImGuiMod_Shift,
-    ModAlt = sys::ImGuiMod_Alt,
-    ModSuper = sys::ImGuiMod_Super,
-    ModShortcut = sys::ImGuiMod_Shortcut,
 }
 
 impl Key {
@@ -229,6 +238,18 @@ impl Key {
         Key::F10,
         Key::F11,
         Key::F12,
+        Key::F13,
+        Key::F14,
+        Key::F15,
+        Key::F16,
+        Key::F17,
+        Key::F18,
+        Key::F19,
+        Key::F20,
+        Key::F21,
+        Key::F22,
+        Key::F23,
+        Key::F24,
         Key::Apostrophe,
         Key::Comma,
         Key::Minus,
@@ -262,6 +283,8 @@ impl Key {
         Key::KeypadAdd,
         Key::KeypadEnter,
         Key::KeypadEqual,
+        Key::AppBack,
+        Key::AppForward,
         Key::GamepadStart,
         Key::GamepadBack,
         Key::GamepadFaceLeft,
@@ -328,34 +351,15 @@ impl FocusedWidget {
 
 /// # Input: Keyboard
 impl Ui {
-    /// Returns the key index of the given key identifier.
-    ///
-    /// Equivalent to indexing the Io struct `key_map` field: `ui.io().key_map[key]`
-    #[inline]
-    #[doc(alias = "GetKeyIndex")]
-    fn key_index(&self, key: Key) -> u32 {
-        unsafe { sys::igGetKeyIndex(key as u32) }
-    }
     /// Returns true if the key is being held.
-    ///
-    /// Equivalent to indexing the Io struct `keys_down` field: `ui.io().keys_down[key_index]`
     #[inline]
     #[doc(alias = "IsKeyDown")]
     pub fn is_key_down(&self, key: Key) -> bool {
-        let key_index = self.key_index(key);
-        self.is_key_index_down(key_index)
-    }
-
-    /// Same as [`is_key_down`](Self::is_key_down) but takes a key index. The meaning of
-    /// index is defined by your backend implementation.
-    #[inline]
-    #[doc(alias = "IsKeyDown")]
-    pub fn is_key_index_down(&self, key_index: u32) -> bool {
         cfg_if::cfg_if! {
             if #[cfg(feature = "docking")] {
-                unsafe { sys::igIsKeyDown_Nil(key_index) }
+                unsafe { sys::igIsKeyDown_Nil(key as u32) }
             } else {
-                unsafe { sys::igIsKeyDown(key_index) }
+                unsafe { sys::igIsKeyDown(key as u32) }
             }
         }
     }
@@ -366,22 +370,11 @@ impl Ui {
     #[inline]
     #[doc(alias = "IsKeyPressed")]
     pub fn is_key_pressed(&self, key: Key) -> bool {
-        let key_index = self.key_index(key);
-        self.is_key_index_pressed(key_index)
-    }
-
-    /// Same as [`is_key_pressed`](Self::is_key_pressed) but takes a key index.
-    ///
-    /// The meaning of index is defined by your backend
-    /// implementation.
-    #[inline]
-    #[doc(alias = "IsKeyPressed")]
-    pub fn is_key_index_pressed(&self, key_index: u32) -> bool {
         cfg_if::cfg_if! {
             if #[cfg(feature = "docking")] {
-                unsafe { sys::igIsKeyPressed_Bool(key_index, true) }
+                unsafe { sys::igIsKeyPressed_Bool(key as u32, true) }
             } else {
-                unsafe { sys::igIsKeyPressed(key_index, true) }
+                unsafe { sys::igIsKeyPressed(key as u32, true) }
             }
         }
     }
@@ -392,23 +385,11 @@ impl Ui {
     #[inline]
     #[doc(alias = "IsKeyPressed")]
     pub fn is_key_pressed_no_repeat(&self, key: Key) -> bool {
-        let key_index = self.key_index(key);
-        self.is_key_index_pressed_no_repeat(key_index)
-    }
-
-    /// Same as [`is_key_pressed_no_repeat`](Self::is_key_pressed_no_repeat)
-    /// but takes a key index.
-    ///
-    /// The meaning of index is defined by your backend
-    /// implementation.
-    #[inline]
-    #[doc(alias = "IsKeyPressed")]
-    pub fn is_key_index_pressed_no_repeat(&self, key_index: u32) -> bool {
         cfg_if::cfg_if! {
             if #[cfg(feature = "docking")] {
-                unsafe { sys::igIsKeyPressed_Bool(key_index, false) }
+                unsafe { sys::igIsKeyPressed_Bool(key as u32, false) }
             } else {
-                unsafe { sys::igIsKeyPressed(key_index, false) }
+                unsafe { sys::igIsKeyPressed(key as u32, false) }
             }
         }
     }
@@ -417,22 +398,11 @@ impl Ui {
     #[inline]
     #[doc(alias = "IsKeyReleased")]
     pub fn is_key_released(&self, key: Key) -> bool {
-        let key_index = self.key_index(key);
-        self.is_key_index_released(key_index)
-    }
-
-    /// Same as [`is_key_released`](Self::is_key_released) but takes a key index.
-    ///
-    /// The meaning of index is defined by your backend
-    /// implementation.
-    #[inline]
-    #[doc(alias = "IsKeyReleased")]
-    pub fn is_key_index_released(&self, key_index: u32) -> bool {
         cfg_if::cfg_if! {
             if #[cfg(feature = "docking")] {
-                unsafe { sys::igIsKeyReleased_Nil(key_index) }
+                unsafe { sys::igIsKeyReleased_Nil(key as u32) }
             } else {
-                unsafe { sys::igIsKeyReleased(key_index) }
+                unsafe { sys::igIsKeyReleased(key as u32) }
             }
         }
     }
@@ -444,15 +414,7 @@ impl Ui {
     #[inline]
     #[doc(alias = "GetKeyPressedAmount")]
     pub fn key_pressed_amount(&self, key: Key, repeat_delay: f32, rate: f32) -> u32 {
-        let key_index = self.key_index(key);
-        self.key_index_pressed_amount(key_index, repeat_delay, rate)
-    }
-
-    /// Same as [`crate::Ui::key_pressed_amount`] but takes a key index.
-    #[inline]
-    #[doc(alias = "GetKeyPressedAmount")]
-    pub fn key_index_pressed_amount(&self, key_index: u32, repeat_delay: f32, rate: f32) -> u32 {
-        unsafe { sys::igGetKeyPressedAmount(key_index, repeat_delay, rate) as u32 }
+        unsafe { sys::igGetKeyPressedAmount(key as u32, repeat_delay, rate) as u32 }
     }
 
     /// Focuses keyboard on the next widget.

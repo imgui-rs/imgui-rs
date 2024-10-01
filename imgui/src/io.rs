@@ -9,7 +9,7 @@ use crate::fonts::font::Font;
 use crate::input::keyboard::Key;
 use crate::input::mouse::MouseButton;
 use crate::internal::{ImVector, RawCast};
-use crate::sys;
+use crate::{sys, MouseSource};
 
 bitflags! {
     /// Configuration flags
@@ -61,22 +61,31 @@ bitflags! {
     }
 }
 
-#[cfg(feature = "docking")]
 bitflags! {
     #[repr(transparent)]
     pub struct ViewportFlags: u32 {
         const IS_PLATFORM_WINDOW = sys::ImGuiViewportFlags_IsPlatformWindow;
         const IS_PLATFORM_MONITOR = sys::ImGuiViewportFlags_IsPlatformMonitor;
         const OWNED_BY_APP = sys::ImGuiViewportFlags_OwnedByApp;
+        #[cfg(feature = "docking")]
         const NO_DECORATION = sys::ImGuiViewportFlags_NoDecoration;
+        #[cfg(feature = "docking")]
         const NO_TASK_BAR_ICON = sys::ImGuiViewportFlags_NoTaskBarIcon;
+        #[cfg(feature = "docking")]
         const NO_FOCUS_ON_APPEARING = sys::ImGuiViewportFlags_NoFocusOnAppearing;
+        #[cfg(feature = "docking")]
         const NO_FOCUS_ON_CLICK = sys::ImGuiViewportFlags_NoFocusOnClick;
+        #[cfg(feature = "docking")]
         const NO_INPUTS = sys::ImGuiViewportFlags_NoInputs;
+        #[cfg(feature = "docking")]
         const NO_RENDERER_CLEAR = sys::ImGuiViewportFlags_NoRendererClear;
+        #[cfg(feature = "docking")]
         const TOP_MOST = sys::ImGuiViewportFlags_TopMost;
+        #[cfg(feature = "docking")]
         const MINIMIZED = sys::ImGuiViewportFlags_Minimized;
+        #[cfg(feature = "docking")]
         const NO_AUTO_MERGE = sys::ImGuiViewportFlags_NoAutoMerge;
+        #[cfg(feature = "docking")]
         const CAN_HOST_OTHER_WINDOWS = sys::ImGuiViewportFlags_CanHostOtherWindows;
     }
 }
@@ -107,61 +116,6 @@ bitflags! {
     }
 }
 
-/// An input identifier for navigation
-#[repr(u32)]
-#[derive(Copy, Clone, Debug, Hash, Eq, PartialEq)]
-pub enum NavInput {
-    Activate = sys::ImGuiNavInput_Activate,
-    Cancel = sys::ImGuiNavInput_Cancel,
-    Input = sys::ImGuiNavInput_Input,
-    Menu = sys::ImGuiNavInput_Menu,
-    DpadLeft = sys::ImGuiNavInput_DpadLeft,
-    DpadRight = sys::ImGuiNavInput_DpadRight,
-    DpadUp = sys::ImGuiNavInput_DpadUp,
-    DpadDown = sys::ImGuiNavInput_DpadDown,
-    LStickLeft = sys::ImGuiNavInput_LStickLeft,
-    LStickRight = sys::ImGuiNavInput_LStickRight,
-    LStickUp = sys::ImGuiNavInput_LStickUp,
-    LStickDown = sys::ImGuiNavInput_LStickDown,
-    FocusPrev = sys::ImGuiNavInput_FocusPrev,
-    FocusNext = sys::ImGuiNavInput_FocusNext,
-    TweakSlow = sys::ImGuiNavInput_TweakSlow,
-    TweakFast = sys::ImGuiNavInput_TweakFast,
-}
-
-impl NavInput {
-    /// All possible `NavInput` variants
-    pub const VARIANTS: [NavInput; NavInput::COUNT] = [
-        NavInput::Activate,
-        NavInput::Cancel,
-        NavInput::Input,
-        NavInput::Menu,
-        NavInput::DpadLeft,
-        NavInput::DpadRight,
-        NavInput::DpadUp,
-        NavInput::DpadDown,
-        NavInput::LStickLeft,
-        NavInput::LStickRight,
-        NavInput::LStickUp,
-        NavInput::LStickDown,
-        NavInput::FocusPrev,
-        NavInput::FocusNext,
-        NavInput::TweakSlow,
-        NavInput::TweakFast,
-    ];
-    /// Amount of internal/hidden variants (not exposed by imgui-rs)
-    const INTERNAL_COUNT: usize = 0;
-    /// Total count of `NavInput` variants
-    pub const COUNT: usize = sys::ImGuiNavInput_COUNT as usize - NavInput::INTERNAL_COUNT;
-}
-
-#[test]
-fn test_nav_input_variants() {
-    for (idx, &value) in NavInput::VARIANTS.iter().enumerate() {
-        assert_eq!(idx, value as usize);
-    }
-}
-
 /// Settings and inputs/outputs for imgui-rs
 #[repr(C)]
 pub struct Io {
@@ -178,24 +132,8 @@ pub struct Io {
 
     pub(crate) ini_filename: *const c_char,
     pub(crate) log_filename: *const c_char,
-
-    /// Time for a double-click, in seconds
-    pub mouse_double_click_time: f32,
-    /// Distance threshold to stay in to validate a double-click, in pixels
-    pub mouse_double_click_max_dist: f32,
-    /// Distance threshold before considering we are dragging
-    pub mouse_drag_threshold: f32,
-    /// When holding a key/button, time before it starts repeating, in seconds
-    pub key_repeat_delay: f32,
-    /// When holding a key/button, rate at which it repeats, in seconds
-    pub key_repeat_rate: f32,
-
-    /// Delay on hover before [`ui.is_item_hovered_with_flags(ItemHoveredFlags::DELAY_NORMAL)`](crate::Ui::is_item_hovered_with_flags) returns true
-    pub hover_delay_normal: f32,
-    /// Delay on hover before [`ui.is_item_hovered_with_flags(ItemHoveredFlags::DELAY_SHORT)`](crate::Ui::is_item_hovered_with_flags) returns true
-    pub hover_delay_short: f32,
-
     user_data: *mut c_void,
+
     pub(crate) fonts: *mut FontAtlas,
 
     /// Global scale for all fonts
@@ -204,27 +142,9 @@ pub struct Io {
     pub font_allow_user_scaling: bool,
 
     pub(crate) font_default: *mut Font,
-
     /// For retina display or other situations where window coordinates are different from
     /// framebuffer coordinates
     pub display_framebuffer_scale: [f32; 2],
-
-    #[cfg(feature = "docking")]
-    pub config_docking_no_split: bool,
-    #[cfg(feature = "docking")]
-    pub config_docking_with_shift: bool,
-    #[cfg(feature = "docking")]
-    pub config_docking_always_tab_bar: bool,
-    #[cfg(feature = "docking")]
-    pub config_docking_transparent_payload: bool,
-    #[cfg(feature = "docking")]
-    pub config_viewports_no_auto_merge: bool,
-    #[cfg(feature = "docking")]
-    pub config_viewports_no_task_bar_icon: bool,
-    #[cfg(feature = "docking")]
-    pub config_viewports_no_decoration: bool,
-    #[cfg(feature = "docking")]
-    pub config_viewports_no_default_parent: bool,
 
     /// Request imgui-rs to draw a mouse cursor for you
     pub mouse_draw_cursor: bool,
@@ -238,6 +158,11 @@ pub struct Io {
     /// * Double-click selects by word instead of selecting the whole text
     /// * Multi-selection in lists uses Cmd/Super instead of Ctrl
     pub config_mac_os_behaviors: bool,
+
+    /// Swap Activate/Cancel (A<>B) buttons, to match the typical "Nintendo/Japanese consoles"
+    /// button layout when using Gamepad navigation
+    pub config_nav_swap_gamepad_buttons: bool,
+
     /// Enable input queue trickling: some types of events submitted during the same frame (e.g. button down + up)
     /// will be spread over multiple frames, improving interactions with low framerates.
     pub config_input_trickle_event_queue: bool,
@@ -262,23 +187,44 @@ pub struct Io {
     /// Set to -1.0 to disable.
     pub config_memory_compact_timer: f32,
 
+    /// Time for a double-click, in seconds
+    pub mouse_double_click_time: f32,
+    /// Distance threshold to stay in to validate a double-click, in pixels
+    pub mouse_double_click_max_dist: f32,
+    /// Distance threshold before considering we are dragging
+    pub mouse_drag_threshold: f32,
+    /// When holding a key/button, time before it starts repeating, in seconds
+    pub key_repeat_delay: f32,
+    /// When holding a key/button, rate at which it repeats, in seconds
+    pub key_repeat_rate: f32,
+
+    /// Option to enable various debug tools showing buttons that will call the IM_DEBUG_BREAK() macro.
+    /// - The Item Picker tool will be available regardless of this being enabled, in order to maximize its discoverability.
+    /// - Requires a debugger being attached, otherwise IM_DEBUG_BREAK() options will appear to crash your application.
+    pub config_debug_is_debugger_present: bool,
+
+    /// Highlight and show an error message when multiple items have conflicting identifiers.
+    pub config_debug_highlight_id_conflicts: bool,
+
+    /// First-time calls to Begin()/BeginChild() will return false. NEEDS TO BE SET AT APPLICATION BOOT TIME if you don't want to miss windows.
+    pub config_debug_begin_return_value_once: bool,
+
+    /// Some calls to Begin()/BeginChild() will return false.
+    /// Will cycle through window depths then repeat.
+    pub config_debug_begin_return_value_loop: bool,
+
+    /// Ignore `add_focus_event(false)`, consequently not calling io.clear_input_keys()/io.clear_mouse_input() in input processing.
+    pub config_debug_ignore_focus_loss: bool,
+
+    /// Save .ini data with extra comments (particularly helpful for Docking, but makes saving slower)
+    pub config_debug_ini_settings: bool,
+
     pub(crate) backend_platform_name: *const c_char,
     pub(crate) backend_renderer_name: *const c_char,
     pub(crate) backend_platform_user_data: *mut c_void,
     pub(crate) backend_renderer_user_data: *mut c_void,
     backend_language_user_data: *mut c_void,
-    pub(crate) get_clipboard_text_fn:
-        Option<unsafe extern "C" fn(user_data: *mut c_void) -> *const c_char>,
-    pub(crate) set_clipboard_text_fn:
-        Option<unsafe extern "C" fn(user_data: *mut c_void, text: *const c_char)>,
-    pub(crate) clipboard_user_data: *mut c_void,
-    pub set_platform_ime_data_fn: Option<
-        unsafe extern "C" fn(
-            viewport: *mut sys::ImGuiViewport,
-            data: *mut sys::ImGuiPlatformImeData,
-        ),
-    >,
-    unused_padding: *mut c_void,
+
     /// When true, imgui-rs will use the mouse inputs, so do not dispatch them to your main
     /// game/application
     pub want_capture_mouse: bool,
@@ -315,23 +261,13 @@ pub struct Io {
     pub metrics_render_windows: i32,
     /// Number of active windows
     pub metrics_active_windows: i32,
-    /// Number of active internal imgui-rs allocations
-    pub metrics_active_allocations: i32,
+
     /// Mouse delta.
     ///
     /// Note that this is zero if either current or previous position is invalid ([f32::MAX,
     /// f32::MAX]), so a disappearing/reappearing mouse won't have a huge delta.
     pub mouse_delta: [f32; 2],
-    /// Map of indices into the `keys_down` entries array, which represent your "native" keyboard
-    /// state
-    pub key_map: [u32; sys::ImGuiKey_COUNT as usize],
-    /// Keyboard keys that are pressed (indexing defined by the user/application)
-    pub keys_down: [bool; sys::ImGuiKey_COUNT as usize],
-    /// Gamepad inputs.
-    ///
-    /// Cleared back to zero after each frame. Keyboard keys will be auto-mapped and written
-    /// here by `frame()`.
-    pub nav_inputs: [f32; NavInput::COUNT + NavInput::INTERNAL_COUNT],
+    pub(crate) ctx: *mut sys::ImGuiContext,
     /// Mouse position, in pixels.
     ///
     /// Set to [f32::MAX, f32::MAX] if mouse is unavailable (on another screen, etc.).
@@ -347,8 +283,10 @@ pub struct Io {
     /// Most users don't have a mouse with a horizontal wheel, and may not be filled by all
     /// backends.
     pub mouse_wheel_h: f32,
-    #[cfg(feature = "docking")]
-    mouse_hovered_viewport: sys::ImGuiID,
+
+    /// Notates the origin of the mouse input event.
+    pub mouse_source: MouseSource,
+
     /// Keyboard modifier pressed: Control
     pub key_ctrl: bool,
     /// Keyboard modifier pressed: Shift
@@ -358,7 +296,11 @@ pub struct Io {
     /// Keyboard modifier pressed: Cmd/Super/Windows
     pub key_super: bool,
     key_mods: sys::ImGuiKeyChord,
-    keys_data: [sys::ImGuiKeyData; sys::ImGuiKey_COUNT as usize],
+
+    // note: this *should* be `ImGuiKey_COUNT` but that appears to end up
+    // being a very different value -- I suspect there's some namespace collision
+    // going on here.
+    keys_data: [sys::ImGuiKeyData; sys::ImGuiKey_NamedKey_COUNT as usize],
 
     pub want_capture_mouse_unless_popup_close: bool,
 
@@ -372,6 +314,10 @@ pub struct Io {
     mouse_released: [bool; 5],
     mouse_down_owned: [bool; 5],
     mouse_down_owned_unless_popup_close: [bool; 5],
+
+    mouse_wheel_request_axis_swap: bool,
+    mouse_ctrl_left_as_right_click: bool,
+
     mouse_down_duration: [f32; 5],
     mouse_down_duration_prev: [f32; 5],
     #[cfg(feature = "docking")]
@@ -390,6 +336,38 @@ pub struct Io {
 
     input_queue_surrogate: sys::ImWchar16,
     input_queue_characters: ImVector<sys::ImWchar>,
+
+    #[cfg(feature = "docking")]
+    mouse_hovered_viewport: sys::ImGuiID,
+
+    #[cfg(feature = "docking")]
+    pub config_docking_no_split: bool,
+    #[cfg(feature = "docking")]
+    pub config_docking_with_shift: bool,
+    #[cfg(feature = "docking")]
+    pub config_docking_always_tab_bar: bool,
+    #[cfg(feature = "docking")]
+    pub config_docking_transparent_payload: bool,
+    #[cfg(feature = "docking")]
+    pub config_viewports_no_auto_merge: bool,
+    #[cfg(feature = "docking")]
+    pub config_viewports_no_task_bar_icon: bool,
+    #[cfg(feature = "docking")]
+    pub config_viewports_no_decoration: bool,
+    #[cfg(feature = "docking")]
+    pub config_viewports_no_default_parent: bool,
+    // pub(crate) get_clipboard_text_fn:
+    //     Option<unsafe extern "C" fn(user_data: *mut c_void) -> *const c_char>,
+    // pub(crate) set_clipboard_text_fn:
+    //     Option<unsafe extern "C" fn(user_data: *mut c_void, text: *const c_char)>,
+    // pub(crate) clipboard_user_data: *mut c_void,
+    // pub set_platform_ime_data_fn: Option<
+    //     unsafe extern "C" fn(
+    //         viewport: *mut sys::ImGuiViewport,
+    //         data: *mut sys::ImGuiPlatformImeData,
+    //     ),
+    // >,
+    // unused_padding: *mut c_void,
 }
 
 unsafe impl RawCast<sys::ImGuiIO> for Io {}
@@ -408,7 +386,7 @@ impl Io {
     #[doc(alias = "ClearCharacters")]
     pub fn clear_input_characters(&mut self) {
         unsafe {
-            sys::ImGuiIO_ClearInputCharacters(self.raw_mut());
+            sys::ImGuiIO_ClearInputKeys(self.raw_mut());
         }
     }
     /// Peek character input buffer, return a copy of entire buffer
@@ -467,32 +445,6 @@ impl Io {
     }
 }
 
-impl Index<Key> for Io {
-    type Output = u32;
-    fn index(&self, index: Key) -> &u32 {
-        &self.key_map[index as usize]
-    }
-}
-
-impl IndexMut<Key> for Io {
-    fn index_mut(&mut self, index: Key) -> &mut u32 {
-        &mut self.key_map[index as usize]
-    }
-}
-
-impl Index<NavInput> for Io {
-    type Output = f32;
-    fn index(&self, index: NavInput) -> &f32 {
-        &self.nav_inputs[index as usize]
-    }
-}
-
-impl IndexMut<NavInput> for Io {
-    fn index_mut(&mut self, index: NavInput) -> &mut f32 {
-        &mut self.nav_inputs[index as usize]
-    }
-}
-
 impl Index<MouseButton> for Io {
     type Output = bool;
     fn index(&self, index: MouseButton) -> &bool {
@@ -540,8 +492,6 @@ fn test_io_memory_layout() {
             assert_field_offset!(mouse_drag_threshold, MouseDragThreshold);
             assert_field_offset!(key_repeat_delay, KeyRepeatDelay);
             assert_field_offset!(key_repeat_rate, KeyRepeatRate);
-            assert_field_offset!(hover_delay_normal, HoverDelayNormal);
-            assert_field_offset!(hover_delay_short, HoverDelayShort);
             assert_field_offset!(user_data, UserData);
             assert_field_offset!(fonts, Fonts);
             assert_field_offset!(font_global_scale, FontGlobalScale);
@@ -572,11 +522,6 @@ fn test_io_memory_layout() {
             assert_field_offset!(backend_platform_user_data, BackendPlatformUserData);
             assert_field_offset!(backend_renderer_user_data, BackendRendererUserData);
             assert_field_offset!(backend_language_user_data, BackendLanguageUserData);
-            assert_field_offset!(get_clipboard_text_fn, GetClipboardTextFn);
-            assert_field_offset!(set_clipboard_text_fn, SetClipboardTextFn);
-            assert_field_offset!(clipboard_user_data, ClipboardUserData);
-            assert_field_offset!(set_platform_ime_data_fn, SetPlatformImeDataFn);
-            assert_field_offset!(unused_padding, _UnusedPadding);
             assert_field_offset!(want_capture_mouse, WantCaptureMouse);
             assert_field_offset!(want_capture_keyboard, WantCaptureKeyboard);
             assert_field_offset!(want_text_input, WantTextInput);
@@ -589,11 +534,7 @@ fn test_io_memory_layout() {
             assert_field_offset!(metrics_render_indices, MetricsRenderIndices);
             assert_field_offset!(metrics_render_windows, MetricsRenderWindows);
             assert_field_offset!(metrics_active_windows, MetricsActiveWindows);
-            assert_field_offset!(metrics_active_allocations, MetricsActiveAllocations);
             assert_field_offset!(mouse_delta, MouseDelta);
-            assert_field_offset!(key_map, KeyMap);
-            assert_field_offset!(keys_down, KeysDown);
-            assert_field_offset!(nav_inputs, NavInputs);
             assert_field_offset!(mouse_pos, MousePos);
             assert_field_offset!(mouse_down, MouseDown);
             assert_field_offset!(mouse_wheel, MouseWheel);

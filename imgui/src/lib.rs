@@ -105,7 +105,6 @@ pub use self::input_widget::*;
 pub use self::io::*;
 pub use self::layout::*;
 pub use self::list_clipper::ListClipper;
-#[cfg(feature = "docking")]
 pub use self::platform_io::*;
 pub use self::plothistogram::PlotHistogram;
 pub use self::plotlines::PlotLines;
@@ -149,6 +148,8 @@ mod columns;
 mod context;
 #[cfg(feature = "docking")]
 mod dock_space;
+#[cfg(feature = "docking")]
+mod docking_utils;
 pub mod drag_drop;
 pub mod draw_list;
 mod fonts;
@@ -159,8 +160,8 @@ mod io;
 mod layout;
 mod list_clipper;
 mod math;
-#[cfg(feature = "docking")]
 mod platform_io;
+
 mod plothistogram;
 mod plotlines;
 mod popups;
@@ -683,17 +684,21 @@ impl Ui {
     /// ```
     #[doc(alias = "BeginTooltip", alias = "EndTootip")]
     pub fn tooltip<F: FnOnce()>(&self, f: F) {
-        unsafe { sys::igBeginTooltip() };
-        f();
-        unsafe { sys::igEndTooltip() };
+        if unsafe { sys::igBeginTooltip() } {
+            f();
+            unsafe { sys::igEndTooltip() };
+        }
     }
     /// Construct a tooltip window that can have any kind of content.
     ///
-    /// Returns a `TooltipToken` that must be ended by calling `.end()`
+    /// Can return a `TooltipToken` that must be ended by calling `.end()`
     #[doc(alias = "BeginTooltip")]
-    pub fn begin_tooltip(&self) -> TooltipToken<'_> {
-        unsafe { sys::igBeginTooltip() };
-        TooltipToken::new(self)
+    pub fn begin_tooltip(&self) -> Option<TooltipToken<'_>> {
+        if unsafe { sys::igBeginTooltip() } {
+            Some(TooltipToken::new(self))
+        } else {
+            None
+        }
     }
 
     /// Shortcut to call [`Self::tooltip`] with simple text content.
@@ -709,7 +714,7 @@ impl Ui {
     ///     }
     /// }
     /// ```
-    #[doc(alias = "BeginTooltip", alias = "EndTootip")]
+    #[doc(alias = "BeginTooltip", alias = "EndTooltip", alias = "SetTooltip")]
     pub fn tooltip_text<T: AsRef<str>>(&self, text: T) {
         self.tooltip(|| self.text(text));
     }

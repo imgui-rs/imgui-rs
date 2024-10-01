@@ -216,7 +216,7 @@ impl Context {
     /// Sets the clipboard backend used for clipboard operations
     pub fn set_clipboard_backend<T: ClipboardBackend>(&mut self, backend: T) {
         let clipboard_ctx: Box<UnsafeCell<_>> = Box::new(ClipboardContext::new(backend).into());
-        let io = self.io_mut();
+        let io = self.platform_io_mut();
         io.set_clipboard_text_fn = Some(crate::clipboard::set_clipboard_text);
         io.get_clipboard_text_fn = Some(crate::clipboard::get_clipboard_text);
 
@@ -451,8 +451,7 @@ fn test_ini_load_save() {
     let (_guard, mut ctx) = crate::test::test_ctx();
     let data = "[Window][Debug##Default]
 Pos=60,60
-Size=400,400
-Collapsed=0";
+Size=400,400";
     ctx.load_ini_settings(data);
     let mut buf = String::new();
     ctx.save_ini_settings(&mut buf);
@@ -502,6 +501,24 @@ impl Context {
             &mut *(sys::igGetIO() as *mut Io)
         }
     }
+
+    /// Returns an immutable reference to the Context's [`PlatformIo`](crate::PlatformIo) object.
+    pub fn platform_io(&self) -> &crate::PlatformIo {
+        unsafe {
+            // safe because PlatformIo is a transparent wrapper around sys::ImGuiPlatformIO
+            // and &self ensures we have shared ownership of PlatformIo.
+            &*(sys::igGetPlatformIO() as *const crate::PlatformIo)
+        }
+    }
+    /// Returns a mutable reference to the Context's [`PlatformIo`](crate::PlatformIo) object.
+    pub fn platform_io_mut(&mut self) -> &mut crate::PlatformIo {
+        unsafe {
+            // safe because PlatformIo is a transparent wrapper around sys::ImGuiPlatformIO
+            // and &mut self ensures exclusive ownership of PlatformIo.
+            &mut *(sys::igGetPlatformIO() as *mut crate::PlatformIo)
+        }
+    }
+
     /// Returns an immutable reference to the user interface style
     #[doc(alias = "GetStyle")]
     pub fn style(&self) -> &Style {
@@ -594,22 +611,6 @@ impl Context {
 
 #[cfg(feature = "docking")]
 impl Context {
-    /// Returns an immutable reference to the Context's [`PlatformIo`](crate::PlatformIo) object.
-    pub fn platform_io(&self) -> &crate::PlatformIo {
-        unsafe {
-            // safe because PlatformIo is a transparent wrapper around sys::ImGuiPlatformIO
-            // and &self ensures we have shared ownership of PlatformIo.
-            &*(sys::igGetPlatformIO() as *const crate::PlatformIo)
-        }
-    }
-    /// Returns a mutable reference to the Context's [`PlatformIo`](crate::PlatformIo) object.
-    pub fn platform_io_mut(&mut self) -> &mut crate::PlatformIo {
-        unsafe {
-            // safe because PlatformIo is a transparent wrapper around sys::ImGuiPlatformIO
-            // and &mut self ensures exclusive ownership of PlatformIo.
-            &mut *(sys::igGetPlatformIO() as *mut crate::PlatformIo)
-        }
-    }
     /// Returns an immutable reference to the main [`Viewport`](crate::Viewport)
     pub fn main_viewport(&self) -> &crate::Viewport {
         unsafe {

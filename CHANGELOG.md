@@ -4,6 +4,8 @@
 
 - Fixed null pointers in zero-sized slices - [PR #779](https://github.com/imgui-rs/imgui-rs/pull/779)
 - Fixed `NewFrame` doc alias typo - [PR #791](https://github.com/imgui-rs/imgui-rs/pull/791)
+- Removed `GetWindowContentRegionMax`, `GetWindowContentRegionMin`, `GetContentRegionMax` --
+  see https://github.com/ocornut/imgui/issues/7838 for more information.
 
 ## [0.12.0] - 2024-05-05
 

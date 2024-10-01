@@ -1,3 +1,4 @@
+use std::ffi::c_short;
 use std::os::raw::c_int;
 
 use crate::fonts::atlas::{FontAtlas, FontId};
@@ -19,7 +20,9 @@ pub struct Font {
     pub config_data_count: i16,
     pub fallback_char: sys::ImWchar,
     pub ellipsis_char: sys::ImWchar,
-    pub dot_char: sys::ImWchar,
+    pub ellipsis_char_count: c_short,
+    pub ellipsis_width: f32,
+    pub ellipsis_char_step: f32,
     pub dirty_lookup_tables: bool,
     pub scale: f32,
     pub ascent: f32,
@@ -51,6 +54,7 @@ fn test_font_memory_layout() {
             );
         };
     }
+
     assert_field_offset!(index_advance_x, IndexAdvanceX);
     assert_field_offset!(fallback_advance_x, FallbackAdvanceX);
     assert_field_offset!(font_size, FontSize);
@@ -62,7 +66,9 @@ fn test_font_memory_layout() {
     assert_field_offset!(config_data_count, ConfigDataCount);
     assert_field_offset!(fallback_char, FallbackChar);
     assert_field_offset!(ellipsis_char, EllipsisChar);
-    assert_field_offset!(dot_char, DotChar);
+    assert_field_offset!(ellipsis_char_count, EllipsisCharCount);
+    assert_field_offset!(ellipsis_width, EllipsisWidth);
+    assert_field_offset!(ellipsis_char_step, EllipsisCharStep);
     assert_field_offset!(dirty_lookup_tables, DirtyLookupTables);
     assert_field_offset!(scale, Scale);
     assert_field_offset!(ascent, Ascent);

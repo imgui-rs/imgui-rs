@@ -21,6 +21,12 @@ impl Ui {
         unsafe { sys::igSeparator() }
     }
 
+    /// Renders a separator with text.
+    #[doc(alias = "SeparatorText")]
+    pub fn separator_with_text(&self, text: impl AsRef<str>) {
+        unsafe { sys::igSeparatorText(self.scratch_txt(text)) }
+    }
+
     /// Call between widgets or groups to layout them horizontally.
     ///
     /// X position is given in window coordinates.

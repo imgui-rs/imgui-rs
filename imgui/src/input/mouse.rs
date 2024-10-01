@@ -81,6 +81,34 @@ impl MouseCursor {
     pub const COUNT: usize = sys::ImGuiMouseCursor_COUNT as usize;
 }
 
+// pub const ImGuiMouseSource_Mouse: ImGuiMouseSource = 0;
+// pub const ImGuiMouseSource_TouchScreen: ImGuiMouseSource = 1;
+// pub const ImGuiMouseSource_Pen: ImGuiMouseSource = 2;
+// pub const ImGuiMouseSource_COUNT: ImGuiMouseSource = 3;
+
+/// Notates the type and origin of a mouse input.
+#[repr(u32)]
+#[derive(Copy, Clone, Debug, Hash, Eq, PartialEq)]
+pub enum MouseSource {
+    /// From an normal cursor mouse.
+    Mouse = sys::ImGuiMouseSource_Mouse,
+    /// From a touchscreen used with a finger.
+    Touchscreen = sys::ImGuiMouseSource_TouchScreen,
+    /// From a pen.
+    Pen = sys::ImGuiMouseSource_Pen,
+}
+
+impl MouseSource {
+    /// All possible [`MouseSource`] varirants
+    pub const VARIANTS: [MouseSource; MouseSource::COUNT] = [
+        MouseSource::Mouse,
+        MouseSource::Touchscreen,
+        MouseSource::Pen,
+    ];
+    /// Total count of [`MouseSource`] variants
+    pub const COUNT: usize = sys::ImGuiMouseSource_COUNT as usize;
+}
+
 #[test]
 fn test_mouse_cursor_variants() {
     for (idx, &value) in MouseCursor::VARIANTS.iter().enumerate() {
@@ -122,7 +150,13 @@ impl Ui {
     /// Returns true if the given mouse button was double-clicked
     #[doc(alias = "IsMouseDoubleClicked")]
     pub fn is_mouse_double_clicked(&self, button: MouseButton) -> bool {
-        unsafe { sys::igIsMouseDoubleClicked(button as i32) }
+        cfg_if::cfg_if! {
+            if #[cfg(feature = "docking")] {
+                unsafe { sys::igIsMouseDoubleClicked_Nil(button as i32) }
+            } else {
+                unsafe { sys::igIsMouseDoubleClicked(button as i32) }
+            }
+        }
     }
     /// Returns true if the given mouse button was released (went from down to !down)
     #[doc(alias = "IsMouseReleased")]
