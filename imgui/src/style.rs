@@ -340,12 +340,14 @@ pub enum StyleColor {
     TabDimmedSelected = sys::ImGuiCol_TabDimmedSelected,
     /// Non-selected, when in an unfocused window
     TabDimmedSelectedOverline = sys::ImGuiCol_TabDimmedSelectedOverline,
+
     /// Color of widget which appears when moving windows around, allowing splitting/etc of dock areas
     #[cfg(feature = "docking")]
     DockingPreview = sys::ImGuiCol_DockingPreview,
     /// Colour when black area is present in docking setup (e.g while dragging a window away from a split area, leaving it temporarily empty)
     #[cfg(feature = "docking")]
     DockingEmptyBg = sys::ImGuiCol_DockingEmptyBg,
+
     /// Lines in [`crate::Ui::plot_lines`]
     PlotLines = sys::ImGuiCol_PlotLines,
     /// `PlotLines` when hovered
@@ -354,6 +356,7 @@ pub enum StyleColor {
     PlotHistogram = sys::ImGuiCol_PlotHistogram,
     /// `PlotHistogram` when hovered
     PlotHistogramHovered = sys::ImGuiCol_PlotHistogramHovered,
+
     /// Background color of header rows in table widget
     TableHeaderBg = sys::ImGuiCol_TableHeaderBg,
     /// Main border color for table, used around whole table and around header cells
@@ -364,10 +367,12 @@ pub enum StyleColor {
     TableRowBg = sys::ImGuiCol_TableRowBg,
     /// Used for alternating row colors, if enabled by `TableFlags::ROW_BG`
     TableRowBgAlt = sys::ImGuiCol_TableRowBgAlt,
+
     /// Hyperlink color
     TextLink = sys::ImGuiCol_TextLink,
     /// The highlight color used for selection in text inputs
     TextSelectedBg = sys::ImGuiCol_TextSelectedBg,
+
     /// Used for drag-and-drop system
     DragDropTarget = sys::ImGuiCol_DragDropTarget,
     /// Gamepad/keyboard: current highlighted item

@@ -2,10 +2,57 @@
 
 ## [0.13.0] - Unreleased
 
+### Added
+
+- Bindings for `Key::F12..=Key::F24`, `Key::AppBack`, and `Key::AppForward`.
+- `MouseSource` enumeration which describes from what kind of device a mouse event originated.
+- `Ui::text_link` and `Ui::text_link_open_url` have been added, for working with hyperlinks.
+- Added support for `ChildFlags` for `ChildWindow`.
+- `Ui::separator_with_text`, which is like a `Ui::separator` but with text input.
+- `ItemFlags` to be used with `Ui::push_item_flags`. See note in `Deprecated` for more on that.
+- New style parameters have been added. Note especially `Style::hover_flags_for_tooltip_mouse` and
+  `Style::hover_flags_for_tooltip_nav` which describe the default flags when hovering items.
+
+### Changed
+
+- Keys now communicate with `imgui` in a far simpler manner -- rather than going through
+  a complex keymap, they instead simply notate if they are or are not down to `imgui` directly.
+  Multiple functions, such as `Ui::key_index`, `Ui::is_key_index_down`, `Ui::is_key_index_pressed`, `Ui::is_key_index_pressed_no_repeat`, and `Ui::key_index_pressed_amount` were removed. Use the corresponding non-`index` version.
+- The default `oversample_h` on the `FontConfig` has changed to 2 instead of 3.
+- `SelectableFlags::DONT_CLOSE_POPUPS` has been renamed to `SelectableFlags::NO_AUTO_CLOSE_POPUPS`
+- `SelectableFlags::ALLOW_ITEM_OVERLAP` has been renamed to `SelectableFlags::ALLOW_OVERLAP`.
+- `TreeNodeFlags::ALLOW_ITEM_OVERLAP` has been renamed to `TreeNodeFlags::ALLOW_OVERLAP`.
+- `DragDropFlags::SOURCE_AUTO_EXPIRE_PAYLOAD` has been renamed to `DragDropFlags::PAYLOAD_AUTO_EXPIRE`.
+- `Ui::begin_tooltip` now returns an `Option`, as sometimes tooltips fail to begin.
+- `StyleColor::TabActive` has been renamed to `StyleColor::TabSelected`.
+- `StyleColor::TabActive` has been renamed to `StyleColor::TabSelected`.
+- `StyleColor::TabUnfocused` has been renamed to `StyleColor::TabDimmed`.
+- `StyleColor::TabUnfocusedActive` has been renamed to `StyleColor::TabDimmedSelected`.
+- `ItemHoveredFlags` has been renamed to `HoveredFlags`.
+- `Ui::set_item_allow_overlap` has been replaced with `Ui::set_next_item_allow_overlap`:
+  Instead of calling `Ui::set_item_allow_overlap` *after* calling an item, call `Ui::set_next_item_allow_overlap`
+  before calling the item.
+
+### Fixed
+
 - Fixed null pointers in zero-sized slices - [PR #779](https://github.com/imgui-rs/imgui-rs/pull/779)
 - Fixed `NewFrame` doc alias typo - [PR #791](https://github.com/imgui-rs/imgui-rs/pull/791)
-- Removed `GetWindowContentRegionMax`, `GetWindowContentRegionMin`, `GetContentRegionMax` --
-  see https://github.com/ocornut/imgui/issues/7838 for more information.
+
+### Deprecated
+
+- `ChildWindow::always_use_window_padding` and `ChildWindow::borders` have both been deprecated
+  in favor of using the new `ChildWindow::child_flags` API.
+- `Ui::push_allow_keyboard_focus` and `Ui::push_button_repeat` have been deprecated in favor
+  of using the new `Ui::push_item_flag` instead. This function itself was deprecated in the
+  past, but Dear ImGui has changed directions and it will now be used going forward instead
+  of many individual methods.
+
+### Removed
+
+- `GetWindowContentRegionMax`, `GetWindowContentRegionMin`, `GetContentRegionMax` --
+  see [this issue](https://github.com/ocornut/imgui/issues/7838) for more information.
+- `WindowFlags::ALWAYS_USE_WINDOW_PADDING` was removed, as this only pertained to `ChildWindow`,
+  which now has a dedicated API for it (see in the `Added` section).
 
 ## [0.12.0] - 2024-05-05
 
@@ -83,7 +130,7 @@
 
 - BREAKING: `ui.input_int` and `ui.input_float` now return `InputScalar<'ui, 'l, f32/i32>`, instead of `InputFloat`/`InputInt`. This struct has all of the same flags as `InputFloat` and `InputInt` did.
 
-- DEPRECATED: `InputFloat` and `InputInt` have been deprecated. `ui.input_float` and `ui.input_int` are _not_, however, and instead will just call `input_scalar` as appropriate. Therefore, please switch your code to `ui.input_float` or `ui.input_int`.
+- DEPRECATED: `InputFloat` and `InputInt` have been deprecated. `ui.input_float` and `ui.input_int` are *not*, however, and instead will just call `input_scalar` as appropriate. Therefore, please switch your code to `ui.input_float` or `ui.input_int`.
 
 - Added `add_polyline` method to `DrawListMut`, which binds to Dear ImGui's `AddPolyline` and `AddConvexPolyFilled`
 
@@ -124,7 +171,7 @@ if let Some(_t) = ui.begin_popup("example") {
 
   - The most likely breaking changes users will see is `button` and `same_line` now take one fewer parameter -- if you were calling `button` with `[0.0, 0.0]`, simply delete that -- otherwise, call `button_with_size`. Similarly, for `same_line`, if you were passing in `0.0.` simply delete that argument. Otherwise, call `same_line_with_pos`.
 
-- ADDED: support for the `tables` API which was added in dear imgui `1.80`. We currently have this _feature gated_ behind `tables-api`. You should feel safe to use this in stable production, but be aware of two things:
+- ADDED: support for the `tables` API which was added in dear imgui `1.80`. We currently have this *feature gated* behind `tables-api`. You should feel safe to use this in stable production, but be aware of two things:
 
   1. The tables API is marked as "beta" meaning that it may change with fewer stability promises. This is unlikely and it seems fairly settled.
   2. There are a few cases where the tables API will segfault by dereferencing a `NULL` where it should instead `ASSERT` and crash. This is simply annoying because you won't get a stacktrace. [See here for more info on that.](https://github.com/imgui-rs/imgui-rs/issues/524). If this is fixed upstream, we will issue a patch.
@@ -139,11 +186,11 @@ if let Some(_t) = ui.begin_popup("example") {
   - Wrapped callback kinds into their own enums, `InputTextCallback` and `InputTextCallbackMultiline`.
   - Created a trait, `InputTextCallbackHandler`.
   - To see how to create an InputText callback, see `examples/text_callback.rs`.
-  - Finally, please note that editing an `&mut String` which contains `\0` within it will produce _surprising_ truncation within ImGui. If you need to edit such a string, please pre-process it.
+  - Finally, please note that editing an `&mut String` which contains `\0` within it will produce *surprising* truncation within ImGui. If you need to edit such a string, please pre-process it.
 
-- ADDED: `begin_disable` and `begin_enable` methods. These add (finally) support for disabling _any_ widget. Thank you to @dbr for [implementing this here](https://github.com/imgui-rs/imgui-rs/pull/519).
+- ADDED: `begin_disable` and `begin_enable` methods. These add (finally) support for disabling *any* widget. Thank you to @dbr for [implementing this here](https://github.com/imgui-rs/imgui-rs/pull/519).
 
-- BREAKING: MSRV is now **1.54**. This is gives us access to min-const-generics, which we use in a few places, but will gradually use more. Because this is the first time we've bumped MSRV intentionally, we have added a new feature `min-const-generics`, which is _enabled by default_. If you are pre-1.54, you can hang onto this update by disabling that feature. In our next update, this feature will be removed and we will commit to our MSRVs going forward. Thank you to @dbr for changing our CI infrastructure to support better MSRVs [here](https://github.com/imgui-rs/imgui-rs/pull/512).
+- BREAKING: MSRV is now **1.54**. This is gives us access to min-const-generics, which we use in a few places, but will gradually use more. Because this is the first time we've bumped MSRV intentionally, we have added a new feature `min-const-generics`, which is *enabled by default*. If you are pre-1.54, you can hang onto this update by disabling that feature. In our next update, this feature will be removed and we will commit to our MSRVs going forward. Thank you to @dbr for changing our CI infrastructure to support better MSRVs [here](https://github.com/imgui-rs/imgui-rs/pull/512).
 
 - BREAKING: Changed default version of Winit in `imgui-winit-support` to `winit 0.25`. Thank you to @repi [for implementing this here](https://github.com/imgui-rs/imgui-rs/pull/485).
 
@@ -205,31 +252,31 @@ if let Some(_t) = ui.begin_popup("example") {
 
 - Upgrade to [Dear ImGui v1.80](https://github.com/ocornut/imgui/releases/tag/v1.80). (Note that the new table functionality is not yet supported, however)
 
-- `Ui::key_index()` is now called internally when needed, and the various `is_key_foo` now take a `Key` directly: https://github.com/imgui-rs/imgui-rs/pull/416
+- `Ui::key_index()` is now called internally when needed, and the various `is_key_foo` now take a `Key` directly: <https://github.com/imgui-rs/imgui-rs/pull/416>
 
   - `is_key_down`, `is_key_pressed`, `is_key_released` and `key_pressed_amount` now take a `Key` instead of `u32` (breaking).
   - `key_index` is no longer public (breaking). If you need access to the key map, it can be accessed as `ui.io().key_map[key]` (If you need to do this, file a bug, since I'm open to exposing this if there's actually a use case).
 
-- `winit` 0.23/0.24 handling has been (hopefully) fixed: https://github.com/imgui-rs/imgui-rs/pull/420 (breaking, see also https://github.com/imgui-rs/imgui-rs/issues/412).
+- `winit` 0.23/0.24 handling has been (hopefully) fixed: <https://github.com/imgui-rs/imgui-rs/pull/420> (breaking, see also <https://github.com/imgui-rs/imgui-rs/issues/412>).
 
   - `imgui-winit-support`'s `winit-23` feature no longer supports `winit` version `0.24` (this caused an unintentional semver breakage before, unfortunately).
   - `imgui-winit-support` has a new `winit-24` feature for 0.24 support.
   - By default `imgui-winit-support` feature now enables `winit-24`, and not `winit-23` (by default it will always enable the latest).
 
-- The `imgui` crate no longer depends on `gfx` or `glium` directly: https://github.com/imgui-rs/imgui-rs/pull/420 (breaking, related to the previous change).
+- The `imgui` crate no longer depends on `gfx` or `glium` directly: <https://github.com/imgui-rs/imgui-rs/pull/420> (breaking, related to the previous change).
 
   - That is, the `gfx` and `glium` features are removed to reduce version compatibility issues going forward.
     - This only matters if you manually implement `gfx` or `glium` renderers without using the `imgui-glium-renderer` or `imgui-gfx-renderer` crates.
     - In the (somewhat unlikely) case you were relying on these this, you should define your own vertex type that's layout-compatible with `imgui::DrawVert`, and replace calls to `imgui::DrawList::vtx_buffer()` with `imgui::DrawList::transmute_vtx_buffer::<MyDrawVert>()`. You can see `imgui_glium_renderer::GliumDrawVert` and `imgui_gfx_renderer::GfxDrawVert` types respectively for examples of this, if needed, but it should be straightforward enough if you're already implementing a renderer from scratch.
   - This is admittedly less convenient, but avoids depending on any specific version of `gfx` or `glium` in the core `imgui` crate, which will ease maintenance and reduce unintentional breakage in the future.
 
-- Non-window DrawList support has been fixed/improved: https://github.com/imgui-rs/imgui-rs/pull/414
+- Non-window DrawList support has been fixed/improved: <https://github.com/imgui-rs/imgui-rs/pull/414>
 
   - `WindowDrawList` has been renamed to `DrawListMut`, to reflect that it may refer to other kinds of draw lists, and is mutable, unlike `imgui::DrawList` (breaking).
   - `Ui::get_background_draw_list()` has been fixed when used outside of a window context, and now has an example.
   - `Ui::get_foreground_draw_list()` has been added, analogous to `Ui::get_background_draw_list()`.
 
-- Added drag drop support, with a safe and an unsafe variant: https://github.com/imgui-rs/imgui-rs/pull/428
+- Added drag drop support, with a safe and an unsafe variant: <https://github.com/imgui-rs/imgui-rs/pull/428>
 
   - `DragDropSource` allows users to create a dragdrop payload which is either empty, of `'static + Copy` data,
     or `unsafe`, allowing for theoretically arbitrary payloads.
@@ -267,7 +314,7 @@ if let Some(_t) = ui.begin_popup("example") {
 
 ### Caveat: Semver broken in 0.6.1 in `imgui-winit-support`
 
-_Note from the future: `imgui-winit-support@0.6.1` has been yanked. I don't believe the breakage impacted the other crates so I'm leaving those to avoid impacting non-`winit` usages._
+*Note from the future: `imgui-winit-support@0.6.1` has been yanked. I don't believe the breakage impacted the other crates so I'm leaving those to avoid impacting non-`winit` usages.*
 
 This release accidentally broke semver, and should have been 0.7.0. It will be yanked when 0.7.0 is released, unless there are objections.
 
@@ -392,8 +439,8 @@ As mentioned, the 0.6.1 release of `imgui-winit-support` has been yanked.
 - Gfx renderer re-exports imgui and gfx
 - These functions now take/return PathBuf: log_filename, set_log_filename, ini_filename, set_logfilename
 - ID stack manipulation now uses stack tokens
-- Parameter stack pushes _must almost always be paired by a manual call to stack pop_
-- Container widget tokens _must be ended manually by calling end_. Closure-based function (e.g. build()) are unaffected and do this automatically
+- Parameter stack pushes *must almost always be paired by a manual call to stack pop*
+- Container widget tokens *must be ended manually by calling end*. Closure-based function (e.g. build()) are unaffected and do this automatically
 - Bump minimum Rust version to 1.36 (some dependencies, including winit, require MaybeUninit)
 - Upgrade to cimgui / imgui 1.72b
 
@@ -500,7 +547,7 @@ As mentioned, the 0.6.1 release of `imgui-winit-support` has been yanked.
   - Style: Add `PopupRounding`, `FrameBorderSize`, `WindowBorderSize`, `PopupBorderSize`.
   - DemoWindow: Add `no_close` state.
   - Input: Add `no_undo_redo` method.
-  - _imgui-sys_:
+  - *imgui-sys*:
     - `igStyleColorsDark` and `igStyleColorsLight`
     - DragDrop low level API
     - `igGetFrameHeight`
@@ -836,7 +883,6 @@ As mentioned, the 0.6.1 release of `imgui-winit-support` has been yanked.
 
 - Initial release with cimgui/imgui 1.44, glium 0.9
 
-[unreleased]: https://github.com/Gekkio/imgui-rs/compare/v0.10.0...HEAD
 [0.10.0]: https://github.com/Gekkio/imgui-rs/compare/v0.9.0...v0.10.0
 [0.9.0]: https://github.com/Gekkio/imgui-rs/compare/v0.8.0...v0.9.0
 [0.8.0]: https://github.com/Gekkio/imgui-rs/compare/v0.7.0...v0.8.0

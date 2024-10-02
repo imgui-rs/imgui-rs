@@ -199,10 +199,19 @@ impl<'ui> ChildWindow<'ui> {
         self
     }
 
+    /// When enabled, ensures child windows without border use `style.window_padding`.
+    #[deprecated(since = "0.13.0", note = "use `child_flags` instead")]
+    pub fn always_use_window_padding(mut self, value: bool) -> Self {
+        self.child_flags
+            .set(ChildFlags::ALWAYS_USE_WINDOW_PADDING, value);
+        self
+    }
+
     /// Sets the child flags on the [`ChildWindow`].
     ///
     /// See [`ChildFlags`] for more information on each flag.
     /// The default flags are [`ChildFlags::empty`].
+    #[inline]
     pub fn child_flags(mut self, child_flags: ChildFlags) -> Self {
         self.child_flags = child_flags;
         self

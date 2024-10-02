@@ -56,7 +56,7 @@ bitflags!(
         const SOURCE_EXTERN = sys::ImGuiDragDropFlags_SourceExtern;
         /// Automatically expire the payload if the source ceases to be submitted (otherwise
         /// payloads are persisting while being dragged)
-        const SOURCE_AUTO_EXPIRE_PAYLOAD = sys::ImGuiDragDropFlags_PayloadAutoExpire;
+        const PAYLOAD_AUTO_EXPIRE = sys::ImGuiDragDropFlags_PayloadAutoExpire;
         /// igAcceptDragDropPayload() will returns true even before the mouse button is released.
         /// You can then call igIsDelivery() to test if the payload needs to be delivered.
         const ACCEPT_BEFORE_DELIVERY = sys::ImGuiDragDropFlags_AcceptBeforeDelivery;
