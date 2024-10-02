@@ -1,4 +1,9 @@
-# Change Log
+# Changelog
+
+## [0.13.0] - Unreleased
+
+- Fixed null pointers in zero-sized slices - [PR #779](https://github.com/imgui-rs/imgui-rs/pull/779)
+- Fixed `NewFrame` doc alias typo - [PR #791](https://github.com/imgui-rs/imgui-rs/pull/791)
 
 ## [0.12.0] - 2024-05-05
 
