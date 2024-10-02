@@ -140,7 +140,7 @@ impl<'ui> DrawListMut<'ui> {
                 cfg_if::cfg_if! {
                     if #[cfg(feature = "docking")] {
                         // Has extra overload in docking branch
-                        sys::igGetBackgroundDrawList_Nil()
+                        sys::igGetBackgroundDrawList(std::ptr::null_mut())
                     } else {
                         sys::igGetBackgroundDrawList()
                     }
@@ -159,7 +159,7 @@ impl<'ui> DrawListMut<'ui> {
                 cfg_if::cfg_if! {
                     if #[cfg(feature = "docking")] {
                         // Has extra overload in docking branch
-                        sys::igGetForegroundDrawList_Nil()
+                        sys::igGetForegroundDrawList_ViewportPtr(std::ptr::null_mut())
                     } else {
                         sys::igGetForegroundDrawList()
                     }

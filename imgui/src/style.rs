@@ -143,6 +143,11 @@ pub struct Style {
     ///
     /// Also applies to popups/tooltips in addition to regular windows.
     pub display_safe_area_padding: [f32; 2],
+
+    /// Thickness of resizing border between docked windows
+    #[cfg(feature = "docking")]
+    pub docking_separator_size: f32,
+
     /// Scale software-rendered mouse cursor.
     ///
     /// May be removed later.
@@ -712,6 +717,7 @@ fn test_style_memory_layout() {
     assert_field_offset!(selectable_text_align, SelectableTextAlign);
     assert_field_offset!(display_window_padding, DisplayWindowPadding);
     assert_field_offset!(display_safe_area_padding, DisplaySafeAreaPadding);
+    assert_field_offset!(docking_separator_size, DockingSeparatorSize);
     assert_field_offset!(mouse_cursor_scale, MouseCursorScale);
     assert_field_offset!(anti_aliased_lines, AntiAliasedLines);
     assert_field_offset!(anti_aliased_lines_use_tex, AntiAliasedLinesUseTex);

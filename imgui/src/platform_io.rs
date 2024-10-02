@@ -1,6 +1,9 @@
 use std::ffi::{c_char, c_void};
 
-use crate::{internal::RawCast, ViewportFlags};
+use crate::{
+    internal::{ImVector, RawCast},
+    PlatformMonitor, ViewportFlags,
+};
 
 /// Holds the information needed to enable multiple viewports.
 #[repr(C)]
@@ -61,9 +64,15 @@ pub struct PlatformIo {
     pub(crate) platform_get_window_dpi_scale: Option<unsafe extern "C" fn(*mut Viewport) -> f32>,
     #[cfg(feature = "docking")]
     pub(crate) platform_on_changed_viewport: Option<unsafe extern "C" fn(*mut Viewport)>,
+
     #[cfg(feature = "docking")]
-    pub(crate) platform_create_vk_surface:
-        Option<unsafe extern "C" fn(*mut Viewport, u64, *const c_void, *mut u64) -> c_int>,
+    pub(crate) platform_get_window_work_area_inserts:
+        Option<unsafe extern "C" fn(vp: *mut Viewport) -> sys::ImVec4>,
+
+    #[cfg(feature = "docking")]
+    pub(crate) platform_create_vk_surface: Option<
+        unsafe extern "C" fn(*mut Viewport, u64, *const c_void, *mut u64) -> std::ffi::c_int,
+    >,
 
     #[cfg(feature = "docking")]
     pub(crate) renderer_create_window: Option<unsafe extern "C" fn(*mut Viewport)>,
@@ -77,7 +86,7 @@ pub struct PlatformIo {
     pub(crate) renderer_swap_buffers: Option<unsafe extern "C" fn(*mut Viewport, *mut c_void)>,
 
     /// Holds information about the available monitors.
-    /// Should be initialized and updated by the [`PlatformViewportBackend`].
+    /// Should be initialized and updated by the [`PlatformViewportBackend`](crate::PlatformViewportBackend).
     #[cfg(feature = "docking")]
     pub monitors: ImVector<PlatformMonitor>,
 
@@ -161,11 +170,9 @@ pub struct Viewport {
     pub size: [f32; 2],
     pub work_pos: [f32; 2],
     pub work_size: [f32; 2],
-    pub platform_handle: *mut c_void,
-    pub platform_handle_raw: *mut c_void,
-
     #[cfg(feature = "docking")]
     pub dpi_scale: f32,
+
     #[cfg(feature = "docking")]
     pub(crate) parent_viewport_id: crate::Id,
     #[cfg(feature = "docking")]
@@ -175,6 +182,10 @@ pub struct Viewport {
     pub renderer_user_data: *mut c_void,
     #[cfg(feature = "docking")]
     pub platform_user_data: *mut c_void,
+
+    pub platform_handle: *mut c_void,
+    pub platform_handle_raw: *mut c_void,
+
     #[cfg(feature = "docking")]
     pub platform_window_created: bool,
     #[cfg(feature = "docking")]
