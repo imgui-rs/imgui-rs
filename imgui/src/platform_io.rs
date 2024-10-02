@@ -1,9 +1,9 @@
 use std::ffi::{c_char, c_void};
 
-use crate::{
-    internal::{ImVector, RawCast},
-    PlatformMonitor, ViewportFlags,
-};
+use crate::{internal::RawCast, ViewportFlags};
+
+#[cfg(feature = "docking")]
+use crate::{internal::ImVector, PlatformMonitor};
 
 /// Holds the information needed to enable multiple viewports.
 #[repr(C)]

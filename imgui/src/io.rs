@@ -486,14 +486,6 @@ fn test_io_memory_layout() {
             assert_field_offset!(font_allow_user_scaling, FontAllowUserScaling);
             assert_field_offset!(font_default, FontDefault);
             assert_field_offset!(display_framebuffer_scale, DisplayFramebufferScale);
-            assert_field_offset!(config_docking_no_split, ConfigDockingNoSplit);
-            assert_field_offset!(config_docking_with_shift, ConfigDockingWithShift);
-            assert_field_offset!(config_docking_always_tab_bar, ConfigDockingAlwaysTabBar);
-            assert_field_offset!(config_docking_transparent_payload, ConfigDockingTransparentPayload);
-            assert_field_offset!(config_viewports_no_auto_merge, ConfigViewportsNoAutoMerge);
-            assert_field_offset!(config_viewports_no_task_bar_icon, ConfigViewportsNoTaskBarIcon);
-            assert_field_offset!(config_viewports_no_decoration, ConfigViewportsNoDecoration);
-            assert_field_offset!(config_viewports_no_default_parent, ConfigViewportsNoDefaultParent);
             assert_field_offset!(mouse_draw_cursor, MouseDrawCursor);
             assert_field_offset!(config_mac_os_behaviors, ConfigMacOSXBehaviors);
             assert_field_offset!(
@@ -536,7 +528,6 @@ fn test_io_memory_layout() {
             assert_field_offset!(mouse_wheel, MouseWheel);
             assert_field_offset!(mouse_wheel_h, MouseWheelH);
             assert_field_offset!(mouse_source, MouseSource);
-            assert_field_offset!(mouse_hovered_viewport, MouseHoveredViewport);
             assert_field_offset!(key_ctrl, KeyCtrl);
             assert_field_offset!(key_shift, KeyShift);
             assert_field_offset!(key_alt, KeyAlt);
@@ -569,6 +560,28 @@ fn test_io_memory_layout() {
             );
             assert_field_offset!(input_queue_surrogate, InputQueueSurrogate);
             assert_field_offset!(input_queue_characters, InputQueueCharacters);
+
+            #[cfg(feature = "docking")]
+            {
+                assert_field_offset!(mouse_hovered_viewport, MouseHoveredViewport);
+                assert_field_offset!(config_docking_no_split, ConfigDockingNoSplit);
+                assert_field_offset!(config_docking_with_shift, ConfigDockingWithShift);
+                assert_field_offset!(config_docking_always_tab_bar, ConfigDockingAlwaysTabBar);
+                assert_field_offset!(
+                    config_docking_transparent_payload,
+                    ConfigDockingTransparentPayload
+                );
+                assert_field_offset!(config_viewports_no_auto_merge, ConfigViewportsNoAutoMerge);
+                assert_field_offset!(
+                    config_viewports_no_task_bar_icon,
+                    ConfigViewportsNoTaskBarIcon
+                );
+                assert_field_offset!(config_viewports_no_decoration, ConfigViewportsNoDecoration);
+                assert_field_offset!(
+                    config_viewports_no_default_parent,
+                    ConfigViewportsNoDefaultParent
+                );
+            }
         })
         .unwrap()
         .join()
