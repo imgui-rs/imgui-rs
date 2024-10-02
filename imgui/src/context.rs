@@ -9,7 +9,7 @@ use crate::clipboard::{ClipboardBackend, ClipboardContext};
 use crate::fonts::atlas::{FontAtlas, FontId, SharedFontAtlas};
 use crate::io::Io;
 use crate::style::Style;
-use crate::{sys, DrawData};
+use crate::{docking_utils, sys, DrawData};
 use crate::{MouseCursor, Ui};
 
 /// An imgui-rs context.
@@ -449,9 +449,18 @@ fn test_shared_font_atlas() {
 #[test]
 fn test_ini_load_save() {
     let (_guard, mut ctx) = crate::test::test_ctx();
+
+    #[cfg(feature = "docking")]
+    let data = "[Window][Debug##Default]
+Pos=60,60
+Size=400,400
+Collapsed=0";
+
+    #[cfg(not(feature = "docking"))]
     let data = "[Window][Debug##Default]
 Pos=60,60
 Size=400,400";
+
     ctx.load_ini_settings(data);
     let mut buf = String::new();
     ctx.save_ini_settings(&mut buf);
@@ -675,34 +684,34 @@ impl Context {
         io.backend_platform_user_data = ctx.get() as *mut _;
 
         let pio = self.platform_io_mut();
-        pio.platform_create_window = Some(crate::platform_io::platform_create_window);
-        pio.platform_destroy_window = Some(crate::platform_io::platform_destroy_window);
-        pio.platform_show_window = Some(crate::platform_io::platform_show_window);
-        pio.platform_set_window_pos = Some(crate::platform_io::platform_set_window_pos);
+        pio.platform_create_window = Some(docking_utils::platform_create_window);
+        pio.platform_destroy_window = Some(docking_utils::platform_destroy_window);
+        pio.platform_show_window = Some(docking_utils::platform_show_window);
+        pio.platform_set_window_pos = Some(docking_utils::platform_set_window_pos);
         // since pio.platform_get_window_pos is not a C compatible function, cimgui provides an extra function to set it.
         unsafe {
-            crate::platform_io::ImGuiPlatformIO_Set_Platform_GetWindowPos(
+            docking_utils::ImGuiPlatformIO_Set_Platform_GetWindowPos(
                 pio,
-                crate::platform_io::platform_get_window_pos,
+                docking_utils::platform_get_window_pos,
             );
         }
-        pio.platform_set_window_size = Some(crate::platform_io::platform_set_window_size);
+        pio.platform_set_window_size = Some(docking_utils::platform_set_window_size);
         // since pio.platform_get_window_size is not a C compatible function, cimgui provides an extra function to set it.
         unsafe {
-            crate::platform_io::ImGuiPlatformIO_Set_Platform_GetWindowSize(
+            docking_utils::ImGuiPlatformIO_Set_Platform_GetWindowSize(
                 pio,
-                crate::platform_io::platform_get_window_size,
+                docking_utils::platform_get_window_size,
             );
         }
-        pio.platform_set_window_focus = Some(crate::platform_io::platform_set_window_focus);
-        pio.platform_get_window_focus = Some(crate::platform_io::platform_get_window_focus);
-        pio.platform_get_window_minimized = Some(crate::platform_io::platform_get_window_minimized);
-        pio.platform_set_window_title = Some(crate::platform_io::platform_set_window_title);
-        pio.platform_set_window_alpha = Some(crate::platform_io::platform_set_window_alpha);
-        pio.platform_update_window = Some(crate::platform_io::platform_update_window);
-        pio.platform_render_window = Some(crate::platform_io::platform_render_window);
-        pio.platform_swap_buffers = Some(crate::platform_io::platform_swap_buffers);
-        pio.platform_create_vk_surface = Some(crate::platform_io::platform_create_vk_surface);
+        pio.platform_set_window_focus = Some(docking_utils::platform_set_window_focus);
+        pio.platform_get_window_focus = Some(docking_utils::platform_get_window_focus);
+        pio.platform_get_window_minimized = Some(docking_utils::platform_get_window_minimized);
+        pio.platform_set_window_title = Some(docking_utils::platform_set_window_title);
+        pio.platform_set_window_alpha = Some(docking_utils::platform_set_window_alpha);
+        pio.platform_update_window = Some(docking_utils::platform_update_window);
+        pio.platform_render_window = Some(docking_utils::platform_render_window);
+        pio.platform_swap_buffers = Some(docking_utils::platform_swap_buffers);
+        pio.platform_create_vk_surface = Some(docking_utils::platform_create_vk_surface);
 
         self.platform_viewport_ctx = ctx;
     }
@@ -717,11 +726,11 @@ impl Context {
         io.backend_renderer_user_data = ctx.get() as *mut _;
 
         let pio = self.platform_io_mut();
-        pio.renderer_create_window = Some(crate::platform_io::renderer_create_window);
-        pio.renderer_destroy_window = Some(crate::platform_io::renderer_destroy_window);
-        pio.renderer_set_window_size = Some(crate::platform_io::renderer_set_window_size);
-        pio.renderer_render_window = Some(crate::platform_io::renderer_render_window);
-        pio.renderer_swap_buffers = Some(crate::platform_io::renderer_swap_buffers);
+        pio.renderer_create_window = Some(docking_utils::renderer_create_window);
+        pio.renderer_destroy_window = Some(docking_utils::renderer_destroy_window);
+        pio.renderer_set_window_size = Some(docking_utils::renderer_set_window_size);
+        pio.renderer_render_window = Some(docking_utils::renderer_render_window);
+        pio.renderer_swap_buffers = Some(docking_utils::renderer_swap_buffers);
 
         self.renderer_viewport_ctx = ctx;
     }

@@ -82,7 +82,7 @@ bitflags! {
         #[cfg(feature = "docking")]
         const TOP_MOST = sys::ImGuiViewportFlags_TopMost;
         #[cfg(feature = "docking")]
-        const MINIMIZED = sys::ImGuiViewportFlags_Minimized;
+        const IS_MINIMIZED = sys::ImGuiViewportFlags_IsMinimized;
         #[cfg(feature = "docking")]
         const NO_AUTO_MERGE = sys::ImGuiViewportFlags_NoAutoMerge;
         #[cfg(feature = "docking")]
@@ -145,6 +145,23 @@ pub struct Io {
     /// For retina display or other situations where window coordinates are different from
     /// framebuffer coordinates
     pub display_framebuffer_scale: [f32; 2],
+
+    #[cfg(feature = "docking")]
+    pub config_docking_no_split: bool,
+    #[cfg(feature = "docking")]
+    pub config_docking_with_shift: bool,
+    #[cfg(feature = "docking")]
+    pub config_docking_always_tab_bar: bool,
+    #[cfg(feature = "docking")]
+    pub config_docking_transparent_payload: bool,
+    #[cfg(feature = "docking")]
+    pub config_viewports_no_auto_merge: bool,
+    #[cfg(feature = "docking")]
+    pub config_viewports_no_task_bar_icon: bool,
+    #[cfg(feature = "docking")]
+    pub config_viewports_no_decoration: bool,
+    #[cfg(feature = "docking")]
+    pub config_viewports_no_default_parent: bool,
 
     /// Request imgui-rs to draw a mouse cursor for you
     pub mouse_draw_cursor: bool,
@@ -287,6 +304,9 @@ pub struct Io {
     /// Notates the origin of the mouse input event.
     pub mouse_source: MouseSource,
 
+    #[cfg(feature = "docking")]
+    mouse_hovered_viewport: sys::ImGuiID,
+
     /// Keyboard modifier pressed: Control
     pub key_ctrl: bool,
     /// Keyboard modifier pressed: Shift
@@ -336,38 +356,6 @@ pub struct Io {
 
     input_queue_surrogate: sys::ImWchar16,
     input_queue_characters: ImVector<sys::ImWchar>,
-
-    #[cfg(feature = "docking")]
-    mouse_hovered_viewport: sys::ImGuiID,
-
-    #[cfg(feature = "docking")]
-    pub config_docking_no_split: bool,
-    #[cfg(feature = "docking")]
-    pub config_docking_with_shift: bool,
-    #[cfg(feature = "docking")]
-    pub config_docking_always_tab_bar: bool,
-    #[cfg(feature = "docking")]
-    pub config_docking_transparent_payload: bool,
-    #[cfg(feature = "docking")]
-    pub config_viewports_no_auto_merge: bool,
-    #[cfg(feature = "docking")]
-    pub config_viewports_no_task_bar_icon: bool,
-    #[cfg(feature = "docking")]
-    pub config_viewports_no_decoration: bool,
-    #[cfg(feature = "docking")]
-    pub config_viewports_no_default_parent: bool,
-    // pub(crate) get_clipboard_text_fn:
-    //     Option<unsafe extern "C" fn(user_data: *mut c_void) -> *const c_char>,
-    // pub(crate) set_clipboard_text_fn:
-    //     Option<unsafe extern "C" fn(user_data: *mut c_void, text: *const c_char)>,
-    // pub(crate) clipboard_user_data: *mut c_void,
-    // pub set_platform_ime_data_fn: Option<
-    //     unsafe extern "C" fn(
-    //         viewport: *mut sys::ImGuiViewport,
-    //         data: *mut sys::ImGuiPlatformImeData,
-    //     ),
-    // >,
-    // unused_padding: *mut c_void,
 }
 
 unsafe impl RawCast<sys::ImGuiIO> for Io {}
@@ -498,6 +486,14 @@ fn test_io_memory_layout() {
             assert_field_offset!(font_allow_user_scaling, FontAllowUserScaling);
             assert_field_offset!(font_default, FontDefault);
             assert_field_offset!(display_framebuffer_scale, DisplayFramebufferScale);
+            assert_field_offset!(config_docking_no_split, ConfigDockingNoSplit);
+            assert_field_offset!(config_docking_with_shift, ConfigDockingWithShift);
+            assert_field_offset!(config_docking_always_tab_bar, ConfigDockingAlwaysTabBar);
+            assert_field_offset!(config_docking_transparent_payload, ConfigDockingTransparentPayload);
+            assert_field_offset!(config_viewports_no_auto_merge, ConfigViewportsNoAutoMerge);
+            assert_field_offset!(config_viewports_no_task_bar_icon, ConfigViewportsNoTaskBarIcon);
+            assert_field_offset!(config_viewports_no_decoration, ConfigViewportsNoDecoration);
+            assert_field_offset!(config_viewports_no_default_parent, ConfigViewportsNoDefaultParent);
             assert_field_offset!(mouse_draw_cursor, MouseDrawCursor);
             assert_field_offset!(config_mac_os_behaviors, ConfigMacOSXBehaviors);
             assert_field_offset!(
@@ -539,6 +535,8 @@ fn test_io_memory_layout() {
             assert_field_offset!(mouse_down, MouseDown);
             assert_field_offset!(mouse_wheel, MouseWheel);
             assert_field_offset!(mouse_wheel_h, MouseWheelH);
+            assert_field_offset!(mouse_source, MouseSource);
+            assert_field_offset!(mouse_hovered_viewport, MouseHoveredViewport);
             assert_field_offset!(key_ctrl, KeyCtrl);
             assert_field_offset!(key_shift, KeyShift);
             assert_field_offset!(key_alt, KeyAlt);

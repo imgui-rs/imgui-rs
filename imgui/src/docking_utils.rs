@@ -3,12 +3,7 @@ use std::{
     os::raw::{c_char, c_int},
 };
 
-use crate::{
-    internal::{ImVector, RawCast},
-    Io, ViewportFlags,
-};
-
-todo!("needs to be checked with docking feature...");
+use crate::{Io, PlatformIo, Viewport};
 
 /// Trait holding functions needed when the platform integration supports viewports.
 ///
@@ -353,6 +348,8 @@ pub struct PlatformMonitor {
     /// Set to `work_size` if not known.
     pub work_size: [f32; 2],
     pub dpi_scale: f32,
+
+    pub platform_handle: *mut c_void,
 }
 
 #[test]
@@ -382,6 +379,7 @@ fn test_platform_monitor_memory_layout() {
     assert_field_offset!(work_pos, WorkPos);
     assert_field_offset!(work_size, WorkSize);
     assert_field_offset!(dpi_scale, DpiScale);
+    assert_field_offset!(platform_handle, PlatformHandle);
 }
 
 extern "C" {

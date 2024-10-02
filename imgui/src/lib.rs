@@ -93,6 +93,8 @@ use std::os::raw::c_char;
 pub use self::clipboard::*;
 pub use self::color::ImColor32;
 pub use self::context::*;
+#[cfg(feature = "docking")]
+pub use self::docking_utils::*;
 pub use self::drag_drop::{DragDropFlags, DragDropSource, DragDropTarget};
 pub use self::draw_list::{ChannelsSplit, DrawListMut};
 pub use self::fonts::atlas::*;
@@ -150,6 +152,7 @@ mod context;
 mod dock_space;
 #[cfg(feature = "docking")]
 mod docking_utils;
+
 pub mod drag_drop;
 pub mod draw_list;
 mod fonts;
