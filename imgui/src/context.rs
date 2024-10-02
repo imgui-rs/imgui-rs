@@ -9,8 +9,11 @@ use crate::clipboard::{ClipboardBackend, ClipboardContext};
 use crate::fonts::atlas::{FontAtlas, FontId, SharedFontAtlas};
 use crate::io::Io;
 use crate::style::Style;
-use crate::{docking_utils, sys, DrawData};
+use crate::{sys, DrawData};
 use crate::{MouseCursor, Ui};
+
+#[cfg(feature = "docking")]
+use crate::docking_utils;
 
 /// An imgui-rs context.
 ///

@@ -717,7 +717,6 @@ fn test_style_memory_layout() {
     assert_field_offset!(selectable_text_align, SelectableTextAlign);
     assert_field_offset!(display_window_padding, DisplayWindowPadding);
     assert_field_offset!(display_safe_area_padding, DisplaySafeAreaPadding);
-    assert_field_offset!(docking_separator_size, DockingSeparatorSize);
     assert_field_offset!(mouse_cursor_scale, MouseCursorScale);
     assert_field_offset!(anti_aliased_lines, AntiAliasedLines);
     assert_field_offset!(anti_aliased_lines_use_tex, AntiAliasedLinesUseTex);
@@ -725,6 +724,9 @@ fn test_style_memory_layout() {
     assert_field_offset!(curve_tessellation_tol, CurveTessellationTol);
     assert_field_offset!(circle_tesselation_max_error, CircleTessellationMaxError);
     assert_field_offset!(colors, Colors);
+
+    #[cfg(feature = "docking")]
+    assert_field_offset!(docking_separator_size, DockingSeparatorSize);
 }
 
 #[test]
