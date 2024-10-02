@@ -185,11 +185,9 @@ impl Ui {
         unsafe { sys::igGetItemRectSize(&mut out) }
         out.into()
     }
-    /// Allows the last item to be overlapped by a subsequent item.
-    ///
-    /// Both may be activated during the same frame before the later one takes priority.
+    /// Allows the next item to be overlapped by a subsequent item.
     #[doc(alias = "SetNextItemAllowOverlap")]
-    pub fn set_item_allow_overlap(&self) {
+    pub fn set_next_item_allow_overlap(&self) {
         unsafe { sys::igSetNextItemAllowOverlap() };
     }
     /// Makes the last item the default focused item of the window

@@ -219,11 +219,15 @@ impl Context {
     /// Sets the clipboard backend used for clipboard operations
     pub fn set_clipboard_backend<T: ClipboardBackend>(&mut self, backend: T) {
         let clipboard_ctx: Box<UnsafeCell<_>> = Box::new(ClipboardContext::new(backend).into());
-        let io = self.platform_io_mut();
-        io.set_clipboard_text_fn = Some(crate::clipboard::set_clipboard_text);
-        io.get_clipboard_text_fn = Some(crate::clipboard::get_clipboard_text);
+        let platform_io = unsafe {
+            // safe because PlatformIo is a transparent wrapper around sys::ImGuiPlatformIO
+            // and &mut self ensures exclusive ownership of PlatformIo.
+            &mut *(sys::igGetPlatformIO() as *mut crate::PlatformIo)
+        };
+        platform_io.set_clipboard_text_fn = Some(crate::clipboard::set_clipboard_text);
+        platform_io.get_clipboard_text_fn = Some(crate::clipboard::get_clipboard_text);
 
-        io.clipboard_user_data = clipboard_ctx.get() as *mut _;
+        platform_io.clipboard_user_data = clipboard_ctx.get() as *mut _;
         self.clipboard_ctx = clipboard_ctx;
     }
     fn create_internal(mut shared_font_atlas: Option<SharedFontAtlas>) -> Self {
@@ -511,23 +515,6 @@ impl Context {
         unsafe {
             // safe because Io is a transparent wrapper around sys::ImGuiIO
             &mut *(sys::igGetIO() as *mut Io)
-        }
-    }
-
-    /// Returns an immutable reference to the Context's [`PlatformIo`](crate::PlatformIo) object.
-    pub fn platform_io(&self) -> &crate::PlatformIo {
-        unsafe {
-            // safe because PlatformIo is a transparent wrapper around sys::ImGuiPlatformIO
-            // and &self ensures we have shared ownership of PlatformIo.
-            &*(sys::igGetPlatformIO() as *const crate::PlatformIo)
-        }
-    }
-    /// Returns a mutable reference to the Context's [`PlatformIo`](crate::PlatformIo) object.
-    pub fn platform_io_mut(&mut self) -> &mut crate::PlatformIo {
-        unsafe {
-            // safe because PlatformIo is a transparent wrapper around sys::ImGuiPlatformIO
-            // and &mut self ensures exclusive ownership of PlatformIo.
-            &mut *(sys::igGetPlatformIO() as *mut crate::PlatformIo)
         }
     }
 

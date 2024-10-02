@@ -81,11 +81,6 @@ impl MouseCursor {
     pub const COUNT: usize = sys::ImGuiMouseCursor_COUNT as usize;
 }
 
-// pub const ImGuiMouseSource_Mouse: ImGuiMouseSource = 0;
-// pub const ImGuiMouseSource_TouchScreen: ImGuiMouseSource = 1;
-// pub const ImGuiMouseSource_Pen: ImGuiMouseSource = 2;
-// pub const ImGuiMouseSource_COUNT: ImGuiMouseSource = 3;
-
 /// Notates the type and origin of a mouse input.
 #[repr(u32)]
 #[derive(Copy, Clone, Debug, Hash, Eq, PartialEq)]
