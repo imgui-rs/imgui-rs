@@ -23,7 +23,6 @@ parking_lot = "0.12"
 cfg-if = "1"
 
 [features]
-# default = ["docking"]
 wasm = ["imgui-sys/wasm"]
 freetype = ["imgui-sys/freetype"]
 docking = ["imgui-sys/docking"]
