@@ -243,9 +243,12 @@ bitflags! {
     }
 }
 
+/// The sort direction of the given tabe.
 #[derive(Copy, Clone, Debug, Eq, PartialEq, PartialOrd, Ord)]
 pub enum TableSortDirection {
+    /// Ascending, from 0 -> 9, or 'A' -> 'Z'
     Ascending,
+    /// Descending, from 9 -> 0, or 'Z' -> 'A'
     Descending,
 }
 
@@ -865,10 +868,10 @@ impl<'a> TableColumnSortSpecs<'a> {
     /// Gets the sort direction for the given column. This will nearly always be `Some` if you
     /// can access it.
     pub fn sort_direction(&self) -> Option<TableSortDirection> {
-        match self.0.SortDirection() {
-            0 => None,
-            1 => Some(TableSortDirection::Ascending),
-            2 => Some(TableSortDirection::Descending),
+        match self.0.SortDirection {
+            sys::ImGuiSortDirection_None => None,
+            sys::ImGuiSortDirection_Ascending => Some(TableSortDirection::Ascending),
+            sys::ImGuiSortDirection_Descending => Some(TableSortDirection::Descending),
             _ => unimplemented!(),
         }
     }
