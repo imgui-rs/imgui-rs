@@ -86,7 +86,8 @@ impl<'ui, T: AsRef<str>> Selectable<'ui, T> {
     ///
     /// Default: enabled
     pub fn close_popups(mut self, value: bool) -> Self {
-        self.flags.set(SelectableFlags::NO_AUTO_CLOSE_POPUPS, !value);
+        self.flags
+            .set(SelectableFlags::NO_AUTO_CLOSE_POPUPS, !value);
         self
     }
     /// Enables/disables full column span (text will still fit in the current column).
