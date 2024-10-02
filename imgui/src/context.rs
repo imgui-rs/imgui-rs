@@ -610,6 +610,23 @@ impl Context {
 
 #[cfg(feature = "docking")]
 impl Context {
+    /// Returns an immutable reference to the Context's [`PlatformIo`](crate::PlatformIo) object.
+    pub fn platform_io(&self) -> &crate::PlatformIo {
+        unsafe {
+            // safe because PlatformIo is a transparent wrapper around sys::ImGuiPlatformIO
+            // and &self ensures we have shared ownership of PlatformIo.
+            &*(sys::igGetPlatformIO() as *const crate::PlatformIo)
+        }
+    }
+    /// Returns a mutable reference to the Context's [`PlatformIo`](crate::PlatformIo) object.
+    pub fn platform_io_mut(&mut self) -> &mut crate::PlatformIo {
+        unsafe {
+            // safe because PlatformIo is a transparent wrapper around sys::ImGuiPlatformIO
+            // and &mut self ensures exclusive ownership of PlatformIo.
+            &mut *(sys::igGetPlatformIO() as *mut crate::PlatformIo)
+        }
+    }
+
     /// Returns an immutable reference to the main [`Viewport`](crate::Viewport)
     pub fn main_viewport(&self) -> &crate::Viewport {
         unsafe {
