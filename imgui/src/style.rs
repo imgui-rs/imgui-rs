@@ -675,6 +675,17 @@ impl StyleColor {
         colors[Self::NavWindowingDimBg as usize] = [0.80, 0.80, 0.80, 0.20];
         colors[Self::ModalWindowDimBg as usize] = [0.80, 0.80, 0.80, 0.35];
 
+        #[cfg(feature = "docking")]
+        {
+            colors[Self::DockingPreview as usize] = std::array::from_fn(|idx| {
+                let multiplier = if idx == 3 { 0.7 } else { 1.0 };
+
+                colors[Self::HeaderActive as usize][idx] * multiplier
+            });
+
+            colors[Self::DockingEmptyBg as usize] = [0.2, 0.2, 0.2, 1.0];
+        }
+
         colors
     }
 
@@ -756,6 +767,17 @@ impl StyleColor {
         colors[Self::NavWindowingHighlight as usize] = [0.70, 0.70, 0.70, 0.70];
         colors[Self::NavWindowingDimBg as usize] = [0.20, 0.20, 0.20, 0.20];
         colors[Self::ModalWindowDimBg as usize] = [0.20, 0.20, 0.20, 0.35];
+
+        #[cfg(feature = "docking")]
+        {
+            colors[Self::DockingPreview as usize] = std::array::from_fn(|idx| {
+                let multiplier = if idx == 3 { 0.7 } else { 1.0 };
+
+                colors[Self::Header as usize][idx] * multiplier
+            });
+
+            colors[Self::DockingEmptyBg as usize] = [0.2, 0.2, 0.2, 1.0];
+        }
 
         colors
     }
@@ -839,6 +861,17 @@ impl StyleColor {
         colors[Self::NavWindowingHighlight as usize] = [1.00, 1.00, 1.00, 0.70];
         colors[Self::NavWindowingDimBg as usize] = [0.80, 0.80, 0.80, 0.20];
         colors[Self::ModalWindowDimBg as usize] = [0.20, 0.20, 0.20, 0.35];
+
+        #[cfg(feature = "docking")]
+        {
+            colors[Self::DockingPreview as usize] = std::array::from_fn(|idx| {
+                let multiplier = if idx == 3 { 0.7 } else { 1.0 };
+
+                colors[Self::Header as usize][idx] * multiplier
+            });
+
+            colors[Self::DockingEmptyBg as usize] = [0.2, 0.2, 0.2, 1.0];
+        }
 
         colors
     }
@@ -1120,6 +1153,7 @@ mod tests {
             let our_color = dark_colors[i];
 
             println!("Checking {}..", StyleColor::try_from(i).unwrap());
+            println!("{:?} vs {:?}", imgui_color, our_color);
 
             for (imgui_color, our_color) in imgui_color.into_iter().zip(our_color.into_iter()) {
                 approx::assert_abs_diff_eq!(imgui_color, our_color, epsilon = 0.01);
