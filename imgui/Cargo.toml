@@ -31,4 +31,7 @@ docking = ["imgui-sys/docking"]
 tables-api = []
 
 [dev-dependencies]
+approx = "0.5.1"
 memoffset = "0.9"
+pretty_assertions = "1.4.1"
+
