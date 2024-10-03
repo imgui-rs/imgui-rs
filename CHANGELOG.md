@@ -12,6 +12,9 @@
 - `ItemFlags` to be used with `Ui::push_item_flags`. See note in `Deprecated` for more on that.
 - New style parameters have been added. Note especially `Style::hover_flags_for_tooltip_mouse` and
   `Style::hover_flags_for_tooltip_nav` which describe the default flags when hovering items.
+- `Style::default`, `StyleColor::dark_colors`, `StyleColor::light_colors`, and `StyleColor::classic_colors`
+  have been added. Note though that `Style::use_x_colors` is still present, as it avoids taking up
+  a lot of stack space like the `StyleColor`s do.
 
 ### Changed
 
@@ -30,7 +33,7 @@
 - `StyleColor::TabUnfocusedActive` has been renamed to `StyleColor::TabDimmedSelected`.
 - `ItemHoveredFlags` has been renamed to `HoveredFlags`.
 - `Ui::set_item_allow_overlap` has been replaced with `Ui::set_next_item_allow_overlap`:
-  Instead of calling `Ui::set_item_allow_overlap` *after* calling an item, call `Ui::set_next_item_allow_overlap`
+  Instead of calling `Ui::set_item_allow_overlap` _after_ calling an item, call `Ui::set_next_item_allow_overlap`
   before calling the item.
 
 ### Fixed
@@ -130,11 +133,12 @@
 
 - BREAKING: `ui.input_int` and `ui.input_float` now return `InputScalar<'ui, 'l, f32/i32>`, instead of `InputFloat`/`InputInt`. This struct has all of the same flags as `InputFloat` and `InputInt` did.
 
-- DEPRECATED: `InputFloat` and `InputInt` have been deprecated. `ui.input_float` and `ui.input_int` are *not*, however, and instead will just call `input_scalar` as appropriate. Therefore, please switch your code to `ui.input_float` or `ui.input_int`.
+- DEPRECATED: `InputFloat` and `InputInt` have been deprecated. `ui.input_float` and `ui.input_int` are _not_, however, and instead will just call `input_scalar` as appropriate. Therefore, please switch your code to `ui.input_float` or `ui.input_int`.
 
 - Added `add_polyline` method to `DrawListMut`, which binds to Dear ImGui's `AddPolyline` and `AddConvexPolyFilled`
 
 - BREAKING: The following structs have had their `new` method changed and deprecated; they now also take `ui` in their `new`, but you should create them on the `Ui` struct instead.
+
   - `Window` should be made with `ui.window` - e.g `ui.window("My Window").build(|| { ui.text("Contents") });`
   - `ChildWindow` should be made with `ui.child_window`
   - `MenuItem` should be made with `ui.menu_item` or `ui.menu_item_config`.
@@ -171,7 +175,7 @@ if let Some(_t) = ui.begin_popup("example") {
 
   - The most likely breaking changes users will see is `button` and `same_line` now take one fewer parameter -- if you were calling `button` with `[0.0, 0.0]`, simply delete that -- otherwise, call `button_with_size`. Similarly, for `same_line`, if you were passing in `0.0.` simply delete that argument. Otherwise, call `same_line_with_pos`.
 
-- ADDED: support for the `tables` API which was added in dear imgui `1.80`. We currently have this *feature gated* behind `tables-api`. You should feel safe to use this in stable production, but be aware of two things:
+- ADDED: support for the `tables` API which was added in dear imgui `1.80`. We currently have this _feature gated_ behind `tables-api`. You should feel safe to use this in stable production, but be aware of two things:
 
   1. The tables API is marked as "beta" meaning that it may change with fewer stability promises. This is unlikely and it seems fairly settled.
   2. There are a few cases where the tables API will segfault by dereferencing a `NULL` where it should instead `ASSERT` and crash. This is simply annoying because you won't get a stacktrace. [See here for more info on that.](https://github.com/imgui-rs/imgui-rs/issues/524). If this is fixed upstream, we will issue a patch.
@@ -186,11 +190,11 @@ if let Some(_t) = ui.begin_popup("example") {
   - Wrapped callback kinds into their own enums, `InputTextCallback` and `InputTextCallbackMultiline`.
   - Created a trait, `InputTextCallbackHandler`.
   - To see how to create an InputText callback, see `examples/text_callback.rs`.
-  - Finally, please note that editing an `&mut String` which contains `\0` within it will produce *surprising* truncation within ImGui. If you need to edit such a string, please pre-process it.
+  - Finally, please note that editing an `&mut String` which contains `\0` within it will produce _surprising_ truncation within ImGui. If you need to edit such a string, please pre-process it.
 
-- ADDED: `begin_disable` and `begin_enable` methods. These add (finally) support for disabling *any* widget. Thank you to @dbr for [implementing this here](https://github.com/imgui-rs/imgui-rs/pull/519).
+- ADDED: `begin_disable` and `begin_enable` methods. These add (finally) support for disabling _any_ widget. Thank you to @dbr for [implementing this here](https://github.com/imgui-rs/imgui-rs/pull/519).
 
-- BREAKING: MSRV is now **1.54**. This is gives us access to min-const-generics, which we use in a few places, but will gradually use more. Because this is the first time we've bumped MSRV intentionally, we have added a new feature `min-const-generics`, which is *enabled by default*. If you are pre-1.54, you can hang onto this update by disabling that feature. In our next update, this feature will be removed and we will commit to our MSRVs going forward. Thank you to @dbr for changing our CI infrastructure to support better MSRVs [here](https://github.com/imgui-rs/imgui-rs/pull/512).
+- BREAKING: MSRV is now **1.54**. This is gives us access to min-const-generics, which we use in a few places, but will gradually use more. Because this is the first time we've bumped MSRV intentionally, we have added a new feature `min-const-generics`, which is _enabled by default_. If you are pre-1.54, you can hang onto this update by disabling that feature. In our next update, this feature will be removed and we will commit to our MSRVs going forward. Thank you to @dbr for changing our CI infrastructure to support better MSRVs [here](https://github.com/imgui-rs/imgui-rs/pull/512).
 
 - BREAKING: Changed default version of Winit in `imgui-winit-support` to `winit 0.25`. Thank you to @repi [for implementing this here](https://github.com/imgui-rs/imgui-rs/pull/485).
 
@@ -314,7 +318,7 @@ if let Some(_t) = ui.begin_popup("example") {
 
 ### Caveat: Semver broken in 0.6.1 in `imgui-winit-support`
 
-*Note from the future: `imgui-winit-support@0.6.1` has been yanked. I don't believe the breakage impacted the other crates so I'm leaving those to avoid impacting non-`winit` usages.*
+_Note from the future: `imgui-winit-support@0.6.1` has been yanked. I don't believe the breakage impacted the other crates so I'm leaving those to avoid impacting non-`winit` usages._
 
 This release accidentally broke semver, and should have been 0.7.0. It will be yanked when 0.7.0 is released, unless there are objections.
 
@@ -439,8 +443,8 @@ As mentioned, the 0.6.1 release of `imgui-winit-support` has been yanked.
 - Gfx renderer re-exports imgui and gfx
 - These functions now take/return PathBuf: log_filename, set_log_filename, ini_filename, set_logfilename
 - ID stack manipulation now uses stack tokens
-- Parameter stack pushes *must almost always be paired by a manual call to stack pop*
-- Container widget tokens *must be ended manually by calling end*. Closure-based function (e.g. build()) are unaffected and do this automatically
+- Parameter stack pushes _must almost always be paired by a manual call to stack pop_
+- Container widget tokens _must be ended manually by calling end_. Closure-based function (e.g. build()) are unaffected and do this automatically
 - Bump minimum Rust version to 1.36 (some dependencies, including winit, require MaybeUninit)
 - Upgrade to cimgui / imgui 1.72b
 
@@ -547,7 +551,7 @@ As mentioned, the 0.6.1 release of `imgui-winit-support` has been yanked.
   - Style: Add `PopupRounding`, `FrameBorderSize`, `WindowBorderSize`, `PopupBorderSize`.
   - DemoWindow: Add `no_close` state.
   - Input: Add `no_undo_redo` method.
-  - *imgui-sys*:
+  - _imgui-sys_:
     - `igStyleColorsDark` and `igStyleColorsLight`
     - DragDrop low level API
     - `igGetFrameHeight`
