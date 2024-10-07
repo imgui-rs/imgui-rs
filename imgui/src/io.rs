@@ -199,6 +199,11 @@ pub struct Io {
     ///
     /// Windows without a title bar are not affected.
     pub config_windows_move_from_title_bar_only: bool,
+
+    /// Enable scrolling page by page when clicking outside the scrollbar grab.
+    /// When disabled, always scroll to clicked location. When enabled, Shift+Click scrolls to clicked location.
+    pub config_scrollbar_scroll_by_page: bool,
+
     /// Compact memory usage when unused.
     ///
     /// Set to -1.0 to disable.
@@ -214,6 +219,33 @@ pub struct Io {
     pub key_repeat_delay: f32,
     /// When holding a key/button, rate at which it repeats, in seconds
     pub key_repeat_rate: f32,
+
+    /// Options to configure Error Handling and how we handle recoverable errors [EXPERIMENTAL]
+    /// - Error recovery is provided as a way to facilitate:
+    ///    - Recovery after a programming error (native code or scripting language - the later tends to facilitate iterating on code while running).
+    ///    - Recovery after running an exception handler or any error processing which may skip code after an error has been detected.
+    /// - Error recovery is not perfect nor guaranteed! It is a feature to ease development.
+    ///   You not are not supposed to rely on it in the course of a normal application run.
+    /// - Functions that support error recovery are using IM_ASSERT_USER_ERROR() instead of IM_ASSERT().
+    /// - By design, we do NOT allow error recovery to be 100% silent. One of the three options needs to be checked!
+    /// - Always ensure that on programmers seats you have at minimum Asserts or Tooltips enabled when making direct imgui API calls!
+    ///   Otherwise it would severely hinder your ability to catch and correct mistakes!
+    /// - Read https://github.com/ocornut/imgui/wiki/Error-Handling for details.
+    /// - Programmer seats: keep asserts (default), or disable asserts and keep error tooltips (new and nice!)
+    /// - Non-programmer seats: maybe disable asserts, but make sure errors are resurfaced (tooltips, visible log entries, use callback etc.)
+    /// - Recovery after error/exception: record stack sizes with ErrorRecoveryStoreState(), disable assert, set log callback (to e.g. trigger high-level breakpoint), recover with ErrorRecoveryTryToRecoverState(), restore settings.
+    ///
+    /// Enable error recovery support. Some errors won't be detected and lead to direct crashes if recovery is disabled.
+    pub config_error_recovery: bool,
+
+    /// Enable asserts on recoverable error. By default call IM_ASSERT() when returning from a failing IM_ASSERT_USER_ERROR()
+    pub config_error_recovery_enable_assert: bool,
+
+    /// Enable debug log output on recoverable errors.
+    pub config_error_recovery_enable_debug_log: bool,
+
+    /// Enable tooltip on recoverable errors. The tooltip include a way to enable asserts if they were disabled.
+    pub config_error_recovery_enable_tooltip: bool,
 
     /// Option to enable various debug tools showing buttons that will call the IM_DEBUG_BREAK() macro.
     /// - The Item Picker tool will be available regardless of this being enabled, in order to maximize its discoverability.
@@ -488,6 +520,24 @@ fn test_io_memory_layout() {
             assert_field_offset!(display_framebuffer_scale, DisplayFramebufferScale);
             assert_field_offset!(mouse_draw_cursor, MouseDrawCursor);
             assert_field_offset!(config_mac_os_behaviors, ConfigMacOSXBehaviors);
+
+            assert_field_offset!(config_error_recovery, ConfigErrorRecovery);
+
+            assert_field_offset!(
+                config_error_recovery_enable_assert,
+                ConfigErrorRecoveryEnableAssert
+            );
+
+            assert_field_offset!(
+                config_error_recovery_enable_debug_log,
+                ConfigErrorRecoveryEnableDebugLog
+            );
+
+            assert_field_offset!(
+                config_error_recovery_enable_tooltip,
+                ConfigErrorRecoveryEnableTooltip
+            );
+
             assert_field_offset!(
                 config_input_trickle_event_queue,
                 ConfigInputTrickleEventQueue
@@ -504,6 +554,10 @@ fn test_io_memory_layout() {
             assert_field_offset!(
                 config_windows_move_from_title_bar_only,
                 ConfigWindowsMoveFromTitleBarOnly
+            );
+            assert_field_offset!(
+                config_scrollbar_scroll_by_page,
+                ConfigScrollbarScrollByPage
             );
             assert_field_offset!(backend_platform_name, BackendPlatformName);
             assert_field_offset!(backend_renderer_name, BackendRendererName);

@@ -78,7 +78,7 @@ In short, there are a few steps:
 
 7. Run the tests with `cargo test`.
 
-8. Try running one of the examples
+8. Try running one of the examples in `imgui-examples` by first patching it to refer to this new imgui branch
 
     ```sh
         cargo run --example test_window_impl

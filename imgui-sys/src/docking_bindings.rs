@@ -824,11 +824,13 @@ pub const ImGuiColorEditFlags_PickerMask_: ImGuiColorEditFlags_ = 100663296;
 pub const ImGuiColorEditFlags_InputMask_: ImGuiColorEditFlags_ = 402653184;
 pub type ImGuiColorEditFlags_ = cty::c_uint;
 pub const ImGuiSliderFlags_None: ImGuiSliderFlags_ = 0;
-pub const ImGuiSliderFlags_AlwaysClamp: ImGuiSliderFlags_ = 16;
 pub const ImGuiSliderFlags_Logarithmic: ImGuiSliderFlags_ = 32;
 pub const ImGuiSliderFlags_NoRoundToFormat: ImGuiSliderFlags_ = 64;
 pub const ImGuiSliderFlags_NoInput: ImGuiSliderFlags_ = 128;
 pub const ImGuiSliderFlags_WrapAround: ImGuiSliderFlags_ = 256;
+pub const ImGuiSliderFlags_ClampOnInput: ImGuiSliderFlags_ = 512;
+pub const ImGuiSliderFlags_ClampZeroRange: ImGuiSliderFlags_ = 1024;
+pub const ImGuiSliderFlags_AlwaysClamp: ImGuiSliderFlags_ = 1536;
 pub const ImGuiSliderFlags_InvalidMask_: ImGuiSliderFlags_ = 1879048207;
 pub type ImGuiSliderFlags_ = cty::c_uint;
 pub const ImGuiMouseButton_Left: ImGuiMouseButton_ = 0;
@@ -1091,12 +1093,17 @@ pub struct ImGuiIO {
     pub ConfigDragClickToInputText: bool,
     pub ConfigWindowsResizeFromEdges: bool,
     pub ConfigWindowsMoveFromTitleBarOnly: bool,
+    pub ConfigScrollbarScrollByPage: bool,
     pub ConfigMemoryCompactTimer: f32,
     pub MouseDoubleClickTime: f32,
     pub MouseDoubleClickMaxDist: f32,
     pub MouseDragThreshold: f32,
     pub KeyRepeatDelay: f32,
     pub KeyRepeatRate: f32,
+    pub ConfigErrorRecovery: bool,
+    pub ConfigErrorRecoveryEnableAssert: bool,
+    pub ConfigErrorRecoveryEnableDebugLog: bool,
+    pub ConfigErrorRecoveryEnableTooltip: bool,
     pub ConfigDebugIsDebuggerPresent: bool,
     pub ConfigDebugHighlightIdConflicts: bool,
     pub ConfigDebugBeginReturnValueOnce: bool,
@@ -2339,9 +2346,6 @@ pub type ImGuiTextFlags = cty::c_int;
 pub type ImGuiTooltipFlags = cty::c_int;
 pub type ImGuiTypingSelectFlags = cty::c_int;
 pub type ImGuiWindowRefreshFlags = cty::c_int;
-pub type ImGuiErrorLogCallback = ::core::option::Option<
-    unsafe extern "C" fn(user_data: *mut cty::c_void, fmt: *const cty::c_char, ...),
->;
 pub type ImFileHandle = *mut FILE;
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone, PartialEq)]
@@ -2816,8 +2820,10 @@ pub struct ImGuiTreeNodeStackData {
 }
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone, Hash, PartialEq, Eq)]
-pub struct ImGuiStackSizes {
+pub struct ImGuiErrorRecoveryState {
+    pub SizeOfWindowStack: cty::c_short,
     pub SizeOfIDStack: cty::c_short,
+    pub SizeOfTreeStack: cty::c_short,
     pub SizeOfColorStack: cty::c_short,
     pub SizeOfStyleVarStack: cty::c_short,
     pub SizeOfFontStack: cty::c_short,
@@ -2832,7 +2838,7 @@ pub struct ImGuiStackSizes {
 pub struct ImGuiWindowStackData {
     pub Window: *mut ImGuiWindow,
     pub ParentLastItemDataBackup: ImGuiLastItemData,
-    pub StackSizesOnBegin: ImGuiStackSizes,
+    pub StackSizesInBegin: ImGuiErrorRecoveryState,
     pub DisabledOverrideReenable: bool,
 }
 impl Default for ImGuiWindowStackData {
@@ -3952,18 +3958,26 @@ impl Default for ImGuiLocEntry {
         }
     }
 }
+pub type ImGuiErrorCallback = ::core::option::Option<
+    unsafe extern "C" fn(
+        ctx: *mut ImGuiContext,
+        user_data: *mut cty::c_void,
+        msg: *const cty::c_char,
+    ),
+>;
 pub const ImGuiDebugLogFlags_None: ImGuiDebugLogFlags_ = 0;
-pub const ImGuiDebugLogFlags_EventActiveId: ImGuiDebugLogFlags_ = 1;
-pub const ImGuiDebugLogFlags_EventFocus: ImGuiDebugLogFlags_ = 2;
-pub const ImGuiDebugLogFlags_EventPopup: ImGuiDebugLogFlags_ = 4;
-pub const ImGuiDebugLogFlags_EventNav: ImGuiDebugLogFlags_ = 8;
-pub const ImGuiDebugLogFlags_EventClipper: ImGuiDebugLogFlags_ = 16;
-pub const ImGuiDebugLogFlags_EventSelection: ImGuiDebugLogFlags_ = 32;
-pub const ImGuiDebugLogFlags_EventIO: ImGuiDebugLogFlags_ = 64;
-pub const ImGuiDebugLogFlags_EventInputRouting: ImGuiDebugLogFlags_ = 128;
-pub const ImGuiDebugLogFlags_EventDocking: ImGuiDebugLogFlags_ = 256;
-pub const ImGuiDebugLogFlags_EventViewport: ImGuiDebugLogFlags_ = 512;
-pub const ImGuiDebugLogFlags_EventMask_: ImGuiDebugLogFlags_ = 1023;
+pub const ImGuiDebugLogFlags_EventError: ImGuiDebugLogFlags_ = 1;
+pub const ImGuiDebugLogFlags_EventActiveId: ImGuiDebugLogFlags_ = 2;
+pub const ImGuiDebugLogFlags_EventFocus: ImGuiDebugLogFlags_ = 4;
+pub const ImGuiDebugLogFlags_EventPopup: ImGuiDebugLogFlags_ = 8;
+pub const ImGuiDebugLogFlags_EventNav: ImGuiDebugLogFlags_ = 16;
+pub const ImGuiDebugLogFlags_EventClipper: ImGuiDebugLogFlags_ = 32;
+pub const ImGuiDebugLogFlags_EventSelection: ImGuiDebugLogFlags_ = 64;
+pub const ImGuiDebugLogFlags_EventIO: ImGuiDebugLogFlags_ = 128;
+pub const ImGuiDebugLogFlags_EventInputRouting: ImGuiDebugLogFlags_ = 256;
+pub const ImGuiDebugLogFlags_EventDocking: ImGuiDebugLogFlags_ = 512;
+pub const ImGuiDebugLogFlags_EventViewport: ImGuiDebugLogFlags_ = 1024;
+pub const ImGuiDebugLogFlags_EventMask_: ImGuiDebugLogFlags_ = 2047;
 pub const ImGuiDebugLogFlags_OutputToTTY: ImGuiDebugLogFlags_ = 1048576;
 pub const ImGuiDebugLogFlags_OutputToTestEngine: ImGuiDebugLogFlags_ = 2097152;
 pub type ImGuiDebugLogFlags_ = cty::c_uint;
@@ -4789,6 +4803,7 @@ pub struct ImGuiContext {
     pub DisabledStackSize: cty::c_short,
     pub LockMarkEdited: cty::c_short,
     pub TooltipOverrideCount: cty::c_short,
+    pub TooltipPreviousWindow: *mut ImGuiWindow,
     pub ClipboardHandlerData: ImVector_char,
     pub MenusIdSubmittedThisFrame: ImVector_ImGuiID,
     pub TypingSelectState: ImGuiTypingSelectState,
@@ -4823,9 +4838,18 @@ pub struct ImGuiContext {
     pub LogDepthRef: cty::c_int,
     pub LogDepthToExpand: cty::c_int,
     pub LogDepthToExpandDefault: cty::c_int,
+    pub ErrorCallback: ImGuiErrorCallback,
+    pub ErrorCallbackUserData: *mut cty::c_void,
+    pub ErrorTooltipLockedPos: ImVec2,
+    pub ErrorFirst: bool,
+    pub ErrorCountCurrentFrame: cty::c_int,
+    pub StackSizesInNewFrame: ImGuiErrorRecoveryState,
+    pub StackSizesInBeginForCurrentWindow: *mut ImGuiErrorRecoveryState,
+    pub DebugDrawIdConflictsCount: cty::c_int,
     pub DebugLogFlags: ImGuiDebugLogFlags,
     pub DebugLogBuf: ImGuiTextBuffer,
     pub DebugLogIndex: ImGuiTextIndex,
+    pub DebugLogSkippedErrors: cty::c_int,
     pub DebugLogAutoDisableFlags: ImGuiDebugLogFlags,
     pub DebugLogAutoDisableFrames: ImU8,
     pub DebugLocateFrames: ImU8,
@@ -5281,6 +5305,7 @@ impl Default for ImVector_ImGuiTabItem {
 #[repr(C)]
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub struct ImGuiTabBar {
+    pub Window: *mut ImGuiWindow,
     pub Tabs: ImVector_ImGuiTabItem,
     pub Flags: ImGuiTabBarFlags,
     pub ID: ImGuiID,
@@ -9666,19 +9691,10 @@ extern "C" {
     pub fn ImGuiLastItemData_destroy(self_: *mut ImGuiLastItemData);
 }
 extern "C" {
-    pub fn ImGuiStackSizes_ImGuiStackSizes() -> *mut ImGuiStackSizes;
+    pub fn ImGuiErrorRecoveryState_ImGuiErrorRecoveryState() -> *mut ImGuiErrorRecoveryState;
 }
 extern "C" {
-    pub fn ImGuiStackSizes_destroy(self_: *mut ImGuiStackSizes);
-}
-extern "C" {
-    pub fn ImGuiStackSizes_SetToContextState(self_: *mut ImGuiStackSizes, ctx: *mut ImGuiContext);
-}
-extern "C" {
-    pub fn ImGuiStackSizes_CompareWithContextState(
-        self_: *mut ImGuiStackSizes,
-        ctx: *mut ImGuiContext,
-    );
+    pub fn ImGuiErrorRecoveryState_destroy(self_: *mut ImGuiErrorRecoveryState);
 }
 extern "C" {
     pub fn ImGuiPtrOrIndex_ImGuiPtrOrIndex_Ptr(ptr: *mut cty::c_void) -> *mut ImGuiPtrOrIndex;
@@ -11282,7 +11298,10 @@ extern "C" {
     pub fn igTabBarCloseTab(tab_bar: *mut ImGuiTabBar, tab: *mut ImGuiTabItem);
 }
 extern "C" {
-    pub fn igTabBarQueueFocus(tab_bar: *mut ImGuiTabBar, tab: *mut ImGuiTabItem);
+    pub fn igTabBarQueueFocus_TabItemPtr(tab_bar: *mut ImGuiTabBar, tab: *mut ImGuiTabItem);
+}
+extern "C" {
+    pub fn igTabBarQueueFocus_Str(tab_bar: *mut ImGuiTabBar, tab_name: *const cty::c_char);
 }
 extern "C" {
     pub fn igTabBarQueueReorder(
@@ -11687,6 +11706,9 @@ extern "C" {
     ) -> bool;
 }
 extern "C" {
+    pub fn igDataTypeIsZero(data_type: ImGuiDataType, p_data: *const cty::c_void) -> bool;
+}
+extern "C" {
     pub fn igInputTextEx(
         label: *const cty::c_char,
         hint: *const cty::c_char,
@@ -11801,27 +11823,36 @@ extern "C" {
     pub fn igGcAwakeTransientWindowBuffers(window: *mut ImGuiWindow);
 }
 extern "C" {
+    pub fn igErrorLog(msg: *const cty::c_char) -> bool;
+}
+extern "C" {
+    pub fn igErrorRecoveryStoreState(state_out: *mut ImGuiErrorRecoveryState);
+}
+extern "C" {
+    pub fn igErrorRecoveryTryToRecoverState(state_in: *const ImGuiErrorRecoveryState);
+}
+extern "C" {
+    pub fn igErrorRecoveryTryToRecoverWindowState(state_in: *const ImGuiErrorRecoveryState);
+}
+extern "C" {
+    pub fn igErrorCheckUsingSetCursorPosToExtendParentBoundaries();
+}
+extern "C" {
+    pub fn igErrorCheckEndFrameFinalizeErrorTooltip();
+}
+extern "C" {
+    pub fn igBeginErrorTooltip() -> bool;
+}
+extern "C" {
+    pub fn igEndErrorTooltip();
+}
+extern "C" {
     pub fn igDebugAllocHook(
         info: *mut ImGuiDebugAllocInfo,
         frame_count: cty::c_int,
         ptr: *mut cty::c_void,
         size: usize,
     );
-}
-extern "C" {
-    pub fn igErrorCheckEndFrameRecover(
-        log_callback: ImGuiErrorLogCallback,
-        user_data: *mut cty::c_void,
-    );
-}
-extern "C" {
-    pub fn igErrorCheckEndWindowRecover(
-        log_callback: ImGuiErrorLogCallback,
-        user_data: *mut cty::c_void,
-    );
-}
-extern "C" {
-    pub fn igErrorCheckUsingSetCursorPosToExtendParentBoundaries();
 }
 extern "C" {
     pub fn igDebugDrawCursorPos(col: ImU32);

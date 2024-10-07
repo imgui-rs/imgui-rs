@@ -711,11 +711,13 @@ pub const ImGuiColorEditFlags_PickerMask_: ImGuiColorEditFlags_ = 100663296;
 pub const ImGuiColorEditFlags_InputMask_: ImGuiColorEditFlags_ = 402653184;
 pub type ImGuiColorEditFlags_ = cty::c_uint;
 pub const ImGuiSliderFlags_None: ImGuiSliderFlags_ = 0;
-pub const ImGuiSliderFlags_AlwaysClamp: ImGuiSliderFlags_ = 16;
 pub const ImGuiSliderFlags_Logarithmic: ImGuiSliderFlags_ = 32;
 pub const ImGuiSliderFlags_NoRoundToFormat: ImGuiSliderFlags_ = 64;
 pub const ImGuiSliderFlags_NoInput: ImGuiSliderFlags_ = 128;
 pub const ImGuiSliderFlags_WrapAround: ImGuiSliderFlags_ = 256;
+pub const ImGuiSliderFlags_ClampOnInput: ImGuiSliderFlags_ = 512;
+pub const ImGuiSliderFlags_ClampZeroRange: ImGuiSliderFlags_ = 1024;
+pub const ImGuiSliderFlags_AlwaysClamp: ImGuiSliderFlags_ = 1536;
 pub const ImGuiSliderFlags_InvalidMask_: ImGuiSliderFlags_ = 1879048207;
 pub type ImGuiSliderFlags_ = cty::c_uint;
 pub const ImGuiMouseButton_Left: ImGuiMouseButton_ = 0;
@@ -969,12 +971,17 @@ pub struct ImGuiIO {
     pub ConfigDragClickToInputText: bool,
     pub ConfigWindowsResizeFromEdges: bool,
     pub ConfigWindowsMoveFromTitleBarOnly: bool,
+    pub ConfigScrollbarScrollByPage: bool,
     pub ConfigMemoryCompactTimer: f32,
     pub MouseDoubleClickTime: f32,
     pub MouseDoubleClickMaxDist: f32,
     pub MouseDragThreshold: f32,
     pub KeyRepeatDelay: f32,
     pub KeyRepeatRate: f32,
+    pub ConfigErrorRecovery: bool,
+    pub ConfigErrorRecoveryEnableAssert: bool,
+    pub ConfigErrorRecoveryEnableDebugLog: bool,
+    pub ConfigErrorRecoveryEnableTooltip: bool,
     pub ConfigDebugIsDebuggerPresent: bool,
     pub ConfigDebugHighlightIdConflicts: bool,
     pub ConfigDebugBeginReturnValueOnce: bool,
@@ -1035,7 +1042,6 @@ pub struct ImGuiIO {
     pub InputQueueSurrogate: ImWchar16,
     pub InputQueueCharacters: ImVector_ImWchar,
 }
-
 impl Default for ImGuiIO {
     fn default() -> Self {
         let mut s = ::core::mem::MaybeUninit::<Self>::uninit();

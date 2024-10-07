@@ -6,14 +6,20 @@ IMGUI_DIR=${1:?}
 COMMITISH=${2:?}
 OUT_DIR=${3:?}
 
-echo $IMGUI_DIR;
-echo $SCRIPT_DIR;
+echo "imgui_dir = $IMGUI_DIR";
+echo "script_dir = $SCRIPT_DIR";
+echo "commit/tag = $COMMITISH";
 
 # Location of temporary checkout of imgui at specified commit (or branch)
 CHECKOUT="${SCRIPT_DIR}"/_temp_imgui_worktree
 
-# Make checkout
+# this can happen on failed runs
+if [ -d "${CHECKOUT}" ]; then
+  rm -rf "${CHECKOUT}";
+fi
 
+
+# Make checkout
 pushd "${IMGUI_DIR}" > /dev/null
 
 # Sanity check the supplied imgui path
@@ -22,6 +28,7 @@ ls imgui.h
 
 # Get files from specified rev
 mkdir "${CHECKOUT}"
+
 git archive "${COMMITISH}" | tar xC "${CHECKOUT}"
 
 popd > /dev/null

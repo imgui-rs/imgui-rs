@@ -259,6 +259,9 @@ igSetWindowSize	3
 igShortcut	2
 1	bool	igShortcut_Nil (ImGuiKeyChord,ImGuiInputFlags)
 2	bool	igShortcut_ID (ImGuiKeyChord,ImGuiInputFlags,ImGuiID)
+igTabBarQueueFocus	2
+1	void	igTabBarQueueFocus_TabItemPtr (ImGuiTabBar*,ImGuiTabItem*)
+2	void	igTabBarQueueFocus_Str (ImGuiTabBar*,const char*)
 igTabItemCalcSize	2
 1	ImVec2	igTabItemCalcSize_Str (const char*,bool)
 2	ImVec2	igTabItemCalcSize_WindowPtr (ImGuiWindow*)
@@ -290,4 +293,4 @@ igValue	4
 2	void	igValue_Int (const char*,int)
 3	void	igValue_Uint (const char*,unsigned int)
 4	void	igValue_Float (const char*,float,const char*)
-203 overloaded
+205 overloaded
