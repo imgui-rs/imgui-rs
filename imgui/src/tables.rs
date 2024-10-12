@@ -161,7 +161,7 @@ bitflags! {
 bitflags! {
     /// Flags for [TableColumnSetup] and [table_setup_column_with].
     #[repr(transparent)]
-    #[derive(Default)]
+    #[derive(Copy, Clone, Default)]
     pub struct TableColumnFlags: u32 {
         // Input configuration flags
 
@@ -749,7 +749,7 @@ impl Ui {
 
 /// A struct containing all the data needed to setup a table column header
 /// via [begin_table_header](Ui::begin_table_header) or [table_setup_column](Ui::table_setup_column).
-#[derive(Debug, Default)]
+#[derive(Copy, Clone, Debug, Default)]
 pub struct TableColumnSetup<Name> {
     /// The name of column to be displayed to users.
     pub name: Name,
