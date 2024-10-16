@@ -161,7 +161,7 @@ bitflags! {
 bitflags! {
     /// Flags for [TableColumnSetup] and [table_setup_column_with].
     #[repr(transparent)]
-    #[derive(Copy, Clone, Default)]
+    #[derive(Default)]
     pub struct TableColumnFlags: u32 {
         // Input configuration flags
 
