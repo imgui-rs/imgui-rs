@@ -458,6 +458,12 @@ impl Io {
         }
     }
 
+    pub fn add_focus_event(&mut self, focused: bool) {
+        unsafe {
+            sys::ImGuiIO_AddFocusEvent(self.raw_mut(), focused);
+        }
+    }
+
     pub fn add_key_analog_event(&mut self, key: Key, down: bool, value: f32) {
         unsafe {
             sys::ImGuiIO_AddKeyAnalogEvent(self.raw_mut(), key as u32, down, value);
