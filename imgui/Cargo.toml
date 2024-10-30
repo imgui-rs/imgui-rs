@@ -8,7 +8,7 @@ repository = "https://github.com/imgui-rs/imgui-rs"
 documentation = "https://docs.rs/imgui"
 license = "MIT OR Apache-2.0"
 categories = ["gui", "api-bindings"]
-readme = "../README.markdown"
+readme = "../README.md"
 
 exclude = ["/resources"]
 
@@ -34,4 +34,3 @@ tables-api = []
 approx = "0.5.1"
 memoffset = "0.9"
 pretty_assertions = "1.4.1"
-
