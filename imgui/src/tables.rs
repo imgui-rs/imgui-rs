@@ -848,8 +848,8 @@ impl<'a> Specs<'a> {
 pub struct TableColumnSortSpecs<'a>(&'a sys::ImGuiTableColumnSortSpecs);
 impl<'a> TableColumnSortSpecs<'a> {
     /// User id of the column (if specified by a TableSetupColumn() call)
-    pub fn column_user_id(&self) -> sys::ImGuiID {
-        self.0.ColumnUserID
+    pub fn column_user_id(&self) -> Id {
+        Id(self.0.ColumnUserID)
     }
 
     /// Index of the column
