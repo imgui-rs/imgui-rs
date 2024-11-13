@@ -457,7 +457,9 @@ impl Io {
             sys::ImGuiIO_AddKeyEvent(self.raw_mut(), key as u32, down);
         }
     }
-
+    // Queue a gain/loss of focus for the application (generally based on OS/platform focus of your window)
+    // Note: [`io.config_debug_ignore_focus_loss`] will ignore this event from firing
+    #[doc(alias = "AddFocusEvent")
     pub fn add_focus_event(&mut self, focused: bool) {
         unsafe {
             sys::ImGuiIO_AddFocusEvent(self.raw_mut(), focused);
