@@ -304,7 +304,7 @@ where
                 sys::igInputTextWithHint(
                     label,
                     hint,
-                    ptr as *mut sys::cty::c_char,
+                    ptr as *mut core::ffi::c_char,
                     capacity,
                     self.flags.bits() as i32,
                     Some(callback::<T>),
@@ -315,7 +315,7 @@ where
 
                 sys::igInputText(
                     label,
-                    ptr as *mut sys::cty::c_char,
+                    ptr as *mut core::ffi::c_char,
                     capacity,
                     self.flags.bits() as i32,
                     Some(callback::<T>),
@@ -461,7 +461,7 @@ impl<'ui, 'p, T: InputTextCallbackHandler, L: AsRef<str>> InputTextMultiline<'ui
         let o = unsafe {
             sys::igInputTextMultiline(
                 self.ui.scratch_txt(self.label),
-                ptr as *mut sys::cty::c_char,
+                ptr as *mut core::ffi::c_char,
                 capacity,
                 self.size.into(),
                 self.flags.bits() as i32,

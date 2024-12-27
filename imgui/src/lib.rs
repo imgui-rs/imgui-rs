@@ -236,7 +236,7 @@ impl Ui {
     }
 
     /// Internal method to push a single text to our scratch buffer.
-    fn scratch_txt(&self, txt: impl AsRef<str>) -> *const sys::cty::c_char {
+    fn scratch_txt(&self, txt: impl AsRef<str>) -> *const core::ffi::c_char {
         unsafe {
             let handle = &mut *self.buffer.get();
             handle.scratch_txt(txt)
@@ -244,7 +244,7 @@ impl Ui {
     }
 
     /// Internal method to push an option text to our scratch buffer.
-    fn scratch_txt_opt(&self, txt: Option<impl AsRef<str>>) -> *const sys::cty::c_char {
+    fn scratch_txt_opt(&self, txt: Option<impl AsRef<str>>) -> *const core::ffi::c_char {
         unsafe {
             let handle = &mut *self.buffer.get();
             handle.scratch_txt_opt(txt)
@@ -255,7 +255,7 @@ impl Ui {
         &self,
         txt_0: impl AsRef<str>,
         txt_1: impl AsRef<str>,
-    ) -> (*const sys::cty::c_char, *const sys::cty::c_char) {
+    ) -> (*const core::ffi::c_char, *const core::ffi::c_char) {
         unsafe {
             let handle = &mut *self.buffer.get();
             handle.scratch_txt_two(txt_0, txt_1)
@@ -266,7 +266,7 @@ impl Ui {
         &self,
         txt_0: impl AsRef<str>,
         txt_1: Option<impl AsRef<str>>,
-    ) -> (*const sys::cty::c_char, *const sys::cty::c_char) {
+    ) -> (*const core::ffi::c_char, *const core::ffi::c_char) {
         unsafe {
             let handle = &mut *self.buffer.get();
             handle.scratch_txt_with_opt(txt_0, txt_1)
@@ -418,7 +418,7 @@ impl Ui {
 
     /// Create [`Id`] from a pointer
     pub fn new_id_ptr<T>(&self, input: &T) -> Id {
-        let p = input as *const T as *const sys::cty::c_void;
+        let p = input as *const T as *const core::ffi::c_void;
         let value = unsafe { sys::igGetID_Ptr(p) };
         Id(value)
     }
