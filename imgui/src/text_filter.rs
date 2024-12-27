@@ -22,7 +22,7 @@ impl TextFilter {
         let ptr = filter.as_mut_ptr();
         Self {
             id: label,
-            raw: unsafe { sys::ImGuiTextFilter_ImGuiTextFilter(ptr as *mut sys::cty::c_char) },
+            raw: unsafe { sys::ImGuiTextFilter_ImGuiTextFilter(ptr as *mut core::ffi::c_char) },
         }
     }
 
@@ -51,7 +51,7 @@ impl TextFilter {
             let mut id = self.id.clone();
             id.push('\0');
             let ptr = id.as_mut_ptr();
-            sys::ImGuiTextFilter_Draw(self.raw, ptr as *mut sys::cty::c_char, size);
+            sys::ImGuiTextFilter_Draw(self.raw, ptr as *mut core::ffi::c_char, size);
         }
     }
 
@@ -68,7 +68,7 @@ impl TextFilter {
         buf.push('\0');
         let ptr = buf.as_mut_ptr();
         unsafe {
-            sys::ImGuiTextFilter_PassFilter(self.raw, ptr as *mut sys::cty::c_char, ptr::null())
+            sys::ImGuiTextFilter_PassFilter(self.raw, ptr as *mut core::ffi::c_char, ptr::null())
         }
     }
 
@@ -81,8 +81,8 @@ impl TextFilter {
         unsafe {
             sys::ImGuiTextFilter_PassFilter(
                 self.raw,
-                b_ptr as *mut sys::cty::c_char,
-                e_ptr as *mut sys::cty::c_char,
+                b_ptr as *mut core::ffi::c_char,
+                e_ptr as *mut core::ffi::c_char,
             )
         }
     }

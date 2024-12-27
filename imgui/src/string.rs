@@ -22,7 +22,7 @@ impl UiBuffer {
     }
 
     /// Internal method to push a single text to our scratch buffer.
-    pub fn scratch_txt(&mut self, txt: impl AsRef<str>) -> *const sys::cty::c_char {
+    pub fn scratch_txt(&mut self, txt: impl AsRef<str>) -> *const core::ffi::c_char {
         self.refresh_buffer();
 
         let start_of_substr = self.push(txt);
@@ -30,7 +30,7 @@ impl UiBuffer {
     }
 
     /// Internal method to push an option text to our scratch buffer.
-    pub fn scratch_txt_opt(&mut self, txt: Option<impl AsRef<str>>) -> *const sys::cty::c_char {
+    pub fn scratch_txt_opt(&mut self, txt: Option<impl AsRef<str>>) -> *const core::ffi::c_char {
         match txt {
             Some(v) => self.scratch_txt(v),
             None => ptr::null(),
@@ -42,7 +42,7 @@ impl UiBuffer {
         &mut self,
         txt_0: impl AsRef<str>,
         txt_1: impl AsRef<str>,
-    ) -> (*const sys::cty::c_char, *const sys::cty::c_char) {
+    ) -> (*const core::ffi::c_char, *const core::ffi::c_char) {
         self.refresh_buffer();
 
         let first_offset = self.push(txt_0);
@@ -56,7 +56,7 @@ impl UiBuffer {
         &mut self,
         txt_0: impl AsRef<str>,
         txt_1: Option<impl AsRef<str>>,
-    ) -> (*const sys::cty::c_char, *const sys::cty::c_char) {
+    ) -> (*const core::ffi::c_char, *const core::ffi::c_char) {
         match txt_1 {
             Some(value) => self.scratch_txt_two(txt_0, value),
             None => (self.scratch_txt(txt_0), ptr::null()),
@@ -76,7 +76,7 @@ impl UiBuffer {
     /// # Safety
     /// This can return a pointer to undefined data if given a `pos >= self.buffer.len()`.
     /// This is marked as unsafe to reflect that.
-    pub unsafe fn offset(&self, pos: usize) -> *const sys::cty::c_char {
+    pub unsafe fn offset(&self, pos: usize) -> *const core::ffi::c_char {
         self.buffer.as_ptr().add(pos) as *const _
     }
 
