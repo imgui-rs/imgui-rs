@@ -683,12 +683,11 @@ impl Context {
     /// Installs a [`PlatformViewportBackend`](crate::PlatformViewportBackend) that is used to
     /// create platform windows on demand if a window is dragged outside of the main viewport.
     pub fn set_platform_backend<T: crate::PlatformViewportBackend>(&mut self, backend: T) {
-        let ctx = Box::new(UnsafeCell::new(crate::PlatformViewportContext {
+        let ctx = crate::PlatformViewportContext {
             backend: Box::new(backend),
-        }));
+        };
 
-        let io = self.io_mut();
-        io.backend_platform_user_data = ctx.get() as *mut _;
+        *crate::PLATFORM_VIEWPORT_BACKEND.lock().unwrap() = Some(ctx);
 
         let pio = self.platform_io_mut();
         pio.platform_create_window = Some(docking_utils::platform_create_window);
@@ -719,18 +718,15 @@ impl Context {
         pio.platform_render_window = Some(docking_utils::platform_render_window);
         pio.platform_swap_buffers = Some(docking_utils::platform_swap_buffers);
         pio.platform_create_vk_surface = Some(docking_utils::platform_create_vk_surface);
-
-        self.platform_viewport_ctx = ctx;
     }
     /// Installs a [`RendererViewportBackend`](crate::RendererViewportBackend) that is used to
     /// render extra viewports created by ImGui.
     pub fn set_renderer_backend<T: crate::RendererViewportBackend>(&mut self, backend: T) {
-        let ctx = Box::new(UnsafeCell::new(crate::RendererViewportContext {
+        let ctx = crate::RendererViewportContext {
             backend: Box::new(backend),
-        }));
+        };
 
-        let io = self.io_mut();
-        io.backend_renderer_user_data = ctx.get() as *mut _;
+        *crate::RENDERER_VIEWPORT_BACKEND.lock().unwrap() = Some(ctx);
 
         let pio = self.platform_io_mut();
         pio.renderer_create_window = Some(docking_utils::renderer_create_window);
@@ -738,8 +734,6 @@ impl Context {
         pio.renderer_set_window_size = Some(docking_utils::renderer_set_window_size);
         pio.renderer_render_window = Some(docking_utils::renderer_render_window);
         pio.renderer_swap_buffers = Some(docking_utils::renderer_swap_buffers);
-
-        self.renderer_viewport_ctx = ctx;
     }
     /// Updates the extra Viewports created by ImGui.
     /// Has to be called every frame if Viewports are enabled.

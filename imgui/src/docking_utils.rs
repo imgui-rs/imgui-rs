@@ -1,9 +1,17 @@
 use std::{
+    cell::UnsafeCell,
     ffi::{c_void, CStr},
     os::raw::{c_char, c_int},
+    sync::{Mutex, MutexGuard},
 };
 
-use crate::{Io, PlatformIo, Viewport};
+use crate::{PlatformIo, Viewport};
+
+pub(crate) static PLATFORM_VIEWPORT_BACKEND: Mutex<Option<crate::PlatformViewportContext>> =
+    Mutex::new(None);
+
+pub(crate) static RENDERER_VIEWPORT_BACKEND: Mutex<Option<crate::RendererViewportContext>> =
+    Mutex::new(None);
 
 /// Trait holding functions needed when the platform integration supports viewports.
 ///
@@ -67,20 +75,14 @@ pub trait PlatformViewportBackend: 'static {
 
 /// Used to get the current Contexts [`PlatformViewportContext`].
 fn get_platform_ctx() -> &'static mut PlatformViewportContext {
-    unsafe {
-        // should be safe as it is impossible to call any imgui function on a non-active context.
-        &mut *((*(sys::igGetIO() as *const Io)).backend_platform_user_data
-            as *mut PlatformViewportContext)
-    }
+    let a = UnsafeCell::new(PLATFORM_VIEWPORT_BACKEND.lock().unwrap()).get();
+    unsafe { (*a).as_mut().unwrap() }
 }
 
 /// Used to get the current Contexts [`RendererViewportContext`].
 fn get_renderer_ctx() -> &'static mut RendererViewportContext {
-    unsafe {
-        // should be safe as it is impossible to call any imgui function on a non-active context.
-        &mut *((*(sys::igGetIO() as *const Io)).backend_renderer_user_data
-            as *mut RendererViewportContext)
-    }
+    let a = UnsafeCell::new(RENDERER_VIEWPORT_BACKEND.lock().unwrap()).get();
+    unsafe { (*a).as_mut().unwrap() }
 }
 
 pub(crate) extern "C" fn platform_create_window(viewport: *mut Viewport) {
@@ -259,6 +261,8 @@ impl PlatformViewportContext {
     }
 }
 
+unsafe impl Send for PlatformViewportContext {}
+
 /// Trait that holds optional functions for a rendering backend to support multiple viewports.
 ///
 /// It is completely fine to not use this Backend at all, as all functions are optional.
@@ -331,6 +335,8 @@ impl RendererViewportContext {
         }
     }
 }
+
+unsafe impl Send for RendererViewportContext {}
 
 /// Describes a monitor that can be used by ImGui.
 #[repr(C)]
