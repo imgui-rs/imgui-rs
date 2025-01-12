@@ -63,13 +63,6 @@ pub struct Context {
     // imgui a mutable pointer to it.
     clipboard_ctx: Box<UnsafeCell<ClipboardContext>>,
 
-    // we need to store an owning reference to our PlatformViewportBackend and PlatformRendererBackend,
-    // so that it is ensured that PlatformIo::backend_platform_user_data and PlatformIo::backend_renderer_user_data remain valid
-    #[cfg(feature = "docking")]
-    platform_viewport_ctx: Box<UnsafeCell<crate::PlatformViewportContext>>,
-    #[cfg(feature = "docking")]
-    renderer_viewport_ctx: Box<UnsafeCell<crate::RendererViewportContext>>,
-
     ui: Ui,
 }
 
@@ -253,14 +246,6 @@ impl Context {
             platform_name: None,
             renderer_name: None,
             clipboard_ctx: Box::new(ClipboardContext::dummy().into()),
-            #[cfg(feature = "docking")]
-            platform_viewport_ctx: Box::new(UnsafeCell::new(
-                crate::PlatformViewportContext::dummy(),
-            )),
-            #[cfg(feature = "docking")]
-            renderer_viewport_ctx: Box::new(UnsafeCell::new(
-                crate::RendererViewportContext::dummy(),
-            )),
             ui: Ui {
                 buffer: UnsafeCell::new(crate::string::UiBuffer::new(1024)),
             },
@@ -350,14 +335,6 @@ impl SuspendedContext {
             platform_name: None,
             renderer_name: None,
             clipboard_ctx: Box::new(ClipboardContext::dummy().into()),
-            #[cfg(feature = "docking")]
-            platform_viewport_ctx: Box::new(UnsafeCell::new(
-                crate::PlatformViewportContext::dummy(),
-            )),
-            #[cfg(feature = "docking")]
-            renderer_viewport_ctx: Box::new(UnsafeCell::new(
-                crate::RendererViewportContext::dummy(),
-            )),
             ui: Ui {
                 buffer: UnsafeCell::new(crate::string::UiBuffer::new(1024)),
             },
