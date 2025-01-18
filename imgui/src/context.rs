@@ -664,7 +664,7 @@ impl Context {
             backend: Box::new(backend),
         };
 
-        crate::PLATFORM_VIEWPORT_CONTEXT.with_borrow_mut(|c| *c = Some(ctx));
+        crate::PLATFORM_VIEWPORT_CONTEXT.set(ctx);
 
         let pio = self.platform_io_mut();
         pio.platform_create_window = Some(docking_utils::platform_create_window);
@@ -703,7 +703,7 @@ impl Context {
             backend: Box::new(backend),
         };
 
-        crate::RENDERER_VIEWPORT_CONTEXT.with_borrow_mut(|c| *c = Some(ctx));
+        crate::RENDERER_VIEWPORT_CONTEXT.set(ctx);
 
         let pio = self.platform_io_mut();
         pio.renderer_create_window = Some(docking_utils::renderer_create_window);

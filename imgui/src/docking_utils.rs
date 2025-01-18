@@ -7,10 +7,10 @@ use std::{
 use crate::{PlatformIo, Viewport};
 
 thread_local!(
-    pub(crate) static PLATFORM_VIEWPORT_CONTEXT: RefCell<Option<crate::PlatformViewportContext>> = const { RefCell::new(None) });
+    pub(crate) static PLATFORM_VIEWPORT_CONTEXT: RefCell<crate::PlatformViewportContext> = RefCell::new(PlatformViewportContext::dummy()));
 
 thread_local!(
-    pub(crate) static RENDERER_VIEWPORT_CONTEXT: RefCell<Option<crate::RendererViewportContext>> = const { RefCell::new(None) });
+    pub(crate) static RENDERER_VIEWPORT_CONTEXT: RefCell<crate::RendererViewportContext> = RefCell::new(RendererViewportContext::dummy()));
 
 /// Trait holding functions needed when the platform integration supports viewports.
 ///
@@ -72,39 +72,26 @@ pub trait PlatformViewportBackend: 'static {
     ) -> i32;
 }
 
-#[inline]
-fn get_platform(
-    ctx: &mut Option<PlatformViewportContext>,
-) -> &mut Box<dyn PlatformViewportBackend> {
-    &mut ctx.as_mut().unwrap().backend
-}
-
-#[inline]
-fn get_renderer(
-    ctx: &mut Option<RendererViewportContext>,
-) -> &mut Box<dyn RendererViewportBackend> {
-    &mut ctx.as_mut().unwrap().backend
-}
-
 pub(crate) extern "C" fn platform_create_window(viewport: *mut Viewport) {
-    PLATFORM_VIEWPORT_CONTEXT.with_borrow_mut(|ctx: &mut Option<crate::PlatformViewportContext>| {
-        get_platform(ctx).create_window(unsafe { &mut *viewport });
+    PLATFORM_VIEWPORT_CONTEXT.with_borrow_mut(|ctx: &mut crate::PlatformViewportContext| {
+        ctx.backend.create_window(unsafe { &mut *viewport });
     })
 }
 pub(crate) extern "C" fn platform_destroy_window(viewport: *mut Viewport) {
     PLATFORM_VIEWPORT_CONTEXT.with_borrow_mut(|ctx| {
-        get_platform(ctx).destroy_window(unsafe { &mut *viewport });
+        ctx.backend.destroy_window(unsafe { &mut *viewport });
     })
 }
 
 pub(crate) extern "C" fn platform_show_window(viewport: *mut Viewport) {
     PLATFORM_VIEWPORT_CONTEXT.with_borrow_mut(|ctx| {
-        get_platform(ctx).show_window(unsafe { &mut *viewport });
+        ctx.backend.show_window(unsafe { &mut *viewport });
     })
 }
 pub(crate) extern "C" fn platform_set_window_pos(viewport: *mut Viewport, pos: sys::ImVec2) {
     PLATFORM_VIEWPORT_CONTEXT.with_borrow_mut(|ctx| {
-        get_platform(ctx).set_window_pos(unsafe { &mut *viewport }, [pos.x, pos.y]);
+        ctx.backend
+            .set_window_pos(unsafe { &mut *viewport }, [pos.x, pos.y]);
     })
 }
 pub(crate) extern "C" fn platform_get_window_pos(
@@ -112,7 +99,7 @@ pub(crate) extern "C" fn platform_get_window_pos(
     out_pos: *mut sys::ImVec2,
 ) {
     PLATFORM_VIEWPORT_CONTEXT.with_borrow_mut(|ctx| {
-        let pos = get_platform(ctx).get_window_pos(unsafe { &mut *viewport });
+        let pos = ctx.backend.get_window_pos(unsafe { &mut *viewport });
         unsafe {
             *out_pos = sys::ImVec2::new(pos[0], pos[1]);
         }
@@ -120,59 +107,60 @@ pub(crate) extern "C" fn platform_get_window_pos(
 }
 pub(crate) extern "C" fn platform_set_window_size(viewport: *mut Viewport, size: sys::ImVec2) {
     PLATFORM_VIEWPORT_CONTEXT.with_borrow_mut(|ctx| {
-        get_platform(ctx).set_window_size(unsafe { &mut *viewport }, [size.x, size.y]);
+        ctx.backend
+            .set_window_size(unsafe { &mut *viewport }, [size.x, size.y]);
     })
 }
 pub(crate) extern "C" fn platform_get_window_size(
     viewport: *mut Viewport,
     out_size: *mut sys::ImVec2,
 ) {
-    PLATFORM_VIEWPORT_CONTEXT.with_borrow_mut(|ctx: &mut Option<crate::PlatformViewportContext>| {
-        let size = get_platform(ctx).get_window_size(unsafe { &mut *viewport });
+    PLATFORM_VIEWPORT_CONTEXT.with_borrow_mut(|ctx| {
+        let size = ctx.backend.get_window_size(unsafe { &mut *viewport });
         unsafe {
             *out_size = sys::ImVec2::new(size[0], size[1]);
         }
     })
 }
 pub(crate) extern "C" fn platform_set_window_focus(viewport: *mut Viewport) {
-    PLATFORM_VIEWPORT_CONTEXT.with_borrow_mut(|ctx: &mut Option<crate::PlatformViewportContext>| {
-        get_platform(ctx).set_window_focus(unsafe { &mut *viewport });
+    PLATFORM_VIEWPORT_CONTEXT.with_borrow_mut(|ctx| {
+        ctx.backend.set_window_focus(unsafe { &mut *viewport });
     })
 }
 pub(crate) extern "C" fn platform_get_window_focus(viewport: *mut Viewport) -> bool {
-    PLATFORM_VIEWPORT_CONTEXT.with_borrow_mut(|ctx: &mut Option<crate::PlatformViewportContext>| {
-        get_platform(ctx).get_window_focus(unsafe { &mut *viewport })
-    })
+    PLATFORM_VIEWPORT_CONTEXT
+        .with_borrow_mut(|ctx| ctx.backend.get_window_focus(unsafe { &mut *viewport }))
 }
 pub(crate) extern "C" fn platform_get_window_minimized(viewport: *mut Viewport) -> bool {
-    PLATFORM_VIEWPORT_CONTEXT.with_borrow_mut(|ctx: &mut Option<crate::PlatformViewportContext>| {
-        get_platform(ctx).get_window_minimized(unsafe { &mut *viewport })
-    })
+    PLATFORM_VIEWPORT_CONTEXT
+        .with_borrow_mut(|ctx| ctx.backend.get_window_minimized(unsafe { &mut *viewport }))
 }
 pub(crate) extern "C" fn platform_set_window_title(viewport: *mut Viewport, title: *const c_char) {
     PLATFORM_VIEWPORT_CONTEXT.with_borrow_mut(|ctx| {
         let title = unsafe { CStr::from_ptr(title).to_str().unwrap() };
-        get_platform(ctx).set_window_title(unsafe { &mut *viewport }, title);
+        ctx.backend
+            .set_window_title(unsafe { &mut *viewport }, title);
     })
 }
 pub(crate) extern "C" fn platform_set_window_alpha(viewport: *mut Viewport, alpha: f32) {
     PLATFORM_VIEWPORT_CONTEXT.with_borrow_mut(|ctx| {
-        get_platform(ctx).set_window_alpha(unsafe { &mut *viewport }, alpha);
+        ctx.backend
+            .set_window_alpha(unsafe { &mut *viewport }, alpha);
     })
 }
 pub(crate) extern "C" fn platform_update_window(viewport: *mut Viewport) {
     PLATFORM_VIEWPORT_CONTEXT.with_borrow_mut(|ctx| {
-        get_platform(ctx).update_window(unsafe { &mut *viewport });
+        ctx.backend.update_window(unsafe { &mut *viewport });
     })
 }
 pub(crate) extern "C" fn platform_render_window(viewport: *mut Viewport, _arg: *mut c_void) {
     PLATFORM_VIEWPORT_CONTEXT.with_borrow_mut(|ctx| {
-        get_platform(ctx).render_window(unsafe { &mut *viewport });
+        ctx.backend.render_window(unsafe { &mut *viewport });
     })
 }
 pub(crate) extern "C" fn platform_swap_buffers(viewport: *mut Viewport, _arg: *mut c_void) {
     PLATFORM_VIEWPORT_CONTEXT.with_borrow_mut(|ctx| {
-        get_platform(ctx).swap_buffers(unsafe { &mut *viewport });
+        ctx.backend.swap_buffers(unsafe { &mut *viewport });
     })
 }
 pub(crate) extern "C" fn platform_create_vk_surface(
@@ -182,9 +170,10 @@ pub(crate) extern "C" fn platform_create_vk_surface(
     out_surface: *mut u64,
 ) -> c_int {
     PLATFORM_VIEWPORT_CONTEXT.with_borrow_mut(|ctx| {
-        get_platform(ctx).create_vk_surface(unsafe { &mut *viewport }, instance, unsafe {
-            &mut *out_surface
-        })
+        ctx.backend
+            .create_vk_surface(unsafe { &mut *viewport }, instance, unsafe {
+                &mut *out_surface
+            })
     })
 }
 
@@ -290,27 +279,28 @@ pub trait RendererViewportBackend: 'static {
 
 pub(crate) extern "C" fn renderer_create_window(viewport: *mut Viewport) {
     RENDERER_VIEWPORT_CONTEXT.with_borrow_mut(|ctx| {
-        get_renderer(ctx).create_window(unsafe { &mut *viewport });
+        ctx.backend.create_window(unsafe { &mut *viewport });
     })
 }
 pub(crate) extern "C" fn renderer_destroy_window(viewport: *mut Viewport) {
     RENDERER_VIEWPORT_CONTEXT.with_borrow_mut(|ctx| {
-        get_renderer(ctx).destroy_window(unsafe { &mut *viewport });
+        ctx.backend.destroy_window(unsafe { &mut *viewport });
     })
 }
 pub(crate) extern "C" fn renderer_set_window_size(viewport: *mut Viewport, size: sys::ImVec2) {
     RENDERER_VIEWPORT_CONTEXT.with_borrow_mut(|ctx| {
-        get_renderer(ctx).set_window_size(unsafe { &mut *viewport }, [size.x, size.y]);
+        ctx.backend
+            .set_window_size(unsafe { &mut *viewport }, [size.x, size.y]);
     })
 }
 pub(crate) extern "C" fn renderer_render_window(viewport: *mut Viewport, _arg: *mut c_void) {
     RENDERER_VIEWPORT_CONTEXT.with_borrow_mut(|ctx| {
-        get_renderer(ctx).render_window(unsafe { &mut *viewport });
+        ctx.backend.render_window(unsafe { &mut *viewport });
     })
 }
 pub(crate) extern "C" fn renderer_swap_buffers(viewport: *mut Viewport, _arg: *mut c_void) {
     RENDERER_VIEWPORT_CONTEXT.with_borrow_mut(|ctx| {
-        get_renderer(ctx).swap_buffers(unsafe { &mut *viewport });
+        ctx.backend.swap_buffers(unsafe { &mut *viewport });
     })
 }
 
@@ -350,8 +340,6 @@ impl RendererViewportContext {
         }
     }
 }
-
-unsafe impl Send for RendererViewportContext {}
 
 /// Describes a monitor that can be used by ImGui.
 #[repr(C)]
