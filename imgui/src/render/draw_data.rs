@@ -221,7 +221,7 @@ pub struct DrawCmdIterator<'a> {
     iter: std::slice::Iter<'a, sys::ImDrawCmd>,
 }
 
-impl<'a> Iterator for DrawCmdIterator<'a> {
+impl Iterator for DrawCmdIterator<'_> {
     type Item = DrawCmd;
 
     #[inline]

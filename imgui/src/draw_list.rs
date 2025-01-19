@@ -84,7 +84,7 @@ static DRAW_LIST_LOADED_BACKGROUND: std::sync::atomic::AtomicBool =
 static DRAW_LIST_LOADED_FOREGROUND: std::sync::atomic::AtomicBool =
     std::sync::atomic::AtomicBool::new(false);
 
-impl<'ui> Drop for DrawListMut<'ui> {
+impl Drop for DrawListMut<'_> {
     fn drop(&mut self) {
         match self.draw_list_type {
             DrawListType::Window => &DRAW_LIST_LOADED_WINDOW,
@@ -95,7 +95,7 @@ impl<'ui> Drop for DrawListMut<'ui> {
     }
 }
 
-impl<'ui> DrawListMut<'ui> {
+impl DrawListMut<'_> {
     fn lock_draw_list(t: DrawListType) {
         let lock = match t {
             DrawListType::Window => &DRAW_LIST_LOADED_WINDOW,
@@ -208,7 +208,7 @@ pub struct ChannelsSplit<'ui> {
     channels_count: u32,
 }
 
-impl<'ui> ChannelsSplit<'ui> {
+impl ChannelsSplit<'_> {
     /// Change current channel.
     ///
     /// Panic if channel_index overflows the number of channels.
@@ -438,7 +438,7 @@ impl<'ui> DrawListMut<'ui> {
         texture_id: TextureId,
         p_min: impl Into<MintVec2>,
         p_max: impl Into<MintVec2>,
-    ) -> Image<'_> {
+    ) -> Image<'ui> {
         Image::new(self, texture_id, p_min, p_max)
     }
 
@@ -452,7 +452,7 @@ impl<'ui> DrawListMut<'ui> {
         p2: impl Into<MintVec2>,
         p3: impl Into<MintVec2>,
         p4: impl Into<MintVec2>,
-    ) -> ImageQuad<'_> {
+    ) -> ImageQuad<'ui> {
         ImageQuad::new(self, texture_id, p1, p2, p3, p4)
     }
 
@@ -463,7 +463,7 @@ impl<'ui> DrawListMut<'ui> {
         p_min: impl Into<MintVec2>,
         p_max: impl Into<MintVec2>,
         rounding: f32,
-    ) -> ImageRounded<'_> {
+    ) -> ImageRounded<'ui> {
         ImageRounded::new(self, texture_id, p_min, p_max, rounding)
     }
 
