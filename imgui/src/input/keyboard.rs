@@ -157,10 +157,11 @@ pub enum Key {
     MouseX2 = sys::ImGuiKey_MouseX2,
     MouseWheelX = sys::ImGuiKey_MouseWheelX,
     MouseWheelY = sys::ImGuiKey_MouseWheelY,
-    ReservedForModCtrl = sys::ImGuiKey_ReservedForModCtrl,
-    ReservedForModShift = sys::ImGuiKey_ReservedForModShift,
-    ReservedForModAlt = sys::ImGuiKey_ReservedForModAlt,
-    ReservedForModSuper = sys::ImGuiKey_ReservedForModSuper,
+
+    ModCtrl = sys::ImGuiMod_Ctrl,
+    ModShift = sys::ImGuiMod_Shift,
+    ModAlt = sys::ImGuiMod_Alt,
+    ModSuper = sys::ImGuiMod_Super,
 }
 
 impl Key {
@@ -316,10 +317,10 @@ impl Key {
         Key::MouseX2,
         Key::MouseWheelX,
         Key::MouseWheelY,
-        Key::ReservedForModCtrl,
-        Key::ReservedForModShift,
-        Key::ReservedForModAlt,
-        Key::ReservedForModSuper,
+        Key::ModCtrl,
+        Key::ModShift,
+        Key::ModAlt,
+        Key::ModSuper,
     ];
     /// Total count of `Key` variants
     pub const COUNT: usize = sys::ImGuiKey_NamedKey_COUNT as usize;
