@@ -88,7 +88,7 @@ jobs:
           profile: minimal
           toolchain: ${{ matrix.rust }}
           override: true
-      - run: sudo apt install libxcb-shape0-dev libxcb-xfixes0-dev
+      - run: sudo apt install libxcb-shape0-dev libxcb-xfixes0-dev libfreetype6-dev
         if: runner.os == 'Linux'
       # workaround for https://github.com/actions/cache/issues/403
       - name: Install GNU tar
