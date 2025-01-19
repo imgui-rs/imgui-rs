@@ -220,7 +220,7 @@ pub struct Io {
     /// When holding a key/button, rate at which it repeats, in seconds
     pub key_repeat_rate: f32,
 
-    /// Options to configure Error Handling and how we handle recoverable errors [EXPERIMENTAL]
+    /// Options to configure Error Handling and how we handle recoverable errors
     /// - Error recovery is provided as a way to facilitate:
     ///    - Recovery after a programming error (native code or scripting language - the later tends to facilitate iterating on code while running).
     ///    - Recovery after running an exception handler or any error processing which may skip code after an error has been detected.
@@ -230,7 +230,7 @@ pub struct Io {
     /// - By design, we do NOT allow error recovery to be 100% silent. One of the three options needs to be checked!
     /// - Always ensure that on programmers seats you have at minimum Asserts or Tooltips enabled when making direct imgui API calls!
     ///   Otherwise it would severely hinder your ability to catch and correct mistakes!
-    /// - Read https://github.com/ocornut/imgui/wiki/Error-Handling for details.
+    /// - Read <https://github.com/ocornut/imgui/wiki/Error-Handling> for details.
     /// - Programmer seats: keep asserts (default), or disable asserts and keep error tooltips (new and nice!)
     /// - Non-programmer seats: maybe disable asserts, but make sure errors are resurfaced (tooltips, visible log entries, use callback etc.)
     /// - Recovery after error/exception: record stack sizes with ErrorRecoveryStoreState(), disable assert, set log callback (to e.g. trigger high-level breakpoint), recover with ErrorRecoveryTryToRecoverState(), restore settings.
