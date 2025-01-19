@@ -74,7 +74,7 @@ jobs:
       fail-fast: false
       matrix:
         rust:
-          - "1.70"
+          - "1.82"
         os:
           - ubuntu-latest
           - macos-latest
