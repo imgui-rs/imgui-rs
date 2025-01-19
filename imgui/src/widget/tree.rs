@@ -334,7 +334,7 @@ impl<'a, T: AsRef<str>, L: AsRef<str>> TreeNode<'a, T, L> {
 #[derive(Debug)]
 pub struct TreeNodeToken<'a>(core::marker::PhantomData<&'a crate::Ui>, bool);
 
-impl<'a> TreeNodeToken<'a> {
+impl TreeNodeToken<'_> {
     /// Creates a new token type. This takes a bool for the no-op variant on NO_TREE_PUSH_ON_OPEN.
     pub(crate) fn new(_: &crate::Ui, execute_drop: bool) -> Self {
         Self(std::marker::PhantomData, execute_drop)

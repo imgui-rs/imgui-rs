@@ -502,7 +502,7 @@ impl Ui {
 
 impl<'ui> Ui {
     /// # Widgets: Input
-
+    ///
     /// Edits text in a single line input widget
     #[doc(alias = "InputText", alias = "InputTextWithHint")]
     pub fn input_text<'p, L: AsRef<str>>(
@@ -752,7 +752,6 @@ impl Ui {
     ///     ui.button("Dangerous button");
     /// }
     /// ```
-
     #[doc(alias = "BeginDisabled")]
     pub fn begin_disabled(&self, disabled: bool) -> DisabledToken<'_> {
         unsafe { sys::igBeginDisabled(disabled) };
