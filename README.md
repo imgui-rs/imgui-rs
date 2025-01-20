@@ -111,7 +111,7 @@ git clone https://github.com/imgui-rs/imgui-examples
 cd imgui-examples
 
 # At the reposity root
-cargo test;
+cargo test
 
 cargo run --example hello_world
 cargo run --example test_window
