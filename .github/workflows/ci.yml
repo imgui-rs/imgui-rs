@@ -29,7 +29,7 @@ jobs:
         with:
           components: clippy
       - name: Cache cargo directories
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: |
             ~/.cargo/registry
@@ -39,7 +39,7 @@ jobs:
             ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.toml') }}
             ${{ runner.os }}-cargo-
       - name: Cache cargo target dirs
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: target
           key: ${{ runner.os }}-target-lint-stable-${{ hashFiles('**/Cargo.toml') }}
@@ -97,7 +97,7 @@ jobs:
           brew install gnu-tar
           echo PATH="/usr/local/opt/gnu-tar/libexec/gnubin:$PATH" >> $GITHUB_ENV
       - name: Cache cargo directories
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: |
             ~/.cargo/registry
@@ -107,7 +107,7 @@ jobs:
             ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.toml') }}
             ${{ runner.os }}-cargo-
       - name: Cache cargo target dirs
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: target
           # note `cargo test` and `cargo clippy` don't use the same build
