@@ -154,10 +154,10 @@ impl FontAtlas {
                 &mut height,
                 &mut bytes_per_pixel,
             );
-            assert!(width >= 0, "font texture width must be positive");
-            assert!(height >= 0, "font texture height must be positive");
+            assert!(width > 0, "font texture width must be positive");
+            assert!(height > 0, "font texture height must be positive");
             assert!(
-                bytes_per_pixel >= 0,
+                bytes_per_pixel > 0,
                 "font texture bytes per pixel must be positive"
             );
             let height = height as usize;
@@ -188,10 +188,10 @@ impl FontAtlas {
                 &mut height,
                 &mut bytes_per_pixel,
             );
-            assert!(width >= 0, "font texture width must be positive");
-            assert!(height >= 0, "font texture height must be positive");
+            assert!(width > 0, "font texture width must be positive");
+            assert!(height > 0, "font texture height must be positive");
             assert!(
-                bytes_per_pixel >= 0,
+                bytes_per_pixel > 0,
                 "font texture bytes per pixel must be positive"
             );
             let height = height as usize;

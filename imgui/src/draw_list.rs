@@ -216,7 +216,7 @@ impl ChannelsSplit<'_> {
     pub fn set_current(&self, channel_index: u32) {
         assert!(
             channel_index < self.channels_count,
-            "Channel cannot be set! Provided channel index ({}) is higher than channel count ({}).",
+            "Channel cannot be set! Provided channel index ({}) is greater than or equal to channel count ({}).",
             channel_index,
             self.channels_count
         );
