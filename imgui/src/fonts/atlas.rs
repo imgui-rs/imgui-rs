@@ -364,7 +364,7 @@ impl FontConfig {
         raw.GlyphMaxAdvanceX = self.glyph_max_advance_x;
         raw.FontBuilderFlags = self.font_builder_flags;
         raw.RasterizerMultiply = self.rasterizer_multiply;
-        raw.RasterizerMultiply = self.rasterizer_density;
+        raw.RasterizerDensity = self.rasterizer_density;
         // char is used as "unset" for EllipsisChar
         raw.EllipsisChar = self.ellipsis_char.map(|c| c as u32).unwrap_or(!0);
         if let Some(name) = self.name.as_ref() {
@@ -423,6 +423,10 @@ fn test_font_config_default() {
     assert_eq!(
         font_config.rasterizer_multiply,
         sys_font_config.RasterizerMultiply
+    );
+    assert_eq!(
+        font_config.rasterizer_density,
+        sys_font_config.RasterizerDensity
     );
 }
 
