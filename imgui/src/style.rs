@@ -965,6 +965,25 @@ pub enum StyleVar {
     SelectableTextAlign([f32; 2]),
     /// Padding within a table cell
     CellPadding([f32; 2]),
+    /// Additional alpha multiplier applied to disabled elements. Multiplies over current value
+    /// of [`StyleVar::Alpha`]
+    DisabledAlpha(f32),
+    /// Thickness of border around tabs
+    TabBorderSize(f32),
+    /// Thickness of tab-bar separator, which takes on the tab active color to denote focus
+    TabBarBorderSize(f32),
+    /// Thickness of tab-bar overline, which highlights the selected tab-bar
+    TabBarOverlineSize(f32),
+    /// Angle of angled headers (supported values range from -50.0 degrees to +50.0 degrees)
+    TableAngledHeadersAngle(f32),
+    /// Alignment of angled headers within the cell
+    TableAngledHeadersTextAlign([f32; 2]),
+    /// Thickness of border in [`Ui::separator_with_text`](crate::Ui::separator_with_text)
+    SeparatorTextBorderSize(f32),
+    /// Alignment of text within the separator
+    SeparatorTextAlign([f32; 2]),
+    /// Horizontal offset of text from each edge of the separator + spacing on other axis
+    SeparatorTextPadding([f32; 2]),
 }
 
 // lerps a color with the given value

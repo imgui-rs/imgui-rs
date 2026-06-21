@@ -173,6 +173,30 @@ unsafe fn push_style_var(style_var: StyleVar) {
             igPushStyleVar_Vec2(sys::ImGuiStyleVar_SelectableTextAlign as i32, v.into())
         }
         CellPadding(v) => igPushStyleVar_Vec2(sys::ImGuiStyleVar_CellPadding as i32, v.into()),
+        DisabledAlpha(v) => igPushStyleVar_Float(sys::ImGuiStyleVar_DisabledAlpha as i32, v),
+        TabBorderSize(v) => igPushStyleVar_Float(sys::ImGuiStyleVar_TabBorderSize as i32, v),
+        TabBarBorderSize(v) => {
+            igPushStyleVar_Float(sys::ImGuiStyleVar_TabBarBorderSize as i32, v)
+        }
+        TabBarOverlineSize(v) => {
+            igPushStyleVar_Float(sys::ImGuiStyleVar_TabBarOverlineSize as i32, v)
+        }
+        TableAngledHeadersAngle(v) => {
+            igPushStyleVar_Float(sys::ImGuiStyleVar_TableAngledHeadersAngle as i32, v)
+        }
+        TableAngledHeadersTextAlign(v) => igPushStyleVar_Vec2(
+            sys::ImGuiStyleVar_TableAngledHeadersTextAlign as i32,
+            v.into(),
+        ),
+        SeparatorTextBorderSize(v) => {
+            igPushStyleVar_Float(sys::ImGuiStyleVar_SeparatorTextBorderSize as i32, v)
+        }
+        SeparatorTextAlign(v) => {
+            igPushStyleVar_Vec2(sys::ImGuiStyleVar_SeparatorTextAlign as i32, v.into())
+        }
+        SeparatorTextPadding(v) => {
+            igPushStyleVar_Vec2(sys::ImGuiStyleVar_SeparatorTextPadding as i32, v.into())
+        }
     }
 }
 
