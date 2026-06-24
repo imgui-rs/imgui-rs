@@ -7,6 +7,7 @@ use std::ptr;
 
 use crate::clipboard::{ClipboardBackend, ClipboardContext};
 use crate::fonts::atlas::{FontAtlas, FontId, SharedFontAtlas};
+use crate::ime::{ImeDataBackend, ImeDataContext};
 use crate::io::Io;
 use crate::style::Style;
 use crate::{sys, DrawData};
@@ -62,6 +63,7 @@ pub struct Context {
     // we also put it in an unsafecell since we're going to give
     // imgui a mutable pointer to it.
     clipboard_ctx: Box<UnsafeCell<ClipboardContext>>,
+    ime_data_ctx: Box<UnsafeCell<ImeDataContext>>,
 
     ui: Ui,
 }
@@ -223,6 +225,18 @@ impl Context {
         platform_io.clipboard_user_data = clipboard_ctx.get() as *mut _;
         self.clipboard_ctx = clipboard_ctx;
     }
+    /// Sets the IME
+    pub fn set_ime_data_backend<T: ImeDataBackend>(&mut self, backend: T) {
+        let ime_data_ctx: Box<UnsafeCell<_>> = Box::new(ImeDataContext::new(backend).into());
+        let platform_io = unsafe {
+            // safe because PlatformIo is a transparent wrapper around sys::ImGuiPlatformIO
+            // and &mut self ensures exclusive ownership of PlatformIo.
+            &mut *(sys::igGetPlatformIO() as *mut crate::PlatformIo)
+        };
+        platform_io.set_ime_data_fn = Some(crate::ime::set_ime_data);
+        platform_io.ime_user_data = ime_data_ctx.get() as *mut _;
+        self.ime_data_ctx = ime_data_ctx;
+    }
     fn create_internal(mut shared_font_atlas: Option<SharedFontAtlas>) -> Self {
         let _guard = CTX_MUTEX.lock();
         assert!(
@@ -246,6 +260,7 @@ impl Context {
             platform_name: None,
             renderer_name: None,
             clipboard_ctx: Box::new(ClipboardContext::dummy().into()),
+            ime_data_ctx: Box::new(ImeDataContext::dummy().into()),
             ui: Ui {
                 buffer: UnsafeCell::new(crate::string::UiBuffer::new(1024)),
             },
@@ -335,6 +350,7 @@ impl SuspendedContext {
             platform_name: None,
             renderer_name: None,
             clipboard_ctx: Box::new(ClipboardContext::dummy().into()),
+            ime_data_ctx: Box::new(ImeDataContext::dummy().into()),
             ui: Ui {
                 buffer: UnsafeCell::new(crate::string::UiBuffer::new(1024)),
             },
