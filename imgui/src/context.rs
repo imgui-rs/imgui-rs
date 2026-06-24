@@ -1,5 +1,5 @@
 use parking_lot::ReentrantMutex;
-use std::cell::UnsafeCell;
+use std::cell::{Cell, UnsafeCell};
 use std::ffi::{CStr, CString};
 use std::ops::Drop;
 use std::path::PathBuf;
@@ -248,6 +248,7 @@ impl Context {
             clipboard_ctx: Box::new(ClipboardContext::dummy().into()),
             ui: Ui {
                 buffer: UnsafeCell::new(crate::string::UiBuffer::new(1024)),
+                multi_select_lock: Cell::new(false),
             },
         }
     }
@@ -337,6 +338,7 @@ impl SuspendedContext {
             clipboard_ctx: Box::new(ClipboardContext::dummy().into()),
             ui: Ui {
                 buffer: UnsafeCell::new(crate::string::UiBuffer::new(1024)),
+                multi_select_lock: Cell::new(false),
             },
         };
         if ctx.is_current_context() {

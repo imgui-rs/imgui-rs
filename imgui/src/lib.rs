@@ -163,6 +163,7 @@ mod io;
 mod layout;
 mod list_clipper;
 mod math;
+pub mod multi_select;
 mod platform_io;
 mod plothistogram;
 mod plotlines;
@@ -215,6 +216,7 @@ impl Context {
 pub struct Ui {
     /// our scratch sheet
     buffer: cell::UnsafeCell<string::UiBuffer>,
+    multi_select_lock: cell::Cell<bool>,
 }
 
 impl Ui {

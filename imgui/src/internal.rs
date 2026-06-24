@@ -13,12 +13,20 @@ pub struct ImVector<T> {
 impl<T> ImVector<T> {
     #[inline]
     pub fn as_slice(&self) -> &[T] {
-        unsafe { slice::from_raw_parts(self.data, self.size as usize) }
+        if self.size > 0 {
+            unsafe { slice::from_raw_parts(self.data, self.size as usize) }
+        } else {
+            &[]
+        }
     }
 
     #[inline]
     pub fn as_slice_mut(&mut self) -> &mut [T] {
-        unsafe { slice::from_raw_parts_mut(self.data, self.size as usize) }
+        if self.size > 0 {
+            unsafe { slice::from_raw_parts_mut(self.data, self.size as usize) }
+        } else {
+            &mut []
+        }
     }
 
     pub fn replace_from_slice(&mut self, data: &[T]) {

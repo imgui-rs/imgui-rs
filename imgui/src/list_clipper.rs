@@ -18,6 +18,7 @@ use crate::Ui;
 pub struct ListClipper {
     items_count: i32,
     items_height: f32,
+    include_items_by_index: Vec<(i32, i32)>,
 }
 
 impl ListClipper {
@@ -26,6 +27,7 @@ impl ListClipper {
         ListClipper {
             items_count,
             items_height: -1.0,
+            include_items_by_index: Vec::new(),
         }
     }
 
@@ -35,10 +37,25 @@ impl ListClipper {
         self
     }
 
+    /// Ensures the given index is not clipped.
+    pub fn include_item_by_index(self, item_index: i32) -> Self {
+        self.include_items_by_index(item_index, item_index + 1)
+    }
+
+    /// Ensures the indices from `item_begin` (inclusive) to `item_end` (exclusive)
+    /// are not clipped.
+    pub fn include_items_by_index(mut self, item_begin: i32, item_end: i32) -> Self {
+        self.include_items_by_index.push((item_begin, item_end));
+        self
+    }
+
     pub fn begin(self, ui: &Ui) -> ListClipperToken<'_> {
         let list_clipper = unsafe {
             let list_clipper = sys::ImGuiListClipper_ImGuiListClipper();
             sys::ImGuiListClipper_Begin(list_clipper, self.items_count, self.items_height);
+            for (item_begin, item_end) in self.include_items_by_index {
+                sys::ImGuiListClipper_IncludeItemsByIndex(list_clipper, item_begin, item_end);
+            }
             list_clipper
         };
         ListClipperToken::new(ui, list_clipper)
