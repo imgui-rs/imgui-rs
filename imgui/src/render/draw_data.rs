@@ -114,8 +114,8 @@ fn test_drawdata_memory_layout() {
     macro_rules! assert_field_offset {
         ($l:ident, $r:ident) => {
             assert_eq!(
-                memoffset::offset_of!(DrawData, $l),
-                memoffset::offset_of!(ImDrawData, $r)
+                core::mem::offset_of!(DrawData, $l),
+                core::mem::offset_of!(ImDrawData, $r)
             );
         };
     }
@@ -301,8 +301,8 @@ fn test_drawvert_memory_layout() {
     macro_rules! assert_field_offset {
         ($l:ident, $r:ident) => {
             assert_eq!(
-                memoffset::offset_of!(DrawVert, $l),
-                memoffset::offset_of!(ImDrawVert, $r)
+                core::mem::offset_of!(DrawVert, $l),
+                core::mem::offset_of!(ImDrawVert, $r)
             );
         };
     }

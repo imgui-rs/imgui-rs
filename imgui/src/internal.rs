@@ -52,8 +52,8 @@ fn test_imvector_memory_layout() {
     macro_rules! assert_field_offset {
         ($l:ident, $r:ident) => {
             assert_eq!(
-                memoffset::offset_of!(VectorChar, $l),
-                memoffset::offset_of!(ImVector_char, $r)
+                core::mem::offset_of!(VectorChar, $l),
+                core::mem::offset_of!(ImVector_char, $r)
             );
         };
     }

@@ -49,8 +49,8 @@ fn test_font_glyph_memory_layout() {
     macro_rules! assert_field_offset {
         ($l:ident, $r:ident) => {
             assert_eq!(
-                memoffset::offset_of!(FontGlyph, $l),
-                memoffset::offset_of!(ImFontGlyph, $r)
+                core::mem::offset_of!(FontGlyph, $l),
+                core::mem::offset_of!(ImFontGlyph, $r)
             );
         };
     }
