@@ -255,8 +255,8 @@ fn test_font_atlas_memory_layout() {
     macro_rules! assert_field_offset {
         ($l:ident, $r:ident) => {
             assert_eq!(
-                memoffset::offset_of!(FontAtlas, $l),
-                memoffset::offset_of!(ImFontAtlas, $r)
+                core::mem::offset_of!(FontAtlas, $l),
+                core::mem::offset_of!(ImFontAtlas, $r)
             );
         };
     }

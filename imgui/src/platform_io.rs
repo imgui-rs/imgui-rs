@@ -112,8 +112,8 @@ fn test_platform_io_memory_layout() {
     macro_rules! assert_field_offset {
         ($l:ident, $r:ident) => {
             assert_eq!(
-                memoffset::offset_of!(PlatformIo, $l),
-                memoffset::offset_of!(ImGuiPlatformIO, $r)
+                core::mem::offset_of!(PlatformIo, $l),
+                core::mem::offset_of!(ImGuiPlatformIO, $r)
             );
         };
     }
@@ -220,8 +220,8 @@ fn test_viewport_memory_layout() {
     macro_rules! assert_field_offset {
         ($l:ident, $r:ident) => {
             assert_eq!(
-                memoffset::offset_of!(Viewport, $l),
-                memoffset::offset_of!(ImGuiViewport, $r)
+                core::mem::offset_of!(Viewport, $l),
+                core::mem::offset_of!(ImGuiViewport, $r)
             );
         };
     }

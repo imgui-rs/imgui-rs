@@ -377,8 +377,8 @@ fn test_platform_monitor_memory_layout() {
     macro_rules! assert_field_offset {
         ($l:ident, $r:ident) => {
             assert_eq!(
-                memoffset::offset_of!(PlatformMonitor, $l),
-                memoffset::offset_of!(ImGuiPlatformMonitor, $r)
+                core::mem::offset_of!(PlatformMonitor, $l),
+                core::mem::offset_of!(ImGuiPlatformMonitor, $r)
             );
         };
     }

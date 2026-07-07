@@ -1047,8 +1047,8 @@ mod tests {
         macro_rules! assert_field_offset {
             ($l:ident, $r:ident) => {
                 assert_eq!(
-                    memoffset::offset_of!(Style, $l),
-                    memoffset::offset_of!(ImGuiStyle, $r)
+                    core::mem::offset_of!(Style, $l),
+                    core::mem::offset_of!(ImGuiStyle, $r)
                 );
             };
         }

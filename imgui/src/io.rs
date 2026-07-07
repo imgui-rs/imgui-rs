@@ -497,8 +497,8 @@ fn test_io_memory_layout() {
     macro_rules! assert_field_offset {
         ($l:ident, $r:ident) => {
             assert_eq!(
-                memoffset::offset_of!(Io, $l),
-                memoffset::offset_of!(ImGuiIO, $r)
+                core::mem::offset_of!(Io, $l),
+                core::mem::offset_of!(ImGuiIO, $r)
             );
         };
     }
