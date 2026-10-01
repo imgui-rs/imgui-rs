@@ -24,13 +24,15 @@ impl Ui {
     /// Useful for drawing custom shapes with the draw list API.
     #[doc(alias = "FontTexUvWhitePixel")]
     pub fn font_tex_uv_white_pixel(&self) -> [f32; 2] {
-        let mut out = sys::ImVec2::zero();
-        unsafe { sys::igGetFontTexUvWhitePixel(&mut out) };
+        let out = unsafe { sys::igGetFontTexUvWhitePixel() };
         out.into()
     }
-    /// Sets the font scale of the current window
-    #[doc(alias = "SetWindowFontScale")]
-    pub fn set_window_font_scale(&self, scale: f32) {
-        unsafe { sys::igSetWindowFontScale(scale) }
-    }
+    // `set_window_font_scale` was removed here: Dear ImGui 1.92 obsoleted
+    // `ImGui::SetWindowFontScale()` and it is no longer compiled in under
+    // IMGUI_DISABLE_OBSOLETE_FUNCTIONS.
+    //
+    // There is no drop-in replacement. Upstream suggests `PushFont(NULL, style.FontSizeBase *
+    // factor)` for a scoped change, which is push/pop rather than a setter, or
+    // `style.FontScaleMain` to scale every window at once. Picking between those is an API
+    // decision rather than a mechanical port, so it is left for maintainers.
 }

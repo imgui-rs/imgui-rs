@@ -36,7 +36,16 @@ impl Ui {
         let font = fonts
             .get_font(id)
             .expect("Font atlas did not contain the given font");
-        unsafe { sys::igPushFont(font.raw() as *const _ as *mut _) };
+        // 1.92 made the size mandatory. `PushFont(font)` used to mean "use the size this font
+        // was passed to AddFontXXX() with", which 1.92 preserves as `ImFont::LegacySize`.
+        //
+        // The size is read through `sys::ImFont` rather than through `Font`, because `Font` is a
+        // hand-maintained mirror that 1.92's ImFont rework has invalidated. The pointer itself is
+        // still the real font.
+        unsafe {
+            let raw = font.raw() as *const _ as *mut sys::ImFont;
+            sys::igPushFont(raw, (*raw).LegacySize)
+        };
         FontStackToken::new(self)
     }
     /// Changes a style color by pushing a change to the color stack.

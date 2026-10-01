@@ -229,7 +229,10 @@ impl Iterator for DrawCmdIterator<'_> {
         self.iter.next().map(|cmd| {
             let cmd_params = DrawCmdParams {
                 clip_rect: cmd.ClipRect.into(),
-                texture_id: TextureId::from(cmd.TextureId),
+                texture_id: TextureId::from(unsafe {
+                    // Resolves to TexData's id when the ref points at imgui-owned data.
+                    sys::ImTextureRef_GetTexID(&cmd.TexRef as *const _ as *mut _) as usize
+                }),
                 vtx_offset: cmd.VtxOffset as usize,
                 idx_offset: cmd.IdxOffset as usize,
             };
