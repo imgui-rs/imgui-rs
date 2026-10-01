@@ -7,7 +7,7 @@ ImColor_ImColor	5
 5	nil	ImColor_ImColor_U32 (ImU32)
 ImDrawList_AddText	2
 1	void	ImDrawList_AddText_Vec2 (const ImVec2,ImU32,const char*,const char*)
-2	void	ImDrawList_AddText_FontPtr (const ImFont*,float,const ImVec2,ImU32,const char*,const char*,float,const ImVec4*)
+2	void	ImDrawList_AddText_FontPtr (ImFont*,float,const ImVec2,ImU32,const char*,const char*,float,const ImVec4*)
 ImGuiPtrOrIndex_ImGuiPtrOrIndex	2
 1	nil	ImGuiPtrOrIndex_ImGuiPtrOrIndex_Ptr (void*)
 2	nil	ImGuiPtrOrIndex_ImGuiPtrOrIndex_Int (int)
@@ -56,12 +56,18 @@ ImSpan_end	2
 ImSpan_set	2
 1	void	ImSpan_set_Int (T*,int)
 2	void	ImSpan_set_TPtr (T*,T*)
+ImTextureRef_ImTextureRef	2
+1	nil	ImTextureRef_ImTextureRef_Nil ()
+2	nil	ImTextureRef_ImTextureRef_TextureID (ImTextureID)
 ImVec1_ImVec1	2
 1	nil	ImVec1_ImVec1_Nil ()
 2	nil	ImVec1_ImVec1_Float (float)
 ImVec2_ImVec2	2
 1	nil	ImVec2_ImVec2_Nil ()
 2	nil	ImVec2_ImVec2_Float (float,float)
+ImVec2i_ImVec2i	2
+1	nil	ImVec2i_ImVec2i_Nil ()
+2	nil	ImVec2i_ImVec2i_Int (int,int)
 ImVec2ih_ImVec2ih	3
 1	nil	ImVec2ih_ImVec2ih_Nil ()
 2	nil	ImVec2ih_ImVec2ih_short (short,short)
@@ -123,9 +129,15 @@ igGetID	4
 igGetIDWithSeed	2
 1	ImGuiID	igGetIDWithSeed_Str (const char*,const char*,ImGuiID)
 2	ImGuiID	igGetIDWithSeed_Int (int,ImGuiID)
+igGetIO	2
+1	ImGuiIO*	igGetIO_Nil ()
+2	ImGuiIO*	igGetIO_ContextPtr (ImGuiContext*)
 igGetKeyData	2
 1	ImGuiKeyData*	igGetKeyData_ContextPtr (ImGuiContext*,ImGuiKey)
 2	ImGuiKeyData*	igGetKeyData_Key (ImGuiKey)
+igGetPlatformIO	2
+1	ImGuiPlatformIO*	igGetPlatformIO_Nil ()
+2	ImGuiPlatformIO*	igGetPlatformIO_ContextPtr (ImGuiContext*)
 igImAbs	3
 1	int	igImAbs_Int (int)
 2	float	igImAbs_Float (float)
@@ -293,4 +305,4 @@ igValue	4
 2	void	igValue_Int (const char*,int)
 3	void	igValue_Uint (const char*,unsigned int)
 4	void	igValue_Float (const char*,float,const char*)
-205 overloaded
+213 overloaded

@@ -24,16 +24,9 @@ bitflags! {
         /// This is mostly to instruct the backend to fill `io.nav_inputs`. The backend
         /// also needs to set `BackendFlags::HasGamepad`.
         const NAV_ENABLE_GAMEPAD = sys::ImGuiConfigFlags_NavEnableGamepad;
-        /// Instruction navigation to move the mouse cursor.
-        ///
-        /// May be useful on TV/console systems where moving a virtual mouse is awkward.
-        /// Will update `io.mouse_pos` and set `io.want_set_mouse_pos = true`. If enabled,
-        /// you *must* honor `io.want_set_mouse_pos`, or imgui-rs will react as if the mouse is
-        /// jumping around back and forth.
-        const NAV_ENABLE_SET_MOUSE_POS = sys::ImGuiConfigFlags_NavEnableSetMousePos;
-        /// Instruction navigation to not set the `io.want_capture_keyboard` flag when
-        /// `io.nav_active` is set.
-        const NAV_NO_CAPTURE_KEYBOARD = sys::ImGuiConfigFlags_NavNoCaptureKeyboard;
+        // NAV_ENABLE_SET_MOUSE_POS and NAV_NO_CAPTURE_KEYBOARD were moved out of ImGuiConfigFlags
+        // in Dear ImGui 1.91.4. They are now the `Io::config_nav_move_set_mouse_pos` and
+        // `Io::config_nav_capture_keyboard` booleans (the latter with inverted meaning).
         /// Instruction imgui-rs to clear mouse position/buttons in `frame()`.
         ///
         /// This allows ignoring the mouse information set by the backend.
@@ -100,7 +93,7 @@ bitflags! {
         const HAS_MOUSE_CURSORS = sys::ImGuiBackendFlags_HasMouseCursors;
         /// Backend supports `io.want_set_mouse_pos` requests to reposition the OS mouse position.
         ///
-        /// Only used if `ConfigFlags::NavEnableSetMousePos` is set.
+        /// Only used if `Io::config_nav_move_set_mouse_pos` is set.
         const HAS_SET_MOUSE_POS = sys::ImGuiBackendFlags_HasSetMousePos;
         /// Backend renderer supports DrawCmd::vtx_offset.
         ///
@@ -287,7 +280,7 @@ pub struct Io {
     /// Mouse position has been altered, so the backend should reposition the mouse on the next
     /// frame.
     ///
-    /// Set only when `ConfigFlags::NavEnableSetMousePos` is enabled.
+    /// Set only when `Io::config_nav_move_set_mouse_pos` is enabled.
     pub want_set_mouse_pos: bool,
     /// When manual .ini load/save is active (`ini_filename` is `None`), this will be set to notify
     /// your application that you can call `save_ini_settings` and save the settings yourself.
@@ -564,10 +557,7 @@ fn test_io_memory_layout() {
                 config_windows_move_from_title_bar_only,
                 ConfigWindowsMoveFromTitleBarOnly
             );
-            assert_field_offset!(
-                config_scrollbar_scroll_by_page,
-                ConfigScrollbarScrollByPage
-            );
+            assert_field_offset!(config_scrollbar_scroll_by_page, ConfigScrollbarScrollByPage);
             assert_field_offset!(backend_platform_name, BackendPlatformName);
             assert_field_offset!(backend_renderer_name, BackendRendererName);
             assert_field_offset!(backend_platform_user_data, BackendPlatformUserData);

@@ -401,6 +401,8 @@ pub enum StyleColor {
     ResizeGripHovered = sys::ImGuiCol_ResizeGripHovered,
     /// Resize handle when mouse button down
     ResizeGripActive = sys::ImGuiCol_ResizeGripActive,
+    /// Color of the cursor/caret in a text input
+    InputTextCursor = sys::ImGuiCol_InputTextCursor,
     /// Hovered tab (applies regardless if tab is active, or is in the active window)
     TabHovered = sys::ImGuiCol_TabHovered,
     /// Inactive tab color. Applies to both tab widgets and docked windows
@@ -447,11 +449,15 @@ pub enum StyleColor {
     TextLink = sys::ImGuiCol_TextLink,
     /// The highlight color used for selection in text inputs
     TextSelectedBg = sys::ImGuiCol_TextSelectedBg,
+    /// Tree node hierarchy outlines when drawn
+    TreeLines = sys::ImGuiCol_TreeLines,
 
     /// Used for drag-and-drop system
     DragDropTarget = sys::ImGuiCol_DragDropTarget,
+    DragDropTargetBg = sys::ImGuiCol_DragDropTargetBg,
+    UnsavedMarker = sys::ImGuiCol_UnsavedMarker,
     /// Gamepad/keyboard: current highlighted item
-    NavHighlight = sys::ImGuiCol_NavHighlight,
+    NavCursor = sys::ImGuiCol_NavCursor,
     /// Highlight window when using CTRL+TAB
     NavWindowingHighlight = sys::ImGuiCol_NavWindowingHighlight,
     /// Darken/colorize entire screen behind the CTRL+TAB window list, when active
@@ -496,6 +502,7 @@ impl StyleColor {
         StyleColor::ResizeGrip,
         StyleColor::ResizeGripHovered,
         StyleColor::ResizeGripActive,
+        StyleColor::InputTextCursor,
         StyleColor::TabHovered,
         StyleColor::Tab,
         StyleColor::TabSelected,
@@ -518,8 +525,11 @@ impl StyleColor {
         StyleColor::TableRowBgAlt,
         StyleColor::TextLink,
         StyleColor::TextSelectedBg,
+        StyleColor::TreeLines,
         StyleColor::DragDropTarget,
-        StyleColor::NavHighlight,
+        StyleColor::DragDropTargetBg,
+        StyleColor::UnsavedMarker,
+        StyleColor::NavCursor,
         StyleColor::NavWindowingHighlight,
         StyleColor::NavWindowingDimBg,
         StyleColor::ModalWindowDimBg,
@@ -566,6 +576,7 @@ impl StyleColor {
             StyleColor::ResizeGrip => "ResizeGrip",
             StyleColor::ResizeGripHovered => "ResizeGripHovered",
             StyleColor::ResizeGripActive => "ResizeGripActive",
+            StyleColor::InputTextCursor => "InputTextCursor",
             StyleColor::Tab => "Tab",
             StyleColor::TabHovered => "TabHovered",
             StyleColor::TabSelected => "TabSelected",
@@ -581,8 +592,11 @@ impl StyleColor {
             StyleColor::TableRowBg => "TableRowBg",
             StyleColor::TableRowBgAlt => "TableRowBgAlt",
             StyleColor::TextSelectedBg => "TextSelectedBg",
+            StyleColor::TreeLines => "TreeLines",
             StyleColor::DragDropTarget => "DragDropTarget",
-            StyleColor::NavHighlight => "NavHighlight",
+            StyleColor::DragDropTargetBg => "DragDropTargetBg",
+            StyleColor::UnsavedMarker => "UnsavedMarker",
+            StyleColor::NavCursor => "NavCursor",
             StyleColor::NavWindowingHighlight => "NavWindowingHighlight",
             StyleColor::NavWindowingDimBg => "NavWindowingDimBg",
             StyleColor::ModalWindowDimBg => "ModalWindowDimBg",
@@ -670,7 +684,7 @@ impl StyleColor {
         colors[Self::TextLink as usize] = colors[Self::HeaderActive as usize];
         colors[Self::TextSelectedBg as usize] = [0.26, 0.59, 0.98, 0.35];
         colors[Self::DragDropTarget as usize] = [1.00, 1.00, 0.00, 0.90];
-        colors[Self::NavHighlight as usize] = [0.26, 0.59, 0.98, 1.00];
+        colors[Self::NavCursor as usize] = [0.26, 0.59, 0.98, 1.00];
         colors[Self::NavWindowingHighlight as usize] = [1.00, 1.00, 1.00, 0.70];
         colors[Self::NavWindowingDimBg as usize] = [0.80, 0.80, 0.80, 0.20];
         colors[Self::ModalWindowDimBg as usize] = [0.80, 0.80, 0.80, 0.35];
@@ -763,7 +777,7 @@ impl StyleColor {
         colors[Self::TextLink as usize] = colors[Self::HeaderActive as usize];
         colors[Self::TextSelectedBg as usize] = [0.26, 0.59, 0.98, 0.35];
         colors[Self::DragDropTarget as usize] = [0.26, 0.59, 0.98, 0.95];
-        colors[Self::NavHighlight as usize] = colors[Self::HeaderHovered as usize];
+        colors[Self::NavCursor as usize] = colors[Self::HeaderHovered as usize];
         colors[Self::NavWindowingHighlight as usize] = [0.70, 0.70, 0.70, 0.70];
         colors[Self::NavWindowingDimBg as usize] = [0.20, 0.20, 0.20, 0.20];
         colors[Self::ModalWindowDimBg as usize] = [0.20, 0.20, 0.20, 0.35];
@@ -857,7 +871,7 @@ impl StyleColor {
         colors[Self::TextLink as usize] = colors[Self::HeaderActive as usize];
         colors[Self::TextSelectedBg as usize] = [0.00, 0.00, 1.00, 0.35];
         colors[Self::DragDropTarget as usize] = [1.00, 1.00, 0.00, 0.90];
-        colors[Self::NavHighlight as usize] = colors[Self::HeaderHovered as usize];
+        colors[Self::NavCursor as usize] = colors[Self::HeaderHovered as usize];
         colors[Self::NavWindowingHighlight as usize] = [1.00, 1.00, 1.00, 0.70];
         colors[Self::NavWindowingDimBg as usize] = [0.80, 0.80, 0.80, 0.20];
         colors[Self::ModalWindowDimBg as usize] = [0.20, 0.20, 0.20, 0.35];

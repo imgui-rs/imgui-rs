@@ -38,13 +38,21 @@ impl Bindgen {
                     (var, Some(f)) => format!("{}_{}_bindings.rs", var, f),
                 };
 
-                generate_binding_file(&header, &output.join(&output_name), &types, &funcs, None)?;
+                generate_binding_file(
+                    &header,
+                    &output.join(&output_name),
+                    &types,
+                    &funcs,
+                    None,
+                    flag.is_some(),
+                )?;
                 generate_binding_file(
                     &header,
                     &output.join(format!("wasm_{}", &output_name)),
                     &types,
                     &funcs,
                     Some(&wasm_name),
+                    flag.is_some(),
                 )?;
             }
         }
@@ -113,10 +121,10 @@ fn generate_binding_file(
     types: &[String],
     funcs: &[String],
     wasm_import_mod: Option<&str>,
+    freetype: bool,
 ) -> Result<()> {
     let mut cmd = std::process::Command::new("bindgen");
     let a = &[
-        "--size_t-is-usize",
         "--no-prepend-enum-name",
         "--no-doc-comments",
         // Layout tests aren't portable (they hardcode type sizes), and for
@@ -134,7 +142,7 @@ fn generate_binding_file(
     cmd.args(["--blocklist-type", "__darwin_size_t"]);
     cmd.args(["--raw-line", "#![allow(nonstandard_style, clippy::all)]"]);
     cmd.arg("--output").arg(output);
-    cmd.args(["--ctypes-prefix", "cty"]);
+    cmd.args(["--ctypes-prefix", "core::ffi"]);
 
     if let Some(name) = wasm_import_mod {
         cmd.args(["--wasm-import-module-name", name]);
@@ -146,7 +154,18 @@ fn generate_binding_file(
         cmd.args(["--allowlist-function", f]);
     }
     cmd.arg(header);
-    cmd.args(["--", "-DCIMGUI_DEFINE_ENUMS_AND_STRUCTS=1"]);
+    // As of 1.92, cimgui leaves these as `#ifdef`s in the generated header rather than
+    // resolving them while generating, so they have to match what imgui-sys/build.rs
+    // compiles the C++ with -- `IMGUI_USE_WCHAR32` in particular decides whether `ImWchar`
+    // binds as 32- or 16-bit.
+    cmd.args([
+        "--",
+        "-DCIMGUI_DEFINE_ENUMS_AND_STRUCTS=1",
+        "-DIMGUI_USE_WCHAR32",
+    ]);
+    if freetype {
+        cmd.arg("-DIMGUI_ENABLE_FREETYPE");
+    }
     eprintln!("Executing bindgen [output = {}]", output.display());
     let status = cmd.status().context("Failed to execute bindgen")?;
     if !status.success() {

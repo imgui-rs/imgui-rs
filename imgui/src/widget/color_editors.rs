@@ -139,11 +139,16 @@ bitflags! {
 
         /// ColorEdit, ColorPicker: show vertical alpha bar/gradient in picker.
         const ALPHA_BAR = sys::ImGuiColorEditFlags_AlphaBar;
-        /// ColorEdit, ColorPicker, ColorButton: display preview as a transparent color over a
-        /// checkerboard, instead of opaque.
-        const ALPHA_PREVIEW = sys::ImGuiColorEditFlags_AlphaPreview;
-        /// ColorEdit, ColorPicker, ColorButton: display half opaque / half checkerboard, instead
-        /// of opaque.
+        /// ColorEdit, ColorPicker, ColorButton: disable alpha in the preview.
+        ///
+        /// Since Dear ImGui 1.91.8 the preview is transparent by default, so this is what
+        /// restores the old opaque rendering. Contrary to `ColorEditFlags::NO_ALPHA` the alpha
+        /// component may still be edited by `color_edit4`/`color_picker4`.
+        const ALPHA_OPAQUE = sys::ImGuiColorEditFlags_AlphaOpaque;
+        /// ColorEdit, ColorPicker, ColorButton: disable rendering a checkerboard background
+        /// behind a transparent color.
+        const ALPHA_NO_BG = sys::ImGuiColorEditFlags_AlphaNoBg;
+        /// ColorEdit, ColorPicker, ColorButton: display half opaque / half transparent preview.
         const ALPHA_PREVIEW_HALF = sys::ImGuiColorEditFlags_AlphaPreviewHalf;
         /// (WIP) ColorEdit: Currently onlys disable 0.0f..1.0f limits in RGBA editing (note: you
         /// probably want to use `ColorEditFlags::FLOAT` as well).
@@ -271,9 +276,11 @@ where
             ColorEditFlags::ALPHA_PREVIEW_HALF,
             preview == ColorPreview::HalfAlpha,
         );
+        // Since 1.91.8 a transparent preview is the default, so `Alpha` is the absence of a
+        // flag and `Opaque` is the one that has to be requested explicitly.
         self.flags.set(
-            ColorEditFlags::ALPHA_PREVIEW,
-            preview == ColorPreview::Alpha,
+            ColorEditFlags::ALPHA_OPAQUE,
+            preview == ColorPreview::Opaque,
         );
         self
     }
@@ -491,9 +498,11 @@ where
             ColorEditFlags::ALPHA_PREVIEW_HALF,
             preview == ColorPreview::HalfAlpha,
         );
+        // Since 1.91.8 a transparent preview is the default, so `Alpha` is the absence of a
+        // flag and `Opaque` is the one that has to be requested explicitly.
         self.flags.set(
-            ColorEditFlags::ALPHA_PREVIEW,
-            preview == ColorPreview::Alpha,
+            ColorEditFlags::ALPHA_OPAQUE,
+            preview == ColorPreview::Opaque,
         );
         self
     }
@@ -709,9 +718,11 @@ where
             ColorEditFlags::ALPHA_PREVIEW_HALF,
             preview == ColorPreview::HalfAlpha,
         );
+        // Since 1.91.8 a transparent preview is the default, so `Alpha` is the absence of a
+        // flag and `Opaque` is the one that has to be requested explicitly.
         self.flags.set(
-            ColorEditFlags::ALPHA_PREVIEW,
-            preview == ColorPreview::Alpha,
+            ColorEditFlags::ALPHA_OPAQUE,
+            preview == ColorPreview::Opaque,
         );
         self
     }
@@ -934,9 +945,11 @@ where
             ColorEditFlags::ALPHA_PREVIEW_HALF,
             preview == ColorPreview::HalfAlpha,
         );
+        // Since 1.91.8 a transparent preview is the default, so `Alpha` is the absence of a
+        // flag and `Opaque` is the one that has to be requested explicitly.
         self.flags.set(
-            ColorEditFlags::ALPHA_PREVIEW,
-            preview == ColorPreview::Alpha,
+            ColorEditFlags::ALPHA_OPAQUE,
+            preview == ColorPreview::Opaque,
         );
         self
     }
@@ -1125,9 +1138,11 @@ impl<'ui, T: AsRef<str>> ColorButton<'ui, T> {
             ColorEditFlags::ALPHA_PREVIEW_HALF,
             preview == ColorPreview::HalfAlpha,
         );
+        // Since 1.91.8 a transparent preview is the default, so `Alpha` is the absence of a
+        // flag and `Opaque` is the one that has to be requested explicitly.
         self.flags.set(
-            ColorEditFlags::ALPHA_PREVIEW,
-            preview == ColorPreview::Alpha,
+            ColorEditFlags::ALPHA_OPAQUE,
+            preview == ColorPreview::Opaque,
         );
         self
     }

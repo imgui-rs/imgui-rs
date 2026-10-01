@@ -61,6 +61,10 @@ pub enum MouseCursor {
     /// When hovering something with disallowed interactions.
     ///
     /// Usually a crossed circle.
+    /// When waiting for something to finish, blocking user input.
+    Wait = sys::ImGuiMouseCursor_Wait,
+    /// When waiting for something to finish, allowing user input.
+    Progress = sys::ImGuiMouseCursor_Progress,
     NotAllowed = sys::ImGuiMouseCursor_NotAllowed,
 }
 
@@ -75,6 +79,8 @@ impl MouseCursor {
         MouseCursor::ResizeNESW,
         MouseCursor::ResizeNWSE,
         MouseCursor::Hand,
+        MouseCursor::Wait,
+        MouseCursor::Progress,
         MouseCursor::NotAllowed,
     ];
     /// Total count of `MouseCursor` variants
@@ -191,8 +197,7 @@ impl Ui {
     /// Returns the mouse position backed up at the time of opening a popup
     #[doc(alias = "GetMousePosOnOpeningCurrentPopup")]
     pub fn mouse_pos_on_opening_current_popup(&self) -> [f32; 2] {
-        let mut out = sys::ImVec2::zero();
-        unsafe { sys::igGetMousePosOnOpeningCurrentPopup(&mut out) };
+        let out = unsafe { sys::igGetMousePosOnOpeningCurrentPopup() };
         out.into()
     }
 
@@ -226,8 +231,7 @@ impl Ui {
     /// (`io.mouse_drag_threshold`).
     #[doc(alias = "GetMouseDragDelta")]
     pub fn mouse_drag_delta_with_threshold(&self, button: MouseButton, threshold: f32) -> [f32; 2] {
-        let mut out = sys::ImVec2::zero();
-        unsafe { sys::igGetMouseDragDelta(&mut out, button as i32, threshold) };
+        let out = unsafe { sys::igGetMouseDragDelta(button as i32, threshold) };
         out.into()
     }
     /// Resets the current delta from initial clicking position.
@@ -251,6 +255,8 @@ impl Ui {
             sys::ImGuiMouseCursor_ResizeNESW => Some(MouseCursor::ResizeNESW),
             sys::ImGuiMouseCursor_ResizeNWSE => Some(MouseCursor::ResizeNWSE),
             sys::ImGuiMouseCursor_Hand => Some(MouseCursor::Hand),
+            sys::ImGuiMouseCursor_Wait => Some(MouseCursor::Wait),
+            sys::ImGuiMouseCursor_Progress => Some(MouseCursor::Progress),
             sys::ImGuiMouseCursor_NotAllowed => Some(MouseCursor::NotAllowed),
             _ => None,
         }

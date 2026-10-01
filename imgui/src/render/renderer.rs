@@ -6,6 +6,19 @@ use std::collections::HashMap;
 pub struct TextureId(usize);
 
 impl TextureId {
+    /// Converts to the `ImTextureRef` that Dear ImGui 1.92 takes in place of a bare
+    /// `ImTextureID`.
+    ///
+    /// A ref is either a backend texture id or a pointer to imgui-owned texture data; a
+    /// `TextureId` is always the former, so the data pointer stays null.
+    #[inline]
+    pub(crate) fn as_tex_ref(self) -> crate::sys::ImTextureRef {
+        crate::sys::ImTextureRef {
+            _TexData: std::ptr::null_mut(),
+            _TexID: self.0 as crate::sys::ImTextureID,
+        }
+    }
+
     /// Creates a new texture id with the given identifier.
     #[inline]
     pub const fn new(id: usize) -> Self {

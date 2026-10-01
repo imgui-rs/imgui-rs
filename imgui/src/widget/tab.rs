@@ -31,7 +31,7 @@ bitflags! {
         const NO_CLOSE_WITH_MIDDLE_MOUSE_BUTTON = sys::ImGuiTabBarFlags_NoCloseWithMiddleMouseButton;
         const NO_TAB_LIST_SCROLLING_BUTTONS = sys::ImGuiTabBarFlags_NoTabListScrollingButtons;
         const NO_TOOLTIP = sys::ImGuiTabBarFlags_NoTooltip;
-        const FITTING_POLICY_RESIZE_DOWN = sys::ImGuiTabBarFlags_FittingPolicyResizeDown;
+        const FITTING_POLICY_SHRINK = sys::ImGuiTabBarFlags_FittingPolicyShrink;
         const FITTING_POLICY_SCROLL = sys::ImGuiTabBarFlags_FittingPolicyScroll;
         const FITTING_POLICY_MASK = sys::ImGuiTabBarFlags_FittingPolicyMask_;
         const FITTING_POLICY_DEFAULT = sys::ImGuiTabBarFlags_FittingPolicyDefault_;

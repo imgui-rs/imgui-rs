@@ -912,15 +912,13 @@ impl<'ui> Ui {
         hide_text_after_double_hash: bool,
         wrap_width: f32,
     ) -> [f32; 2] {
-        let mut out = sys::ImVec2::zero();
         let text = text.as_ref();
 
-        unsafe {
+        let out = unsafe {
             let start = text.as_ptr();
             let end = start.add(text.len());
 
             sys::igCalcTextSize(
-                &mut out,
                 start as *const c_char,
                 end as *const c_char,
                 hide_text_after_double_hash,

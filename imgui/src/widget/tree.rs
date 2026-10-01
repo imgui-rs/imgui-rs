@@ -48,7 +48,7 @@ bitflags!(
         /// Extend hit box to the left-most and right-most edges (bypass the indented area)
         const SPAN_FULL_WIDTH = sys::ImGuiTreeNodeFlags_SpanFullWidth;
         /// (WIP) Nav: left direction may move to this tree node from any of its child
-        const NAV_LEFT_JUMPS_BACK_HERE = sys::ImGuiTreeNodeFlags_NavLeftJumpsBackHere;
+        const NAV_LEFT_JUMPS_TO_PARENT = sys::ImGuiTreeNodeFlags_NavLeftJumpsToParent;
     }
 );
 
@@ -269,9 +269,9 @@ impl<'a, T: AsRef<str>, L: AsRef<str>> TreeNode<'a, T, L> {
     /// Left direction may move to this tree node from any of its child.
     ///
     /// Disabled by default.
-    pub fn nav_left_jumps_back_here(mut self, value: bool) -> Self {
+    pub fn nav_left_jumps_to_parent(mut self, value: bool) -> Self {
         self.flags
-            .set(TreeNodeFlags::NAV_LEFT_JUMPS_BACK_HERE, value);
+            .set(TreeNodeFlags::NAV_LEFT_JUMPS_TO_PARENT, value);
         self
     }
 
