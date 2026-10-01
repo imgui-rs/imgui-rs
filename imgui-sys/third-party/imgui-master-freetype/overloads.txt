@@ -7,7 +7,7 @@ ImColor_ImColor	5
 5	nil	ImColor_ImColor_U32 (ImU32)
 ImDrawList_AddText	2
 1	void	ImDrawList_AddText_Vec2 (const ImVec2,ImU32,const char*,const char*)
-2	void	ImDrawList_AddText_FontPtr (const ImFont*,float,const ImVec2,ImU32,const char*,const char*,float,const ImVec4*)
+2	void	ImDrawList_AddText_FontPtr (ImFont*,float,const ImVec2,ImU32,const char*,const char*,float,const ImVec4*)
 ImGuiStoragePair_ImGuiStoragePair	3
 1	nil	ImGuiStoragePair_ImGuiStoragePair_Int (ImGuiID,int)
 2	nil	ImGuiStoragePair_ImGuiStoragePair_Float (ImGuiID,float)
@@ -15,6 +15,9 @@ ImGuiStoragePair_ImGuiStoragePair	3
 ImGuiTextRange_ImGuiTextRange	2
 1	nil	ImGuiTextRange_ImGuiTextRange_Nil ()
 2	nil	ImGuiTextRange_ImGuiTextRange_Str (const char*,const char*)
+ImTextureRef_ImTextureRef	2
+1	nil	ImTextureRef_ImTextureRef_Nil ()
+2	nil	ImTextureRef_ImTextureRef_TextureID (ImTextureID)
 ImVec2_ImVec2	2
 1	nil	ImVec2_ImVec2_Nil ()
 2	nil	ImVec2_ImVec2_Float (float,float)
@@ -136,4 +139,4 @@ igValue	4
 2	void	igValue_Int (const char*,int)
 3	void	igValue_Uint (const char*,unsigned int)
 4	void	igValue_Float (const char*,float,const char*)
-96 overloaded
+98 overloaded
